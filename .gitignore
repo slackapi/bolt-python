@@ -1,0 +1,36 @@
+# general things to ignore
+build/
+dist/
+docs/_sources/
+docs/.doctrees
+.eggs/
+*.egg-info/
+*.egg
+*.py[cod]
+__pycache__/
+*.so
+*~
+
+# virtualenv
+env*/
+venv/
+
+# codecov / coverage
+.coverage
+cov_*
+coverage.xml
+
+# due to using tox and pytest
+.tox
+.cache
+.pytest_cache/
+.python-version
+pip
+.mypy_cache/
+
+# JetBrains PyCharm settings
+.idea/
+
+tmp.txt
+.DS_Store
+logs/
