@@ -37,7 +37,7 @@ class SingleTeamAuthorization(Middleware):
             self.logger.error(f"Failed to authorize with the given token ({e})")
             return BoltResponse(status=401, body=":x: Please install this app into the workspace :bow:")
 
-
+# TODO: implement this
 class MultiTeamsAuthorization(Middleware):
     def __init__(self):
         self.logger = get_bolt_logger(MultiTeamsAuthorization)

@@ -25,7 +25,7 @@ setuptools.setup(
     setup_requires=["pytest-runner==5.2"],
     tests_require=["pytest==3.8.2"],
     install_requires=[
-        "slackclient==2.6.2", # TODO: 2.7.0 & will be replaced with slack_sdk==3.0.0
+        "slackclient==2.7.0", # TODO: will be replaced with slack_sdk==3.0.0
     ],
     # used only under src/slack_bolt/adapter
     extra_requires=[
