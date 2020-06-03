@@ -8,8 +8,8 @@ A Python framework to build Slack apps in a flash with the latest platform featu
 python -m venv env
 source env/bin/activate
 pip install -U pip
-pip install slackclient==2.6.2
-pip install -i https://test.pypi.org/simple/ slack_bolt==0.1.0
+pip install slackclient==2.7.0
+pip install -i https://test.pypi.org/simple/ slack_bolt==0.1.1
 ```
 
 ## First Bolt App
