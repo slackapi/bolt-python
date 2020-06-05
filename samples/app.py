@@ -1,5 +1,5 @@
 # ------------------------------------------------
-# instead of slack_bolt==0.1.0 in requirements.txt
+# instead of slack_bolt in requirements.txt
 import sys
 
 sys.path.insert(1, "../src")
@@ -122,7 +122,8 @@ def new_message(ack, logger, payload, say):
 if __name__ == '__main__':
     app.start(3000)
 
-# pip install -r requirements.txt
+# pip install slackclient
+# pip install -i https://test.pypi.org/simple/ slack_bolt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
-# python app.python
+# python app.py

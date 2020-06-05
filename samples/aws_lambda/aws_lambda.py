@@ -1,5 +1,5 @@
 # ------------------------------------------------
-# instead of slack_bolt==0.1.0 in requirements.txt
+# instead of slack_bolt in requirements.txt
 import sys
 
 sys.path.insert(1, "src")
