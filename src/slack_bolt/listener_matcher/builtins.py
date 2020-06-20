@@ -1,5 +1,8 @@
 import inspect
-from re import Pattern
+try:
+    from re import Pattern
+except ImportError:
+    from re import _pattern_type as Pattern
 from typing import Callable
 from typing import Union, Optional, Dict
 
