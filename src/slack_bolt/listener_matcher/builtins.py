@@ -1,8 +1,9 @@
 import inspect
-try:
-    from re import Pattern
-except ImportError:
+import sys
+if sys.version_info.major == 3 and sys.version_info.minor <= 6:
     from re import _pattern_type as Pattern
+else:
+    from re import Pattern
 from typing import Callable
 from typing import Union, Optional, Dict
 
