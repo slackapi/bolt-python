@@ -1,24 +1,25 @@
 from typing import Callable
 
-from slack_bolt.listener import Listener
 from slack_bolt.logger import get_bolt_logger
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
+from .middleware import Middleware
 
 
-class UrlVerificationListener(Listener):
+class UrlVerification(Middleware):
     def __init__(self):
-        self.logger = get_bolt_logger(UrlVerificationListener)
+        self.logger = get_bolt_logger(UrlVerification)
 
-    def __call__(
+    def process(
         self,
         *,
         req: BoltRequest,
         resp: BoltResponse,
-        done: Callable[[], None]) -> BoltResponse:
-
+        next: Callable[[], BoltResponse],
+    ) -> BoltResponse:
         if req.payload and req.payload.get("type", None) == "url_verification":
-            done()
             return BoltResponse(status=200, body={"challenge": req.payload.get("challenge")})
         else:
-            return resp
+            return next()
+        if self.can_skip(req.payload):
+            return next()

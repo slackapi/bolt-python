@@ -10,7 +10,6 @@ from typing import List, Union, Pattern, Callable, Dict, Optional
 
 from slack_bolt.listener.custom_listener import CustomListener
 from slack_bolt.listener.listener import Listener
-from slack_bolt.listener.url_verification import UrlVerificationListener
 from slack_bolt.listener_matcher import CustomListenerMatcher
 from slack_bolt.listener_matcher import builtins as builtin_matchers
 from slack_bolt.listener_matcher.listener_matcher import ListenerMatcher
@@ -23,6 +22,7 @@ from slack_bolt.middleware import \
     MultiTeamsAuthorization, \
     IgnoringSelfEvents, \
     CustomMiddleware
+from slack_bolt.middleware.url_verification import UrlVerification
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk import WebClient
@@ -67,12 +67,12 @@ class App():
         else:
             self._middleware_list.append(MultiTeamsAuthorization())  # TODO
         self._middleware_list.append(IgnoringSelfEvents())
+        self._middleware_list.append(UrlVerification())
         self._init_middleware_list_done = True
 
     def _init_listeners(self):
         if self._init_listeners_done:
             return
-        self._listeners.append(UrlVerificationListener())
         self._init_listeners_done = True
 
     # -------------------------
