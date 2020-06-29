@@ -21,5 +21,3 @@ class UrlVerification(Middleware):
             return BoltResponse(status=200, body={"challenge": req.payload.get("challenge")})
         else:
             return next()
-        if self.can_skip(req.payload):
-            return next()
