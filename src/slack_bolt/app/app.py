@@ -325,7 +325,7 @@ class SlackAppServer:
                 self.wfile.write(body_bytes)
                 return
 
-        self.server = HTTPServer(('localhost', self.port), SlackAppHandler)
+        self.server = HTTPServer(('0.0.0.0', self.port), SlackAppHandler)
 
     def start(self):
         print("⚡️ Bolt app is running!")
