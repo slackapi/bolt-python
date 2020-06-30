@@ -302,7 +302,7 @@ class SlackAppServer:
             default_request_version = "HTTP/1.1"
 
             def do_POST(self):
-                if _path != self.path.split('?')[0]:
+                if _path != self.path.split("?")[0]:
                     self.send_response(404)
                     return
 
