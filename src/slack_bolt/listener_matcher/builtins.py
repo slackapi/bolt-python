@@ -1,5 +1,6 @@
 import inspect
 import sys
+
 if sys.version_info.major == 3 and sys.version_info.minor <= 6:
     from re import _pattern_type as Pattern
 else:
@@ -39,6 +40,10 @@ class BuiltinListenerMatcher(ListenerMatcher):
 
 
 def event(constraints: Union[str, Pattern, Dict[str, str]]) -> ListenerMatcher:
+    if constraints == "message":
+        # matches message events that don't have subtype in payload
+        constraints = {"type": "message", "subtype": None}
+
     if isinstance(constraints, (str, Pattern)):
         event_type: Union[str, Pattern] = constraints
 
@@ -52,16 +57,17 @@ def event(constraints: Union[str, Pattern, Dict[str, str]]) -> ListenerMatcher:
         def func(payload: dict) -> bool:
             if _is_valid_event_payload(payload):
                 event = payload["event"]
-                expected_type = constraints["type"]
-                expected_subtype = constraints["subtype"] if "subtype" in constraints else None
-                if expected_subtype:
-                    return "subtype" in event \
-                           and _matches(expected_type, event["type"]) \
-                           and _matches(expected_subtype, event["subtype"])
-                else:
-                    return _matches(expected_type, event["type"])
-            else:
-                return False
+                if not _matches(constraints["type"], event["type"]):
+                    return False
+                if "subtype" in constraints:
+                    expected_subtype = constraints["subtype"]
+                    if expected_subtype is None:
+                        # "subtype" in constraints is intentionally None for this pattern
+                        return "subtype" not in event
+                    else:
+                        return "subtype" in event and _matches(expected_subtype, event["subtype"])
+                return True
+            return False
 
         return BuiltinListenerMatcher(func=func)
 

@@ -47,7 +47,7 @@ class App():
         self._client = WebClient(token=token)  # TODO pooling per token
         self._framework_logger = get_bolt_logger(App)
 
-        self._middleware_list: List[Middleware] = []
+        self._middleware_list: List[Union[Callable, Middleware]] = []
         self._listeners: List[Listener] = []
         self._listener_executor = ThreadPoolExecutor(max_workers=5)  # TODO: shutdown
         self._process_before_response = process_before_response
@@ -106,6 +106,13 @@ class App():
             if listener.matches(req=req, resp=resp):
                 listener_name = listener.func.__name__
                 self._framework_logger.debug(f"Starting listener: {listener_name}")
+                # run all the middleware attached to this listener first
+                resp, terminated = listener.run_middleware(req=req, resp=resp)
+                if terminated:
+                    # One of the middleware indicated we should return the response immediately
+                    # and stop running the listener for some reason
+                    return resp
+
                 ack = req.context.ack
                 starting_time = time.time()
                 if self._process_before_response:
@@ -150,20 +157,30 @@ class App():
     # -------------------------
     # events
 
-    def event(self, event_type: Union[str, Pattern], matchers: List[Callable[..., bool]] = []):
+    def event(
+        self,
+        event: Union[str, Pattern, Dict[str, str]],
+        matchers: List[Callable[..., bool]] = [],
+        middleware: List[Union[Callable, Middleware]] = [],
+    ):
         def __call__(func):
-            primary_matcher = builtin_matchers.event(event_type)
-            return self._register_listener(func, primary_matcher, matchers)
+            primary_matcher = builtin_matchers.event(event)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
 
     # -------------------------
     # slash commands
 
-    def command(self, command: Union[str, Pattern], matchers: List[Callable[..., bool]] = []):
+    def command(
+        self,
+        command: Union[str, Pattern],
+        matchers: List[Callable[..., bool]] = [],
+        middleware: List[Union[Callable, Middleware]] = [],
+    ):
         def __call__(func):
             primary_matcher = builtin_matchers.command(command)
-            return self._register_listener(func, primary_matcher, matchers)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -173,30 +190,36 @@ class App():
     def shortcut(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: List[Callable[..., bool]] = []):
+        matchers: List[Callable[..., bool]] = [],
+        middleware: List[Union[Callable, Middleware]] = [],
+    ):
         def __call__(func):
             primary_matcher = builtin_matchers.shortcut(constraints)
-            return self._register_listener(func, primary_matcher, matchers)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
 
     def global_shortcut(
         self,
         callback_id: Union[str, Pattern],
-        matchers: List[Callable[..., bool]] = []):
+        matchers: List[Callable[..., bool]] = [],
+        middleware: List[Union[Callable, Middleware]] = [],
+    ):
         def __call__(func):
             primary_matcher = builtin_matchers.global_shortcut(callback_id)
-            return self._register_listener(func, primary_matcher, matchers)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
 
     def message_shortcut(
         self,
         callback_id: Union[str, Pattern],
-        matchers: List[Callable[..., bool]] = []):
+        matchers: List[Callable[..., bool]] = [],
+        middleware: List[Union[Callable, Middleware]] = [],
+    ):
         def __call__(func):
             primary_matcher = builtin_matchers.message_shortcut(callback_id)
-            return self._register_listener(func, primary_matcher, matchers)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -206,17 +229,24 @@ class App():
     def action(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: List[Callable[..., bool]] = []):
+        matchers: List[Callable[..., bool]] = [],
+        middleware: List[Union[Callable, Middleware]] = [],
+    ):
         def __call__(func):
             primary_matcher = builtin_matchers.action(constraints)
-            return self._register_listener(func, primary_matcher, matchers)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
 
-    def block_action(self, action_id: Union[str, Pattern], matchers: List[Callable[..., bool]] = []):
+    def block_action(
+        self,
+        action_id: Union[str, Pattern],
+        matchers: List[Callable[..., bool]] = [],
+        middleware: List[Union[Callable, Middleware]] = [],
+    ):
         def __call__(func):
             primary_matcher = builtin_matchers.block_action(action_id)
-            return self._register_listener(func, primary_matcher, matchers)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -226,10 +256,12 @@ class App():
     def view(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: List[Callable[..., bool]] = []):
+        matchers: List[Callable[..., bool]] = [],
+        middleware: List[Union[Callable, Middleware]] = [],
+    ):
         def __call__(func):
             primary_matcher = builtin_matchers.view(constraints)
-            return self._register_listener(func, primary_matcher, matchers)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -239,30 +271,36 @@ class App():
     def options(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: List[Callable[..., bool]] = []):
+        matchers: List[Callable[..., bool]] = [],
+        middleware: List[Union[Callable, Middleware]] = [],
+    ):
         def __call__(func):
             primary_matcher = builtin_matchers.options(constraints)
-            return self._register_listener(func, primary_matcher, matchers)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
 
     def block_suggestion(
         self,
         action_id: Union[str, Pattern],
-        matchers: List[Callable[..., bool]] = []):
+        matchers: List[Callable[..., bool]] = [],
+        middleware: List[Union[Callable, Middleware]] = [],
+    ):
         def __call__(func):
             primary_matcher = builtin_matchers.block_suggestion(action_id)
-            return self._register_listener(func, primary_matcher, matchers)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
 
     def dialog_suggestion(
         self,
         callback_id: Union[str, Pattern],
-        matchers: List[Callable[..., bool]] = []):
+        matchers: List[Callable[..., bool]] = [],
+        middleware: List[Union[Callable, Middleware]] = [],
+    ):
         def __call__(func):
             primary_matcher = builtin_matchers.dialog_suggestion(callback_id)
-            return self._register_listener(func, primary_matcher, matchers)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -278,6 +316,7 @@ class App():
         func,
         primary_matcher: ListenerMatcher,
         matchers: List[Callable[..., bool]],
+        middleware: List[Union[Callable, Middleware]],
     ) -> Callable[..., None]:
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -285,7 +324,21 @@ class App():
 
         listener_matchers = [CustomListenerMatcher(app_name=self.name, func=f) for f in matchers]
         listener_matchers.insert(0, primary_matcher)
-        self._listeners.append(CustomListener(app_name=self.name, func=func, matchers=listener_matchers))
+        listener_middleware = []
+        for m in middleware:
+            if isinstance(m, Middleware):
+                listener_middleware.append(m)
+            elif isinstance(m, Callable):
+                listener_middleware.append(CustomMiddleware(app_name=self.name, func=m))
+            else:
+                raise ValueError(f"Unexpected value for a listener middleware: {type(m)}")
+
+        self._listeners.append(CustomListener(
+            app_name=self.name,
+            func=func,
+            matchers=listener_matchers,
+            middleware=listener_middleware,
+        ))
         return wrapper
 
 
