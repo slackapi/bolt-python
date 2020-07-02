@@ -122,14 +122,24 @@ class App():
                 else:
                     # start the listener function asynchronously
                     self._listener_executor.submit(lambda: listener(req=req, resp=resp))
-                    while ack.response is None and time.time() - starting_time <= 3:
-                        time.sleep(0.01)
+
+                    if listener.auto_acknowledgement:
+                        # acknowledge immediately in case of Events API
+                        ack()
+                    else:
+                        # await for the completion of ack() in the async listener execution
+                        while ack.response is None and time.time() - starting_time <= 3:
+                            time.sleep(0.01)
 
                 if self._process_before_response:
-                    if ack.response is None:
+                    if ack.response is None and listener.auto_acknowledgement:
+                        ack() # automatic ack() call if the call is not yet done
+
+                    if resp is not None:
                         return resp
-                    else:
+                    elif ack.response is not None:
                         return ack.response
+                    # None for both means no ack() in the listener
                 else:
                     if resp is None and ack.response is not None:
                         resp = ack.response
@@ -165,7 +175,7 @@ class App():
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.event(event)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(func, primary_matcher, matchers, middleware, True)
 
         return __call__
 
@@ -317,6 +327,7 @@ class App():
         primary_matcher: ListenerMatcher,
         matchers: List[Callable[..., bool]],
         middleware: List[Union[Callable, Middleware]],
+        auto_acknowledgement: bool = False,
     ) -> Callable[..., None]:
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -338,6 +349,7 @@ class App():
             func=func,
             matchers=listener_matchers,
             middleware=listener_middleware,
+            auto_acknowledgement=auto_acknowledgement,
         ))
         return wrapper
 

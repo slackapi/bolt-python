@@ -19,11 +19,13 @@ class CustomListener(Listener):
         func: Callable[[any], BoltResponse],
         matchers: List[ListenerMatcher],
         middleware: List[Middleware],
+        auto_acknowledgement: bool = False,
     ):
         self.app_name = app_name
         self.func = func
         self.matchers = matchers
         self.middleware = middleware
+        self.auto_acknowledgement = auto_acknowledgement
         self.arg_names = inspect.getfullargspec(func).args
         self.logger = get_bolt_app_logger(app_name, self.func)
 
