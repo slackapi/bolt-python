@@ -20,7 +20,7 @@ def log_request(logger, payload, next):
     return next()
 
 
-@app.command("/bolt-py-proto-2")  # or app.command(re.compile(r"/bolt-.+"))(test_command)
+@app.command("/bolt-py-proto-111")  # or app.command(re.compile(r"/bolt-.+"))(test_command)
 def test_command(args: Args):
     args.logger.info(args.payload)
     respond, ack = args.respond, args.ack
@@ -105,18 +105,39 @@ def event_test(ack, payload, say, logger):
     return ack()
 
 
-@app.event({"type": "message", "subtype": "message_deleted"})
+@app.event("message")
+def new_message(ack, logger, payload):
+    ack()
+    message = payload.get("event", {}).get("text", None)
+    logger.info(f"A new message was posted (text: {message})")
+
+
+message_deleted_constraints = {"type": "message", "subtype": "message_deleted"}
+@app.event(
+    event=message_deleted_constraints,
+    matchers=[lambda payload: payload["event"]["previous_message"].get("bot_id", None) is None]
+)
 def deleted(ack, payload, say):
+    ack()
     message = payload["event"]["previous_message"]["text"]
     say(f"I've noticed you deleted: {message}")
-    return ack()
 
 
-@app.event({"type": "message"})
-def new_message(ack, logger, payload, say):
-    logger.info(payload)
-    # say(f"I've noticed you deleted {payload}")
-    return ack()
+def print_bot(req, resp, next):
+    bot_id = req.payload["event"]["previous_message"]["bot_id"]
+    logger = logging.getLogger(__name__)
+    logger.info(f"bot_id surely exists here: {bot_id}")
+    return next()
+
+
+@app.event(
+    event=message_deleted_constraints,
+    matchers=[lambda payload: payload["event"]["previous_message"].get("bot_id", None)],
+    middleware=[print_bot]
+)
+def bot_message_deleted(ack, logger):
+    logger.info("A bot message has been deleted")
+    ack()
 
 
 if __name__ == '__main__':

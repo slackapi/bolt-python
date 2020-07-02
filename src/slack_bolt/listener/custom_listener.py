@@ -7,6 +7,7 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from .listener import Listener
 from ..logger import get_bolt_app_logger
+from ..middleware import Middleware
 
 
 class CustomListener(Listener):
@@ -17,10 +18,12 @@ class CustomListener(Listener):
         app_name: str,
         func: Callable[[any], BoltResponse],
         matchers: List[ListenerMatcher],
+        middleware: List[Middleware],
     ):
         self.app_name = app_name
         self.func = func
         self.matchers = matchers
+        self.middleware = middleware
         self.arg_names = inspect.getfullargspec(func).args
         self.logger = get_bolt_app_logger(app_name, self.func)
 
