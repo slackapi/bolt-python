@@ -1,1 +1,2 @@
-slackclient==2.6.2
+slackclient==2.7.3
+boto3==1.4.4

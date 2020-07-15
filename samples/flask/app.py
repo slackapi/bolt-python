@@ -103,7 +103,6 @@ def button_click(logger, payload, ack, respond):
 def event_test(ack, payload, say, logger):
     logger.info(payload)
     say("What's up?")
-    return ack()
 
 
 @app.event({"type": "message", "subtype": "message_deleted"})
@@ -117,7 +116,6 @@ def deleted(ack, payload, say):
 def new_message(ack, logger, payload, say):
     logger.info(payload)
     # say(f"I've noticed you deleted {payload}")
-    return ack()
 
 
 from flask import Flask, request
@@ -130,7 +128,25 @@ handler = SlackRequestHandler(app)
 def slack_events():
     return handler.handle(request)
 
+
+@flask_app.route("/slack/install", methods=["GET"])
+def install():
+    return handler.handle(request)
+
+
+@flask_app.route("/slack/oauth_redirect", methods=["GET"])
+def oauth_redirect():
+    return handler.handle(request)
+
 # pip install -r requirements.txt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
+
+# # -- OAuth flow -- #
+# export SLACK_SIGNING_SECRET=***
+# export SLACK_BOT_TOKEN=xoxb-***
+# export SLACK_CLIENT_ID=111.111
+# export SLACK_CLIENT_SECRET=***
+# export SLACK_SCOPES=app_mentions:read,channels:history,im:history,chat:write
+
 # FLASK_APP=app.py FLASK_ENV=development flask run -p 3000

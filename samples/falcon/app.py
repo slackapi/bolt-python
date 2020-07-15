@@ -94,11 +94,25 @@ def button_click(logger, payload, say, ack, respond):
     # say(text="say!")
     return ack()
 
+@app.event("app_mention")
+def handle_app_mentions(payload, say, logger):
+    logger.info(payload)
+    say("What's up?")
 
 api = falcon.API()
-api.add_route("/slack/events", SlackAppResource(app))
+resource = SlackAppResource(app)
+api.add_route("/slack/events", resource)
 
 # pip install -r requirements.txt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
 # gunicorn app:api --reload -b 0.0.0.0:3000
+
+# # -- OAuth flow -- #
+# export SLACK_SIGNING_SECRET=***
+# export SLACK_BOT_TOKEN=xoxb-***
+# export SLACK_CLIENT_ID=111.111
+# export SLACK_CLIENT_SECRET=***
+# export SLACK_SCOPES=app_mentions:read,channels:history,im:history,chat:write
+api.add_route("/slack/install", resource)
+api.add_route("/slack/oauth_redirect", resource)

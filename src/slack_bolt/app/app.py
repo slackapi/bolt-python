@@ -7,6 +7,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from functools import wraps
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from typing import List, Union, Pattern, Callable, Dict, Optional
+from urllib.parse import parse_qs
 
 from slack_bolt.listener.custom_listener import CustomListener
 from slack_bolt.listener.listener import Listener
@@ -23,9 +24,12 @@ from slack_bolt.middleware import \
     IgnoringSelfEvents, \
     CustomMiddleware
 from slack_bolt.middleware.url_verification import UrlVerification
+from slack_bolt.oauth.oauth_flow import OAuthFlow
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk import WebClient
+from slack_sdk.installation_store import InstallationStore, FileInstallationStore
+from slack_sdk.oauth_state_store import OAuthStateStore, FileOAuthStateStore
 
 
 class App():
@@ -33,19 +37,93 @@ class App():
     def __init__(
         self,
         *,
+        # Used in logger
         name: Optional[str] = None,
-        signing_secret: str = os.environ["SLACK_SIGNING_SECRET"],
-        token: Optional[str] = os.environ.get("SLACK_BOT_TOKEN", None),
-        verification_token: Optional[str] = os.environ.get("SLACK_VERIFICATION_TOKEN", None),
+        # Set True when you run this app on a FaaS platform
         process_before_response: bool = False,
+        # Basic Information > Credentials > Signing Secret
+        signing_secret: str = os.environ["SLACK_SIGNING_SECRET"],
+        # for single-workspace apps
+        token: Optional[str] = os.environ.get("SLACK_BOT_TOKEN", None),
+        # for multi-workspace apps
+        installation_store: Optional[InstallationStore] = None,
+        oauth_state_store: Optional[OAuthStateStore] = None,
+
+        # for the OAuth flow
+        oauth_flow: Optional[OAuthFlow] = None,
+        client_id: Optional[str] = os.environ.get("SLACK_CLIENT_ID", None),
+        client_secret: Optional[str] = os.environ.get("SLACK_CLIENT_SECRET", None),
+        scopes: List[str] = os.environ.get("SLACK_SCOPES", "").split(","),
+        user_scopes: List[str] = os.environ.get("SLACK_USER_SCOPES", "").split(","),
+        redirect_uri: Optional[str] = os.environ.get("SLACK_REDIRECT_URI", None),
+        oauth_install_path: str = os.environ.get("SLACK_INSTALL_PATH", "/slack/install"),
+        oauth_redirect_uri_path: str = os.environ.get("SLACK_REDIRECT_URI_PATH", "/slack/oauth_redirect"),
+        oauth_success_url: Optional[str] = None,
+        oauth_failure_url: Optional[str] = None,
+
+        # No need to set (the value is used only in response to ssl_check requests)
+        verification_token: Optional[str] = os.environ.get("SLACK_VERIFICATION_TOKEN", None),
     ):
         self.name = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret = signing_secret
-        self._token = token
         self._verification_token = verification_token
 
-        self._client = WebClient(token=token)  # TODO pooling per token
+        self._client = WebClient(token=token)  # NOTE: the token here can be None
         self._framework_logger = get_bolt_logger(App)
+
+        self._token = token
+        self._installation_store = installation_store
+        self._oauth_state_store = oauth_state_store
+
+        self.oauth_flow: Optional[OAuthFlow] = None
+
+        if oauth_flow:
+            self.oauth_flow = oauth_flow
+            self._sync_client_logger_with_oauth_flow()
+            if self._installation_store is None:
+                self._installation_store = self.oauth_flow.installation_store
+        else:
+            if client_id is not None and client_secret is not None:
+                # The OAuth flow support is enabled
+                if self._installation_store is None and self._oauth_state_store is None:
+                    # use the default ones
+                    self._installation_store = FileInstallationStore(
+                        logger=self._framework_logger,
+                        client_id=client_id,
+                    )
+                    self._oauth_state_store = FileOAuthStateStore(
+                        logger=self._framework_logger,
+                        client_id=client_id,
+                    )
+
+                if self._installation_store is not None and self._oauth_state_store is None:
+                    raise ValueError(f"Configure an appropriate OAuthStateStore for {self._installation_store}")
+
+                self.oauth_flow = OAuthFlow(
+                    client=WebClient(token=None),
+                    logger=self._framework_logger,
+                    # required storage implementations
+                    installation_store=self._installation_store,
+                    oauth_state_store=self._oauth_state_store,
+                    # used for oauth.v2.access calls
+                    client_id=client_id,
+                    client_secret=client_secret,
+                    # installation url parameters
+                    scopes=scopes,
+                    user_scopes=user_scopes,
+                    redirect_uri=redirect_uri,
+                    # path in this app
+                    install_path=oauth_install_path,
+                    redirect_uri_path=oauth_redirect_uri_path,
+                    # urls after callback
+                    success_url=oauth_success_url,
+                    failure_url=oauth_failure_url,
+                )
+
+        if self._installation_store is not None and self._token is not None:
+            self._token = None
+            self._framework_logger.warning(
+                "As you gave installation_token as well, the token will be unused.")
 
         self._middleware_list: List[Union[Callable, Middleware]] = []
         self._listeners: List[Listener] = []
@@ -62,10 +140,10 @@ class App():
             return
         self._middleware_list.append(SslCheck(verification_token=self._verification_token))
         self._middleware_list.append(RequestVerification(self._signing_secret))
-        if self._token:
-            self._middleware_list.append(SingleTeamAuthorization(self._client))
+        if self.oauth_flow is None and self._token:
+            self._middleware_list.append(SingleTeamAuthorization())
         else:
-            self._middleware_list.append(MultiTeamsAuthorization())  # TODO
+            self._middleware_list.append(MultiTeamsAuthorization(self._installation_store))
         self._middleware_list.append(IgnoringSelfEvents())
         self._middleware_list.append(UrlVerification())
         self._init_middleware_list_done = True
@@ -75,11 +153,21 @@ class App():
             return
         self._init_listeners_done = True
 
+    def _sync_client_logger_with_oauth_flow(self):
+        if self.oauth_flow.client is None:
+            self.oauth_flow.client = self._client
+        if self.oauth_flow.logger is None:
+            self.oauth_flow.logger = self._framework_logger
+            if self.oauth_flow.installation_store.logger is None:
+                self.oauth_flow.installation_store.logger = self._framework_logger
+            if self.oauth_flow.oauth_state_store.logger is None:
+                self.oauth_flow.oauth_state_store.logger = self._framework_logger
+
     # -------------------------
     # standalone server
 
     def start(self, port: int = 3000, path: str = "/slack/events") -> None:
-        self.server = SlackAppServer(app=self, port=port, path=path)
+        self.server = SlackAppServer(port=port, path=path, app=self, oauth_flow=self.oauth_flow)
         self.server.start()
 
     # -------------------------
@@ -133,7 +221,7 @@ class App():
 
                 if self._process_before_response:
                     if ack.response is None and listener.auto_acknowledgement:
-                        ack() # automatic ack() call if the call is not yet done
+                        ack()  # automatic ack() call if the call is not yet done
 
                     if resp is not None:
                         return resp
@@ -357,18 +445,37 @@ class App():
 # -------------------------
 
 class SlackAppServer:
-    def __init__(self, port: int, path: str, app: App):
+    def __init__(
+        self,
+        port: int,
+        path: str,
+        app: App,
+        oauth_flow: Optional[OAuthFlow] = None,
+    ):
         self.port = port
         _path = path
         _app = app
+        _oauth_flow = oauth_flow
 
         class SlackAppHandler(SimpleHTTPRequestHandler):
-            protocol_version = "HTTP/1.1"
-            default_request_version = "HTTP/1.1"
+
+            def do_GET(self):
+                _path, _, query = self.path.partition("?")
+                qs = {k: v[0] for k, v in parse_qs(query).items()}
+                if _path == _oauth_flow.install_path:
+                    bolt_req = BoltRequest(body="", query=qs, headers=self.headers)
+                    bolt_resp = _oauth_flow.handle_installation(bolt_req)
+                    self._send_bolt_response(bolt_resp)
+                elif _path == _oauth_flow.redirect_uri_path:
+                    bolt_req = BoltRequest(body="", query=qs, headers=self.headers)
+                    bolt_resp = _oauth_flow.handle_callback(bolt_req)
+                    self._send_bolt_response(bolt_resp)
+                else:
+                    self._send_response(404, headers={})
 
             def do_POST(self):
                 if _path != self.path.split("?")[0]:
-                    self.send_response(404)
+                    self._send_response(404, headers={})
                     return
 
                 len_header = self.headers.get("Content-Length") or 0
@@ -376,21 +483,34 @@ class SlackAppServer:
                 request_body = self.rfile.read(content_len).decode("utf-8")
                 bolt_req = BoltRequest(body=request_body, headers=self.headers)
                 bolt_resp: BoltResponse = _app.dispatch(bolt_req)
+                self._send_bolt_response(bolt_resp)
 
-                self.send_response(bolt_resp.status)
+            def _send_bolt_response(self, bolt_resp: BoltResponse):
+                self._send_response(
+                    status=bolt_resp.status,
+                    headers=bolt_resp.headers,
+                    body=bolt_resp.body,
+                )
 
-                response_body = bolt_resp.body if isinstance(bolt_resp.body, str) \
-                    else json.dumps(bolt_resp.body)
+            def _send_response(
+                self,
+                status: int,
+                headers: Dict[str, List[str]],
+                body: Union[str, dict] = "",
+            ):
+                self.send_response(status)
+
+                response_body = body if isinstance(body, str) else json.dumps(body)
                 body_bytes = response_body.encode("utf-8")
 
-                for k, v in bolt_resp.headers.items():
-                    self.send_header(k, v)
+                for k, vs in headers.items():
+                    for v in vs:
+                        self.send_header(k, v)
                 self.send_header("Content-Length", len(body_bytes))
                 self.end_headers()
                 self.wfile.write(body_bytes)
-                return
 
-        self.server = HTTPServer(('0.0.0.0', self.port), SlackAppHandler)
+        self.server = HTTPServer(("0.0.0.0", self.port), SlackAppHandler)
 
     def start(self):
         print("⚡️ Bolt app is running!")

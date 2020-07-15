@@ -1,6 +1,10 @@
+from datetime import datetime
+
 from falcon import Request, Response
 
+from slack_bolt import BoltResponse
 from slack_bolt.app import App
+from slack_bolt.oauth.oauth_flow import OAuthFlow
 from slack_bolt.request import BoltRequest
 
 
@@ -17,12 +21,48 @@ class SlackAppResource():
     def __init__(self, app: App):
         self.app = app
 
+    def on_get(self, req: Request, resp: Response):
+        if self.app.oauth_flow is not None:
+            oauth_flow: OAuthFlow = self.app.oauth_flow
+            if req.path == self.app.oauth_flow.install_path:
+                bolt_resp = oauth_flow.handle_installation(self._to_bolt_request(req))
+                self._write_response(bolt_resp, resp)
+                return
+            elif req.path == self.app.oauth_flow.redirect_uri_path:
+                bolt_resp = oauth_flow.handle_callback(self._to_bolt_request(req))
+                self._write_response(bolt_resp, resp)
+                return
+
+        resp.status = "404"
+        resp.body = "The page is not found..."
+
     def on_post(self, req: Request, resp: Response):
-        slack_req = BoltRequest(
+        bolt_req = self._to_bolt_request(req)
+        bolt_resp = self.app.dispatch(bolt_req)
+        self._write_response(bolt_resp, resp)
+
+    def _to_bolt_request(self, req: Request) -> BoltRequest:
+        return BoltRequest(
             body=req.stream.read(req.content_length or 0).decode("utf-8"),
+            query=req.query_string,
             headers={k.lower(): v for k, v in req.headers.items()}
         )
-        slack_resp = self.app.dispatch(slack_req)
-        resp.body = slack_resp.body
-        resp.status = str(slack_resp.status)
-        resp.set_headers(slack_resp.headers)
+
+    def _write_response(self, bolt_resp: BoltResponse, resp: Response):
+        resp.body = bolt_resp.body
+        resp.status = str(bolt_resp.status)
+        resp.set_headers(bolt_resp.first_headers_without_set_cookie())
+        for cookie in bolt_resp.cookies():
+            for name, c in cookie.items():
+                expire_value = c.get("expires", None)
+                expire = datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z") if expire_value else None
+                resp.set_cookie(
+                    name=name,
+                    value=c.value,
+                    expires=expire,
+                    max_age=c.get("max-age", None),
+                    domain=c.get("domain", None),
+                    path=c.get("path", None),
+                    secure=True,
+                    http_only=True,
+                )

@@ -1,7 +1,33 @@
+from typing import List, Tuple
+
 from pyramid.request import Request
 from pyramid.response import Response
 
-from slack_bolt import App, BoltRequest
+from slack_bolt import App, BoltRequest, BoltResponse
+from slack_bolt.oauth.oauth_flow import OAuthFlow
+
+
+def to_bolt_request(request: Request) -> BoltRequest:
+    bolt_req = BoltRequest(
+        body=request.body.decode("utf-8"),
+        query=request.query_string,
+        headers=request.headers,
+    )
+    return bolt_req
+
+
+def to_pyramid_response(bolt_resp: BoltResponse) -> Response:
+    headers: List[Tuple[str, str]] = []
+    for k, vs in bolt_resp.headers.items():
+        for v in vs:
+            headers.append((k, v))
+
+    return Response(
+        status=bolt_resp.status,
+        body=bolt_resp.body or "",
+        headerlist=headers,
+        charset="utf-8",
+    )
 
 
 class SlackRequestHandler():
@@ -9,13 +35,18 @@ class SlackRequestHandler():
         self.app = app
 
     def handle(self, request: Request) -> Response:
-        bolt_req = BoltRequest(
-            body=request.body.decode("utf-8"),
-            headers=request.headers,
-        )
-        bolt_resp = self.app.dispatch(bolt_req)
-        return Response(
-            status=bolt_resp.status,
-            body=bolt_resp.body,
-            headers=bolt_resp.headers
-        )
+        if request.method == "GET":
+            if self.app.oauth_flow is not None:
+                oauth_flow: OAuthFlow = self.app.oauth_flow
+                if request.path == self.app.oauth_flow.install_path:
+                    bolt_resp = oauth_flow.handle_installation(to_bolt_request(request))
+                    return to_pyramid_response(bolt_resp)
+                elif request.path == self.app.oauth_flow.redirect_uri_path:
+                    bolt_resp = oauth_flow.handle_callback(to_bolt_request(request))
+                    return to_pyramid_response(bolt_resp)
+        elif request.method == "POST":
+            bolt_req = to_bolt_request(request)
+            bolt_resp = self.app.dispatch(bolt_req)
+            return to_pyramid_response(bolt_resp)
+
+        return Response(status=404, body="Not found")

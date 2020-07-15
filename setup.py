@@ -25,10 +25,10 @@ setuptools.setup(
     setup_requires=["pytest-runner==5.2"],
     tests_require=["pytest==3.8.2"],
     install_requires=[
-        "slackclient>=2.7.1", # TODO: will be replaced with slack_sdk==3.0.0
+        "slackclient>=2,<3", # TODO: will be replaced with slack_sdk==3.0.0
     ],
-    # used only under src/slack_bolt/adapter
     extra_requires=[
+        # used only under src/slack_bolt/adapter
         "aiohttp==3.6.2",
         "bottle==0.12.18",
         "falcon==2.0.0",
@@ -36,6 +36,8 @@ setuptools.setup(
         "Flask==1.1.2",
         "pyramid==1.10.4",
         "python-lambda==11.7.1",
+        # used only under src/slack_sdk/*_store
+        "boto3<=2",
     ],
     classifiers=[
         "Programming Language :: Python :: 3.6",
