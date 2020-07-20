@@ -106,8 +106,7 @@ def event_test(ack, payload, say, logger):
 
 
 @app.event("message")
-def new_message(ack, logger, payload):
-    ack()
+def new_message(logger, payload):
     message = payload.get("event", {}).get("text", None)
     logger.info(f"A new message was posted (text: {message})")
 
@@ -117,8 +116,7 @@ message_deleted_constraints = {"type": "message", "subtype": "message_deleted"}
     event=message_deleted_constraints,
     matchers=[lambda payload: payload["event"]["previous_message"].get("bot_id", None) is None]
 )
-def deleted(ack, payload, say):
-    ack()
+def deleted(payload, say):
     message = payload["event"]["previous_message"]["text"]
     say(f"I've noticed you deleted: {message}")
 
@@ -135,9 +133,8 @@ def print_bot(req, resp, next):
     matchers=[lambda payload: payload["event"]["previous_message"].get("bot_id", None)],
     middleware=[print_bot]
 )
-def bot_message_deleted(ack, logger):
+def bot_message_deleted(logger):
     logger.info("A bot message has been deleted")
-    ack()
 
 
 if __name__ == '__main__':
