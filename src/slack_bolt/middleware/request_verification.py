@@ -26,8 +26,8 @@ class RequestVerification(Middleware):
             return next()
 
         body = req.body
-        timestamp = req.headers.get("x-slack-request-timestamp", "0")
-        signature = req.headers.get("x-slack-signature", "")
+        timestamp = req.headers.get("x-slack-request-timestamp", ["0"])[0]
+        signature = req.headers.get("x-slack-signature", [""])[0]
         if self.verifier.is_valid(body, timestamp, signature):
             return next()
         else:

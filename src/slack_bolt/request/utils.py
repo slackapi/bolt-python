@@ -1,8 +1,9 @@
 import json
+from typing import Optional
 from urllib.parse import parse_qsl
 
 
-def parse_payload(body: str, content_type: str) -> dict:
+def parse_payload(body: str, content_type: Optional[str]) -> dict:
     if not body:
         return {}
     if content_type == "application/json" or body.startswith("{"):

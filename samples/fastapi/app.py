@@ -95,6 +95,12 @@ def button_click(logger, payload, say, ack, respond):
     return ack()
 
 
+@app.event("app_mention")
+def handle_app_mentions(payload, say, logger):
+    logger.info(payload)
+    say("What's up?")
+
+
 from fastapi import FastAPI, Request
 
 api = FastAPI()
@@ -104,7 +110,25 @@ api = FastAPI()
 async def endpoint(req: Request):
     return await app_handler.handle(req)
 
+
 # pip install -r requirements.txt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
 # uvicorn app:api --reload --port 3000
+
+
+# # -- OAuth flow -- #
+# export SLACK_SIGNING_SECRET=***
+# export SLACK_BOT_TOKEN=xoxb-***
+# export SLACK_CLIENT_ID=111.111
+# export SLACK_CLIENT_SECRET=***
+# export SLACK_SCOPES=app_mentions:read,channels:history,im:history,chat:write
+
+@api.get("/slack/install")
+async def install(req: Request):
+    return await app_handler.handle(req)
+
+
+@api.get("/slack/oauth_redirect")
+async def oauth_redirect(req: Request):
+    return await app_handler.handle(req)

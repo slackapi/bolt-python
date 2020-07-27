@@ -1,4 +1,5 @@
-from typing import Dict
+from typing import Dict, Optional, List, Union
+from urllib.parse import parse_qs
 
 from slack_bolt.context.context import BoltContext
 from slack_bolt.request.utils import \
@@ -14,16 +15,37 @@ class BoltRequest():
         self,
         *,
         body: str,
-        headers: Dict[str, str] = {},
-        context: Dict[str, any] = {},
+        query: Optional[Union[str, Dict[str, str]]] = None,
+        # many framework use Dict[str, str] but the reality is Dict[str, List[str]]
+        headers: Optional[Dict[str, Union[str, List[str]]]] = None,
+        context: Optional[Dict[str, str]] = None,
     ):
         self.body = body
-        self.headers = headers
-        self.content_type = headers.get("content-type", None)
+
+        if query is None:
+            self.query = {}
+        elif isinstance(query, str):
+            self.query = {k: v[0] for k, v in parse_qs(query).items()}
+        else:
+            self.query = query
+
+        normalized_headers = {}
+        if headers is not None:
+            for key, value in headers.items():
+                normalized_name = key.lower()
+                if isinstance(value, list):
+                    normalized_headers[normalized_name] = value
+                elif isinstance(value, str):
+                    normalized_headers[normalized_name] = [value]
+                else:
+                    raise ValueError(f"Unsupported type ({type(value)}) of element in headers ({headers})")
+
+        self.headers = normalized_headers
+        self.content_type: Optional[str] = normalized_headers.get("content-type", [None])[0]
         if self.content_type:
             self.content_type = self.content_type.split(";")[0]
         self.payload = parse_payload(self.body, self.content_type)
-        self._build_context(self.payload, context)
+        self._build_context(self.payload, context if context else {})
 
     def _build_context(self, payload: dict, context: dict):
         self.context = BoltContext(context)
