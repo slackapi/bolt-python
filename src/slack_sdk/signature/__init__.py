@@ -1,1 +1,1 @@
-from slack.signature.verifier import SignatureVerifier # noqa
+from slack.signature.verifier import SignatureVerifier  # noqa

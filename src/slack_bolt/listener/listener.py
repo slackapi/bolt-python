@@ -37,8 +37,10 @@ class Listener(metaclass=ABCMeta):
         """
         for m in self.middleware:
             middleware_state = {"next_called": False}
+
             def next():
                 middleware_state["next_called"] = True
+
             resp = m.process(req=req, resp=resp, next=next)
             if not middleware_state["next_called"]:
                 return (resp, True)

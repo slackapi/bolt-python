@@ -225,7 +225,6 @@ class OAuthFlow:
                "Path=/; " \
                "Expires=Thu, 01 Jan 1970 00:00:00 GMT"
 
-
     def render_callback_success_html(self, url: str) -> str:
         return f"""
 <html>

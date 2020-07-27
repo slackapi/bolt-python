@@ -16,7 +16,7 @@ class FileOAuthStateStore(OAuthStateStore):
         logger: Logger,
         base_dir: str = str(Path.home()) + "/.bolt-app-oauth-state",
         client_id: Optional[str] = None,
-        expiration_seconds: int = 10 * 60, # 10 minutes after creation
+        expiration_seconds: int = 10 * 60,  # 10 minutes after creation
     ):
         self.logger = logger
         self.base_dir = base_dir

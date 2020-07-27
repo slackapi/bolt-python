@@ -1,7 +1,6 @@
 import json
 from logging import Logger
-from pathlib import Path
-from typing import Optional, Union
+from typing import Optional
 
 from botocore.client import BaseClient
 
