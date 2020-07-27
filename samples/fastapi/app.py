@@ -130,5 +130,5 @@ async def install(req: Request):
 
 
 @api.get("/slack/oauth_redirect")
-async def install(req: Request):
+async def oauth_redirect(req: Request):
     return await app_handler.handle(req)
