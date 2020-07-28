@@ -1,0 +1,2 @@
+responder>=2,<3
+uvicorn==0.11.5

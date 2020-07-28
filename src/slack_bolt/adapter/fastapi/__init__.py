@@ -1,1 +1,1 @@
-from .handler import SlackRequestHandler
+from ..starlette.handler import SlackRequestHandler

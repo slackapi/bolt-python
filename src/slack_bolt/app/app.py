@@ -184,6 +184,10 @@ class App():
     # -------------------------
     # main dispatcher
 
+    # TODO: async_dispatch
+    async def async_dispatch(self, req: BoltRequest) -> BoltResponse:
+        pass
+
     def dispatch(self, req: BoltRequest) -> BoltResponse:
         self._init_context(req)
 
