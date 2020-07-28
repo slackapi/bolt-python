@@ -45,6 +45,7 @@ class App():
         signing_secret: str = os.environ["SLACK_SIGNING_SECRET"],
         # for single-workspace apps
         token: Optional[str] = os.environ.get("SLACK_BOT_TOKEN", None),
+        client: Optional[WebClient] = None,
         # for multi-workspace apps
         installation_store: Optional[InstallationStore] = None,
         oauth_state_store: Optional[OAuthStateStore] = None,
@@ -67,9 +68,15 @@ class App():
         self.name = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret: str = signing_secret
         self._verification_token: Optional[str] = verification_token
-
-        self._client = WebClient(token=token)  # NOTE: the token here can be None
         self._framework_logger = get_bolt_logger(App)
+
+        if client is not None:
+            self._client = client
+            if token is not None:
+                self._framework_logger.warning(
+                    "As you gave client as well, the bot token will be unused.")
+        else:
+            self._client = WebClient(token=token)  # NOTE: the token here can be None
 
         self._token: Optional[str] = token
         self._installation_store: Optional[InstallationStore] = installation_store
@@ -165,6 +172,10 @@ class App():
 
     # -------------------------
     # accessors
+
+    @property
+    def client(self) -> WebClient:
+        return self._client
 
     @property
     def installation_store(self) -> Optional[InstallationStore]:

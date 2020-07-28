@@ -1,0 +1,14 @@
+language:
+  python
+sudo:
+  false
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "3.8-dev"  # 3.8 development branch
+  - "nightly"  # nightly build
+install:
+  - python setup.py install
+script:
+  - python setup.py test

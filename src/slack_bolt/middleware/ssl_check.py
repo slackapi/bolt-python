@@ -22,6 +22,6 @@ class SslCheck(Middleware):
             if self.verification_token and \
                 self.verification_token == req.payload["token"]:
                 return BoltResponse(status=401, body={"error": "invalid verification token"})
-            return BoltResponse(status=200, body={})
+            return BoltResponse(status=200, body="")
         else:
             return next()
