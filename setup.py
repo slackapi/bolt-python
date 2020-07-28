@@ -26,16 +26,15 @@ setuptools.setup(
     tests_require=["pytest==3.8.2"],
     install_requires=[
         "slackclient>=2,<3", # TODO: will be replaced with slack_sdk==3.0.0
+        "aiohttp>=3,<4", # slackclient depends on aiohttp
     ],
     extra_requires=[
         # used only under src/slack_bolt/adapter
-        "aiohttp==3.6.2",
-        "bottle==0.12.18",
-        "falcon==2.0.0",
-        "fastapi==0.54.1",
-        "Flask==1.1.2",
-        "pyramid==1.10.4",
-        "python-lambda==11.7.1",
+        "Django>=3,<4",
+        "falcon>=2,<3",
+        "fastapi>=0.54,<0.55",
+        "Flask>=1,<2",
+        "pyramid>=1,<2",
         # used only under src/slack_sdk/*_store
         "boto3<=2",
     ],

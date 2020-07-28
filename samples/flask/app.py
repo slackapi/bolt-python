@@ -6,10 +6,12 @@ sys.path.insert(1, "../../src")
 # ------------------------------------------------
 
 import logging
+
+logging.basicConfig(level=logging.DEBUG)
+
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
 
-logging.basicConfig(level=logging.DEBUG)
 app = App(process_before_response=True)
 
 

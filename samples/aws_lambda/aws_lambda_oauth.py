@@ -12,6 +12,7 @@ logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
 from slack_bolt import App
 from slack_bolt.adapter.aws_lambda import SlackRequestHandler, LambdaS3OAuthFlow
 
+# process_before_response must be True when running on FaaS
 app = App(
     process_before_response=True,
     oauth_flow=LambdaS3OAuthFlow(),
@@ -42,4 +43,4 @@ def handler(event, context):
 # rm -rf src
 # cp -pr ../../src src
 # pip install python-lambda
-# lambda deploy --config-file aws_lambda_oauth_config.yaml --requirements requirements.txt
+# lambda deploy --config-file aws_lambda_oauth_config.yaml --requirements requirements_oauth.txt
