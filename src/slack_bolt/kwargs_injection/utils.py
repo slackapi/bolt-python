@@ -23,6 +23,7 @@ def build_required_kwargs(
         "response": resp,
         "context": req.context,
         "payload": req.payload,
+        "body": req.payload,
         "ack": req.context.ack,
         "say": req.context.say,
         "respond": req.context.respond,

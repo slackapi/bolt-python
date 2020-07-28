@@ -221,11 +221,11 @@ class App():
                 listener_name = listener.func.__name__
                 self._framework_logger.debug(f"Starting listener: {listener_name}")
                 # run all the middleware attached to this listener first
-                resp, terminated = listener.run_middleware(req=req, resp=resp)
-                if terminated:
-                    # One of the middleware indicated we should return the response immediately
-                    # and stop running the listener for some reason
-                    return resp
+                resp, next_was_not_called = listener.run_middleware(req=req, resp=resp)
+                if next_was_not_called:
+                    # The last listener middleware didn't call next() method.
+                    # This means the listener is not for this incoming request.
+                    continue
 
                 ack = req.context.ack
                 starting_time = time.time()

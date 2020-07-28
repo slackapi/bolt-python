@@ -32,6 +32,7 @@ class Args():
         self.response = self.resp = resp
         self.context: BoltContext = context
         self.payload: dict = payload
+        self.body: dict = payload
         self.ack: Ack = ack
         self.say: Say = say
         self.respond: Respond = respond

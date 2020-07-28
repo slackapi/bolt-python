@@ -12,6 +12,7 @@ class MockHandler(SimpleHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
     default_request_version = "HTTP/1.1"
     logger = logging.getLogger(__name__)
+    received_requests = {}
 
     def is_valid_token(self):
         return "Authorization" in self.headers \
@@ -28,6 +29,7 @@ class MockHandler(SimpleHTTPRequestHandler):
     }
 
     def _handle(self):
+        self.received_requests[self.path] = self.received_requests.get(self.path, 0) + 1
         try:
             body = {"ok": True}
             if self.is_valid_token():
@@ -87,6 +89,7 @@ class MockServerThread(threading.Thread):
 
     def run(self):
         self.server = HTTPServer(('localhost', 8888), self.handler)
+        self.test.mock_received_requests = self.handler.received_requests
         self.test.server_url = "http://localhost:8888"
         self.test.host, self.test.port = self.server.socket.getsockname()
         self.test.server_started.set()  # threading.Event()
@@ -98,6 +101,7 @@ class MockServerThread(threading.Thread):
             self.server.server_close()
 
     def stop(self):
+        self.handler.received_requests = {}
         self.server.shutdown()
         self.join()
 
