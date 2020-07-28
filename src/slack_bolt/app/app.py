@@ -42,7 +42,7 @@ class App():
         # Set True when you run this app on a FaaS platform
         process_before_response: bool = False,
         # Basic Information > Credentials > Signing Secret
-        signing_secret: str = os.environ["SLACK_SIGNING_SECRET"],
+        signing_secret: str = os.environ.get("SLACK_SIGNING_SECRET", None),
         # for single-workspace apps
         token: Optional[str] = os.environ.get("SLACK_BOT_TOKEN", None),
         client: Optional[WebClient] = None,
