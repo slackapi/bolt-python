@@ -70,15 +70,17 @@ class App():
         self._verification_token: Optional[str] = verification_token
         self._framework_logger = get_bolt_logger(App)
 
+        self._token: Optional[str] = token
+
         if client is not None:
             self._client = client
+            self._token = client.token
             if token is not None:
                 self._framework_logger.warning(
                     "As you gave client as well, the bot token will be unused.")
         else:
             self._client = WebClient(token=token)  # NOTE: the token here can be None
 
-        self._token: Optional[str] = token
         self._installation_store: Optional[InstallationStore] = installation_store
         self._oauth_state_store: Optional[OAuthStateStore] = oauth_state_store
 
