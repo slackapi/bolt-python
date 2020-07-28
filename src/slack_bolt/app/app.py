@@ -65,15 +65,15 @@ class App():
         verification_token: Optional[str] = os.environ.get("SLACK_VERIFICATION_TOKEN", None),
     ):
         self.name = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
-        self._signing_secret = signing_secret
-        self._verification_token = verification_token
+        self._signing_secret: str = signing_secret
+        self._verification_token: Optional[str] = verification_token
 
         self._client = WebClient(token=token)  # NOTE: the token here can be None
         self._framework_logger = get_bolt_logger(App)
 
-        self._token = token
-        self._installation_store = installation_store
-        self._oauth_state_store = oauth_state_store
+        self._token: Optional[str] = token
+        self._installation_store: Optional[InstallationStore] = installation_store
+        self._oauth_state_store: Optional[OAuthStateStore] = oauth_state_store
 
         self.oauth_flow: Optional[OAuthFlow] = None
 
@@ -123,7 +123,7 @@ class App():
         if self._installation_store is not None and self._token is not None:
             self._token = None
             self._framework_logger.warning(
-                "As you gave installation_token as well, the token will be unused.")
+                "As you gave installation_store as well, the bot token will be unused.")
 
         self._middleware_list: List[Union[Callable, Middleware]] = []
         self._listeners: List[Listener] = []
@@ -162,6 +162,17 @@ class App():
                 self.oauth_flow.installation_store.logger = self._framework_logger
             if self.oauth_flow.oauth_state_store.logger is None:
                 self.oauth_flow.oauth_state_store.logger = self._framework_logger
+
+    # -------------------------
+    # accessors
+
+    @property
+    def installation_store(self) -> Optional[InstallationStore]:
+        return self._installation_store
+
+    @property
+    def oauth_state_store(self) -> Optional[OAuthStateStore]:
+        return self._oauth_state_store
 
     # -------------------------
     # standalone server

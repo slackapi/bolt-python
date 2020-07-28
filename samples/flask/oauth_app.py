@@ -35,7 +35,23 @@ handler = SlackRequestHandler(app)
 def slack_events():
     return handler.handle(request)
 
+
+@flask_app.route("/slack/install", methods=["GET"])
+def install():
+    return handler.handle(request)
+
+
+@flask_app.route("/slack/oauth_redirect", methods=["GET"])
+def oauth_redirect():
+    return handler.handle(request)
+
 # pip install -r requirements.txt
+
+# # -- OAuth flow -- #
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
-# FLASK_APP=app.py FLASK_ENV=development flask run -p 3000
+# export SLACK_CLIENT_ID=111.111
+# export SLACK_CLIENT_SECRET=***
+# export SLACK_SCOPES=app_mentions:read,chat:write
+
+# FLASK_APP=oauth_app.py FLASK_ENV=development flask run -p 3000

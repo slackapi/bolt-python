@@ -19,6 +19,7 @@ app = App()
 # @app.command("/bolt-py-proto", [lambda payload: payload["team_id"] == "T03E94MJU"])
 def test_command(logger: logging.Logger, payload: dict, ack: Ack, respond: Respond):
     logger.info(payload)
+    ack("thanks!")
     respond(blocks=[
         {
             "type": "section",
@@ -38,7 +39,6 @@ def test_command(logger: logging.Logger, payload: dict, ack: Ack, respond: Respo
             }
         }
     ])
-    return ack("thanks!")
 
 
 app.command(re.compile(r"/bolt-.+"))(test_command)
@@ -47,6 +47,7 @@ app.command(re.compile(r"/bolt-.+"))(test_command)
 @app.shortcut("test-shortcut")
 def test_shortcut(ack, client: WebClient, logger, payload):
     logger.info(payload)
+    ack()
     res = client.views_open(
         trigger_id=payload["trigger_id"],
         view={
@@ -78,26 +79,27 @@ def test_shortcut(ack, client: WebClient, logger, payload):
             ]
         })
     logger.info(res)
-    return ack()
 
 
 @app.view("view-id")
 def view_submission(ack, payload, logger):
     logger.info(payload)
-    return ack()
+    ack()
 
 
 @app.action("a")
 def button_click(logger, payload, say, ack, respond):
     logger.info(payload)
+    ack()
     respond("respond!")
     # say(text="say!")
-    return ack()
+
 
 @app.event("app_mention")
 def handle_app_mentions(payload, say, logger):
     logger.info(payload)
     say("What's up?")
+
 
 api = falcon.API()
 resource = SlackAppResource(app)
@@ -107,12 +109,3 @@ api.add_route("/slack/events", resource)
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
 # gunicorn app:api --reload -b 0.0.0.0:3000
-
-# # -- OAuth flow -- #
-# export SLACK_SIGNING_SECRET=***
-# export SLACK_BOT_TOKEN=xoxb-***
-# export SLACK_CLIENT_ID=111.111
-# export SLACK_CLIENT_SECRET=***
-# export SLACK_SCOPES=app_mentions:read,channels:history,im:history,chat:write
-api.add_route("/slack/install", resource)
-api.add_route("/slack/oauth_redirect", resource)

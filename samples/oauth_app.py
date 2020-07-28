@@ -18,7 +18,7 @@ def log_request(logger, payload, next):
 app.use(log_request)
 
 @app.event("app_mention")
-def handle_app_mentions(payload, say, logger, context):
+def handle_app_mentions(payload, say, logger):
     logger.info(payload)
     say("What's up?")
 

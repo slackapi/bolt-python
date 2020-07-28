@@ -2,31 +2,24 @@
 # instead of slack_bolt in requirements.txt
 import sys
 
-sys.path.insert(1, "../src")
+sys.path.insert(1, "../../src")
 # ------------------------------------------------
 
+import falcon
 import logging
-
-logging.basicConfig(level=logging.DEBUG)
-
-from slack_bolt import App
-from slack_bolt.kwargs_injection import Args
+import re
+from slack_bolt import App, Respond, Ack
+from slack_bolt.adapter.falcon import SlackAppResource
 from slack_sdk import WebClient
 
-app = App(process_before_response=True)
+logging.basicConfig(level=logging.DEBUG)
+app = App()
 
 
-@app.middleware  # or app.use(log_request)
-def log_request(logger, payload, next):
-    logger.debug(payload)
-    return next()
-
-
-@app.command("/bolt-py-proto-111")  # or app.command(re.compile(r"/bolt-.+"))(test_command)
-def test_command(args: Args):
-    args.logger.info(args.payload)
-    respond, ack = args.respond, args.ack
-
+# @app.command("/bolt-py-proto", [lambda payload: payload["team_id"] == "T03E94MJU"])
+def test_command(logger: logging.Logger, payload: dict, ack: Ack, respond: Respond):
+    logger.info(payload)
+    ack("thanks!")
     respond(blocks=[
         {
             "type": "section",
@@ -46,7 +39,9 @@ def test_command(args: Args):
             }
         }
     ])
-    ack("thanks!")
+
+
+app.command(re.compile(r"/bolt-.+"))(test_command)
 
 
 @app.shortcut("test-shortcut")
@@ -89,63 +84,34 @@ def test_shortcut(ack, client: WebClient, logger, payload):
 @app.view("view-id")
 def view_submission(ack, payload, logger):
     logger.info(payload)
-    return ack()
-
-
-@app.action("a")
-def button_click(logger, payload, ack, respond):
-    logger.info(payload)
-    respond("respond!")
-    # say(text="say!")
     ack()
 
 
+@app.action("a")
+def button_click(logger, payload, say, ack, respond):
+    logger.info(payload)
+    ack()
+    respond("respond!")
+    # say(text="say!")
+
+
 @app.event("app_mention")
-def event_test(ack, payload, say, logger):
+def handle_app_mentions(payload, say, logger):
     logger.info(payload)
     say("What's up?")
-    return ack()
 
 
-@app.event("message")
-def new_message(logger, payload):
-    message = payload.get("event", {}).get("text", None)
-    logger.info(f"A new message was posted (text: {message})")
+api = falcon.API()
+resource = SlackAppResource(app)
+api.add_route("/slack/events", resource)
 
-
-message_deleted_constraints = {"type": "message", "subtype": "message_deleted"}
-
-
-@app.event(
-    event=message_deleted_constraints,
-    matchers=[lambda payload: payload["event"]["previous_message"].get("bot_id", None) is None]
-)
-def deleted(payload, say):
-    message = payload["event"]["previous_message"]["text"]
-    say(f"I've noticed you deleted: {message}")
-
-
-def print_bot(req, resp, next):
-    bot_id = req.payload["event"]["previous_message"]["bot_id"]
-    logger = logging.getLogger(__name__)
-    logger.info(f"bot_id surely exists here: {bot_id}")
-    return next()
-
-
-@app.event(
-    event=message_deleted_constraints,
-    matchers=[lambda payload: payload["event"]["previous_message"].get("bot_id", None)],
-    middleware=[print_bot]
-)
-def bot_message_deleted(logger):
-    logger.info("A bot message has been deleted")
-
-
-if __name__ == '__main__':
-    app.start(3000)
-
-# pip install slackclient
-# pip install -i https://test.pypi.org/simple/ slack_bolt
+# # -- OAuth flow -- #
+# pip install -r requirements.txt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
-# python app.py
+# export SLACK_CLIENT_ID=111.111
+# export SLACK_CLIENT_SECRET=***
+# export SLACK_SCOPES=app_mentions:read,channels:history,im:history,chat:write
+# gunicorn oauth_app:api --reload -b 0.0.0.0:3000
+api.add_route("/slack/install", resource)
+api.add_route("/slack/oauth_redirect", resource)
