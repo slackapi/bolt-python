@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 from logging import Logger
@@ -16,7 +17,7 @@ class FileOAuthStateStore(OAuthStateStore):
         expiration_seconds: int,
         base_dir: str = str(Path.home()) + "/.bolt-app-oauth-state",
         client_id: Optional[str] = None,
-        logger: Optional[Logger] = None,
+        logger: Logger = logging.getLogger(__name__),
     ):
         self.expiration_seconds = expiration_seconds
 
@@ -24,7 +25,13 @@ class FileOAuthStateStore(OAuthStateStore):
         self.client_id = client_id
         if self.client_id is not None:
             self.base_dir = f"{self.base_dir}/{self.client_id}"
-        self.logger = logger
+            self._logger = logger
+
+        @property
+        def logger(self) -> Logger:
+            if self._logger is None:
+                self._logger = logging.getLogger(__name__)
+            return self._logger
 
     def issue(self) -> str:
         state = uuid4()

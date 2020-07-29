@@ -43,10 +43,10 @@ class SlackRequestHandler():
         if req.method == "GET":
             if self.app.oauth_flow is not None:
                 oauth_flow: OAuthFlow = self.app.oauth_flow
-                if req.url.path == self.app.oauth_flow.install_path:
+                if req.url.path == oauth_flow.install_path:
                     bolt_resp = oauth_flow.handle_installation(to_bolt_request(req, body))
                     return to_starlette_response(bolt_resp)
-                elif req.url.path == self.app.oauth_flow.redirect_uri_path:
+                elif req.url.path == oauth_flow.redirect_uri_path:
                     bolt_resp = oauth_flow.handle_callback(to_bolt_request(req, body))
                     return to_starlette_response(bolt_resp)
 

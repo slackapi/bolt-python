@@ -1,4 +1,5 @@
 import json
+import logging
 from logging import Logger
 from typing import Optional
 
@@ -14,17 +15,23 @@ class AmazonS3InstallationStore(InstallationStore):
     def __init__(
         self,
         *,
-        logger: Logger,
         s3_client: BaseClient,
         bucket_name: str,
         client_id: str,
         historical_data_enabled: bool = True,
+        logger: Logger = logging.getLogger(__name__),
     ):
-        self.logger = logger
         self.s3_client = s3_client
         self.bucket_name = bucket_name
         self.historical_data_enabled = historical_data_enabled
         self.client_id = client_id
+        self._logger = logger
+
+    @property
+    def logger(self) -> Logger:
+        if self._logger is None:
+            self._logger = logging.getLogger(__name__)
+        return self._logger
 
     def save(self, installation: Installation):
         none = "none"

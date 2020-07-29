@@ -1,3 +1,5 @@
+import logging
+import os
 from logging import Logger
 from typing import Optional, List, Dict
 
@@ -7,7 +9,9 @@ from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth import AuthorizeUrlGenerator, OAuthStateUtils, RedirectUriPageRenderer
 from slack_sdk.oauth.installation_store import InstallationStore, Installation
+from slack_sdk.oauth.installation_store.sqlite3 import SQLite3InstallationStore
 from slack_sdk.oauth.state_store import OAuthStateStore
+from slack_sdk.oauth.state_store.sqlite3 import SQLite3OAuthStateStore
 from slack_sdk.web import WebClient, SlackResponse
 
 
@@ -16,8 +20,8 @@ class OAuthFlow:
     def __init__(
         self,
         *,
-        client: WebClient,
-        logger: Logger,
+        client: Optional[WebClient] = None,
+        logger: Optional[Logger] = None,
 
         installation_store: InstallationStore,
         oauth_state_store: OAuthStateStore,
@@ -36,13 +40,13 @@ class OAuthFlow:
         success_url: Optional[str] = None,
         failure_url: Optional[str] = None,
     ):
-        self.client = client
-        self.logger = logger
+        self._client = client
+        self._logger = logger
 
         self.installation_store = installation_store
         self.oauth_state_store = oauth_state_store
         self.oauth_state_cookie_name = oauth_state_cookie_name
-        self.oauth_state_cookie_utils = OAuthStateUtils(
+        self.oauth_state_utils = OAuthStateUtils(
             cookie_name=oauth_state_cookie_name,
             expiration_seconds=oauth_state_expiration_seconds,
         )
@@ -69,6 +73,54 @@ class OAuthFlow:
             failure_url=failure_url,
         )
 
+    @property
+    def client(self) -> WebClient:
+        if self._client is None:
+            self._client = WebClient()
+        return self._client
+
+    @property
+    def logger(self) -> Logger:
+        if self._logger is None:
+            self._logger = logging.getLogger(__name__)
+        return self._logger
+
+    @classmethod
+    def sqlite3(
+        cls,
+        database: str,
+        client_id: Optional[str] = os.environ.get("SLACK_CLIENT_ID", None),
+        client_secret: Optional[str] = os.environ.get("SLACK_CLIENT_SECRET", None),
+        scopes: List[str] = os.environ.get("SLACK_SCOPES", "").split(","),
+        user_scopes: List[str] = os.environ.get("SLACK_USER_SCOPES", "").split(","),
+        redirect_uri: Optional[str] = os.environ.get("SLACK_REDIRECT_URI", None),
+        oauth_state_cookie_name: str = OAuthStateUtils.default_cookie_name,
+        oauth_state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
+        logger: Optional[Logger] = None,
+    ) -> "OAuthFlow":
+
+        return OAuthFlow(
+            client=WebClient(),
+            logger=logger,
+            installation_store=SQLite3InstallationStore(
+                database=database,
+                client_id=client_id,
+                logger=logger,
+            ),
+            oauth_state_store=SQLite3OAuthStateStore(
+                database=database,
+                expiration_seconds=oauth_state_expiration_seconds,
+                logger=logger,
+            ),
+            oauth_state_cookie_name=oauth_state_cookie_name,
+            oauth_state_expiration_seconds=oauth_state_expiration_seconds,
+            client_id=client_id,
+            client_secret=client_secret,
+            scopes=scopes,
+            user_scopes=user_scopes,
+            redirect_uri=redirect_uri,
+        )
+
     # -----------------------------
     # Installation
     # -----------------------------
@@ -88,7 +140,7 @@ class OAuthFlow:
             status=302,
             headers={
                 "Location": [self.authorize_url_generator.generate(state)],
-                "Set-Cookie": [self.oauth_state_cookie_utils.build_set_cookie_for_new_state(state)]
+                "Set-Cookie": [self.oauth_state_utils.build_set_cookie_for_new_state(state)]
             },
         )
 
@@ -105,7 +157,7 @@ class OAuthFlow:
 
         # state parameter verification
         state = request.query.get("state", None)
-        if not self.oauth_state_cookie_utils.is_valid_browser(state, request.headers):
+        if not self.oauth_state_utils.is_valid_browser(state, request.headers):
             return self.build_callback_failure_response(request, reason="invalid_browser", status=400)
 
         valid_state_consumed = self.oauth_state_store.consume(state)
@@ -195,7 +247,7 @@ class OAuthFlow:
             headers={
                 "Content-Type": "text/html; charset=utf-8",
                 "Content-Length": len(html),
-                "Set-Cookie": self.oauth_state_cookie_utils.build_set_cookie_for_deletion(),
+                "Set-Cookie": self.oauth_state_utils.build_set_cookie_for_deletion(),
             },
             body=html,
         )
@@ -217,7 +269,7 @@ class OAuthFlow:
             headers={
                 "Content-Type": "text/html; charset=utf-8",
                 "Content-Length": len(html),
-                "Set-Cookie": self.oauth_state_cookie_utils.build_set_cookie_for_deletion(),
+                "Set-Cookie": self.oauth_state_utils.build_set_cookie_for_deletion(),
             },
             body=html,
         )

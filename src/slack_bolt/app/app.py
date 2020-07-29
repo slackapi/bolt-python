@@ -86,31 +86,28 @@ class App():
 
         self._installation_store: Optional[InstallationStore] = installation_store
         self._oauth_state_store: Optional[OAuthStateStore] = oauth_state_store
-        if self._installation_store.logger is None:
-            self._installation_store.logger = self._framework_logger
-        if self._oauth_state_store.logger is None:
-            self._oauth_state_store.logger = self._framework_logger
 
         self._oauth_state_cookie_name = oauth_state_cookie_name
         self._oauth_state_expiration_seconds = oauth_state_expiration_seconds
 
-        self.oauth_flow: Optional[OAuthFlow] = None
+        self._oauth_flow: Optional[OAuthFlow] = None
         if oauth_flow:
-            self.oauth_flow = oauth_flow
-            self._sync_client_logger_with_oauth_flow()
+            self._oauth_flow = oauth_flow
             if self._installation_store is None:
-                self._installation_store = self.oauth_flow.installation_store
+                self._installation_store = self._oauth_flow.installation_store
+            if self._oauth_state_store is None:
+                self._oauth_state_store = self._oauth_flow.oauth_state_store
+            if self._oauth_flow._client is None:
+                self._oauth_flow._client = self._client
         else:
             if client_id is not None and client_secret is not None:
                 # The OAuth flow support is enabled
                 if self._installation_store is None and self._oauth_state_store is None:
                     # use the default ones
                     self._installation_store = FileInstallationStore(
-                        logger=self._framework_logger,
                         client_id=client_id,
                     )
                     self._oauth_state_store = FileOAuthStateStore(
-                        logger=self._framework_logger,
                         expiration_seconds=self._oauth_state_expiration_seconds,
                         client_id=client_id,
                     )
@@ -118,7 +115,7 @@ class App():
                 if self._installation_store is not None and self._oauth_state_store is None:
                     raise ValueError(f"Configure an appropriate OAuthStateStore for {self._installation_store}")
 
-                self.oauth_flow = OAuthFlow(
+                self._oauth_flow = OAuthFlow(
                     client=WebClient(token=None),
                     logger=self._framework_logger,
                     # required storage implementations
@@ -161,7 +158,7 @@ class App():
             return
         self._middleware_list.append(SslCheck(verification_token=self._verification_token))
         self._middleware_list.append(RequestVerification(self._signing_secret))
-        if self.oauth_flow is None and self._token:
+        if self._oauth_flow is None and self._token:
             self._middleware_list.append(SingleTeamAuthorization())
         else:
             self._middleware_list.append(MultiTeamsAuthorization(self._installation_store))
@@ -174,18 +171,12 @@ class App():
             return
         self._init_listeners_done = True
 
-    def _sync_client_logger_with_oauth_flow(self):
-        if self.oauth_flow.client is None:
-            self.oauth_flow.client = self._client
-        if self.oauth_flow.logger is None:
-            self.oauth_flow.logger = self._framework_logger
-            if self.oauth_flow.installation_store.logger is None:
-                self.oauth_flow.installation_store.logger = self._framework_logger
-            if self.oauth_flow.oauth_state_store.logger is None:
-                self.oauth_flow.oauth_state_store.logger = self._framework_logger
-
     # -------------------------
     # accessors
+
+    @property
+    def oauth_flow(self) -> Optional[OAuthFlow]:
+        return self._oauth_flow
 
     @property
     def client(self) -> WebClient:
@@ -203,7 +194,12 @@ class App():
     # standalone server
 
     def start(self, port: int = 3000, path: str = "/slack/events") -> None:
-        self.server = SlackAppServer(port=port, path=path, app=self, oauth_flow=self.oauth_flow)
+        self.server = SlackAppServer(
+            port=port,
+            path=path,
+            app=self,
+            oauth_flow=self.oauth_flow,
+        )
         self.server.start()
 
     # -------------------------

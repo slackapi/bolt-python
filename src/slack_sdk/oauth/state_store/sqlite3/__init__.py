@@ -1,8 +1,8 @@
+import logging
 import sqlite3
 import time
 from logging import Logger
 from sqlite3 import Connection
-from typing import Optional
 from uuid import uuid4
 
 from ..state_store import OAuthStateStore
@@ -15,12 +15,18 @@ class SQLite3OAuthStateStore(OAuthStateStore):
         *,
         database: str,
         expiration_seconds: int,
-        logger: Optional[Logger] = None,
+        logger: Logger = logging.getLogger(__name__),
     ):
         self.database = database
         self.expiration_seconds = expiration_seconds
-        self.logger = logger
         self.init_called = False
+        self._logger = logger
+
+    @property
+    def logger(self) -> Logger:
+        if self._logger is None:
+            self._logger = logging.getLogger(__name__)
+        return self._logger
 
     def init(self):
         try:
@@ -46,15 +52,18 @@ class SQLite3OAuthStateStore(OAuthStateStore):
                 expire_at datetime not null
             );
             """)
+            self.logger.debug(f"Tables have been created (database: {self.database})")
             conn.commit()
 
     def issue(self) -> str:
         state: str = str(uuid4())
         with self.connect() as conn:
+            parameters = [state, time.time() + self.expiration_seconds, ]
             conn.execute(
                 "insert into oauth_states (state, expire_at) values (?, ?);",
-                [state, time.time() + self.expiration_seconds, ]
+                parameters
             )
+            self.logger.debug(f"issue's insertion result: {parameters} (database: {self.database})")
             conn.commit()
         return state
 
@@ -62,13 +71,13 @@ class SQLite3OAuthStateStore(OAuthStateStore):
         try:
             with self.connect() as conn:
                 cur = conn.execute(
-                    "select id, expire_at from oauth_states where state = ? and expire_at > ?;",
+                    "select id, state from oauth_states where state = ? and expire_at > ?;",
                     [state, time.time()]
                 )
-                result = cur.fetchone()
-                self.logger.debug(f"Fetched row: {result}")
-                if result and len(result) > 0:
-                    id = result[0]
+                row = cur.fetchone()
+                self.logger.debug(f"consume's query result: {row} (database: {self.database})")
+                if row and len(row) > 0:
+                    id = row[0]
                     conn.execute("delete from oauth_states where id = ?;", [id])
                     conn.commit()
                     return True

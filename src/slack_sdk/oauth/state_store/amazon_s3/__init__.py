@@ -1,3 +1,4 @@
+import logging
 import time
 from logging import Logger
 from typing import Optional
@@ -16,12 +17,18 @@ class AmazonS3OAuthStateStore(OAuthStateStore):
         s3_client: BaseClient,
         bucket_name: str,
         expiration_seconds: int,
-        logger: Optional[Logger] = None,
+        logger: Logger = logging.getLogger(__name__),
     ):
         self.s3_client = s3_client
         self.bucket_name = bucket_name
         self.expiration_seconds = expiration_seconds
-        self.logger = logger
+        self._logger = logger
+
+    @property
+    def logger(self) -> Logger:
+        if self._logger is None:
+            self._logger = logging.getLogger(__name__)
+        return self._logger
 
     def issue(self) -> str:
         state = uuid4()

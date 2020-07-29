@@ -8,4 +8,4 @@ class ListenerMatcher(metaclass=ABCMeta):
 
     @abstractmethod
     def matches(self, req: BoltRequest, resp: BoltResponse) -> bool:
-        raise NotImplementedError
+        raise NotImplementedError()

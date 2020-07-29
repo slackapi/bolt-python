@@ -1,3 +1,4 @@
+import logging
 import sqlite3
 from logging import Logger
 from sqlite3 import Connection
@@ -15,12 +16,18 @@ class SQLite3InstallationStore(InstallationStore):
         *,
         database: str,
         client_id: str,
-        logger: Optional[Logger] = None,
+        logger: Logger = logging.getLogger(__name__),
     ):
         self.database = database
         self.client_id = client_id
-        self.logger = logger
         self.init_called = False
+        self._logger = logger
+
+    @property
+    def logger(self) -> Logger:
+        if self._logger is None:
+            self._logger = logging.getLogger(__name__)
+        return self._logger
 
     def init(self):
         try:
@@ -79,6 +86,7 @@ class SQLite3InstallationStore(InstallationStore):
             conn.execute("""
             create index bots_idx on bots (client_id, enterprise_id, team_id);
             """)
+            self.logger.debug(f"Tables have been created (database: {self.database})")
             conn.commit()
 
     def save(self, installation: Installation):
@@ -171,6 +179,7 @@ class SQLite3InstallationStore(InstallationStore):
                     installation.incoming_webhook_configuration_url,
                 ]
             )
+            self.logger.debug(f"New rows in bots and installations) have been created (database: {self.database})")
             conn.commit()
 
     def find_bot(
@@ -211,8 +220,10 @@ class SQLite3InstallationStore(InstallationStore):
                     ]
                 )
                 row = cur.fetchone()
+                result = "found" if row and len(row) > 0 else "not found"
+                self.logger.debug(f"find_bot's query result: {result} (database: {self.database})")
                 if row and len(row) > 0:
-                    return Bot(
+                    bot = Bot(
                         app_id=row[0],
                         enterprise_id=row[1],
                         team_id=row[2],
@@ -222,6 +233,7 @@ class SQLite3InstallationStore(InstallationStore):
                         bot_scopes=row[6],
                         installed_at=row[7],
                     )
+                    return bot
                 return None
 
         except Exception as e:

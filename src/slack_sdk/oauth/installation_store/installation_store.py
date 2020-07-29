@@ -7,12 +7,15 @@ from .models.installation import Installation
 
 
 class InstallationStore():
-    def __init__(self, logger: Optional[Logger] = None):
-        self.logger: Optional[Logger] = logger
+
+    @property
+    @abstractmethod
+    def logger(self) -> Logger:
+        raise NotImplementedError()
 
     @abstractmethod
     def save(self, installation: Installation):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     @abstractmethod
     def find_bot(
@@ -21,4 +24,4 @@ class InstallationStore():
         enterprise_id: Optional[str],
         team_id: Optional[str],
     ) -> Optional[Bot]:
-        raise NotImplementedError
+        raise NotImplementedError()

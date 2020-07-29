@@ -61,4 +61,4 @@ class Listener(metaclass=ABCMeta):
         :param resp: the current response
         :return: the processed response
         """
-        raise NotImplementedError
+        raise NotImplementedError()
