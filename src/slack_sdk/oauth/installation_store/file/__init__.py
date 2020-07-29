@@ -64,7 +64,7 @@ class FileInstallationStore(InstallationStore):
         *,
         enterprise_id: Optional[str],
         team_id: Optional[str],
-    ) -> Optional[Installation]:
+    ) -> Optional[Bot]:
         # TODO: org-apps support
         none = "none"
         e_id = enterprise_id or none

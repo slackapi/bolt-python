@@ -1,9 +1,11 @@
 from abc import abstractmethod
+from logging import Logger
+from typing import Optional
 
 
 class OAuthStateStore():
-    def __init__(self):
-        pass
+    def __init__(self, logger: Optional[Logger] = None):
+        self.logger: Optional[Logger] = logger
 
     @abstractmethod
     def issue(self) -> str:

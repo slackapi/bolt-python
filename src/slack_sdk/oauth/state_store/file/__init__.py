@@ -13,17 +13,18 @@ class FileOAuthStateStore(OAuthStateStore):
     def __init__(
         self,
         *,
-        logger: Logger,
+        expiration_seconds: int,
         base_dir: str = str(Path.home()) + "/.bolt-app-oauth-state",
         client_id: Optional[str] = None,
-        expiration_seconds: int = 10 * 60,  # 10 minutes after creation
+        logger: Optional[Logger] = None,
     ):
-        self.logger = logger
+        self.expiration_seconds = expiration_seconds
+
         self.base_dir = base_dir
         self.client_id = client_id
         if self.client_id is not None:
             self.base_dir = f"{self.base_dir}/{self.client_id}"
-        self.expiration_seconds = expiration_seconds
+        self.logger = logger
 
     def issue(self) -> str:
         state = uuid4()

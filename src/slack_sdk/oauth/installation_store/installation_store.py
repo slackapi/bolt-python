@@ -1,10 +1,14 @@
 from abc import abstractmethod
+from logging import Logger
 from typing import Optional
 
+from .models.bot import Bot
 from .models.installation import Installation
 
 
 class InstallationStore():
+    def __init__(self, logger: Optional[Logger] = None):
+        self.logger: Optional[Logger] = logger
 
     @abstractmethod
     def save(self, installation: Installation):
@@ -16,5 +20,5 @@ class InstallationStore():
         *,
         enterprise_id: Optional[str],
         team_id: Optional[str],
-    ) -> Optional[Installation]:
+    ) -> Optional[Bot]:
         raise NotImplementedError

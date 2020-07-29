@@ -28,6 +28,7 @@ from slack_bolt.oauth import OAuthFlow
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk import WebClient
+from slack_sdk.oauth import OAuthStateUtils
 from slack_sdk.oauth.installation_store import InstallationStore, FileInstallationStore
 from slack_sdk.oauth.state_store import OAuthStateStore, FileOAuthStateStore
 
@@ -49,6 +50,8 @@ class App():
         # for multi-workspace apps
         installation_store: Optional[InstallationStore] = None,
         oauth_state_store: Optional[OAuthStateStore] = None,
+        oauth_state_cookie_name: str = OAuthStateUtils.default_cookie_name,
+        oauth_state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
 
         # for the OAuth flow
         oauth_flow: Optional[OAuthFlow] = None,
@@ -83,9 +86,15 @@ class App():
 
         self._installation_store: Optional[InstallationStore] = installation_store
         self._oauth_state_store: Optional[OAuthStateStore] = oauth_state_store
+        if self._installation_store.logger is None:
+            self._installation_store.logger = self._framework_logger
+        if self._oauth_state_store.logger is None:
+            self._oauth_state_store.logger = self._framework_logger
+
+        self._oauth_state_cookie_name = oauth_state_cookie_name
+        self._oauth_state_expiration_seconds = oauth_state_expiration_seconds
 
         self.oauth_flow: Optional[OAuthFlow] = None
-
         if oauth_flow:
             self.oauth_flow = oauth_flow
             self._sync_client_logger_with_oauth_flow()
@@ -102,6 +111,7 @@ class App():
                     )
                     self._oauth_state_store = FileOAuthStateStore(
                         logger=self._framework_logger,
+                        expiration_seconds=self._oauth_state_expiration_seconds,
                         client_id=client_id,
                     )
 
@@ -114,6 +124,8 @@ class App():
                     # required storage implementations
                     installation_store=self._installation_store,
                     oauth_state_store=self._oauth_state_store,
+                    oauth_state_cookie_name=self._oauth_state_cookie_name,
+                    oauth_state_expiration_seconds=self._oauth_state_expiration_seconds,
                     # used for oauth.v2.access calls
                     client_id=client_id,
                     client_secret=client_secret,

@@ -5,7 +5,7 @@ from slack_bolt.errors import BoltError
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
-from slack_sdk.oauth import AuthorizeUrlGenerator, OAuthStateCookieUtils, RedirectUriPageRenderer
+from slack_sdk.oauth import AuthorizeUrlGenerator, OAuthStateUtils, RedirectUriPageRenderer
 from slack_sdk.oauth.installation_store import InstallationStore, Installation
 from slack_sdk.oauth.state_store import OAuthStateStore
 from slack_sdk.web import WebClient, SlackResponse
@@ -21,8 +21,8 @@ class OAuthFlow:
 
         installation_store: InstallationStore,
         oauth_state_store: OAuthStateStore,
-        oauth_state_cookie_name: str = OAuthStateCookieUtils.default_cookie_name,
-        oauth_state_expiration_seconds: int = OAuthStateCookieUtils.default_expiration_seconds,
+        oauth_state_cookie_name: str = OAuthStateUtils.default_cookie_name,
+        oauth_state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
 
         client_id: str,
         client_secret: str,
@@ -42,7 +42,7 @@ class OAuthFlow:
         self.installation_store = installation_store
         self.oauth_state_store = oauth_state_store
         self.oauth_state_cookie_name = oauth_state_cookie_name
-        self.oauth_state_cookie_utils = OAuthStateCookieUtils(
+        self.oauth_state_cookie_utils = OAuthStateUtils(
             cookie_name=oauth_state_cookie_name,
             expiration_seconds=oauth_state_expiration_seconds,
         )
@@ -88,7 +88,7 @@ class OAuthFlow:
             status=302,
             headers={
                 "Location": [self.authorize_url_generator.generate(state)],
-                "Set-Cookie": [self.oauth_state_cookie_utils.build_creation_header(state)]
+                "Set-Cookie": [self.oauth_state_cookie_utils.build_set_cookie_for_new_state(state)]
             },
         )
 
@@ -195,7 +195,7 @@ class OAuthFlow:
             headers={
                 "Content-Type": "text/html; charset=utf-8",
                 "Content-Length": len(html),
-                "Set-Cookie": self.oauth_state_cookie_utils.build_deletion_header(),
+                "Set-Cookie": self.oauth_state_cookie_utils.build_set_cookie_for_deletion(),
             },
             body=html,
         )
@@ -217,7 +217,7 @@ class OAuthFlow:
             headers={
                 "Content-Type": "text/html; charset=utf-8",
                 "Content-Length": len(html),
-                "Set-Cookie": self.oauth_state_cookie_utils.build_deletion_header(),
+                "Set-Cookie": self.oauth_state_cookie_utils.build_set_cookie_for_deletion(),
             },
             body=html,
         )

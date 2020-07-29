@@ -1,7 +1,7 @@
 from typing import Optional, Dict
 
 
-class OAuthStateCookieUtils:
+class OAuthStateUtils:
     default_cookie_name = "slack-app-oauth-state"
     default_expiration_seconds = 60 * 10,  # 10 minutes
 
@@ -14,14 +14,14 @@ class OAuthStateCookieUtils:
         self.cookie_name = cookie_name
         self.expiration_seconds = expiration_seconds
 
-    def build_creation_header(self, state: str) -> str:
+    def build_set_cookie_for_new_state(self, state: str) -> str:
         return f"{self.cookie_name}={state}; " \
                "Secure; " \
                "HttpOnly; " \
                "Path=/; " \
                f"Max-Age={self.expiration_seconds}"
 
-    def build_deletion_header(self) -> str:
+    def build_set_cookie_for_deletion(self) -> str:
         return f"{self.cookie_name}=deleted; " \
                "Secure; " \
                "HttpOnly; " \

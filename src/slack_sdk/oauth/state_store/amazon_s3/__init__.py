@@ -1,5 +1,6 @@
 import time
 from logging import Logger
+from typing import Optional
 from uuid import uuid4
 
 from botocore.client import BaseClient
@@ -12,15 +13,15 @@ class AmazonS3OAuthStateStore(OAuthStateStore):
     def __init__(
         self,
         *,
-        logger: Logger,
         s3_client: BaseClient,
         bucket_name: str,
-        expiration_seconds: int = 10 * 60,  # 10 minutes after creation
+        expiration_seconds: int,
+        logger: Optional[Logger] = None,
     ):
-        self.logger = logger
         self.s3_client = s3_client
         self.bucket_name = bucket_name
         self.expiration_seconds = expiration_seconds
+        self.logger = logger
 
     def issue(self) -> str:
         state = uuid4()

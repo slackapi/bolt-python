@@ -36,3 +36,4 @@ tmp.txt
 logs/
 
 .env
+*.db
