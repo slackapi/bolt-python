@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from botocore.client import BaseClient
 
-from .oauth_state_store import OAuthStateStore
+from ..state_store import OAuthStateStore
 
 
 class AmazonS3OAuthStateStore(OAuthStateStore):

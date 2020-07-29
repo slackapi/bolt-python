@@ -3,9 +3,9 @@ from logging import Logger
 from pathlib import Path
 from typing import Optional, Union
 
-from .bot import Bot
-from .installation import Installation
-from .installation_store import InstallationStore
+from slack_sdk.oauth.installation_store.installation_store import InstallationStore
+from slack_sdk.oauth.installation_store.models.bot import Bot
+from slack_sdk.oauth.installation_store.models.installation import Installation
 
 
 class FileInstallationStore(InstallationStore):

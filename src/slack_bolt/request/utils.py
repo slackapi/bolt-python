@@ -1,9 +1,9 @@
 import json
-from typing import Optional
+from typing import Optional, Dict
 from urllib.parse import parse_qsl
 
 
-def parse_payload(body: str, content_type: Optional[str]) -> dict:
+def parse_payload(body: str, content_type: Optional[str]) -> Dict[str, any]:
     if not body:
         return {}
     if content_type == "application/json" or body.startswith("{"):
@@ -21,7 +21,7 @@ def parse_payload(body: str, content_type: Optional[str]) -> dict:
         return {}
 
 
-def extract_enterprise_id(payload: dict):
+def extract_enterprise_id(payload: Dict[str, any]) -> Optional[str]:
     if "enterprise" in payload:
         org = payload.get("enterprise")
         if isinstance(org, str):
@@ -35,7 +35,7 @@ def extract_enterprise_id(payload: dict):
     return None
 
 
-def extract_team_id(payload: dict):
+def extract_team_id(payload: Dict[str, any]) -> Optional[str]:
     if "team" in payload:
         team = payload.get("team")
         if isinstance(team, str):
@@ -49,7 +49,7 @@ def extract_team_id(payload: dict):
     return None
 
 
-def extract_user_id(payload: dict):
+def extract_user_id(payload: Dict[str, any]) -> Optional[str]:
     if "user" in payload:
         user = payload.get("user")
         if isinstance(user, str):
@@ -63,7 +63,7 @@ def extract_user_id(payload: dict):
     return None
 
 
-def extract_channel_id(payload: dict):
+def extract_channel_id(payload: Dict[str, any]) -> Optional[str]:
     if "channel" in payload:
         channel = payload.get("channel")
         if isinstance(channel, str):

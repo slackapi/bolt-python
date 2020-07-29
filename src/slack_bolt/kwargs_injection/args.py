@@ -24,7 +24,7 @@ class Args():
         say: Say,
         respond: Respond,
         next: Callable[[], None],
-        **kwargs
+        **kwargs  # noqa
     ):
         self.logger: logging.Logger = logger
         self.client: WebClient = client

@@ -3,7 +3,7 @@ from typing import Optional
 from responder.models import Request, Response
 
 from slack_bolt import BoltRequest, App, BoltResponse
-from slack_bolt.oauth.oauth_flow import OAuthFlow
+from slack_bolt.oauth import OAuthFlow
 
 
 def to_bolt_request(req: Request, body: str) -> BoltRequest:

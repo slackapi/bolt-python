@@ -4,10 +4,10 @@ from typing import Optional
 
 import boto3
 
-from slack_bolt.oauth.oauth_flow import OAuthFlow
+from slack_bolt.oauth import OAuthFlow
 from slack_sdk import WebClient
-from slack_sdk.installation_store.amazon_s3_installation_store import AmazonS3InstallationStore
-from slack_sdk.oauth_state_store.amazon_s3_oauth_state_store import AmazonS3OAuthStateStore
+from slack_sdk.oauth.installation_store.amazon_s3 import AmazonS3InstallationStore
+from slack_sdk.oauth.state_store.amazon_s3 import AmazonS3OAuthStateStore
 
 
 class LambdaS3OAuthFlow(OAuthFlow):

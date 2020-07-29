@@ -4,7 +4,7 @@ from pyramid.request import Request
 from pyramid.response import Response
 
 from slack_bolt import App, BoltRequest, BoltResponse
-from slack_bolt.oauth.oauth_flow import OAuthFlow
+from slack_bolt.oauth import OAuthFlow
 
 
 def to_bolt_request(request: Request) -> BoltRequest:

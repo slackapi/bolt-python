@@ -1,7 +1,7 @@
 from flask import Request, Response, make_response
 
 from slack_bolt.app import App
-from slack_bolt.oauth.oauth_flow import OAuthFlow
+from slack_bolt.oauth import OAuthFlow
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 

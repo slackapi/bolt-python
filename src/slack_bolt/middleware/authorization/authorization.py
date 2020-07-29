@@ -18,6 +18,7 @@ class Authorization(Middleware):
     def is_no_auth_required(self, req: BoltResponse) -> bool:
         return self._is_url_verification(req) or self._is_ssl_check(req)
 
-    def build_error_response(self) -> BoltResponse:
+    @staticmethod
+    def build_error_response() -> BoltResponse:
         # show an ephemeral message to the end-user
         return BoltResponse(status=200, body=":x: Please install this app into the workspace :bow:")

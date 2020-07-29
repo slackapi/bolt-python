@@ -33,7 +33,8 @@ class CustomListener(Listener):
         self,
         *,
         req: BoltRequest,
-        resp: BoltResponse) -> BoltResponse:
+        resp: BoltResponse,
+    ) -> BoltResponse:
         return self.func(**build_required_kwargs(
             logger=self.logger,
             required_arg_names=self.arg_names,

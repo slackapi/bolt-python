@@ -4,7 +4,7 @@ from typing import List
 
 from slack_bolt.app import App
 from slack_bolt.logger import get_bolt_app_logger
-from slack_bolt.oauth.oauth_flow import OAuthFlow
+from slack_bolt.oauth import OAuthFlow
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 

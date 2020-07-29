@@ -16,7 +16,8 @@ class Listener(metaclass=ABCMeta):
         self,
         *,
         req: BoltRequest,
-        resp: BoltResponse) -> bool:
+        resp: BoltResponse,
+    ) -> bool:
         is_matched: bool = False
         for matcher in self.matchers:
             is_matched = matcher.matches(req, resp)
@@ -28,7 +29,8 @@ class Listener(metaclass=ABCMeta):
         self,
         *,
         req: BoltRequest,
-        resp: BoltResponse) -> (BoltResponse, bool):
+        resp: BoltResponse,
+    ) -> (BoltResponse, bool):
         """
 
         :param req: the incoming request

@@ -2,7 +2,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from slack_bolt import BoltRequest, App, BoltResponse
-from slack_bolt.oauth.oauth_flow import OAuthFlow
+from slack_bolt.oauth import OAuthFlow
 
 
 def to_bolt_request(req: Request, body: bytes) -> BoltRequest:

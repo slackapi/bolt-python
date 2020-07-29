@@ -24,12 +24,12 @@ from slack_bolt.middleware import \
     IgnoringSelfEvents, \
     CustomMiddleware
 from slack_bolt.middleware.url_verification import UrlVerification
-from slack_bolt.oauth.oauth_flow import OAuthFlow
+from slack_bolt.oauth import OAuthFlow
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk import WebClient
-from slack_sdk.installation_store import InstallationStore, FileInstallationStore
-from slack_sdk.oauth_state_store import OAuthStateStore, FileOAuthStateStore
+from slack_sdk.oauth.installation_store import InstallationStore, FileInstallationStore
+from slack_sdk.oauth.state_store import OAuthStateStore, FileOAuthStateStore
 
 
 class App():
@@ -488,16 +488,19 @@ class SlackAppServer:
         class SlackAppHandler(SimpleHTTPRequestHandler):
 
             def do_GET(self):
-                _path, _, query = self.path.partition("?")
-                qs = {k: v[0] for k, v in parse_qs(query).items()}
-                if _path == _oauth_flow.install_path:
-                    bolt_req = BoltRequest(body="", query=qs, headers=self.headers)
-                    bolt_resp = _oauth_flow.handle_installation(bolt_req)
-                    self._send_bolt_response(bolt_resp)
-                elif _path == _oauth_flow.redirect_uri_path:
-                    bolt_req = BoltRequest(body="", query=qs, headers=self.headers)
-                    bolt_resp = _oauth_flow.handle_callback(bolt_req)
-                    self._send_bolt_response(bolt_resp)
+                if _oauth_flow:
+                    _path, _, query = self.path.partition("?")
+                    qs = {k: v[0] for k, v in parse_qs(query).items()}
+                    if _path == _oauth_flow.install_path:
+                        bolt_req = BoltRequest(body="", query=qs, headers=self.headers)
+                        bolt_resp = _oauth_flow.handle_installation(bolt_req)
+                        self._send_bolt_response(bolt_resp)
+                    elif _path == _oauth_flow.redirect_uri_path:
+                        bolt_req = BoltRequest(body="", query=qs, headers=self.headers)
+                        bolt_resp = _oauth_flow.handle_callback(bolt_req)
+                        self._send_bolt_response(bolt_resp)
+                    else:
+                        self._send_response(404, headers={})
                 else:
                     self._send_response(404, headers={})
 

@@ -1,9 +1,9 @@
 from typing import Callable
 
 from slack_bolt.logger import get_bolt_logger
+from slack_bolt.middleware import Middleware
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
-from .middleware import Middleware
 
 
 class UrlVerification(Middleware):

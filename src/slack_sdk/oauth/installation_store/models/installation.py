@@ -1,7 +1,7 @@
 from time import time
 from typing import Optional, List, Union
 
-from .bot import Bot
+from slack_sdk.oauth.installation_store.models.bot import Bot
 
 
 class Installation():

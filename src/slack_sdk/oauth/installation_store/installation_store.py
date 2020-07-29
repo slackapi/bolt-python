@@ -1,13 +1,16 @@
+from abc import abstractmethod
 from typing import Optional
 
-from .installation import Installation
+from .models.installation import Installation
 
 
 class InstallationStore():
 
+    @abstractmethod
     def save(self, installation: Installation):
         raise NotImplementedError
 
+    @abstractmethod
     def find_bot(
         self,
         *,

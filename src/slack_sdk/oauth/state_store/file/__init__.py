@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Union, Optional
 from uuid import uuid4
 
-from .oauth_state_store import OAuthStateStore
+from ..state_store import OAuthStateStore
 
 
 class FileOAuthStateStore(OAuthStateStore):

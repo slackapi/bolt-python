@@ -3,7 +3,7 @@ from typing import Optional
 from django.http import HttpRequest, HttpResponse
 
 from slack_bolt.app import App
-from slack_bolt.oauth.oauth_flow import OAuthFlow
+from slack_bolt.oauth import OAuthFlow
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 

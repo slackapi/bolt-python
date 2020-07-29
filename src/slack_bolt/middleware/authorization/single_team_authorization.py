@@ -34,7 +34,8 @@ class SingleTeamAuthorization(Authorization):
                 )
                 return next()
             else:
-                self.logger.error("Somehow, the auth.test is unexpectedly None")
+                # Just in case
+                self.logger.error("auth.test API call result is unexpectedly None")
                 return self.build_error_response()
         except SlackApiError as e:
             self.logger.error(f"Failed to authorize with the given token ({e})")

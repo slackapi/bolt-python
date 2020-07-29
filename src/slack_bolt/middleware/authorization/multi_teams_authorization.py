@@ -3,12 +3,12 @@ from typing import Callable, Optional
 from slack import WebClient
 
 from slack_bolt.auth.result import AuthorizationResult
+from slack_bolt.logger import get_bolt_logger
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
-from slack_sdk.installation_store import InstallationStore, Bot
+from slack_sdk.oauth.installation_store import InstallationStore, Bot
 from . import Authorization
-from ...logger import get_bolt_logger
 
 
 class MultiTeamsAuthorization(Authorization):
@@ -47,7 +47,8 @@ class MultiTeamsAuthorization(Authorization):
                 req.context["client"] = WebClient(token=bot.bot_token)
                 return next()
             else:
-                self.logger.error("Somehow, the auth.test is unexpectedly None")
+                # Just in case
+                self.logger.error("auth.test API call result is unexpectedly None")
                 return self.build_error_response()
 
         except SlackApiError as e:

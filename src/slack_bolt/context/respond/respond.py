@@ -9,20 +9,22 @@ class Respond():
         *,
         response_url: Optional[str]
     ):
-        self.response_url = response_url
+        self.response_url: Optional[str] = response_url
 
     def __call__(
         self,
         text: str = None,
-        blocks: List[dict] = [],
+        blocks: Optional[List[dict]] = None,
         response_type: Optional[str] = None,
         replace_original: Optional[bool] = None,
         delete_original: Optional[bool] = None,
     ) -> WebhookResponse:
-        if self.response_url:
+        if self.response_url is not None:
             client = WebhookClient(self.response_url)
-            message = {"text": text, "blocks": blocks, }
-            if response_type:
+            message = {"text": text}
+            if blocks is not None:
+                message["blocks"] = blocks
+            if response_type is not None:
                 message["response_type"] = response_type
             if replace_original is not None:
                 message["replace_original"] = replace_original

@@ -1,0 +1,223 @@
+from logging import Logger
+from typing import Optional, List, Dict
+
+from slack_bolt.errors import BoltError
+from slack_bolt.request import BoltRequest
+from slack_bolt.response import BoltResponse
+from slack_sdk.errors import SlackApiError
+from slack_sdk.oauth import AuthorizeUrlGenerator, OAuthStateCookieUtils, RedirectUriPageRenderer
+from slack_sdk.oauth.installation_store import InstallationStore, Installation
+from slack_sdk.oauth.state_store import OAuthStateStore
+from slack_sdk.web import WebClient, SlackResponse
+
+
+class OAuthFlow:
+
+    def __init__(
+        self,
+        *,
+        client: WebClient,
+        logger: Logger,
+
+        installation_store: InstallationStore,
+        oauth_state_store: OAuthStateStore,
+        oauth_state_cookie_name: str = OAuthStateCookieUtils.default_cookie_name,
+        oauth_state_expiration_seconds: int = OAuthStateCookieUtils.default_expiration_seconds,
+
+        client_id: str,
+        client_secret: str,
+        scopes: Optional[List[str]] = None,
+        user_scopes: Optional[List[str]] = None,
+        redirect_uri: Optional[str] = None,
+
+        install_path: str = "/slack/install",
+        redirect_uri_path: str = "/slack/oauth_redirect",
+
+        success_url: Optional[str] = None,
+        failure_url: Optional[str] = None,
+    ):
+        self.client = client
+        self.logger = logger
+
+        self.installation_store = installation_store
+        self.oauth_state_store = oauth_state_store
+        self.oauth_state_cookie_name = oauth_state_cookie_name
+        self.oauth_state_cookie_utils = OAuthStateCookieUtils(
+            cookie_name=oauth_state_cookie_name,
+            expiration_seconds=oauth_state_expiration_seconds,
+        )
+
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.redirect_uri = redirect_uri
+
+        self.authorize_url_generator = AuthorizeUrlGenerator(
+            client_id=client_id,
+            client_secret=client_secret,
+            redirect_uri=redirect_uri,
+            scopes=scopes,
+            user_scopes=user_scopes,
+        )
+
+        self.install_path = install_path
+        self.redirect_uri_path = redirect_uri_path
+
+        self.redirect_uri_page_renderer = RedirectUriPageRenderer(
+            install_path=install_path,
+            redirect_uri_path=redirect_uri_path,
+            success_url=success_url,
+            failure_url=failure_url,
+        )
+
+    # -----------------------------
+    # Installation
+    # -----------------------------
+
+    def handle_installation(self, request: BoltRequest) -> BoltResponse:
+        state = self.issue_new_state(request)
+        return self.build_authorize_url_redirection(request, state)
+
+    # ----------------------
+    # Internal methods for Installation
+
+    def issue_new_state(self, request: BoltRequest) -> str:
+        return self.oauth_state_store.issue()
+
+    def build_authorize_url_redirection(self, request: BoltRequest, state: str) -> BoltResponse:
+        return BoltResponse(
+            status=302,
+            headers={
+                "Location": [self.authorize_url_generator.generate(state)],
+                "Set-Cookie": [self.oauth_state_cookie_utils.build_creation_header(state)]
+            },
+        )
+
+    # -----------------------------
+    # Callback
+    # -----------------------------
+
+    def handle_callback(self, request: BoltRequest) -> BoltResponse:
+
+        # failure due to end-user's cancellation or invalid redirection to slack.com
+        error = request.query.get("error", None)
+        if error is not None:
+            return self.build_callback_failure_response(request, reason=error, status=200)
+
+        # state parameter verification
+        state = request.query.get("state", None)
+        if not self.oauth_state_cookie_utils.is_valid_browser(state, request.headers):
+            return self.build_callback_failure_response(request, reason="invalid_browser", status=400)
+
+        valid_state_consumed = self.oauth_state_store.consume(state)
+        if not valid_state_consumed:
+            return self.build_callback_failure_response(request, reason="invalid_state", status=401)
+
+        # run installation
+        code = request.query.get("code", None)
+        if code is None:
+            return self.build_callback_failure_response(request, reason="missing_code", status=401)
+        installation = self.run_installation(code)
+        if installation is None:
+            # failed to run installation with the code
+            return self.build_callback_failure_response(request, reason="invalid_code", status=401)
+
+        # persist the installation
+        try:
+            self.store_installation(request, installation)
+        except BoltError as e:
+            return self.build_callback_failure_response(request, reason="storage_error", error=e)
+
+        # display a successful completion page to the end-user
+        return self.build_callback_success_response(request, installation)
+
+    # ----------------------
+    # Internal methods for Callback
+
+    def run_installation(self, code: str) -> Optional[Installation]:
+        try:
+            oauth_response: SlackResponse = self.client.oauth_v2_access(
+                code=code,
+                client_id=self.client_id,
+                client_secret=self.client_secret,
+                redirect_uri=self.redirect_uri,  # can be None
+            )
+            installed_enterprise: Dict[str, str] = oauth_response.get("enterprise", {})
+            installed_team: Dict[str, str] = oauth_response.get("team", {})
+            installer: Dict[str, str] = oauth_response.get("authed_user", {})
+            incoming_webhook: Dict[str, str] = oauth_response.get("incoming_webhook", {})
+
+            bot_token: Optional[str] = oauth_response.get("access_token", None)
+            # NOTE: oauth.v2.access doesn't include bot_id in response
+            bot_id: Optional[str] = None
+            if bot_token is not None:
+                auth_test = self.client.auth_test(token=bot_token)
+                bot_id = auth_test["bot_id"]
+
+            return Installation(
+                app_id=oauth_response.get("app_id", None),
+                enterprise_id=installed_enterprise.get("id", None),
+                team_id=installed_team.get("id", None),
+                bot_token=bot_token,
+                bot_id=bot_id,
+                bot_user_id=oauth_response.get("bot_user_id", None),
+                bot_scopes=oauth_response.get("scope", None),  # comma-separated string
+                user_id=installer.get("id", None),
+                user_token=installer.get("access_token", None),
+                user_scopes=installer.get("scope", None),  # comma-separated string
+                incoming_webhook_url=incoming_webhook.get("url", None),
+                incoming_webhook_channel_id=incoming_webhook.get("channel_id", None),
+                incoming_webhook_configuration_url=incoming_webhook.get("configuration_url", None),
+            )
+
+        except SlackApiError as e:
+            message = f"Failed to fetch oauth.v2.access result with code: {code} - error: {e}"
+            self.logger.warning(message)
+            return None
+
+    def store_installation(self, request: BoltRequest, installation: Installation):
+        # may raise BoltError
+        self.installation_store.save(installation)
+
+    def build_callback_failure_response(
+        self,
+        request: BoltRequest,
+        reason: str,
+        status: int = 500,
+        error: Optional[Exception] = None,
+    ) -> BoltResponse:
+        debug_message = "Handling an OAuth callback failure " \
+                        f"(reason: {reason}, error: {error}, request: {request.query})"
+        self.logger.debug(debug_message)
+
+        html = self.redirect_uri_page_renderer.render_failure_page(reason)
+        return BoltResponse(
+            status=status,
+            headers={
+                "Content-Type": "text/html; charset=utf-8",
+                "Content-Length": len(html),
+                "Set-Cookie": self.oauth_state_cookie_utils.build_deletion_header(),
+            },
+            body=html,
+        )
+
+    def build_callback_success_response(
+        self,
+        request: BoltRequest,
+        installation: Installation,
+    ) -> BoltResponse:
+        debug_message = f"Handling an OAuth callback success (request: {request.query})"
+        self.logger.debug(debug_message)
+
+        html = self.redirect_uri_page_renderer.render_success_page(
+            app_id=installation.app_id,
+            team_id=installation.team_id,
+        )
+        return BoltResponse(
+            status=200,
+            headers={
+                "Content-Type": "text/html; charset=utf-8",
+                "Content-Length": len(html),
+                "Set-Cookie": self.oauth_state_cookie_utils.build_deletion_header(),
+            },
+            body=html,
+        )
