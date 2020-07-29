@@ -46,31 +46,38 @@ class OAuthFlow:
         self.installation_store = installation_store
         self.oauth_state_store = oauth_state_store
         self.oauth_state_cookie_name = oauth_state_cookie_name
-        self.oauth_state_utils = OAuthStateUtils(
-            cookie_name=oauth_state_cookie_name,
-            expiration_seconds=oauth_state_expiration_seconds,
-        )
+        self.oauth_state_expiration_seconds = oauth_state_expiration_seconds
 
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
-
-        self.authorize_url_generator = AuthorizeUrlGenerator(
-            client_id=client_id,
-            client_secret=client_secret,
-            redirect_uri=redirect_uri,
-            scopes=scopes,
-            user_scopes=user_scopes,
-        )
+        self.scopes = scopes
+        self.user_scopes = user_scopes
 
         self.install_path = install_path
         self.redirect_uri_path = redirect_uri_path
+        self.success_url = success_url
+        self.failure_url = failure_url
 
+        self._init_internal_utils()
+
+    def _init_internal_utils(self):
+        self.oauth_state_utils = OAuthStateUtils(
+            cookie_name=self.oauth_state_cookie_name,
+            expiration_seconds=self.oauth_state_expiration_seconds,
+        )
+        self.authorize_url_generator = AuthorizeUrlGenerator(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            redirect_uri=self.redirect_uri,
+            scopes=self.scopes,
+            user_scopes=self.user_scopes,
+        )
         self.redirect_uri_page_renderer = RedirectUriPageRenderer(
-            install_path=install_path,
-            redirect_uri_path=redirect_uri_path,
-            success_url=success_url,
-            failure_url=failure_url,
+            install_path=self.install_path,
+            redirect_uri_path=self.redirect_uri_path,
+            success_url=self.success_url,
+            failure_url=self.failure_url,
         )
 
     @property

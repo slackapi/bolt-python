@@ -1,3 +1,4 @@
+import logging
 import os
 from logging import Logger
 from typing import Optional
@@ -15,6 +16,8 @@ class LambdaS3OAuthFlow(OAuthFlow):
     def __init__(
         self,
         *,
+        client: Optional[WebClient] = None,
+        logger: Optional[Logger] = None,
 
         oauth_state_bucket_name: str = os.environ["SLACK_STATE_S3_BUCKET_NAME"],
         installation_bucket_name: str = os.environ["SLACK_INSTALLATION_S3_BUCKET_NAME"],
@@ -33,8 +36,8 @@ class LambdaS3OAuthFlow(OAuthFlow):
         success_url: Optional[str] = None,
         failure_url: Optional[str] = None,
     ):
-        self.client: Optional[WebClient] = None
-        self.logger: Optional[Logger] = None
+        self._client = client
+        self._logger = logger
 
         self.s3_client = boto3.client("s3")
         self.oauth_state_store = AmazonS3OAuthStateStore(
@@ -62,3 +65,17 @@ class LambdaS3OAuthFlow(OAuthFlow):
         self.redirect_uri_path = redirect_uri_path
         self.success_url = success_url
         self.failure_url = failure_url
+
+        self._init_internal_utils()
+
+    @property
+    def client(self) -> WebClient:
+        if self._client is None:
+            self._client = WebClient()
+        return self._client
+
+    @property
+    def logger(self) -> Logger:
+        if self._logger is None:
+            self._logger = logging.getLogger(__name__)
+        return self._logger
