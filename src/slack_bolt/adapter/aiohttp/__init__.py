@@ -19,7 +19,7 @@ async def to_aiohttp_response(bolt_resp: BoltResponse) -> web.Response:
         "content-type",
         ["application/json" if bolt_resp.body.startswith("{") else "text/plain"]
     )[0]
-    content_type = re.sub(";\s*charset=utf-8", "", content_type)
+    content_type = re.sub(r";\s*charset=utf-8", "", content_type)
     resp = web.Response(
         status=bolt_resp.status,
         body=bolt_resp.body,
