@@ -40,12 +40,14 @@ def extract_team_id(payload: Dict[str, any]) -> Optional[str]:
         team = payload.get("team")
         if isinstance(team, str):
             return team
-        elif "id" in team:
+        elif team and "id" in team:
             return team.get("id")
     if "team_id" in payload:
         return payload.get("team_id")
     if "event" in payload:
         return extract_team_id(payload["event"])
+    if "user" in payload:
+        return payload.get("user")["team_id"]    
     return None
 
 
