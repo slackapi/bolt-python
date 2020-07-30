@@ -1,6 +1,6 @@
 import base64
 import logging
-from typing import List
+from typing import List, Dict, Optional
 
 from slack_bolt.app import App
 from slack_bolt.logger import get_bolt_app_logger
@@ -8,17 +8,19 @@ from slack_bolt.oauth import OAuthFlow
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
-# https://stackoverflow.com/questions/37703609/using-python-logging-with-aws-lambda
-root = logging.getLogger()
-if root.handlers:
-    for handler in root.handlers:
-        root.removeHandler(handler)
-
 
 class SlackRequestHandler():
     def __init__(self, app: App):
         self.app = app
         self.logger = get_bolt_app_logger(app.name, SlackRequestHandler)
+
+    @classmethod
+    def clear_all_log_handlers(cls):
+        # https://stackoverflow.com/questions/37703609/using-python-logging-with-aws-lambda
+        root = logging.getLogger()
+        if root.handlers:
+            for handler in root.handlers:
+                root.removeHandler(handler)
 
     def handle(self, event, context):
         self.logger.debug(f"Incoming event: {event}, context: {context}")
@@ -29,11 +31,13 @@ class SlackRequestHandler():
         if method == "GET":
             if self.app.oauth_flow is not None:
                 oauth_flow: OAuthFlow = self.app.oauth_flow
-                bolt_req = to_bolt_request(event)
+                bolt_req: BoltRequest = to_bolt_request(event)
                 query = bolt_req.query
-                is_callback = (query.get("code", None) is not None \
-                               and query.get("state", None) is not None) \
-                              or query.get("error", None) is not None
+                is_callback = query is not None and (
+                    (_first_value(query, "code") is not None and _first_value(query, "state") is not None)
+                    or
+                    _first_value(query, "error") is not None
+                )
                 if is_callback:
                     bolt_resp = oauth_flow.handle_callback(bolt_req)
                     return to_aws_response(bolt_resp)
@@ -49,7 +53,15 @@ class SlackRequestHandler():
         return not_found()
 
 
-def to_bolt_request(event):
+def _first_value(query: Dict[str, List[str]], name: str) -> Optional[str]:
+    if query:
+        values = query.get(name, [])
+        if values and len(values) > 0:
+            return values[0]
+    return None
+
+
+def to_bolt_request(event) -> BoltRequest:
     body = event.get("body", "")
     if event["isBase64Encoded"]:
         body = base64.b64decode(body).decode("utf-8")
@@ -63,7 +75,7 @@ def to_bolt_request(event):
     )
 
 
-def to_aws_response(resp: BoltResponse):
+def to_aws_response(resp: BoltResponse) -> Dict[str, any]:
     return {
         "statusCode": resp.status,
         "body": resp.body,
@@ -71,7 +83,7 @@ def to_aws_response(resp: BoltResponse):
     }
 
 
-def not_found():
+def not_found() -> Dict[str, any]:
     return {
         "statusCode": 404,
         "body": "Not Found",

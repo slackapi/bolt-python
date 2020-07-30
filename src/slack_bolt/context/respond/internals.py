@@ -17,3 +17,4 @@ def _build_message(
         message["replace_original"] = replace_original
     if delete_original is not None:
         message["delete_original"] = delete_original
+    return message

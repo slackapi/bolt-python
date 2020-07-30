@@ -182,12 +182,12 @@ class AsyncOAuthFlow:
     async def handle_callback(self, request: BoltRequest) -> BoltResponse:
 
         # failure due to end-user's cancellation or invalid redirection to slack.com
-        error = request.query.get("error", None)
+        error = request.query.get("error", [None])[0]
         if error is not None:
             return await self.build_callback_failure_response(request, reason=error, status=200)
 
         # state parameter verification
-        state = request.query.get("state", None)
+        state = request.query.get("state", [None])[0]
         if not self.oauth_state_utils.is_valid_browser(state, request.headers):
             return await self.build_callback_failure_response(request, reason="invalid_browser", status=400)
 
@@ -196,7 +196,7 @@ class AsyncOAuthFlow:
             return await self.build_callback_failure_response(request, reason="invalid_state", status=401)
 
         # run installation
-        code = request.query.get("code", None)
+        code = request.query.get("code", [None])[0]
         if code is None:
             return await self.build_callback_failure_response(request, reason="missing_code", status=401)
         installation = await self.run_installation(code)

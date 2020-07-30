@@ -10,7 +10,7 @@ def parse_query(
     if query is None:
         return {}
     elif isinstance(query, str):
-        return {k: v[0] for k, v in parse_qs(query).items()}
+        return parse_qs(query)
     elif isinstance(query, dict):
         result = {}
         for name, value in query.items():
@@ -20,6 +20,7 @@ def parse_query(
                 result[name] = [value]
             else:
                 raise ValueError(f"Unsupported type ({type(value)}) of element in headers ({query})")
+        return result
     else:
         raise ValueError(f"Unsupported type of query detected ({type(query)})")
 
