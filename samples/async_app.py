@@ -6,16 +6,24 @@ sys.path.insert(1, "../src")
 # ------------------------------------------------
 
 import logging
-from slack_bolt import App
 
 logging.basicConfig(level=logging.DEBUG)
-app = App()
+
+from slack_bolt.asyncio import AsyncApp
+
+app = AsyncApp()
+
+
+@app.middleware  # or app.use(log_request)
+async def log_request(logger, payload, next):
+    logger.debug(payload)
+    return await next()
 
 
 @app.event("app_mention")
-def event_test(payload, say, logger):
+async def event_test(payload, say, logger):
     logger.info(payload)
-    say("What's up?")
+    await say("What's up?")
 
 
 if __name__ == '__main__':
@@ -25,7 +33,4 @@ if __name__ == '__main__':
 # pip install -i https://test.pypi.org/simple/ slack_bolt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
-# export SLACK_CLIENT_ID=111.111
-# export SLACK_CLIENT_SECRET=***
-# export SLACK_SCOPES=app_mentions:read,channels:history,im:history,chat:write
-# python oauth_app.py
+# python app.py

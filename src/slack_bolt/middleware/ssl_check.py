@@ -1,12 +1,14 @@
-from typing import Callable
+from typing import Callable, Awaitable
 
 from slack_bolt.logger import get_bolt_logger
 from slack_bolt.middleware import Middleware
+from slack_bolt.middleware.async_middleware import AsyncMiddleware
 from slack_bolt.request import BoltRequest
+from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 
 
-class SslCheck(Middleware):
+class SslCheck(Middleware, AsyncMiddleware):
     def __init__(self, verification_token: str = None):
         self.verification_token = verification_token
         self.logger = get_bolt_logger(SslCheck)
@@ -18,10 +20,41 @@ class SslCheck(Middleware):
         resp: BoltResponse,
         next: Callable[[], BoltResponse],
     ) -> BoltResponse:
-        if "ssl_check" in req.payload and req.payload["ssl_check"] == "1":
-            if self.verification_token and \
-                self.verification_token == req.payload["token"]:
-                return BoltResponse(status=401, body={"error": "invalid verification token"})
-            return BoltResponse(status=200, body="")
+        if self._is_ssl_check_request(req.payload):
+            if self._verify_token_if_needed(req.payload):
+                return self._build_error_response()
+            return self._build_success_response()
         else:
             return next()
+
+    async def async_process(
+        self,
+        *,
+        req: AsyncBoltRequest,
+        resp: BoltResponse,
+        next: Callable[[], Awaitable[BoltResponse]],
+    ) -> BoltResponse:
+        if self._is_ssl_check_request(req.payload):
+            if self._verify_token_if_needed(req.payload):
+                return self._build_error_response()
+            return self._build_success_response()
+        else:
+            return await next()
+
+    # -----------------------------------------
+
+    @staticmethod
+    def _is_ssl_check_request(payload: dict):
+        return "ssl_check" in payload and payload["ssl_check"] == "1"
+
+    def _verify_token_if_needed(self, payload: dict):
+        return self.verification_token and \
+               self.verification_token == payload["token"]
+
+    @staticmethod
+    def _build_success_response() -> BoltResponse:
+        return BoltResponse(status=200, body="")
+
+    @staticmethod
+    def _build_error_response() -> BoltResponse:
+        return BoltResponse(status=401, body={"error": "invalid verification token"})

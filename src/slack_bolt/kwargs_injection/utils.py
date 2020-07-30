@@ -1,7 +1,8 @@
 import logging
-from typing import Set, Callable, Dict
+from typing import Set, Callable, Dict, Union
 
 from slack_bolt.request import BoltRequest
+from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from .args import Args
 
@@ -10,7 +11,7 @@ def build_required_kwargs(
     *,
     logger: logging.Logger,
     required_arg_names: Set[str],
-    req: BoltRequest,
+    req: Union[BoltRequest, AsyncBoltRequest],
     resp: BoltResponse,
     next_func: Callable[[], None] = None,
 ) -> Dict[str, any]:

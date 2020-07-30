@@ -5,10 +5,11 @@ from logging import Logger
 from sqlite3 import Connection
 from uuid import uuid4
 
+from ..async_state_store import AsyncOAuthStateStore
 from ..state_store import OAuthStateStore
 
 
-class SQLite3OAuthStateStore(OAuthStateStore):
+class SQLite3OAuthStateStore(OAuthStateStore, AsyncOAuthStateStore):
 
     def __init__(
         self,
@@ -54,6 +55,12 @@ class SQLite3OAuthStateStore(OAuthStateStore):
             """)
             self.logger.debug(f"Tables have been created (database: {self.database})")
             conn.commit()
+
+    async def async_issue(self) -> str:
+        return self.issue()
+
+    async def async_consume(self, state: str) -> bool:
+        return self.consume(state)
 
     def issue(self) -> str:
         state: str = str(uuid4())

@@ -23,7 +23,10 @@ setuptools.setup(
     package_dir={"": "src"},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
     setup_requires=["pytest-runner==5.2"],
-    tests_require=["pytest==3.8.2"],
+    tests_require=[
+        "pytest>=5,<6",
+        "pytest-asyncio<1",
+    ],
     install_requires=[
         "slackclient>=2,<3",  # TODO: will be replaced with slack_sdk==3.0.0
         "aiohttp>=3,<4",  # slackclient depends on aiohttp

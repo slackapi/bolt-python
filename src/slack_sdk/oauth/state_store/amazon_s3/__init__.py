@@ -1,15 +1,15 @@
 import logging
 import time
 from logging import Logger
-from typing import Optional
 from uuid import uuid4
 
 from botocore.client import BaseClient
 
+from ..async_state_store import AsyncOAuthStateStore
 from ..state_store import OAuthStateStore
 
 
-class AmazonS3OAuthStateStore(OAuthStateStore):
+class AmazonS3OAuthStateStore(OAuthStateStore, AsyncOAuthStateStore):
 
     def __init__(
         self,
@@ -29,6 +29,12 @@ class AmazonS3OAuthStateStore(OAuthStateStore):
         if self._logger is None:
             self._logger = logging.getLogger(__name__)
         return self._logger
+
+    async def async_issue(self) -> str:
+        return self.issue()
+
+    async def async_consume(self, state: str) -> bool:
+        return self.consume(state)
 
     def issue(self) -> str:
         state = uuid4()

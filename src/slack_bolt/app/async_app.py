@@ -1,39 +1,39 @@
+import asyncio
 import inspect
-import json
 import logging
 import os
+import re
 import time
-from concurrent.futures.thread import ThreadPoolExecutor
+from asyncio import Future
 from functools import wraps
-from http.server import SimpleHTTPRequestHandler, HTTPServer
-from typing import List, Union, Pattern, Callable, Dict, Optional
+from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable
 from urllib.parse import parse_qs
 
-from slack_bolt.listener.custom_listener import CustomListener
-from slack_bolt.listener.listener import Listener
-from slack_bolt.listener_matcher import CustomListenerMatcher
+from aiohttp import web
+
 from slack_bolt.listener_matcher import builtins as builtin_matchers
-from slack_bolt.listener_matcher.listener_matcher import ListenerMatcher
-from slack_bolt.logger import get_bolt_app_logger, get_bolt_logger
-from slack_bolt.middleware import \
-    Middleware, \
-    SslCheck, \
-    RequestVerification, \
-    SingleTeamAuthorization, \
-    MultiTeamsAuthorization, \
-    IgnoringSelfEvents, \
-    CustomMiddleware
-from slack_bolt.middleware.url_verification import UrlVerification
-from slack_bolt.oauth import OAuthFlow
-from slack_bolt.request import BoltRequest
+from slack_bolt.logger import get_bolt_logger, get_bolt_app_logger
+from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
-from slack_sdk import WebClient
 from slack_sdk.oauth import OAuthStateUtils
-from slack_sdk.oauth.installation_store import InstallationStore, FileInstallationStore
-from slack_sdk.oauth.state_store import OAuthStateStore, FileOAuthStateStore
+from slack_sdk.oauth.installation_store import FileInstallationStore
+from slack_sdk.oauth.installation_store.async_installation_store import AsyncInstallationStore
+from slack_sdk.oauth.state_store import FileOAuthStateStore
+from slack_sdk.oauth.state_store.async_state_store import AsyncOAuthStateStore
+from slack_sdk.web.async_client import AsyncWebClient
+from ..listener.async_custom_listener import AsyncCustomListener
+from ..listener.async_listener import AsyncListener
+from ..listener_matcher.async_custom_listener_matcher import AsyncCustomListenerMatcher
+from ..listener_matcher.async_listener_matcher import AsyncListenerMatcher
+from ..middleware import SslCheck, RequestVerification, IgnoringSelfEvents, UrlVerification
+from ..middleware.async_custom_middleware import AsyncCustomMiddleware
+from ..middleware.async_middleware import AsyncMiddleware
+from ..middleware.authorization.async_multi_teams_authorization import AsyncMultiTeamsAuthorization
+from ..middleware.authorization.async_single_team_authorization import AsyncSingleTeamAuthorization
+from ..oauth.async_oauth_flow import AsyncOAuthFlow
 
 
-class App():
+class AsyncApp():
 
     def __init__(
         self,
@@ -46,15 +46,15 @@ class App():
         signing_secret: str = os.environ.get("SLACK_SIGNING_SECRET", None),
         # for single-workspace apps
         token: Optional[str] = os.environ.get("SLACK_BOT_TOKEN", None),
-        client: Optional[WebClient] = None,
+        client: Optional[AsyncWebClient] = None,
         # for multi-workspace apps
-        installation_store: Optional[InstallationStore] = None,
-        oauth_state_store: Optional[OAuthStateStore] = None,
+        installation_store: Optional[AsyncInstallationStore] = None,
+        oauth_state_store: Optional[AsyncOAuthStateStore] = None,
         oauth_state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         oauth_state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
 
         # for the OAuth flow
-        oauth_flow: Optional[OAuthFlow] = None,
+        oauth_flow: Optional[AsyncOAuthFlow] = None,
         client_id: Optional[str] = os.environ.get("SLACK_CLIENT_ID", None),
         client_secret: Optional[str] = os.environ.get("SLACK_CLIENT_SECRET", None),
         scopes: List[str] = os.environ.get("SLACK_SCOPES", "").split(","),
@@ -71,7 +71,7 @@ class App():
         self.name = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret: str = signing_secret
         self._verification_token: Optional[str] = verification_token
-        self._framework_logger = get_bolt_logger(App)
+        self._framework_logger = get_bolt_logger(AsyncApp)
 
         self._token: Optional[str] = token
 
@@ -82,15 +82,15 @@ class App():
                 self._framework_logger.warning(
                     "As you gave client as well, the bot token will be unused.")
         else:
-            self._client = WebClient(token=token)  # NOTE: the token here can be None
+            self._client = AsyncWebClient(token=token)  # NOTE: the token here can be None
 
-        self._installation_store: Optional[InstallationStore] = installation_store
-        self._oauth_state_store: Optional[OAuthStateStore] = oauth_state_store
+        self._installation_store: Optional[AsyncInstallationStore] = installation_store
+        self._oauth_state_store: Optional[AsyncOAuthStateStore] = oauth_state_store
 
         self._oauth_state_cookie_name = oauth_state_cookie_name
         self._oauth_state_expiration_seconds = oauth_state_expiration_seconds
 
-        self._oauth_flow: Optional[OAuthFlow] = None
+        self._oauth_flow: Optional[AsyncOAuthFlow] = None
         if oauth_flow:
             self._oauth_flow = oauth_flow
             if self._installation_store is None:
@@ -115,8 +115,8 @@ class App():
                 if self._installation_store is not None and self._oauth_state_store is None:
                     raise ValueError(f"Configure an appropriate OAuthStateStore for {self._installation_store}")
 
-                self._oauth_flow = OAuthFlow(
-                    client=WebClient(token=None),
+                self._oauth_flow = AsyncOAuthFlow(
+                    client=AsyncWebClient(token=None),
                     logger=self._framework_logger,
                     # required storage implementations
                     installation_store=self._installation_store,
@@ -143,10 +143,11 @@ class App():
             self._framework_logger.warning(
                 "As you gave installation_store as well, the bot token will be unused.")
 
-        self._middleware_list: List[Union[Callable, Middleware]] = []
-        self._listeners: List[Listener] = []
-        self._listener_executor = ThreadPoolExecutor(max_workers=5)  # TODO: shutdown
+        self._middleware_list: List[Union[Callable, AsyncMiddleware]] = []
+        self._listeners: List[AsyncListener] = []
         self._process_before_response = process_before_response
+
+        self._listener_tasks = []
 
         self._init_middleware_list_done = False
         self._init_middleware_list()
@@ -159,9 +160,9 @@ class App():
         self._middleware_list.append(SslCheck(verification_token=self._verification_token))
         self._middleware_list.append(RequestVerification(self._signing_secret))
         if self._oauth_flow is None and self._token:
-            self._middleware_list.append(SingleTeamAuthorization())
+            self._middleware_list.append(AsyncSingleTeamAuthorization())
         else:
-            self._middleware_list.append(MultiTeamsAuthorization(self._installation_store))
+            self._middleware_list.append(AsyncMultiTeamsAuthorization(self._installation_store))
         self._middleware_list.append(IgnoringSelfEvents())
         self._middleware_list.append(UrlVerification())
         self._init_middleware_list_done = True
@@ -175,65 +176,64 @@ class App():
     # accessors
 
     @property
-    def oauth_flow(self) -> Optional[OAuthFlow]:
+    def oauth_flow(self) -> Optional[AsyncOAuthFlow]:
         return self._oauth_flow
 
     @property
-    def client(self) -> WebClient:
+    def client(self) -> AsyncWebClient:
         return self._client
 
     @property
-    def installation_store(self) -> Optional[InstallationStore]:
+    def installation_store(self) -> Optional[AsyncInstallationStore]:
         return self._installation_store
 
     @property
-    def oauth_state_store(self) -> Optional[OAuthStateStore]:
+    def oauth_state_store(self) -> Optional[AsyncOAuthStateStore]:
         return self._oauth_state_store
 
     # -------------------------
     # standalone server
 
     def start(self, port: int = 3000, path: str = "/slack/events") -> None:
-        self.server = SlackAppServer(
+        self.server = AsyncSlackAppServer(
             port=port,
             path=path,
             app=self,
-            oauth_flow=self.oauth_flow,
         )
         self.server.start()
 
     # -------------------------
     # main dispatcher
 
-    def dispatch(self, req: BoltRequest) -> BoltResponse:
+    async def async_dispatch(self, req: AsyncBoltRequest) -> BoltResponse:
         self._init_context(req)
 
         resp: BoltResponse = BoltResponse(status=200, body=None)
         middleware_state = {"next_called": False}
 
-        def middleware_next():
+        async def middleware_next():
             middleware_state["next_called"] = True
 
         for middleware in self._middleware_list:
             middleware_state["next_called"] = False
             if self._framework_logger.level <= logging.DEBUG:
                 self._framework_logger.debug(f"Applying {middleware.name}")
-            resp = middleware.process(req=req, resp=resp, next=middleware_next)
+            resp = await middleware.async_process(req=req, resp=resp, next=middleware_next)
             if not middleware_state["next_called"]:
                 return resp
 
         for listener in self._listeners:
-            if listener.matches(req=req, resp=resp):
+            if await listener.async_matches(req=req, resp=resp):
                 listener_name = listener.func.__name__
                 # run all the middleware attached to this listener first
-                resp, next_was_not_called = listener.run_middleware(req=req, resp=resp)
+                resp, next_was_not_called = await listener.run_async_middleware(req=req, resp=resp)
                 if next_was_not_called:
                     # The last listener middleware didn't call next() method.
                     # This means the listener is not for this incoming request.
                     continue
 
                 self._framework_logger.debug(f"Starting listener: {listener_name}")
-                listener_response: Optional[BoltResponse] = self.run_listener(
+                listener_response: Optional[BoltResponse] = await self.run_async_listener(
                     request=req,
                     response=resp,
                     listener_name=listener_name,
@@ -245,39 +245,41 @@ class App():
         self._framework_logger.warning(f"Unhandled request ({req.payload})")
         return BoltResponse(status=404, body={"error": "unhandled request"})
 
-    def run_listener(
+    async def run_async_listener(
         self,
-        request: BoltRequest,
+        request: AsyncBoltRequest,
         response: BoltResponse,
         listener_name: str,
-        listener: Listener,
+        listener: AsyncListener,
     ) -> Optional[BoltResponse]:
         ack = request.context.ack
         starting_time = time.time()
         if self._process_before_response:
-            returned_value = listener(req=request, resp=response)
+            returned_value = await listener(req=request, resp=response)
             if isinstance(returned_value, BoltResponse):
                 response = returned_value
             if ack.response is None and listener.auto_acknowledgement:
-                ack()  # automatic ack() call if the call is not yet done
+                await ack()  # automatic ack() call if the call is not yet done
 
             if response is not None:
                 return response
             elif ack.response is not None:
                 return ack.response
         else:
-            # start the listener function asynchronously
-            self._listener_executor.submit(lambda: listener(req=request, resp=response))
-
             if listener.auto_acknowledgement:
                 # acknowledge immediately in case of Events API
-                ack()
-            else:
-                # await for the completion of ack() in the async listener execution
-                while ack.response is None and time.time() - starting_time <= 3:
-                    time.sleep(0.01)
+                await ack()
 
-            if response is None and ack.response is not None:
+            # start the listener function asynchronously
+            # NOTE: intentionally
+            future: Future = asyncio.ensure_future(listener(req=request, resp=response))
+            self._framework_logger.debug(f"Async execution of listener: {listener_name} started...")
+
+            # await for the completion of ack() in the async listener execution
+            while ack.response is None and time.time() - starting_time <= 3:
+                await asyncio.sleep(0.01)
+
+            if ack.response is not None:
                 response = ack.response
                 millis = int((time.time() - starting_time) * 1000)
                 self._framework_logger.debug(
@@ -298,7 +300,7 @@ class App():
     def middleware(self, *args):
         if len(args) > 0:
             func = args[0]
-            self._middleware_list.append(CustomMiddleware(app_name=self.name, func=func))
+            self._middleware_list.append(AsyncCustomMiddleware(app_name=self.name, func=func))
 
     # -------------------------
     # events
@@ -306,11 +308,11 @@ class App():
     def event(
         self,
         event: Union[str, Pattern, Dict[str, str]],
-        matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        matchers: List[Callable[..., Awaitable[bool]]] = [],
+        middleware: List[Union[Callable, AsyncMiddleware]] = [],
     ):
         def __call__(func):
-            primary_matcher = builtin_matchers.event(event)
+            primary_matcher = builtin_matchers.event(event, True)
             return self._register_listener(func, primary_matcher, matchers, middleware, True)
 
         return __call__
@@ -322,10 +324,10 @@ class App():
         self,
         command: Union[str, Pattern],
         matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        middleware: List[Union[Callable, AsyncMiddleware]] = [],
     ):
         def __call__(func):
-            primary_matcher = builtin_matchers.command(command)
+            primary_matcher = builtin_matchers.command(command, True)
             return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
@@ -337,10 +339,10 @@ class App():
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        middleware: List[Union[Callable, AsyncMiddleware]] = [],
     ):
         def __call__(func):
-            primary_matcher = builtin_matchers.shortcut(constraints)
+            primary_matcher = builtin_matchers.shortcut(constraints, True)
             return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
@@ -349,10 +351,10 @@ class App():
         self,
         callback_id: Union[str, Pattern],
         matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        middleware: List[Union[Callable, AsyncMiddleware]] = [],
     ):
         def __call__(func):
-            primary_matcher = builtin_matchers.global_shortcut(callback_id)
+            primary_matcher = builtin_matchers.global_shortcut(callback_id, True)
             return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
@@ -361,10 +363,10 @@ class App():
         self,
         callback_id: Union[str, Pattern],
         matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        middleware: List[Union[Callable, AsyncMiddleware]] = [],
     ):
         def __call__(func):
-            primary_matcher = builtin_matchers.message_shortcut(callback_id)
+            primary_matcher = builtin_matchers.message_shortcut(callback_id, True)
             return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
@@ -376,10 +378,10 @@ class App():
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        middleware: List[Union[Callable, AsyncMiddleware]] = [],
     ):
         def __call__(func):
-            primary_matcher = builtin_matchers.action(constraints)
+            primary_matcher = builtin_matchers.action(constraints, True)
             return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
@@ -388,10 +390,10 @@ class App():
         self,
         action_id: Union[str, Pattern],
         matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        middleware: List[Union[Callable, AsyncMiddleware]] = [],
     ):
         def __call__(func):
-            primary_matcher = builtin_matchers.block_action(action_id)
+            primary_matcher = builtin_matchers.block_action(action_id, True)
             return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
@@ -403,10 +405,10 @@ class App():
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        middleware: List[Union[Callable, AsyncMiddleware]] = [],
     ):
         def __call__(func):
-            primary_matcher = builtin_matchers.view(constraints)
+            primary_matcher = builtin_matchers.view(constraints, True)
             return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
@@ -418,10 +420,10 @@ class App():
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        middleware: List[Union[Callable, AsyncMiddleware]] = [],
     ):
         def __call__(func):
-            primary_matcher = builtin_matchers.options(constraints)
+            primary_matcher = builtin_matchers.options(constraints, True)
             return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
@@ -430,10 +432,10 @@ class App():
         self,
         action_id: Union[str, Pattern],
         matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        middleware: List[Union[Callable, AsyncMiddleware]] = [],
     ):
         def __call__(func):
-            primary_matcher = builtin_matchers.block_suggestion(action_id)
+            primary_matcher = builtin_matchers.block_suggestion(action_id, True)
             return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
@@ -442,17 +444,17 @@ class App():
         self,
         callback_id: Union[str, Pattern],
         matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        middleware: List[Union[Callable, AsyncMiddleware]] = [],
     ):
         def __call__(func):
-            primary_matcher = builtin_matchers.dialog_suggestion(callback_id)
+            primary_matcher = builtin_matchers.dialog_suggestion(callback_id, True)
             return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
 
     # -------------------------
 
-    def _init_context(self, req: BoltRequest):
+    def _init_context(self, req: AsyncBoltRequest):
         req.context["logger"] = get_bolt_app_logger(self.name)
         req.context["token"] = self._token
         req.context["client"] = self._client
@@ -460,27 +462,31 @@ class App():
     def _register_listener(
         self,
         func,
-        primary_matcher: ListenerMatcher,
-        matchers: List[Callable[..., bool]],
-        middleware: List[Union[Callable, Middleware]],
+        primary_matcher: AsyncListenerMatcher,
+        matchers: List[Callable[..., Awaitable[bool]]],
+        middleware: List[Union[Callable, AsyncMiddleware]],
         auto_acknowledgement: bool = False,
     ) -> Callable[..., None]:
+
+        if not inspect.iscoroutinefunction(func):
+            raise ValueError(f"async function is required for AsyncApp's listener: {type(func)}")
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             func(*args, **kwargs)
 
-        listener_matchers = [CustomListenerMatcher(app_name=self.name, func=f) for f in matchers]
+        listener_matchers = [AsyncCustomListenerMatcher(app_name=self.name, func=f) for f in matchers]
         listener_matchers.insert(0, primary_matcher)
         listener_middleware = []
         for m in middleware:
-            if isinstance(m, Middleware):
+            if isinstance(m, AsyncMiddleware):
                 listener_middleware.append(m)
-            elif isinstance(m, Callable):
-                listener_middleware.append(CustomMiddleware(app_name=self.name, func=m))
+            elif isinstance(m, Callable) and inspect.iscoroutinefunction(m):
+                listener_middleware.append(AsyncCustomMiddleware(app_name=self.name, func=m))
             else:
-                raise ValueError(f"Unexpected value for a listener middleware: {type(m)}")
+                raise ValueError(f"async function is required for AsyncApp's listener middleware: {type(m)}")
 
-        self._listeners.append(CustomListener(
+        self._listeners.append(AsyncCustomListener(
             app_name=self.name,
             func=func,
             matchers=listener_matchers,
@@ -492,80 +498,85 @@ class App():
 
 # -------------------------
 
-class SlackAppServer:
+def to_aiohttp_response(bolt_resp: BoltResponse) -> web.Response:
+    content_type = bolt_resp.headers.pop(
+        "content-type",
+        ["application/json" if bolt_resp.body.startswith("{") else "text/plain"]
+    )[0]
+    content_type = re.sub(";\s*charset=utf-8", "", content_type)
+    resp = web.Response(
+        status=bolt_resp.status,
+        body=bolt_resp.body,
+        headers=bolt_resp.first_headers_without_set_cookie(),
+        content_type=content_type,
+    )
+    for cookie in bolt_resp.cookies():
+        for name, c in cookie.items():
+            resp.set_cookie(
+                name=name,
+                value=c.value,
+                max_age=c.get("max-age", None),
+                expires=c.get("expires", None),
+                path=c.get("path", None),
+                domain=c.get("domain", None),
+                secure=True,
+                httponly=True,
+            )
+    return resp
+
+
+class AsyncSlackAppServer:
+
     def __init__(
         self,
         port: int,
         path: str,
-        app: App,
-        oauth_flow: Optional[OAuthFlow] = None,
+        app: AsyncApp,
     ):
         self.port = port
-        _path = path
-        _app = app
-        _oauth_flow = oauth_flow
+        self.app = app
+        self.path = path
 
-        class SlackAppHandler(SimpleHTTPRequestHandler):
+        self.web_app = web.Application()
+        oauth_flow = self.app.oauth_flow
+        if oauth_flow:
+            self.web_app.add_routes([
+                web.get(oauth_flow.install_path, self.handle_get_requests),
+                web.get(oauth_flow.redirect_uri_path, self.handle_get_requests),
+                web.post(self.path, self.handle_post_requests)
+            ])
+        else:
+            self.web_app.add_routes([
+                web.post(self.path, self.handle_post_requests)
+            ])
 
-            def do_GET(self):
-                if _oauth_flow:
-                    _path, _, query = self.path.partition("?")
-                    qs = {k: v[0] for k, v in parse_qs(query).items()}
-                    if _path == _oauth_flow.install_path:
-                        bolt_req = BoltRequest(body="", query=qs, headers=self.headers)
-                        bolt_resp = _oauth_flow.handle_installation(bolt_req)
-                        self._send_bolt_response(bolt_resp)
-                    elif _path == _oauth_flow.redirect_uri_path:
-                        bolt_req = BoltRequest(body="", query=qs, headers=self.headers)
-                        bolt_resp = _oauth_flow.handle_callback(bolt_req)
-                        self._send_bolt_response(bolt_resp)
-                    else:
-                        self._send_response(404, headers={})
-                else:
-                    self._send_response(404, headers={})
+    async def handle_get_requests(self, request: web.Request) -> web.Response:
+        oauth_flow = self.app.oauth_flow
+        if oauth_flow:
+            _path, query = request.path, request.query_string
+            qs = {k: v[0] for k, v in parse_qs(query).items()}
+            if _path == self.app.oauth_flow.install_path:
+                bolt_req = AsyncBoltRequest(body="", query=qs, headers=request.headers)
+                bolt_resp = await oauth_flow.handle_installation(bolt_req)
+                return to_aiohttp_response(bolt_resp)
+            elif _path == oauth_flow.redirect_uri_path:
+                bolt_req = AsyncBoltRequest(body="", query=qs, headers=request.headers)
+                bolt_resp = await oauth_flow.handle_callback(bolt_req)
+                return to_aiohttp_response(bolt_resp)
+            else:
+                return web.Response(status=404)
+        else:
+            return web.Response(status=404)
 
-            def do_POST(self):
-                if _path != self.path.split("?")[0]:
-                    self._send_response(404, headers={})
-                    return
+    async def handle_post_requests(self, request: web.Request) -> web.Response:
+        if self.path != request.path:
+            return web.Response(status=404)
 
-                len_header = self.headers.get("Content-Length") or 0
-                content_len = int(len_header)
-                request_body = self.rfile.read(content_len).decode("utf-8")
-                bolt_req = BoltRequest(body=request_body, headers=self.headers)
-                bolt_resp: BoltResponse = _app.dispatch(bolt_req)
-                self._send_bolt_response(bolt_resp)
-
-            def _send_bolt_response(self, bolt_resp: BoltResponse):
-                self._send_response(
-                    status=bolt_resp.status,
-                    headers=bolt_resp.headers,
-                    body=bolt_resp.body,
-                )
-
-            def _send_response(
-                self,
-                status: int,
-                headers: Dict[str, List[str]],
-                body: Union[str, dict] = "",
-            ):
-                self.send_response(status)
-
-                response_body = body if isinstance(body, str) else json.dumps(body)
-                body_bytes = response_body.encode("utf-8")
-
-                for k, vs in headers.items():
-                    for v in vs:
-                        self.send_header(k, v)
-                self.send_header("Content-Length", len(body_bytes))
-                self.end_headers()
-                self.wfile.write(body_bytes)
-
-        self.server = HTTPServer(("0.0.0.0", self.port), SlackAppHandler)
+        request_body = await request.text()
+        bolt_req = AsyncBoltRequest(body=request_body, headers=request.headers)
+        bolt_resp: BoltResponse = await self.app.async_dispatch(bolt_req)
+        return to_aiohttp_response(bolt_resp)
 
     def start(self):
         print("⚡️ Bolt app is running!")
-        try:
-            self.server.serve_forever(0.05)
-        finally:
-            self.server.server_close()
+        web.run_app(self.web_app, host="0.0.0.0", port=self.port)

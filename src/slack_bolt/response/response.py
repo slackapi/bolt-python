@@ -29,7 +29,7 @@ class BoltResponse():
             if self.body and self.body.startswith("{"):
                 self.headers["content-type"] = ["application/json;charset=utf-8"]
             else:
-                self.headers["content-type"] = {"text/plain;charset=utf-8"}
+                self.headers["content-type"] = ["text/plain;charset=utf-8"]
 
     def first_headers(self) -> Dict[str, str]:
         return {k: list(v)[0] for k, v in self.headers.items()}
