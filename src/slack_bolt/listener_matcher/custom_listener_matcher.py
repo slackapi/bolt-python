@@ -3,10 +3,10 @@ from logging import Logger
 from typing import Callable, List
 
 from slack_bolt.kwargs_injection import build_required_kwargs
+from slack_bolt.logger import get_bolt_app_logger
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from .listener_matcher import ListenerMatcher
-from ..logger import get_bolt_app_logger
 
 
 class CustomListenerMatcher(ListenerMatcher):

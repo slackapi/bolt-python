@@ -8,6 +8,9 @@ from slack_sdk.web.async_slack_response import AsyncSlackResponse
 
 
 class AsyncSay():
+    client: Optional[AsyncWebClient]
+    channel: Optional[str]
+
     def __init__(
         self,
         client: Optional[AsyncWebClient],

@@ -2,6 +2,9 @@ from typing import Optional, Dict
 
 
 class OAuthStateUtils:
+    cookie_name: str
+    expiration_seconds: int
+
     default_cookie_name: str = "slack-app-oauth-state"
     default_expiration_seconds: int = 60 * 10  # 10 minutes
 

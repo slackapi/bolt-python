@@ -6,6 +6,8 @@ from slack_sdk.models.block_kit import Block
 
 
 class AsyncAck():
+    response: Optional[BoltResponse]
+
     def __init__(self):
         self.response: Optional[BoltResponse] = None
 

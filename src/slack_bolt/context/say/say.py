@@ -8,6 +8,9 @@ from slack_sdk.web import SlackResponse
 
 
 class Say():
+    client: Optional[WebClient]
+    channel: Optional[str]
+
     def __init__(
         self,
         client: Optional[WebClient],

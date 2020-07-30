@@ -15,6 +15,8 @@ class AsyncArgs():
     client: AsyncWebClient
     req: AsyncBoltRequest
     resp: BoltResponse
+    request: AsyncBoltRequest
+    response: BoltResponse
     context: AsyncBoltContext
     payload: Dict[str, any]
     ack: AsyncAck

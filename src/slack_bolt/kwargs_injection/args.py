@@ -14,8 +14,10 @@ from slack_sdk import WebClient
 class Args():
     client: WebClient
     logger: Logger
-    request: BoltRequest
+    req: BoltRequest
     resp: BoltResponse
+    request: BoltRequest
+    response: BoltResponse
     context: BoltContext
     payload: Dict[str, any]
     ack: Ack

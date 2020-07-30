@@ -8,9 +8,9 @@ from slack_bolt.response import BoltResponse
 
 
 class Listener(metaclass=ABCMeta):
-    matchers: List[ListenerMatcher] = []
-    middleware: List[Middleware] = []
-    auto_acknowledgement: bool = False
+    matchers: List[ListenerMatcher]
+    middleware: List[Middleware]
+    auto_acknowledgement: bool
 
     def matches(
         self,

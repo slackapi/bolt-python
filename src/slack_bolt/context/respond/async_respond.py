@@ -5,6 +5,8 @@ from slack_sdk.webhook import AsyncWebhookClient, WebhookResponse
 
 
 class AsyncRespond():
+    response_url: Optional[str]
+
     def __init__(
         self,
         *,

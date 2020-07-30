@@ -1,8 +1,8 @@
 import inspect
 import sys
 
+from slack_bolt.request.async_request import AsyncBoltRequest
 from .async_listener_matcher import AsyncListenerMatcher
-from ..request.async_request import AsyncBoltRequest
 
 if sys.version_info.major == 3 and sys.version_info.minor <= 6:
     from re import _pattern_type as Pattern
@@ -15,7 +15,7 @@ from slack_bolt.kwargs_injection import build_required_kwargs
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from .listener_matcher import ListenerMatcher
-from ..logger import get_bolt_logger
+from slack_bolt.logger import get_bolt_logger
 
 
 # a.k.a Union[ListenerMatcher, AsyncListenerMatcher]
