@@ -1,5 +1,6 @@
 import logging
-from typing import Callable
+from logging import Logger
+from typing import Callable, Dict
 
 from slack_bolt.context import BoltContext
 from slack_bolt.context.ack import Ack
@@ -11,6 +12,17 @@ from slack_sdk import WebClient
 
 
 class Args():
+    client: WebClient
+    logger: Logger
+    request: BoltRequest
+    resp: BoltResponse
+    context: BoltContext
+    payload: Dict[str, any]
+    ack: Ack
+    say: Say
+    respond: Respond
+    next: Callable[[], None]
+
     def __init__(
         self,
         *,
@@ -19,7 +31,7 @@ class Args():
         req: BoltRequest,
         resp: BoltResponse,
         context: BoltContext,
-        payload: dict,
+        payload: Dict[str, any],
         ack: Ack,
         say: Say,
         respond: Respond,
@@ -31,8 +43,8 @@ class Args():
         self.request = self.req = req
         self.response = self.resp = resp
         self.context: BoltContext = context
-        self.payload: dict = payload
-        self.body: dict = payload
+        self.payload: Dict[str, any] = payload
+        self.body: Dict[str, any] = payload
         self.ack: Ack = ack
         self.say: Say = say
         self.respond: Respond = respond

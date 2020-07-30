@@ -1,21 +1,17 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 
+from slack_bolt.context.ack.internals import _set_response
 from slack_bolt.response.response import BoltResponse
+from slack_sdk.models.block_kit import Block
 
 
 class Ack():
     def __init__(self):
         self.response: Optional[BoltResponse] = None
 
-    def __call__(self, text: str = None, blocks: Optional[List[dict]] = None) -> BoltResponse:
-        if not text and (not blocks or len(blocks) == 0):
-            self.response = BoltResponse(status=200, body="")
-        else:
-            self.response = BoltResponse(
-                status=200,
-                body={
-                    "text": text,
-                    "blocks": blocks,
-                }
-            )
-        return self.response
+    def __call__(
+        self,
+        text: str = "",
+        blocks: Optional[List[Union[dict, Block]]] = None,
+    ) -> BoltResponse:
+        return _set_response(self, text, blocks)

@@ -9,7 +9,7 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG)
 
-from slack_bolt.asyncio import AsyncApp
+from slack_bolt import AsyncApp
 
 app = AsyncApp()
 

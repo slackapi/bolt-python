@@ -2,12 +2,12 @@ import logging
 from typing import Callable, Awaitable
 
 from slack_bolt.auth import AuthorizationResult
+from slack_bolt.logger import get_bolt_logger
 from slack_bolt.request import BoltRequest
+from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from .async_middleware import AsyncMiddleware
 from .middleware import Middleware
-from ..logger import get_bolt_logger
-from ..request.async_request import AsyncBoltRequest
 
 
 class IgnoringSelfEvents(Middleware, AsyncMiddleware):
@@ -19,7 +19,8 @@ class IgnoringSelfEvents(Middleware, AsyncMiddleware):
         *,
         req: BoltRequest,
         resp: BoltResponse,
-        next: Callable[[], BoltResponse]) -> BoltResponse:
+        next: Callable[[], BoltResponse],
+    ) -> BoltResponse:
         auth_result = req.context.authorization_result
         if self._is_self_event(auth_result, req.context.user_id):
             self._debug_log(req.payload)

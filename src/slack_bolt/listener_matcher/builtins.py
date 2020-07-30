@@ -18,6 +18,7 @@ from .listener_matcher import ListenerMatcher
 from ..logger import get_bolt_logger
 
 
+# a.k.a Union[ListenerMatcher, AsyncListenerMatcher]
 class BuiltinListenerMatcher(ListenerMatcher, AsyncListenerMatcher):
 
     def __init__(
@@ -285,7 +286,7 @@ def _is_expected_type(payload: dict, expected: str) -> bool:
 
 
 def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -> bool:
-    if str is None:
+    if str_or_pattern is None or input is None:
         return False
 
     if isinstance(str_or_pattern, str):

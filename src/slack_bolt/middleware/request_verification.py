@@ -14,9 +14,6 @@ class RequestVerification(Middleware, AsyncMiddleware):
         self.verifier = SignatureVerifier(signing_secret=signing_secret)
         self.logger = get_bolt_logger(RequestVerification)
 
-    def can_skip(self, payload: Dict[str, any]) -> bool:
-        return payload and payload.get("ssl_check", None) == "1"
-
     def process(
         self,
         *,
@@ -24,7 +21,7 @@ class RequestVerification(Middleware, AsyncMiddleware):
         resp: BoltResponse,
         next: Callable[[], BoltResponse],
     ) -> BoltResponse:
-        if self.can_skip(req.payload):
+        if self._can_skip(req.payload):
             return next()
 
         body = req.body
@@ -43,7 +40,7 @@ class RequestVerification(Middleware, AsyncMiddleware):
         resp: BoltResponse,
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> BoltResponse:
-        if self.can_skip(req.payload):
+        if self._can_skip(req.payload):
             return await next()
 
         body = req.body
@@ -57,11 +54,15 @@ class RequestVerification(Middleware, AsyncMiddleware):
 
     # -----------------------------------------
 
-    def _debug_log_error(self, signature, timestamp, body) -> None:
-        self.logger.info(
-            "Invalid request signature detected "
-            f"(signature: {signature}, timestamp: {timestamp}, body: {body})")
+    @staticmethod
+    def _can_skip(payload: Dict[str, any]) -> bool:
+        return payload and payload.get("ssl_check", None) == "1"
 
     @staticmethod
     def _build_error_response() -> BoltResponse:
         return BoltResponse(status=401, body={"error": "invalid request"})
+
+    def _debug_log_error(self, signature, timestamp, body) -> None:
+        self.logger.info(
+            "Invalid request signature detected "
+            f"(signature: {signature}, timestamp: {timestamp}, body: {body})")

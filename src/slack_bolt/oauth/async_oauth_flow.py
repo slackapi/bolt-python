@@ -18,6 +18,36 @@ from slack_sdk.web.async_slack_response import AsyncSlackResponse
 
 
 class AsyncOAuthFlow:
+    installation_store: AsyncInstallationStore
+    oauth_state_store: AsyncOAuthStateStore
+    oauth_state_cookie_name: str
+    oauth_state_expiration_seconds: int
+
+    client_id: str
+    client_secret: str
+    redirect_uri: Optional[str]
+    scopes: Optional[List[str]]
+    user_scopes: Optional[List[str]]
+
+    install_path: str
+    redirect_uri_path: str
+    success_url: Optional[str]
+    failure_url: Optional[str]
+    oauth_state_utils: OAuthStateUtils
+    authorize_url_generator: AuthorizeUrlGenerator
+    redirect_uri_page_renderer: RedirectUriPageRenderer
+
+    @property
+    def client(self) -> AsyncWebClient:
+        if self._async_client is None:
+            self._async_client = AsyncWebClient()
+        return self._async_client
+
+    @property
+    def logger(self) -> Logger:
+        if self._logger is None:
+            self._logger = logging.getLogger(__name__)
+        return self._logger
 
     def __init__(
         self,
@@ -42,7 +72,7 @@ class AsyncOAuthFlow:
         success_url: Optional[str] = None,
         failure_url: Optional[str] = None,
     ):
-        self._client = client
+        self._async_client = client
         self._logger = logger
 
         self.installation_store = installation_store
@@ -82,17 +112,9 @@ class AsyncOAuthFlow:
             failure_url=self.failure_url,
         )
 
-    @property
-    def client(self) -> AsyncWebClient:
-        if self._client is None:
-            self._client = AsyncWebClient()
-        return self._client
-
-    @property
-    def logger(self) -> Logger:
-        if self._logger is None:
-            self._logger = logging.getLogger(__name__)
-        return self._logger
+    # -----------------------------
+    # Factory Methods
+    # -----------------------------
 
     @classmethod
     def sqlite3(
@@ -106,7 +128,7 @@ class AsyncOAuthFlow:
         oauth_state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         oauth_state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
         logger: Optional[Logger] = None,
-    ) -> "OAuthFlow":
+    ) -> "AsyncOAuthFlow":
 
         return AsyncOAuthFlow(
             client=AsyncWebClient(),

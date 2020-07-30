@@ -1,5 +1,6 @@
 from typing import Optional, List, Union, Dict
 
+from slack_bolt.context.say.internals import _can_say
 from slack_sdk import WebClient
 from slack_sdk.models.attachments import Attachment
 from slack_sdk.models.block_kit import Block
@@ -17,13 +18,12 @@ class Say():
 
     def __call__(
         self,
-        text: Optional[str] = None,
+        text: str = "",
         blocks: Optional[List[Union[Dict, Block]]] = None,
         attachments: Optional[List[Union[Dict, Attachment]]] = None,
         channel: Optional[str] = None,
     ) -> SlackResponse:
-        if self.client is not None \
-            and (channel or self.channel):
+        if _can_say(self, channel):
             return self.client.chat_postMessage(
                 channel=channel or self.channel,
                 text=text,

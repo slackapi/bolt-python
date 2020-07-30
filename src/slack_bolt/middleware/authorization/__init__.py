@@ -1,3 +1,6 @@
+from .async_authorization import AsyncAuthorization
+from .async_multi_teams_authorization import AsyncMultiTeamsAuthorization
+from .async_single_team_authorization import AsyncSingleTeamAuthorization
 from .authorization import Authorization
 from .multi_teams_authorization import MultiTeamsAuthorization
 from .single_team_authorization import SingleTeamAuthorization

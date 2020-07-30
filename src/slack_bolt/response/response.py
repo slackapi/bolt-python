@@ -4,6 +4,10 @@ from typing import Union, Dict, List, Optional
 
 
 class BoltResponse():
+    status: int
+    body: str
+    headers: Dict[str, List[str]]
+
     def __init__(
         self,
         *,
@@ -45,7 +49,8 @@ class BoltResponse():
         header_values = self.headers.get("set-cookie", [])
         return [self._to_simple_cookie(v) for v in header_values]
 
-    def _to_simple_cookie(self, header_value: str) -> SimpleCookie:
+    @staticmethod
+    def _to_simple_cookie(header_value: str) -> SimpleCookie:
         c = SimpleCookie()
         c.load(header_value)
         return c

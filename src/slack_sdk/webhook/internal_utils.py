@@ -2,7 +2,7 @@ import logging
 from typing import Optional, Dict
 
 from slack_sdk.web.internal_utils import _parse_web_class_objects, get_user_agent, convert_bool_to_0_or_1
-from . import WebhookResponse
+from .webhook_response import WebhookResponse
 
 
 def _build_body(original_body: Dict[str, any]) -> Dict[str, any]:

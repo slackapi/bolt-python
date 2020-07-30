@@ -16,6 +16,36 @@ from slack_sdk.web import WebClient, SlackResponse
 
 
 class OAuthFlow:
+    installation_store: InstallationStore
+    oauth_state_store: OAuthStateStore
+    oauth_state_cookie_name: str
+    oauth_state_expiration_seconds: int
+
+    client_id: str
+    client_secret: str
+    redirect_uri: Optional[str]
+    scopes: Optional[List[str]]
+    user_scopes: Optional[List[str]]
+
+    install_path: str
+    redirect_uri_path: str
+    success_url: Optional[str]
+    failure_url: Optional[str]
+    oauth_state_utils: OAuthStateUtils
+    authorize_url_generator: AuthorizeUrlGenerator
+    redirect_uri_page_renderer: RedirectUriPageRenderer
+
+    @property
+    def client(self) -> WebClient:
+        if self._client is None:
+            self._client = WebClient()
+        return self._client
+
+    @property
+    def logger(self) -> Logger:
+        if self._logger is None:
+            self._logger = logging.getLogger(__name__)
+        return self._logger
 
     def __init__(
         self,
@@ -80,17 +110,9 @@ class OAuthFlow:
             failure_url=self.failure_url,
         )
 
-    @property
-    def client(self) -> WebClient:
-        if self._client is None:
-            self._client = WebClient()
-        return self._client
-
-    @property
-    def logger(self) -> Logger:
-        if self._logger is None:
-            self._logger = logging.getLogger(__name__)
-        return self._logger
+    # -----------------------------
+    # Factory Methods
+    # -----------------------------
 
     @classmethod
     def sqlite3(
