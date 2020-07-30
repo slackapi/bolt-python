@@ -11,20 +11,12 @@ from slack_bolt import App
 logging.basicConfig(level=logging.DEBUG)
 app = App()
 
-def log_request(logger, payload, next):
-    logger.debug(payload)
-    return next()
-
-app.use(log_request)
 
 @app.event("app_mention")
-def handle_app_mentions(payload, say, logger):
+def event_test(payload, say, logger):
     logger.info(payload)
     say("What's up?")
 
-@app.event("message")
-def handle_messages():
-    pass
 
 if __name__ == '__main__':
     app.start(3000)

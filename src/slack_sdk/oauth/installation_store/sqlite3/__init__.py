@@ -4,12 +4,13 @@ from logging import Logger
 from sqlite3 import Connection
 from typing import Optional
 
+from slack_sdk.oauth.installation_store.async_installation_store import AsyncInstallationStore
 from slack_sdk.oauth.installation_store.installation_store import InstallationStore
 from slack_sdk.oauth.installation_store.models.bot import Bot
 from slack_sdk.oauth.installation_store.models.installation import Installation
 
 
-class SQLite3InstallationStore(InstallationStore):
+class SQLite3InstallationStore(InstallationStore, AsyncInstallationStore):
 
     def __init__(
         self,
@@ -88,6 +89,9 @@ class SQLite3InstallationStore(InstallationStore):
             """)
             self.logger.debug(f"Tables have been created (database: {self.database})")
             conn.commit()
+
+    async def async_save(self, installation: Installation):
+        return self.save(installation)
 
     def save(self, installation: Installation):
         with self.connect() as conn:
@@ -181,6 +185,14 @@ class SQLite3InstallationStore(InstallationStore):
             )
             self.logger.debug(f"New rows in bots and installations) have been created (database: {self.database})")
             conn.commit()
+
+    async def async_find_bot(
+        self,
+        *,
+        enterprise_id: Optional[str],
+        team_id: Optional[str],
+    ) -> Optional[Bot]:
+        return self.find_bot(enterprise_id=enterprise_id, team_id=team_id)
 
     def find_bot(
         self,

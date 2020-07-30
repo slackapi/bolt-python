@@ -6,10 +6,11 @@ from pathlib import Path
 from typing import Union, Optional
 from uuid import uuid4
 
+from ..async_state_store import AsyncOAuthStateStore
 from ..state_store import OAuthStateStore
 
 
-class FileOAuthStateStore(OAuthStateStore):
+class FileOAuthStateStore(OAuthStateStore, AsyncOAuthStateStore):
 
     def __init__(
         self,
@@ -27,11 +28,17 @@ class FileOAuthStateStore(OAuthStateStore):
             self.base_dir = f"{self.base_dir}/{self.client_id}"
             self._logger = logger
 
-        @property
-        def logger(self) -> Logger:
-            if self._logger is None:
-                self._logger = logging.getLogger(__name__)
-            return self._logger
+    @property
+    def logger(self) -> Logger:
+        if self._logger is None:
+            self._logger = logging.getLogger(__name__)
+        return self._logger
+
+    async def async_issue(self) -> str:
+        return self.issue()
+
+    async def async_consume(self, state: str) -> bool:
+        return self.consume(state)
 
     def issue(self) -> str:
         state = uuid4()

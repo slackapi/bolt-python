@@ -6,6 +6,7 @@ from slack_bolt.middleware.authorization import Authorization
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
+from .internals import _build_error_response, _is_no_auth_required
 
 
 class SingleTeamAuthorization(Authorization):
@@ -19,7 +20,7 @@ class SingleTeamAuthorization(Authorization):
         resp: BoltResponse,
         next: Callable[[], BoltResponse],
     ) -> BoltResponse:
-        if self.is_no_auth_required(req):
+        if _is_no_auth_required(req):
             return next()
         try:
             auth_result = req.context.client.auth_test()
@@ -36,7 +37,7 @@ class SingleTeamAuthorization(Authorization):
             else:
                 # Just in case
                 self.logger.error("auth.test API call result is unexpectedly None")
-                return self.build_error_response()
+                return _build_error_response()
         except SlackApiError as e:
             self.logger.error(f"Failed to authorize with the given token ({e})")
-            return self.build_error_response()
+            return _build_error_response()

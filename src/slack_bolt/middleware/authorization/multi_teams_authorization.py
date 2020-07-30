@@ -1,14 +1,14 @@
 from typing import Callable, Optional
 
-from slack import WebClient
-
 from slack_bolt.auth.result import AuthorizationResult
 from slack_bolt.logger import get_bolt_logger
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import InstallationStore, Bot
+from slack_sdk.web import WebClient
 from . import Authorization
+from .internals import _build_error_response, _is_no_auth_required
 
 
 class MultiTeamsAuthorization(Authorization):
@@ -23,7 +23,7 @@ class MultiTeamsAuthorization(Authorization):
         resp: BoltResponse,
         next: Callable[[], BoltResponse],
     ) -> BoltResponse:
-        if self.is_no_auth_required(req):
+        if _is_no_auth_required(req):
             return next()
         try:
             bot: Optional[Bot] = self.installation_store.find_bot(
@@ -31,7 +31,7 @@ class MultiTeamsAuthorization(Authorization):
                 team_id=req.context.team_id,
             )
             if bot is None:
-                return self.build_error_response()
+                return _build_error_response()
 
             auth_result = req.context.client.auth_test(token=bot.bot_token)
             if auth_result:
@@ -49,8 +49,8 @@ class MultiTeamsAuthorization(Authorization):
             else:
                 # Just in case
                 self.logger.error("auth.test API call result is unexpectedly None")
-                return self.build_error_response()
+                return _build_error_response()
 
         except SlackApiError as e:
             self.logger.error(f"Failed to authorize with the given token ({e})")
-            return self.build_error_rfesponse()
+            return _build_error_response()

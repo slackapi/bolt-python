@@ -1,19 +1,18 @@
-from typing import Callable, Dict
+from typing import Callable, Dict, Awaitable
 
 from slack_bolt.logger import get_bolt_logger
 from slack_bolt.middleware import Middleware
+from slack_bolt.middleware.async_middleware import AsyncMiddleware
 from slack_bolt.request import BoltRequest
+from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.signature import SignatureVerifier
 
 
-class RequestVerification(Middleware):
+class RequestVerification(Middleware, AsyncMiddleware):
     def __init__(self, signing_secret: str):
         self.verifier = SignatureVerifier(signing_secret=signing_secret)
         self.logger = get_bolt_logger(RequestVerification)
-
-    def can_skip(self, payload: Dict[str, any]) -> bool:
-        return payload and payload.get("ssl_check", None) == "1"
 
     def process(
         self,
@@ -22,7 +21,7 @@ class RequestVerification(Middleware):
         resp: BoltResponse,
         next: Callable[[], BoltResponse],
     ) -> BoltResponse:
-        if self.can_skip(req.payload):
+        if self._can_skip(req.payload):
             return next()
 
         body = req.body
@@ -31,7 +30,39 @@ class RequestVerification(Middleware):
         if self.verifier.is_valid(body, timestamp, signature):
             return next()
         else:
-            self.logger.info(
-                "Invalid request signature detected "
-                f"(signature: {signature}, timestamp: {timestamp}, body: {body})")
-            return BoltResponse(status=401, body={"error": "invalid request"})
+            self._debug_log_error(signature, timestamp, body)
+            return self._build_error_response()
+
+    async def async_process(
+        self,
+        *,
+        req: AsyncBoltRequest,
+        resp: BoltResponse,
+        next: Callable[[], Awaitable[BoltResponse]],
+    ) -> BoltResponse:
+        if self._can_skip(req.payload):
+            return await next()
+
+        body = req.body
+        timestamp = req.headers.get("x-slack-request-timestamp", ["0"])[0]
+        signature = req.headers.get("x-slack-signature", [""])[0]
+        if self.verifier.is_valid(body, timestamp, signature):
+            return await next()
+        else:
+            self._debug_log_error(signature, timestamp, body)
+            return self._build_error_response()
+
+    # -----------------------------------------
+
+    @staticmethod
+    def _can_skip(payload: Dict[str, any]) -> bool:
+        return payload and payload.get("ssl_check", None) == "1"
+
+    @staticmethod
+    def _build_error_response() -> BoltResponse:
+        return BoltResponse(status=401, body={"error": "invalid request"})
+
+    def _debug_log_error(self, signature, timestamp, body) -> None:
+        self.logger.info(
+            "Invalid request signature detected "
+            f"(signature: {signature}, timestamp: {timestamp}, body: {body})")

@@ -2,6 +2,14 @@ from typing import Optional
 
 
 class AuthorizationResult(dict):
+    enterprise_id: Optional[str]
+    team_id: Optional[str]
+    bot_id: str
+    bot_user_id: str
+    bot_token: str
+    user_id: Optional[str]
+    user_token: Optional[str]
+
     def __init__(
         self,
         *,

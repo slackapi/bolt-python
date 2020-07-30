@@ -7,7 +7,6 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from functools import wraps
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from typing import List, Union, Pattern, Callable, Dict, Optional
-from urllib.parse import parse_qs
 
 from slack_bolt.listener.custom_listener import CustomListener
 from slack_bolt.listener.listener import Listener
@@ -68,7 +67,7 @@ class App():
         # No need to set (the value is used only in response to ssl_check requests)
         verification_token: Optional[str] = os.environ.get("SLACK_VERIFICATION_TOKEN", None),
     ):
-        self.name = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
+        self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret: str = signing_secret
         self._verification_token: Optional[str] = verification_token
         self._framework_logger = get_bolt_logger(App)
@@ -175,6 +174,10 @@ class App():
     # accessors
 
     @property
+    def name(self) -> str:
+        return self._name
+
+    @property
     def oauth_flow(self) -> Optional[OAuthFlow]:
         return self._oauth_flow
 
@@ -205,10 +208,6 @@ class App():
     # -------------------------
     # main dispatcher
 
-    # TODO: async_dispatch
-    async def async_dispatch(self, req: BoltRequest) -> BoltResponse:
-        pass
-
     def dispatch(self, req: BoltRequest) -> BoltResponse:
         self._init_context(req)
 
@@ -229,7 +228,6 @@ class App():
         for listener in self._listeners:
             if listener.matches(req=req, resp=resp):
                 listener_name = listener.func.__name__
-                self._framework_logger.debug(f"Starting listener: {listener_name}")
                 # run all the middleware attached to this listener first
                 resp, next_was_not_called = listener.run_middleware(req=req, resp=resp)
                 if next_was_not_called:
@@ -237,45 +235,62 @@ class App():
                     # This means the listener is not for this incoming request.
                     continue
 
-                ack = req.context.ack
-                starting_time = time.time()
-                if self._process_before_response:
-                    returned_value = listener(req=req, resp=resp)
-                    if isinstance(returned_value, BoltResponse):
-                        resp = returned_value
-                else:
-                    # start the listener function asynchronously
-                    self._listener_executor.submit(lambda: listener(req=req, resp=resp))
-
-                    if listener.auto_acknowledgement:
-                        # acknowledge immediately in case of Events API
-                        ack()
-                    else:
-                        # await for the completion of ack() in the async listener execution
-                        while ack.response is None and time.time() - starting_time <= 3:
-                            time.sleep(0.01)
-
-                if self._process_before_response:
-                    if ack.response is None and listener.auto_acknowledgement:
-                        ack()  # automatic ack() call if the call is not yet done
-
-                    if resp is not None:
-                        return resp
-                    elif ack.response is not None:
-                        return ack.response
-                    # None for both means no ack() in the listener
-                else:
-                    if resp is None and ack.response is not None:
-                        resp = ack.response
-                        millis = int((time.time() - starting_time) * 1000)
-                        self._framework_logger.debug(
-                            f"Responding with status: {resp.status} body: \"{resp.body}\" ({millis} millis)")
-                        return resp
-                    else:
-                        self._framework_logger.warning(f"{listener_name} didn't call ack()")
+                self._framework_logger.debug(f"Starting listener: {listener_name}")
+                listener_response: Optional[BoltResponse] = self.run_listener(
+                    request=req,
+                    response=resp,
+                    listener_name=listener_name,
+                    listener=listener,
+                )
+                if listener_response is not None:
+                    return listener_response
 
         self._framework_logger.warning(f"Unhandled request ({req.payload})")
         return BoltResponse(status=404, body={"error": "unhandled request"})
+
+    def run_listener(
+        self,
+        request: BoltRequest,
+        response: BoltResponse,
+        listener_name: str,
+        listener: Listener,
+    ) -> Optional[BoltResponse]:
+        ack = request.context.ack
+        starting_time = time.time()
+        if self._process_before_response:
+            returned_value = listener(req=request, resp=response)
+            if isinstance(returned_value, BoltResponse):
+                response = returned_value
+            if ack.response is None and listener.auto_acknowledgement:
+                ack()  # automatic ack() call if the call is not yet done
+
+            if response is not None:
+                return response
+            elif ack.response is not None:
+                return ack.response
+        else:
+            # start the listener function asynchronously
+            self._listener_executor.submit(lambda: listener(req=request, resp=response))
+
+            if listener.auto_acknowledgement:
+                # acknowledge immediately in case of Events API
+                ack()
+            else:
+                # await for the completion of ack() in the async listener execution
+                while ack.response is None and time.time() - starting_time <= 3:
+                    time.sleep(0.01)
+
+            if response is None and ack.response is not None:
+                response = ack.response
+                millis = int((time.time() - starting_time) * 1000)
+                self._framework_logger.debug(
+                    f"Responding with status: {response.status} body: \"{response.body}\" ({millis} millis)")
+                return response
+            else:
+                self._framework_logger.warning(f"{listener_name} didn't call ack()")
+
+        # None for both means no ack() in the listener
+        return None
 
     # -------------------------
     # middleware
@@ -294,8 +309,8 @@ class App():
     def event(
         self,
         event: Union[str, Pattern, Dict[str, str]],
-        matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.event(event)
@@ -309,8 +324,8 @@ class App():
     def command(
         self,
         command: Union[str, Pattern],
-        matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.command(command)
@@ -324,8 +339,8 @@ class App():
     def shortcut(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.shortcut(constraints)
@@ -336,8 +351,8 @@ class App():
     def global_shortcut(
         self,
         callback_id: Union[str, Pattern],
-        matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.global_shortcut(callback_id)
@@ -348,8 +363,8 @@ class App():
     def message_shortcut(
         self,
         callback_id: Union[str, Pattern],
-        matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.message_shortcut(callback_id)
@@ -363,8 +378,8 @@ class App():
     def action(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.action(constraints)
@@ -375,8 +390,8 @@ class App():
     def block_action(
         self,
         action_id: Union[str, Pattern],
-        matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.block_action(action_id)
@@ -390,8 +405,8 @@ class App():
     def view(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.view(constraints)
@@ -405,8 +420,8 @@ class App():
     def options(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.options(constraints)
@@ -417,8 +432,8 @@ class App():
     def block_suggestion(
         self,
         action_id: Union[str, Pattern],
-        matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.block_suggestion(action_id)
@@ -429,8 +444,8 @@ class App():
     def dialog_suggestion(
         self,
         callback_id: Union[str, Pattern],
-        matchers: List[Callable[..., bool]] = [],
-        middleware: List[Union[Callable, Middleware]] = [],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.dialog_suggestion(callback_id)
@@ -449,18 +464,18 @@ class App():
         self,
         func,
         primary_matcher: ListenerMatcher,
-        matchers: List[Callable[..., bool]],
-        middleware: List[Union[Callable, Middleware]],
+        matchers: Optional[List[Callable[..., bool]]],
+        middleware: Optional[List[Union[Callable, Middleware]]],
         auto_acknowledgement: bool = False,
     ) -> Callable[..., None]:
         @wraps(func)
         def wrapper(*args, **kwargs):
             func(*args, **kwargs)
 
-        listener_matchers = [CustomListenerMatcher(app_name=self.name, func=f) for f in matchers]
+        listener_matchers = [CustomListenerMatcher(app_name=self.name, func=f) for f in (matchers or [])]
         listener_matchers.insert(0, primary_matcher)
         listener_middleware = []
-        for m in middleware:
+        for m in (middleware or []):
             if isinstance(m, Middleware):
                 listener_middleware.append(m)
             elif isinstance(m, Callable):
@@ -497,14 +512,13 @@ class SlackAppServer:
 
             def do_GET(self):
                 if _oauth_flow:
-                    _path, _, query = self.path.partition("?")
-                    qs = {k: v[0] for k, v in parse_qs(query).items()}
-                    if _path == _oauth_flow.install_path:
-                        bolt_req = BoltRequest(body="", query=qs, headers=self.headers)
+                    request_path, _, query = self.path.partition("?")
+                    if request_path == _oauth_flow.install_path:
+                        bolt_req = BoltRequest(body="", query=query, headers=self.headers)
                         bolt_resp = _oauth_flow.handle_installation(bolt_req)
                         self._send_bolt_response(bolt_resp)
-                    elif _path == _oauth_flow.redirect_uri_path:
-                        bolt_req = BoltRequest(body="", query=qs, headers=self.headers)
+                    elif request_path == _oauth_flow.redirect_uri_path:
+                        bolt_req = BoltRequest(body="", query=query, headers=self.headers)
                         bolt_resp = _oauth_flow.handle_callback(bolt_req)
                         self._send_bolt_response(bolt_resp)
                     else:
@@ -513,14 +527,14 @@ class SlackAppServer:
                     self._send_response(404, headers={})
 
             def do_POST(self):
-                if _path != self.path.split("?")[0]:
+                request_path, _, query = self.path.partition("?")
+                if _path != request_path:
                     self._send_response(404, headers={})
                     return
 
                 len_header = self.headers.get("Content-Length") or 0
-                content_len = int(len_header)
-                request_body = self.rfile.read(content_len).decode("utf-8")
-                bolt_req = BoltRequest(body=request_body, headers=self.headers)
+                request_body = self.rfile.read(int(len_header)).decode("utf-8")
+                bolt_req = BoltRequest(body=request_body, query=query, headers=self.headers)
                 bolt_resp: BoltResponse = _app.dispatch(bolt_req)
                 self._send_bolt_response(bolt_resp)
 

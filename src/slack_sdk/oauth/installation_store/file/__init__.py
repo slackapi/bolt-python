@@ -4,12 +4,13 @@ from logging import Logger
 from pathlib import Path
 from typing import Optional, Union
 
+from slack_sdk.oauth.installation_store.async_installation_store import AsyncInstallationStore
 from slack_sdk.oauth.installation_store.installation_store import InstallationStore
 from slack_sdk.oauth.installation_store.models.bot import Bot
 from slack_sdk.oauth.installation_store.models.installation import Installation
 
 
-class FileInstallationStore(InstallationStore):
+class FileInstallationStore(InstallationStore, AsyncInstallationStore):
 
     def __init__(
         self,
@@ -31,6 +32,9 @@ class FileInstallationStore(InstallationStore):
         if self._logger is None:
             self._logger = logging.getLogger(__name__)
         return self._logger
+
+    async def async_save(self, installation: Installation):
+        return self.save(installation)
 
     def save(self, installation: Installation):
         none = "none"
@@ -65,6 +69,14 @@ class FileInstallationStore(InstallationStore):
             with open(installer_filepath, "w") as f:
                 entity: str = json.dumps(installation.__dict__)
                 f.write(entity)
+
+    async def async_find_bot(
+        self,
+        *,
+        enterprise_id: Optional[str],
+        team_id: Optional[str],
+    ) -> Optional[Bot]:
+        return self.find_bot(enterprise_id=enterprise_id, team_id=team_id)
 
     def find_bot(
         self,

@@ -1,4 +1,5 @@
 import inspect
+from logging import Logger
 from typing import Callable, List
 
 from slack_bolt.kwargs_injection import build_required_kwargs
@@ -11,6 +12,13 @@ from ..middleware import Middleware
 
 
 class CustomListener(Listener):
+    app_name: str
+    func: Callable[..., BoltResponse]
+    matchers: List[ListenerMatcher]
+    middleware: List[Middleware]
+    auto_acknowledgement: bool
+    arg_names: List[str]
+    logger: Logger
 
     def __init__(
         self,

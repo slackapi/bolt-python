@@ -6,9 +6,6 @@ sys.path.insert(1, "src")
 # ------------------------------------------------
 
 import logging
-
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
-
 from slack_bolt import App
 from slack_bolt.adapter.aws_lambda import SlackRequestHandler
 
@@ -20,6 +17,10 @@ app = App(process_before_response=True)
 def handle_app_mentions(payload, say, logger):
     logger.info(payload)
     say("What's up?")
+
+
+SlackRequestHandler.clear_all_log_handlers()
+logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
 
 
 def handler(event, context):

@@ -4,6 +4,10 @@ from typing import Union, Dict, List, Optional
 
 
 class BoltResponse():
+    status: int
+    body: str
+    headers: Dict[str, List[str]]
+
     def __init__(
         self,
         *,
@@ -29,7 +33,7 @@ class BoltResponse():
             if self.body and self.body.startswith("{"):
                 self.headers["content-type"] = ["application/json;charset=utf-8"]
             else:
-                self.headers["content-type"] = {"text/plain;charset=utf-8"}
+                self.headers["content-type"] = ["text/plain;charset=utf-8"]
 
     def first_headers(self) -> Dict[str, str]:
         return {k: list(v)[0] for k, v in self.headers.items()}
@@ -45,7 +49,8 @@ class BoltResponse():
         header_values = self.headers.get("set-cookie", [])
         return [self._to_simple_cookie(v) for v in header_values]
 
-    def _to_simple_cookie(self, header_value: str) -> SimpleCookie:
+    @staticmethod
+    def _to_simple_cookie(header_value: str) -> SimpleCookie:
         c = SimpleCookie()
         c.load(header_value)
         return c

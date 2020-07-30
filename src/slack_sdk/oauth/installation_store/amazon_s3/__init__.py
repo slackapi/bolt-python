@@ -5,12 +5,13 @@ from typing import Optional
 
 from botocore.client import BaseClient
 
+from slack_sdk.oauth.installation_store.async_installation_store import AsyncInstallationStore
 from slack_sdk.oauth.installation_store.installation_store import InstallationStore
 from slack_sdk.oauth.installation_store.models.bot import Bot
 from slack_sdk.oauth.installation_store.models.installation import Installation
 
 
-class AmazonS3InstallationStore(InstallationStore):
+class AmazonS3InstallationStore(InstallationStore, AsyncInstallationStore):
 
     def __init__(
         self,
@@ -32,6 +33,9 @@ class AmazonS3InstallationStore(InstallationStore):
         if self._logger is None:
             self._logger = logging.getLogger(__name__)
         return self._logger
+
+    async def async_save(self, installation: Installation):
+        return self.save(installation)
 
     def save(self, installation: Installation):
         none = "none"
@@ -87,6 +91,14 @@ class AmazonS3InstallationStore(InstallationStore):
                 Key=f"{workspace_path}/installer-{u_id}-latest",
             )
             self.logger.debug(f"S3 put_object response: {response}")
+
+    async def async_find_bot(
+        self,
+        *,
+        enterprise_id: Optional[str],
+        team_id: Optional[str],
+    ) -> Optional[Bot]:
+        return self.find_bot(enterprise_id=enterprise_id, team_id=team_id)
 
     def find_bot(
         self,
