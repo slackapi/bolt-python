@@ -1,5 +1,6 @@
 # ------------------------------------------------
 # instead of slack_bolt in requirements.txt
+import re
 import sys
 
 sys.path.insert(1, "../src")
@@ -107,10 +108,20 @@ def event_test(ack, payload, say, logger):
     return ack()
 
 
-@app.event("message")
-def new_message(logger, payload):
-    message = payload.get("event", {}).get("text", None)
-    logger.info(f"A new message was posted (text: {message})")
+@app.message("test")
+def test_message(logger, payload):
+    logger.info(payload)
+
+
+@app.message(re.compile("seratch\d"))
+def seratch_message(logger, payload):
+    logger.info(payload)
+
+
+# @app.event("message")
+# def new_message(logger, payload):
+#     message = payload.get("event", {}).get("text", None)
+#     logger.info(f"A new message was posted (text: {message})")
 
 
 message_deleted_constraints = {"type": "message", "subtype": "message_deleted"}

@@ -1,3 +1,4 @@
+from .async_custom_middleware import AsyncCustomMiddleware
 from .async_middleware import AsyncMiddleware
 from .authorization import \
     SingleTeamAuthorization, \

@@ -26,10 +26,10 @@ from slack_bolt.middleware.url_verification import UrlVerification
 from slack_bolt.oauth import OAuthFlow
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
-from slack_sdk import WebClient
 from slack_sdk.oauth import OAuthStateUtils
 from slack_sdk.oauth.installation_store import InstallationStore, FileInstallationStore
 from slack_sdk.oauth.state_store import OAuthStateStore, FileOAuthStateStore
+from slack_sdk.web import WebClient
 
 
 class App():
@@ -226,8 +226,9 @@ class App():
                 return resp
 
         for listener in self._listeners:
+            listener_name = listener.func.__name__
+            self._framework_logger.debug(f"Checking listener: {listener_name} ...")
             if listener.matches(req=req, resp=resp):
-                listener_name = listener.func.__name__
                 # run all the middleware attached to this listener first
                 resp, next_was_not_called = listener.run_middleware(req=req, resp=resp)
                 if next_was_not_called:
@@ -235,7 +236,7 @@ class App():
                     # This means the listener is not for this incoming request.
                     continue
 
-                self._framework_logger.debug(f"Starting listener: {listener_name}")
+                self._framework_logger.debug(f"Running listener: {listener_name} ...")
                 listener_response: Optional[BoltResponse] = self.run_listener(
                     request=req,
                     response=resp,
@@ -265,8 +266,10 @@ class App():
                 ack()  # automatic ack() call if the call is not yet done
 
             if response is not None:
+                self._debug_log_completion(starting_time, response)
                 return response
             elif ack.response is not None:
+                self._debug_log_completion(starting_time, ack.response)
                 return ack.response
         else:
             # start the listener function asynchronously
@@ -282,15 +285,18 @@ class App():
 
             if response is None and ack.response is not None:
                 response = ack.response
-                millis = int((time.time() - starting_time) * 1000)
-                self._framework_logger.debug(
-                    f"Responding with status: {response.status} body: \"{response.body}\" ({millis} millis)")
+                self._debug_log_completion(starting_time, response)
                 return response
             else:
                 self._framework_logger.warning(f"{listener_name} didn't call ack()")
 
         # None for both means no ack() in the listener
         return None
+
+    def _debug_log_completion(self, starting_time: float, response: BoltResponse) -> None:
+        millis = int((time.time() - starting_time) * 1000)
+        self._framework_logger.debug(
+            f"Responding with status: {response.status} body: \"{response.body}\" ({millis} millis)")
 
     # -------------------------
     # middleware
@@ -314,6 +320,31 @@ class App():
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.event(event)
+            return self._register_listener(func, primary_matcher, matchers, middleware, True)
+
+        return __call__
+
+    def message(
+        self,
+        keyword: Union[str, Pattern],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+    ):
+        matchers = matchers if matchers else []
+
+        def __call__(func):
+            primary_matcher = builtin_matchers.event("message")
+
+            def keyword_matcher(payload) -> bool:
+                text: Optional[str] = payload.get("event", {}).get("text", {})
+                if text:
+                    if isinstance(keyword, Pattern):
+                        return keyword.match(text)
+                    elif isinstance(keyword, str):
+                        return keyword in text
+                return False
+
+            matchers.insert(0, keyword_matcher)
             return self._register_listener(func, primary_matcher, matchers, middleware, True)
 
         return __call__
