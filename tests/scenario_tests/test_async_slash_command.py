@@ -1,6 +1,5 @@
 import asyncio
 import json
-from random import random
 from time import time
 
 import pytest
@@ -13,7 +12,7 @@ from tests.mock_web_api_server import \
     setup_mock_web_api_server, cleanup_mock_web_api_server
 
 
-class TestAsyncEvents():
+class TestAsyncSlashCommand():
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -39,13 +38,13 @@ class TestAsyncEvents():
 
     def build_headers(self, timestamp: str, body: str):
         return {
-            "content-type": ["application/json"],
+            "content-type": ["application/x-www-form-urlencoded"],
             "x-slack-signature": [self.generate_signature(body, timestamp)],
             "x-slack-request-timestamp": [timestamp]
         }
 
-    def build_valid_app_mention_request(self) -> AsyncBoltRequest:
-        timestamp, body = str(int(time())), json.dumps(app_mention_payload)
+    def build_valid_request(self) -> AsyncBoltRequest:
+        timestamp, body = str(int(time())), json.dumps(slash_command_payload)
         return AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
     @pytest.mark.asyncio
@@ -54,19 +53,17 @@ class TestAsyncEvents():
         assert resp != None
 
     @pytest.mark.asyncio
-    async def test_app_mention(self):
+    async def test_success(self):
         app = AsyncApp(
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.event("app_mention")(whats_up)
+        app.command("/hello-world")(commander)
 
-        request = self.build_valid_app_mention_request()
+        request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
 
     @pytest.mark.asyncio
     async def test_process_before_response(self):
@@ -75,82 +72,45 @@ class TestAsyncEvents():
             signing_secret=self.signing_secret,
             process_before_response=True,
         )
-        app.event("app_mention")(whats_up)
+        app.command("/hello-world")(commander)
 
-        request = self.build_valid_app_mention_request()
+        request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
-        # no sleep here
-        assert self.mock_received_requests["/chat.postMessage"] == 1
 
     @pytest.mark.asyncio
-    async def test_simultaneous_requests(self):
+    async def test_failure(self):
         app = AsyncApp(
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.event("app_mention")(random_sleeper)
-
-        request = self.build_valid_app_mention_request()
-
-        times = 10
-        for i in range(times):
-            asyncio.ensure_future(app.async_dispatch(request))
-
-        await asyncio.sleep(5)
-
-        assert self.mock_received_requests["/auth.test"] == times
-        assert self.mock_received_requests["/chat.postMessage"] == times
-
-    @pytest.mark.asyncio
-    async def test_middleware_skip(self):
-        app = AsyncApp(
-            client=self.web_client,
-            signing_secret=self.signing_secret
-        )
-        app.event("app_mention", middleware=[skip_middleware])(whats_up)
-
-        request = self.build_valid_app_mention_request()
+        request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 1
 
-
-app_mention_payload = {
-    "token": "verification_token",
-    "team_id": "T111",
-    "enterprise_id": "E111",
-    "api_app_id": "A111",
-    "event": {
-        "client_msg_id": "9cbd4c5b-7ddf-4ede-b479-ad21fca66d63",
-        "type": "app_mention",
-        "text": "<@W111> Hi there!",
-        "user": "W222",
-        "ts": "1595926230.009600",
-        "team": "T111",
-        "channel": "C111",
-        "event_ts": "1595926230.009600"
-    },
-    "type": "event_callback",
-    "event_id": "Ev111",
-    "event_time": 1595926230,
-    "authed_users": ["W111"]
-}
+        app.command("/another-one")(commander)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
 
 
-async def random_sleeper(payload, say):
-    assert payload == app_mention_payload
-    seconds = random() + 2 # 2-3 seconds
-    await asyncio.sleep(seconds)
-    await say(f"Sending this message after sleeping for {seconds} seconds")
+slash_command_payload = \
+    "token=verification_token" \
+    "&team_id=T111" \
+    "&team_domain=test-domain" \
+    "&channel_id=C111" \
+    "&channel_name=random" \
+    "&user_id=W111" \
+    "&user_name=primary-owner" \
+    "&command=%2Fhello-world" \
+    "&text=Hi" \
+    "&enterprise_id=E111" \
+    "&enterprise_name=Org+Name" \
+    "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx" \
+    "&trigger_id=111.111.xxx"
 
 
-async def whats_up(payload, say):
-    assert payload == app_mention_payload
-    await say("What's up?")
-
-
-async def skip_middleware(req, resp, next):
-    # return next()
-    pass
+async def commander(ack):
+    await ack()
