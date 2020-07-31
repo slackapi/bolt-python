@@ -73,7 +73,7 @@ def event_test(ack, say):
     say("What's up?")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.start(3000) # POST http://localhost:3000/slack/events
 ```
 

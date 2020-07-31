@@ -1,7 +1,5 @@
 language:
   python
-sudo:
-  false
 python:
   - "3.6"
   - "3.7"
@@ -11,4 +9,4 @@ python:
 install:
   - python setup.py install
 script:
-  - python setup.py test
+  - python -m pytest tests/

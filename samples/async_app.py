@@ -26,7 +26,7 @@ async def event_test(payload, say, logger):
     await say("What's up?")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.start(3000)
 
 # pip install slackclient

@@ -85,25 +85,6 @@ class TestAsyncEvents():
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     @pytest.mark.asyncio
-    async def test_simultaneous_requests(self):
-        app = AsyncApp(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
-        )
-        app.event("app_mention")(random_sleeper)
-
-        request = self.build_valid_app_mention_request()
-
-        times = 10
-        for i in range(times):
-            asyncio.ensure_future(app.async_dispatch(request))
-
-        await asyncio.sleep(5)
-
-        assert self.mock_received_requests["/auth.test"] == times
-        assert self.mock_received_requests["/chat.postMessage"] == times
-
-    @pytest.mark.asyncio
     async def test_middleware_skip(self):
         app = AsyncApp(
             client=self.web_client,
@@ -115,6 +96,28 @@ class TestAsyncEvents():
         response = await app.async_dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 1
+
+    @pytest.mark.asyncio
+    async def test_simultaneous_requests(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.event("app_mention")(random_sleeper)
+
+        request = self.build_valid_app_mention_request()
+
+        times = 10
+        tasks = []
+        for i in range(times):
+            tasks.append(asyncio.ensure_future(app.async_dispatch(request)))
+
+        await asyncio.sleep(5)
+        # Verifies all the tasks have been completed with 200 OK
+        assert sum([t.result().status for t in tasks if t.done()]) == 200 * times
+
+        assert self.mock_received_requests["/auth.test"] == times
+        assert self.mock_received_requests["/chat.postMessage"] == times
 
 
 app_mention_payload = {
@@ -141,7 +144,7 @@ app_mention_payload = {
 
 async def random_sleeper(payload, say):
     assert payload == app_mention_payload
-    seconds = random() + 2 # 2-3 seconds
+    seconds = random() + 2  # 2-3 seconds
     await asyncio.sleep(seconds)
     await say(f"Sending this message after sleeping for {seconds} seconds")
 

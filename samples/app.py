@@ -152,7 +152,7 @@ def bot_message_deleted(logger):
     logger.info("A bot message has been deleted")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.start(3000)
 
 # pip install slackclient
