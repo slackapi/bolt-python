@@ -13,7 +13,7 @@ from tests.mock_web_api_server import \
     setup_mock_web_api_server, cleanup_mock_web_api_server
 
 
-class TestAsyncSlashCommand():
+class TestAsyncShortcut():
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
