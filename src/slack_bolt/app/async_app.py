@@ -9,9 +9,15 @@ from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable
 
 from aiohttp import web
 
-from slack_bolt.listener_matcher import builtins as builtin_matchers
+from slack_bolt.adapter.aiohttp import to_aiohttp_response, to_bolt_request
+from slack_bolt.listener import AsyncListener, AsyncCustomListener
+from slack_bolt.listener_matcher import AsyncListenerMatcher, AsyncCustomListenerMatcher, builtins as builtin_matchers
 from slack_bolt.logger import get_bolt_logger, get_bolt_app_logger
-from slack_bolt.request.async_request import AsyncBoltRequest
+from slack_bolt.middleware import AsyncMiddleware, AsyncCustomMiddleware
+from slack_bolt.middleware import SslCheck, RequestVerification, IgnoringSelfEvents, UrlVerification
+from slack_bolt.middleware.authorization import AsyncMultiTeamsAuthorization, AsyncSingleTeamAuthorization
+from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
+from slack_bolt.request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.oauth import OAuthStateUtils
 from slack_sdk.oauth.installation_store import FileInstallationStore
@@ -19,17 +25,6 @@ from slack_sdk.oauth.installation_store.async_installation_store import AsyncIns
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 from slack_sdk.oauth.state_store.async_state_store import AsyncOAuthStateStore
 from slack_sdk.web.async_client import AsyncWebClient
-from ..adapter.aiohttp import to_aiohttp_response, to_bolt_request
-from ..listener.async_custom_listener import AsyncCustomListener
-from ..listener.async_listener import AsyncListener
-from ..listener_matcher.async_custom_listener_matcher import AsyncCustomListenerMatcher
-from ..listener_matcher.async_listener_matcher import AsyncListenerMatcher
-from ..middleware import SslCheck, RequestVerification, IgnoringSelfEvents, UrlVerification
-from ..middleware.async_custom_middleware import AsyncCustomMiddleware
-from ..middleware.async_middleware import AsyncMiddleware
-from ..middleware.authorization.async_multi_teams_authorization import AsyncMultiTeamsAuthorization
-from ..middleware.authorization.async_single_team_authorization import AsyncSingleTeamAuthorization
-from ..oauth.async_oauth_flow import AsyncOAuthFlow
 
 
 class AsyncApp():
@@ -224,8 +219,9 @@ class AsyncApp():
                 return resp
 
         for listener in self._async_listeners:
+            listener_name = listener.func.__name__
+            self._framework_logger.debug(f"Checking listener: {listener_name} ...")
             if await listener.async_matches(req=req, resp=resp):
-                listener_name = listener.func.__name__
                 # run all the middleware attached to this listener first
                 resp, next_was_not_called = await listener.run_async_middleware(req=req, resp=resp)
                 if next_was_not_called:
@@ -233,7 +229,7 @@ class AsyncApp():
                     # This means the listener is not for this incoming request.
                     continue
 
-                self._framework_logger.debug(f"Starting listener: {listener_name}")
+                self._framework_logger.debug(f"Running listener: {listener_name} ...")
                 listener_response: Optional[BoltResponse] = await self.run_async_listener(
                     request=req,
                     response=resp,
@@ -263,8 +259,10 @@ class AsyncApp():
                 await ack()  # automatic ack() call if the call is not yet done
 
             if response is not None:
+                self._debug_log_completion(starting_time, response)
                 return response
             elif ack.response is not None:
+                self._debug_log_completion(starting_time, ack.response)
                 return ack.response
         else:
             if async_listener.auto_acknowledgement:
@@ -274,7 +272,7 @@ class AsyncApp():
             # start the listener function asynchronously
             # NOTE: intentionally
             _f: Future = asyncio.ensure_future(async_listener(req=request, resp=response))
-            self._framework_logger.debug(f"Async listener: {listener_name} started...")
+            self._framework_logger.debug(f"Async listener: {listener_name} started..")
 
             # await for the completion of ack() in the async listener execution
             while ack.response is None and time.time() - starting_time <= 3:
@@ -282,15 +280,18 @@ class AsyncApp():
 
             if ack.response is not None:
                 response = ack.response
-                millis = int((time.time() - starting_time) * 1000)
-                self._framework_logger.debug(
-                    f"Responding with status: {response.status} body: \"{response.body}\" ({millis} millis)")
+                self._debug_log_completion(starting_time, response)
                 return response
             else:
                 self._framework_logger.warning(f"{listener_name} didn't call ack()")
 
         # None for both means no ack() in the listener
         return None
+
+    def _debug_log_completion(self, starting_time: float, response: BoltResponse) -> None:
+        millis = int((time.time() - starting_time) * 1000)
+        self._framework_logger.debug(
+            f"Responding with status: {response.status} body: \"{response.body}\" ({millis} millis)")
 
     # -------------------------
     # middleware
@@ -314,6 +315,32 @@ class AsyncApp():
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.event(event, True)
+            return self._register_listener(func, primary_matcher, matchers, middleware, True)
+
+        return __call__
+
+    def message(
+        self,
+        keyword: Union[str, Pattern],
+        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+    ):
+        matchers = matchers if matchers else []
+
+        def __call__(func):
+            primary_matcher = builtin_matchers.event("message", True)
+
+            async def keyword_matcher(payload) -> bool:
+                text: Optional[str] = payload.get("event", {}).get("text", {})
+                if text:
+                    if isinstance(keyword, Pattern):
+                        return keyword.match(text)
+                    elif isinstance(keyword, str):
+                        return keyword in text
+                return False
+
+            matchers.insert(0, keyword_matcher)
+
             return self._register_listener(func, primary_matcher, matchers, middleware, True)
 
         return __call__
