@@ -8,6 +8,7 @@ from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 from tests.mock_web_api_server import \
     setup_mock_web_api_server, cleanup_mock_web_api_server
+from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
 class TestSlashCommand(unittest.TestCase):
@@ -21,10 +22,12 @@ class TestSlashCommand(unittest.TestCase):
     )
 
     def setUp(self):
+        self.old_os_env = remove_os_env_temporarily()
         setup_mock_web_api_server(self)
 
     def tearDown(self):
         cleanup_mock_web_api_server(self)
+        restore_os_env(self.old_os_env)
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(

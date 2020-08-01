@@ -1,2 +1,2 @@
-falcon==2.0.0
-gunicorn==20.0.4
+falcon>=2,<3
+gunicorn>=20,<21

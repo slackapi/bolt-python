@@ -49,22 +49,34 @@ class AsyncApp():
 
         # for the OAuth flow
         oauth_flow: Optional[AsyncOAuthFlow] = None,
-        client_id: Optional[str] = os.environ.get("SLACK_CLIENT_ID", None),
-        client_secret: Optional[str] = os.environ.get("SLACK_CLIENT_SECRET", None),
-        scopes: List[str] = os.environ.get("SLACK_SCOPES", "").split(","),
-        user_scopes: List[str] = os.environ.get("SLACK_USER_SCOPES", "").split(","),
-        redirect_uri: Optional[str] = os.environ.get("SLACK_REDIRECT_URI", None),
-        oauth_install_path: str = os.environ.get("SLACK_INSTALL_PATH", "/slack/install"),
-        oauth_redirect_uri_path: str = os.environ.get("SLACK_REDIRECT_URI_PATH", "/slack/oauth_redirect"),
+
+        client_id: Optional[str] = None,
+        client_secret: Optional[str] = None,
+        scopes: Optional[List[str]] = None,
+        user_scopes: Optional[List[str]] = None,
+        redirect_uri: Optional[str] = None,
+        oauth_install_path: Optional[str] = None,
+        oauth_redirect_uri_path: Optional[str] = None,
         oauth_success_url: Optional[str] = None,
         oauth_failure_url: Optional[str] = None,
 
         # No need to set (the value is used only in response to ssl_check requests)
-        verification_token: Optional[str] = os.environ.get("SLACK_VERIFICATION_TOKEN", None),
+        verification_token: Optional[str] = None,
     ):
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret: str = signing_secret
-        self._verification_token: Optional[str] = verification_token
+
+        client_id = client_id or os.environ.get("SLACK_CLIENT_ID", None)
+        client_secret = client_secret or os.environ.get("SLACK_CLIENT_SECRET", None)
+        scopes = scopes or os.environ.get("SLACK_SCOPES", "").split(",")
+        user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", "").split(",")
+        redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI", None)
+        oauth_install_path = oauth_install_path or os.environ.get("SLACK_INSTALL_PATH", "/slack/install")
+        oauth_redirect_uri_path = oauth_redirect_uri_path or \
+                                  os.environ.get("SLACK_REDIRECT_URI_PATH", "/slack/oauth_redirect")
+
+        self._verification_token: Optional[str] = \
+            verification_token or os.environ.get("SLACK_VERIFICATION_TOKEN", None)
         self._framework_logger = get_bolt_logger(AsyncApp)
 
         self._token: Optional[str] = token

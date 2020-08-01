@@ -1,0 +1,3 @@
+chalice>=1,<2
+click>=7,<8
+slackclient>=2,<3

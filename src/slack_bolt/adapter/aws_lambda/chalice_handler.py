@@ -1,6 +1,6 @@
-import base64
 import logging
-from typing import List, Dict
+
+from chalice.app import Request, Response
 
 from slack_bolt.adapter.aws_lambda.internals import _first_value
 from slack_bolt.app import App
@@ -10,10 +10,10 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
-class SlackRequestHandler():
+class ChaliceSlackRequestHandler():
     def __init__(self, app: App):
         self.app = app
-        self.logger = get_bolt_app_logger(app.name, SlackRequestHandler)
+        self.logger = get_bolt_app_logger(app.name, ChaliceSlackRequestHandler)
 
     @classmethod
     def clear_all_log_handlers(cls):
@@ -23,16 +23,17 @@ class SlackRequestHandler():
             for handler in root.handlers:
                 root.removeHandler(handler)
 
-    def handle(self, event, context):
-        self.logger.debug(f"Incoming event: {event}, context: {context}")
+    def handle(self, request: Request):
+        body: str = request.raw_body.decode("utf-8") if request.raw_body else ""
+        self.logger.debug(f"Incoming request: {request.to_dict()}, body: {body}")
 
-        method = event.get("requestContext", {}).get("http", {}).get("method", None)
+        method = request.method
         if method is None:
             return not_found()
         if method == "GET":
             if self.app.oauth_flow is not None:
                 oauth_flow: OAuthFlow = self.app.oauth_flow
-                bolt_req: BoltRequest = to_bolt_request(event)
+                bolt_req: BoltRequest = to_bolt_request(request, body)
                 query = bolt_req.query
                 is_callback = query is not None and (
                     (_first_value(query, "code") is not None and _first_value(query, "state") is not None)
@@ -41,44 +42,38 @@ class SlackRequestHandler():
                 )
                 if is_callback:
                     bolt_resp = oauth_flow.handle_callback(bolt_req)
-                    return to_aws_response(bolt_resp)
+                    return to_chalice_response(bolt_resp)
                 else:
                     bolt_resp = oauth_flow.handle_installation(bolt_req)
-                    return to_aws_response(bolt_resp)
+                    return to_chalice_response(bolt_resp)
         elif method == "POST":
-            bolt_req = to_bolt_request(event)
+            bolt_req: BoltRequest = to_bolt_request(request, body)
             bolt_resp = self.app.dispatch(bolt_req)
-            aws_response = to_aws_response(bolt_resp)
+            aws_response = to_chalice_response(bolt_resp)
             return aws_response
 
         return not_found()
 
 
-def to_bolt_request(event) -> BoltRequest:
-    body = event.get("body", "")
-    if event["isBase64Encoded"]:
-        body = base64.b64decode(body).decode("utf-8")
-    cookies: List[str] = event.get("cookies", [])
-    headers = event.get("headers", {})
-    headers["cookie"] = cookies
+def to_bolt_request(request: Request, body: str) -> BoltRequest:
     return BoltRequest(
         body=body,
-        query=event.get("queryStringParameters", {}),
-        headers=headers,
+        query=request.query_params,
+        headers=request.headers,
     )
 
 
-def to_aws_response(resp: BoltResponse) -> Dict[str, any]:
-    return {
-        "statusCode": resp.status,
-        "body": resp.body,
-        "headers": resp.first_headers(),
-    }
+def to_chalice_response(resp: BoltResponse) -> Response:
+    return Response(
+        status_code=resp.status,
+        body=resp.body,
+        headers=resp.first_headers(),
+    )
 
 
-def not_found() -> Dict[str, any]:
-    return {
-        "statusCode": 404,
-        "body": "Not Found",
-        "headers": {},
-    }
+def not_found() -> Response:
+    return Response(
+        status_code=404,
+        body="Not Found",
+        headers={},
+    )

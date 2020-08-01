@@ -11,6 +11,7 @@ from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 from tests.mock_web_api_server import \
     setup_mock_web_api_server, cleanup_mock_web_api_server
+from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
 class TestAsyncMessage():
@@ -25,11 +26,15 @@ class TestAsyncMessage():
 
     @pytest.fixture
     def event_loop(self):
-        setup_mock_web_api_server(self)
-        loop = asyncio.get_event_loop()
-        yield loop
-        loop.close()
-        cleanup_mock_web_api_server(self)
+        old_os_env = remove_os_env_temporarily()
+        try:
+            setup_mock_web_api_server(self)
+            loop = asyncio.get_event_loop()
+            yield loop
+            loop.close()
+            cleanup_mock_web_api_server(self)
+        finally:
+            restore_os_env(old_os_env)
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(

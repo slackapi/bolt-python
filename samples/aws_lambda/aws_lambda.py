@@ -2,7 +2,7 @@
 # instead of slack_bolt in requirements.txt
 import sys
 
-sys.path.insert(1, "src")
+sys.path.insert(1, "latest_slack_bolt")
 # ------------------------------------------------
 
 import logging
@@ -30,7 +30,6 @@ def handler(event, context):
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
 
-# rm -rf src
-# cp -pr ../../src src
+# rm -rf latest_slack_bolt && cp -pr ../../src latest_slack_bolt
 # pip install python-lambda
 # lambda deploy --config-file aws_lambda_config.yaml --requirements requirements.txt

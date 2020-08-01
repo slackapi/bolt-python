@@ -2,12 +2,13 @@
 # instead of slack_bolt in requirements.txt
 import sys
 
-sys.path.insert(1, "src")
+sys.path.insert(1, "latest_slack_bolt")
 # ------------------------------------------------
 
 import logging
 from slack_bolt import App
-from slack_bolt.adapter.aws_lambda import SlackRequestHandler, LambdaS3OAuthFlow
+from slack_bolt.adapter.aws_lambda import SlackRequestHandler
+from slack_bolt.adapter.aws_lambda.lambda_s3_oauth_flow import LambdaS3OAuthFlow
 
 # process_before_response must be True when running on FaaS
 app = App(
@@ -41,7 +42,6 @@ def handler(event, context):
 #   - AmazonS3FullAccess
 #   - AWSLambdaBasicExecutionRole
 
-# rm -rf src
-# cp -pr ../../src src
+# rm -rf latest_slack_bolt && cp -pr ../../src latest_slack_bolt
 # pip install python-lambda
 # lambda deploy --config-file aws_lambda_oauth_config.yaml --requirements requirements_oauth.txt
