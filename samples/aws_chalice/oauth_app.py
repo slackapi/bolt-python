@@ -9,9 +9,16 @@ import logging
 from chalice import Chalice, Response
 from slack_bolt import App
 from slack_bolt.adapter.aws_lambda.chalice_handler import ChaliceSlackRequestHandler
+from slack_bolt.adapter.aws_lambda.lambda_s3_oauth_flow import LambdaS3OAuthFlow
 
 # process_before_response must be True when running on FaaS
-bolt_app = App(process_before_response=True)
+bolt_app = App(
+    process_before_response=True,
+    oauth_flow=LambdaS3OAuthFlow(
+        install_path="/api/slack/install",
+        redirect_uri_path="/api/slack/oauth_redirect",
+    ),
+)
 
 
 @bolt_app.event("app_mention")
@@ -30,6 +37,16 @@ slack_handler = ChaliceSlackRequestHandler(app=bolt_app)
 
 @app.route("/slack/events", methods=["POST"])
 def events() -> Response:
+    return slack_handler.handle(app.current_request)
+
+
+@app.route("/slack/install", methods=["GET"])
+def install() -> Response:
+    return slack_handler.handle(app.current_request)
+
+
+@app.route("/slack/oauth_redirect", methods=["GET"])
+def oauth_redirect() -> Response:
     return slack_handler.handle(app.current_request)
 
 # configure aws credentials properly

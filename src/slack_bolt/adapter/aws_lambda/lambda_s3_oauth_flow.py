@@ -30,8 +30,8 @@ class LambdaS3OAuthFlow(OAuthFlow):
         user_scopes: Optional[str] = os.environ.get("SLACK_USER_SCOPES", None),
         redirect_uri: Optional[str] = os.environ.get("SLACK_REDIRECT_URI", None),
 
-        install_path: str = os.environ["SLACK_LAMBDA_PATH"],
-        redirect_uri_path: str = os.environ["SLACK_LAMBDA_PATH"],
+        install_path: str = os.environ.get("SLACK_LAMBDA_PATH", "/slack/install"),
+        redirect_uri_path: str = os.environ.get("SLACK_LAMBDA_PATH", "/slack/oauth_redirect"),
 
         success_url: Optional[str] = None,
         failure_url: Optional[str] = None,
