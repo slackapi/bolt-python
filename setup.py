@@ -41,6 +41,7 @@ setuptools.setup(
         # pip install -e ".[adapters]"
         "adapters": [
             # used only under src/slack_bolt/adapter
+            "bottle>=0.12,<1",
             "chalice>=1,<2",
             "click>=7,<8", # for chalice
             "Django>=3,<4",
