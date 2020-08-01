@@ -10,7 +10,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 from slack_bolt import App
-from slack_bolt.adapter.flask import SlackRequestHandler
+from slack_bolt.adapter.tornado import SlackEventsHandler
 
 app = App()
 
@@ -27,17 +27,16 @@ def event_test(ack, payload, say, logger):
     say("What's up?")
 
 
-from flask import Flask, request
+from tornado.web import Application
+from tornado.ioloop import IOLoop
 
-flask_app = Flask(__name__)
-handler = SlackRequestHandler(app)
+api = Application([("/slack/events", SlackEventsHandler, dict(app=app))])
 
-
-@flask_app.route("/slack/events", methods=["POST"])
-def slack_events():
-    return handler.handle(request)
+if __name__ == "__main__":
+    api.listen(3000)
+    IOLoop.current().start()
 
 # pip install -r requirements.txt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
-# FLASK_APP=app.py FLASK_ENV=development flask run -p 3000
+# python app.py

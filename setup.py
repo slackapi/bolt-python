@@ -50,6 +50,7 @@ setuptools.setup(
             "pyramid>=1,<2",
             "sanic>=20,<21",
             "starlette>=0.13,<1",
+            "tornado>=6,<7",
             # used only under src/slack_sdk/*_store
             "boto3<=2",
         ]

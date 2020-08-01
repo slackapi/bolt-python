@@ -7,7 +7,7 @@ sys.path.insert(1, "../../src")
 
 import logging
 from slack_bolt import App
-from slack_bolt.adapter.flask import SlackRequestHandler
+from slack_bolt.adapter.tornado import SlackEventsHandler, SlackOAuthHandler
 
 logging.basicConfig(level=logging.DEBUG)
 app = App()
@@ -25,25 +25,18 @@ def event_test(ack, payload, say, logger):
     say("What's up?")
 
 
-from flask import Flask, request
+from tornado.web import Application
+from tornado.ioloop import IOLoop
 
-flask_app = Flask(__name__)
-handler = SlackRequestHandler(app)
+api = Application([
+    ("/slack/events", SlackEventsHandler, dict(app=app)),
+    ("/slack/install", SlackOAuthHandler, dict(app=app)),
+    ("/slack/oauth_redirect", SlackOAuthHandler, dict(app=app)),
+])
 
-
-@flask_app.route("/slack/events", methods=["POST"])
-def slack_events():
-    return handler.handle(request)
-
-
-@flask_app.route("/slack/install", methods=["GET"])
-def install():
-    return handler.handle(request)
-
-
-@flask_app.route("/slack/oauth_redirect", methods=["GET"])
-def oauth_redirect():
-    return handler.handle(request)
+if __name__ == "__main__":
+    api.listen(3000)
+    IOLoop.current().start()
 
 # pip install -r requirements.txt
 
@@ -54,4 +47,4 @@ def oauth_redirect():
 # export SLACK_CLIENT_SECRET=***
 # export SLACK_SCOPES=app_mentions:read,chat:write
 
-# FLASK_APP=oauth_app.py FLASK_ENV=development flask run -p 3000
+# python oauth_app.py
