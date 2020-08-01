@@ -11,7 +11,7 @@ def parse_query(
         return {}
     elif isinstance(query, str):
         return parse_qs(query)
-    elif isinstance(query, dict):
+    elif isinstance(query, dict) or hasattr(query, "items"):
         result = {}
         for name, value in query.items():
             if isinstance(value, list):

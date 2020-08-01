@@ -1,12 +1,12 @@
 from starlette.requests import Request
 from starlette.responses import Response
 
-from slack_bolt import BoltRequest, App, BoltResponse
-from slack_bolt.oauth import OAuthFlow
+from slack_bolt import BoltResponse, AsyncApp, AsyncBoltRequest
+from slack_bolt.oauth import AsyncOAuthFlow
 
 
-def to_bolt_request(req: Request, body: bytes) -> BoltRequest:
-    return BoltRequest(
+def to_async_bolt_request(req: Request, body: bytes) -> AsyncBoltRequest:
+    return AsyncBoltRequest(
         body=body.decode("utf-8"),
         query=req.query_params,
         headers=req.headers,
@@ -34,23 +34,23 @@ def to_starlette_response(bolt_resp: BoltResponse) -> Response:
     return resp
 
 
-class SlackRequestHandler():
-    def __init__(self, app: App):
+class AsyncSlackRequestHandler():
+    def __init__(self, app: AsyncApp):
         self.app = app
 
     async def handle(self, req: Request) -> Response:
         body = await req.body()
         if req.method == "GET":
             if self.app.oauth_flow is not None:
-                oauth_flow: OAuthFlow = self.app.oauth_flow
+                oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
                 if req.url.path == oauth_flow.install_path:
-                    bolt_resp = oauth_flow.handle_installation(to_bolt_request(req, body))
+                    bolt_resp = await oauth_flow.handle_installation(to_async_bolt_request(req, body))
                     return to_starlette_response(bolt_resp)
                 elif req.url.path == oauth_flow.redirect_uri_path:
-                    bolt_resp = oauth_flow.handle_callback(to_bolt_request(req, body))
+                    bolt_resp = await oauth_flow.handle_callback(to_async_bolt_request(req, body))
                     return to_starlette_response(bolt_resp)
         elif req.method == "POST":
-            bolt_resp = self.app.dispatch(to_bolt_request(req, body))
+            bolt_resp = await self.app.async_dispatch(to_async_bolt_request(req, body))
             return to_starlette_response(bolt_resp)
 
         return Response(

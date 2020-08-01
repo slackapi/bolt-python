@@ -48,7 +48,7 @@ setuptools.setup(
             "fastapi>=0.54,<0.55",
             "Flask>=1,<2",
             "pyramid>=1,<2",
-            "responder>=2,<3",
+            "sanic>=20,<21",
             "starlette>=0.13,<1",
             # used only under src/slack_sdk/*_store
             "boto3<=2",

@@ -1,2 +1,0 @@
-responder>=2,<3
-uvicorn<1
