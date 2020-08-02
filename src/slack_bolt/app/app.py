@@ -4,7 +4,6 @@ import logging
 import os
 import time
 from concurrent.futures.thread import ThreadPoolExecutor
-from functools import wraps
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from typing import List, Union, Pattern, Callable, Dict, Optional
 
@@ -54,6 +53,7 @@ class App():
 
         # for the OAuth flow
         oauth_flow: Optional[OAuthFlow] = None,
+        authorization_test_enabled: bool = True,
 
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
@@ -102,6 +102,7 @@ class App():
         self._oauth_state_expiration_seconds = oauth_state_expiration_seconds
 
         self._oauth_flow: Optional[OAuthFlow] = None
+        self._authorization_test_enabled = authorization_test_enabled
         if oauth_flow:
             self._oauth_flow = oauth_flow
             if self._installation_store is None:
@@ -161,8 +162,6 @@ class App():
 
         self._init_middleware_list_done = False
         self._init_middleware_list()
-        self._init_listeners_done = False
-        self._init_listeners()
 
     def _init_middleware_list(self):
         if self._init_middleware_list_done:
@@ -172,15 +171,13 @@ class App():
         if self._oauth_flow is None and self._token:
             self._middleware_list.append(SingleTeamAuthorization())
         else:
-            self._middleware_list.append(MultiTeamsAuthorization(self._installation_store))
+            self._middleware_list.append(MultiTeamsAuthorization(
+                installation_store=self._installation_store,
+                verification_enabled=self._authorization_test_enabled,
+            ))
         self._middleware_list.append(IgnoringSelfEvents())
         self._middleware_list.append(UrlVerification())
         self._init_middleware_list_done = True
-
-    def _init_listeners(self):
-        if self._init_listeners_done:
-            return
-        self._init_listeners_done = True
 
     # -------------------------
     # accessors
@@ -271,7 +268,7 @@ class App():
         ack = request.context.ack
         starting_time = time.time()
         if self._process_before_response:
-            returned_value = listener(req=request, resp=response)
+            returned_value = listener.run_ack_function(request=request, response=response)
             if isinstance(returned_value, BoltResponse):
                 response = returned_value
             if ack.response is None and listener.auto_acknowledgement:
@@ -285,7 +282,8 @@ class App():
                 return ack.response
         else:
             # start the listener function asynchronously
-            self._listener_executor.submit(lambda: listener(req=request, resp=response))
+            self._listener_executor.submit(
+                lambda: listener.run_ack_function(request=request, response=response))
 
             if listener.auto_acknowledgement:
                 # acknowledge immediately in case of Events API
@@ -505,15 +503,12 @@ class App():
 
     def _register_listener(
         self,
-        func,
+        func: Callable[..., BoltResponse],
         primary_matcher: ListenerMatcher,
         matchers: Optional[List[Callable[..., bool]]],
         middleware: Optional[List[Union[Callable, Middleware]]],
         auto_acknowledgement: bool = False,
-    ) -> Callable[..., None]:
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            func(*args, **kwargs)
+    ) -> None:
 
         listener_matchers = [CustomListenerMatcher(app_name=self.name, func=f) for f in (matchers or [])]
         listener_matchers.insert(0, primary_matcher)
@@ -533,7 +528,6 @@ class App():
             middleware=listener_middleware,
             auto_acknowledgement=auto_acknowledgement,
         ))
-        return wrapper
 
 
 # -------------------------

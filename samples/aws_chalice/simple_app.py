@@ -1,11 +1,6 @@
-# ------------------------------------------------
-# instead of slack_bolt in requirements.txt
-import sys
-
-sys.path.insert(1, "latest_slack_bolt")
-# ------------------------------------------------
-
 import logging
+import time
+
 from chalice import Chalice, Response
 from slack_bolt import App
 from slack_bolt.adapter.aws_lambda.chalice_handler import ChaliceSlackRequestHandler
@@ -25,10 +20,32 @@ logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
 
 # Don't change this variable name "app"
 app = Chalice(app_name="bolt-python-chalice")
-slack_handler = ChaliceSlackRequestHandler(app=bolt_app)
+slack_handler = ChaliceSlackRequestHandler(app=bolt_app, chalice=app)
 
 
-@app.route("/slack/events", methods=["POST"])
+def respond_to_slack_within_3_seconds(ack):
+    # This method is for synchronous communication with the Slack API server
+    ack("Thanks!")
+
+
+def can_be_long(say):
+    # This can be executed in a thread, asyncio's Future, a new AWS lambda function
+    # ack() is not allowed here
+    time.sleep(5)
+    say("I'm done!")
+
+
+bolt_app.command("/hello-bolt-python-chalice")(
+    ack=respond_to_slack_within_3_seconds,
+    subsequent=[can_be_long],
+)
+
+
+@app.route(
+    "/slack/events",
+    methods=["POST"],
+    content_types=["application/x-www-form-urlencoded", "application/json"],
+)
 def events() -> Response:
     return slack_handler.handle(app.current_request)
 

@@ -11,6 +11,7 @@ import mimetypes
 import re
 import uuid
 import warnings
+from base64 import b64encode
 from http.client import HTTPResponse
 from ssl import SSLContext
 from typing import BinaryIO, Dict, List
@@ -24,7 +25,7 @@ from slack_sdk.errors import SlackRequestError
 from .deprecation import show_2020_01_deprecation
 from .internal_utils import convert_bool_to_0_or_1, get_user_agent, _get_url, _build_req_args
 from .slack_response import SlackResponse
-from base64 import b64encode
+
 
 class BaseClient:
     BASE_URL = "https://www.slack.com/api/"

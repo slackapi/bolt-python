@@ -2,10 +2,11 @@
 # instead of slack_bolt in requirements.txt
 import sys
 
-sys.path.insert(1, "latest_slack_bolt")
+sys.path.insert(1, "vendor")
 # ------------------------------------------------
 
 import logging
+
 from slack_bolt import App
 from slack_bolt.adapter.aws_lambda import SlackRequestHandler
 from slack_bolt.adapter.aws_lambda.lambda_s3_oauth_flow import LambdaS3OAuthFlow
@@ -21,6 +22,12 @@ app = App(
 def handle_app_mentions(payload, say, logger):
     logger.info(payload)
     say("What's up?")
+
+
+@app.command("/hello-bolt-python-lambda")
+def respond_to_slack_within_3_seconds(ack):
+    # This method is for synchronous communication with the Slack API server
+    ack("Thanks!")
 
 
 SlackRequestHandler.clear_all_log_handlers()

@@ -40,6 +40,7 @@ class LambdaS3OAuthFlow(OAuthFlow):
         self._logger = logger
 
         self.s3_client = boto3.client("s3")
+
         self.oauth_state_store = AmazonS3OAuthStateStore(
             logger=self.logger,
             s3_client=self.s3_client,

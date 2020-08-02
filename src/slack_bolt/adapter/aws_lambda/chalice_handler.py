@@ -1,6 +1,6 @@
 import logging
 
-from chalice.app import Request, Response
+from chalice.app import Request, Response, Chalice
 
 from slack_bolt.adapter.aws_lambda.internals import _first_value
 from slack_bolt.app import App
@@ -11,8 +11,9 @@ from slack_bolt.response import BoltResponse
 
 
 class ChaliceSlackRequestHandler():
-    def __init__(self, app: App):
+    def __init__(self, app: App, chalice: Chalice):
         self.app = app
+        self.chalice = chalice
         self.logger = get_bolt_app_logger(app.name, ChaliceSlackRequestHandler)
 
     @classmethod

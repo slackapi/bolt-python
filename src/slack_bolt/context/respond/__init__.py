@@ -1,2 +1,2 @@
-from .async_respond import AsyncRespond
+# Don't add async module imports here
 from .respond import Respond

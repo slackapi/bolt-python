@@ -1,1 +1,0 @@
-slackclient>=2,<3

@@ -1,9 +1,6 @@
 import inspect
 import sys
 
-from slack_bolt.request.async_request import AsyncBoltRequest
-from .async_listener_matcher import AsyncListenerMatcher
-
 if sys.version_info.major == 3 and sys.version_info.minor <= 6:
     from re import _pattern_type as Pattern
 else:
@@ -18,8 +15,8 @@ from .listener_matcher import ListenerMatcher
 from slack_bolt.logger import get_bolt_logger
 
 
-# a.k.a Union[ListenerMatcher, AsyncListenerMatcher]
-class BuiltinListenerMatcher(ListenerMatcher, AsyncListenerMatcher):
+# a.k.a Union[ListenerMatcher, "AsyncListenerMatcher"]
+class BuiltinListenerMatcher(ListenerMatcher):
 
     def __init__(
         self,
@@ -34,28 +31,21 @@ class BuiltinListenerMatcher(ListenerMatcher, AsyncListenerMatcher):
         return self.func(**build_required_kwargs(
             logger=self.logger,
             required_arg_names=self.arg_names,
-            req=req,
-            resp=resp
-        ))
-
-    async def async_matches(self, req: AsyncBoltRequest, resp: BoltResponse) -> bool:
-        return await self.func(**build_required_kwargs(
-            logger=self.logger,
-            required_arg_names=self.arg_names,
-            req=req,
-            resp=resp
+            request=req,
+            response=resp
         ))
 
 
 def build_listener_matcher(
     func: Callable[..., bool],
     asyncio: bool,
-) -> Union[ListenerMatcher, AsyncListenerMatcher]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     if asyncio:
+        from .async_builtins import AsyncBuiltinListenerMatcher
         async def async_fun(payload: dict) -> bool:
             return func(payload)
 
-        return BuiltinListenerMatcher(func=async_fun)
+        return AsyncBuiltinListenerMatcher(func=async_fun)
     else:
         return BuiltinListenerMatcher(func=func)
 
@@ -66,7 +56,7 @@ def build_listener_matcher(
 def event(
     constraints: Union[str, Pattern, Dict[str, str]],
     asyncio: bool = False,
-) -> Union[ListenerMatcher, AsyncListenerMatcher]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     if constraints == "message":
         # matches message events that don't have subtype in payload
         constraints = {"type": "message", "subtype": None}
@@ -107,7 +97,7 @@ def event(
 def command(
     command: Union[str, Pattern],
     asyncio: bool = False,
-) -> Union[ListenerMatcher, AsyncListenerMatcher]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(payload: dict) -> bool:
         return payload \
                and "command" in payload \
@@ -122,7 +112,7 @@ def command(
 def shortcut(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
-) -> Union[ListenerMatcher, AsyncListenerMatcher]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     if isinstance(constraints, (str, Pattern)):
         callback_id: Union[str, Pattern] = constraints
 
@@ -145,7 +135,7 @@ def shortcut(
 def global_shortcut(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
-) -> Union[ListenerMatcher, AsyncListenerMatcher]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(payload: dict) -> bool:
         return payload \
                and _is_expected_type(payload, "shortcut") \
@@ -158,7 +148,7 @@ def global_shortcut(
 def message_shortcut(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
-) -> Union[ListenerMatcher, AsyncListenerMatcher]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(payload: dict) -> bool:
         return payload \
                and _is_expected_type(payload, "message_action") \
@@ -174,7 +164,7 @@ def message_shortcut(
 def action(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
-) -> Union[ListenerMatcher, AsyncListenerMatcher]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     if isinstance(constraints, (str, Pattern)):
         return block_action(constraints, asyncio)
     elif "type" in constraints:
@@ -187,7 +177,7 @@ def action(
 def block_action(
     action_id: Union[str, Pattern],
     asyncio: bool = False,
-) -> Union[ListenerMatcher, AsyncListenerMatcher]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(payload: dict) -> bool:
         return payload \
                and _is_expected_type(payload, "block_actions") \
@@ -203,7 +193,7 @@ def block_action(
 def view(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
-) -> Union[ListenerMatcher, AsyncListenerMatcher]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     if isinstance(constraints, (str, Pattern)):
         return view_submission(constraints, asyncio)
     elif "type" in constraints:
@@ -216,7 +206,7 @@ def view(
 def view_submission(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
-) -> Union[ListenerMatcher, AsyncListenerMatcher]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(payload: dict) -> bool:
         return payload \
                and _is_expected_type(payload, "view_submission") \
@@ -233,7 +223,7 @@ def view_submission(
 def options(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
-) -> Union[ListenerMatcher, AsyncListenerMatcher]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     if isinstance(constraints, (str, Pattern)):
         return block_suggestion(constraints, asyncio)
     elif "action_id" in constraints:
@@ -247,7 +237,7 @@ def options(
 def block_suggestion(
     action_id: Union[str, Pattern],
     asyncio: bool = False,
-) -> Union[ListenerMatcher, AsyncListenerMatcher]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(payload: dict) -> bool:
         return payload \
                and _is_expected_type(payload, "block_suggestion") \
@@ -260,7 +250,7 @@ def block_suggestion(
 def dialog_suggestion(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
-) -> Union[ListenerMatcher, AsyncListenerMatcher]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(payload: dict) -> bool:
         return payload \
                and _is_expected_type(payload, "dialog_suggestion") \

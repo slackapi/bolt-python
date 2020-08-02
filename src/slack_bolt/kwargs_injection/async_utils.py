@@ -1,16 +1,16 @@
 import logging
 from typing import Callable, Dict, Optional, List
 
-from slack_bolt.request import BoltRequest
+from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
-from .args import Args
+from .async_args import AsyncArgs
 
 
-def build_required_kwargs(
+def build_async_required_kwargs(
     *,
     logger: logging.Logger,
     required_arg_names: List[str],
-    request: BoltRequest,
+    request: AsyncBoltRequest,
     response: Optional[BoltResponse],
     next_func: Callable[[], None] = None,
 ) -> Dict[str, any]:
@@ -37,8 +37,8 @@ def build_required_kwargs(
     found_arg_names = kwargs.keys()
     for name in required_arg_names:
         if name == "args":
-            if isinstance(request, BoltRequest):
-                kwargs[name] = Args(**all_available_args)
+            if isinstance(request, AsyncBoltRequest):
+                kwargs[name] = AsyncArgs(**all_available_args)
             else:
                 logger.warning(f"Unknown Request object type detected ({type(request)})")
 

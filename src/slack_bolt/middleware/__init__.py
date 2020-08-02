@@ -1,10 +1,7 @@
-from .async_custom_middleware import AsyncCustomMiddleware
-from .async_middleware import AsyncMiddleware
+# Don't add async module imports here
 from .authorization import \
     SingleTeamAuthorization, \
-    MultiTeamsAuthorization, \
-    AsyncSingleTeamAuthorization, \
-    AsyncMultiTeamsAuthorization
+    MultiTeamsAuthorization
 from .custom_middleware import CustomMiddleware
 from .ignoring_self_events import IgnoringSelfEvents
 from .middleware import Middleware
@@ -22,14 +19,3 @@ builtin_middleware_classes = [
 ]
 for cls in builtin_middleware_classes:
     Middleware.register(cls)
-
-builtin_async_middleware_classes = [
-    SslCheck,
-    RequestVerification,
-    AsyncSingleTeamAuthorization,
-    AsyncMultiTeamsAuthorization,
-    IgnoringSelfEvents,
-    UrlVerification,
-]
-for cls in builtin_async_middleware_classes:
-    AsyncMiddleware.register(cls)

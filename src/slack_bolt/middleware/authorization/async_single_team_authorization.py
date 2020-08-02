@@ -6,7 +6,7 @@ from slack_bolt.middleware.authorization.async_authorization import AsyncAuthori
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
-from .internals import _build_error_response, _is_no_auth_required
+from .async_internals import _build_error_response, _is_no_auth_required
 
 
 class AsyncSingleTeamAuthorization(AsyncAuthorization):

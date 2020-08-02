@@ -1,2 +1,2 @@
-from .async_request import AsyncBoltRequest
+# Don't add async module imports here
 from .request import BoltRequest

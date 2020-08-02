@@ -1,11 +1,11 @@
 from typing import Dict, Optional, List, Union
 
 from slack_bolt.context.async_context import AsyncBoltContext
+from slack_bolt.request.async_internals import build_async_context
 from slack_bolt.request.internals import \
     parse_query, \
     parse_payload, \
     build_normalized_headers, \
-    build_context, \
     extract_content_type
 
 
@@ -31,4 +31,4 @@ class AsyncBoltRequest():
         self.headers = build_normalized_headers(headers)
         self.content_type = extract_content_type(self.headers)
         self.payload = parse_payload(self.body, self.content_type)
-        self.context = build_context(AsyncBoltContext(context if context else {}), self.payload)
+        self.context = build_async_context(AsyncBoltContext(context if context else {}), self.payload)

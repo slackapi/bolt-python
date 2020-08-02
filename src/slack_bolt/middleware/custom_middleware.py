@@ -36,8 +36,8 @@ class CustomMiddleware(Middleware):
         return self.func(**build_required_kwargs(
             logger=self.logger,
             required_arg_names=self.arg_names,
-            req=req,
-            resp=resp,
+            request=req,
+            response=resp,
             next_func=next,
         ))
 

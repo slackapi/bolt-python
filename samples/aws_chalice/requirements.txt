@@ -1,4 +1,1 @@
-chalice>=1,<2
-click>=7,<8
-slackclient>=2,<3
-boto3==1.4.4
+#slackclient>=2,<3

@@ -1,14 +1,12 @@
-from typing import Callable, Awaitable
+from typing import Callable
 
 from slack_bolt.logger import get_bolt_logger
 from slack_bolt.middleware import Middleware
-from slack_bolt.middleware.async_middleware import AsyncMiddleware
 from slack_bolt.request import BoltRequest
-from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 
 
-class UrlVerification(Middleware, AsyncMiddleware):
+class UrlVerification(Middleware):
     def __init__(self):
         self.logger = get_bolt_logger(UrlVerification)
 
@@ -23,18 +21,6 @@ class UrlVerification(Middleware, AsyncMiddleware):
             return self._build_success_response(req.payload)
         else:
             return next()
-
-    async def async_process(
-        self,
-        *,
-        req: AsyncBoltRequest,
-        resp: BoltResponse,
-        next: Callable[[], Awaitable[BoltResponse]],
-    ) -> BoltResponse:
-        if self._is_url_verification_request(req.payload):
-            return self._build_success_response(req.payload)
-        else:
-            return await next()
 
     # -----------------------------------------
 
