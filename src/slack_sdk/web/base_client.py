@@ -19,22 +19,12 @@ from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-import aiohttp
-from aiohttp import FormData, BasicAuth
-
 import slack_sdk.errors as err
 from slack_sdk.errors import SlackRequestError
-from .async_internal_utils import (
-    _get_event_loop,
-    _build_req_args,
-    _get_url,
-    _files_to_data,
-    _request_with_session,
-)
 from .deprecation import show_2020_01_deprecation
-from .internal_utils import convert_bool_to_0_or_1, get_user_agent
+from .internal_utils import convert_bool_to_0_or_1, get_user_agent, _get_url, _build_req_args
 from .slack_response import SlackResponse
-
+from base64 import b64encode
 
 class BaseClient:
     BASE_URL = "https://www.slack.com/api/"
@@ -48,8 +38,6 @@ class BaseClient:
         ssl: Optional[SSLContext] = None,
         proxy: Optional[str] = None,
         run_async: bool = False,
-        use_sync_aiohttp: bool = False,
-        session: Optional[aiohttp.ClientSession] = None,
         headers: Optional[dict] = None,
     ):
         self.token = None if token is None else token.strip()
@@ -58,8 +46,6 @@ class BaseClient:
         self.ssl = ssl
         self.proxy = proxy
         self.run_async = run_async
-        self.use_sync_aiohttp = use_sync_aiohttp
-        self.session = session
         self.headers = headers or {}
         self._logger = logging.getLogger(__name__)
         self._event_loop = loop
@@ -70,7 +56,7 @@ class BaseClient:
         *,
         http_verb: str = "POST",
         files: dict = None,
-        data: Union[dict, FormData] = None,
+        data: Union[dict] = None,
         params: dict = None,
         json: dict = None,  # skipcq: PYL-W0621
         headers: dict = None,
@@ -124,79 +110,7 @@ class BaseClient:
         )
 
         show_2020_01_deprecation(api_method)
-
-        if self.run_async or self.use_sync_aiohttp:
-            if self._event_loop is None:
-                self._event_loop = _get_event_loop()
-
-            future = asyncio.ensure_future(
-                self._send(http_verb=http_verb, api_url=api_url, req_args=req_args),
-                loop=self._event_loop,
-            )
-            if self.run_async:
-                return future
-            if self.use_sync_aiohttp:
-                # Using this is no longer recommended - just keep this for backward-compatibility
-                return self._event_loop.run_until_complete(future)
-        else:
-            return self._sync_send(api_url=api_url, req_args=req_args)
-
-    # =================================================================
-    # aiohttp based async WebClient
-    # =================================================================
-
-    async def _send(self, http_verb: str, api_url: str, req_args: dict) -> SlackResponse:
-        """Sends the request out for transmission.
-
-        Args:
-            http_verb (str): The HTTP verb. e.g. 'GET' or 'POST'.
-            api_url (str): The Slack API url. e.g. 'https://slack.com/api/chat.postMessage'
-            req_args (dict): The request arguments to be attached to the request.
-            e.g.
-            {
-                json: {
-                    'attachments': [{"pretext": "pre-hello", "text": "text-world"}],
-                    'channel': '#random'
-                }
-            }
-        Returns:
-            The response parsed into a SlackResponse object.
-        """
-        open_files = _files_to_data(req_args)
-        try:
-            if "params" in req_args:
-                # True/False -> "1"/"0"
-                req_args["params"] = convert_bool_to_0_or_1(req_args["params"])
-
-            res = await self._request(
-                http_verb=http_verb, api_url=api_url, req_args=req_args
-            )
-        finally:
-            for f in open_files:
-                f.close()
-
-        data = {
-            "client": self,
-            "http_verb": http_verb,
-            "api_url": api_url,
-            "req_args": req_args,
-            "use_sync_aiohttp": self.use_sync_aiohttp,
-        }
-        return SlackResponse(**{**data, **res}).validate()
-
-    async def _request(self, *, http_verb, api_url, req_args) -> Dict[str, any]:
-        """Submit the HTTP request with the running session or a new session.
-        Returns:
-            A dictionary of the response data.
-        """
-        return await _request_with_session(
-            current_session=self.session,
-            timeout=self.timeout,
-            logger=self._logger,
-            http_verb=http_verb,
-            api_url=api_url,
-            req_args=req_args,
-        )
+        return self._sync_send(api_url=api_url, req_args=req_args)
 
     # =================================================================
     # urllib based WebClient
@@ -213,10 +127,12 @@ class BaseClient:
             req_args["auth"] if "auth" in req_args else None
         )  # Basic Auth for oauth.v2.access / oauth.access
         if auth is not None:
-            if isinstance(auth, BasicAuth):
-                headers["Authorization"] = auth.encode()
-            elif isinstance(auth, str):
+            if isinstance(auth, str):
                 headers["Authorization"] = auth
+            elif isinstance(auth, dict):
+                client_id, client_secret = auth["client_id"], auth["client_secret"]
+                value = b64encode(f"{client_id}:{client_secret}".encode("utf-8")).decode("ascii")
+                headers["Authorization"] = f"Basic {value}"
             else:
                 self._logger.warning(
                     f"As the auth: {auth}: {type(auth)} is unsupported, skipped"
@@ -364,7 +280,6 @@ class BaseClient:
                 data=response_body_data,
                 headers=dict(response["headers"]),
                 status_code=response["status"],
-                use_sync_aiohttp=False,
             ).validate()
         finally:
             for f in files_to_close:

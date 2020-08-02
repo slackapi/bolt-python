@@ -37,6 +37,8 @@ class OAuthStateUtils:
             or request_headers.get("cookie", None) is None:
             return False
         for cookie in request_headers["cookie"]:
-            if cookie == f"{self.cookie_name}={state}":
-                return True
+            values = cookie.split(";")
+            for value in values:
+                if value.strip() == f"{self.cookie_name}={state}":
+                    return True
         return False

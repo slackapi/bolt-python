@@ -1,7 +1,7 @@
 import logging
 from logging import NullHandler
 
-from .rtm import RTMClient  # noqa
+# from .rtm import RTMClient  # noqa
 from .web import WebClient  # noqa
 from .webhook import WebhookClient  # noqa
 
