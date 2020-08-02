@@ -13,6 +13,7 @@ with open("README.md", "r") as fh:
 test_dependencies = [
     "pytest>=5,<6",
     "pytest-asyncio<1",
+    "aiohttp>=3,<4",  # for async
 ]
 
 setuptools.setup(
