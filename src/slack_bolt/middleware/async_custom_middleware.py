@@ -2,7 +2,7 @@ import inspect
 from logging import Logger
 from typing import Callable, Awaitable, List
 
-from slack_bolt.kwargs_injection import build_required_kwargs
+from slack_bolt.kwargs_injection.async_utils import build_async_required_kwargs
 from slack_bolt.logger import get_bolt_app_logger
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
@@ -37,11 +37,11 @@ class AsyncCustomMiddleware(AsyncMiddleware):
         resp: BoltResponse,
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> BoltResponse:
-        return await self.func(**build_required_kwargs(
+        return await self.func(**build_async_required_kwargs(
             logger=self.logger,
             required_arg_names=self.arg_names,
-            req=req,
-            resp=resp,
+            request=req,
+            response=resp,
             next_func=next,
         ))
 

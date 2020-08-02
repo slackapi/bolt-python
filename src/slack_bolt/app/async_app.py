@@ -4,20 +4,19 @@ import logging
 import os
 import time
 from asyncio import Future
-from functools import wraps
 from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable
 
-from aiohttp import web
-
-from slack_bolt.adapter.aiohttp import to_aiohttp_response, to_bolt_request
-from slack_bolt.listener import AsyncListener, AsyncCustomListener
-from slack_bolt.listener_matcher import AsyncListenerMatcher, AsyncCustomListenerMatcher, builtins as builtin_matchers
+from slack_bolt.listener.async_listener import AsyncListener, AsyncCustomListener
+from slack_bolt.listener_matcher import builtins as builtin_matchers
+from slack_bolt.listener_matcher.async_listener_matcher import AsyncListenerMatcher, AsyncCustomListenerMatcher
 from slack_bolt.logger import get_bolt_logger, get_bolt_app_logger
-from slack_bolt.middleware import AsyncMiddleware, AsyncCustomMiddleware
-from slack_bolt.middleware import SslCheck, RequestVerification, IgnoringSelfEvents, UrlVerification
-from slack_bolt.middleware.authorization import AsyncMultiTeamsAuthorization, AsyncSingleTeamAuthorization
+from slack_bolt.middleware.async_builtins import \
+    AsyncSslCheck, AsyncRequestVerification, AsyncIgnoringSelfEvents, AsyncUrlVerification
+from slack_bolt.middleware.async_custom_middleware import AsyncMiddleware, AsyncCustomMiddleware
+from slack_bolt.middleware.authorization.async_multi_teams_authorization import AsyncMultiTeamsAuthorization
+from slack_bolt.middleware.authorization.async_single_team_authorization import AsyncSingleTeamAuthorization
 from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
-from slack_bolt.request import AsyncBoltRequest
+from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.oauth import OAuthStateUtils
 from slack_sdk.oauth.installation_store import FileInstallationStore
@@ -155,26 +154,19 @@ class AsyncApp():
 
         self._init_middleware_list_done = False
         self._init_async_middleware_list()
-        self._init_async_listeners_done = False
-        self._init_async_listeners()
 
     def _init_async_middleware_list(self):
         if self._init_middleware_list_done:
             return
-        self._async_middleware_list.append(SslCheck(verification_token=self._verification_token))
-        self._async_middleware_list.append(RequestVerification(self._signing_secret))
+        self._async_middleware_list.append(AsyncSslCheck(verification_token=self._verification_token))
+        self._async_middleware_list.append(AsyncRequestVerification(self._signing_secret))
         if self._async_oauth_flow is None and self._token:
             self._async_middleware_list.append(AsyncSingleTeamAuthorization())
         else:
             self._async_middleware_list.append(AsyncMultiTeamsAuthorization(self._async_installation_store))
-        self._async_middleware_list.append(IgnoringSelfEvents())
-        self._async_middleware_list.append(UrlVerification())
+        self._async_middleware_list.append(AsyncIgnoringSelfEvents())
+        self._async_middleware_list.append(AsyncUrlVerification())
         self._init_middleware_list_done = True
-
-    def _init_async_listeners(self):
-        if self._init_async_listeners_done:
-            return
-        self._init_async_listeners_done = True
 
     # -------------------------
     # accessors
@@ -203,6 +195,7 @@ class AsyncApp():
     # standalone server
 
     def start(self, port: int = 3000, path: str = "/slack/events") -> None:
+        from .async_server import AsyncSlackAppServer
         self.server = AsyncSlackAppServer(
             port=port,
             path=path,
@@ -264,7 +257,7 @@ class AsyncApp():
         ack = request.context.ack
         starting_time = time.time()
         if self._process_before_response:
-            returned_value = await async_listener(req=request, resp=response)
+            returned_value = await async_listener.run_ack_function(request=request, response=response)
             if isinstance(returned_value, BoltResponse):
                 response = returned_value
             if ack.response is None and async_listener.auto_acknowledgement:
@@ -283,7 +276,7 @@ class AsyncApp():
 
             # start the listener function asynchronously
             # NOTE: intentionally
-            _f: Future = asyncio.ensure_future(async_listener(req=request, resp=response))
+            _f: Future = asyncio.ensure_future(async_listener.run_ack_function(request=request, response=response))
             self._framework_logger.debug(f"Async listener: {listener_name} started..")
 
             # await for the completion of ack() in the async listener execution
@@ -501,19 +494,12 @@ class AsyncApp():
 
     def _register_listener(
         self,
-        func,
+        func: Callable[..., Awaitable[BoltResponse]],
         primary_matcher: AsyncListenerMatcher,
         matchers: Optional[List[Callable[..., Awaitable[bool]]]],
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]],
         auto_acknowledgement: bool = False,
     ) -> Callable[..., None]:
-
-        if not inspect.iscoroutinefunction(func):
-            raise ValueError(f"async function is required for AsyncApp's listener: {type(func)}")
-
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            func(*args, **kwargs)
 
         listener_matchers = [AsyncCustomListenerMatcher(app_name=self.name, func=f) for f in (matchers or [])]
         listener_matchers.insert(0, primary_matcher)
@@ -533,60 +519,3 @@ class AsyncApp():
             middleware=listener_middleware,
             auto_acknowledgement=auto_acknowledgement,
         ))
-        return wrapper
-
-
-# -------------------------
-
-class AsyncSlackAppServer:
-
-    def __init__(
-        self,
-        port: int,
-        path: str,
-        app: AsyncApp,
-    ):
-        self.port = port
-        self.app = app
-        self.path = path
-
-        self.web_app = web.Application()
-        oauth_flow = self.app.oauth_flow
-        if oauth_flow:
-            self.web_app.add_routes([
-                web.get(oauth_flow.install_path, self.handle_get_requests),
-                web.get(oauth_flow.redirect_uri_path, self.handle_get_requests),
-                web.post(self.path, self.handle_post_requests)
-            ])
-        else:
-            self.web_app.add_routes([
-                web.post(self.path, self.handle_post_requests)
-            ])
-
-    async def handle_get_requests(self, request: web.Request) -> web.Response:
-        oauth_flow = self.app.oauth_flow
-        if oauth_flow:
-            if request.path == self.app.oauth_flow.install_path:
-                bolt_req = await to_bolt_request(request)
-                bolt_resp = await oauth_flow.handle_installation(bolt_req)
-                return await to_aiohttp_response(bolt_resp)
-            elif request.path == oauth_flow.redirect_uri_path:
-                bolt_req = await to_bolt_request(request)
-                bolt_resp = await oauth_flow.handle_callback(bolt_req)
-                return await to_aiohttp_response(bolt_resp)
-            else:
-                return web.Response(status=404)
-        else:
-            return web.Response(status=404)
-
-    async def handle_post_requests(self, request: web.Request) -> web.Response:
-        if self.path != request.path:
-            return web.Response(status=404)
-
-        bolt_req = await to_bolt_request(request)
-        bolt_resp: BoltResponse = await self.app.async_dispatch(bolt_req)
-        return await to_aiohttp_response(bolt_resp)
-
-    def start(self):
-        print("⚡️ Bolt app is running!")
-        web.run_app(self.web_app, host="0.0.0.0", port=self.port)

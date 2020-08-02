@@ -24,7 +24,7 @@ class CustomListener(Listener):
         self,
         *,
         app_name: str,
-        func: Callable[[any], BoltResponse],
+        func: Callable[..., BoltResponse],
         matchers: List[ListenerMatcher],
         middleware: List[Middleware],
         auto_acknowledgement: bool = False,
@@ -37,15 +37,15 @@ class CustomListener(Listener):
         self.arg_names = inspect.getfullargspec(func).args
         self.logger = get_bolt_app_logger(app_name, self.func)
 
-    def __call__(
+    def run_ack_function(
         self,
         *,
-        req: BoltRequest,
-        resp: BoltResponse,
+        request: BoltRequest,
+        response: BoltResponse,
     ) -> BoltResponse:
         return self.func(**build_required_kwargs(
             logger=self.logger,
             required_arg_names=self.arg_names,
-            req=req,
-            resp=resp
+            request=request,
+            response=response
         ))

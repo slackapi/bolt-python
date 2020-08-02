@@ -9,7 +9,7 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG)
 
-from slack_bolt import AsyncApp
+from slack_bolt.async_app import AsyncApp
 
 app = AsyncApp()
 
@@ -24,6 +24,12 @@ async def log_request(logger, payload, next):
 async def event_test(payload, say, logger):
     logger.info(payload)
     await say("What's up?")
+
+
+@app.command("/hello-bolt-python")
+# or app.command(re.compile(r"/hello-.+"))(test_command)
+async def command(ack):
+    await ack("Thanks!")
 
 
 if __name__ == "__main__":

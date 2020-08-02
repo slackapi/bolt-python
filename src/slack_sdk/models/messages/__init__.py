@@ -1,10 +1,88 @@
-from slack.web.classes.messages import Message  # noqa
-from slack.web.classes.objects import ButtonStyles  # noqa
-from slack.web.classes.objects import ChannelLink  # noqa
-from slack.web.classes.objects import ConfirmObject  # noqa
-from slack.web.classes.objects import DateLink  # noqa
-from slack.web.classes.objects import DynamicSelectElementTypes  # noqa
-from slack.web.classes.objects import EveryoneLink  # noqa
-from slack.web.classes.objects import HereLink  # noqa
-from slack.web.classes.objects import Link  # noqa
-from slack.web.classes.objects import ObjectLink  # noqa
+from datetime import datetime
+from typing import Optional, Union
+
+from slack_sdk.models import BaseObject
+
+ButtonStyles = {"danger", "primary"}
+DynamicSelectElementTypes = {"channels", "conversations", "users"}
+
+
+class Link(BaseObject):
+    def __init__(self, *, url: str, text: str):
+        """Base class used to generate links in Slack's not-quite Markdown, not quite HTML syntax
+        https://api.slack.com/docs/message-formatting#linking_to_urls
+        """
+        self.url = url
+        self.text = text
+
+    def __str__(self):
+        if self.text:
+            separator = "|"
+        else:
+            separator = ""
+        return f"<{self.url}{separator}{self.text}>"
+
+
+class DateLink(Link):
+    def __init__(
+        self,
+        *,
+        date: Union[datetime, int],
+        date_format: str,
+        fallback: str,
+        link: Optional[str] = None,
+    ):
+        """Text containing a date or time should display that date in the local timezone of the person seeing the text.
+        https://api.slack.com/reference/surfaces/formatting#date-formatting
+        """
+        if isinstance(date, datetime):
+            epoch = int(date.timestamp())
+        else:
+            epoch = date
+        if link is not None:
+            link = f"^{link}"
+        else:
+            link = ""
+        super().__init__(url=f"!date^{epoch}^{date_format}{link}", text=fallback)
+
+
+class ObjectLink(Link):
+    prefix_mapping = {
+        "C": "#",  # channel
+        "G": "#",  # group message
+        "U": "@",  # user
+        "W": "@",  # workspace user (enterprise)
+        "B": "@",  # bot user
+        "S": "!subteam^",  # user groups, originally known as subteams
+    }
+
+    def __init__(self, *, object_id: str, text: str = ""):
+        """Convenience class to create links to specific object types
+        https://api.slack.com/reference/surfaces/formatting#linking-channels
+        """
+        prefix = self.prefix_mapping.get(object_id[0].upper(), "@")
+        super().__init__(url=f"{prefix}{object_id}", text=text)
+
+
+class ChannelLink(Link):
+    def __init__(self):
+        """Represents an @channel link, which notifies everyone present in this channel.
+        https://api.slack.com/reference/surfaces/formatting
+        """
+        super().__init__(url="!channel", text="channel")
+
+
+class HereLink(Link):
+    def __init__(self):
+        """Represents an @here link, which notifies all online users of this channel.
+        https://api.slack.com/reference/surfaces/formatting
+        """
+        super().__init__(url="!here", text="here")
+
+
+class EveryoneLink(Link):
+    def __init__(self):
+        """Represents an @everyone link, which notifies all users of this workspace.
+        https://api.slack.com/reference/surfaces/formatting
+        """
+        super().__init__(url="!everyone", text="everyone")

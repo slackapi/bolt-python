@@ -1,7 +1,7 @@
 from typing import Optional, List
 
 from slack_bolt.context.respond.internals import _build_message
-from slack_sdk.webhook import AsyncWebhookClient, WebhookResponse
+from slack_sdk.webhook.async_client import AsyncWebhookClient, WebhookResponse
 
 
 class AsyncRespond():

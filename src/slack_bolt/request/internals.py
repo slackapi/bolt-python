@@ -2,7 +2,7 @@ import json
 from typing import Optional, Dict, Union, List
 from urllib.parse import parse_qsl, parse_qs
 
-from slack_bolt.context import AsyncBoltContext, BoltContext
+from slack_bolt.context import BoltContext
 
 
 def parse_query(
@@ -52,6 +52,9 @@ def extract_enterprise_id(payload: Dict[str, any]) -> Optional[str]:
             return org.get("id")
     if "enterprise_id" in payload:
         return payload.get("enterprise_id")
+    if "team" in payload and "enterprise_id" in payload["team"]:
+        # type: view_submission
+        return payload["team"].get("enterprise_id", None)
     if "event" in payload:
         return extract_enterprise_id(payload["event"])
     return None
@@ -102,9 +105,9 @@ def extract_channel_id(payload: Dict[str, any]) -> Optional[str]:
 
 
 def build_context(
-    context: Union[BoltContext, AsyncBoltContext],
+    context: BoltContext,
     payload: Dict[str, any],
-) -> Union[BoltContext, AsyncBoltContext]:
+) -> BoltContext:
     enterprise_id = extract_enterprise_id(payload)
     if enterprise_id:
         context["enterprise_id"] = enterprise_id

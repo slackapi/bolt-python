@@ -1,2 +1,2 @@
-from .async_context import AsyncBoltContext
+# Don't add async module imports here
 from .context import BoltContext

@@ -11,8 +11,6 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 from slack_bolt import App
-from slack_bolt.kwargs_injection import Args
-from slack_sdk import WebClient
 
 app = App(process_before_response=True)
 
@@ -23,10 +21,11 @@ def log_request(logger, payload, next):
     return next()
 
 
-@app.command("/bolt-py-proto-111")  # or app.command(re.compile(r"/bolt-.+"))(test_command)
-def test_command(args: Args):
-    args.logger.info(args.payload)
-    respond, ack = args.respond, args.ack
+@app.command("/hello-bolt-python")
+# or app.command(re.compile(r"/hello-.+"))(test_command)
+def test_command(payload, respond, client, ack, logger):
+    logger.info(payload)
+    ack("Thanks!")
 
     respond(blocks=[
         {
@@ -47,13 +46,7 @@ def test_command(args: Args):
             }
         }
     ])
-    ack("thanks!")
 
-
-@app.shortcut("test-shortcut")
-def test_shortcut(ack, client: WebClient, logger, payload):
-    logger.info(payload)
-    ack()
     res = client.views_open(
         trigger_id=payload["trigger_id"],
         view={
@@ -102,10 +95,9 @@ def button_click(logger, payload, ack, respond):
 
 
 @app.event("app_mention")
-def event_test(ack, payload, say, logger):
+def event_test(payload, say, logger):
     logger.info(payload)
     say("What's up?")
-    return ack()
 
 
 @app.message("test")

@@ -1,10 +1,10 @@
 from logging import Logger
 from typing import Callable, Awaitable, Dict
 
-from slack_bolt.context import AsyncBoltContext
-from slack_bolt.context.ack import AsyncAck
-from slack_bolt.context.respond import AsyncRespond
-from slack_bolt.context.say import AsyncSay
+from slack_bolt.context.ack.async_ack import AsyncAck
+from slack_bolt.context.async_context import AsyncBoltContext
+from slack_bolt.context.respond.async_respond import AsyncRespond
+from slack_bolt.context.say.async_say import AsyncSay
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.web.async_client import AsyncWebClient

@@ -1,12 +1,12 @@
 import asyncio
 import json
-import re
+from random import random
 from time import time
 
 import pytest
 
 from slack_bolt.app.async_app import AsyncApp
-from slack_bolt.request import AsyncBoltRequest
+from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 from tests.mock_web_api_server import \
@@ -14,7 +14,7 @@ from tests.mock_web_api_server import \
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-class TestAsyncMessage():
+class TestAsyncEvents():
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -49,19 +49,24 @@ class TestAsyncMessage():
             "x-slack-request-timestamp": [timestamp]
         }
 
-    def build_request(self) -> AsyncBoltRequest:
-        timestamp, body = str(int(time())), json.dumps(message_payload)
+    def build_valid_app_mention_request(self) -> AsyncBoltRequest:
+        timestamp, body = str(int(time())), json.dumps(app_mention_payload)
         return AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
     @pytest.mark.asyncio
-    async def test_string_keyword(self):
+    async def test_mock_server_is_running(self):
+        resp = await self.web_client.api_test()
+        assert resp != None
+
+    @pytest.mark.asyncio
+    async def test_app_mention(self):
         app = AsyncApp(
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.message("Hello")(whats_up)
+        app.event("app_mention")(whats_up)
 
-        request = self.build_request()
+        request = self.build_valid_app_mention_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
@@ -69,87 +74,91 @@ class TestAsyncMessage():
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     @pytest.mark.asyncio
-    async def test_string_keyword_unmatched(self):
+    async def test_process_before_response(self):
         app = AsyncApp(
             client=self.web_client,
             signing_secret=self.signing_secret,
+            process_before_response=True,
         )
-        app.message("HELLO")(whats_up)
+        app.event("app_mention")(whats_up)
 
-        request = self.build_request()
-        response = await app.async_dispatch(request)
-        assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
-
-    @pytest.mark.asyncio
-    async def test_regexp_keyword(self):
-        app = AsyncApp(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
-        )
-        app.message(re.compile("He.lo"))(whats_up)
-
-        request = self.build_request()
+        request = self.build_valid_app_mention_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
-        await asyncio.sleep(1)  # wait a bit after auto ack()
+        # no sleep here
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     @pytest.mark.asyncio
-    async def test_regexp_keyword_unmatched(self):
+    async def test_middleware_skip(self):
         app = AsyncApp(
             client=self.web_client,
-            signing_secret=self.signing_secret,
+            signing_secret=self.signing_secret
         )
-        app.message(re.compile("HELLO"))(whats_up)
+        app.event("app_mention", middleware=[skip_middleware])(whats_up)
 
-        request = self.build_request()
+        request = self.build_valid_app_mention_request()
         response = await app.async_dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 1
 
+    @pytest.mark.asyncio
+    async def test_simultaneous_requests(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.event("app_mention")(random_sleeper)
 
-message_payload = {
+        request = self.build_valid_app_mention_request()
+
+        times = 10
+        tasks = []
+        for i in range(times):
+            tasks.append(asyncio.ensure_future(app.async_dispatch(request)))
+
+        await asyncio.sleep(5)
+        # Verifies all the tasks have been completed with 200 OK
+        assert sum([t.result().status for t in tasks if t.done()]) == 200 * times
+
+        assert self.mock_received_requests["/auth.test"] == times
+        assert self.mock_received_requests["/chat.postMessage"] == times
+
+
+app_mention_payload = {
     "token": "verification_token",
     "team_id": "T111",
     "enterprise_id": "E111",
     "api_app_id": "A111",
     "event": {
-        "client_msg_id": "a8744611-0210-4f85-9f15-5faf7fb225c8",
-        "type": "message",
-        "text": "Hello World!",
-        "user": "W111",
-        "ts": "1596183880.004200",
+        "client_msg_id": "9cbd4c5b-7ddf-4ede-b479-ad21fca66d63",
+        "type": "app_mention",
+        "text": "<@W111> Hi there!",
+        "user": "W222",
+        "ts": "1595926230.009600",
         "team": "T111",
-        "blocks": [
-            {
-                "type": "rich_text",
-                "block_id": "ezJ",
-                "elements": [
-                    {
-                        "type": "rich_text_section",
-                        "elements": [
-                            {
-                                "type": "text",
-                                "text": "Hello World!"
-                            }
-                        ]
-                    }
-                ]
-            }
-        ],
         "channel": "C111",
-        "event_ts": "1596183880.004200",
-        "channel_type": "channel"
+        "event_ts": "1595926230.009600"
     },
     "type": "event_callback",
     "event_id": "Ev111",
-    "event_time": 1596183880,
+    "event_time": 1595926230,
     "authed_users": ["W111"]
 }
 
 
+async def random_sleeper(payload, say):
+    assert payload == app_mention_payload
+    seconds = random() + 2  # 2-3 seconds
+    await asyncio.sleep(seconds)
+    await say(f"Sending this message after sleeping for {seconds} seconds")
+
+
 async def whats_up(payload, say):
-    assert payload == message_payload
+    assert payload == app_mention_payload
     await say("What's up?")
+
+
+async def skip_middleware(req, resp, next):
+    # return next()
+    pass

@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABCMeta
-from typing import List
+from typing import List, Callable
 
 from slack_bolt.listener_matcher import ListenerMatcher
 from slack_bolt.middleware import Middleware
@@ -10,6 +10,7 @@ from slack_bolt.response import BoltResponse
 class Listener(metaclass=ABCMeta):
     matchers: List[ListenerMatcher]
     middleware: List[Middleware]
+    func: Callable[..., BoltResponse]
     auto_acknowledgement: bool
 
     def matches(
@@ -50,15 +51,15 @@ class Listener(metaclass=ABCMeta):
         return (resp, False)
 
     @abstractmethod
-    def __call__(
+    def run_ack_function(
         self,
         *,
-        req: BoltRequest,
-        resp: BoltResponse) -> BoltResponse:
+        request: BoltRequest,
+        response: BoltResponse) -> BoltResponse:
         """Runs all the registered middleware and then run the listener function.
 
-        :param req: the incoming request
-        :param resp: the current response
+        :param request: the incoming request
+        :param response: the current response
         :return: the processed response
         """
         raise NotImplementedError()

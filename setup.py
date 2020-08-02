@@ -13,6 +13,7 @@ with open("README.md", "r") as fh:
 test_dependencies = [
     "pytest>=5,<6",
     "pytest-asyncio<1",
+    "aiohttp>=3,<4",  # for async
 ]
 
 setuptools.setup(
@@ -30,20 +31,18 @@ setuptools.setup(
     setup_requires=["pytest-runner==5.2"],
     # python setup.py test
     tests_require=test_dependencies,
-    install_requires=[
-        "slackclient>=2,<3",  # TODO: will be replaced with slack_sdk==3.0.0
-        "aiohttp>=3,<4",  # slackclient depends on aiohttp
-    ],
+    install_requires=[],
     extras_require={
         # pip install -e ".[testing]"
         # python -m pytest tests/scenario_tests/test_async_events.py
         "testing": test_dependencies,
         # pip install -e ".[adapters]"
         "adapters": [
+            "aiohttp>=3,<4",  # slackclient depends on aiohttp
             # used only under src/slack_bolt/adapter
             "bottle>=0.12,<1",
             "chalice>=1,<2",
-            "click>=7,<8", # for chalice
+            "click>=7,<8",  # for chalice
             "Django>=3,<4",
             "falcon>=2,<3",
             "fastapi>=0.54,<0.55",

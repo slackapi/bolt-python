@@ -1,2 +1,2 @@
-from .async_say import AsyncSay
+# Don't add async module imports here
 from .say import Say

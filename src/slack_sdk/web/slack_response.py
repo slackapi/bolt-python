@@ -1,6 +1,5 @@
 """A Python module for interacting and consuming responses from Slack."""
 
-import asyncio
 import logging
 
 import slack_sdk.errors as e
@@ -62,7 +61,6 @@ class SlackResponse:
         data: dict,
         headers: dict,
         status_code: int,
-        use_sync_aiohttp: bool = True,  # True for backward-compatibility
     ):
         self.http_verb = http_verb
         self.api_url = api_url
@@ -73,7 +71,6 @@ class SlackResponse:
         self._initial_data = data
         self._iteration = None  # for __iter__ & __next__
         self._client = client
-        self._use_sync_aiohttp = use_sync_aiohttp
         self._logger = logging.getLogger(__name__)
 
     def __str__(self):
@@ -136,21 +133,10 @@ class SlackResponse:
             params.update({"cursor": self.data["response_metadata"]["next_cursor"]})
             self.req_args.update({"params": params})
 
-            if self._use_sync_aiohttp:
-                # We no longer recommend going with this way
-                response = asyncio.get_event_loop().run_until_complete(
-                    self._client._request(  # skipcq: PYL-W0212
-                        http_verb=self.http_verb,
-                        api_url=self.api_url,
-                        req_args=self.req_args,
-                    )
-                )
-            else:
-                # This method sends a request in a synchronous way
-                response = self._client._request_for_pagination(  # skipcq: PYL-W0212
-                    api_url=self.api_url, req_args=self.req_args
-                )
-
+            # This method sends a request in a synchronous way
+            response = self._client._request_for_pagination(  # skipcq: PYL-W0212
+                api_url=self.api_url, req_args=self.req_args
+            )
             self.data = response["data"]
             self.headers = response["headers"]
             self.status_code = response["status_code"]

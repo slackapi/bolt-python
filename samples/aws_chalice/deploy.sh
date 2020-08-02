@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # configure aws credentials properly
+pip install -U chalice click boto3
 pip install -r requirements.txt
 # edit .chalice/config.json
-rm -rf vendor/latest_slack_bolt && cp -pr ../../src vendor/latest_slack_bolt
+rm -rf vendor/slack_* && cp -pr ../../src vendor
 chalice deploy
