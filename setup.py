@@ -39,13 +39,17 @@ setuptools.setup(
         "slack_sdk==3.0.0a1",
     ],
     extras_require={
-        # pip install -e ".[testing]"
-        # python -m pytest tests/scenario_tests/test_async_events.py
-        "testing": test_dependencies,
-        # pip install -e ".[adapters]"
-        "adapters": [
-            "aiohttp>=3,<4",  # slackclient depends on aiohttp
+        # pip install -e ".[async]"
+        "async": [
+            # async features heavily depends on aiohttp
+            "aiohttp>=3,<4",
+        ],
+        # pip install -e ".[adapter]"
+        "adapter": [
+            # any of async ones
+            "aiohttp>=3,<4",
             # used only under src/slack_bolt/adapter
+            "boto3<=2",
             "bottle>=0.12,<1",
             "chalice>=1,<2",
             "click>=7,<8",  # for chalice
@@ -57,9 +61,9 @@ setuptools.setup(
             "sanic>=20,<21",
             "starlette>=0.13,<1",
             "tornado>=6,<7",
-            # used only under src/slack_sdk/*_store
-            "boto3<=2",
-        ]
+        ],
+        # pip install -e ".[testing]"
+        "testing": test_dependencies,
     },
     classifiers=[
         "Programming Language :: Python :: 3.6",

@@ -3,7 +3,7 @@ import os
 from logging import Logger
 from typing import Optional, List, Dict
 
-from slack_bolt.errors import BoltError
+from slack_bolt.error import BoltError
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
