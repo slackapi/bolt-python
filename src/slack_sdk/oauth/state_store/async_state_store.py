@@ -2,8 +2,7 @@ from abc import abstractmethod
 from logging import Logger
 
 
-class AsyncOAuthStateStore():
-
+class AsyncOAuthStateStore:
     @property
     @abstractmethod
     def logger(self) -> Logger:

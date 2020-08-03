@@ -4,14 +4,10 @@ from slack_bolt.context.respond.internals import _build_message
 from slack_sdk.webhook import WebhookClient, WebhookResponse
 
 
-class Respond():
+class Respond:
     response_url: Optional[str]
 
-    def __init__(
-        self,
-        *,
-        response_url: Optional[str]
-    ):
+    def __init__(self, *, response_url: Optional[str]):
         self.response_url: Optional[str] = response_url
 
     def __call__(

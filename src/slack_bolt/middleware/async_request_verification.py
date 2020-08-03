@@ -7,7 +7,6 @@ from slack_bolt.response import BoltResponse
 
 
 class AsyncRequestVerification(RequestVerification, AsyncMiddleware):
-
     async def async_process(
         self,
         *,

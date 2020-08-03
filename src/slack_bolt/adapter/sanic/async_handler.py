@@ -9,9 +9,7 @@ from slack_bolt.oauth import AsyncOAuthFlow
 
 def to_async_bolt_request(req: Request) -> AsyncBoltRequest:
     return AsyncBoltRequest(
-        body=req.body.decode("utf-8"),
-        query=req.query_string,
-        headers=req.headers,
+        body=req.body.decode("utf-8"), query=req.query_string, headers=req.headers,
     )
 
 
@@ -36,7 +34,7 @@ def to_sanic_response(bolt_resp: BoltResponse) -> HTTPResponse:
     return resp
 
 
-class AsyncSlackRequestHandler():
+class AsyncSlackRequestHandler:
     def __init__(self, app: AsyncApp):
         self.app = app
 
@@ -45,17 +43,18 @@ class AsyncSlackRequestHandler():
             if self.app.oauth_flow is not None:
                 oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
                 if req.path == oauth_flow.install_path:
-                    bolt_resp = await oauth_flow.handle_installation(to_async_bolt_request(req))
+                    bolt_resp = await oauth_flow.handle_installation(
+                        to_async_bolt_request(req)
+                    )
                     return to_sanic_response(bolt_resp)
                 elif req.path == oauth_flow.redirect_uri_path:
-                    bolt_resp = await oauth_flow.handle_callback(to_async_bolt_request(req))
+                    bolt_resp = await oauth_flow.handle_callback(
+                        to_async_bolt_request(req)
+                    )
                     return to_sanic_response(bolt_resp)
 
         elif req.method == "POST":
             bolt_resp = await self.app.async_dispatch(to_async_bolt_request(req))
             return to_sanic_response(bolt_resp)
 
-        return HTTPResponse(
-            status=404,
-            body="Not found",
-        )
+        return HTTPResponse(status=404, body="Not found",)

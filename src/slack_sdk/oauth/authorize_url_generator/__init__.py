@@ -20,11 +20,13 @@ class AuthorizeUrlGenerator:
     def generate(self, state: str):
         scopes = ",".join(self.scopes) if self.scopes else ""
         user_scopes = ",".join(self.user_scopes) if self.user_scopes else ""
-        url = "https://slack.com/oauth/v2/authorize?" \
-              f"state={state}&" \
-              f"client_id={self.client_id}&" \
-              f"scope={scopes}&" \
-              f"user_scope={user_scopes}"
+        url = (
+            "https://slack.com/oauth/v2/authorize?"
+            f"state={state}&"
+            f"client_id={self.client_id}&"
+            f"scope={scopes}&"
+            f"user_scope={user_scopes}"
+        )
         if self.redirect_uri is not None:
             url += f"&redirect_uri={self.redirect_uri}"
         return url

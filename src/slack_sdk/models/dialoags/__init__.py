@@ -3,8 +3,8 @@ from json import dumps
 from typing import List, Optional, Union, Set
 
 from slack_sdk.models import EnumValidator, JsonObject, JsonValidator, extract_json
-from slack_sdk.models.block_kit import Option, OptionGroup
-from slack_sdk.models.messages import DynamicSelectElementTypes
+from slack_sdk.models.attachments import AbstractActionSelector
+from slack_sdk.models.block_kit import Option, OptionGroup, DynamicSelectElementTypes
 
 TextElementSubtypes = {"email", "number", "tel", "url"}
 
@@ -861,4 +861,57 @@ class DialogBuilder(JsonObject):
             json["submit_label"] = self._submit_label
         if self._state is not None:
             json["state"] = self._state
+        return json
+
+
+class ActionStaticSelector(AbstractActionSelector):
+    """
+    Use the select element for multiple choice selections allowing users to pick a
+    single item from a list. True to web roots, this selection is displayed as a
+    dropdown menu.
+
+    https://api.slack.com/dialogs#select_elements
+    """
+
+    data_source = "static"
+
+    options_max_length = 100
+
+    def __init__(
+        self,
+        *,
+        name: str,
+        text: str,
+        options: List[Union[Option, OptionGroup]],
+        selected_option: Optional[Option] = None,
+    ):
+        """
+        Help users make clear, concise decisions by providing a menu of options
+        within messages.
+
+        https://api.slack.com/docs/message-menus
+
+        Args:
+            name: Name this specific action. The name will be returned to your
+                Action URL along with the message's callback_id when this action is
+                invoked. Use it to identify this particular response path.
+            text: The user-facing label for the message button or menu
+                representing this action. Cannot contain markup.
+            options: A list of no mre than 100 Option or OptionGroup objects
+            selected_option: An Option object to pre-select as the default
+                value.
+        """
+        super().__init__(name=name, text=text, selected_option=selected_option)
+        self.options = options
+
+    @JsonValidator(f"options attribute cannot exceed {options_max_length} items")
+    def options_length(self):
+        return len(self.options) < self.options_max_length
+
+    def to_dict(self) -> dict:
+        json = super().to_dict()
+        if isinstance(self.options[0], OptionGroup):
+            json["option_groups"] = extract_json(self.options, "action")
+        else:
+            json["options"] = extract_json(self.options, "action")
         return json

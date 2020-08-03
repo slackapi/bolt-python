@@ -4,14 +4,15 @@ from logging import Logger
 from pathlib import Path
 from typing import Optional, Union
 
-from slack_sdk.oauth.installation_store.async_installation_store import AsyncInstallationStore
+from slack_sdk.oauth.installation_store.async_installation_store import (
+    AsyncInstallationStore,
+)
 from slack_sdk.oauth.installation_store.installation_store import InstallationStore
 from slack_sdk.oauth.installation_store.models.bot import Bot
 from slack_sdk.oauth.installation_store.models.installation import Installation
 
 
 class FileInstallationStore(InstallationStore, AsyncInstallationStore):
-
     def __init__(
         self,
         *,
@@ -56,7 +57,9 @@ class FileInstallationStore(InstallationStore, AsyncInstallationStore):
             entity: str = json.dumps(installation.__dict__)
             with open(f"{team_installation_dir}/installer-{u_id}-latest", "w") as f:
                 f.write(entity)
-            with open(f"{team_installation_dir}/installer-{u_id}-{history_version}", "w") as f:
+            with open(
+                f"{team_installation_dir}/installer-{u_id}-{history_version}", "w"
+            ) as f:
                 f.write(entity)
 
         else:
@@ -71,18 +74,12 @@ class FileInstallationStore(InstallationStore, AsyncInstallationStore):
                 f.write(entity)
 
     async def async_find_bot(
-        self,
-        *,
-        enterprise_id: Optional[str],
-        team_id: Optional[str],
+        self, *, enterprise_id: Optional[str], team_id: Optional[str],
     ) -> Optional[Bot]:
         return self.find_bot(enterprise_id=enterprise_id, team_id=team_id)
 
     def find_bot(
-        self,
-        *,
-        enterprise_id: Optional[str],
-        team_id: Optional[str],
+        self, *, enterprise_id: Optional[str], team_id: Optional[str],
     ) -> Optional[Bot]:
         # TODO: org-apps support
         none = "none"

@@ -1,7 +1,7 @@
 from typing import Optional, Union, List
 
 
-class Bot():
+class Bot:
     def __init__(
         self,
         *,

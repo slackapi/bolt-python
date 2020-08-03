@@ -4,14 +4,15 @@ from logging import Logger
 from sqlite3 import Connection
 from typing import Optional
 
-from slack_sdk.oauth.installation_store.async_installation_store import AsyncInstallationStore
+from slack_sdk.oauth.installation_store.async_installation_store import (
+    AsyncInstallationStore,
+)
 from slack_sdk.oauth.installation_store.installation_store import InstallationStore
 from slack_sdk.oauth.installation_store.models.bot import Bot
 from slack_sdk.oauth.installation_store.models.installation import Installation
 
 
 class SQLite3InstallationStore(InstallationStore, AsyncInstallationStore):
-
     def __init__(
         self,
         *,
@@ -35,7 +36,9 @@ class SQLite3InstallationStore(InstallationStore, AsyncInstallationStore):
             with sqlite3.connect(database=self.database) as conn:
                 cur = conn.execute("select count(1) from installations;")
                 row_num = cur.fetchone()[0]
-                self.logger.debug(f"{row_num} installations are stored in {self.database}")
+                self.logger.debug(
+                    f"{row_num} installations are stored in {self.database}"
+                )
         except:
             self.create_tables()
         self.init_called = True
@@ -47,7 +50,8 @@ class SQLite3InstallationStore(InstallationStore, AsyncInstallationStore):
 
     def create_tables(self):
         with sqlite3.connect(database=self.database) as conn:
-            conn.execute("""
+            conn.execute(
+                """
             create table installations (
                 id integer primary key autoincrement,
                 client_id text not null,
@@ -66,11 +70,15 @@ class SQLite3InstallationStore(InstallationStore, AsyncInstallationStore):
                 incoming_webhook_configuration_url text,
                 installed_at datetime not null default current_timestamp
             );
-            """)
-            conn.execute("""
+            """
+            )
+            conn.execute(
+                """
             create index installations_idx on installations (client_id, enterprise_id, team_id, installer_user_id);
-            """)
-            conn.execute("""
+            """
+            )
+            conn.execute(
+                """
             create table bots (
                 id integer primary key autoincrement,
                 client_id text not null,
@@ -83,10 +91,13 @@ class SQLite3InstallationStore(InstallationStore, AsyncInstallationStore):
                 bot_scopes text,
                 installed_at datetime not null default current_timestamp
             );
-            """)
-            conn.execute("""
+            """
+            )
+            conn.execute(
+                """
             create index bots_idx on bots (client_id, enterprise_id, team_id);
-            """)
+            """
+            )
             self.logger.debug(f"Tables have been created (database: {self.database})")
             conn.commit()
 
@@ -128,7 +139,7 @@ class SQLite3InstallationStore(InstallationStore, AsyncInstallationStore):
                     installation.bot_id,
                     installation.bot_user_id,
                     ",".join(installation.bot_scopes),
-                ]
+                ],
             )
             conn.execute(
                 """
@@ -177,28 +188,26 @@ class SQLite3InstallationStore(InstallationStore, AsyncInstallationStore):
                     ",".join(installation.bot_scopes),
                     installation.user_id,
                     installation.user_token,
-                    ",".join(installation.user_scopes) if installation.user_scopes else None,
+                    ",".join(installation.user_scopes)
+                    if installation.user_scopes
+                    else None,
                     installation.incoming_webhook_url,
                     installation.incoming_webhook_channel_id,
                     installation.incoming_webhook_configuration_url,
-                ]
+                ],
             )
-            self.logger.debug(f"New rows in bots and installations) have been created (database: {self.database})")
+            self.logger.debug(
+                f"New rows in bots and installations) have been created (database: {self.database})"
+            )
             conn.commit()
 
     async def async_find_bot(
-        self,
-        *,
-        enterprise_id: Optional[str],
-        team_id: Optional[str],
+        self, *, enterprise_id: Optional[str], team_id: Optional[str],
     ) -> Optional[Bot]:
         return self.find_bot(enterprise_id=enterprise_id, team_id=team_id)
 
     def find_bot(
-        self,
-        *,
-        enterprise_id: Optional[str],
-        team_id: Optional[str],
+        self, *, enterprise_id: Optional[str], team_id: Optional[str],
     ) -> Optional[Bot]:
         # TODO: org-apps support
         try:
@@ -225,15 +234,13 @@ class SQLite3InstallationStore(InstallationStore, AsyncInstallationStore):
                     order by installed_at desc
                     limit 1
                     """,
-                    [
-                        self.client_id,
-                        enterprise_id or "",
-                        team_id or "",
-                    ]
+                    [self.client_id, enterprise_id or "", team_id or "",],
                 )
                 row = cur.fetchone()
                 result = "found" if row and len(row) > 0 else "not found"
-                self.logger.debug(f"find_bot's query result: {result} (database: {self.database})")
+                self.logger.debug(
+                    f"find_bot's query result: {result} (database: {self.database})"
+                )
                 if row and len(row) > 0:
                     bot = Bot(
                         app_id=row[0],

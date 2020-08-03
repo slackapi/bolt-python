@@ -13,11 +13,7 @@ class RequestVerification(Middleware):
         self.logger = get_bolt_logger(RequestVerification)
 
     def process(
-        self,
-        *,
-        req: BoltRequest,
-        resp: BoltResponse,
-        next: Callable[[], BoltResponse],
+        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         if self._can_skip(req.payload):
             return next()
@@ -44,4 +40,5 @@ class RequestVerification(Middleware):
     def _debug_log_error(self, signature, timestamp, body) -> None:
         self.logger.info(
             "Invalid request signature detected "
-            f"(signature: {signature}, timestamp: {timestamp}, body: {body})")
+            f"(signature: {signature}, timestamp: {timestamp}, body: {body})"
+        )

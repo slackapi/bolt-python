@@ -7,7 +7,6 @@ from slack_bolt.context.say.async_say import AsyncSay
 
 
 class AsyncBoltContext(BaseContext):
-
     @property
     def ack(self) -> AsyncAck:
         if "ack" not in self:

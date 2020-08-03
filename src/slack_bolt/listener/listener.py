@@ -13,12 +13,7 @@ class Listener(metaclass=ABCMeta):
     func: Callable[..., BoltResponse]
     auto_acknowledgement: bool
 
-    def matches(
-        self,
-        *,
-        req: BoltRequest,
-        resp: BoltResponse,
-    ) -> bool:
+    def matches(self, *, req: BoltRequest, resp: BoltResponse,) -> bool:
         is_matched: bool = False
         for matcher in self.matchers:
             is_matched = matcher.matches(req, resp)
@@ -27,10 +22,7 @@ class Listener(metaclass=ABCMeta):
         return is_matched
 
     def run_middleware(
-        self,
-        *,
-        req: BoltRequest,
-        resp: BoltResponse,
+        self, *, req: BoltRequest, resp: BoltResponse,
     ) -> (BoltResponse, bool):
         """
 
@@ -52,10 +44,8 @@ class Listener(metaclass=ABCMeta):
 
     @abstractmethod
     def run_ack_function(
-        self,
-        *,
-        request: BoltRequest,
-        response: BoltResponse) -> BoltResponse:
+        self, *, request: BoltRequest, response: BoltResponse
+    ) -> BoltResponse:
         """Runs all the registered middleware and then run the listener function.
 
         :param request: the incoming request

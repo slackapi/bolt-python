@@ -7,7 +7,6 @@ from slack_bolt.context.say import Say
 
 
 class BoltContext(BaseContext):
-
     @property
     def ack(self) -> Ack:
         if "ack" not in self:

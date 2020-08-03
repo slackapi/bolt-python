@@ -1,15 +1,16 @@
 from typing import Dict, Optional, List, Union
 
 from slack_bolt.context.context import BoltContext
-from slack_bolt.request.internals import \
-    parse_query, \
-    parse_payload, \
-    build_normalized_headers, \
-    build_context, \
-    extract_content_type
+from slack_bolt.request.internals import (
+    parse_query,
+    parse_payload,
+    build_normalized_headers,
+    build_context,
+    extract_content_type,
+)
 
 
-class BoltRequest():
+class BoltRequest:
     body: str
     query: Dict[str, List[str]]
     headers: Dict[str, List[str]]
@@ -31,4 +32,6 @@ class BoltRequest():
         self.headers = build_normalized_headers(headers)
         self.content_type = extract_content_type(self.headers)
         self.payload = parse_payload(self.body, self.content_type)
-        self.context = build_context(BoltContext(context if context else {}), self.payload)
+        self.context = build_context(
+            BoltContext(context if context else {}), self.payload
+        )

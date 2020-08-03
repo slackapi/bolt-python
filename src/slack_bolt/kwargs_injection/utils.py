@@ -30,9 +30,7 @@ def build_required_kwargs(
         "next": next_func,
     }
     kwargs: Dict[str, any] = {
-        k: v
-        for k, v in all_available_args.items()
-        if k in required_arg_names
+        k: v for k, v in all_available_args.items() if k in required_arg_names
     }
     found_arg_names = kwargs.keys()
     for name in required_arg_names:
@@ -40,7 +38,9 @@ def build_required_kwargs(
             if isinstance(request, BoltRequest):
                 kwargs[name] = Args(**all_available_args)
             else:
-                logger.warning(f"Unknown Request object type detected ({type(request)})")
+                logger.warning(
+                    f"Unknown Request object type detected ({type(request)})"
+                )
 
         if name not in found_arg_names:
             logger.warning(f"{name} is not a valid argument")

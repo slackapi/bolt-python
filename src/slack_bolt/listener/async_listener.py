@@ -15,10 +15,7 @@ class AsyncListener(metaclass=ABCMeta):
     auto_acknowledgement: bool
 
     async def async_matches(
-        self,
-        *,
-        req: AsyncBoltRequest,
-        resp: BoltResponse,
+        self, *, req: AsyncBoltRequest, resp: BoltResponse,
     ) -> bool:
         is_matched: bool = False
         for matcher in self.matchers:
@@ -28,10 +25,7 @@ class AsyncListener(metaclass=ABCMeta):
         return is_matched
 
     async def run_async_middleware(
-        self,
-        *,
-        req: AsyncBoltRequest,
-        resp: BoltResponse,
+        self, *, req: AsyncBoltRequest, resp: BoltResponse,
     ) -> (BoltResponse, bool):
         """
 
@@ -53,10 +47,8 @@ class AsyncListener(metaclass=ABCMeta):
 
     @abstractmethod
     async def run_ack_function(
-        self,
-        *,
-        request: AsyncBoltRequest,
-        response: BoltResponse) -> BoltResponse:
+        self, *, request: AsyncBoltRequest, response: BoltResponse
+    ) -> BoltResponse:
         """Runs all the registered middleware and then run the listener function.
 
         :param request: the incoming request
@@ -105,17 +97,16 @@ class AsyncCustomListener(AsyncListener):
         self.logger = get_bolt_app_logger(app_name, self.func)
 
     async def run_ack_function(
-        self,
-        *,
-        request: AsyncBoltRequest,
-        response: BoltResponse,
+        self, *, request: AsyncBoltRequest, response: BoltResponse,
     ) -> BoltResponse:
-        return await self.func(**build_async_required_kwargs(
-            logger=self.logger,
-            required_arg_names=self.arg_names,
-            request=request,
-            response=response
-        ))
+        return await self.func(
+            **build_async_required_kwargs(
+                logger=self.logger,
+                required_arg_names=self.arg_names,
+                request=request,
+                response=response,
+            )
+        )
 
 
 builtin_async_listener_classes = [

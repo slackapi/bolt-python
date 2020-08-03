@@ -6,8 +6,7 @@ from .models.bot import Bot
 from .models.installation import Installation
 
 
-class AsyncInstallationStore():
-
+class AsyncInstallationStore:
     @property
     @abstractmethod
     def logger(self) -> Logger:
@@ -19,9 +18,6 @@ class AsyncInstallationStore():
 
     @abstractmethod
     async def async_find_bot(
-        self,
-        *,
-        enterprise_id: Optional[str],
-        team_id: Optional[str],
+        self, *, enterprise_id: Optional[str], team_id: Optional[str],
     ) -> Optional[Bot]:
         raise NotImplementedError()

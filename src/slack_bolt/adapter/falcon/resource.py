@@ -8,7 +8,7 @@ from slack_bolt.oauth import OAuthFlow
 from slack_bolt.request import BoltRequest
 
 
-class SlackAppResource():
+class SlackAppResource:
     """
     from slack_bolt import App
     app = App()
@@ -45,7 +45,7 @@ class SlackAppResource():
         return BoltRequest(
             body=req.stream.read(req.content_length or 0).decode("utf-8"),
             query=req.query_string,
-            headers={k.lower(): v for k, v in req.headers.items()}
+            headers={k.lower(): v for k, v in req.headers.items()},
         )
 
     def _write_response(self, bolt_resp: BoltResponse, resp: Response):
@@ -55,7 +55,11 @@ class SlackAppResource():
         for cookie in bolt_resp.cookies():
             for name, c in cookie.items():
                 expire_value = c.get("expires", None)
-                expire = datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z") if expire_value else None
+                expire = (
+                    datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z")
+                    if expire_value
+                    else None
+                )
                 resp.set_cookie(
                     name=name,
                     value=c.value,

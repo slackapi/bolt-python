@@ -8,16 +8,14 @@ from slack_bolt.response import BoltResponse
 
 async def to_bolt_request(request: web.Request) -> AsyncBoltRequest:
     return AsyncBoltRequest(
-        body=await request.text(),
-        query=request.query_string,
-        headers=request.headers,
+        body=await request.text(), query=request.query_string, headers=request.headers,
     )
 
 
 async def to_aiohttp_response(bolt_resp: BoltResponse) -> web.Response:
     content_type = bolt_resp.headers.pop(
         "content-type",
-        ["application/json" if bolt_resp.body.startswith("{") else "text/plain"]
+        ["application/json" if bolt_resp.body.startswith("{") else "text/plain"],
     )[0]
     content_type = re.sub(r";\s*charset=utf-8", "", content_type)
     resp = web.Response(

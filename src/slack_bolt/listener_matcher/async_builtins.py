@@ -6,11 +6,12 @@ from ..kwargs_injection.async_utils import build_async_required_kwargs
 
 
 class AsyncBuiltinListenerMatcher(BuiltinListenerMatcher, AsyncListenerMatcher):
-
     async def async_matches(self, req: AsyncBoltRequest, resp: BoltResponse) -> bool:
-        return await self.func(**build_async_required_kwargs(
-            logger=self.logger,
-            required_arg_names=self.arg_names,
-            request=req,
-            response=resp
-        ))
+        return await self.func(
+            **build_async_required_kwargs(
+                logger=self.logger,
+                required_arg_names=self.arg_names,
+                request=req,
+                response=resp,
+            )
+        )

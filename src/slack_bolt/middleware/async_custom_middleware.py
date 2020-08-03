@@ -15,12 +15,7 @@ class AsyncCustomMiddleware(AsyncMiddleware):
     arg_names: List[str]
     logger: Logger
 
-    def __init__(
-        self,
-        *,
-        app_name: str,
-        func: Callable[..., Awaitable[any]]
-    ):
+    def __init__(self, *, app_name: str, func: Callable[..., Awaitable[any]]):
         self.app_name = app_name
         if inspect.iscoroutinefunction(func):
             self.func = func
@@ -37,13 +32,15 @@ class AsyncCustomMiddleware(AsyncMiddleware):
         resp: BoltResponse,
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> BoltResponse:
-        return await self.func(**build_async_required_kwargs(
-            logger=self.logger,
-            required_arg_names=self.arg_names,
-            request=req,
-            response=resp,
-            next_func=next,
-        ))
+        return await self.func(
+            **build_async_required_kwargs(
+                logger=self.logger,
+                required_arg_names=self.arg_names,
+                request=req,
+                response=resp,
+                next_func=next,
+            )
+        )
 
     @property
     def name(self) -> str:

@@ -3,7 +3,7 @@ from http.cookies import SimpleCookie
 from typing import Union, Dict, List, Optional
 
 
-class BoltResponse():
+class BoltResponse:
     status: int
     body: str
     headers: Dict[str, List[str]]
@@ -39,11 +39,7 @@ class BoltResponse():
         return {k: list(v)[0] for k, v in self.headers.items()}
 
     def first_headers_without_set_cookie(self) -> Dict[str, str]:
-        return {
-            k: list(v)[0]
-            for k, v in self.headers.items()
-            if k != "set-cookie"
-        }
+        return {k: list(v)[0] for k, v in self.headers.items() if k != "set-cookie"}
 
     def cookies(self) -> List[SimpleCookie]:
         header_values = self.headers.get("set-cookie", [])

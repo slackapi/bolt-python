@@ -22,7 +22,7 @@ def to_flask_response(bolt_resp: BoltResponse) -> Response:
     return resp
 
 
-class SlackRequestHandler():
+class SlackRequestHandler:
     def __init__(self, app: App):
         self.app = app
 

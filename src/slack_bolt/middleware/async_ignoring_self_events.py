@@ -7,7 +7,6 @@ from .async_middleware import AsyncMiddleware
 
 
 class AsyncIgnoringSelfEvents(IgnoringSelfEvents, AsyncMiddleware):
-
     async def async_process(
         self,
         *,

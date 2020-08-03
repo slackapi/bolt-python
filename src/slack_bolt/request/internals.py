@@ -6,7 +6,8 @@ from slack_bolt.context import BoltContext
 
 
 def parse_query(
-    query: Optional[Union[str, Dict[str, str], Dict[str, List[str]]]]) -> Dict[str, List[str]]:
+    query: Optional[Union[str, Dict[str, str], Dict[str, List[str]]]]
+) -> Dict[str, List[str]]:
     if query is None:
         return {}
     elif isinstance(query, str):
@@ -19,7 +20,9 @@ def parse_query(
             elif isinstance(value, str):
                 result[name] = [value]
             else:
-                raise ValueError(f"Unsupported type ({type(value)}) of element in headers ({query})")
+                raise ValueError(
+                    f"Unsupported type ({type(value)}) of element in headers ({query})"
+                )
         return result
     else:
         raise ValueError(f"Unsupported type of query detected ({type(query)})")
@@ -104,10 +107,7 @@ def extract_channel_id(payload: Dict[str, any]) -> Optional[str]:
     return None
 
 
-def build_context(
-    context: BoltContext,
-    payload: Dict[str, any],
-) -> BoltContext:
+def build_context(context: BoltContext, payload: Dict[str, any],) -> BoltContext:
     enterprise_id = extract_enterprise_id(payload)
     if enterprise_id:
         context["enterprise_id"] = enterprise_id
@@ -132,7 +132,9 @@ def extract_content_type(headers: Dict[str, List[str]]) -> Optional[str]:
     return None
 
 
-def build_normalized_headers(headers: Optional[Dict[str, Union[str, List[str]]]]) -> Dict[str, List[str]]:
+def build_normalized_headers(
+    headers: Optional[Dict[str, Union[str, List[str]]]]
+) -> Dict[str, List[str]]:
     normalized_headers = {}
     if headers is not None:
         for key, value in headers.items():
@@ -142,5 +144,7 @@ def build_normalized_headers(headers: Optional[Dict[str, Union[str, List[str]]]]
             elif isinstance(value, str):
                 normalized_headers[normalized_name] = [value]
             else:
-                raise ValueError(f"Unsupported type ({type(value)}) of element in headers ({headers})")
+                raise ValueError(
+                    f"Unsupported type ({type(value)}) of element in headers ({headers})"
+                )
     return normalized_headers

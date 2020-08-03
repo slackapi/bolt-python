@@ -7,14 +7,12 @@ from slack_sdk.web.async_client import AsyncWebClient
 from slack_sdk.web.async_slack_response import AsyncSlackResponse
 
 
-class AsyncSay():
+class AsyncSay:
     client: Optional[AsyncWebClient]
     channel: Optional[str]
 
     def __init__(
-        self,
-        client: Optional[AsyncWebClient],
-        channel: Optional[str],
+        self, client: Optional[AsyncWebClient], channel: Optional[str],
     ):
         self.client = client
         self.channel = channel

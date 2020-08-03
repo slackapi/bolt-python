@@ -3,14 +3,11 @@ from typing import Optional, Union
 
 from slack_sdk.models import BaseObject
 
-ButtonStyles = {"danger", "primary"}
-DynamicSelectElementTypes = {"channels", "conversations", "users"}
-
 
 class Link(BaseObject):
     def __init__(self, *, url: str, text: str):
         """Base class used to generate links in Slack's not-quite Markdown, not quite HTML syntax
-        https://api.slack.com/docs/message-formatting#linking_to_urls
+        https://api.slack.com/reference/surfaces/formatting#linking_to_urls
         """
         self.url = url
         self.text = text

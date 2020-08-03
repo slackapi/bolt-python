@@ -13,14 +13,15 @@ from slack_bolt.listener_matcher import CustomListenerMatcher
 from slack_bolt.listener_matcher import builtins as builtin_matchers
 from slack_bolt.listener_matcher.listener_matcher import ListenerMatcher
 from slack_bolt.logger import get_bolt_app_logger, get_bolt_logger
-from slack_bolt.middleware import \
-    Middleware, \
-    SslCheck, \
-    RequestVerification, \
-    SingleTeamAuthorization, \
-    MultiTeamsAuthorization, \
-    IgnoringSelfEvents, \
-    CustomMiddleware
+from slack_bolt.middleware import (
+    Middleware,
+    SslCheck,
+    RequestVerification,
+    SingleTeamAuthorization,
+    MultiTeamsAuthorization,
+    IgnoringSelfEvents,
+    CustomMiddleware,
+)
 from slack_bolt.middleware.url_verification import UrlVerification
 from slack_bolt.oauth import OAuthFlow
 from slack_bolt.request import BoltRequest
@@ -31,8 +32,7 @@ from slack_sdk.oauth.state_store import OAuthStateStore, FileOAuthStateStore
 from slack_sdk.web import WebClient
 
 
-class App():
-
+class App:
     def __init__(
         self,
         *,
@@ -50,11 +50,9 @@ class App():
         oauth_state_store: Optional[OAuthStateStore] = None,
         oauth_state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         oauth_state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
-
         # for the OAuth flow
         oauth_flow: Optional[OAuthFlow] = None,
         authorization_test_enabled: bool = True,
-
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
         scopes: Optional[List[str]] = None,
@@ -64,7 +62,6 @@ class App():
         oauth_redirect_uri_path: Optional[str] = None,
         oauth_success_url: Optional[str] = None,
         oauth_failure_url: Optional[str] = None,
-
         # No need to set (the value is used only in response to ssl_check requests)
         verification_token: Optional[str] = None,
     ):
@@ -76,12 +73,16 @@ class App():
         scopes = scopes or os.environ.get("SLACK_SCOPES", "").split(",")
         user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", "").split(",")
         redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI", None)
-        oauth_install_path = oauth_install_path or os.environ.get("SLACK_INSTALL_PATH", "/slack/install")
-        oauth_redirect_uri_path = oauth_redirect_uri_path or \
-                                  os.environ.get("SLACK_REDIRECT_URI_PATH", "/slack/oauth_redirect")
+        oauth_install_path = oauth_install_path or os.environ.get(
+            "SLACK_INSTALL_PATH", "/slack/install"
+        )
+        oauth_redirect_uri_path = oauth_redirect_uri_path or os.environ.get(
+            "SLACK_REDIRECT_URI_PATH", "/slack/oauth_redirect"
+        )
 
-        self._verification_token: Optional[str] = \
-            verification_token or os.environ.get("SLACK_VERIFICATION_TOKEN", None)
+        self._verification_token: Optional[str] = verification_token or os.environ.get(
+            "SLACK_VERIFICATION_TOKEN", None
+        )
         self._framework_logger = get_bolt_logger(App)
 
         self._token: Optional[str] = token
@@ -91,7 +92,8 @@ class App():
             self._token = client.token
             if token is not None:
                 self._framework_logger.warning(
-                    "As you gave client as well, the bot token will be unused.")
+                    "As you gave client as well, the bot token will be unused."
+                )
         else:
             self._client = WebClient(token=token)  # NOTE: the token here can be None
 
@@ -124,8 +126,13 @@ class App():
                         client_id=client_id,
                     )
 
-                if self._installation_store is not None and self._oauth_state_store is None:
-                    raise ValueError(f"Configure an appropriate OAuthStateStore for {self._installation_store}")
+                if (
+                    self._installation_store is not None
+                    and self._oauth_state_store is None
+                ):
+                    raise ValueError(
+                        f"Configure an appropriate OAuthStateStore for {self._installation_store}"
+                    )
 
                 self._oauth_flow = OAuthFlow(
                     client=WebClient(token=None),
@@ -153,7 +160,8 @@ class App():
         if self._installation_store is not None and self._token is not None:
             self._token = None
             self._framework_logger.warning(
-                "As you gave installation_store as well, the bot token will be unused.")
+                "As you gave installation_store as well, the bot token will be unused."
+            )
 
         self._middleware_list: List[Union[Callable, Middleware]] = []
         self._listeners: List[Listener] = []
@@ -166,15 +174,19 @@ class App():
     def _init_middleware_list(self):
         if self._init_middleware_list_done:
             return
-        self._middleware_list.append(SslCheck(verification_token=self._verification_token))
+        self._middleware_list.append(
+            SslCheck(verification_token=self._verification_token)
+        )
         self._middleware_list.append(RequestVerification(self._signing_secret))
         if self._oauth_flow is None and self._token:
             self._middleware_list.append(SingleTeamAuthorization())
         else:
-            self._middleware_list.append(MultiTeamsAuthorization(
-                installation_store=self._installation_store,
-                verification_enabled=self._authorization_test_enabled,
-            ))
+            self._middleware_list.append(
+                MultiTeamsAuthorization(
+                    installation_store=self._installation_store,
+                    verification_enabled=self._authorization_test_enabled,
+                )
+            )
         self._middleware_list.append(IgnoringSelfEvents())
         self._middleware_list.append(UrlVerification())
         self._init_middleware_list_done = True
@@ -207,10 +219,7 @@ class App():
 
     def start(self, port: int = 3000, path: str = "/slack/events") -> None:
         self.server = SlackAppServer(
-            port=port,
-            path=path,
-            app=self,
-            oauth_flow=self.oauth_flow,
+            port=port, path=path, app=self, oauth_flow=self.oauth_flow,
         )
         self.server.start()
 
@@ -268,7 +277,9 @@ class App():
         ack = request.context.ack
         starting_time = time.time()
         if self._process_before_response:
-            returned_value = listener.run_ack_function(request=request, response=response)
+            returned_value = listener.run_ack_function(
+                request=request, response=response
+            )
             if isinstance(returned_value, BoltResponse):
                 response = returned_value
             if ack.response is None and listener.auto_acknowledgement:
@@ -283,7 +294,8 @@ class App():
         else:
             # start the listener function asynchronously
             self._listener_executor.submit(
-                lambda: listener.run_ack_function(request=request, response=response))
+                lambda: listener.run_ack_function(request=request, response=response)
+            )
 
             if listener.auto_acknowledgement:
                 # acknowledge immediately in case of Events API
@@ -303,10 +315,13 @@ class App():
         # None for both means no ack() in the listener
         return None
 
-    def _debug_log_completion(self, starting_time: float, response: BoltResponse) -> None:
+    def _debug_log_completion(
+        self, starting_time: float, response: BoltResponse
+    ) -> None:
         millis = int((time.time() - starting_time) * 1000)
         self._framework_logger.debug(
-            f"Responding with status: {response.status} body: \"{response.body}\" ({millis} millis)")
+            f'Responding with status: {response.status} body: "{response.body}" ({millis} millis)'
+        )
 
     # -------------------------
     # middleware
@@ -317,7 +332,9 @@ class App():
     def middleware(self, *args):
         if len(args) > 0:
             func = args[0]
-            self._middleware_list.append(CustomMiddleware(app_name=self.name, func=func))
+            self._middleware_list.append(
+                CustomMiddleware(app_name=self.name, func=func)
+            )
 
     # -------------------------
     # events
@@ -330,7 +347,9 @@ class App():
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.event(event)
-            return self._register_listener(func, primary_matcher, matchers, middleware, True)
+            return self._register_listener(
+                func, primary_matcher, matchers, middleware, True
+            )
 
         return __call__
 
@@ -355,7 +374,9 @@ class App():
                 return False
 
             matchers.insert(0, keyword_matcher)
-            return self._register_listener(func, primary_matcher, matchers, middleware, True)
+            return self._register_listener(
+                func, primary_matcher, matchers, middleware, True
+            )
 
         return __call__
 
@@ -510,35 +531,38 @@ class App():
         auto_acknowledgement: bool = False,
     ) -> None:
 
-        listener_matchers = [CustomListenerMatcher(app_name=self.name, func=f) for f in (matchers or [])]
+        listener_matchers = [
+            CustomListenerMatcher(app_name=self.name, func=f) for f in (matchers or [])
+        ]
         listener_matchers.insert(0, primary_matcher)
         listener_middleware = []
-        for m in (middleware or []):
+        for m in middleware or []:
             if isinstance(m, Middleware):
                 listener_middleware.append(m)
             elif isinstance(m, Callable):
                 listener_middleware.append(CustomMiddleware(app_name=self.name, func=m))
             else:
-                raise ValueError(f"Unexpected value for a listener middleware: {type(m)}")
+                raise ValueError(
+                    f"Unexpected value for a listener middleware: {type(m)}"
+                )
 
-        self._listeners.append(CustomListener(
-            app_name=self.name,
-            func=func,
-            matchers=listener_matchers,
-            middleware=listener_middleware,
-            auto_acknowledgement=auto_acknowledgement,
-        ))
+        self._listeners.append(
+            CustomListener(
+                app_name=self.name,
+                func=func,
+                matchers=listener_matchers,
+                middleware=listener_middleware,
+                auto_acknowledgement=auto_acknowledgement,
+            )
+        )
 
 
 # -------------------------
 
+
 class SlackAppServer:
     def __init__(
-        self,
-        port: int,
-        path: str,
-        app: App,
-        oauth_flow: Optional[OAuthFlow] = None,
+        self, port: int, path: str, app: App, oauth_flow: Optional[OAuthFlow] = None,
     ):
         self.port = port
         _path = path
@@ -546,16 +570,19 @@ class SlackAppServer:
         _oauth_flow = oauth_flow
 
         class SlackAppHandler(SimpleHTTPRequestHandler):
-
             def do_GET(self):
                 if _oauth_flow:
                     request_path, _, query = self.path.partition("?")
                     if request_path == _oauth_flow.install_path:
-                        bolt_req = BoltRequest(body="", query=query, headers=self.headers)
+                        bolt_req = BoltRequest(
+                            body="", query=query, headers=self.headers
+                        )
                         bolt_resp = _oauth_flow.handle_installation(bolt_req)
                         self._send_bolt_response(bolt_resp)
                     elif request_path == _oauth_flow.redirect_uri_path:
-                        bolt_req = BoltRequest(body="", query=query, headers=self.headers)
+                        bolt_req = BoltRequest(
+                            body="", query=query, headers=self.headers
+                        )
                         bolt_resp = _oauth_flow.handle_callback(bolt_req)
                         self._send_bolt_response(bolt_resp)
                     else:
@@ -571,7 +598,9 @@ class SlackAppServer:
 
                 len_header = self.headers.get("Content-Length") or 0
                 request_body = self.rfile.read(int(len_header)).decode("utf-8")
-                bolt_req = BoltRequest(body=request_body, query=query, headers=self.headers)
+                bolt_req = BoltRequest(
+                    body=request_body, query=query, headers=self.headers
+                )
                 bolt_resp: BoltResponse = _app.dispatch(bolt_req)
                 self._send_bolt_response(bolt_resp)
 

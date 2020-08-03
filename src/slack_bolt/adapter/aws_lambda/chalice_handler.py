@@ -10,7 +10,7 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
-class ChaliceSlackRequestHandler():
+class ChaliceSlackRequestHandler:
     def __init__(self, app: App, chalice: Chalice):
         self.app = app
         self.chalice = chalice
@@ -37,9 +37,11 @@ class ChaliceSlackRequestHandler():
                 bolt_req: BoltRequest = to_bolt_request(request, body)
                 query = bolt_req.query
                 is_callback = query is not None and (
-                    (_first_value(query, "code") is not None and _first_value(query, "state") is not None)
-                    or
-                    _first_value(query, "error") is not None
+                    (
+                        _first_value(query, "code") is not None
+                        and _first_value(query, "state") is not None
+                    )
+                    or _first_value(query, "error") is not None
                 )
                 if is_callback:
                     bolt_resp = oauth_flow.handle_callback(bolt_req)
@@ -57,24 +59,14 @@ class ChaliceSlackRequestHandler():
 
 
 def to_bolt_request(request: Request, body: str) -> BoltRequest:
-    return BoltRequest(
-        body=body,
-        query=request.query_params,
-        headers=request.headers,
-    )
+    return BoltRequest(body=body, query=request.query_params, headers=request.headers,)
 
 
 def to_chalice_response(resp: BoltResponse) -> Response:
     return Response(
-        status_code=resp.status,
-        body=resp.body,
-        headers=resp.first_headers(),
+        status_code=resp.status, body=resp.body, headers=resp.first_headers(),
     )
 
 
 def not_found() -> Response:
-    return Response(
-        status_code=404,
-        body="Not Found",
-        headers={},
-    )
+    return Response(status_code=404, body="Not Found", headers={},)

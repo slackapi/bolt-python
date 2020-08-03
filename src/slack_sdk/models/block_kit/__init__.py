@@ -5,8 +5,16 @@ import warnings
 from abc import ABCMeta
 from typing import Dict, List, Optional, Set, Union
 
-from slack_sdk.models import JsonObject, JsonValidator, show_unknown_key_warning, EnumValidator
-from slack_sdk.models.messages import Link, ButtonStyles
+from slack_sdk.models import (
+    JsonObject,
+    JsonValidator,
+    show_unknown_key_warning,
+    EnumValidator,
+)
+from slack_sdk.models.messages import Link
+
+ButtonStyles = {"danger", "primary"}
+DynamicSelectElementTypes = {"channels", "conversations", "users"}
 
 
 class TextObject(JsonObject):
@@ -165,13 +173,13 @@ class Option(JsonObject):
         (StaticDialogSelectElement)
 
         Blocks:
-        https://api.slack.com/reference/messaging/composition-objects#option
+        https://api.slack.com/reference/block-kit/composition-objects#option
 
         Dialogs:
         https://api.slack.com/dialogs#select_elements
 
         Legacy interactive attachments:
-        https://api.slack.com/docs/interactive-message-field-guide#option_fields
+        https://api.slack.com/legacy/interactive-message-field-guide#option_fields
 
         Args:
             label: A short, user-facing string to label this option to users.
@@ -294,13 +302,13 @@ class OptionGroup(JsonObject):
         UI) and a list of Option objects.
 
         Blocks:
-        https://api.slack.com/reference/messaging/composition-objects#option-group
+        https://api.slack.com/reference/block-kit/composition-objects#option-group
 
         Dialogs:
         https://api.slack.com/dialogs#select_elements
 
         Legacy interactive attachments:
-        https://api.slack.com/docs/interactive-message-field-guide#option_groups_to_place_within_message_menu_actions
+        https://api.slack.com/legacy/interactive-message-field-guide#option_groups_to_place_within_message_menu_actions
 
         Args:
             label: Text to display at the top of this group of options.
@@ -576,6 +584,7 @@ class BlockElement(JsonObject, metaclass=ABCMeta):
 # -------------------------------------------------
 # Interactive Block Elements
 # -------------------------------------------------
+
 
 class InteractiveElement(BlockElement):
     action_id_max_length = 255

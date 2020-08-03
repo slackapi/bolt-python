@@ -6,8 +6,7 @@ from .models.bot import Bot
 from .models.installation import Installation
 
 
-class InstallationStore():
-
+class InstallationStore:
     @property
     @abstractmethod
     def logger(self) -> Logger:
@@ -19,9 +18,6 @@ class InstallationStore():
 
     @abstractmethod
     def find_bot(
-        self,
-        *,
-        enterprise_id: Optional[str],
-        team_id: Optional[str],
+        self, *, enterprise_id: Optional[str], team_id: Optional[str],
     ) -> Optional[Bot]:
         raise NotImplementedError()

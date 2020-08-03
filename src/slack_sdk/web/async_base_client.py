@@ -3,7 +3,7 @@ from ssl import SSLContext
 from typing import Optional, Union, Dict
 
 import aiohttp
-from aiohttp import FormData
+from aiohttp import FormData, BasicAuth
 
 from .async_internal_utils import (
     _files_to_data,
@@ -89,6 +89,11 @@ class AsyncBaseClient:
         """
 
         api_url = _get_url(self.base_url, api_method)
+        if isinstance(auth, dict):
+            auth = BasicAuth(auth["client_id"], auth["client_secret"])
+        elif isinstance(auth, BasicAuth):
+            headers["Authorization"] = auth.encode()
+
         req_args = _build_req_args(
             token=self.token,
             http_verb=http_verb,
@@ -108,7 +113,9 @@ class AsyncBaseClient:
             http_verb=http_verb, api_url=api_url, req_args=req_args,
         )
 
-    async def _send(self, http_verb: str, api_url: str, req_args: dict) -> AsyncSlackResponse:
+    async def _send(
+        self, http_verb: str, api_url: str, req_args: dict
+    ) -> AsyncSlackResponse:
         """Sends the request out for transmission.
 
         Args:
