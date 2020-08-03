@@ -15,31 +15,24 @@ class CustomMiddleware(Middleware):
     arg_names: List[str]
     logger: Logger
 
-    def __init__(
-        self,
-        *,
-        app_name: str,
-        func: Callable
-    ):
+    def __init__(self, *, app_name: str, func: Callable):
         self.app_name = app_name
         self.func = func
         self.arg_names = inspect.getfullargspec(func).args
         self.logger = get_bolt_app_logger(self.app_name, self.func)
 
     def process(
-        self,
-        *,
-        req: BoltRequest,
-        resp: BoltResponse,
-        next: Callable[[], BoltResponse],
+        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
     ) -> BoltResponse:
-        return self.func(**build_required_kwargs(
-            logger=self.logger,
-            required_arg_names=self.arg_names,
-            request=req,
-            response=resp,
-            next_func=next,
-        ))
+        return self.func(
+            **build_required_kwargs(
+                logger=self.logger,
+                required_arg_names=self.arg_names,
+                request=req,
+                response=resp,
+                next_func=next,
+            )
+        )
 
     @property
     def name(self) -> str:

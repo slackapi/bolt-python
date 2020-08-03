@@ -6,7 +6,6 @@ from slack_bolt.response import BoltResponse
 
 
 class AsyncMiddleware(metaclass=ABCMeta):
-
     @abstractmethod
     async def async_process(
         self,

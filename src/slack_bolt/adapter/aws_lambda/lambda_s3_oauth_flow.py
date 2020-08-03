@@ -12,27 +12,24 @@ from slack_sdk.oauth.state_store.amazon_s3 import AmazonS3OAuthStateStore
 
 
 class LambdaS3OAuthFlow(OAuthFlow):
-
     def __init__(
         self,
         *,
         client: Optional[WebClient] = None,
         logger: Optional[Logger] = None,
-
         oauth_state_bucket_name: str = os.environ["SLACK_STATE_S3_BUCKET_NAME"],
         installation_bucket_name: str = os.environ["SLACK_INSTALLATION_S3_BUCKET_NAME"],
         oauth_state_cookie_name: str = "slack-app-oauth-state",
         oauth_state_expiration_seconds: int = 60 * 10,  # 10 minutes
-
         client_id: str = os.environ["SLACK_CLIENT_ID"],
         client_secret: str = os.environ["SLACK_CLIENT_SECRET"],
         scopes: Optional[str] = os.environ.get("SLACK_SCOPES", None),
         user_scopes: Optional[str] = os.environ.get("SLACK_USER_SCOPES", None),
         redirect_uri: Optional[str] = os.environ.get("SLACK_REDIRECT_URI", None),
-
         install_path: str = os.environ.get("SLACK_LAMBDA_PATH", "/slack/install"),
-        redirect_uri_path: str = os.environ.get("SLACK_LAMBDA_PATH", "/slack/oauth_redirect"),
-
+        redirect_uri_path: str = os.environ.get(
+            "SLACK_LAMBDA_PATH", "/slack/oauth_redirect"
+        ),
         success_url: Optional[str] = None,
         failure_url: Optional[str] = None,
     ):

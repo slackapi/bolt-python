@@ -7,9 +7,7 @@ from slack_bolt.oauth import OAuthFlow
 
 def to_bolt_request(req: Request, body: bytes) -> BoltRequest:
     return BoltRequest(
-        body=body.decode("utf-8"),
-        query=req.query_params,
-        headers=req.headers,
+        body=body.decode("utf-8"), query=req.query_params, headers=req.headers,
     )
 
 
@@ -34,7 +32,7 @@ def to_starlette_response(bolt_resp: BoltResponse) -> Response:
     return resp
 
 
-class SlackRequestHandler():
+class SlackRequestHandler:
     def __init__(self, app: App):
         self.app = app
 
@@ -44,7 +42,9 @@ class SlackRequestHandler():
             if self.app.oauth_flow is not None:
                 oauth_flow: OAuthFlow = self.app.oauth_flow
                 if req.url.path == oauth_flow.install_path:
-                    bolt_resp = oauth_flow.handle_installation(to_bolt_request(req, body))
+                    bolt_resp = oauth_flow.handle_installation(
+                        to_bolt_request(req, body)
+                    )
                     return to_starlette_response(bolt_resp)
                 elif req.url.path == oauth_flow.redirect_uri_path:
                     bolt_resp = oauth_flow.handle_callback(to_bolt_request(req, body))
@@ -53,7 +53,4 @@ class SlackRequestHandler():
             bolt_resp = self.app.dispatch(to_bolt_request(req, body))
             return to_starlette_response(bolt_resp)
 
-        return Response(
-            status_code=404,
-            content="Not found",
-        )
+        return Response(status_code=404, content="Not found",)

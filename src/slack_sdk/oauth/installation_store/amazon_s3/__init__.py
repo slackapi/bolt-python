@@ -5,14 +5,15 @@ from typing import Optional
 
 from botocore.client import BaseClient
 
-from slack_sdk.oauth.installation_store.async_installation_store import AsyncInstallationStore
+from slack_sdk.oauth.installation_store.async_installation_store import (
+    AsyncInstallationStore,
+)
 from slack_sdk.oauth.installation_store.installation_store import InstallationStore
 from slack_sdk.oauth.installation_store.models.bot import Bot
 from slack_sdk.oauth.installation_store.models.installation import Installation
 
 
 class AmazonS3InstallationStore(InstallationStore, AsyncInstallationStore):
-
     def __init__(
         self,
         *,
@@ -93,18 +94,12 @@ class AmazonS3InstallationStore(InstallationStore, AsyncInstallationStore):
             self.logger.debug(f"S3 put_object response: {response}")
 
     async def async_find_bot(
-        self,
-        *,
-        enterprise_id: Optional[str],
-        team_id: Optional[str],
+        self, *, enterprise_id: Optional[str], team_id: Optional[str],
     ) -> Optional[Bot]:
         return self.find_bot(enterprise_id=enterprise_id, team_id=team_id)
 
     def find_bot(
-        self,
-        *,
-        enterprise_id: Optional[str],
-        team_id: Optional[str],
+        self, *, enterprise_id: Optional[str], team_id: Optional[str],
     ) -> Optional[Bot]:
         # TODO: org-apps support
         none = "none"
@@ -113,8 +108,7 @@ class AmazonS3InstallationStore(InstallationStore, AsyncInstallationStore):
         workspace_path = f"{self.client_id}/{e_id}-{t_id}"
         try:
             fetch_response = self.s3_client.get_object(
-                Bucket=self.bucket_name,
-                Key=f"{workspace_path}/bot-latest",
+                Bucket=self.bucket_name, Key=f"{workspace_path}/bot-latest",
             )
             self.logger.debug(f"S3 get_object response: {fetch_response}")
             body = fetch_response["Body"].read().decode("utf-8")

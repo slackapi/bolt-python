@@ -1,6 +1,5 @@
 """A Python module for interacting with Slack's Web API."""
 import os
-from asyncio import Future
 from io import IOBase
 from typing import Union, List, Optional, Dict
 
@@ -21,9 +20,6 @@ class WebClient(BaseClient):
 
     Attributes:
         token (str): A string specifying an xoxp or xoxb token.
-        use_session (bool): An boolean specifying if the client
-            should take advantage of connection pooling.
-            Default is True.
         base_url (str): A string representing the Slack API base URL.
             Default is 'https://www.slack.com/api/'
         timeout (int): The maximum number of seconds the client will wait
@@ -36,9 +32,9 @@ class WebClient(BaseClient):
     Example of recommended usage:
     ```python
         import os
-        import slack
+        from slack_sdk import WebClient
 
-        client = slack.WebClient(token=os.environ['SLACK_API_TOKEN'])
+        client = WebClient(token=os.environ['SLACK_API_TOKEN'])
         response = client.chat_postMessage(
             channel='#random',
             text="Hello world!")
@@ -49,9 +45,9 @@ class WebClient(BaseClient):
     Example manually creating an API request:
     ```python
         import os
-        import slack
+        from slack_sdk import WebClient
 
-        client = slack.WebClient(token=os.environ['SLACK_API_TOKEN'])
+        client = WebClient(token=os.environ['SLACK_API_TOKEN'])
         response = client.api_call(
             api_method='chat.postMessage',
             json={'channel': '#random','text': "Hello world!"}
@@ -68,7 +64,7 @@ class WebClient(BaseClient):
 
     def admin_apps_approve(
         self, *, app_id: str = None, request_id: str = None, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Approve an app for installation on a workspace.
 
         Either app_id or request_id is required.
@@ -92,27 +88,25 @@ class WebClient(BaseClient):
 
         return self.api_call("admin.apps.approve", json=kwargs)
 
-    def admin_apps_approved_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def admin_apps_approved_list(self, **kwargs) -> SlackResponse:
         """List approved apps for an org or workspace."""
         return self.api_call("admin.apps.approved.list", http_verb="GET", params=kwargs)
 
-    def admin_apps_requests_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def admin_apps_requests_list(self, **kwargs) -> SlackResponse:
         """List app requests for a team/workspace."""
         return self.api_call("admin.apps.requests.list", http_verb="GET", params=kwargs)
 
-    def admin_apps_restrict(self, **kwargs) -> Union[Future, SlackResponse]:
+    def admin_apps_restrict(self, **kwargs) -> SlackResponse:
         """Restrict an app for installation on a workspace."""
         return self.api_call("admin.apps.restrict", json=kwargs)
 
-    def admin_apps_restricted_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def admin_apps_restricted_list(self, **kwargs) -> SlackResponse:
         """List restricted apps for an org or workspace."""
         return self.api_call(
             "admin.apps.restricted.list", http_verb="GET", params=kwargs
         )
 
-    def admin_conversations_restrictAccess_addGroup(
-        self, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def admin_conversations_restrictAccess_addGroup(self, **kwargs) -> SlackResponse:
         """Add an allowlist of IDP groups for accessing a channel."""
         return self.api_call(
             "admin.conversations.restrictAccess.addGroup",
@@ -120,9 +114,7 @@ class WebClient(BaseClient):
             params=kwargs,
         )
 
-    def admin_conversations_restrictAccess_listGroups(
-        self, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def admin_conversations_restrictAccess_listGroups(self, **kwargs) -> SlackResponse:
         """List all IDP Groups linked to a channel."""
         return self.api_call(
             "admin.conversations.restrictAccess.listGroups",
@@ -130,9 +122,7 @@ class WebClient(BaseClient):
             params=kwargs,
         )
 
-    def admin_conversations_restrictAccess_removeGroup(
-        self, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def admin_conversations_restrictAccess_removeGroup(self, **kwargs) -> SlackResponse:
         """Remove a linked IDP group linked from a private channel."""
         return self.api_call(
             "admin.conversations.restrictAccess.removeGroup",
@@ -140,33 +130,31 @@ class WebClient(BaseClient):
             params=kwargs,
         )
 
-    def admin_conversations_setTeams(self, **kwargs) -> Union[Future, SlackResponse]:
+    def admin_conversations_setTeams(self, **kwargs) -> SlackResponse:
         """Set the workspaces in an Enterprise grid org that connect to a channel."""
         return self.api_call("admin.conversations.setTeams", json=kwargs)
 
-    def admin_emoji_add(self, **kwargs) -> Union[Future, SlackResponse]:
+    def admin_emoji_add(self, **kwargs) -> SlackResponse:
         """Add an emoji."""
         return self.api_call("admin.emoji.add", http_verb="GET", params=kwargs)
 
-    def admin_emoji_addAlias(self, **kwargs) -> Union[Future, SlackResponse]:
+    def admin_emoji_addAlias(self, **kwargs) -> SlackResponse:
         """Add an emoji alias."""
         return self.api_call("admin.emoji.addAlias", http_verb="GET", params=kwargs)
 
-    def admin_emoji_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def admin_emoji_list(self, **kwargs) -> SlackResponse:
         """List emoji for an Enterprise Grid organization."""
         return self.api_call("admin.emoji.list", http_verb="GET", params=kwargs)
 
-    def admin_emoji_remove(self, **kwargs) -> Union[Future, SlackResponse]:
+    def admin_emoji_remove(self, **kwargs) -> SlackResponse:
         """Remove an emoji across an Enterprise Grid organization."""
         return self.api_call("admin.emoji.remove", http_verb="GET", params=kwargs)
 
-    def admin_emoji_rename(self, **kwargs) -> Union[Future, SlackResponse]:
+    def admin_emoji_rename(self, **kwargs) -> SlackResponse:
         """Rename an emoji."""
         return self.api_call("admin.emoji.rename", http_verb="GET", params=kwargs)
 
-    def admin_users_session_reset(
-        self, *, user_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def admin_users_session_reset(self, *, user_id: str, **kwargs) -> SlackResponse:
         """Wipes all valid sessions on all devices for a given user.
 
         Args:
@@ -177,7 +165,7 @@ class WebClient(BaseClient):
 
     def admin_inviteRequests_approve(
         self, *, invite_request_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Approve a workspace invite request.
 
         team_id is required if your Enterprise Grid org contains more than one workspace.
@@ -188,21 +176,17 @@ class WebClient(BaseClient):
         kwargs.update({"invite_request_id": invite_request_id})
         return self.api_call("admin.inviteRequests.approve", json=kwargs)
 
-    def admin_inviteRequests_approved_list(
-        self, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def admin_inviteRequests_approved_list(self, **kwargs) -> SlackResponse:
         """List all approved workspace invite requests."""
         return self.api_call("admin.inviteRequests.approved.list", json=kwargs)
 
-    def admin_inviteRequests_denied_list(
-        self, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def admin_inviteRequests_denied_list(self, **kwargs) -> SlackResponse:
         """List all denied workspace invite requests."""
         return self.api_call("admin.inviteRequests.denied.list", json=kwargs)
 
     def admin_inviteRequests_deny(
         self, *, invite_request_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Deny a workspace invite request.
 
         Args:
@@ -211,13 +195,11 @@ class WebClient(BaseClient):
         kwargs.update({"invite_request_id": invite_request_id})
         return self.api_call("admin.inviteRequests.deny", json=kwargs)
 
-    def admin_inviteRequests_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def admin_inviteRequests_list(self, **kwargs) -> SlackResponse:
         """List all pending workspace invite requests."""
         return self.api_call("admin.inviteRequests.list", json=kwargs)
 
-    def admin_teams_admins_list(
-        self, *, team_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def admin_teams_admins_list(self, *, team_id: str, **kwargs) -> SlackResponse:
         """List all of the admins on a given workspace.
 
         Args:
@@ -228,7 +210,7 @@ class WebClient(BaseClient):
 
     def admin_teams_create(
         self, *, team_domain: str, team_name: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Create an Enterprise team.
 
         Args:
@@ -238,13 +220,11 @@ class WebClient(BaseClient):
         kwargs.update({"team_domain": team_domain, "team_name": team_name})
         return self.api_call("admin.teams.create", json=kwargs)
 
-    def admin_teams_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def admin_teams_list(self, **kwargs) -> SlackResponse:
         """List all teams on an Enterprise organization."""
         return self.api_call("admin.teams.list", json=kwargs)
 
-    def admin_teams_owners_list(
-        self, *, team_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def admin_teams_owners_list(self, *, team_id: str, **kwargs) -> SlackResponse:
         """List all of the admins on a given workspace.
 
         Args:
@@ -253,9 +233,7 @@ class WebClient(BaseClient):
         kwargs.update({"team_id": team_id})
         return self.api_call("admin.teams.owners.list", http_verb="GET", params=kwargs)
 
-    def admin_teams_settings_info(
-        self, team_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def admin_teams_settings_info(self, team_id: str, **kwargs) -> SlackResponse:
         """Fetch information about settings in a workspace
 
         Args:
@@ -266,7 +244,7 @@ class WebClient(BaseClient):
 
     def admin_teams_settings_setDefaultChannels(
         self, *, team_id: str, channel_ids: Union[str, List[str]], **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Set the default channels of a workspace.
 
         Args:
@@ -285,7 +263,7 @@ class WebClient(BaseClient):
 
     def admin_teams_settings_setDescription(
         self, *, team_id: str, description: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Set the description of a given workspace.
 
         Args:
@@ -297,7 +275,7 @@ class WebClient(BaseClient):
 
     def admin_teams_settings_setDiscoverability(
         self, *, team_id: str, discoverability: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Sets the icon of a workspace.
 
         Args:
@@ -310,7 +288,7 @@ class WebClient(BaseClient):
 
     def admin_teams_settings_setIcon(
         self, *, team_id: str, image_url: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Sets the icon of a workspace.
 
         Args:
@@ -324,7 +302,7 @@ class WebClient(BaseClient):
 
     def admin_teams_settings_setName(
         self, *, team_id: str, name: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Sets the icon of a workspace.
 
         Args:
@@ -341,7 +319,7 @@ class WebClient(BaseClient):
         usergroup_id: str,
         channel_ids: Union[str, List[str]],
         **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Add one or more default channels to an IDP group.
 
         Args:
@@ -358,7 +336,7 @@ class WebClient(BaseClient):
 
     def admin_usergroups_addTeams(
         self, *, usergroup_id: str, team_ids: Union[str, List[str]], **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Associate one or more default workspaces with an organization-wide IDP group.
 
         Args:
@@ -376,7 +354,7 @@ class WebClient(BaseClient):
 
     def admin_usergroups_listChannels(
         self, *, usergroup_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Add one or more default channels to an IDP group.
 
         Args:
@@ -387,7 +365,7 @@ class WebClient(BaseClient):
 
     def admin_usergroups_removeChannels(
         self, *, usergroup_id: str, channel_ids: Union[str, List[str]], **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Add one or more default channels to an IDP group.
 
         Args:
@@ -403,7 +381,7 @@ class WebClient(BaseClient):
 
     def admin_users_assign(
         self, *, team_id: str, user_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Add an Enterprise user to a workspace.
 
         Args:
@@ -415,7 +393,7 @@ class WebClient(BaseClient):
 
     def admin_users_invite(
         self, *, team_id: str, email: str, channel_ids: Union[str, List[str]], **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Invite a user to a workspace.
 
         Args:
@@ -431,9 +409,7 @@ class WebClient(BaseClient):
             kwargs.update({"channel_ids": channel_ids})
         return self.api_call("admin.users.invite", json=kwargs)
 
-    def admin_users_list(
-        self, *, team_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def admin_users_list(self, *, team_id: str, **kwargs) -> SlackResponse:
         """List users on a workspace
 
         Args:
@@ -444,7 +420,7 @@ class WebClient(BaseClient):
 
     def admin_users_remove(
         self, *, team_id: str, user_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Remove a user from a workspace.
 
         Args:
@@ -456,7 +432,7 @@ class WebClient(BaseClient):
 
     def admin_users_setAdmin(
         self, *, team_id: str, user_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Set an existing guest, regular user, or owner to be an admin user.
 
         Args:
@@ -468,7 +444,7 @@ class WebClient(BaseClient):
 
     def admin_users_setExpiration(
         self, *, expiration_ts: int, team_id: str, user_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Set an expiration for a guest user.
 
         Args:
@@ -483,7 +459,7 @@ class WebClient(BaseClient):
 
     def admin_users_setOwner(
         self, *, team_id: str, user_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Set an existing guest, regular user, or admin user to be a workspace owner.
 
         Args:
@@ -495,7 +471,7 @@ class WebClient(BaseClient):
 
     def admin_users_setRegular(
         self, *, team_id: str, user_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Set an existing guest user, admin user, or owner to be a regular user.
 
         Args:
@@ -505,25 +481,25 @@ class WebClient(BaseClient):
         kwargs.update({"team_id": team_id, "user_id": user_id})
         return self.api_call("admin.users.setRegular", json=kwargs)
 
-    def api_test(self, **kwargs) -> Union[Future, SlackResponse]:
+    def api_test(self, **kwargs) -> SlackResponse:
         """Checks API calling code."""
         return self.api_call("api.test", json=kwargs)
 
-    def auth_revoke(self, **kwargs) -> Union[Future, SlackResponse]:
+    def auth_revoke(self, **kwargs) -> SlackResponse:
         """Revokes a token."""
         return self.api_call("auth.revoke", http_verb="GET", params=kwargs)
 
-    def auth_test(self, **kwargs) -> Union[Future, SlackResponse]:
+    def auth_test(self, **kwargs) -> SlackResponse:
         """Checks authentication & identity."""
         return self.api_call("auth.test", json=kwargs)
 
-    def bots_info(self, **kwargs) -> Union[Future, SlackResponse]:
+    def bots_info(self, **kwargs) -> SlackResponse:
         """Gets information about a bot user."""
         return self.api_call("bots.info", http_verb="GET", params=kwargs)
 
     def calls_add(
         self, *, external_unique_id: str, join_url: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Registers a new Call.
 
         Args:
@@ -537,9 +513,7 @@ class WebClient(BaseClient):
         _update_call_participants(kwargs, kwargs.get("users", None))
         return self.api_call("calls.add", http_verb="POST", params=kwargs)
 
-    def calls_end(
-        self, *, id: str, **kwargs  # skipcq: PYL-W0622
-    ) -> Union[Future, SlackResponse]:
+    def calls_end(self, *, id: str, **kwargs) -> SlackResponse:  # skipcq: PYL-W0622
         """Ends a Call.
 
         Args:
@@ -548,9 +522,7 @@ class WebClient(BaseClient):
         kwargs.update({"id": id})
         return self.api_call("calls.end", http_verb="POST", params=kwargs)
 
-    def calls_info(
-        self, *, id: str, **kwargs  # skipcq: PYL-W0622
-    ) -> Union[Future, SlackResponse]:
+    def calls_info(self, *, id: str, **kwargs) -> SlackResponse:  # skipcq: PYL-W0622
         """Returns information about a Call.
 
         Args:
@@ -565,7 +537,7 @@ class WebClient(BaseClient):
         id: str,  # skipcq: PYL-W0622
         users: Union[str, List[Dict[str, str]]],
         **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Registers new participants added to a Call.
 
         Args:
@@ -582,7 +554,7 @@ class WebClient(BaseClient):
         id: str,  # skipcq: PYL-W0622
         users: Union[str, List[Dict[str, str]]],
         **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Registers participants removed from a Call.
 
         Args:
@@ -595,9 +567,7 @@ class WebClient(BaseClient):
             "calls.participants.remove", http_verb="POST", params=kwargs
         )
 
-    def calls_update(
-        self, *, id: str, **kwargs  # skipcq: PYL-W0622
-    ) -> Union[Future, SlackResponse]:
+    def calls_update(self, *, id: str, **kwargs) -> SlackResponse:  # skipcq: PYL-W0622
         """Updates information about a Call.
 
         Args:
@@ -606,9 +576,7 @@ class WebClient(BaseClient):
         kwargs.update({"id": id})
         return self.api_call("calls.update", http_verb="POST", params=kwargs)
 
-    def channels_archive(
-        self, *, channel: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def channels_archive(self, *, channel: str, **kwargs) -> SlackResponse:
         """Archives a channel.
 
         Args:
@@ -617,7 +585,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("channels.archive", json=kwargs)
 
-    def channels_create(self, *, name: str, **kwargs) -> Union[Future, SlackResponse]:
+    def channels_create(self, *, name: str, **kwargs) -> SlackResponse:
         """Creates a channel.
 
         Args:
@@ -626,9 +594,7 @@ class WebClient(BaseClient):
         kwargs.update({"name": name})
         return self.api_call("channels.create", json=kwargs)
 
-    def channels_history(
-        self, *, channel: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def channels_history(self, *, channel: str, **kwargs) -> SlackResponse:
         """Fetches history of messages and events from a channel.
 
         Args:
@@ -637,7 +603,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("channels.history", http_verb="GET", params=kwargs)
 
-    def channels_info(self, *, channel: str, **kwargs) -> Union[Future, SlackResponse]:
+    def channels_info(self, *, channel: str, **kwargs) -> SlackResponse:
         """Gets information about a channel.
 
         Args:
@@ -646,9 +612,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("channels.info", http_verb="GET", params=kwargs)
 
-    def channels_invite(
-        self, *, channel: str, user: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def channels_invite(self, *, channel: str, user: str, **kwargs) -> SlackResponse:
         """Invites a user to a channel.
 
         Args:
@@ -658,7 +622,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "user": user})
         return self.api_call("channels.invite", json=kwargs)
 
-    def channels_join(self, *, name: str, **kwargs) -> Union[Future, SlackResponse]:
+    def channels_join(self, *, name: str, **kwargs) -> SlackResponse:
         """Joins a channel, creating it if needed.
 
         Args:
@@ -667,9 +631,7 @@ class WebClient(BaseClient):
         kwargs.update({"name": name})
         return self.api_call("channels.join", json=kwargs)
 
-    def channels_kick(
-        self, *, channel: str, user: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def channels_kick(self, *, channel: str, user: str, **kwargs) -> SlackResponse:
         """Removes a user from a channel.
 
         Args:
@@ -679,7 +641,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "user": user})
         return self.api_call("channels.kick", json=kwargs)
 
-    def channels_leave(self, *, channel: str, **kwargs) -> Union[Future, SlackResponse]:
+    def channels_leave(self, *, channel: str, **kwargs) -> SlackResponse:
         """Leaves a channel.
 
         Args:
@@ -688,13 +650,11 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("channels.leave", json=kwargs)
 
-    def channels_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def channels_list(self, **kwargs) -> SlackResponse:
         """Lists all channels in a Slack team."""
         return self.api_call("channels.list", http_verb="GET", params=kwargs)
 
-    def channels_mark(
-        self, *, channel: str, ts: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def channels_mark(self, *, channel: str, ts: str, **kwargs) -> SlackResponse:
         """Sets the read cursor in a channel.
 
         Args:
@@ -704,9 +664,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "ts": ts})
         return self.api_call("channels.mark", json=kwargs)
 
-    def channels_rename(
-        self, *, channel: str, name: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def channels_rename(self, *, channel: str, name: str, **kwargs) -> SlackResponse:
         """Renames a channel.
 
         Args:
@@ -718,7 +676,7 @@ class WebClient(BaseClient):
 
     def channels_replies(
         self, *, channel: str, thread_ts: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Retrieve a thread of messages posted to a channel
 
         Args:
@@ -731,7 +689,7 @@ class WebClient(BaseClient):
 
     def channels_setPurpose(
         self, *, channel: str, purpose: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Sets the purpose for a channel.
 
         Args:
@@ -741,9 +699,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "purpose": purpose})
         return self.api_call("channels.setPurpose", json=kwargs)
 
-    def channels_setTopic(
-        self, *, channel: str, topic: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def channels_setTopic(self, *, channel: str, topic: str, **kwargs) -> SlackResponse:
         """Sets the topic for a channel.
 
         Args:
@@ -753,9 +709,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "topic": topic})
         return self.api_call("channels.setTopic", json=kwargs)
 
-    def channels_unarchive(
-        self, *, channel: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def channels_unarchive(self, *, channel: str, **kwargs) -> SlackResponse:
         """Unarchives a channel.
 
         Args:
@@ -764,9 +718,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("channels.unarchive", json=kwargs)
 
-    def chat_delete(
-        self, *, channel: str, ts: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def chat_delete(self, *, channel: str, ts: str, **kwargs) -> SlackResponse:
         """Deletes a message.
 
         Args:
@@ -778,7 +730,7 @@ class WebClient(BaseClient):
 
     def chat_deleteScheduledMessage(
         self, *, channel: str, scheduled_message_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Deletes a scheduled message.
 
         Args:
@@ -792,7 +744,7 @@ class WebClient(BaseClient):
 
     def chat_getPermalink(
         self, *, channel: str, message_ts: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Retrieve a permalink URL for a specific extant message
 
         Args:
@@ -802,9 +754,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "message_ts": message_ts})
         return self.api_call("chat.getPermalink", http_verb="GET", params=kwargs)
 
-    def chat_meMessage(
-        self, *, channel: str, text: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def chat_meMessage(self, *, channel: str, text: str, **kwargs) -> SlackResponse:
         """Share a me message into a channel.
 
         Args:
@@ -814,9 +764,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "text": text})
         return self.api_call("chat.meMessage", json=kwargs)
 
-    def chat_postEphemeral(
-        self, *, channel: str, user: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def chat_postEphemeral(self, *, channel: str, user: str, **kwargs) -> SlackResponse:
         """Sends an ephemeral message to a user in a channel.
 
         Args:
@@ -832,9 +780,7 @@ class WebClient(BaseClient):
         _parse_web_class_objects(kwargs)
         return self.api_call("chat.postEphemeral", json=kwargs)
 
-    def chat_postMessage(
-        self, *, channel: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def chat_postMessage(self, *, channel: str, **kwargs) -> SlackResponse:
         """Sends a message to a channel.
 
         Args:
@@ -851,7 +797,7 @@ class WebClient(BaseClient):
 
     def chat_scheduleMessage(
         self, *, channel: str, post_at: str, text: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Schedules a message.
 
         Args:
@@ -865,7 +811,7 @@ class WebClient(BaseClient):
 
     def chat_unfurl(
         self, *, channel: str, ts: str, unfurls: dict, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Provide custom unfurl behavior for user-posted URLs.
 
         Args:
@@ -877,9 +823,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "ts": ts, "unfurls": unfurls})
         return self.api_call("chat.unfurl", json=kwargs)
 
-    def chat_update(
-        self, *, channel: str, ts: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def chat_update(self, *, channel: str, ts: str, **kwargs) -> SlackResponse:
         """Updates a message in a channel.
 
         Args:
@@ -895,13 +839,11 @@ class WebClient(BaseClient):
         _parse_web_class_objects(kwargs)
         return self.api_call("chat.update", json=kwargs)
 
-    def chat_scheduledMessages_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def chat_scheduledMessages_list(self, **kwargs) -> SlackResponse:
         """Lists all scheduled messages."""
         return self.api_call("chat.scheduledMessages.list", json=kwargs)
 
-    def conversations_archive(
-        self, *, channel: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def conversations_archive(self, *, channel: str, **kwargs) -> SlackResponse:
         """Archives a conversation.
 
         Args:
@@ -910,9 +852,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("conversations.archive", json=kwargs)
 
-    def conversations_close(
-        self, *, channel: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def conversations_close(self, *, channel: str, **kwargs) -> SlackResponse:
         """Closes a direct message or multi-person direct message.
 
         Args:
@@ -921,9 +861,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("conversations.close", json=kwargs)
 
-    def conversations_create(
-        self, *, name: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def conversations_create(self, *, name: str, **kwargs) -> SlackResponse:
         """Initiates a public or private channel-based conversation
 
         Args:
@@ -932,9 +870,7 @@ class WebClient(BaseClient):
         kwargs.update({"name": name})
         return self.api_call("conversations.create", json=kwargs)
 
-    def conversations_history(
-        self, *, channel: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def conversations_history(self, *, channel: str, **kwargs) -> SlackResponse:
         """Fetches a conversation's history of messages and events.
 
         Args:
@@ -943,9 +879,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("conversations.history", http_verb="GET", params=kwargs)
 
-    def conversations_info(
-        self, *, channel: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def conversations_info(self, *, channel: str, **kwargs) -> SlackResponse:
         """Retrieve information about a conversation.
 
         Args:
@@ -956,7 +890,7 @@ class WebClient(BaseClient):
 
     def conversations_invite(
         self, *, channel: str, users: Union[str, List[str]], **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Invites users to a channel.
 
         Args:
@@ -970,9 +904,7 @@ class WebClient(BaseClient):
             kwargs.update({"users": users})
         return self.api_call("conversations.invite", json=kwargs)
 
-    def conversations_join(
-        self, *, channel: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def conversations_join(self, *, channel: str, **kwargs) -> SlackResponse:
         """Joins an existing conversation.
 
         Args:
@@ -981,9 +913,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("conversations.join", json=kwargs)
 
-    def conversations_kick(
-        self, *, channel: str, user: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def conversations_kick(self, *, channel: str, user: str, **kwargs) -> SlackResponse:
         """Removes a user from a conversation.
 
         Args:
@@ -993,9 +923,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "user": user})
         return self.api_call("conversations.kick", json=kwargs)
 
-    def conversations_leave(
-        self, *, channel: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def conversations_leave(self, *, channel: str, **kwargs) -> SlackResponse:
         """Leaves a conversation.
 
         Args:
@@ -1004,13 +932,11 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("conversations.leave", json=kwargs)
 
-    def conversations_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def conversations_list(self, **kwargs) -> SlackResponse:
         """Lists all channels in a Slack team."""
         return self.api_call("conversations.list", http_verb="GET", params=kwargs)
 
-    def conversations_mark(
-        self, *, channel: str, ts: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def conversations_mark(self, *, channel: str, ts: str, **kwargs) -> SlackResponse:
         """Sets the read cursor in a channel.
 
         Args:
@@ -1020,9 +946,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "ts": ts})
         return self.api_call("conversations.mark", json=kwargs)
 
-    def conversations_members(
-        self, *, channel: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def conversations_members(self, *, channel: str, **kwargs) -> SlackResponse:
         """Retrieve members of a conversation.
 
         Args:
@@ -1031,13 +955,13 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("conversations.members", http_verb="GET", params=kwargs)
 
-    def conversations_open(self, **kwargs) -> Union[Future, SlackResponse]:
+    def conversations_open(self, **kwargs) -> SlackResponse:
         """Opens or resumes a direct message or multi-person direct message."""
         return self.api_call("conversations.open", json=kwargs)
 
     def conversations_rename(
         self, *, channel: str, name: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Renames a conversation.
 
         Args:
@@ -1049,7 +973,7 @@ class WebClient(BaseClient):
 
     def conversations_replies(
         self, *, channel: str, ts: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Retrieve a thread of messages posted to a conversation
 
         Args:
@@ -1061,7 +985,7 @@ class WebClient(BaseClient):
 
     def conversations_setPurpose(
         self, *, channel: str, purpose: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Sets the purpose for a conversation.
 
         Args:
@@ -1073,7 +997,7 @@ class WebClient(BaseClient):
 
     def conversations_setTopic(
         self, *, channel: str, topic: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Sets the topic for a conversation.
 
         Args:
@@ -1083,9 +1007,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "topic": topic})
         return self.api_call("conversations.setTopic", json=kwargs)
 
-    def conversations_unarchive(
-        self, *, channel: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def conversations_unarchive(self, *, channel: str, **kwargs) -> SlackResponse:
         """Reverses conversation archival.
 
         Args:
@@ -1094,9 +1016,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("conversations.unarchive", json=kwargs)
 
-    def dialog_open(
-        self, *, dialog: dict, trigger_id: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def dialog_open(self, *, dialog: dict, trigger_id: str, **kwargs) -> SlackResponse:
         """Open a dialog with a user.
 
         Args:
@@ -1125,21 +1045,19 @@ class WebClient(BaseClient):
         kwargs.update({"dialog": dialog, "trigger_id": trigger_id})
         return self.api_call("dialog.open", json=kwargs)
 
-    def dnd_endDnd(self, **kwargs) -> Union[Future, SlackResponse]:
+    def dnd_endDnd(self, **kwargs) -> SlackResponse:
         """Ends the current user's Do Not Disturb session immediately."""
         return self.api_call("dnd.endDnd", json=kwargs)
 
-    def dnd_endSnooze(self, **kwargs) -> Union[Future, SlackResponse]:
+    def dnd_endSnooze(self, **kwargs) -> SlackResponse:
         """Ends the current user's snooze mode immediately."""
         return self.api_call("dnd.endSnooze", json=kwargs)
 
-    def dnd_info(self, **kwargs) -> Union[Future, SlackResponse]:
+    def dnd_info(self, **kwargs) -> SlackResponse:
         """Retrieves a user's current Do Not Disturb status."""
         return self.api_call("dnd.info", http_verb="GET", params=kwargs)
 
-    def dnd_setSnooze(
-        self, *, num_minutes: int, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def dnd_setSnooze(self, *, num_minutes: int, **kwargs) -> SlackResponse:
         """Turns on Do Not Disturb mode for the current user, or changes its duration.
 
         Args:
@@ -1148,9 +1066,7 @@ class WebClient(BaseClient):
         kwargs.update({"num_minutes": num_minutes})
         return self.api_call("dnd.setSnooze", http_verb="GET", params=kwargs)
 
-    def dnd_teamInfo(
-        self, users: Union[str, List[str]], **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def dnd_teamInfo(self, users: Union[str, List[str]], **kwargs) -> SlackResponse:
         """Retrieves the Do Not Disturb status for users on a team.
 
         Args:
@@ -1162,13 +1078,13 @@ class WebClient(BaseClient):
             kwargs.update({"users": users})
         return self.api_call("dnd.teamInfo", http_verb="GET", params=kwargs)
 
-    def emoji_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def emoji_list(self, **kwargs) -> SlackResponse:
         """Lists custom emoji for a team."""
         return self.api_call("emoji.list", http_verb="GET", params=kwargs)
 
     def files_comments_delete(
         self, *, file: str, id: str, **kwargs  # skipcq: PYL-W0622
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Deletes an existing comment on a file.
 
         Args:
@@ -1178,7 +1094,7 @@ class WebClient(BaseClient):
         kwargs.update({"file": file, "id": id})
         return self.api_call("files.comments.delete", json=kwargs)
 
-    def files_delete(self, *, file: str, **kwargs) -> Union[Future, SlackResponse]:
+    def files_delete(self, *, file: str, **kwargs) -> SlackResponse:
         """Deletes a file.
 
         Args:
@@ -1187,7 +1103,7 @@ class WebClient(BaseClient):
         kwargs.update({"file": file})
         return self.api_call("files.delete", json=kwargs)
 
-    def files_info(self, *, file: str, **kwargs) -> Union[Future, SlackResponse]:
+    def files_info(self, *, file: str, **kwargs) -> SlackResponse:
         """Gets information about a team file.
 
         Args:
@@ -1196,21 +1112,21 @@ class WebClient(BaseClient):
         kwargs.update({"file": file})
         return self.api_call("files.info", http_verb="GET", params=kwargs)
 
-    def files_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def files_list(self, **kwargs) -> SlackResponse:
         """Lists & filters team files."""
         return self.api_call("files.list", http_verb="GET", params=kwargs)
 
-    def files_remote_info(self, **kwargs) -> Union[Future, SlackResponse]:
+    def files_remote_info(self, **kwargs) -> SlackResponse:
         """Retrieve information about a remote file added to Slack."""
         return self.api_call("files.remote.info", http_verb="GET", params=kwargs)
 
-    def files_remote_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def files_remote_list(self, **kwargs) -> SlackResponse:
         """Retrieve information about a remote file added to Slack."""
         return self.api_call("files.remote.list", http_verb="GET", params=kwargs)
 
     def files_remote_add(
         self, *, external_id: str, external_url: str, title: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Adds a file from a remote service.
 
         Args:
@@ -1234,17 +1150,17 @@ class WebClient(BaseClient):
             files=files,
         )
 
-    def files_remote_update(self, **kwargs) -> Union[Future, SlackResponse]:
+    def files_remote_update(self, **kwargs) -> SlackResponse:
         """Updates an existing remote file."""
         return self.api_call("files.remote.update", http_verb="GET", params=kwargs)
 
-    def files_remote_remove(self, **kwargs) -> Union[Future, SlackResponse]:
+    def files_remote_remove(self, **kwargs) -> SlackResponse:
         """Remove a remote file."""
         return self.api_call("files.remote.remove", http_verb="GET", params=kwargs)
 
     def files_remote_share(
         self, *, channels: Union[str, List[str]], **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Share a remote file into a channel.
 
         Args:
@@ -1257,9 +1173,7 @@ class WebClient(BaseClient):
             kwargs.update({"channels": channels})
         return self.api_call("files.remote.share", http_verb="GET", params=kwargs)
 
-    def files_revokePublicURL(
-        self, *, file: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def files_revokePublicURL(self, *, file: str, **kwargs) -> SlackResponse:
         """Revokes public/external sharing access for a file
 
         Args:
@@ -1268,9 +1182,7 @@ class WebClient(BaseClient):
         kwargs.update({"file": file})
         return self.api_call("files.revokePublicURL", json=kwargs)
 
-    def files_sharedPublicURL(
-        self, *, file: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def files_sharedPublicURL(self, *, file: str, **kwargs) -> SlackResponse:
         """Enables a file for public/external sharing.
 
         Args:
@@ -1281,7 +1193,7 @@ class WebClient(BaseClient):
 
     def files_upload(
         self, *, file: Union[str, IOBase] = None, content: str = None, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Uploads or creates a file.
 
         Args:
@@ -1308,7 +1220,7 @@ class WebClient(BaseClient):
         data.update({"content": content})
         return self.api_call("files.upload", data=data)
 
-    def groups_archive(self, *, channel: str, **kwargs) -> Union[Future, SlackResponse]:
+    def groups_archive(self, *, channel: str, **kwargs) -> SlackResponse:
         """Archives a private channel.
 
         Args:
@@ -1317,7 +1229,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("groups.archive", json=kwargs)
 
-    def groups_create(self, *, name: str, **kwargs) -> Union[Future, SlackResponse]:
+    def groups_create(self, *, name: str, **kwargs) -> SlackResponse:
         """Creates a private channel.
 
         Args:
@@ -1326,9 +1238,7 @@ class WebClient(BaseClient):
         kwargs.update({"name": name})
         return self.api_call("groups.create", json=kwargs)
 
-    def groups_createChild(
-        self, *, channel: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def groups_createChild(self, *, channel: str, **kwargs) -> SlackResponse:
         """Clones and archives a private channel.
 
         Args:
@@ -1337,7 +1247,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("groups.createChild", http_verb="GET", params=kwargs)
 
-    def groups_history(self, *, channel: str, **kwargs) -> Union[Future, SlackResponse]:
+    def groups_history(self, *, channel: str, **kwargs) -> SlackResponse:
         """Fetches history of messages and events from a private channel.
 
         Args:
@@ -1346,7 +1256,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("groups.history", http_verb="GET", params=kwargs)
 
-    def groups_info(self, *, channel: str, **kwargs) -> Union[Future, SlackResponse]:
+    def groups_info(self, *, channel: str, **kwargs) -> SlackResponse:
         """Gets information about a private channel.
 
         Args:
@@ -1355,9 +1265,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("groups.info", http_verb="GET", params=kwargs)
 
-    def groups_invite(
-        self, *, channel: str, user: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def groups_invite(self, *, channel: str, user: str, **kwargs) -> SlackResponse:
         """Invites a user to a private channel.
 
         Args:
@@ -1367,9 +1275,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "user": user})
         return self.api_call("groups.invite", json=kwargs)
 
-    def groups_kick(
-        self, *, channel: str, user: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def groups_kick(self, *, channel: str, user: str, **kwargs) -> SlackResponse:
         """Removes a user from a private channel.
 
         Args:
@@ -1379,7 +1285,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "user": user})
         return self.api_call("groups.kick", json=kwargs)
 
-    def groups_leave(self, *, channel: str, **kwargs) -> Union[Future, SlackResponse]:
+    def groups_leave(self, *, channel: str, **kwargs) -> SlackResponse:
         """Leaves a private channel.
 
         Args:
@@ -1388,13 +1294,11 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("groups.leave", json=kwargs)
 
-    def groups_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def groups_list(self, **kwargs) -> SlackResponse:
         """Lists private channels that the calling user has access to."""
         return self.api_call("groups.list", http_verb="GET", params=kwargs)
 
-    def groups_mark(
-        self, *, channel: str, ts: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def groups_mark(self, *, channel: str, ts: str, **kwargs) -> SlackResponse:
         """Sets the read cursor in a private channel.
 
         Args:
@@ -1404,7 +1308,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "ts": ts})
         return self.api_call("groups.mark", json=kwargs)
 
-    def groups_open(self, *, channel: str, **kwargs) -> Union[Future, SlackResponse]:
+    def groups_open(self, *, channel: str, **kwargs) -> SlackResponse:
         """Opens a private channel.
 
         Args:
@@ -1413,9 +1317,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("groups.open", json=kwargs)
 
-    def groups_rename(
-        self, *, channel: str, name: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def groups_rename(self, *, channel: str, name: str, **kwargs) -> SlackResponse:
         """Renames a private channel.
 
         Args:
@@ -1427,7 +1329,7 @@ class WebClient(BaseClient):
 
     def groups_replies(
         self, *, channel: str, thread_ts: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Retrieve a thread of messages posted to a private channel
 
         Args:
@@ -1440,7 +1342,7 @@ class WebClient(BaseClient):
 
     def groups_setPurpose(
         self, *, channel: str, purpose: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Sets the purpose for a private channel.
 
         Args:
@@ -1450,9 +1352,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "purpose": purpose})
         return self.api_call("groups.setPurpose", json=kwargs)
 
-    def groups_setTopic(
-        self, *, channel: str, topic: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def groups_setTopic(self, *, channel: str, topic: str, **kwargs) -> SlackResponse:
         """Sets the topic for a private channel.
 
         Args:
@@ -1462,9 +1362,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "topic": topic})
         return self.api_call("groups.setTopic", json=kwargs)
 
-    def groups_unarchive(
-        self, *, channel: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def groups_unarchive(self, *, channel: str, **kwargs) -> SlackResponse:
         """Unarchives a private channel.
 
         Args:
@@ -1473,7 +1371,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("groups.unarchive", json=kwargs)
 
-    def im_close(self, *, channel: str, **kwargs) -> Union[Future, SlackResponse]:
+    def im_close(self, *, channel: str, **kwargs) -> SlackResponse:
         """Close a direct message channel.
 
         Args:
@@ -1482,7 +1380,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("im.close", json=kwargs)
 
-    def im_history(self, *, channel: str, **kwargs) -> Union[Future, SlackResponse]:
+    def im_history(self, *, channel: str, **kwargs) -> SlackResponse:
         """Fetches history of messages and events from direct message channel.
 
         Args:
@@ -1491,13 +1389,11 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("im.history", http_verb="GET", params=kwargs)
 
-    def im_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def im_list(self, **kwargs) -> SlackResponse:
         """Lists direct message channels for the calling user."""
         return self.api_call("im.list", http_verb="GET", params=kwargs)
 
-    def im_mark(
-        self, *, channel: str, ts: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def im_mark(self, *, channel: str, ts: str, **kwargs) -> SlackResponse:
         """Sets the read cursor in a direct message channel.
 
         Args:
@@ -1507,7 +1403,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "ts": ts})
         return self.api_call("im.mark", json=kwargs)
 
-    def im_open(self, *, user: str, **kwargs) -> Union[Future, SlackResponse]:
+    def im_open(self, *, user: str, **kwargs) -> SlackResponse:
         """Opens a direct message channel.
 
         Args:
@@ -1516,9 +1412,7 @@ class WebClient(BaseClient):
         kwargs.update({"user": user})
         return self.api_call("im.open", json=kwargs)
 
-    def im_replies(
-        self, *, channel: str, thread_ts: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def im_replies(self, *, channel: str, thread_ts: str, **kwargs) -> SlackResponse:
         """Retrieve a thread of messages posted to a direct message conversation
 
         Args:
@@ -1531,7 +1425,7 @@ class WebClient(BaseClient):
 
     def migration_exchange(
         self, *, users: Union[str, List[str]], **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """For Enterprise Grid workspaces, map local user IDs to global user IDs
 
         Args:
@@ -1544,7 +1438,7 @@ class WebClient(BaseClient):
             kwargs.update({"users": users})
         return self.api_call("migration.exchange", http_verb="GET", params=kwargs)
 
-    def mpim_close(self, *, channel: str, **kwargs) -> Union[Future, SlackResponse]:
+    def mpim_close(self, *, channel: str, **kwargs) -> SlackResponse:
         """Closes a multiparty direct message channel.
 
         Args:
@@ -1553,7 +1447,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("mpim.close", json=kwargs)
 
-    def mpim_history(self, *, channel: str, **kwargs) -> Union[Future, SlackResponse]:
+    def mpim_history(self, *, channel: str, **kwargs) -> SlackResponse:
         """Fetches history of messages and events from a multiparty direct message.
 
         Args:
@@ -1562,13 +1456,11 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("mpim.history", http_verb="GET", params=kwargs)
 
-    def mpim_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def mpim_list(self, **kwargs) -> SlackResponse:
         """Lists multiparty direct message channels for the calling user."""
         return self.api_call("mpim.list", http_verb="GET", params=kwargs)
 
-    def mpim_mark(
-        self, *, channel: str, ts: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def mpim_mark(self, *, channel: str, ts: str, **kwargs) -> SlackResponse:
         """Sets the read cursor in a multiparty direct message channel.
 
         Args:
@@ -1580,9 +1472,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel, "ts": ts})
         return self.api_call("mpim.mark", json=kwargs)
 
-    def mpim_open(
-        self, *, users: Union[str, List[str]], **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def mpim_open(self, *, users: Union[str, List[str]], **kwargs) -> SlackResponse:
         """This method opens a multiparty direct message.
 
         Args:
@@ -1596,9 +1486,7 @@ class WebClient(BaseClient):
             kwargs.update({"users": users})
         return self.api_call("mpim.open", json=kwargs)
 
-    def mpim_replies(
-        self, *, channel: str, thread_ts: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def mpim_replies(self, *, channel: str, thread_ts: str, **kwargs) -> SlackResponse:
         """Retrieve a thread of messages posted to a direct message conversation from a
         multiparty direct message.
 
@@ -1619,7 +1507,7 @@ class WebClient(BaseClient):
         code: str,
         redirect_uri: Optional[str] = None,
         **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Exchanges a temporary OAuth verifier code for an access token.
 
         Args:
@@ -1646,7 +1534,7 @@ class WebClient(BaseClient):
         code: str,
         redirect_uri: Optional[str] = None,
         **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Exchanges a temporary OAuth verifier code for an access token.
 
         Args:
@@ -1665,7 +1553,7 @@ class WebClient(BaseClient):
             auth={"client_id": client_id, "client_secret": client_secret},
         )
 
-    def pins_add(self, *, channel: str, **kwargs) -> Union[Future, SlackResponse]:
+    def pins_add(self, *, channel: str, **kwargs) -> SlackResponse:
         """Pins an item to a channel.
 
         Args:
@@ -1677,7 +1565,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("pins.add", json=kwargs)
 
-    def pins_list(self, *, channel: str, **kwargs) -> Union[Future, SlackResponse]:
+    def pins_list(self, *, channel: str, **kwargs) -> SlackResponse:
         """Lists items pinned to a channel.
 
         Args:
@@ -1686,7 +1574,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("pins.list", http_verb="GET", params=kwargs)
 
-    def pins_remove(self, *, channel: str, **kwargs) -> Union[Future, SlackResponse]:
+    def pins_remove(self, *, channel: str, **kwargs) -> SlackResponse:
         """Un-pins an item from a channel.
 
         Args:
@@ -1698,7 +1586,7 @@ class WebClient(BaseClient):
         kwargs.update({"channel": channel})
         return self.api_call("pins.remove", json=kwargs)
 
-    def reactions_add(self, *, name: str, **kwargs) -> Union[Future, SlackResponse]:
+    def reactions_add(self, *, name: str, **kwargs) -> SlackResponse:
         """Adds a reaction to an item.
 
         Args:
@@ -1710,15 +1598,15 @@ class WebClient(BaseClient):
         kwargs.update({"name": name})
         return self.api_call("reactions.add", json=kwargs)
 
-    def reactions_get(self, **kwargs) -> Union[Future, SlackResponse]:
+    def reactions_get(self, **kwargs) -> SlackResponse:
         """Gets reactions for an item."""
         return self.api_call("reactions.get", http_verb="GET", params=kwargs)
 
-    def reactions_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def reactions_list(self, **kwargs) -> SlackResponse:
         """Lists reactions made by a user."""
         return self.api_call("reactions.list", http_verb="GET", params=kwargs)
 
-    def reactions_remove(self, *, name: str, **kwargs) -> Union[Future, SlackResponse]:
+    def reactions_remove(self, *, name: str, **kwargs) -> SlackResponse:
         """Removes a reaction from an item.
 
         Args:
@@ -1727,9 +1615,7 @@ class WebClient(BaseClient):
         kwargs.update({"name": name})
         return self.api_call("reactions.remove", json=kwargs)
 
-    def reminders_add(
-        self, *, text: str, time: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def reminders_add(self, *, text: str, time: str, **kwargs) -> SlackResponse:
         """Creates a reminder.
 
         Args:
@@ -1742,9 +1628,7 @@ class WebClient(BaseClient):
         kwargs.update({"text": text, "time": time})
         return self.api_call("reminders.add", json=kwargs)
 
-    def reminders_complete(
-        self, *, reminder: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def reminders_complete(self, *, reminder: str, **kwargs) -> SlackResponse:
         """Marks a reminder as complete.
 
         Args:
@@ -1754,9 +1638,7 @@ class WebClient(BaseClient):
         kwargs.update({"reminder": reminder})
         return self.api_call("reminders.complete", json=kwargs)
 
-    def reminders_delete(
-        self, *, reminder: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def reminders_delete(self, *, reminder: str, **kwargs) -> SlackResponse:
         """Deletes a reminder.
 
         Args:
@@ -1765,9 +1647,7 @@ class WebClient(BaseClient):
         kwargs.update({"reminder": reminder})
         return self.api_call("reminders.delete", json=kwargs)
 
-    def reminders_info(
-        self, *, reminder: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def reminders_info(self, *, reminder: str, **kwargs) -> SlackResponse:
         """Gets information about a reminder.
 
         Args:
@@ -1776,19 +1656,19 @@ class WebClient(BaseClient):
         kwargs.update({"reminder": reminder})
         return self.api_call("reminders.info", http_verb="GET", params=kwargs)
 
-    def reminders_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def reminders_list(self, **kwargs) -> SlackResponse:
         """Lists all reminders created by or for a given user."""
         return self.api_call("reminders.list", http_verb="GET", params=kwargs)
 
-    def rtm_connect(self, **kwargs) -> Union[Future, SlackResponse]:
+    def rtm_connect(self, **kwargs) -> SlackResponse:
         """Starts a Real Time Messaging session."""
         return self.api_call("rtm.connect", http_verb="GET", params=kwargs)
 
-    def rtm_start(self, **kwargs) -> Union[Future, SlackResponse]:
+    def rtm_start(self, **kwargs) -> SlackResponse:
         """Starts a Real Time Messaging session."""
         return self.api_call("rtm.start", http_verb="GET", params=kwargs)
 
-    def search_all(self, *, query: str, **kwargs) -> Union[Future, SlackResponse]:
+    def search_all(self, *, query: str, **kwargs) -> SlackResponse:
         """Searches for messages and files matching a query.
 
         Args:
@@ -1798,7 +1678,7 @@ class WebClient(BaseClient):
         kwargs.update({"query": query})
         return self.api_call("search.all", http_verb="GET", params=kwargs)
 
-    def search_files(self, *, query: str, **kwargs) -> Union[Future, SlackResponse]:
+    def search_files(self, *, query: str, **kwargs) -> SlackResponse:
         """Searches for files matching a query.
 
         Args:
@@ -1808,7 +1688,7 @@ class WebClient(BaseClient):
         kwargs.update({"query": query})
         return self.api_call("search.files", http_verb="GET", params=kwargs)
 
-    def search_messages(self, *, query: str, **kwargs) -> Union[Future, SlackResponse]:
+    def search_messages(self, *, query: str, **kwargs) -> SlackResponse:
         """Searches for messages matching a query.
 
         Args:
@@ -1818,7 +1698,7 @@ class WebClient(BaseClient):
         kwargs.update({"query": query})
         return self.api_call("search.messages", http_verb="GET", params=kwargs)
 
-    def stars_add(self, **kwargs) -> Union[Future, SlackResponse]:
+    def stars_add(self, **kwargs) -> SlackResponse:
         """Adds a star to an item.
 
         Args:
@@ -1830,11 +1710,11 @@ class WebClient(BaseClient):
         """
         return self.api_call("stars.add", json=kwargs)
 
-    def stars_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def stars_list(self, **kwargs) -> SlackResponse:
         """Lists stars for a user."""
         return self.api_call("stars.list", http_verb="GET", params=kwargs)
 
-    def stars_remove(self, **kwargs) -> Union[Future, SlackResponse]:
+    def stars_remove(self, **kwargs) -> SlackResponse:
         """Removes a star from an item.
 
         Args:
@@ -1846,27 +1726,27 @@ class WebClient(BaseClient):
         """
         return self.api_call("stars.remove", json=kwargs)
 
-    def team_accessLogs(self, **kwargs) -> Union[Future, SlackResponse]:
+    def team_accessLogs(self, **kwargs) -> SlackResponse:
         """Gets the access logs for the current team."""
         return self.api_call("team.accessLogs", http_verb="GET", params=kwargs)
 
-    def team_billableInfo(self, **kwargs) -> Union[Future, SlackResponse]:
+    def team_billableInfo(self, **kwargs) -> SlackResponse:
         """Gets billable users information for the current team."""
         return self.api_call("team.billableInfo", http_verb="GET", params=kwargs)
 
-    def team_info(self, **kwargs) -> Union[Future, SlackResponse]:
+    def team_info(self, **kwargs) -> SlackResponse:
         """Gets information about the current team."""
         return self.api_call("team.info", http_verb="GET", params=kwargs)
 
-    def team_integrationLogs(self, **kwargs) -> Union[Future, SlackResponse]:
+    def team_integrationLogs(self, **kwargs) -> SlackResponse:
         """Gets the integration logs for the current team."""
         return self.api_call("team.integrationLogs", http_verb="GET", params=kwargs)
 
-    def team_profile_get(self, **kwargs) -> Union[Future, SlackResponse]:
+    def team_profile_get(self, **kwargs) -> SlackResponse:
         """Retrieve a team's profile."""
         return self.api_call("team.profile.get", http_verb="GET", params=kwargs)
 
-    def usergroups_create(self, *, name: str, **kwargs) -> Union[Future, SlackResponse]:
+    def usergroups_create(self, *, name: str, **kwargs) -> SlackResponse:
         """Create a User Group
 
         Args:
@@ -1876,9 +1756,7 @@ class WebClient(BaseClient):
         kwargs.update({"name": name})
         return self.api_call("usergroups.create", json=kwargs)
 
-    def usergroups_disable(
-        self, *, usergroup: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def usergroups_disable(self, *, usergroup: str, **kwargs) -> SlackResponse:
         """Disable an existing User Group
 
         Args:
@@ -1888,9 +1766,7 @@ class WebClient(BaseClient):
         kwargs.update({"usergroup": usergroup})
         return self.api_call("usergroups.disable", json=kwargs)
 
-    def usergroups_enable(
-        self, *, usergroup: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def usergroups_enable(self, *, usergroup: str, **kwargs) -> SlackResponse:
         """Enable a User Group
 
         Args:
@@ -1900,13 +1776,11 @@ class WebClient(BaseClient):
         kwargs.update({"usergroup": usergroup})
         return self.api_call("usergroups.enable", json=kwargs)
 
-    def usergroups_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def usergroups_list(self, **kwargs) -> SlackResponse:
         """List all User Groups for a team"""
         return self.api_call("usergroups.list", http_verb="GET", params=kwargs)
 
-    def usergroups_update(
-        self, *, usergroup: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def usergroups_update(self, *, usergroup: str, **kwargs) -> SlackResponse:
         """Update an existing User Group
 
         Args:
@@ -1916,9 +1790,7 @@ class WebClient(BaseClient):
         kwargs.update({"usergroup": usergroup})
         return self.api_call("usergroups.update", json=kwargs)
 
-    def usergroups_users_list(
-        self, *, usergroup: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def usergroups_users_list(self, *, usergroup: str, **kwargs) -> SlackResponse:
         """List all users in a User Group
 
         Args:
@@ -1930,7 +1802,7 @@ class WebClient(BaseClient):
 
     def usergroups_users_update(
         self, *, usergroup: str, users: Union[str, List[str]], **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Update the list of users for a User Group
 
         Args:
@@ -1946,15 +1818,15 @@ class WebClient(BaseClient):
             kwargs.update({"users": users})
         return self.api_call("usergroups.users.update", json=kwargs)
 
-    def users_conversations(self, **kwargs) -> Union[Future, SlackResponse]:
+    def users_conversations(self, **kwargs) -> SlackResponse:
         """List conversations the calling user may access."""
         return self.api_call("users.conversations", http_verb="GET", params=kwargs)
 
-    def users_deletePhoto(self, **kwargs) -> Union[Future, SlackResponse]:
+    def users_deletePhoto(self, **kwargs) -> SlackResponse:
         """Delete the user profile photo"""
         return self.api_call("users.deletePhoto", http_verb="GET", params=kwargs)
 
-    def users_getPresence(self, *, user: str, **kwargs) -> Union[Future, SlackResponse]:
+    def users_getPresence(self, *, user: str, **kwargs) -> SlackResponse:
         """Gets user presence information.
 
         Args:
@@ -1964,11 +1836,11 @@ class WebClient(BaseClient):
         kwargs.update({"user": user})
         return self.api_call("users.getPresence", http_verb="GET", params=kwargs)
 
-    def users_identity(self, **kwargs) -> Union[Future, SlackResponse]:
+    def users_identity(self, **kwargs) -> SlackResponse:
         """Get a user's identity."""
         return self.api_call("users.identity", http_verb="GET", params=kwargs)
 
-    def users_info(self, *, user: str, **kwargs) -> Union[Future, SlackResponse]:
+    def users_info(self, *, user: str, **kwargs) -> SlackResponse:
         """Gets information about a user.
 
         Args:
@@ -1978,13 +1850,11 @@ class WebClient(BaseClient):
         kwargs.update({"user": user})
         return self.api_call("users.info", http_verb="GET", params=kwargs)
 
-    def users_list(self, **kwargs) -> Union[Future, SlackResponse]:
+    def users_list(self, **kwargs) -> SlackResponse:
         """Lists all users in a Slack team."""
         return self.api_call("users.list", http_verb="GET", params=kwargs)
 
-    def users_lookupByEmail(
-        self, *, email: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def users_lookupByEmail(self, *, email: str, **kwargs) -> SlackResponse:
         """Find a user with an email address.
 
         Args:
@@ -1994,9 +1864,7 @@ class WebClient(BaseClient):
         kwargs.update({"email": email})
         return self.api_call("users.lookupByEmail", http_verb="GET", params=kwargs)
 
-    def users_setPhoto(
-        self, *, image: Union[str, IOBase], **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def users_setPhoto(self, *, image: Union[str, IOBase], **kwargs) -> SlackResponse:
         """Set the user profile photo
 
         Args:
@@ -2005,9 +1873,7 @@ class WebClient(BaseClient):
         """
         return self.api_call("users.setPhoto", files={"image": image}, data=kwargs)
 
-    def users_setPresence(
-        self, *, presence: str, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def users_setPresence(self, *, presence: str, **kwargs) -> SlackResponse:
         """Manually sets user presence.
 
         Args:
@@ -2016,17 +1882,17 @@ class WebClient(BaseClient):
         kwargs.update({"presence": presence})
         return self.api_call("users.setPresence", json=kwargs)
 
-    def users_profile_get(self, **kwargs) -> Union[Future, SlackResponse]:
+    def users_profile_get(self, **kwargs) -> SlackResponse:
         """Retrieves a user's profile information."""
         return self.api_call("users.profile.get", http_verb="GET", params=kwargs)
 
-    def users_profile_set(self, **kwargs) -> Union[Future, SlackResponse]:
+    def users_profile_set(self, **kwargs) -> SlackResponse:
         """Set the profile information for a user."""
         return self.api_call("users.profile.set", json=kwargs)
 
     def views_open(
         self, *, trigger_id: str, view: Union[dict, View], **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Open a view for a user.
         See https://api.slack.com/block-kit/surfaces/modals for details.
 
@@ -2042,9 +1908,7 @@ class WebClient(BaseClient):
             kwargs.update({"view": view})
         return self.api_call("views.open", json=kwargs)
 
-    def views_push(
-        self, *, trigger_id: str, view: dict, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def views_push(self, *, trigger_id: str, view: dict, **kwargs) -> SlackResponse:
         """Push a view onto the stack of a root view.
 
         Push a new view onto the existing view stack by passing a view
@@ -2064,7 +1928,7 @@ class WebClient(BaseClient):
 
     def views_update(
         self, *, view: dict, external_id: str = None, view_id: str = None, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    ) -> SlackResponse:
         """Update an existing view.
 
         Update a view by passing a new view definition along with the
@@ -2092,9 +1956,7 @@ class WebClient(BaseClient):
 
         return self.api_call("views.update", json=kwargs)
 
-    def views_publish(
-        self, *, user_id: str, view: dict, **kwargs
-    ) -> Union[Future, SlackResponse]:
+    def views_publish(self, *, user_id: str, view: dict, **kwargs) -> SlackResponse:
         """Publish a static view for a User.
         Create or update the view that comprises an
         app's Home tab (https://api.slack.com/surfaces/tabs)

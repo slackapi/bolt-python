@@ -30,7 +30,7 @@ def to_pyramid_response(bolt_resp: BoltResponse) -> Response:
     )
 
 
-class SlackRequestHandler():
+class SlackRequestHandler:
     def __init__(self, app: App):
         self.app = app
 

@@ -8,26 +8,41 @@ from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable
 
 from slack_bolt.listener.async_listener import AsyncListener, AsyncCustomListener
 from slack_bolt.listener_matcher import builtins as builtin_matchers
-from slack_bolt.listener_matcher.async_listener_matcher import AsyncListenerMatcher, AsyncCustomListenerMatcher
+from slack_bolt.listener_matcher.async_listener_matcher import (
+    AsyncListenerMatcher,
+    AsyncCustomListenerMatcher,
+)
 from slack_bolt.logger import get_bolt_logger, get_bolt_app_logger
-from slack_bolt.middleware.async_builtins import \
-    AsyncSslCheck, AsyncRequestVerification, AsyncIgnoringSelfEvents, AsyncUrlVerification
-from slack_bolt.middleware.async_custom_middleware import AsyncMiddleware, AsyncCustomMiddleware
-from slack_bolt.middleware.authorization.async_multi_teams_authorization import AsyncMultiTeamsAuthorization
-from slack_bolt.middleware.authorization.async_single_team_authorization import AsyncSingleTeamAuthorization
+from slack_bolt.middleware.async_builtins import (
+    AsyncSslCheck,
+    AsyncRequestVerification,
+    AsyncIgnoringSelfEvents,
+    AsyncUrlVerification,
+)
+from slack_bolt.middleware.async_custom_middleware import (
+    AsyncMiddleware,
+    AsyncCustomMiddleware,
+)
+from slack_bolt.middleware.authorization.async_multi_teams_authorization import (
+    AsyncMultiTeamsAuthorization,
+)
+from slack_bolt.middleware.authorization.async_single_team_authorization import (
+    AsyncSingleTeamAuthorization,
+)
 from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.oauth import OAuthStateUtils
 from slack_sdk.oauth.installation_store import FileInstallationStore
-from slack_sdk.oauth.installation_store.async_installation_store import AsyncInstallationStore
+from slack_sdk.oauth.installation_store.async_installation_store import (
+    AsyncInstallationStore,
+)
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 from slack_sdk.oauth.state_store.async_state_store import AsyncOAuthStateStore
 from slack_sdk.web.async_client import AsyncWebClient
 
 
-class AsyncApp():
-
+class AsyncApp:
     def __init__(
         self,
         *,
@@ -45,10 +60,8 @@ class AsyncApp():
         oauth_state_store: Optional[AsyncOAuthStateStore] = None,
         oauth_state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         oauth_state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
-
         # for the OAuth flow
         oauth_flow: Optional[AsyncOAuthFlow] = None,
-
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
         scopes: Optional[List[str]] = None,
@@ -58,7 +71,6 @@ class AsyncApp():
         oauth_redirect_uri_path: Optional[str] = None,
         oauth_success_url: Optional[str] = None,
         oauth_failure_url: Optional[str] = None,
-
         # No need to set (the value is used only in response to ssl_check requests)
         verification_token: Optional[str] = None,
     ):
@@ -70,12 +82,16 @@ class AsyncApp():
         scopes = scopes or os.environ.get("SLACK_SCOPES", "").split(",")
         user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", "").split(",")
         redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI", None)
-        oauth_install_path = oauth_install_path or os.environ.get("SLACK_INSTALL_PATH", "/slack/install")
-        oauth_redirect_uri_path = oauth_redirect_uri_path or \
-                                  os.environ.get("SLACK_REDIRECT_URI_PATH", "/slack/oauth_redirect")
+        oauth_install_path = oauth_install_path or os.environ.get(
+            "SLACK_INSTALL_PATH", "/slack/install"
+        )
+        oauth_redirect_uri_path = oauth_redirect_uri_path or os.environ.get(
+            "SLACK_REDIRECT_URI_PATH", "/slack/oauth_redirect"
+        )
 
-        self._verification_token: Optional[str] = \
-            verification_token or os.environ.get("SLACK_VERIFICATION_TOKEN", None)
+        self._verification_token: Optional[str] = verification_token or os.environ.get(
+            "SLACK_VERIFICATION_TOKEN", None
+        )
         self._framework_logger = get_bolt_logger(AsyncApp)
 
         self._token: Optional[str] = token
@@ -85,12 +101,19 @@ class AsyncApp():
             self._token = client.token
             if token is not None:
                 self._framework_logger.warning(
-                    "As you gave client as well, the bot token will be unused.")
+                    "As you gave client as well, the bot token will be unused."
+                )
         else:
-            self._async_client = AsyncWebClient(token=token)  # NOTE: the token here can be None
+            self._async_client = AsyncWebClient(
+                token=token
+            )  # NOTE: the token here can be None
 
-        self._async_installation_store: Optional[AsyncInstallationStore] = installation_store
-        self._async_oauth_state_store: Optional[AsyncOAuthStateStore] = oauth_state_store
+        self._async_installation_store: Optional[
+            AsyncInstallationStore
+        ] = installation_store
+        self._async_oauth_state_store: Optional[
+            AsyncOAuthStateStore
+        ] = oauth_state_store
 
         self._oauth_state_cookie_name = oauth_state_cookie_name
         self._oauth_state_expiration_seconds = oauth_state_expiration_seconds
@@ -99,7 +122,9 @@ class AsyncApp():
         if oauth_flow:
             self._async_oauth_flow = oauth_flow
             if self._async_installation_store is None:
-                self._async_installation_store = self._async_oauth_flow.installation_store
+                self._async_installation_store = (
+                    self._async_oauth_flow.installation_store
+                )
             if self._async_oauth_state_store is None:
                 self._async_oauth_state_store = self._async_oauth_flow.oauth_state_store
             if self._async_oauth_flow._async_client is None:
@@ -107,7 +132,10 @@ class AsyncApp():
         else:
             if client_id is not None and client_secret is not None:
                 # The OAuth flow support is enabled
-                if self._async_installation_store is None and self._async_oauth_state_store is None:
+                if (
+                    self._async_installation_store is None
+                    and self._async_oauth_state_store is None
+                ):
                     # use the default ones
                     self._async_installation_store = FileInstallationStore(
                         client_id=client_id,
@@ -117,8 +145,13 @@ class AsyncApp():
                         client_id=client_id,
                     )
 
-                if self._async_installation_store is not None and self._async_oauth_state_store is None:
-                    raise ValueError(f"Configure an appropriate OAuthStateStore for {self._async_installation_store}")
+                if (
+                    self._async_installation_store is not None
+                    and self._async_oauth_state_store is None
+                ):
+                    raise ValueError(
+                        f"Configure an appropriate OAuthStateStore for {self._async_installation_store}"
+                    )
 
                 self._async_oauth_flow = AsyncOAuthFlow(
                     client=AsyncWebClient(token=None),
@@ -146,7 +179,8 @@ class AsyncApp():
         if self._async_installation_store is not None and self._token is not None:
             self._token = None
             self._framework_logger.warning(
-                "As you gave installation_store as well, the bot token will be unused.")
+                "As you gave installation_store as well, the bot token will be unused."
+            )
 
         self._async_middleware_list: List[Union[Callable, AsyncMiddleware]] = []
         self._async_listeners: List[AsyncListener] = []
@@ -158,12 +192,18 @@ class AsyncApp():
     def _init_async_middleware_list(self):
         if self._init_middleware_list_done:
             return
-        self._async_middleware_list.append(AsyncSslCheck(verification_token=self._verification_token))
-        self._async_middleware_list.append(AsyncRequestVerification(self._signing_secret))
+        self._async_middleware_list.append(
+            AsyncSslCheck(verification_token=self._verification_token)
+        )
+        self._async_middleware_list.append(
+            AsyncRequestVerification(self._signing_secret)
+        )
         if self._async_oauth_flow is None and self._token:
             self._async_middleware_list.append(AsyncSingleTeamAuthorization())
         else:
-            self._async_middleware_list.append(AsyncMultiTeamsAuthorization(self._async_installation_store))
+            self._async_middleware_list.append(
+                AsyncMultiTeamsAuthorization(self._async_installation_store)
+            )
         self._async_middleware_list.append(AsyncIgnoringSelfEvents())
         self._async_middleware_list.append(AsyncUrlVerification())
         self._init_middleware_list_done = True
@@ -196,11 +236,8 @@ class AsyncApp():
 
     def start(self, port: int = 3000, path: str = "/slack/events") -> None:
         from .async_server import AsyncSlackAppServer
-        self.server = AsyncSlackAppServer(
-            port=port,
-            path=path,
-            app=self,
-        )
+
+        self.server = AsyncSlackAppServer(port=port, path=path, app=self,)
         self.server.start()
 
     # -------------------------
@@ -219,7 +256,9 @@ class AsyncApp():
             middleware_state["next_called"] = False
             if self._framework_logger.level <= logging.DEBUG:
                 self._framework_logger.debug(f"Applying {middleware.name}")
-            resp = await middleware.async_process(req=req, resp=resp, next=async_middleware_next)
+            resp = await middleware.async_process(
+                req=req, resp=resp, next=async_middleware_next
+            )
             if not middleware_state["next_called"]:
                 return resp
 
@@ -228,14 +267,18 @@ class AsyncApp():
             self._framework_logger.debug(f"Checking listener: {listener_name} ...")
             if await listener.async_matches(req=req, resp=resp):
                 # run all the middleware attached to this listener first
-                resp, next_was_not_called = await listener.run_async_middleware(req=req, resp=resp)
+                resp, next_was_not_called = await listener.run_async_middleware(
+                    req=req, resp=resp
+                )
                 if next_was_not_called:
                     # The last listener middleware didn't call next() method.
                     # This means the listener is not for this incoming request.
                     continue
 
                 self._framework_logger.debug(f"Running listener: {listener_name} ...")
-                listener_response: Optional[BoltResponse] = await self.run_async_listener(
+                listener_response: Optional[
+                    BoltResponse
+                ] = await self.run_async_listener(
                     request=req,
                     response=resp,
                     listener_name=listener_name,
@@ -257,7 +300,9 @@ class AsyncApp():
         ack = request.context.ack
         starting_time = time.time()
         if self._process_before_response:
-            returned_value = await async_listener.run_ack_function(request=request, response=response)
+            returned_value = await async_listener.run_ack_function(
+                request=request, response=response
+            )
             if isinstance(returned_value, BoltResponse):
                 response = returned_value
             if ack.response is None and async_listener.auto_acknowledgement:
@@ -276,7 +321,9 @@ class AsyncApp():
 
             # start the listener function asynchronously
             # NOTE: intentionally
-            _f: Future = asyncio.ensure_future(async_listener.run_ack_function(request=request, response=response))
+            _f: Future = asyncio.ensure_future(
+                async_listener.run_ack_function(request=request, response=response)
+            )
             self._framework_logger.debug(f"Async listener: {listener_name} started..")
 
             # await for the completion of ack() in the async listener execution
@@ -293,10 +340,13 @@ class AsyncApp():
         # None for both means no ack() in the listener
         return None
 
-    def _debug_log_completion(self, starting_time: float, response: BoltResponse) -> None:
+    def _debug_log_completion(
+        self, starting_time: float, response: BoltResponse
+    ) -> None:
         millis = int((time.time() - starting_time) * 1000)
         self._framework_logger.debug(
-            f"Responding with status: {response.status} body: \"{response.body}\" ({millis} millis)")
+            f'Responding with status: {response.status} body: "{response.body}" ({millis} millis)'
+        )
 
     # -------------------------
     # middleware
@@ -307,7 +357,9 @@ class AsyncApp():
     def middleware(self, *args):
         if len(args) > 0:
             func = args[0]
-            self._async_middleware_list.append(AsyncCustomMiddleware(app_name=self.name, func=func))
+            self._async_middleware_list.append(
+                AsyncCustomMiddleware(app_name=self.name, func=func)
+            )
 
     # -------------------------
     # events
@@ -320,7 +372,9 @@ class AsyncApp():
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.event(event, True)
-            return self._register_listener(func, primary_matcher, matchers, middleware, True)
+            return self._register_listener(
+                func, primary_matcher, matchers, middleware, True
+            )
 
         return __call__
 
@@ -346,7 +400,9 @@ class AsyncApp():
 
             matchers.insert(0, keyword_matcher)
 
-            return self._register_listener(func, primary_matcher, matchers, middleware, True)
+            return self._register_listener(
+                func, primary_matcher, matchers, middleware, True
+            )
 
         return __call__
 
@@ -501,21 +557,30 @@ class AsyncApp():
         auto_acknowledgement: bool = False,
     ) -> Callable[..., None]:
 
-        listener_matchers = [AsyncCustomListenerMatcher(app_name=self.name, func=f) for f in (matchers or [])]
+        listener_matchers = [
+            AsyncCustomListenerMatcher(app_name=self.name, func=f)
+            for f in (matchers or [])
+        ]
         listener_matchers.insert(0, primary_matcher)
         listener_middleware = []
-        for m in (middleware or []):
+        for m in middleware or []:
             if isinstance(m, AsyncMiddleware):
                 listener_middleware.append(m)
             elif isinstance(m, Callable) and inspect.iscoroutinefunction(m):
-                listener_middleware.append(AsyncCustomMiddleware(app_name=self.name, func=m))
+                listener_middleware.append(
+                    AsyncCustomMiddleware(app_name=self.name, func=m)
+                )
             else:
-                raise ValueError(f"async function is required for AsyncApp's listener middleware: {type(m)}")
+                raise ValueError(
+                    f"async function is required for AsyncApp's listener middleware: {type(m)}"
+                )
 
-        self._async_listeners.append(AsyncCustomListener(
-            app_name=self.name,
-            func=func,
-            matchers=listener_matchers,
-            middleware=listener_middleware,
-            auto_acknowledgement=auto_acknowledgement,
-        ))
+        self._async_listeners.append(
+            AsyncCustomListener(
+                app_name=self.name,
+                func=func,
+                matchers=listener_matchers,
+                middleware=listener_middleware,
+                auto_acknowledgement=auto_acknowledgement,
+            )
+        )

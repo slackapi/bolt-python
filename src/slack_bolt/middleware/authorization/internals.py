@@ -3,15 +3,11 @@ from slack_bolt.response import BoltResponse
 
 
 def _is_url_verification(req: BoltRequest) -> bool:
-    return req \
-           and req.payload \
-           and req.payload.get("type", None) == "url_verification"
+    return req and req.payload and req.payload.get("type", None) == "url_verification"
 
 
 def _is_ssl_check(req: BoltRequest) -> bool:
-    return req \
-           and req.payload \
-           and req.payload.get("type", None) == "ssl_check"
+    return req and req.payload and req.payload.get("type", None) == "ssl_check"
 
 
 def _is_no_auth_required(req: BoltRequest) -> bool:
@@ -21,6 +17,5 @@ def _is_no_auth_required(req: BoltRequest) -> bool:
 def _build_error_response() -> BoltResponse:
     # show an ephemeral message to the end-user
     return BoltResponse(
-        status=200,
-        body=":x: Please install this app into the workspace :bow:",
+        status=200, body=":x: Please install this app into the workspace :bow:",
     )

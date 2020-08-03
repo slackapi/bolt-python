@@ -1,26 +1,26 @@
 import re
 from abc import ABCMeta, abstractmethod
 from typing import List, Optional, Set
-from typing import Union
 
-from slack_sdk.models import EnumValidator, JsonObject, JsonValidator, extract_json
+from slack_sdk.models import (
+    EnumValidator,
+    JsonObject,
+    JsonValidator,
+    extract_json,
+)
 from slack_sdk.models.block_kit import (
     Block,
     Option,
-    OptionGroup,
     ConfirmObject,
-)
-from slack_sdk.models.messages import (
     ButtonStyles,
     DynamicSelectElementTypes,
 )
 
 
 class Action(JsonObject):
-    """
-    https://api.slack.com/docs/message-attachments#action_fields
-
-    https://api.slack.com/docs/interactive-message-field-guide#message_action_fields
+    """Action in attachments
+    https://api.slack.com/messaging/composing/layouts#attachments
+    https://api.slack.com/legacy/interactive-message-field-guide#message_action_fields
     """
 
     attributes = {"name", "text", "url"}
@@ -64,10 +64,9 @@ class ActionButton(Action):
         confirm: Optional[ConfirmObject] = None,
         style: Optional[str] = None,
     ):
-        """
-        Simple button for use inside attachments
+        """Simple button for use inside attachments
 
-        https://api.slack.com/docs/message-buttons
+        https://api.slack.com/legacy/message-buttons
 
         Args:
             name: Name this specific action. The name will be returned to your
@@ -107,10 +106,9 @@ class ActionButton(Action):
 
 class ActionLinkButton(Action):
     def __init__(self, *, text: str, url: str):
-        """
-        A simple interactive button that just opens a URL
+        """A simple interactive button that just opens a URL
 
-        https://api.slack.com/docs/message-attachments#link_buttons
+        https://api.slack.com/messaging/composing/layouts#attachments
 
         Args:
           text: text to display on the button, eg 'Click Me!"
@@ -148,67 +146,13 @@ class AbstractActionSelector(Action, metaclass=ABCMeta):
         return json
 
 
-class ActionStaticSelector(AbstractActionSelector):
-    """
-    Use the select element for multiple choice selections allowing users to pick a
-    single item from a list. True to web roots, this selection is displayed as a
-    dropdown menu.
-
-    https://api.slack.com/dialogs#select_elements
-    """
-
-    data_source = "static"
-
-    options_max_length = 100
-
-    def __init__(
-        self,
-        *,
-        name: str,
-        text: str,
-        options: List[Union[Option, OptionGroup]],
-        selected_option: Optional[Option] = None,
-    ):
-        """
-        Help users make clear, concise decisions by providing a menu of options
-        within messages.
-
-        https://api.slack.com/docs/message-menus
-
-        Args:
-            name: Name this specific action. The name will be returned to your
-                Action URL along with the message's callback_id when this action is
-                invoked. Use it to identify this particular response path.
-            text: The user-facing label for the message button or menu
-                representing this action. Cannot contain markup.
-            options: A list of no mre than 100 Option or OptionGroup objects
-            selected_option: An Option object to pre-select as the default
-                value.
-        """
-        super().__init__(name=name, text=text, selected_option=selected_option)
-        self.options = options
-
-    @JsonValidator(f"options attribute cannot exceed {options_max_length} items")
-    def options_length(self):
-        return len(self.options) < self.options_max_length
-
-    def to_dict(self) -> dict:
-        json = super().to_dict()
-        if isinstance(self.options[0], OptionGroup):
-            json["option_groups"] = extract_json(self.options, "action")
-        else:
-            json["options"] = extract_json(self.options, "action")
-        return json
-
-
 class ActionUserSelector(AbstractActionSelector):
     data_source = "users"
 
     def __init__(self, name: str, text: str, selected_user: Optional[Option] = None):
-        """
-        Automatically populate the selector with a list of users in the workspace.
+        """Automatically populate the selector with a list of users in the workspace.
 
-        https://api.slack.com/docs/message-menus#allow_users_to_select_from_a_list_of_members
+        https://api.slack.com/legacy/message-menus#allow_users_to_select_from_a_list_of_members
 
         Args:
             name: Name this specific action. The name will be returned to your
@@ -230,7 +174,7 @@ class ActionChannelSelector(AbstractActionSelector):
         Automatically populate the selector with a list of public channels in the
         workspace.
 
-        https://api.slack.com/docs/message-menus#let_users_choose_one_of_their_workspace_s_channels
+        https://api.slack.com/legacy/message-menus#let_users_choose_one_of_their_workspace_s_channels
 
         Args:
             name: Name this specific action. The name will be returned to your
@@ -254,7 +198,7 @@ class ActionConversationSelector(AbstractActionSelector):
         Automatically populate the selector with a list of conversations they have in
         the workspace.
 
-        https://api.slack.com/docs/message-menus#let_users_choose_one_of_their_conversations
+        https://api.slack.com/legacy/message-menus#let_users_choose_one_of_their_conversations
 
         Args:
             name: Name this specific action. The name will be returned to your
@@ -286,7 +230,7 @@ class ActionExternalSelector(AbstractActionSelector):
         """
         Populate a message select menu from your own application dynamically.
 
-        https://api.slack.com/docs/message-menus#populate_message_menus_dynamically
+        https://api.slack.com/legacy/message-menus#populate_message_menus_dynamically
 
         Args:
             name: Name this specific action. The name will be returned to your
@@ -553,8 +497,7 @@ class InteractiveAttachment(Attachment):
         An Attachment, but designed to contain interactive Actions
         Considered legacy - recommended replacement is to use message blocks instead.
 
-        https://api.slack.com/docs/interactive-message-field-guide#attachment_fields
-
+        https://api.slack.com/legacy/interactive-message-field-guide#attachment_fields
         https://api.slack.com/reference/messaging/attachments#fields
 
         Args:

@@ -5,7 +5,6 @@ from slack_bolt.response import BoltResponse
 
 
 class AsyncListenerMatcher(metaclass=ABCMeta):
-
     @abstractmethod
     async def async_matches(self, req: AsyncBoltRequest, resp: BoltResponse) -> bool:
         raise NotImplementedError()
@@ -28,24 +27,21 @@ class AsyncCustomListenerMatcher(AsyncListenerMatcher):
     arg_names: List[str]
     logger: Logger
 
-    def __init__(
-        self,
-        *,
-        app_name: str,
-        func: Callable[..., Awaitable[bool]]
-    ):
+    def __init__(self, *, app_name: str, func: Callable[..., Awaitable[bool]]):
         self.app_name = app_name
         self.func = func
         self.arg_names = inspect.getfullargspec(func).args
         self.logger = get_bolt_app_logger(self.app_name, self.func)
 
     async def async_matches(self, req: AsyncBoltRequest, resp: BoltResponse) -> bool:
-        return await self.func(**build_async_required_kwargs(
-            logger=self.logger,
-            required_arg_names=self.arg_names,
-            request=req,
-            response=resp
-        ))
+        return await self.func(
+            **build_async_required_kwargs(
+                logger=self.logger,
+                required_arg_names=self.arg_names,
+                request=req,
+                response=resp,
+            )
+        )
 
 
 builtin_async_listener_matcher_classes = [

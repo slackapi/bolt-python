@@ -6,7 +6,6 @@ from slack_sdk import WebClient
 
 
 class BaseContext(dict):
-
     @property
     def authorization_result(self) -> Optional[AuthorizationResult]:
         return self.get("authorization_result", None)

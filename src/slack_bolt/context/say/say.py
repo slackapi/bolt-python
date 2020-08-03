@@ -7,14 +7,12 @@ from slack_sdk.models.block_kit import Block
 from slack_sdk.web import SlackResponse
 
 
-class Say():
+class Say:
     client: Optional[WebClient]
     channel: Optional[str]
 
     def __init__(
-        self,
-        client: Optional[WebClient],
-        channel: Optional[str],
+        self, client: Optional[WebClient], channel: Optional[str],
     ):
         self.client = client
         self.channel = channel

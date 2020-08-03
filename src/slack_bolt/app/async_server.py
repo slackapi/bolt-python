@@ -5,12 +5,8 @@ from slack_bolt.response import BoltResponse
 
 
 class AsyncSlackAppServer:
-
     def __init__(
-        self,
-        port: int,
-        path: str,
-        app,  # AsyncApp
+        self, port: int, path: str, app,  # AsyncApp
     ):
         self.port = port
         self.app = app
@@ -19,15 +15,15 @@ class AsyncSlackAppServer:
         self.web_app = web.Application()
         oauth_flow = self.app.oauth_flow
         if oauth_flow:
-            self.web_app.add_routes([
-                web.get(oauth_flow.install_path, self.handle_get_requests),
-                web.get(oauth_flow.redirect_uri_path, self.handle_get_requests),
-                web.post(self.path, self.handle_post_requests)
-            ])
+            self.web_app.add_routes(
+                [
+                    web.get(oauth_flow.install_path, self.handle_get_requests),
+                    web.get(oauth_flow.redirect_uri_path, self.handle_get_requests),
+                    web.post(self.path, self.handle_post_requests),
+                ]
+            )
         else:
-            self.web_app.add_routes([
-                web.post(self.path, self.handle_post_requests)
-            ])
+            self.web_app.add_routes([web.post(self.path, self.handle_post_requests)])
 
     async def handle_get_requests(self, request: web.Request) -> web.Response:
         oauth_flow = self.app.oauth_flow

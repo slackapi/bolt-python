@@ -16,27 +16,20 @@ class MultiTeamsAuthorization(Authorization):
     verification_enabled: bool
 
     def __init__(
-        self,
-        installation_store: InstallationStore,
-        verification_enabled: bool = True,
+        self, installation_store: InstallationStore, verification_enabled: bool = True,
     ):
         self.installation_store = installation_store
         self.verification_enabled = verification_enabled
         self.logger = get_bolt_logger(MultiTeamsAuthorization)
 
     def process(
-        self,
-        *,
-        req: BoltRequest,
-        resp: BoltResponse,
-        next: Callable[[], BoltResponse],
+        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         if _is_no_auth_required(req):
             return next()
         try:
             bot: Optional[Bot] = self.installation_store.find_bot(
-                enterprise_id=req.context.enterprise_id,
-                team_id=req.context.team_id,
+                enterprise_id=req.context.enterprise_id, team_id=req.context.team_id,
             )
             if bot is None:
                 return _build_error_response()
@@ -71,7 +64,6 @@ class MultiTeamsAuthorization(Authorization):
                 req.context["token"] = bot.bot_token
                 req.context["client"] = WebClient(token=bot.bot_token)
                 return next()
-
 
         except SlackApiError as e:
             self.logger.error(f"Failed to authorize with the given token ({e})")

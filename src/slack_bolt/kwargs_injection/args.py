@@ -11,7 +11,7 @@ from slack_bolt.response import BoltResponse
 from slack_sdk import WebClient
 
 
-class Args():
+class Args:
     client: WebClient
     logger: Logger
     req: BoltRequest

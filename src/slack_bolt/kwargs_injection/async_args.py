@@ -10,7 +10,7 @@ from slack_bolt.response import BoltResponse
 from slack_sdk.web.async_client import AsyncWebClient
 
 
-class AsyncArgs():
+class AsyncArgs:
     logger: Logger
     client: AsyncWebClient
     req: AsyncBoltRequest

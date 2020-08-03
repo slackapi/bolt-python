@@ -8,9 +8,7 @@ from slack_bolt.response import BoltResponse
 
 def to_bolt_request(req: Request) -> BoltRequest:
     return BoltRequest(
-        body=req.body.read(),
-        query=req.query_string,
-        headers=req.headers,
+        body=req.body.read(), query=req.query_string, headers=req.headers,
     )
 
 
@@ -21,7 +19,7 @@ def set_response(bolt_resp: BoltResponse, resp: Response) -> None:
             resp.add_header(k, v)
 
 
-class SlackRequestHandler():
+class SlackRequestHandler:
     def __init__(self, app: App):
         self.app = app
 

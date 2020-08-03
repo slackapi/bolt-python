@@ -23,7 +23,12 @@ from urllib.request import Request, urlopen
 import slack_sdk.errors as err
 from slack_sdk.errors import SlackRequestError
 from .deprecation import show_2020_01_deprecation
-from .internal_utils import convert_bool_to_0_or_1, get_user_agent, _get_url, _build_req_args
+from .internal_utils import (
+    convert_bool_to_0_or_1,
+    get_user_agent,
+    _get_url,
+    _build_req_args,
+)
 from .slack_response import SlackResponse
 
 
@@ -132,7 +137,9 @@ class BaseClient:
                 headers["Authorization"] = auth
             elif isinstance(auth, dict):
                 client_id, client_secret = auth["client_id"], auth["client_secret"]
-                value = b64encode(f"{client_id}:{client_secret}".encode("utf-8")).decode("ascii")
+                value = b64encode(
+                    f"{client_id}:{client_secret}".encode("utf-8")
+                ).decode("ascii")
                 headers["Authorization"] = f"Basic {value}"
             else:
                 self._logger.warning(

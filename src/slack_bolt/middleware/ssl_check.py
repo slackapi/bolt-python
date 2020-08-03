@@ -12,11 +12,7 @@ class SslCheck(Middleware):
         self.logger = get_bolt_logger(SslCheck)
 
     def process(
-        self,
-        *,
-        req: BoltRequest,
-        resp: BoltResponse,
-        next: Callable[[], BoltResponse],
+        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         if self._is_ssl_check_request(req.payload):
             if self._verify_token_if_needed(req.payload):
@@ -32,8 +28,7 @@ class SslCheck(Middleware):
         return "ssl_check" in payload and payload["ssl_check"] == "1"
 
     def _verify_token_if_needed(self, payload: dict):
-        return self.verification_token and \
-               self.verification_token == payload["token"]
+        return self.verification_token and self.verification_token == payload["token"]
 
     @staticmethod
     def _build_success_response() -> BoltResponse:

@@ -10,7 +10,7 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
-class SlackRequestHandler():
+class SlackRequestHandler:
     def __init__(self, app: App):
         self.app = app
         self.logger = get_bolt_app_logger(app.name, SlackRequestHandler)
@@ -35,9 +35,11 @@ class SlackRequestHandler():
                 bolt_req: BoltRequest = to_bolt_request(event)
                 query = bolt_req.query
                 is_callback = query is not None and (
-                    (_first_value(query, "code") is not None and _first_value(query, "state") is not None)
-                    or
-                    _first_value(query, "error") is not None
+                    (
+                        _first_value(query, "code") is not None
+                        and _first_value(query, "state") is not None
+                    )
+                    or _first_value(query, "error") is not None
                 )
                 if is_callback:
                     bolt_resp = oauth_flow.handle_callback(bolt_req)
@@ -62,9 +64,7 @@ def to_bolt_request(event) -> BoltRequest:
     headers = event.get("headers", {})
     headers["cookie"] = cookies
     return BoltRequest(
-        body=body,
-        query=event.get("queryStringParameters", {}),
-        headers=headers,
+        body=body, query=event.get("queryStringParameters", {}), headers=headers,
     )
 
 

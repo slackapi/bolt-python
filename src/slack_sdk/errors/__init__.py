@@ -1,6 +1,3 @@
-"""A Python module for managing any Slack client errors."""
-
-
 class SlackClientError(Exception):
     """Base class for Client errors"""
 
@@ -10,14 +7,10 @@ class BotUserAccessError(SlackClientError):
     being used for a Slack API method that only accepts 'xoxp-*' tokens.
     """
 
-    pass
-
 
 class SlackRequestError(SlackClientError):
     """Error raised when there's a problem with the request that's being submitted.
     """
-
-    pass
 
 
 class SlackApiError(SlackClientError):
@@ -41,8 +34,6 @@ class SlackApiError(SlackClientError):
 class SlackClientNotConnectedError(SlackClientError):
     """Error raised when attempting to send messages over the websocket when the
     connection is closed. """
-
-    pass
 
 
 class SlackObjectFormationError(SlackClientError):

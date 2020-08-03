@@ -11,7 +11,6 @@ from ..state_store import OAuthStateStore
 
 
 class FileOAuthStateStore(OAuthStateStore, AsyncOAuthStateStore):
-
     def __init__(
         self,
         *,

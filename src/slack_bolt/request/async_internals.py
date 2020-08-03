@@ -1,13 +1,16 @@
 from typing import Dict
 
 from slack_bolt.context.async_context import AsyncBoltContext
-from slack_bolt.request.internals import extract_enterprise_id, \
-    extract_team_id, extract_user_id, extract_channel_id
+from slack_bolt.request.internals import (
+    extract_enterprise_id,
+    extract_team_id,
+    extract_user_id,
+    extract_channel_id,
+)
 
 
 def build_async_context(
-    context: AsyncBoltContext,
-    payload: Dict[str, any],
+    context: AsyncBoltContext, payload: Dict[str, any],
 ) -> AsyncBoltContext:
     enterprise_id = extract_enterprise_id(payload)
     if enterprise_id:

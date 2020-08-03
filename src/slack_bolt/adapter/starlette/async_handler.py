@@ -7,9 +7,7 @@ from slack_bolt.oauth import AsyncOAuthFlow
 
 def to_async_bolt_request(req: Request, body: bytes) -> AsyncBoltRequest:
     return AsyncBoltRequest(
-        body=body.decode("utf-8"),
-        query=req.query_params,
-        headers=req.headers,
+        body=body.decode("utf-8"), query=req.query_params, headers=req.headers,
     )
 
 
@@ -34,7 +32,7 @@ def to_starlette_response(bolt_resp: BoltResponse) -> Response:
     return resp
 
 
-class AsyncSlackRequestHandler():
+class AsyncSlackRequestHandler:
     def __init__(self, app: AsyncApp):
         self.app = app
 
@@ -44,16 +42,17 @@ class AsyncSlackRequestHandler():
             if self.app.oauth_flow is not None:
                 oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
                 if req.url.path == oauth_flow.install_path:
-                    bolt_resp = await oauth_flow.handle_installation(to_async_bolt_request(req, body))
+                    bolt_resp = await oauth_flow.handle_installation(
+                        to_async_bolt_request(req, body)
+                    )
                     return to_starlette_response(bolt_resp)
                 elif req.url.path == oauth_flow.redirect_uri_path:
-                    bolt_resp = await oauth_flow.handle_callback(to_async_bolt_request(req, body))
+                    bolt_resp = await oauth_flow.handle_callback(
+                        to_async_bolt_request(req, body)
+                    )
                     return to_starlette_response(bolt_resp)
         elif req.method == "POST":
             bolt_resp = await self.app.async_dispatch(to_async_bolt_request(req, body))
             return to_starlette_response(bolt_resp)
 
-        return Response(
-            status_code=404,
-            content="Not found",
-        )
+        return Response(status_code=404, content="Not found",)

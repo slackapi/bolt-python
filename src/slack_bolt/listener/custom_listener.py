@@ -38,14 +38,13 @@ class CustomListener(Listener):
         self.logger = get_bolt_app_logger(app_name, self.func)
 
     def run_ack_function(
-        self,
-        *,
-        request: BoltRequest,
-        response: BoltResponse,
+        self, *, request: BoltRequest, response: BoltResponse,
     ) -> BoltResponse:
-        return self.func(**build_required_kwargs(
-            logger=self.logger,
-            required_arg_names=self.arg_names,
-            request=request,
-            response=response
-        ))
+        return self.func(
+            **build_required_kwargs(
+                logger=self.logger,
+                required_arg_names=self.arg_names,
+                request=request,
+                response=response,
+            )
+        )

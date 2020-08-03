@@ -4,7 +4,7 @@ from typing import Optional, List, Union
 from slack_sdk.oauth.installation_store.models.bot import Bot
 
 
-class Installation():
+class Installation:
     def __init__(
         self,
         *,

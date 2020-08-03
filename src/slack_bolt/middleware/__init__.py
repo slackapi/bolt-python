@@ -1,7 +1,5 @@
 # Don't add async module imports here
-from .authorization import \
-    SingleTeamAuthorization, \
-    MultiTeamsAuthorization
+from .authorization import SingleTeamAuthorization, MultiTeamsAuthorization
 from .custom_middleware import CustomMiddleware
 from .ignoring_self_events import IgnoringSelfEvents
 from .middleware import Middleware

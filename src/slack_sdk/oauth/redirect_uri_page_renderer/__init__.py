@@ -2,7 +2,6 @@ from typing import Optional
 
 
 class RedirectUriPageRenderer:
-
     def __init__(
         self,
         *,
