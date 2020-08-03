@@ -6,7 +6,7 @@ from os.path import splitext, basename
 import setuptools
 
 __version__ = None
-exec(open("src/slack_bolt/version.py").read())
+exec(open("slack_bolt/version.py").read())
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -29,15 +29,14 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/slackapi/bolt-python",
-    packages=setuptools.find_packages("src"),
-    package_dir={"": "src"},
-    py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
+    packages=setuptools.find_packages("slack_bolt"),
+    package_dir={"": "slack_bolt"},
+    py_modules=[splitext(basename(path))[0] for path in glob("slack_bolt/*.py")],
+    include_package_data=True, # MANIFEST.in
     setup_requires=["pytest-runner==5.2"],
     # python setup.py test
     tests_require=test_dependencies,
-    install_requires=[
-        "slack_sdk==3.0.0a1",
-    ],
+    install_requires=["slack_sdk==3.0.0a1",],
     extras_require={
         # pip install -e ".[async]"
         "async": [
@@ -73,5 +72,5 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    python_requires=">=3.6",
 )

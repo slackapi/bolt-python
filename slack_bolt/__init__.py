@@ -1,3 +1,4 @@
+# Don't add async module imports here
 from .app import App  # noqa
 from .context import BoltContext  # noqa
 from .context.ack import Ack  # noqa
