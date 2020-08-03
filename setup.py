@@ -1,17 +1,15 @@
 #!/usr/bin/env python
 import os
-from glob import glob
-from os.path import splitext, basename
 
 import setuptools
 
-__version__ = None
-exec(open("slack_bolt/version.py").read())
-
-with open("README.md", "r") as fh:
-    long_description = fh.read()
-
 here = os.path.abspath(os.path.dirname(__file__))
+
+__version__ = None
+exec(open(f"{here}/slack_bolt/version.py").read())
+
+with open(f"{here}/README.md", "r") as fh:
+    long_description = fh.read()
 
 test_dependencies = [
     "pytest>=5,<6",
@@ -23,20 +21,26 @@ test_dependencies = [
 setuptools.setup(
     name="slack_bolt",
     version=__version__,
+    license="MIT",
     author="Slack Technologies, Inc.",
     author_email="opensource@slack.com",
     description="The Bolt Framework for Python",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/slackapi/bolt-python",
-    packages=setuptools.find_packages("slack_bolt"),
-    package_dir={"": "slack_bolt"},
-    py_modules=[splitext(basename(path))[0] for path in glob("slack_bolt/*.py")],
-    include_package_data=True, # MANIFEST.in
+    packages=setuptools.find_packages(
+        exclude=[
+            "samples",
+            "integration_tests",
+            "tests",
+            "tests.*",
+        ]
+    ),
+    include_package_data=True,  # MANIFEST.in
+    install_requires=["slack_sdk==3.0.0a1", ],
     setup_requires=["pytest-runner==5.2"],
-    # python setup.py test
     tests_require=test_dependencies,
-    install_requires=["slack_sdk==3.0.0a1",],
+    test_suite="tests",
     extras_require={
         # pip install -e ".[async]"
         "async": [

@@ -35,7 +35,6 @@ async def command(ack):
 if __name__ == "__main__":
     app.start(3000)
 
-# pip install slackclient
 # pip install -i https://test.pypi.org/simple/ slack_bolt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
