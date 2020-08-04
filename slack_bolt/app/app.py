@@ -7,6 +7,12 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from typing import List, Union, Pattern, Callable, Dict, Optional
 
+from slack_sdk.oauth import OAuthStateUtils
+from slack_sdk.oauth.installation_store import InstallationStore, FileInstallationStore
+from slack_sdk.oauth.state_store import OAuthStateStore, FileOAuthStateStore
+from slack_sdk.web import WebClient
+
+from slack_bolt.error import BoltError
 from slack_bolt.listener.custom_listener import CustomListener
 from slack_bolt.listener.listener import Listener
 from slack_bolt.listener_matcher import CustomListenerMatcher
@@ -26,10 +32,7 @@ from slack_bolt.middleware.url_verification import UrlVerification
 from slack_bolt.oauth import OAuthFlow
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
-from slack_sdk.oauth import OAuthStateUtils
-from slack_sdk.oauth.installation_store import InstallationStore, FileInstallationStore
-from slack_sdk.oauth.state_store import OAuthStateStore, FileOAuthStateStore
-from slack_sdk.web import WebClient
+from slack_bolt.util.utils import create_web_client
 
 
 class App:
@@ -41,9 +44,9 @@ class App:
         # Set True when you run this app on a FaaS platform
         process_before_response: bool = False,
         # Basic Information > Credentials > Signing Secret
-        signing_secret: str = os.environ.get("SLACK_SIGNING_SECRET", None),
+        signing_secret: Optional[str] = None,
         # for single-workspace apps
-        token: Optional[str] = os.environ.get("SLACK_BOT_TOKEN", None),
+        token: Optional[str] = None,
         client: Optional[WebClient] = None,
         # for multi-workspace apps
         installation_store: Optional[InstallationStore] = None,
@@ -65,6 +68,14 @@ class App:
         # No need to set (the value is used only in response to ssl_check requests)
         verification_token: Optional[str] = None,
     ):
+        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET", None)
+        token = token or os.environ.get("SLACK_BOT_TOKEN", None)
+
+        if signing_secret is None or signing_secret == "":
+            raise BoltError(
+                "Signing secret not found, so could not initialize the Bolt app."
+            )
+
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret: str = signing_secret
 
@@ -95,7 +106,7 @@ class App:
                     "As you gave client as well, the bot token will be unused."
                 )
         else:
-            self._client = WebClient(token=token)  # NOTE: the token here can be None
+            self._client = create_web_client(token)  # NOTE: the token here can be None
 
         self._installation_store: Optional[InstallationStore] = installation_store
         self._oauth_state_store: Optional[OAuthStateStore] = oauth_state_store
@@ -135,7 +146,7 @@ class App:
                     )
 
                 self._oauth_flow = OAuthFlow(
-                    client=WebClient(token=None),
+                    client=create_web_client(),
                     logger=self._framework_logger,
                     # required storage implementations
                     installation_store=self._installation_store,
@@ -178,8 +189,14 @@ class App:
             SslCheck(verification_token=self._verification_token)
         )
         self._middleware_list.append(RequestVerification(self._signing_secret))
-        if self._oauth_flow is None and self._token:
-            self._middleware_list.append(SingleTeamAuthorization())
+
+        if self._oauth_flow is None:
+            if self._token:
+                self._middleware_list.append(SingleTeamAuthorization())
+            else:
+                raise BoltError(
+                    "OAuthFlow not found, so could not initialize the Bolt app."
+                )
         else:
             self._middleware_list.append(
                 MultiTeamsAuthorization(

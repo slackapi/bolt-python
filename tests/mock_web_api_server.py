@@ -15,8 +15,9 @@ class MockHandler(SimpleHTTPRequestHandler):
     received_requests = {}
 
     def is_valid_token(self):
-        return "Authorization" in self.headers \
-               and str(self.headers["Authorization"]).startswith("Bearer xoxb-")
+        return "Authorization" in self.headers and str(
+            self.headers["Authorization"]
+        ).startswith("Bearer xoxb-")
 
     def set_common_headers(self):
         self.send_header("content-type", "application/json;charset=utf-8")
@@ -35,7 +36,7 @@ class MockHandler(SimpleHTTPRequestHandler):
             if self.is_valid_token():
                 parsed_path = urlparse(self.path)
 
-                len_header = self.headers.get('Content-Length') or 0
+                len_header = self.headers.get("Content-Length") or 0
                 content_len = int(len_header)
                 post_body = self.rfile.read(content_len)
                 request_body = None
@@ -45,12 +46,16 @@ class MockHandler(SimpleHTTPRequestHandler):
                         if post_body.startswith("{"):
                             request_body = json.loads(post_body)
                         else:
-                            request_body = {k: v[0] for k, v in parse_qs(post_body).items()}
+                            request_body = {
+                                k: v[0] for k, v in parse_qs(post_body).items()
+                            }
                     except UnicodeDecodeError:
                         pass
                 else:
                     if parsed_path and parsed_path.query:
-                        request_body = {k: v[0] for k, v in parse_qs(parsed_path.query).items()}
+                        request_body = {
+                            k: v[0] for k, v in parse_qs(parsed_path.query).items()
+                        }
 
                 self.logger.info(f"request body: {request_body}")
 
@@ -81,14 +86,15 @@ class MockHandler(SimpleHTTPRequestHandler):
 
 
 class MockServerThread(threading.Thread):
-
-    def __init__(self, test: TestCase, handler: Type[SimpleHTTPRequestHandler] = MockHandler):
+    def __init__(
+        self, test: TestCase, handler: Type[SimpleHTTPRequestHandler] = MockHandler
+    ):
         threading.Thread.__init__(self)
         self.handler = handler
         self.test = test
 
     def run(self):
-        self.server = HTTPServer(('localhost', 8888), self.handler)
+        self.server = HTTPServer(("localhost", 8888), self.handler)
         self.test.mock_received_requests = self.handler.received_requests
         self.test.server_url = "http://localhost:8888"
         self.test.host, self.test.port = self.server.socket.getsockname()

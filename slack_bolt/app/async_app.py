@@ -6,6 +6,16 @@ import time
 from asyncio import Future
 from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable
 
+from slack_sdk.oauth import OAuthStateUtils
+from slack_sdk.oauth.installation_store import FileInstallationStore
+from slack_sdk.oauth.installation_store.async_installation_store import (
+    AsyncInstallationStore,
+)
+from slack_sdk.oauth.state_store import FileOAuthStateStore
+from slack_sdk.oauth.state_store.async_state_store import AsyncOAuthStateStore
+from slack_sdk.web.async_client import AsyncWebClient
+
+from slack_bolt.error import BoltError
 from slack_bolt.listener.async_listener import AsyncListener, AsyncCustomListener
 from slack_bolt.listener_matcher import builtins as builtin_matchers
 from slack_bolt.listener_matcher.async_listener_matcher import (
@@ -32,14 +42,7 @@ from slack_bolt.middleware.authorization.async_single_team_authorization import 
 from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
-from slack_sdk.oauth import OAuthStateUtils
-from slack_sdk.oauth.installation_store import FileInstallationStore
-from slack_sdk.oauth.installation_store.async_installation_store import (
-    AsyncInstallationStore,
-)
-from slack_sdk.oauth.state_store import FileOAuthStateStore
-from slack_sdk.oauth.state_store.async_state_store import AsyncOAuthStateStore
-from slack_sdk.web.async_client import AsyncWebClient
+from slack_bolt.util.async_utils import create_async_web_client
 
 
 class AsyncApp:
@@ -51,9 +54,9 @@ class AsyncApp:
         # Set True when you run this app on a FaaS platform
         process_before_response: bool = False,
         # Basic Information > Credentials > Signing Secret
-        signing_secret: str = os.environ.get("SLACK_SIGNING_SECRET", None),
+        signing_secret: Optional[str] = None,
         # for single-workspace apps
-        token: Optional[str] = os.environ.get("SLACK_BOT_TOKEN", None),
+        token: Optional[str] = None,
         client: Optional[AsyncWebClient] = None,
         # for multi-workspace apps
         installation_store: Optional[AsyncInstallationStore] = None,
@@ -74,6 +77,14 @@ class AsyncApp:
         # No need to set (the value is used only in response to ssl_check requests)
         verification_token: Optional[str] = None,
     ):
+        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET", None)
+        token = token or os.environ.get("SLACK_BOT_TOKEN", None)
+
+        if signing_secret is None or signing_secret == "":
+            raise BoltError(
+                "Signing secret not found, so could not initialize the Bolt app."
+            )
+
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret: str = signing_secret
 
@@ -104,9 +115,8 @@ class AsyncApp:
                     "As you gave client as well, the bot token will be unused."
                 )
         else:
-            self._async_client = AsyncWebClient(
-                token=token
-            )  # NOTE: the token here can be None
+            # NOTE: the token here can be None
+            self._async_client = create_async_web_client(token)
 
         self._async_installation_store: Optional[
             AsyncInstallationStore
@@ -154,7 +164,7 @@ class AsyncApp:
                     )
 
                 self._async_oauth_flow = AsyncOAuthFlow(
-                    client=AsyncWebClient(token=None),
+                    client=create_async_web_client(),
                     logger=self._framework_logger,
                     # required storage implementations
                     installation_store=self._async_installation_store,
@@ -198,12 +208,18 @@ class AsyncApp:
         self._async_middleware_list.append(
             AsyncRequestVerification(self._signing_secret)
         )
-        if self._async_oauth_flow is None and self._token:
-            self._async_middleware_list.append(AsyncSingleTeamAuthorization())
+        if self._async_oauth_flow is None:
+            if self._token:
+                self._async_middleware_list.append(AsyncSingleTeamAuthorization())
+            else:
+                raise BoltError(
+                    "AsyncOAuthFlow not found, so could not initialize the Bolt app."
+                )
         else:
             self._async_middleware_list.append(
                 AsyncMultiTeamsAuthorization(self._async_installation_store)
             )
+
         self._async_middleware_list.append(AsyncIgnoringSelfEvents())
         self._async_middleware_list.append(AsyncUrlVerification())
         self._init_middleware_list_done = True
@@ -556,6 +572,12 @@ class AsyncApp:
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]],
         auto_acknowledgement: bool = False,
     ) -> Callable[..., None]:
+
+        if not inspect.iscoroutinefunction(func):
+            name = func.__name__
+            raise BoltError(
+                f"The listener function ({name}) is not a coroutine function."
+            )
 
         listener_matchers = [
             AsyncCustomListenerMatcher(app_name=self.name, func=f)

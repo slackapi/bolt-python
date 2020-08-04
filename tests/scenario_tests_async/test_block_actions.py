@@ -4,11 +4,11 @@ from time import time
 from urllib.parse import quote
 
 import pytest
+from slack_sdk.signature import SignatureVerifier
+from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.request.async_request import AsyncBoltRequest
-from slack_sdk.signature import SignatureVerifier
-from slack_sdk.web.async_client import AsyncWebClient
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -16,7 +16,7 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-class TestAsyncShortcut:
+class TestAsyncBlockActions:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -61,7 +61,7 @@ class TestAsyncShortcut:
     @pytest.mark.asyncio
     async def test_success(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
-        app.shortcut("test-shortcut")(simple_listener)
+        app.action("a")(simple_listener)
 
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
@@ -75,7 +75,7 @@ class TestAsyncShortcut:
             signing_secret=self.signing_secret,
             process_before_response=True,
         )
-        app.shortcut("test-shortcut")(simple_listener)
+        app.action("a")(simple_listener)
 
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
@@ -90,29 +90,52 @@ class TestAsyncShortcut:
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 1
 
-        app.shortcut("another-one")(simple_listener)
+        app.action("aaa")(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 2
 
 
 payload = {
-    "type": "shortcut",
+    "type": "block_actions",
+    "user": {
+        "id": "W111",
+        "username": "primary-owner",
+        "name": "primary-owner",
+        "team_id": "T111",
+    },
+    "api_app_id": "A111",
     "token": "verification_token",
-    "action_ts": "111.111",
+    "container": {
+        "type": "message",
+        "message_ts": "111.222",
+        "channel_id": "C111",
+        "is_ephemeral": True,
+    },
+    "trigger_id": "111.222.valid",
     "team": {
         "id": "T111",
         "domain": "workspace-domain",
         "enterprise_id": "E111",
-        "enterprise_name": "Org Name",
+        "enterprise_name": "Sandbox Org",
     },
-    "user": {"id": "W111", "username": "primary-owner", "team_id": "T111"},
-    "callback_id": "test-shortcut",
-    "trigger_id": "111.111.xxxxxx",
+    "channel": {"id": "C111", "name": "test-channel"},
+    "response_url": "https://hooks.slack.com/actions/T111/111/random-value",
+    "actions": [
+        {
+            "action_id": "a",
+            "block_id": "b",
+            "text": {"type": "plain_text", "text": "Button", "emoji": True},
+            "value": "click_me_123",
+            "type": "button",
+            "action_ts": "1596530385.194939",
+        }
+    ],
 }
 
 raw_body = f"payload={quote(json.dumps(payload))}"
 
 
-async def simple_listener(ack):
+async def simple_listener(ack, body):
+    assert body["trigger_id"] == "111.222.valid"
     await ack()

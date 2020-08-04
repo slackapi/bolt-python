@@ -4,8 +4,6 @@ import os
 def remove_os_env_temporarily() -> dict:
     old_env = os.environ.copy()
     os.environ.clear()
-    os.environ.update({})
-    print(os.environ)
     return old_env
 
 

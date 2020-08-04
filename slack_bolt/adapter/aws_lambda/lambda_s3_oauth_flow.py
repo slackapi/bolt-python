@@ -10,6 +10,8 @@ from slack_sdk import WebClient
 from slack_sdk.oauth.installation_store.amazon_s3 import AmazonS3InstallationStore
 from slack_sdk.oauth.state_store.amazon_s3 import AmazonS3OAuthStateStore
 
+from slack_bolt.util.utils import create_web_client
+
 
 class LambdaS3OAuthFlow(OAuthFlow):
     def __init__(
@@ -69,7 +71,7 @@ class LambdaS3OAuthFlow(OAuthFlow):
     @property
     def client(self) -> WebClient:
         if self._client is None:
-            self._client = WebClient()
+            self._client = create_web_client()
         return self._client
 
     @property

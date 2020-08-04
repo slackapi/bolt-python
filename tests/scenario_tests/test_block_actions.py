@@ -1,11 +1,12 @@
 import json
 from time import time
+from urllib.parse import quote
 
+from slack_sdk import WebClient
 from slack_sdk.signature import SignatureVerifier
-from slack_sdk.web import WebClient
 
+from slack_bolt import BoltRequest
 from slack_bolt.app import App
-from slack_bolt.request import BoltRequest
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -13,7 +14,7 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-class TestSlashCommand:
+class TestBlockActions:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -41,8 +42,10 @@ class TestSlashCommand:
         }
 
     def build_valid_request(self) -> BoltRequest:
-        timestamp, body = str(int(time())), json.dumps(slash_command_payload)
-        return BoltRequest(body=body, headers=self.build_headers(timestamp, body))
+        timestamp = str(int(time()))
+        return BoltRequest(
+            body=raw_body, headers=self.build_headers(timestamp, raw_body)
+        )
 
     def test_mock_server_is_running(self):
         resp = self.web_client.api_test()
@@ -50,7 +53,7 @@ class TestSlashCommand:
 
     def test_success(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
-        app.command("/hello-world")(commander)
+        app.action("a")(simple_listener)
 
         request = self.build_valid_request()
         response = app.dispatch(request)
@@ -63,7 +66,7 @@ class TestSlashCommand:
             signing_secret=self.signing_secret,
             process_before_response=True,
         )
-        app.command("/hello-world")(commander)
+        app.action("a")(simple_listener)
 
         request = self.build_valid_request()
         response = app.dispatch(request)
@@ -77,28 +80,52 @@ class TestSlashCommand:
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 1
 
-        app.command("/another-one")(commander)
+        app.action("aaa")(simple_listener)
         response = app.dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 2
 
 
-slash_command_payload = (
-    "token=verification_token"
-    "&team_id=T111"
-    "&team_domain=test-domain"
-    "&channel_id=C111"
-    "&channel_name=random"
-    "&user_id=W111"
-    "&user_name=primary-owner"
-    "&command=%2Fhello-world"
-    "&text=Hi"
-    "&enterprise_id=E111"
-    "&enterprise_name=Org+Name"
-    "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
-    "&trigger_id=111.111.xxx"
-)
+payload = {
+    "type": "block_actions",
+    "user": {
+        "id": "W111",
+        "username": "primary-owner",
+        "name": "primary-owner",
+        "team_id": "T111",
+    },
+    "api_app_id": "A111",
+    "token": "verification_token",
+    "container": {
+        "type": "message",
+        "message_ts": "111.222",
+        "channel_id": "C111",
+        "is_ephemeral": True,
+    },
+    "trigger_id": "111.222.valid",
+    "team": {
+        "id": "T111",
+        "domain": "workspace-domain",
+        "enterprise_id": "E111",
+        "enterprise_name": "Sandbox Org",
+    },
+    "channel": {"id": "C111", "name": "test-channel"},
+    "response_url": "https://hooks.slack.com/actions/T111/111/random-value",
+    "actions": [
+        {
+            "action_id": "a",
+            "block_id": "b",
+            "text": {"type": "plain_text", "text": "Button", "emoji": True},
+            "value": "click_me_123",
+            "type": "button",
+            "action_ts": "1596530385.194939",
+        }
+    ],
+}
+
+raw_body = f"payload={quote(json.dumps(payload))}"
 
 
-def commander(ack):
+def simple_listener(ack, body):
+    assert body["trigger_id"] == "111.222.valid"
     ack()

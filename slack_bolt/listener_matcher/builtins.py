@@ -1,6 +1,8 @@
 import inspect
 import sys
 
+from ..error import BoltError
+
 if sys.version_info.major == 3 and sys.version_info.minor <= 6:
     from re import _pattern_type as Pattern
 else:
@@ -89,7 +91,7 @@ def event(
 
         return build_listener_matcher(func, asyncio)
 
-    raise ValueError(
+    raise BoltError(
         f"event ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
     )
 
@@ -135,7 +137,7 @@ def shortcut(
         elif constraints["type"] == "message_action":
             return message_shortcut(constraints["callback_id"], asyncio)
 
-    raise ValueError(
+    raise BoltError(
         f"shortcut ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
     )
 
@@ -179,10 +181,13 @@ def action(
     if isinstance(constraints, (str, Pattern)):
         return block_action(constraints, asyncio)
     elif "type" in constraints:
-        if constraints["type"] == "block_actions":
+        action_type = constraints["type"]
+        if action_type == "block_actions":
             return block_action(constraints["action_id"], asyncio)
+        else:
+            raise BoltError(f"type: {action_type} is unsupported")
 
-    raise ValueError(
+    raise BoltError(
         f"action ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
     )
 
@@ -215,7 +220,7 @@ def view(
         if constraints["type"] == "view_submission":
             return view_submission(constraints["callback_id"], asyncio)
 
-    raise ValueError(
+    raise BoltError(
         f"view ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
     )
 
@@ -250,7 +255,7 @@ def options(
     elif "callback_id" in constraints:
         return dialog_suggestion(constraints["callback_id"], asyncio)
     else:
-        raise ValueError(
+        raise BoltError(
             f"options ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
         )
 
@@ -310,6 +315,6 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -> bool:
         pattern: Pattern = str_or_pattern
         return pattern.search(input)
     else:
-        raise ValueError(
+        raise BoltError(
             f"{str_or_pattern} ({type(str_or_pattern)}) must be either str or Pattern"
         )

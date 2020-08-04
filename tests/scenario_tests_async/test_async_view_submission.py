@@ -4,11 +4,11 @@ from time import time
 from urllib.parse import quote
 
 import pytest
+from slack_sdk.signature import SignatureVerifier
+from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.request.async_request import AsyncBoltRequest
-from slack_sdk.signature import SignatureVerifier
-from slack_sdk.web.async_client import AsyncWebClient
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -16,7 +16,7 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-class TestAsyncShortcut:
+class TestAsyncViewSubmission:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -61,7 +61,7 @@ class TestAsyncShortcut:
     @pytest.mark.asyncio
     async def test_success(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
-        app.shortcut("test-shortcut")(simple_listener)
+        app.view("view-id")(simple_listener)
 
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
@@ -75,7 +75,7 @@ class TestAsyncShortcut:
             signing_secret=self.signing_secret,
             process_before_response=True,
         )
-        app.shortcut("test-shortcut")(simple_listener)
+        app.view("view-id")(simple_listener)
 
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
@@ -90,29 +90,67 @@ class TestAsyncShortcut:
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 1
 
-        app.shortcut("another-one")(simple_listener)
+        app.view("view-idddd")(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 2
 
 
 payload = {
-    "type": "shortcut",
-    "token": "verification_token",
-    "action_ts": "111.111",
+    "type": "view_submission",
     "team": {
         "id": "T111",
         "domain": "workspace-domain",
         "enterprise_id": "E111",
-        "enterprise_name": "Org Name",
+        "enterprise_name": "Sandbox Org",
     },
-    "user": {"id": "W111", "username": "primary-owner", "team_id": "T111"},
-    "callback_id": "test-shortcut",
-    "trigger_id": "111.111.xxxxxx",
+    "user": {
+        "id": "W111",
+        "username": "primary-owner",
+        "name": "primary-owner",
+        "team_id": "T111",
+    },
+    "api_app_id": "A111",
+    "token": "verification_token",
+    "trigger_id": "111.222.valid",
+    "view": {
+        "id": "V111",
+        "team_id": "T111",
+        "type": "modal",
+        "blocks": [
+            {
+                "type": "input",
+                "block_id": "hspI",
+                "label": {"type": "plain_text", "text": "Label",},
+                "optional": False,
+                "element": {"type": "plain_text_input", "action_id": "maBWU"},
+            }
+        ],
+        "private_metadata": "This is for you!",
+        "callback_id": "view-id",
+        "state": {
+            "values": {"hspI": {"maBWU": {"type": "plain_text_input", "value": "test"}}}
+        },
+        "hash": "1596530361.3wRYuk3R",
+        "title": {"type": "plain_text", "text": "My App",},
+        "clear_on_close": False,
+        "notify_on_close": False,
+        "close": {"type": "plain_text", "text": "Cancel",},
+        "submit": {"type": "plain_text", "text": "Submit",},
+        "previous_view_id": None,
+        "root_view_id": "V111",
+        "app_id": "A111",
+        "external_id": "",
+        "app_installed_team_id": "T111",
+        "bot_id": "B111",
+    },
+    "response_urls": [],
 }
 
 raw_body = f"payload={quote(json.dumps(payload))}"
 
 
-async def simple_listener(ack):
+async def simple_listener(ack, body):
+    assert body["trigger_id"] == "111.222.valid"
+    assert body["view"]["private_metadata"] == "This is for you!"
     await ack()

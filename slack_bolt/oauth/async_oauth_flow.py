@@ -22,6 +22,8 @@ from slack_sdk.oauth.state_store.sqlite3 import SQLite3OAuthStateStore
 from slack_sdk.web.async_client import AsyncWebClient
 from slack_sdk.web.async_slack_response import AsyncSlackResponse
 
+from slack_bolt.util.async_utils import create_async_web_client
+
 
 class AsyncOAuthFlow:
     installation_store: AsyncInstallationStore
@@ -46,7 +48,7 @@ class AsyncOAuthFlow:
     @property
     def client(self) -> AsyncWebClient:
         if self._async_client is None:
-            self._async_client = AsyncWebClient()
+            self._async_client = create_async_web_client()
         return self._async_client
 
     @property
@@ -133,7 +135,7 @@ class AsyncOAuthFlow:
     ) -> "AsyncOAuthFlow":
 
         return AsyncOAuthFlow(
-            client=AsyncWebClient(),
+            client=create_async_web_client(),
             logger=logger,
             installation_store=SQLite3InstallationStore(
                 database=database, client_id=client_id, logger=logger,
