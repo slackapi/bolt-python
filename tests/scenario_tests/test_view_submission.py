@@ -60,6 +60,15 @@ class TestViewSubmission:
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
+    def test_success_2(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app.view_submission("view-id")(simple_listener)
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
     def test_process_before_response(self):
         app = App(
             client=self.web_client,
@@ -81,6 +90,18 @@ class TestViewSubmission:
         assert self.mock_received_requests["/auth.test"] == 1
 
         app.view("view-idddd")(simple_listener)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    def test_failure_2(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app.view_submission("view-idddd")(simple_listener)
         response = app.dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 2

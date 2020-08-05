@@ -4,11 +4,11 @@ from time import time
 from urllib.parse import quote
 
 import pytest
+from slack_sdk.signature import SignatureVerifier
+from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.request.async_request import AsyncBoltRequest
-from slack_sdk.signature import SignatureVerifier
-from slack_sdk.web.async_client import AsyncWebClient
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -47,11 +47,9 @@ class TestAsyncShortcut:
             "x-slack-request-timestamp": [timestamp],
         }
 
-    def build_valid_request(self) -> AsyncBoltRequest:
+    def build_valid_request(self, body) -> AsyncBoltRequest:
         timestamp = str(int(time()))
-        return AsyncBoltRequest(
-            body=raw_body, headers=self.build_headers(timestamp, raw_body)
-        )
+        return AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
     @pytest.mark.asyncio
     async def test_mock_server_is_running(self):
@@ -59,17 +57,69 @@ class TestAsyncShortcut:
         assert resp != None
 
     @pytest.mark.asyncio
-    async def test_success(self):
+    async def test_success_global(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
         app.shortcut("test-shortcut")(simple_listener)
 
-        request = self.build_valid_request()
+        request = self.build_valid_request(global_shortcut_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
+        request = self.build_valid_request(message_shortcut_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
     @pytest.mark.asyncio
-    async def test_process_before_response(self):
+    async def test_success_global_2(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.global_shortcut("test-shortcut")(simple_listener)
+
+        request = self.build_valid_request(global_shortcut_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        request = self.build_valid_request(message_shortcut_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    @pytest.mark.asyncio
+    async def test_success_message(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.shortcut({"type": "message_action", "callback_id": "test-shortcut"})(
+            simple_listener
+        )
+
+        request = self.build_valid_request(message_shortcut_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        request = self.build_valid_request(global_shortcut_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    @pytest.mark.asyncio
+    async def test_success_message_2(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.message_shortcut("test-shortcut")(simple_listener)
+
+        request = self.build_valid_request(message_shortcut_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        request = self.build_valid_request(global_shortcut_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    @pytest.mark.asyncio
+    async def test_process_before_response_global(self):
         app = AsyncApp(
             client=self.web_client,
             signing_secret=self.signing_secret,
@@ -77,7 +127,7 @@ class TestAsyncShortcut:
         )
         app.shortcut("test-shortcut")(simple_listener)
 
-        request = self.build_valid_request()
+        request = self.build_valid_request(global_shortcut_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
@@ -85,7 +135,7 @@ class TestAsyncShortcut:
     @pytest.mark.asyncio
     async def test_failure(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
-        request = self.build_valid_request()
+        request = self.build_valid_request(global_shortcut_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 1
@@ -95,8 +145,26 @@ class TestAsyncShortcut:
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 2
 
+    @pytest.mark.asyncio
+    async def test_failure_2(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        request = self.build_valid_request(global_shortcut_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
 
-payload = {
+        app.global_shortcut("another-one")(simple_listener)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+        request = self.build_valid_request(message_shortcut_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 3
+
+
+global_shortcut_payload = {
     "type": "shortcut",
     "token": "verification_token",
     "action_ts": "111.111",
@@ -111,7 +179,49 @@ payload = {
     "trigger_id": "111.111.xxxxxx",
 }
 
-raw_body = f"payload={quote(json.dumps(payload))}"
+message_shortcut_payload = {
+    "type": "message_action",
+    "token": "verification_token",
+    "action_ts": "1583637157.207593",
+    "team": {
+        "id": "T111",
+        "domain": "test-test",
+        "enterprise_id": "E111",
+        "enterprise_name": "Org Name",
+    },
+    "user": {"id": "W111", "name": "test-test"},
+    "channel": {"id": "C111", "name": "dev"},
+    "callback_id": "test-shortcut",
+    "trigger_id": "111.222.xxx",
+    "message_ts": "1583636382.000300",
+    "message": {
+        "client_msg_id": "zzzz-111-222-xxx-yyy",
+        "type": "message",
+        "text": "<@W222> test",
+        "user": "W111",
+        "ts": "1583636382.000300",
+        "team": "T111",
+        "blocks": [
+            {
+                "type": "rich_text",
+                "block_id": "d7eJ",
+                "elements": [
+                    {
+                        "type": "rich_text_section",
+                        "elements": [
+                            {"type": "user", "user_id": "U222"},
+                            {"type": "text", "text": " test"},
+                        ],
+                    }
+                ],
+            }
+        ],
+    },
+    "response_url": "https://hooks.slack.com/app/T111/111/xxx",
+}
+
+global_shortcut_raw_body = f"payload={quote(json.dumps(global_shortcut_payload))}"
+message_shortcut_raw_body = f"payload={quote(json.dumps(message_shortcut_payload))}"
 
 
 async def simple_listener(ack):

@@ -69,6 +69,17 @@ class TestBlockSuggestion:
         assert response.headers["content-type"][0] == "application/json;charset=utf-8"
         assert self.mock_received_requests["/auth.test"] == 1
 
+    def test_success_2(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app.block_suggestion("es_a")(show_options)
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert response.body == expected_response_body
+        assert response.headers["content-type"][0] == "application/json;charset=utf-8"
+        assert self.mock_received_requests["/auth.test"] == 1
+
     def test_success_multi(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
         app.options("mes_a")(show_multi_options)
@@ -118,6 +129,18 @@ class TestBlockSuggestion:
         assert self.mock_received_requests["/auth.test"] == 1
 
         app.options("mes_a")(show_multi_options)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    def test_failure_2(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app.block_suggestion("mes_a")(show_multi_options)
         response = app.dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 2

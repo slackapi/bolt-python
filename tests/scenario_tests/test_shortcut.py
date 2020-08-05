@@ -2,11 +2,11 @@ import json
 from time import time
 from urllib.parse import quote
 
-from slack_sdk import WebClient
 from slack_sdk.signature import SignatureVerifier
+from slack_sdk.web import WebClient
 
-from slack_bolt import BoltRequest
 from slack_bolt.app import App
+from slack_bolt.request import BoltRequest
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -41,26 +41,73 @@ class TestShortcut:
             "x-slack-request-timestamp": [timestamp],
         }
 
-    def build_valid_request(self) -> BoltRequest:
+    def build_valid_request(self, body) -> BoltRequest:
         timestamp = str(int(time()))
-        return BoltRequest(
-            body=raw_body, headers=self.build_headers(timestamp, raw_body)
-        )
+        return BoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
     def test_mock_server_is_running(self):
         resp = self.web_client.api_test()
         assert resp != None
 
-    def test_success(self):
+    def test_success_global(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
         app.shortcut("test-shortcut")(simple_listener)
 
-        request = self.build_valid_request()
+        request = self.build_valid_request(global_shortcut_raw_body)
         response = app.dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
-    def test_process_before_response(self):
+        request = self.build_valid_request(message_shortcut_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    def test_success_global_2(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app.global_shortcut("test-shortcut")(simple_listener)
+
+        request = self.build_valid_request(global_shortcut_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        request = self.build_valid_request(message_shortcut_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    def test_success_message(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app.shortcut({"type": "message_action", "callback_id": "test-shortcut"})(
+            simple_listener
+        )
+
+        request = self.build_valid_request(message_shortcut_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        request = self.build_valid_request(global_shortcut_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    def test_success_message_2(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app.message_shortcut("test-shortcut")(simple_listener)
+
+        request = self.build_valid_request(message_shortcut_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        request = self.build_valid_request(global_shortcut_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    def test_process_before_response_global(self):
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
@@ -68,14 +115,14 @@ class TestShortcut:
         )
         app.shortcut("test-shortcut")(simple_listener)
 
-        request = self.build_valid_request()
+        request = self.build_valid_request(global_shortcut_raw_body)
         response = app.dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_failure(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
-        request = self.build_valid_request()
+        request = self.build_valid_request(global_shortcut_raw_body)
         response = app.dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 1
@@ -85,8 +132,25 @@ class TestShortcut:
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 2
 
+    def test_failure_2(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        request = self.build_valid_request(global_shortcut_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
 
-payload = {
+        app.global_shortcut("another-one")(simple_listener)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+        request = self.build_valid_request(message_shortcut_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 3
+
+
+global_shortcut_payload = {
     "type": "shortcut",
     "token": "verification_token",
     "action_ts": "111.111",
@@ -101,7 +165,49 @@ payload = {
     "trigger_id": "111.111.xxxxxx",
 }
 
-raw_body = f"payload={quote(json.dumps(payload))}"
+message_shortcut_payload = {
+    "type": "message_action",
+    "token": "verification_token",
+    "action_ts": "1583637157.207593",
+    "team": {
+        "id": "T111",
+        "domain": "test-test",
+        "enterprise_id": "E111",
+        "enterprise_name": "Org Name",
+    },
+    "user": {"id": "W111", "name": "test-test"},
+    "channel": {"id": "C111", "name": "dev"},
+    "callback_id": "test-shortcut",
+    "trigger_id": "111.222.xxx",
+    "message_ts": "1583636382.000300",
+    "message": {
+        "client_msg_id": "zzzz-111-222-xxx-yyy",
+        "type": "message",
+        "text": "<@W222> test",
+        "user": "W111",
+        "ts": "1583636382.000300",
+        "team": "T111",
+        "blocks": [
+            {
+                "type": "rich_text",
+                "block_id": "d7eJ",
+                "elements": [
+                    {
+                        "type": "rich_text_section",
+                        "elements": [
+                            {"type": "user", "user_id": "U222"},
+                            {"type": "text", "text": " test"},
+                        ],
+                    }
+                ],
+            }
+        ],
+    },
+    "response_url": "https://hooks.slack.com/app/T111/111/xxx",
+}
+
+global_shortcut_raw_body = f"payload={quote(json.dumps(global_shortcut_payload))}"
+message_shortcut_raw_body = f"payload={quote(json.dumps(message_shortcut_payload))}"
 
 
 def simple_listener(ack):

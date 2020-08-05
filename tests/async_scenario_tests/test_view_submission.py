@@ -69,6 +69,16 @@ class TestAsyncViewSubmission:
         assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
+    async def test_success_2(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.view_submission("view-id")(simple_listener)
+
+        request = self.build_valid_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+    @pytest.mark.asyncio
     async def test_process_before_response(self):
         app = AsyncApp(
             client=self.web_client,
@@ -91,6 +101,19 @@ class TestAsyncViewSubmission:
         assert self.mock_received_requests["/auth.test"] == 1
 
         app.view("view-idddd")(simple_listener)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    @pytest.mark.asyncio
+    async def test_failure_2(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        request = self.build_valid_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app.view_submission("view-idddd")(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 2

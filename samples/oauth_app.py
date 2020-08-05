@@ -87,7 +87,6 @@ def view_submission(ack, payload, logger):
 def button_click(logger, payload, ack, respond):
     logger.info(payload)
     respond("respond!")
-    # say(text="say!")
     ack()
 
 

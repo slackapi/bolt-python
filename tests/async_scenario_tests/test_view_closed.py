@@ -16,7 +16,7 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-class TestAsyncBlockActions:
+class TestAsyncViewClosed:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -61,7 +61,7 @@ class TestAsyncBlockActions:
     @pytest.mark.asyncio
     async def test_success(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
-        app.action("a")(simple_listener)
+        app.view({"type": "view_closed", "callback_id": "view-id"})(simple_listener)
 
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
@@ -71,7 +71,7 @@ class TestAsyncBlockActions:
     @pytest.mark.asyncio
     async def test_success_2(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
-        app.block_action("a")(simple_listener)
+        app.view_closed("view-id")(simple_listener)
 
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
@@ -85,21 +85,7 @@ class TestAsyncBlockActions:
             signing_secret=self.signing_secret,
             process_before_response=True,
         )
-        app.action("a")(simple_listener)
-
-        request = self.build_valid_request()
-        response = await app.async_dispatch(request)
-        assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
-
-    @pytest.mark.asyncio
-    async def test_process_before_response_2(self):
-        app = AsyncApp(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
-            process_before_response=True,
-        )
-        app.block_action("a")(simple_listener)
+        app.view({"type": "view_closed", "callback_id": "view-id"})(simple_listener)
 
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
@@ -114,7 +100,20 @@ class TestAsyncBlockActions:
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 1
 
-        app.action("aaa")(simple_listener)
+        app.view("view-idddd")(simple_listener)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    @pytest.mark.asyncio
+    async def test_failure(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        request = self.build_valid_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app.view({"type": "view_closed", "callback_id": "view-idddd"})(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 2
@@ -127,14 +126,20 @@ class TestAsyncBlockActions:
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 1
 
-        app.block_action("aaa")(simple_listener)
+        app.view_closed("view-idddd")(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 2
 
 
 payload = {
-    "type": "block_actions",
+    "type": "view_closed",
+    "team": {
+        "id": "T111",
+        "domain": "workspace-domain",
+        "enterprise_id": "E111",
+        "enterprise_name": "Sandbox Org",
+    },
     "user": {
         "id": "W111",
         "username": "primary-owner",
@@ -143,36 +148,41 @@ payload = {
     },
     "api_app_id": "A111",
     "token": "verification_token",
-    "container": {
-        "type": "message",
-        "message_ts": "111.222",
-        "channel_id": "C111",
-        "is_ephemeral": True,
+    "view": {
+        "id": "V111",
+        "team_id": "T111",
+        "type": "modal",
+        "blocks": [
+            {
+                "type": "input",
+                "block_id": "hspI",
+                "label": {"type": "plain_text", "text": "Label",},
+                "optional": False,
+                "element": {"type": "plain_text_input", "action_id": "maBWU"},
+            }
+        ],
+        "private_metadata": "This is for you!",
+        "callback_id": "view-id",
+        "state": {"values": {}},
+        "hash": "1596530361.3wRYuk3R",
+        "title": {"type": "plain_text", "text": "My App",},
+        "clear_on_close": False,
+        "notify_on_close": False,
+        "close": {"type": "plain_text", "text": "Cancel",},
+        "submit": {"type": "plain_text", "text": "Submit",},
+        "previous_view_id": None,
+        "root_view_id": "V111",
+        "app_id": "A111",
+        "external_id": "",
+        "app_installed_team_id": "T111",
+        "bot_id": "B111",
     },
-    "trigger_id": "111.222.valid",
-    "team": {
-        "id": "T111",
-        "domain": "workspace-domain",
-        "enterprise_id": "E111",
-        "enterprise_name": "Sandbox Org",
-    },
-    "channel": {"id": "C111", "name": "test-channel"},
-    "response_url": "https://hooks.slack.com/actions/T111/111/random-value",
-    "actions": [
-        {
-            "action_id": "a",
-            "block_id": "b",
-            "text": {"type": "plain_text", "text": "Button", "emoji": True},
-            "value": "click_me_123",
-            "type": "button",
-            "action_ts": "1596530385.194939",
-        }
-    ],
+    "response_urls": [],
 }
 
 raw_body = f"payload={quote(json.dumps(payload))}"
 
 
 async def simple_listener(ack, body):
-    assert body["trigger_id"] == "111.222.valid"
+    assert body["view"]["private_metadata"] == "This is for you!"
     await ack()

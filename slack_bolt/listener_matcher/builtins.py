@@ -126,6 +126,7 @@ def shortcut(
             return (
                 payload
                 and "callback_id" in payload
+                and payload["type"] == "shortcut"
                 and _matches(callback_id, payload["callback_id"])
             )
 
@@ -134,7 +135,7 @@ def shortcut(
     elif "type" in constraints and "callback_id" in constraints:
         if constraints["type"] == "shortcut":
             return global_shortcut(constraints["callback_id"], asyncio)
-        elif constraints["type"] == "message_action":
+        if constraints["type"] == "message_action":
             return message_shortcut(constraints["callback_id"], asyncio)
 
     raise BoltError(
@@ -186,8 +187,12 @@ def action(
             return block_action(constraints["action_id"], asyncio)
         if action_type == "interactive_message":
             return attachment_action(constraints["callback_id"], asyncio)
-        else:
-            raise BoltError(f"type: {action_type} is unsupported")
+        if action_type == "dialog_submission":
+            return dialog_submission(constraints["callback_id"], asyncio)
+        if action_type == "dialog_cancellation":
+            return dialog_cancellation(constraints["callback_id"], asyncio)
+
+        raise BoltError(f"type: {action_type} is unsupported")
 
     raise BoltError(
         f"action ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
@@ -222,6 +227,32 @@ def attachment_action(
     return build_listener_matcher(func, asyncio)
 
 
+def dialog_submission(
+    callback_id: Union[str, Pattern], asyncio: bool = False,
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+    def func(payload: dict) -> bool:
+        return (
+            payload
+            and _is_expected_type(payload, "dialog_submission")
+            and _matches(callback_id, payload["callback_id"])
+        )
+
+    return build_listener_matcher(func, asyncio)
+
+
+def dialog_cancellation(
+    callback_id: Union[str, Pattern], asyncio: bool = False,
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+    def func(payload: dict) -> bool:
+        return (
+            payload
+            and _is_expected_type(payload, "dialog_cancellation")
+            and _matches(callback_id, payload["callback_id"])
+        )
+
+    return build_listener_matcher(func, asyncio)
+
+
 # -------------------------
 # view
 
@@ -235,6 +266,8 @@ def view(
     elif "type" in constraints:
         if constraints["type"] == "view_submission":
             return view_submission(constraints["callback_id"], asyncio)
+        if constraints["type"] == "view_closed":
+            return view_closed(constraints["callback_id"], asyncio)
 
     raise BoltError(
         f"view ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
@@ -256,6 +289,21 @@ def view_submission(
     return build_listener_matcher(func, asyncio)
 
 
+def view_closed(
+    callback_id: Union[str, Pattern], asyncio: bool = False,
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+    def func(payload: dict) -> bool:
+        return (
+            payload
+            and _is_expected_type(payload, "view_closed")
+            and "view" in payload
+            and "callback_id" in payload["view"]
+            and _matches(callback_id, payload["view"]["callback_id"])
+        )
+
+    return build_listener_matcher(func, asyncio)
+
+
 # -------------
 # options
 
@@ -266,9 +314,9 @@ def options(
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     if isinstance(constraints, (str, Pattern)):
         return block_suggestion(constraints, asyncio)
-    elif "action_id" in constraints:
+    if "action_id" in constraints:
         return block_suggestion(constraints["action_id"], asyncio)
-    elif "callback_id" in constraints:
+    if "callback_id" in constraints:
         return dialog_suggestion(constraints["callback_id"], asyncio)
     else:
         raise BoltError(

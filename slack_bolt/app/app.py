@@ -478,7 +478,7 @@ class App:
 
         return __call__
 
-    def attachment_actioN(
+    def attachment_action(
         self,
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
@@ -486,6 +486,30 @@ class App:
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.attachment_action(callback_id)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
+
+        return __call__
+
+    def dialog_submission(
+        self,
+        callback_id: Union[str, Pattern],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+    ):
+        def __call__(func):
+            primary_matcher = builtin_matchers.dialog_submission(callback_id)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
+
+        return __call__
+
+    def dialog_cancellation(
+        self,
+        callback_id: Union[str, Pattern],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+    ):
+        def __call__(func):
+            primary_matcher = builtin_matchers.dialog_cancellation(callback_id)
             return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__
@@ -501,6 +525,30 @@ class App:
     ):
         def __call__(func):
             primary_matcher = builtin_matchers.view(constraints)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
+
+        return __call__
+
+    def view_submission(
+        self,
+        constraints: Union[str, Pattern],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+    ):
+        def __call__(func):
+            primary_matcher = builtin_matchers.view_submission(constraints)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
+
+        return __call__
+
+    def view_closed(
+        self,
+        constraints: Union[str, Pattern],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+    ):
+        def __call__(func):
+            primary_matcher = builtin_matchers.view_closed(constraints)
             return self._register_listener(func, primary_matcher, matchers, middleware)
 
         return __call__

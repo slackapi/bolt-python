@@ -71,6 +71,16 @@ class TestAsyncAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
+    async def test_success_2(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.attachment_action("pick_channel_for_fun")(simple_listener)
+
+        request = self.build_valid_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+    @pytest.mark.asyncio
     async def test_process_before_response(self):
         app = AsyncApp(
             client=self.web_client,
@@ -80,6 +90,20 @@ class TestAsyncAttachmentActions:
         app.action(
             {"callback_id": "pick_channel_for_fun", "type": "interactive_message",}
         )(simple_listener)
+
+        request = self.build_valid_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+    @pytest.mark.asyncio
+    async def test_process_before_response_2(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            process_before_response=True,
+        )
+        app.attachment_action("pick_channel_for_fun")(simple_listener)
 
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
@@ -97,6 +121,19 @@ class TestAsyncAttachmentActions:
         app.action({"callback_id": "unknown", "type": "interactive_message",})(
             simple_listener
         )
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    @pytest.mark.asyncio
+    async def test_failure_2(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        request = self.build_valid_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app.attachment_action("unknown")(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 2
