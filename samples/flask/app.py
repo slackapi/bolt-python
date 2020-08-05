@@ -37,6 +37,7 @@ handler = SlackRequestHandler(app)
 def slack_events():
     return handler.handle(request)
 
+
 # pip install -r requirements.txt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***

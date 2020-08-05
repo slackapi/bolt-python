@@ -6,7 +6,7 @@ sys.path.insert(1, "../..")
 # ------------------------------------------------
 
 from slack_bolt.async_app import AsyncApp
-from slack_bolt.adapter.starlette import AsyncSlackRequestHandler
+from slack_bolt.adapter.starlette.async_handler import AsyncSlackRequestHandler
 
 app = AsyncApp()
 app_handler = AsyncSlackRequestHandler(app)
@@ -40,8 +40,8 @@ api = Starlette(
     routes=[
         Route("/slack/events", endpoint=endpoint, methods=["POST"]),
         Route("/slack/install", endpoint=install, methods=["GET"]),
-        Route("/slack/oauth_redirect", endpoint=oauth_redirect, methods=["GET"])
-    ]
+        Route("/slack/oauth_redirect", endpoint=oauth_redirect, methods=["GET"]),
+    ],
 )
 
 # pip install -r requirements.txt

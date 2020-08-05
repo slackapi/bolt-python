@@ -27,6 +27,7 @@ api = FastAPI()
 async def endpoint(req: Request):
     return await app_handler.handle(req)
 
+
 # pip install -r requirements.txt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***

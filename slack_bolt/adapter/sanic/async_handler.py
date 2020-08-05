@@ -3,8 +3,9 @@ from datetime import datetime
 from sanic.request import Request
 from sanic.response import HTTPResponse
 
-from slack_bolt import BoltResponse, AsyncApp, AsyncBoltRequest
-from slack_bolt.oauth import AsyncOAuthFlow
+from slack_bolt import BoltResponse
+from slack_bolt.async_app import AsyncApp, AsyncBoltRequest
+from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
 
 
 def to_async_bolt_request(req: Request) -> AsyncBoltRequest:

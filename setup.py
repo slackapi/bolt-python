@@ -64,6 +64,9 @@ setuptools.setup(
             "sanic>=20,<21",
             "starlette>=0.13,<1",
             "tornado>=6,<7",
+            # server
+            "uvicorn<1",
+            "gunicorn>=20,<21",
         ],
         # pip install -e ".[testing]"
         "testing": test_dependencies,

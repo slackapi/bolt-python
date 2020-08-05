@@ -28,11 +28,13 @@ def event_test(ack, payload, say, logger):
 from tornado.web import Application
 from tornado.ioloop import IOLoop
 
-api = Application([
-    ("/slack/events", SlackEventsHandler, dict(app=app)),
-    ("/slack/install", SlackOAuthHandler, dict(app=app)),
-    ("/slack/oauth_redirect", SlackOAuthHandler, dict(app=app)),
-])
+api = Application(
+    [
+        ("/slack/events", SlackEventsHandler, dict(app=app)),
+        ("/slack/install", SlackOAuthHandler, dict(app=app)),
+        ("/slack/oauth_redirect", SlackOAuthHandler, dict(app=app)),
+    ]
+)
 
 if __name__ == "__main__":
     api.listen(3000)

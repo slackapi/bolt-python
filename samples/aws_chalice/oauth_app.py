@@ -29,7 +29,7 @@ def respond_to_slack_within_3_seconds(ack):
 
 
 ChaliceSlackRequestHandler.clear_all_log_handlers()
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(format="%(asctime)s %(message)s", level=logging.DEBUG)
 
 # Don't change this variable name "app"
 app = Chalice(app_name="bolt-python-chalice")
@@ -53,6 +53,7 @@ def install() -> Response:
 @app.route("/slack/oauth_redirect", methods=["GET"])
 def oauth_redirect() -> Response:
     return slack_handler.handle(app.current_request)
+
 
 # configure aws credentials properly
 # pip install -r requirements.txt

@@ -16,7 +16,7 @@ def handle_app_mentions(payload, say, logger):
 
 
 ChaliceSlackRequestHandler.clear_all_log_handlers()
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(format="%(asctime)s %(message)s", level=logging.DEBUG)
 
 # Don't change this variable name "app"
 app = Chalice(app_name="bolt-python-chalice")
@@ -36,8 +36,7 @@ def can_be_long(say):
 
 
 bolt_app.command("/hello-bolt-python-chalice")(
-    ack=respond_to_slack_within_3_seconds,
-    subsequent=[can_be_long],
+    ack=respond_to_slack_within_3_seconds, subsequent=[can_be_long],
 )
 
 
@@ -48,6 +47,7 @@ bolt_app.command("/hello-bolt-python-chalice")(
 )
 def events() -> Response:
     return slack_handler.handle(app.current_request)
+
 
 # configure aws credentials properly
 # pip install -r requirements.txt

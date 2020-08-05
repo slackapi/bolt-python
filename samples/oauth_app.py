@@ -24,56 +24,42 @@ def test_command(payload, respond, client, ack, logger):
     logger.info(payload)
     ack("Thanks!")
 
-    respond(blocks=[
-        {
-            "type": "section",
-            "block_id": "b",
-            "text": {
-                "type": "mrkdwn",
-                "text": "You can add a button alongside text in your message. "
-            },
-            "accessory": {
-                "type": "button",
-                "action_id": "a",
+    respond(
+        blocks=[
+            {
+                "type": "section",
+                "block_id": "b",
                 "text": {
-                    "type": "plain_text",
-                    "text": "Button"
+                    "type": "mrkdwn",
+                    "text": "You can add a button alongside text in your message. ",
                 },
-                "value": "click_me_123"
+                "accessory": {
+                    "type": "button",
+                    "action_id": "a",
+                    "text": {"type": "plain_text", "text": "Button"},
+                    "value": "click_me_123",
+                },
             }
-        }
-    ])
+        ]
+    )
 
     res = client.views_open(
         trigger_id=payload["trigger_id"],
         view={
             "type": "modal",
             "callback_id": "view-id",
-            "title": {
-                "type": "plain_text",
-                "text": "My App",
-            },
-            "submit": {
-                "type": "plain_text",
-                "text": "Submit",
-            },
-            "close": {
-                "type": "plain_text",
-                "text": "Cancel",
-            },
+            "title": {"type": "plain_text", "text": "My App",},
+            "submit": {"type": "plain_text", "text": "Submit",},
+            "close": {"type": "plain_text", "text": "Cancel",},
             "blocks": [
                 {
                     "type": "input",
-                    "element": {
-                        "type": "plain_text_input"
-                    },
-                    "label": {
-                        "type": "plain_text",
-                        "text": "Label",
-                    }
+                    "element": {"type": "plain_text_input"},
+                    "label": {"type": "plain_text", "text": "Label",},
                 }
-            ]
-        })
+            ],
+        },
+    )
     logger.info(res)
 
 

@@ -29,10 +29,7 @@ async def endpoint(req: Request):
 
 
 api = Starlette(
-    debug=True,
-    routes=[
-        Route("/slack/events", endpoint=endpoint, methods=["POST"])
-    ]
+    debug=True, routes=[Route("/slack/events", endpoint=endpoint, methods=["POST"])]
 )
 
 # pip install -r requirements.txt

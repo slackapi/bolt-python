@@ -6,7 +6,7 @@ sys.path.insert(1, "../..")
 # ------------------------------------------------
 
 from slack_bolt.async_app import AsyncApp
-from slack_bolt.adapter.starlette import AsyncSlackRequestHandler
+from slack_bolt.adapter.starlette.async_handler import AsyncSlackRequestHandler
 
 app = AsyncApp()
 
@@ -29,10 +29,7 @@ async def endpoint(req: Request):
 
 
 api = Starlette(
-    debug=True,
-    routes=[
-        Route("/slack/events", endpoint=endpoint, methods=["POST"])
-    ]
+    debug=True, routes=[Route("/slack/events", endpoint=endpoint, methods=["POST"])]
 )
 
 # pip install -r requirements.txt

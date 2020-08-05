@@ -22,21 +22,27 @@ def event_test(payload, say, logger):
 
 handler = SlackRequestHandler(app)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from wsgiref.simple_server import make_server
     from pyramid.config import Configurator
 
     with Configurator() as config:
-        config.add_route('slack_events', '/slack/events')
-        config.add_view(handler.handle, route_name='slack_events', request_method='POST')
+        config.add_route("slack_events", "/slack/events")
+        config.add_view(
+            handler.handle, route_name="slack_events", request_method="POST"
+        )
 
-        config.add_route('slack_install', '/slack/install')
-        config.add_route('slack_oauth_redirect', '/slack/oauth_redirect')
-        config.add_view(handler.handle, route_name='slack_install', request_method='GET')
-        config.add_view(handler.handle, route_name='slack_oauth_redirect', request_method='GET')
+        config.add_route("slack_install", "/slack/install")
+        config.add_route("slack_oauth_redirect", "/slack/oauth_redirect")
+        config.add_view(
+            handler.handle, route_name="slack_install", request_method="GET"
+        )
+        config.add_view(
+            handler.handle, route_name="slack_oauth_redirect", request_method="GET"
+        )
 
         pyramid_app = config.make_wsgi_app()
-    server = make_server('0.0.0.0', 3000, pyramid_app)
+    server = make_server("0.0.0.0", 3000, pyramid_app)
     server.serve_forever()
 
 # # -- OAuth flow -- #

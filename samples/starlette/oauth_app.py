@@ -40,8 +40,8 @@ api = Starlette(
     routes=[
         Route("/slack/events", endpoint=endpoint, methods=["POST"]),
         Route("/slack/install", endpoint=install, methods=["GET"]),
-        Route("/slack/oauth_redirect", endpoint=oauth_redirect, methods=["GET"])
-    ]
+        Route("/slack/oauth_redirect", endpoint=oauth_redirect, methods=["GET"]),
+    ],
 )
 
 # pip install -r requirements.txt

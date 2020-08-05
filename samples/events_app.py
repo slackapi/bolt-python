@@ -39,7 +39,9 @@ def mention_bug(logger, payload):
 
 @app.event(
     event={"type": "message", "subtype": "message_deleted"},
-    matchers=[lambda payload: payload["event"]["previous_message"].get("bot_id", None) is None]
+    matchers=[
+        lambda payload: payload["event"]["previous_message"].get("bot_id", None) is None
+    ],
 )
 def deleted(payload, say):
     message = payload["event"]["previous_message"]["text"]
@@ -56,7 +58,7 @@ def print_bot(req, resp, next):
 @app.event(
     event={"type": "message", "subtype": "message_deleted"},
     matchers=[lambda payload: payload["event"]["previous_message"].get("bot_id", None)],
-    middleware=[print_bot]
+    middleware=[print_bot],
 )
 def bot_message_deleted(logger):
     logger.info("A bot message has been deleted")
