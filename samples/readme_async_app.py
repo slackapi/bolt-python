@@ -23,9 +23,9 @@ async def event_test(say):
 
 
 # Interactivity: https://api.slack.com/interactivity
-# @app.shortcut("callback-id-here")
-@app.command("/hello-bolt-python")
-async def handle_global_shortcut(ack, client, logger, payload):
+@app.shortcut("callback-id-here")
+# @app.command("/hello-bolt-python")
+async def open_modal(ack, client, logger, payload):
     # acknowledge the incoming request from Slack immediately
     await ack()
     # open a modal

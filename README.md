@@ -44,13 +44,13 @@ def event_test(say):
 
 
 # Interactivity: https://api.slack.com/interactivity
-# @app.shortcut("callback-id-here")
-@app.command("/hello-bolt-python")
-def handle_global_shortcut(ack, client, logger, payload):
+@app.shortcut("callback-id-here")
+# @app.command("/hello-bolt-python")
+def open_modal(ack, client, logger, payload):
     # acknowledge the incoming request from Slack immediately
     ack()
     # open a modal
-    api_response = client.views_open(
+api_response = client.views_open(
         trigger_id=payload["trigger_id"],
         view={
             "type": "modal",
