@@ -15,6 +15,6 @@ script:
   - travis_retry pytest tests/scenario_tests/
   # testing with aiohttp
   - pip install "pytest-asyncio<1" "aiohttp>=3,<4"
-  - travis_retry pytest tests/scenario_tests_async/
+  - travis_retry pytest tests/async_scenario_tests/
   # run all tests just in case
   - travis_retry python setup.py test
