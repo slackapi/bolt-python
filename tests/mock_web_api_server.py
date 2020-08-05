@@ -97,7 +97,7 @@ class MockServerThread(threading.Thread):
         self.server = HTTPServer(("localhost", 8888), self.handler)
         self.test.mock_received_requests = self.handler.received_requests
         self.test.server_url = "http://localhost:8888"
-        self.test.host, self.test.port = self.server.socket.getsockname()
+        self.test.host, self.test._port = self.server.socket.getsockname()
         self.test.server_started.set()  # threading.Event()
 
         self.test = None

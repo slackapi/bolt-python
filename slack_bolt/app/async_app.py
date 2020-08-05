@@ -240,6 +240,10 @@ class AsyncApp:
         return self._async_client
 
     @property
+    def logger(self) -> logging.Logger:
+        return self._framework_logger
+
+    @property
     def installation_store(self) -> Optional[AsyncInstallationStore]:
         return self._async_installation_store
 

@@ -220,6 +220,10 @@ class App:
         return self._oauth_flow
 
     @property
+    def logger(self) -> logging.Logger:
+        return self._framework_logger
+
+    @property
     def client(self) -> WebClient:
         return self._client
 
@@ -641,26 +645,31 @@ class SlackAppServer:
     def __init__(
         self, port: int, path: str, app: App, oauth_flow: Optional[OAuthFlow] = None,
     ):
-        self.port = port
-        _path = path
-        _app = app
-        _oauth_flow = oauth_flow
+        self._port: int = port
+        self._bolt_endpoint_path: str = path
+        self._bolt_app: App = app
+        self._bolt_oauth_flow: OAuthFlow = oauth_flow
+
+        _port: int = self._port
+        _bolt_endpoint_path: str = self._bolt_endpoint_path
+        _bolt_app: App = self._bolt_app
+        _bolt_oauth_flow: OAuthFlow = self._bolt_oauth_flow
 
         class SlackAppHandler(SimpleHTTPRequestHandler):
             def do_GET(self):
-                if _oauth_flow:
+                if _bolt_oauth_flow:
                     request_path, _, query = self.path.partition("?")
-                    if request_path == _oauth_flow.install_path:
+                    if request_path == _bolt_oauth_flow.install_path:
                         bolt_req = BoltRequest(
                             body="", query=query, headers=self.headers
                         )
-                        bolt_resp = _oauth_flow.handle_installation(bolt_req)
+                        bolt_resp = _bolt_oauth_flow.handle_installation(bolt_req)
                         self._send_bolt_response(bolt_resp)
-                    elif request_path == _oauth_flow.redirect_uri_path:
+                    elif request_path == _bolt_oauth_flow.redirect_uri_path:
                         bolt_req = BoltRequest(
                             body="", query=query, headers=self.headers
                         )
-                        bolt_resp = _oauth_flow.handle_callback(bolt_req)
+                        bolt_resp = _bolt_oauth_flow.handle_callback(bolt_req)
                         self._send_bolt_response(bolt_resp)
                     else:
                         self._send_response(404, headers={})
@@ -669,7 +678,7 @@ class SlackAppServer:
 
             def do_POST(self):
                 request_path, _, query = self.path.partition("?")
-                if _path != request_path:
+                if _bolt_endpoint_path != request_path:
                     self._send_response(404, headers={})
                     return
 
@@ -678,7 +687,7 @@ class SlackAppServer:
                 bolt_req = BoltRequest(
                     body=request_body, query=query, headers=self.headers
                 )
-                bolt_resp: BoltResponse = _app.dispatch(bolt_req)
+                bolt_resp: BoltResponse = _bolt_app.dispatch(bolt_req)
                 self._send_bolt_response(bolt_resp)
 
             def _send_bolt_response(self, bolt_resp: BoltResponse):
@@ -706,11 +715,11 @@ class SlackAppServer:
                 self.end_headers()
                 self.wfile.write(body_bytes)
 
-        self.server = HTTPServer(("0.0.0.0", self.port), SlackAppHandler)
+        self._server = HTTPServer(("0.0.0.0", self._port), SlackAppHandler)
 
     def start(self):
-        print("⚡️ Bolt app is running!")
+        self._bolt_app.logger.info("⚡️ Bolt app is running!")
         try:
-            self.server.serve_forever(0.05)
+            self._server.serve_forever(0.05)
         finally:
-            self.server.server_close()
+            self._server.server_close()
