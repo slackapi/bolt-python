@@ -25,9 +25,7 @@ class ChaliceSlackRequestHandler:
                 root.removeHandler(handler)
 
     def handle(self, request: Request):
-        body: str = request.raw_body.decode(
-            "utf-8"
-        ) if request.raw_body else ""
+        body: str = request.raw_body.decode("utf-8") if request.raw_body else ""
         self.logger.debug(f"Incoming request: {request.to_dict()}, body: {body}")
 
         method = request.method

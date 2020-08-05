@@ -17,13 +17,20 @@ class AsyncSlackAppServer:
         if self._bolt_oauth_flow:
             self.web_app.add_routes(
                 [
-                    web.get(self._bolt_oauth_flow.install_path, self.handle_get_requests),
-                    web.get(self._bolt_oauth_flow.redirect_uri_path, self.handle_get_requests),
+                    web.get(
+                        self._bolt_oauth_flow.install_path, self.handle_get_requests
+                    ),
+                    web.get(
+                        self._bolt_oauth_flow.redirect_uri_path,
+                        self.handle_get_requests,
+                    ),
                     web.post(self._endpoint_path, self.handle_post_requests),
                 ]
             )
         else:
-            self.web_app.add_routes([web.post(self._endpoint_path, self.handle_post_requests)])
+            self.web_app.add_routes(
+                [web.post(self._endpoint_path, self.handle_post_requests)]
+            )
 
     async def handle_get_requests(self, request: web.Request) -> web.Response:
         oauth_flow = self._bolt_oauth_flow

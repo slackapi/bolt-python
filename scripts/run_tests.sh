@@ -6,7 +6,6 @@
 script_dir=`dirname $0`
 cd ${script_dir}/..
 
-python setup.py install && \
-  pip install "black==19.10b0" && \
+pip install -e ".[testing]" && \
   black slack_bolt/ tests/ && \
   pytest $1
