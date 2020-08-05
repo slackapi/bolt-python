@@ -1,4 +1,8 @@
-# Bolt for Python
+# Important Notice
+
+This project is **still in alpha**, and may have bugs in it. Also, the public APIs can be changed until the v1 release.
+
+# Bolt for Python (still in alpha)
 
 A Python framework to build Slack apps in a flash with the latest platform features.
 
@@ -98,3 +102,7 @@ python app.py
 # another terminal
 ngrok http 3000
 ```
+
+# License
+
+The MIT License
