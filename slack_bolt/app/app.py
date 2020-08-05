@@ -478,6 +478,18 @@ class App:
 
         return __call__
 
+    def attachment_actioN(
+        self,
+        callback_id: Union[str, Pattern],
+        matchers: Optional[List[Callable[..., bool]]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+    ):
+        def __call__(func):
+            primary_matcher = builtin_matchers.attachment_action(callback_id)
+            return self._register_listener(func, primary_matcher, matchers, middleware)
+
+        return __call__
+
     # -------------------------
     # view
 

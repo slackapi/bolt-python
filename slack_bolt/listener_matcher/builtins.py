@@ -184,6 +184,8 @@ def action(
         action_type = constraints["type"]
         if action_type == "block_actions":
             return block_action(constraints["action_id"], asyncio)
+        if action_type == "interactive_message":
+            return attachment_action(constraints["callback_id"], asyncio)
         else:
             raise BoltError(f"type: {action_type} is unsupported")
 
@@ -201,6 +203,20 @@ def block_action(
             and _is_expected_type(payload, "block_actions")
             and "actions" in payload
             and _matches(action_id, payload["actions"][0]["action_id"])
+        )
+
+    return build_listener_matcher(func, asyncio)
+
+
+def attachment_action(
+    callback_id: Union[str, Pattern], asyncio: bool = False,
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+    def func(payload: dict) -> bool:
+        return (
+            payload
+            and _is_expected_type(payload, "interactive_message")
+            and "actions" in payload
+            and _matches(callback_id, payload["callback_id"])
         )
 
     return build_listener_matcher(func, asyncio)

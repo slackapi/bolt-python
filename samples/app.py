@@ -3,7 +3,7 @@
 import re
 import sys
 
-sys.path.insert(1, "../src")
+sys.path.insert(1, "..")
 # ------------------------------------------------
 
 import logging
@@ -74,10 +74,103 @@ def test_command(payload, respond, client, ack, logger):
                         "type": "plain_text",
                         "text": "Label",
                     }
+                },
+                {
+                    "type": "input",
+                    "block_id": "es_b",
+                    "element": {
+                        "type": "external_select",
+                        "action_id": "es_a",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Select an item"
+                        }
+                    },
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Search"
+                    }
+                },
+                {
+                    "type": "input",
+                    "block_id": "mes_b",
+                    "element": {
+                        "type": "multi_external_select",
+                        "action_id": "mes_a",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Select an item"
+                        }
+                    },
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Search (multi)"
+                    }
                 }
+
             ]
         })
     logger.info(res)
+
+
+@app.options("es_a")
+def show_options(ack):
+    ack({
+        "options": [
+            {
+                "text": {
+                    "type": "plain_text",
+                    "text": "Maru"
+                },
+                "value": "maru"
+            }
+        ]
+    })
+
+
+@app.options("mes_a")
+def show_multi_options(ack):
+    ack({
+        "option_groups": [
+            {
+                "label": {
+                    "type": "plain_text",
+                    "text": "Group 1"
+                },
+                "options": [
+                    {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Option 1"
+                        },
+                        "value": "1-1"
+                    },
+                    {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Option 2"
+                        },
+                        "value": "1-2"
+                    }
+                ]
+            },
+            {
+                "label": {
+                    "type": "plain_text",
+                    "text": "Group 2"
+                },
+                "options": [
+                    {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Option 1"
+                        },
+                        "value": "2-1"
+                    },
+                ]
+            }
+        ]
+    })
 
 
 @app.view("view-id")
