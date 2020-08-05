@@ -319,7 +319,9 @@ class App:
                     listener.run_ack_function(request=request, response=response)
                 except Exception as e:
                     # TODO: error handler
-                    self._framework_logger.exception(f"Failed to run listener function (error: {e})")
+                    self._framework_logger.exception(
+                        f"Failed to run listener function (error: {e})"
+                    )
 
             self._listener_executor.submit(run_ack_function_asynchronously)
 

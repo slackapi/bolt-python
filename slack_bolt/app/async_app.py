@@ -342,16 +342,21 @@ class AsyncApp:
             # start the listener function asynchronously
             # NOTE: intentionally
             async def run_ack_function_asynchronously(
-                request: AsyncBoltRequest,
-                response: BoltResponse,
+                request: AsyncBoltRequest, response: BoltResponse,
             ):
                 try:
-                    await async_listener.run_ack_function(request=request, response=response)
+                    await async_listener.run_ack_function(
+                        request=request, response=response
+                    )
                 except Exception as e:
                     # TODO: error handler
-                    self._framework_logger.exception(f"Failed to run listener function (error: {e})")
+                    self._framework_logger.exception(
+                        f"Failed to run listener function (error: {e})"
+                    )
 
-            _f: Future = asyncio.ensure_future(run_ack_function_asynchronously(request, response))
+            _f: Future = asyncio.ensure_future(
+                run_ack_function_asynchronously(request, response)
+            )
             self._framework_logger.debug(f"Async listener: {listener_name} started..")
 
             # await for the completion of ack() in the async listener execution
