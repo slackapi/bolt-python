@@ -6,15 +6,15 @@ labels: 'docs'
 assignees: ''
 ---
 
-### Description
+## Description
 
 (Describe your issue and goal here)
 
-#### The page URLs
+### The page URLs
 
 * https://slack.dev/bolt-python/
 
-### Requirements (place an `x` in each of the `[ ]`)
+## Requirements (place an `x` in each of the `[ ]`)
 
 * [ ] I've read and understood the [Contributing guidelines](https://github.com/slackapi/bolt-python/blob/main/.github/contributing.md) and have done my best effort to follow them.
 * [ ] I've read and agree to the [Code of Conduct](https://slackhq.github.io/code-of-conduct).
