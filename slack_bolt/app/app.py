@@ -314,9 +314,14 @@ class App:
                 return ack.response
         else:
             # start the listener function asynchronously
-            self._listener_executor.submit(
-                lambda: listener.run_ack_function(request=request, response=response)
-            )
+            def run_ack_function_asynchronously():
+                try:
+                    listener.run_ack_function(request=request, response=response)
+                except Exception as e:
+                    # TODO: error handler
+                    self._framework_logger.exception(f"Failed to run listener function (error: {e})")
+
+            self._listener_executor.submit(run_ack_function_asynchronously)
 
             if listener.auto_acknowledgement:
                 # acknowledge immediately in case of Events API
@@ -718,7 +723,11 @@ class SlackAppServer:
         self._server = HTTPServer(("0.0.0.0", self._port), SlackAppHandler)
 
     def start(self):
-        self._bolt_app.logger.info("⚡️ Bolt app is running!")
+        if self._bolt_app.logger.level > logging.INFO:
+            print("⚡️ Bolt app is running!")
+        else:
+            self._bolt_app.logger.info("⚡️ Bolt app is running!")
+
         try:
             self._server.serve_forever(0.05)
         finally:

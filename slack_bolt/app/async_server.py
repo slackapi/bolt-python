@@ -1,3 +1,5 @@
+import logging
+
 from aiohttp import web
 
 from slack_bolt.adapter.aiohttp import to_bolt_request, to_aiohttp_response
@@ -57,5 +59,9 @@ class AsyncSlackAppServer:
         return await to_aiohttp_response(bolt_resp)
 
     def start(self):
-        self._bolt_app.logger.info("⚡️ Bolt app is running!")
+        if self._bolt_app.logger.level > logging.INFO:
+            print("⚡️ Bolt app is running!")
+        else:
+            self._bolt_app.logger.info("⚡️ Bolt app is running!")
+
         web.run_app(self.web_app, host="0.0.0.0", port=self._port)

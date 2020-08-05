@@ -1,20 +1,3 @@
-# Bolt for Python
-
-A Python framework to build Slack apps in a flash with the latest platform features.
-
-## Setup
-
-```bash
-python -m venv env
-source env/bin/activate
-pip install slack_bolt
-```
-
-## First Bolt App (app.py)
-
-Create an app by calling a constructor, which is a top-level export.
-
-```python
 import logging
 
 from slack_bolt import App
@@ -86,15 +69,3 @@ def view_submission(ack, payload, logger):
 
 if __name__ == "__main__":
     app.start(3000)  # POST http://localhost:3000/slack/events
-```
-
-## Run the Bolt App
-
-```bash
-export SLACK_SIGNING_SECRET=***
-export SLACK_BOT_TOKEN=xoxb-***
-python app.py
-
-# another terminal
-ngrok http 3000
-```
