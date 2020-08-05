@@ -1,11 +1,3 @@
----
-name: Code Change
-about: Submit an pull request
-title: code
-labels: ''
-assignees: ''
----
-
 ##  Summary
 
 (Describe the goal of this PR. Mention any related Issue numbers)
