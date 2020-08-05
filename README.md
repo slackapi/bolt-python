@@ -50,7 +50,7 @@ def open_modal(ack, client, logger, payload):
     # acknowledge the incoming request from Slack immediately
     ack()
     # open a modal
-api_response = client.views_open(
+    api_response = client.views_open(
         trigger_id=payload["trigger_id"],
         view={
             "type": "modal",
