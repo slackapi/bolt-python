@@ -1,17 +1,18 @@
 from typing import Callable, Optional, Awaitable
 
-from slack_bolt.auth.result import AuthorizationResult
-from slack_bolt.logger import get_bolt_logger
-from slack_bolt.request.async_request import AsyncBoltRequest
-from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import Bot
 from slack_sdk.oauth.installation_store.async_installation_store import (
     AsyncInstallationStore,
 )
-from slack_sdk.web.async_client import AsyncWebClient
+
+from slack_bolt.auth.result import AuthorizationResult
+from slack_bolt.logger import get_bolt_logger
+from slack_bolt.request.async_request import AsyncBoltRequest
+from slack_bolt.response import BoltResponse
 from .async_authorization import AsyncAuthorization
 from .async_internals import _build_error_response, _is_no_auth_required
+from ...util.async_utils import create_async_web_client
 
 
 class AsyncMultiTeamsAuthorization(AsyncAuthorization):
@@ -55,7 +56,7 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
                     )
                     # TODO: bot -> user token
                     req.context["token"] = bot.bot_token
-                    req.context["client"] = AsyncWebClient(token=bot.bot_token)
+                    req.context["client"] = create_async_web_client(bot.bot_token)
                     return await next()
                 else:
                     # Just in case
@@ -71,7 +72,7 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
                 )
                 # TODO: bot -> user token
                 req.context["token"] = bot.bot_token
-                req.context["client"] = AsyncWebClient(token=bot.bot_token)
+                req.context["client"] = create_async_web_client(bot.bot_token)
                 return next()
 
         except SlackApiError as e:

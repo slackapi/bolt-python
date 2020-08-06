@@ -18,6 +18,8 @@ from slack_sdk.oauth.state_store import OAuthStateStore
 from slack_sdk.oauth.state_store.sqlite3 import SQLite3OAuthStateStore
 from slack_sdk.web import WebClient, SlackResponse
 
+from slack_bolt.util.utils import create_web_client
+
 
 class OAuthFlow:
     installation_store: InstallationStore
@@ -42,7 +44,7 @@ class OAuthFlow:
     @property
     def client(self) -> WebClient:
         if self._client is None:
-            self._client = WebClient()
+            self._client = create_web_client()
         return self._client
 
     @property

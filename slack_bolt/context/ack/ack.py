@@ -2,7 +2,7 @@ from typing import List, Optional, Union
 
 from slack_bolt.context.ack.internals import _set_response
 from slack_bolt.response.response import BoltResponse
-from slack_sdk.models.block_kit import Block
+from slack_sdk.models.blocks import Block
 
 
 class Ack:

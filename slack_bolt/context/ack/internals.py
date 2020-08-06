@@ -1,6 +1,6 @@
 from typing import Optional, List, Union
 
-from slack_sdk.models.block_kit import Block
+from slack_sdk.models.blocks import Block
 
 from slack_bolt.error import BoltError
 from slack_bolt.response import BoltResponse

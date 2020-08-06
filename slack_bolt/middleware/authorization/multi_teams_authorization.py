@@ -6,9 +6,9 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import InstallationStore, Bot
-from slack_sdk.web import WebClient
 from . import Authorization
 from .internals import _build_error_response, _is_no_auth_required
+from ...util.utils import create_web_client
 
 
 class MultiTeamsAuthorization(Authorization):
@@ -46,7 +46,7 @@ class MultiTeamsAuthorization(Authorization):
                     )
                     # TODO: bot -> user token
                     req.context["token"] = bot.bot_token
-                    req.context["client"] = WebClient(token=bot.bot_token)
+                    req.context["client"] = create_web_client(bot.bot_token)
                     return next()
                 else:
                     # Just in case
@@ -62,7 +62,7 @@ class MultiTeamsAuthorization(Authorization):
                 )
                 # TODO: bot -> user token
                 req.context["token"] = bot.bot_token
-                req.context["client"] = WebClient(token=bot.bot_token)
+                req.context["client"] = create_web_client(bot.bot_token)
                 return next()
 
         except SlackApiError as e:

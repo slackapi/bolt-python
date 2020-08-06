@@ -2,7 +2,7 @@ from typing import Optional, List, Union, Dict
 
 from slack_bolt.context.say.internals import _can_say
 from slack_sdk.models.attachments import Attachment
-from slack_sdk.models.block_kit import Block
+from slack_sdk.models.blocks import Block
 from slack_sdk.web.async_client import AsyncWebClient
 from slack_sdk.web.async_slack_response import AsyncSlackResponse
 
