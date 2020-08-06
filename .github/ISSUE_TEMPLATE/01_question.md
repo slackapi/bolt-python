@@ -48,7 +48,7 @@ sw_vers && uname -v # or `ver`
 
 ## Requirements (place an `x` in each of the `[ ]`)
 
-(For general questions/issues about Slack API platfor or its server-side, could you submit questions at https://my.slack.com/help/requests/new instead. :bow:)
+(For general questions/issues about Slack API platform or its server-side, could you submit questions at https://my.slack.com/help/requests/new instead. :bow:)
 
 * [ ] This is a question specific to this SDK project.
 * [ ] I've read and understood the [Contributing guidelines](https://github.com/slackapi/bolt-python/blob/main/.github/contributing.md) and have done my best effort to follow them.
