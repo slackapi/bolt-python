@@ -12,9 +12,9 @@ assignees: ''
 
 ### Category (place an `x` in each of the `[ ]`)
 
-* [ ] `slack_bolt.App` and/or its core components
-* [ ] `slack_bolt.async_app.AsyncApp` and/or its core components
-* [ ] Adapters in `slack_bolt.adapter`
+* [ ] **slack_bolt.App** and/or its core components
+* [ ] **slack_bolt.async_app.AsyncApp** and/or its core components
+* [ ] Adapters in **slack_bolt.adapter**
 
 ## Requirements (place an `x` in each of the `[ ]`)
 

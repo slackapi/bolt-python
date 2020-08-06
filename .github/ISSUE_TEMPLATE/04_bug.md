@@ -1,6 +1,6 @@
 ---
 name: Bug
-about: Report a Slack Python SDK bug
+about: Report the SDK bug
 title: (Set a clear title describing the issue)
 labels: 'bug'
 assignees: ''
@@ -20,7 +20,7 @@ sw_vers && uname -v # or `ver`
 
 #### The `slack_bolt` version
 
-(Paste the output of `pip freeze \| grep slack`)
+(Paste the output of `pip freeze | grep slack`)
 
 #### Python runtime version
 

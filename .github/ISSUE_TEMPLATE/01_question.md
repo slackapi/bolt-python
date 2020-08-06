@@ -20,7 +20,7 @@ sw_vers && uname -v # or `ver`
 
 #### The `slack_bolt` version
 
-(Paste the output of `pip freeze \| grep slack`)
+(Paste the output of `pip freeze | grep slack`)
 
 #### Python runtime version
 
