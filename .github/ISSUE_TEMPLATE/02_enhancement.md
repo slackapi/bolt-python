@@ -1,7 +1,7 @@
 ---
 name: Enhancement / Feature Request
 about: Submit an enhancement/feature request
-title: enhancement
+title: (Set a clear title describing your idea)
 labels: 'enhancement'
 assignees: ''
 ---

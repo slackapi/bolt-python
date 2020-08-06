@@ -1,7 +1,7 @@
 ---
 name: Document
 about: Submit an issue on documents
-title: docs
+title: (Set a clear title describing your idea)
 labels: 'docs'
 assignees: ''
 ---
