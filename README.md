@@ -1,10 +1,12 @@
-# Important Notice
+# ⚠️ Important Notice ⚠️
 
-This project is **still in alpha**, and may have bugs in it. Also, the public APIs can be changed until the v1 release.
+## 🔄 Still Work In Progress 🔄
+
+This project is **still in alpha**, and may have bugs in it. Also, the public APIs can be changed until the v1 release. We are keen to hear your feedback. Please feel free to [submit an issue](https://github.com/slackapi/bolt-python/issues)!
 
 # Bolt for Python (still in alpha)
 
-A Python framework to build Slack apps in a flash with the latest platform features.
+A Python framework to build Slack apps in a flash with the latest platform features. Check the [samples](https://github.com/slackapi/bolt-python/tree/main/samples) to know how to use this framework.
 
 ## Setup
 
@@ -20,15 +22,13 @@ Create an app by calling a constructor, which is a top-level export.
 
 ```python
 import logging
+logging.basicConfig(level=logging.DEBUG)
 
 from slack_bolt import App
-
-logging.basicConfig(level=logging.DEBUG)
 
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
 app = App()
-
 
 # Middleware
 @app.middleware  # or app.use(log_request)
@@ -36,12 +36,10 @@ def log_request(logger, payload, next):
     logger.info(payload)
     return next()
 
-
 # Events API: https://api.slack.com/events-api
 @app.event("app_mention")
 def event_test(say):
     say("What's up?")
-
 
 # Interactivity: https://api.slack.com/interactivity
 @app.shortcut("callback-id-here")
@@ -80,13 +78,11 @@ def open_modal(ack, client, logger, payload):
         })
     logger.debug(api_response)
 
-
 @app.view("view-id")
 def view_submission(ack, payload, logger):
     ack()
     # Prints {'b': {'a': {'type': 'plain_text_input', 'value': 'Your Input'}}}
     logger.info(payload["view"]["state"]["values"])
-
 
 if __name__ == "__main__":
     app.start(3000)  # POST http://localhost:3000/slack/events
@@ -99,9 +95,13 @@ export SLACK_SIGNING_SECRET=***
 export SLACK_BOT_TOKEN=xoxb-***
 python app.py
 
-# another terminal
+# in another terminal
 ngrok http 3000
 ```
+
+# Feedback
+
+We are keen to hear your feedback. Please feel free to [submit an issue](https://github.com/slackapi/bolt-python/issues)!
 
 # License
 
