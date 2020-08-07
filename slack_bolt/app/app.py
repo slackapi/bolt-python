@@ -1,3 +1,4 @@
+import copy
 import inspect
 import json
 import logging
@@ -13,6 +14,8 @@ from slack_sdk.oauth.state_store import OAuthStateStore, FileOAuthStateStore
 from slack_sdk.web import WebClient
 
 from slack_bolt.error import BoltError
+from slack_bolt.lazy_listener.runner import LazyListenerRunner
+from slack_bolt.lazy_listener.thread_runner import ThreadLazyListenerRunner
 from slack_bolt.listener.custom_listener import CustomListener
 from slack_bolt.listener.listener import Listener
 from slack_bolt.listener.listener_error_handler import (
@@ -190,6 +193,10 @@ class App:
         )
         self._process_before_response = process_before_response
 
+        self.lazy_listener_runner: LazyListenerRunner = ThreadLazyListenerRunner(
+            logger=self._framework_logger, executor=self._listener_executor,
+        )
+
         self._init_middleware_list_done = False
         self._init_middleware_list()
 
@@ -280,7 +287,7 @@ class App:
                 return resp
 
         for listener in self._listeners:
-            listener_name = listener.func.__name__
+            listener_name = listener.ack_function.__name__
             self._framework_logger.debug(f"Checking listener: {listener_name} ...")
             if listener.matches(req=req, resp=resp):
                 # run all the middleware attached to this listener first
@@ -313,24 +320,38 @@ class App:
         ack = request.context.ack
         starting_time = time.time()
         if self._process_before_response:
-            try:
-                returned_value = listener.run_ack_function(
-                    request=request, response=response
-                )
-                if isinstance(returned_value, BoltResponse):
-                    response = returned_value
-                if ack.response is None and listener.auto_acknowledgement:
-                    ack()  # automatic ack() call if the call is not yet done
-            except Exception as e:
-                # The default response status code is 500 in this case.
-                # You can customize this by passing your own error handler.
-                if response is None:
-                    response = BoltResponse(status=500)
-                response.status = 500
-                self._listener_error_handler.handle(
-                    error=e, request=request, response=response,
-                )
-                ack.response = response
+            if not request.lazy_only:
+                try:
+                    returned_value = listener.run_ack_function(
+                        request=request, response=response
+                    )
+                    if isinstance(returned_value, BoltResponse):
+                        response = returned_value
+                    if ack.response is None and listener.auto_acknowledgement:
+                        ack()  # automatic ack() call if the call is not yet done
+                except Exception as e:
+                    # The default response status code is 500 in this case.
+                    # You can customize this by passing your own error handler.
+                    if response is None:
+                        response = BoltResponse(status=500)
+                    response.status = 500
+                    self._listener_error_handler.handle(
+                        error=e, request=request, response=response,
+                    )
+                    ack.response = response
+
+            for lazy_func in listener.lazy_functions:
+                if request.lazy_function_name:
+                    func_name = lazy_func.__name__
+                    if func_name == request.lazy_function_name:
+                        self.lazy_listener_runner.run(
+                            function=lazy_func, request=request
+                        )
+                        return None
+                    else:
+                        continue
+                else:
+                    self._start_lazy_function(lazy_func, request)
 
             if response is not None:
                 self._debug_log_completion(starting_time, response)
@@ -339,34 +360,48 @@ class App:
                 self._debug_log_completion(starting_time, ack.response)
                 return ack.response
         else:
-            # start the listener function asynchronously
-            def run_ack_function_asynchronously():
-                nonlocal ack, request, response
-                try:
-                    listener.run_ack_function(request=request, response=response)
-                except Exception as e:
-                    # The default response status code is 500 in this case.
-                    # You can customize this by passing your own error handler.
-                    if response is None:
-                        response = BoltResponse(status=500)
-                    response.status = 500
-                    if ack.response is not None:  # already acknowledged
-                        response = None
-
-                    self._listener_error_handler.handle(
-                        error=e, request=request, response=response,
-                    )
-                    ack.response = response
-
-            self._listener_executor.submit(run_ack_function_asynchronously)
-
             if listener.auto_acknowledgement:
                 # acknowledge immediately in case of Events API
                 ack()
-            else:
-                # await for the completion of ack() in the async listener execution
-                while ack.response is None and time.time() - starting_time <= 3:
-                    time.sleep(0.01)
+
+            if not request.lazy_only:
+                # start the listener function asynchronously
+                def run_ack_function_asynchronously():
+                    nonlocal ack, request, response
+                    try:
+                        listener.run_ack_function(request=request, response=response)
+                    except Exception as e:
+                        # The default response status code is 500 in this case.
+                        # You can customize this by passing your own error handler.
+                        if response is None:
+                            response = BoltResponse(status=500)
+                        response.status = 500
+                        if ack.response is not None:  # already acknowledged
+                            response = None
+
+                        self._listener_error_handler.handle(
+                            error=e, request=request, response=response,
+                        )
+                        ack.response = response
+
+                self._listener_executor.submit(run_ack_function_asynchronously)
+
+            for lazy_func in listener.lazy_functions:
+                if request.lazy_function_name:
+                    func_name = lazy_func.__name__
+                    if func_name == request.lazy_function_name:
+                        self.lazy_listener_runner.run(
+                            function=lazy_func, request=request
+                        )
+                        return None
+                    else:
+                        continue
+                else:
+                    self._start_lazy_function(lazy_func, request)
+
+            # await for the completion of ack() in the async listener execution
+            while ack.response is None and time.time() - starting_time <= 3:
+                time.sleep(0.01)
 
             if response is None and ack.response is None:
                 self._framework_logger.warning(f"{listener_name} didn't call ack()")
@@ -382,6 +417,22 @@ class App:
 
         # None for both means no ack() in the listener
         return None
+
+    # TODO: type
+    def _start_lazy_function(self, lazy_func, request):
+        # Start a lazy function asynchronously
+        func_name = lazy_func.__name__
+        self._framework_logger.debug(f"Running lazy listener: {func_name} ...")
+        copied_request = self._build_lazy_request(request, func_name)
+        self.lazy_listener_runner.start(function=lazy_func, request=copied_request)
+
+    @staticmethod
+    def _build_lazy_request(request: BoltRequest, lazy_func_name: str) -> BoltRequest:
+        copied_request = copy.deepcopy(request)
+        copied_request.method = "NONE"
+        copied_request.lazy_only = True
+        copied_request.lazy_function_name = lazy_func_name
+        return copied_request
 
     def _debug_log_completion(
         self, starting_time: float, response: BoltResponse
@@ -423,10 +474,11 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.event(event)
             return self._register_listener(
-                func, primary_matcher, matchers, middleware, True
+                list(functions), primary_matcher, matchers, middleware, True
             )
 
         return __call__
@@ -440,11 +492,12 @@ class App:
         matchers = matchers if matchers else []
         middleware = middleware if middleware else []
 
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.event("message")
             middleware.append(MessageListenerMatches(keyword))
             return self._register_listener(
-                func, primary_matcher, matchers, middleware, True
+                list(functions), primary_matcher, matchers, middleware, True
             )
 
         return __call__
@@ -458,9 +511,12 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.command(command)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(
+                list(functions), primary_matcher, matchers, middleware
+            )
 
         return __call__
 
@@ -473,9 +529,12 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.shortcut(constraints)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(
+                list(functions), primary_matcher, matchers, middleware
+            )
 
         return __call__
 
@@ -485,9 +544,12 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.global_shortcut(callback_id)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(
+                list(functions), primary_matcher, matchers, middleware
+            )
 
         return __call__
 
@@ -497,9 +559,12 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.message_shortcut(callback_id)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(
+                list(functions), primary_matcher, matchers, middleware
+            )
 
         return __call__
 
@@ -512,9 +577,12 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.action(constraints)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(
+                list(functions), primary_matcher, matchers, middleware
+            )
 
         return __call__
 
@@ -524,9 +592,12 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.block_action(action_id)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(
+                list(functions), primary_matcher, matchers, middleware
+            )
 
         return __call__
 
@@ -536,9 +607,12 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.attachment_action(callback_id)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(
+                list(functions), primary_matcher, matchers, middleware
+            )
 
         return __call__
 
@@ -548,9 +622,12 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.dialog_submission(callback_id)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(
+                list(functions), primary_matcher, matchers, middleware
+            )
 
         return __call__
 
@@ -560,9 +637,12 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.dialog_cancellation(callback_id)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(
+                list(functions), primary_matcher, matchers, middleware
+            )
 
         return __call__
 
@@ -575,9 +655,12 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.view(constraints)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(
+                list(functions), primary_matcher, matchers, middleware
+            )
 
         return __call__
 
@@ -587,9 +670,12 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.view_submission(constraints)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(
+                list(functions), primary_matcher, matchers, middleware
+            )
 
         return __call__
 
@@ -599,9 +685,12 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.view_closed(constraints)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(
+                list(functions), primary_matcher, matchers, middleware
+            )
 
         return __call__
 
@@ -614,9 +703,12 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.options(constraints)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(
+                list(functions), primary_matcher, matchers, middleware
+            )
 
         return __call__
 
@@ -626,9 +718,12 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.block_suggestion(action_id)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(
+                list(functions), primary_matcher, matchers, middleware
+            )
 
         return __call__
 
@@ -638,9 +733,12 @@ class App:
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
-        def __call__(func):
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.dialog_suggestion(callback_id)
-            return self._register_listener(func, primary_matcher, matchers, middleware)
+            return self._register_listener(
+                list(functions), primary_matcher, matchers, middleware
+            )
 
         return __call__
 
@@ -651,14 +749,27 @@ class App:
         req.context["token"] = self._token
         req.context["client"] = self._client
 
+    @staticmethod
+    def _to_listener_functions(
+        kwargs: dict,
+    ) -> Optional[List[Callable[..., Optional[BoltResponse]]]]:
+        if kwargs:
+            functions = [kwargs["ack"]]
+            for sub in kwargs["lazy"]:
+                functions.append(sub)
+            return functions
+        return None
+
     def _register_listener(
         self,
-        func: Callable[..., BoltResponse],
+        functions: List[Callable[..., Optional[BoltResponse]]],
         primary_matcher: ListenerMatcher,
         matchers: Optional[List[Callable[..., bool]]],
         middleware: Optional[List[Union[Callable, Middleware]]],
         auto_acknowledgement: bool = False,
     ) -> None:
+        if not isinstance(functions, list):
+            functions = list(functions)
 
         listener_matchers = [
             CustomListenerMatcher(app_name=self.name, func=f) for f in (matchers or [])
@@ -678,7 +789,8 @@ class App:
         self._listeners.append(
             CustomListener(
                 app_name=self.name,
-                func=func,
+                ack_function=functions.pop(0),
+                lazy_functions=functions,
                 matchers=listener_matchers,
                 middleware=listener_middleware,
                 auto_acknowledgement=auto_acknowledgement,

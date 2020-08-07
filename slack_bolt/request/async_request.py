@@ -17,6 +17,8 @@ class AsyncBoltRequest:
     content_type: Optional[str]
     payload: Dict[str, Any]
     context: AsyncBoltContext
+    lazy_only: bool
+    lazy_function_name: Optional[str]
 
     def __init__(
         self,
@@ -35,3 +37,7 @@ class AsyncBoltRequest:
         self.context = build_async_context(
             AsyncBoltContext(context if context else {}), self.payload
         )
+        self.lazy_only = self.headers.get("x-slack-bolt-lazy-only", [False])[0]
+        self.lazy_function_name = self.headers.get(
+            "x-slack-bolt-lazy-function-name", [None]
+        )[0]

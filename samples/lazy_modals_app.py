@@ -1,6 +1,7 @@
 # ------------------------------------------------
 # instead of slack_bolt in requirements.txt
 import sys
+import time
 
 sys.path.insert(1, "..")
 # ------------------------------------------------
@@ -20,20 +21,12 @@ def log_request(logger, payload, next):
     return next()
 
 
-@app.command("/hello-bolt-python")
-def handle_command(payload, ack, respond, client, logger):
+def ack_command(payload, ack, logger):
     logger.info(payload)
-    ack(
-        text="Accepted!",
-        blocks=[
-            {
-                "type": "section",
-                "block_id": "b",
-                "text": {"type": "mrkdwn", "text": ":white_check_mark: Accepted!",},
-            }
-        ],
-    )
+    ack("Thanks!")
 
+
+def post_button_message(respond):
     respond(
         blocks=[
             {
@@ -53,6 +46,8 @@ def handle_command(payload, ack, respond, client, logger):
         ]
     )
 
+
+def open_modal(payload, client, logger):
     res = client.views_open(
         trigger_id=payload["trigger_id"],
         view={
@@ -95,6 +90,11 @@ def handle_command(payload, ack, respond, client, logger):
     logger.info(res)
 
 
+app.command("/hello-bolt-python")(
+    ack=ack_command,
+    lazy=[post_button_message, open_modal],
+)
+
 @app.options("es_a")
 def show_options(ack):
     ack(
@@ -135,34 +135,27 @@ def show_multi_options(ack):
 
 
 @app.view("view-id")
-def view_submission(ack, payload, logger):
+def handle_view_submission(ack, payload, logger):
     ack()
     logger.info(payload["view"]["state"]["values"])
 
 
-@app.action("a")
-def button_click(ack, payload, respond):
+def ack_button_click(ack, respond):
     ack()
+    respond("Loading ...")
 
-    user_id = payload["user"]["id"]
-    # in_channel / dict
-    respond(
-        {
-            "response_type": "in_channel",
-            "replace_original": False,
-            "text": f"<@{user_id}> clicked a button! (in_channel)",
-        }
-    )
-    # ephemeral / kwargs
-    respond(
-        replace_original=False, text=":white_check_mark: Done!",
-    )
 
+def respond_5_seconds_later(respond):
+    time.sleep(5)
+    respond("Completed!")
+
+
+app.action("a")(ack=ack_button_click, lazy=[respond_5_seconds_later])
 
 if __name__ == "__main__":
     app.start(3000)
 
-# pip install slack_bolt
+# pip install -i https://test.pypi.org/simple/ slack_bolt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
 # python modals_app.py

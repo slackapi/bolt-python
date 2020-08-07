@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABCMeta
-from typing import List, Callable, Awaitable, Tuple
+from typing import List, Callable, Awaitable, Tuple, Optional
 
 from slack_bolt.listener_matcher.async_listener_matcher import AsyncListenerMatcher
 from slack_bolt.middleware.async_middleware import AsyncMiddleware
@@ -11,7 +11,8 @@ from ..kwargs_injection.async_utils import build_async_required_kwargs
 class AsyncListener(metaclass=ABCMeta):
     matchers: List[AsyncListenerMatcher]
     middleware: List[AsyncMiddleware]
-    func: Callable[..., Awaitable[BoltResponse]]
+    ack_function: Callable[..., Awaitable[BoltResponse]]
+    lazy_functions: List[Callable[..., Awaitable[None]]]
     auto_acknowledgement: bool
 
     async def async_matches(
@@ -71,7 +72,8 @@ from slack_bolt.response import BoltResponse
 
 class AsyncCustomListener(AsyncListener):
     app_name: str
-    func: Callable[..., Awaitable[BoltResponse]]
+    ack_function: Callable[..., Awaitable[Optional[BoltResponse]]]
+    lazy_functions: List[Callable[..., Awaitable[None]]]
     matchers: List[AsyncListenerMatcher]
     middleware: List[AsyncMiddleware]
     auto_acknowledgement: bool
@@ -82,23 +84,25 @@ class AsyncCustomListener(AsyncListener):
         self,
         *,
         app_name: str,
-        func: Callable[..., Awaitable[BoltResponse]],
+        ack_function: Callable[..., Awaitable[Optional[BoltResponse]]],
+        lazy_functions: List[Callable[..., Awaitable[None]]],
         matchers: List[AsyncListenerMatcher],
         middleware: List[AsyncMiddleware],
         auto_acknowledgement: bool = False,
     ):
         self.app_name = app_name
-        self.func = func
+        self.ack_function = ack_function
+        self.lazy_functions = lazy_functions
         self.matchers = matchers
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
-        self.arg_names = inspect.getfullargspec(func).args
-        self.logger = get_bolt_app_logger(app_name, self.func)
+        self.arg_names = inspect.getfullargspec(ack_function).args
+        self.logger = get_bolt_app_logger(app_name, self.ack_function)
 
     async def run_ack_function(
         self, *, request: AsyncBoltRequest, response: BoltResponse,
-    ) -> BoltResponse:
-        return await self.func(
+    ) -> Optional[BoltResponse]:
+        return await self.ack_function(
             **build_async_required_kwargs(
                 logger=self.logger,
                 required_arg_names=self.arg_names,
