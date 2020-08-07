@@ -6,6 +6,10 @@ This project is **still in alpha**, and may have bugs in it. Also, the public AP
 
 # Bolt for Python (still in alpha)
 
+[![Python Version][python-version]][pypi-url]
+[![pypi package][pypi-image]][pypi-url]
+[![Build Status][travis-image]][travis-url]
+
 A Python framework to build Slack apps in a flash with the latest platform features. Check the [samples](https://github.com/slackapi/bolt-python/tree/main/samples) to know how to use this framework.
 
 ## Setup
@@ -106,3 +110,9 @@ We are keen to hear your feedback. Please feel free to [submit an issue](https:/
 # License
 
 The MIT License
+
+[pypi-image]: https://badge.fury.io/py/slack-bolt.svg
+[pypi-url]: https://pypi.org/project/slack-bolt/
+[travis-image]: https://travis-ci.org/slackapi/bolt-python.svg?branch=main
+[travis-url]: https://travis-ci.org/slackapi/bolt-python
+[python-version]: https://img.shields.io/pypi/pyversions/slack-bolt.svg
