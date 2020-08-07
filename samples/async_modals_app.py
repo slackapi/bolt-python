@@ -1,5 +1,6 @@
 # ------------------------------------------------
 # instead of slack_bolt in requirements.txt
+import asyncio
 import sys
 
 sys.path.insert(1, "..")
@@ -9,32 +10,23 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG)
 
-from slack_bolt import App
+from slack_bolt.async_app import AsyncApp
 
-app = App()
+app = AsyncApp()
 
 
 @app.middleware  # or app.use(log_request)
-def log_request(logger, payload, next):
+async def log_request(logger, payload, next):
     logger.debug(payload)
-    return next()
+    return await next()
 
 
 @app.command("/hello-bolt-python")
-def handle_command(payload, ack, respond, client, logger):
+async def handle_command(payload, ack, respond, client, logger):
     logger.info(payload)
-    ack(
-        text="Accepted!",
-        blocks=[
-            {
-                "type": "section",
-                "block_id": "b",
-                "text": {"type": "mrkdwn", "text": ":white_check_mark: Accepted!",},
-            }
-        ],
-    )
+    await ack("Accepted!")
 
-    respond(
+    await respond(
         blocks=[
             {
                 "type": "section",
@@ -53,7 +45,7 @@ def handle_command(payload, ack, respond, client, logger):
         ]
     )
 
-    res = client.views_open(
+    res = await client.views_open(
         trigger_id=payload["trigger_id"],
         view={
             "type": "modal",
@@ -74,7 +66,6 @@ def handle_command(payload, ack, respond, client, logger):
                         "type": "external_select",
                         "action_id": "es_a",
                         "placeholder": {"type": "plain_text", "text": "Select an item"},
-                        "min_query_length": 0,
                     },
                     "label": {"type": "plain_text", "text": "Search"},
                 },
@@ -85,7 +76,6 @@ def handle_command(payload, ack, respond, client, logger):
                         "type": "multi_external_select",
                         "action_id": "mes_a",
                         "placeholder": {"type": "plain_text", "text": "Select an item"},
-                        "min_query_length": 0,
                     },
                     "label": {"type": "plain_text", "text": "Search (multi)"},
                 },
@@ -96,15 +86,15 @@ def handle_command(payload, ack, respond, client, logger):
 
 
 @app.options("es_a")
-def show_options(ack):
-    ack(
+async def show_options(ack):
+    await ack(
         {"options": [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]}
     )
 
 
 @app.options("mes_a")
-def show_multi_options(ack):
-    ack(
+async def show_multi_options(ack):
+    await ack(
         {
             "option_groups": [
                 {
@@ -135,27 +125,17 @@ def show_multi_options(ack):
 
 
 @app.view("view-id")
-def view_submission(ack, payload, logger):
-    ack()
+async def view_submission(ack, payload, logger):
+    await ack()
     logger.info(payload["view"]["state"]["values"])
 
 
 @app.action("a")
-def button_click(ack, payload, respond):
-    ack()
-
-    user_id = payload["user"]["id"]
-    # in_channel / dict
-    respond(
-        {
-            "response_type": "in_channel",
-            "replace_original": False,
-            "text": f"<@{user_id}> clicked a button! (in_channel)",
-        }
-    )
-    # ephemeral / kwargs
-    respond(
-        replace_original=False, text=":white_check_mark: Done!",
+async def button_click(ack, respond):
+    await ack()
+    await asyncio.sleep(5)
+    await respond(
+        {"response_type": "in_channel", "text": "Clicked!",}
     )
 
 

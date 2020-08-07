@@ -79,7 +79,7 @@ def button_click(logger, payload, ack, respond):
 if __name__ == "__main__":
     app.start(3000)
 
-# pip install -i https://test.pypi.org/simple/ slack_bolt
+# pip install slack_bolt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
 # export SLACK_CLIENT_ID=111.111
