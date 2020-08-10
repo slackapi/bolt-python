@@ -57,7 +57,8 @@ def oauth_redirect() -> Response:
 
 # configure aws credentials properly
 # pip install -r requirements.txt
-# edit .chalice/config.json
+# cp -p .chalice/config.json.oauth .chalice/config.json
+# # edit .chalice/config.json
 # rm -rf vendor/latest_slack_bolt && cp -pr ../../src vendor/latest_slack_bolt
 # chalice deploy
 

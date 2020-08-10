@@ -4,16 +4,11 @@ from chalice import Chalice, Response
 
 from slack_bolt import App
 from slack_bolt.adapter.aws_lambda.chalice_handler import ChaliceSlackRequestHandler
-from slack_bolt.adapter.aws_lambda.lambda_s3_oauth_flow import LambdaS3OAuthFlow
 
 # process_before_response must be True when running on FaaS
 bolt_app = App(
     process_before_response=True,
     authorization_test_enabled=False,
-    oauth_flow=LambdaS3OAuthFlow(
-        install_path="/api/slack/install",
-        redirect_uri_path="/api/slack/oauth_redirect",
-    ),
 )
 
 
@@ -57,9 +52,10 @@ def oauth_redirect() -> Response:
 
 # configure aws credentials properly
 # pip install -r requirements.txt
-# edit .chalice/config.json
+# cp -p .chalice/config.json.simple .chalice/config.json
+# # edit .chalice/config.json
 # rm -rf vendor/slack_* && cp -pr ../../src/* vendor/
 # chalice deploy
 
-# for local dev
+# # for local dev
 # chalice local --stage dev --port 3000
