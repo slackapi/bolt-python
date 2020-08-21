@@ -59,7 +59,7 @@ setuptools.setup(
             "click>=7,<8",  # for chalice
             "Django>=3,<4",
             "falcon>=2,<3",
-            "fastapi>=0.54,<0.55",
+            "fastapi<1",
             "Flask>=1,<2",
             "pyramid>=1,<2",
             "sanic>=20,<21",
