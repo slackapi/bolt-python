@@ -35,5 +35,5 @@ tmp.txt
 .DS_Store
 logs/
 
-.env
+.env*
 *.db
