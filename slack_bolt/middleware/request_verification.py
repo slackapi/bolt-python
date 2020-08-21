@@ -3,7 +3,7 @@ from typing import Callable, Dict, Any
 from slack_sdk.signature import SignatureVerifier
 
 from slack_bolt.logger import get_bolt_logger
-from slack_bolt.middleware import Middleware
+from .middleware import Middleware
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
