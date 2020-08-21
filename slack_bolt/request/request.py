@@ -1,4 +1,4 @@
-from typing import Dict, Optional, List, Union
+from typing import Dict, Optional, List, Union, Any
 
 from slack_bolt.context.context import BoltContext
 from slack_bolt.request.internals import (
@@ -15,7 +15,7 @@ class BoltRequest:
     query: Dict[str, List[str]]
     headers: Dict[str, List[str]]
     content_type: Optional[str]
-    payload: Dict[str, any]
+    payload: Dict[str, Any]
     context: BoltContext
 
     def __init__(

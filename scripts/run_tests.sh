@@ -8,4 +8,5 @@ cd ${script_dir}/..
 
 pip install -e ".[testing]" && \
   black slack_bolt/ tests/ && \
-  pytest $1
+  pytest $1 && \
+  pytype slack_bolt/

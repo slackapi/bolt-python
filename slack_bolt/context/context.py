@@ -1,3 +1,4 @@
+# pytype: skip-file
 from typing import Optional
 
 from slack_bolt.context.ack import Ack

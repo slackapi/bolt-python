@@ -1,13 +1,14 @@
-from typing import Callable, Dict
+from typing import Callable, Dict, Any
 
-from slack_bolt.logger import get_bolt_logger
-from slack_bolt.middleware import Middleware
-from slack_bolt.request import BoltRequest
-from slack_bolt.response import BoltResponse
 from slack_sdk.signature import SignatureVerifier
 
+from slack_bolt.logger import get_bolt_logger
+from .middleware import Middleware
+from slack_bolt.request import BoltRequest
+from slack_bolt.response import BoltResponse
 
-class RequestVerification(Middleware):
+
+class RequestVerification(Middleware):  # type: ignore
     def __init__(self, signing_secret: str):
         self.verifier = SignatureVerifier(signing_secret=signing_secret)
         self.logger = get_bolt_logger(RequestVerification)
@@ -30,8 +31,8 @@ class RequestVerification(Middleware):
     # -----------------------------------------
 
     @staticmethod
-    def _can_skip(payload: Dict[str, any]) -> bool:
-        return payload and payload.get("ssl_check", None) == "1"
+    def _can_skip(payload: Dict[str, Any]) -> bool:
+        return payload is not None and payload.get("ssl_check", None) == "1"
 
     @staticmethod
     def _build_error_response() -> BoltResponse:

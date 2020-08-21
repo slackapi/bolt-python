@@ -34,7 +34,7 @@ def to_starlette_response(bolt_resp: BoltResponse) -> Response:
 
 
 class AsyncSlackRequestHandler:
-    def __init__(self, app: AsyncApp):
+    def __init__(self, app: AsyncApp):  # type: ignore
         self.app = app
 
     async def handle(self, req: Request) -> Response:

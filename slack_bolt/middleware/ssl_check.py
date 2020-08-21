@@ -1,12 +1,12 @@
 from typing import Callable
 
 from slack_bolt.logger import get_bolt_logger
-from slack_bolt.middleware import Middleware
+from .middleware import Middleware
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
-class SslCheck(Middleware):
+class SslCheck(Middleware):  # type: ignore
     def __init__(self, verification_token: str = None):
         self.verification_token = verification_token
         self.logger = get_bolt_logger(SslCheck)

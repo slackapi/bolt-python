@@ -266,7 +266,7 @@ class AsyncApp:
     async def async_dispatch(self, req: AsyncBoltRequest) -> BoltResponse:
         self._init_context(req)
 
-        resp: BoltResponse = BoltResponse(status=200, body=None)
+        resp: BoltResponse = BoltResponse(status=200, body="")
         middleware_state = {"next_called": False}
 
         async def async_middleware_next():
@@ -426,7 +426,7 @@ class AsyncApp:
                 text: Optional[str] = payload.get("event", {}).get("text", {})
                 if text:
                     if isinstance(keyword, Pattern):
-                        return keyword.match(text)
+                        return keyword.match(text)  # type: ignore
                     elif isinstance(keyword, str):
                         return keyword in text
                 return False
@@ -648,7 +648,7 @@ class AsyncApp:
         matchers: Optional[List[Callable[..., Awaitable[bool]]]],
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]],
         auto_acknowledgement: bool = False,
-    ) -> Callable[..., None]:
+    ) -> None:
 
         if not inspect.iscoroutinefunction(func):
             name = func.__name__

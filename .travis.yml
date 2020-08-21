@@ -4,12 +4,11 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
-  - "3.8-dev"  # 3.8 development branch
-  - "nightly"  # nightly build
 install:
   - python setup.py install
   - pip install -U pip
   - pip install "pytest>=5,<6"
+  - pip install "pytype"
 script:
   # testing without aiohttp
   - travis_retry pytest tests/scenario_tests/
@@ -18,3 +17,5 @@ script:
   - travis_retry pytest tests/async_scenario_tests/
   # run all tests just in case
   - travis_retry python setup.py test
+  # Run pytype only for Python 3.8
+  - if [ ${TRAVIS_PYTHON_VERSION:0:3} == "3.8" ]; then pip install -e ".[adapter]"; pytype slack_bolt/; fi

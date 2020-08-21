@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABCMeta
-from typing import List, Callable
+from typing import List, Callable, Tuple
 
 from slack_bolt.listener_matcher import ListenerMatcher
 from slack_bolt.middleware import Middleware
@@ -9,7 +9,7 @@ from slack_bolt.response import BoltResponse
 
 class Listener(metaclass=ABCMeta):
     matchers: List[ListenerMatcher]
-    middleware: List[Middleware]
+    middleware: List[Middleware]  # type: ignore
     func: Callable[..., BoltResponse]
     auto_acknowledgement: bool
 
@@ -23,7 +23,7 @@ class Listener(metaclass=ABCMeta):
 
     def run_middleware(
         self, *, req: BoltRequest, resp: BoltResponse,
-    ) -> (BoltResponse, bool):
+    ) -> Tuple[BoltResponse, bool]:
         """
 
         :param req: the incoming request

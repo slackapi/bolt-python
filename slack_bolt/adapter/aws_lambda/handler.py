@@ -1,6 +1,6 @@
 import base64
 import logging
-from typing import List, Dict
+from typing import List, Dict, Any
 
 from slack_bolt.adapter.aws_lambda.internals import _first_value
 from slack_bolt.app import App
@@ -11,7 +11,7 @@ from slack_bolt.response import BoltResponse
 
 
 class SlackRequestHandler:
-    def __init__(self, app: App):
+    def __init__(self, app: App):  # type: ignore
         self.app = app
         self.logger = get_bolt_app_logger(app.name, SlackRequestHandler)
 
@@ -68,7 +68,7 @@ def to_bolt_request(event) -> BoltRequest:
     )
 
 
-def to_aws_response(resp: BoltResponse) -> Dict[str, any]:
+def to_aws_response(resp: BoltResponse) -> Dict[str, Any]:
     return {
         "statusCode": resp.status,
         "body": resp.body,
@@ -76,7 +76,7 @@ def to_aws_response(resp: BoltResponse) -> Dict[str, any]:
     }
 
 
-def not_found() -> Dict[str, any]:
+def not_found() -> Dict[str, Any]:
     return {
         "statusCode": 404,
         "body": "Not Found",

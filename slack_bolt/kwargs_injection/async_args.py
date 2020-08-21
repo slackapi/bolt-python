@@ -1,5 +1,6 @@
+# pytype: skip-file
 from logging import Logger
-from typing import Callable, Awaitable, Dict
+from typing import Callable, Awaitable, Dict, Any
 
 from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.context.async_context import AsyncBoltContext
@@ -18,7 +19,7 @@ class AsyncArgs:
     request: AsyncBoltRequest
     response: BoltResponse
     context: AsyncBoltContext
-    payload: Dict[str, any]
+    payload: Dict[str, Any]
     ack: AsyncAck
     say: AsyncSay
     respond: AsyncRespond
@@ -32,7 +33,7 @@ class AsyncArgs:
         req: AsyncBoltRequest,
         resp: BoltResponse,
         context: AsyncBoltContext,
-        payload: Dict[str, any],
+        payload: Dict[str, Any],
         ack: AsyncAck,
         say: AsyncSay,
         respond: AsyncRespond,
@@ -44,8 +45,8 @@ class AsyncArgs:
         self.request = self.req = req
         self.response = self.resp = resp
         self.context: AsyncBoltContext = context
-        self.payload: Dict[str, any] = payload
-        self.body: Dict[str, any] = payload
+        self.payload: Dict[str, Any] = payload
+        self.body: Dict[str, Any] = payload
         self.ack: AsyncAck = ack
         self.say: AsyncSay = say
         self.respond: AsyncRespond = respond

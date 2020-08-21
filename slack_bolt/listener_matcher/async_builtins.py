@@ -1,3 +1,4 @@
+# pytype: skip-file
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from .async_listener_matcher import AsyncListenerMatcher

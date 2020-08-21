@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict, Union
+from typing import Optional, List, Dict, Union, Any
 
 from slack_sdk.models.attachments import Attachment
 from slack_sdk.models.blocks import Block
@@ -13,7 +13,7 @@ def _build_message(
     response_type: Optional[str] = None,
     replace_original: Optional[bool] = None,
     delete_original: Optional[bool] = None,
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     message = {"text": text}
     if blocks is not None and len(blocks) > 0:
         message["blocks"] = convert_to_dict_list(blocks)
