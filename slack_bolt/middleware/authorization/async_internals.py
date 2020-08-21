@@ -3,11 +3,19 @@ from slack_bolt.response import BoltResponse
 
 
 def _is_url_verification(req: AsyncBoltRequest) -> bool:
-    return req and req.payload and req.payload.get("type", None) == "url_verification"
+    return (
+        req is not None
+        and req.payload is not None
+        and req.payload.get("type", None) == "url_verification"
+    )
 
 
 def _is_ssl_check(req: AsyncBoltRequest) -> bool:
-    return req and req.payload and req.payload.get("type", None) == "ssl_check"
+    return (
+        req is not None
+        and req.payload is not None
+        and req.payload.get("type", None) == "ssl_check"
+    )
 
 
 def _is_no_auth_required(req: AsyncBoltRequest) -> bool:

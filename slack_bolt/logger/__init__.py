@@ -1,8 +1,9 @@
 import logging
 from logging import Logger
+from typing import Any
 
 
-def get_bolt_logger(cls: any) -> Logger:
+def get_bolt_logger(cls: Any) -> Logger:
     logger = logging.getLogger(f"slack_bolt.{cls.__name__}")
     logger.disabled = logging.root.disabled
     logger.level = logging.root.level

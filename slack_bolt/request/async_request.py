@@ -1,4 +1,4 @@
-from typing import Dict, Optional, List, Union
+from typing import Dict, Optional, List, Union, Any
 
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.request.async_internals import build_async_context
@@ -15,7 +15,7 @@ class AsyncBoltRequest:
     query: Dict[str, List[str]]
     headers: Dict[str, List[str]]
     content_type: Optional[str]
-    payload: Dict[str, any]
+    payload: Dict[str, Any]
     context: AsyncBoltContext
 
     def __init__(

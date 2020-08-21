@@ -1,6 +1,7 @@
+# pytype: skip-file
 import logging
 from logging import Logger
-from typing import Callable, Dict
+from typing import Callable, Dict, Any
 
 from slack_bolt.context import BoltContext
 from slack_bolt.context.ack import Ack
@@ -19,7 +20,7 @@ class Args:
     request: BoltRequest
     response: BoltResponse
     context: BoltContext
-    payload: Dict[str, any]
+    payload: Dict[str, Any]
     ack: Ack
     say: Say
     respond: Respond
@@ -33,7 +34,7 @@ class Args:
         req: BoltRequest,
         resp: BoltResponse,
         context: BoltContext,
-        payload: Dict[str, any],
+        payload: Dict[str, Any],
         ack: Ack,
         say: Say,
         respond: Respond,
@@ -45,8 +46,8 @@ class Args:
         self.request = self.req = req
         self.response = self.resp = resp
         self.context: BoltContext = context
-        self.payload: Dict[str, any] = payload
-        self.body: Dict[str, any] = payload
+        self.payload: Dict[str, Any] = payload
+        self.body: Dict[str, Any] = payload
         self.ack: Ack = ack
         self.say: Say = say
         self.respond: Respond = respond

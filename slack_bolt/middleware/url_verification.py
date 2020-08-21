@@ -6,7 +6,7 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
-class UrlVerification(Middleware):
+class UrlVerification(Middleware):  # type: ignore
     def __init__(self):
         self.logger = get_bolt_logger(UrlVerification)
 
@@ -22,7 +22,7 @@ class UrlVerification(Middleware):
 
     @staticmethod
     def _is_url_verification_request(payload: dict) -> bool:
-        return payload and payload.get("type", None) == "url_verification"
+        return payload is not None and payload.get("type", None) == "url_verification"
 
     @staticmethod
     def _build_success_response(payload: dict) -> BoltResponse:

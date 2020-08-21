@@ -1,6 +1,6 @@
 import inspect
 from logging import Logger
-from typing import Callable, List
+from typing import Callable, List, Any
 
 from slack_bolt.kwargs_injection import build_required_kwargs
 from slack_bolt.logger import get_bolt_app_logger
@@ -11,7 +11,7 @@ from .middleware import Middleware
 
 class CustomMiddleware(Middleware):
     app_name: str
-    func: Callable[..., any]
+    func: Callable[..., Any]
     arg_names: List[str]
     logger: Logger
 

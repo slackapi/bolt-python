@@ -250,7 +250,7 @@ class App:
     def dispatch(self, req: BoltRequest) -> BoltResponse:
         self._init_context(req)
 
-        resp: BoltResponse = BoltResponse(status=200, body=None)
+        resp: BoltResponse = BoltResponse(status=200, body="")
         middleware_state = {"next_called": False}
 
         def middleware_next():
@@ -396,7 +396,7 @@ class App:
                 text: Optional[str] = payload.get("event", {}).get("text", {})
                 if text:
                     if isinstance(keyword, Pattern):
-                        return keyword.match(text)
+                        return keyword.match(text)  # type: ignore
                     elif isinstance(keyword, str):
                         return keyword in text
                 return False

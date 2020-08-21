@@ -1,5 +1,5 @@
 import json
-from typing import Optional, Dict, Union, List
+from typing import Optional, Dict, Union, List, Any
 from urllib.parse import parse_qsl, parse_qs
 
 from slack_bolt.context import BoltContext
@@ -13,7 +13,7 @@ def parse_query(
     elif isinstance(query, str):
         return parse_qs(query)
     elif isinstance(query, dict) or hasattr(query, "items"):
-        result = {}
+        result: Dict[str, List[str]] = {}
         for name, value in query.items():
             if isinstance(value, list):
                 result[name] = value
@@ -23,12 +23,12 @@ def parse_query(
                 raise ValueError(
                     f"Unsupported type ({type(value)}) of element in headers ({query})"
                 )
-        return result
+        return result  # type: ignore
     else:
         raise ValueError(f"Unsupported type of query detected ({type(query)})")
 
 
-def parse_payload(body: str, content_type: Optional[str]) -> Dict[str, any]:
+def parse_payload(body: str, content_type: Optional[str]) -> Dict[str, Any]:
     if not body:
         return {}
     if content_type == "application/json" or body.startswith("{"):
@@ -46,24 +46,24 @@ def parse_payload(body: str, content_type: Optional[str]) -> Dict[str, any]:
         return {}
 
 
-def extract_enterprise_id(payload: Dict[str, any]) -> Optional[str]:
+def extract_enterprise_id(payload: Dict[str, Any]) -> Optional[str]:
     if "enterprise" in payload:
         org = payload.get("enterprise")
         if isinstance(org, str):
             return org
         elif "id" in org:
-            return org.get("id")
+            return org.get("id")  # type: ignore
     if "enterprise_id" in payload:
         return payload.get("enterprise_id")
     if "team" in payload and "enterprise_id" in payload["team"]:
-        # type: view_submission
+        # In the case where the type is view_submission
         return payload["team"].get("enterprise_id", None)
     if "event" in payload:
         return extract_enterprise_id(payload["event"])
     return None
 
 
-def extract_team_id(payload: Dict[str, any]) -> Optional[str]:
+def extract_team_id(payload: Dict[str, Any]) -> Optional[str]:
     if "team" in payload:
         team = payload.get("team")
         if isinstance(team, str):
@@ -79,13 +79,13 @@ def extract_team_id(payload: Dict[str, any]) -> Optional[str]:
     return None
 
 
-def extract_user_id(payload: Dict[str, any]) -> Optional[str]:
+def extract_user_id(payload: Dict[str, Any]) -> Optional[str]:
     if "user" in payload:
         user = payload.get("user")
         if isinstance(user, str):
             return user
         elif "id" in user:
-            return user.get("id")
+            return user.get("id")  # type: ignore
     if "user_id" in payload:
         return payload.get("user_id")
     if "event" in payload:
@@ -93,13 +93,13 @@ def extract_user_id(payload: Dict[str, any]) -> Optional[str]:
     return None
 
 
-def extract_channel_id(payload: Dict[str, any]) -> Optional[str]:
+def extract_channel_id(payload: Dict[str, Any]) -> Optional[str]:
     if "channel" in payload:
         channel = payload.get("channel")
         if isinstance(channel, str):
             return channel
         elif "id" in channel:
-            return channel.get("id")
+            return channel.get("id")  # type: ignore
     if "channel_id" in payload:
         return payload.get("channel_id")
     if "event" in payload:
@@ -107,7 +107,7 @@ def extract_channel_id(payload: Dict[str, any]) -> Optional[str]:
     return None
 
 
-def build_context(context: BoltContext, payload: Dict[str, any],) -> BoltContext:
+def build_context(context: BoltContext, payload: Dict[str, Any],) -> BoltContext:
     enterprise_id = extract_enterprise_id(payload)
     if enterprise_id:
         context["enterprise_id"] = enterprise_id
@@ -135,7 +135,7 @@ def extract_content_type(headers: Dict[str, List[str]]) -> Optional[str]:
 def build_normalized_headers(
     headers: Optional[Dict[str, Union[str, List[str]]]]
 ) -> Dict[str, List[str]]:
-    normalized_headers = {}
+    normalized_headers: Dict[str, List[str]] = {}
     if headers is not None:
         for key, value in headers.items():
             normalized_name = key.lower()
@@ -147,4 +147,4 @@ def build_normalized_headers(
                 raise ValueError(
                     f"Unsupported type ({type(value)}) of element in headers ({headers})"
                 )
-    return normalized_headers
+    return normalized_headers  # type: ignore

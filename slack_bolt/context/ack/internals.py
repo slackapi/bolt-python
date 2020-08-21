@@ -1,4 +1,4 @@
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Any
 
 from slack_sdk.models.attachments import Attachment
 from slack_sdk.models.blocks import Block, Option, OptionGroup
@@ -9,7 +9,7 @@ from slack_bolt.util.utils import convert_to_dict_list
 
 
 def _set_response(
-    self: any,
+    self: Any,
     text_or_whole_response: Union[str, dict] = "",
     blocks: Optional[List[Union[dict, Block]]] = None,
     attachments: Optional[List[Union[dict, Attachment]]] = None,
@@ -50,6 +50,7 @@ def _set_response(
             body["option_groups"] = convert_to_dict_list(body["option_groups"])
 
         self.response = BoltResponse(status=200, body=body)
+        return self.response
     else:
         raise BoltError(
             f"{text_or_whole_response} (type: {type(text_or_whole_response)}) is unsupported"

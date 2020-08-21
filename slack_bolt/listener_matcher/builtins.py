@@ -1,3 +1,4 @@
+# pytype: skip-file
 import inspect
 import sys
 

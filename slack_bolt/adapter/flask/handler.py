@@ -7,11 +7,11 @@ from slack_bolt.response import BoltResponse
 
 
 def to_bolt_request(req: Request) -> BoltRequest:
-    return BoltRequest(
+    return BoltRequest(  # type: ignore
         body=req.get_data(as_text=True),
         query=req.query_string.decode("utf-8"),
-        headers=req.headers,
-    )
+        headers=req.headers,  # type: ignore
+    )  # type: ignore
 
 
 def to_flask_response(bolt_resp: BoltResponse) -> Response:
@@ -23,7 +23,7 @@ def to_flask_response(bolt_resp: BoltResponse) -> Response:
 
 
 class SlackRequestHandler:
-    def __init__(self, app: App):
+    def __init__(self, app: App):  # type: ignore
         self.app = app
 
     def handle(self, req: Request) -> Response:

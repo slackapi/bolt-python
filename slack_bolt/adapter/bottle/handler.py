@@ -20,7 +20,7 @@ def set_response(bolt_resp: BoltResponse, resp: Response) -> None:
 
 
 class SlackRequestHandler:
-    def __init__(self, app: App):
+    def __init__(self, app: App):  # type: ignore
         self.app = app
 
     def handle(self, req: Request, resp: Response) -> str:

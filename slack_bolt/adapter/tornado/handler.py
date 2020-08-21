@@ -10,7 +10,7 @@ from slack_bolt.response import BoltResponse
 
 
 class SlackEventsHandler(RequestHandler):
-    def initialize(self, app: App):
+    def initialize(self, app: App):  # type: ignore
         self.app = app
 
     def post(self):
@@ -20,12 +20,12 @@ class SlackEventsHandler(RequestHandler):
 
 
 class SlackOAuthHandler(RequestHandler):
-    def initialize(self, app: App):
+    def initialize(self, app: App):  # type: ignore
         self.app = app
 
     def get(self):
-        if self.app.oauth_flow is not None:
-            oauth_flow: OAuthFlow = self.app.oauth_flow
+        if self.app.oauth_flow is not None:  # type: ignore
+            oauth_flow: OAuthFlow = self.app.oauth_flow  # type: ignore
             if self.request.path == oauth_flow.install_path:
                 bolt_resp = oauth_flow.handle_installation(
                     to_bolt_request(self.request)

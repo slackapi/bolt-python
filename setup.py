@@ -16,6 +16,7 @@ test_dependencies = [
     "pytest-asyncio<1",  # for async
     "aiohttp>=3,<4",  # for async
     "black==19.10b0",
+    "pytype",
 ]
 
 setuptools.setup(

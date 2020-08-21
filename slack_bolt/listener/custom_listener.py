@@ -15,7 +15,7 @@ class CustomListener(Listener):
     app_name: str
     func: Callable[..., BoltResponse]
     matchers: List[ListenerMatcher]
-    middleware: List[Middleware]
+    middleware: List[Middleware]  # type: ignore
     auto_acknowledgement: bool
     arg_names: List[str]
     logger: Logger
@@ -26,7 +26,7 @@ class CustomListener(Listener):
         app_name: str,
         func: Callable[..., BoltResponse],
         matchers: List[ListenerMatcher],
-        middleware: List[Middleware],
+        middleware: List[Middleware],  # type: ignore
         auto_acknowledgement: bool = False,
     ):
         self.app_name = app_name

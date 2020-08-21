@@ -1,6 +1,6 @@
 import inspect
 from logging import Logger
-from typing import Callable, Awaitable, List
+from typing import Callable, Awaitable, List, Any
 
 from slack_bolt.kwargs_injection.async_utils import build_async_required_kwargs
 from slack_bolt.logger import get_bolt_app_logger
@@ -11,11 +11,11 @@ from .async_middleware import AsyncMiddleware
 
 class AsyncCustomMiddleware(AsyncMiddleware):
     app_name: str
-    func: Callable[..., Awaitable[any]]
+    func: Callable[..., Awaitable[Any]]
     arg_names: List[str]
     logger: Logger
 
-    def __init__(self, *, app_name: str, func: Callable[..., Awaitable[any]]):
+    def __init__(self, *, app_name: str, func: Callable[..., Awaitable[Any]]):
         self.app_name = app_name
         if inspect.iscoroutinefunction(func):
             self.func = func

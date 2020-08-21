@@ -39,7 +39,7 @@ def to_django_response(bolt_resp: BoltResponse) -> HttpResponse:
 
 
 class SlackRequestHandler:
-    def __init__(self, app: App):
+    def __init__(self, app: App):  # type: ignore
         self.app = app
 
     def handle(self, req: HttpRequest) -> HttpResponse:

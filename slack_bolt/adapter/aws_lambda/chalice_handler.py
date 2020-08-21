@@ -11,7 +11,7 @@ from slack_bolt.response import BoltResponse
 
 
 class ChaliceSlackRequestHandler:
-    def __init__(self, app: App, chalice: Chalice):
+    def __init__(self, app: App, chalice: Chalice):  # type: ignore
         self.app = app
         self.chalice = chalice
         self.logger = get_bolt_app_logger(app.name, ChaliceSlackRequestHandler)
