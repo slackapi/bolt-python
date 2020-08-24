@@ -51,12 +51,42 @@ class TestAsyncMessage:
         timestamp, body = str(int(time())), json.dumps(message_payload)
         return AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
+    def build_request2(self) -> AsyncBoltRequest:
+        timestamp, body = str(int(time())), json.dumps(message_payload2)
+        return AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
+
     @pytest.mark.asyncio
     async def test_string_keyword(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
         app.message("Hello")(whats_up)
 
         request = self.build_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+        await asyncio.sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
+    @pytest.mark.asyncio
+    async def test_string_keyword_capturing(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.message("We've received ([0-9]+) messages from (.+)!")(verify_matches)
+
+        request = self.build_request2()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+        await asyncio.sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
+    @pytest.mark.asyncio
+    async def test_string_keyword_capturing2(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.message(re.compile("We've received ([0-9]+) messages from (.+)!"))(
+            verify_matches
+        )
+
+        request = self.build_request2()
         response = await app.async_dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
@@ -134,3 +164,32 @@ message_payload = {
 async def whats_up(payload, say):
     assert payload == message_payload
     await say("What's up?")
+
+
+message_payload2 = {
+    "token": "verification_token",
+    "team_id": "T111",
+    "enterprise_id": "E111",
+    "api_app_id": "A111",
+    "event": {
+        "client_msg_id": "a8744611-0210-4f85-9f15-5faf7fb225c8",
+        "type": "message",
+        "text": "We've received 103 messages from you!",
+        "user": "W111",
+        "ts": "1596183880.004200",
+        "team": "T111",
+        "channel": "C111",
+        "event_ts": "1596183880.004200",
+        "channel_type": "channel",
+    },
+    "type": "event_callback",
+    "event_id": "Ev111",
+    "event_time": 1596183880,
+    "authed_users": ["W111"],
+}
+
+
+async def verify_matches(context, say):
+    assert context["matches"] == ("103", "you")
+    assert context.matches == ("103", "you")
+    await say("Thanks!")

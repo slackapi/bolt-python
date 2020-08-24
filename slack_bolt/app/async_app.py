@@ -33,6 +33,9 @@ from slack_bolt.middleware.async_custom_middleware import (
     AsyncMiddleware,
     AsyncCustomMiddleware,
 )
+from slack_bolt.middleware.async_message_listener_matches import (
+    AsyncMessageListenerMatches,
+)
 from slack_bolt.middleware.authorization.async_multi_teams_authorization import (
     AsyncMultiTeamsAuthorization,
 )
@@ -418,21 +421,11 @@ class AsyncApp:
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
     ):
         matchers = matchers if matchers else []
+        middleware = middleware if middleware else []
 
         def __call__(func):
             primary_matcher = builtin_matchers.event("message", True)
-
-            async def keyword_matcher(payload) -> bool:
-                text: Optional[str] = payload.get("event", {}).get("text", {})
-                if text:
-                    if isinstance(keyword, Pattern):
-                        return keyword.match(text)  # type: ignore
-                    elif isinstance(keyword, str):
-                        return keyword in text
-                return False
-
-            matchers.insert(0, keyword_matcher)
-
+            middleware.append(AsyncMessageListenerMatches(keyword))
             return self._register_listener(
                 func, primary_matcher, matchers, middleware, True
             )

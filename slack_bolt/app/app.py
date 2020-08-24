@@ -28,6 +28,7 @@ from slack_bolt.middleware import (
     IgnoringSelfEvents,
     CustomMiddleware,
 )
+from slack_bolt.middleware.message_listener_matches import MessageListenerMatches
 from slack_bolt.middleware.url_verification import UrlVerification
 from slack_bolt.oauth import OAuthFlow
 from slack_bolt.request import BoltRequest
@@ -388,20 +389,11 @@ class App:
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
         matchers = matchers if matchers else []
+        middleware = middleware if middleware else []
 
         def __call__(func):
             primary_matcher = builtin_matchers.event("message")
-
-            def keyword_matcher(payload) -> bool:
-                text: Optional[str] = payload.get("event", {}).get("text", {})
-                if text:
-                    if isinstance(keyword, Pattern):
-                        return keyword.match(text)  # type: ignore
-                    elif isinstance(keyword, str):
-                        return keyword in text
-                return False
-
-            matchers.insert(0, keyword_matcher)
+            middleware.append(MessageListenerMatches(keyword))
             return self._register_listener(
                 func, primary_matcher, matchers, middleware, True
             )
