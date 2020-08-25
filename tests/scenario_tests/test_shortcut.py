@@ -49,7 +49,8 @@ class TestShortcut:
         resp = self.web_client.api_test()
         assert resp != None
 
-    def test_success_global(self):
+    # NOTE: This is a compatible behavior with Bolt for JS
+    def test_success_both_global_and_message(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
         app.shortcut("test-shortcut")(simple_listener)
 
@@ -60,8 +61,17 @@ class TestShortcut:
 
         request = self.build_valid_request(message_shortcut_raw_body)
         response = app.dispatch(request)
-        assert response.status == 404
+        assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 2
+
+    def test_success_global(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app.shortcut("test-shortcut")(simple_listener)
+
+        request = self.build_valid_request(global_shortcut_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_success_global_2(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)

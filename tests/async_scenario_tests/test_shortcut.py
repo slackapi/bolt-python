@@ -56,8 +56,9 @@ class TestAsyncShortcut:
         resp = await self.web_client.api_test()
         assert resp != None
 
+    # NOTE: This is a compatible behavior with Bolt for JS
     @pytest.mark.asyncio
-    async def test_success_global(self):
+    async def test_success_both_global_and_message(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
         app.shortcut("test-shortcut")(simple_listener)
 
@@ -68,8 +69,18 @@ class TestAsyncShortcut:
 
         request = self.build_valid_request(message_shortcut_raw_body)
         response = await app.async_dispatch(request)
-        assert response.status == 404
+        assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 2
+
+    @pytest.mark.asyncio
+    async def test_success_global(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.shortcut("test-shortcut")(simple_listener)
+
+        request = self.build_valid_request(global_shortcut_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
     async def test_success_global_2(self):
