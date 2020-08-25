@@ -2,7 +2,6 @@ from logging import Logger
 from typing import Optional, Tuple
 
 from slack_bolt.auth import AuthorizationResult
-from slack_sdk import WebClient
 
 
 class BaseContext(dict):
@@ -17,10 +16,6 @@ class BaseContext(dict):
     @property
     def token(self) -> Optional[str]:
         return self.get("token", None)
-
-    @property
-    def client(self) -> Optional[WebClient]:
-        return self.get("client", None)
 
     @property
     def enterprise_id(self) -> Optional[str]:

@@ -20,4 +20,4 @@ script:
   # run all tests just in case
   - travis_retry python setup.py test
   # Run pytype only for Python 3.8
-  - if [ ${TRAVIS_PYTHON_VERSION:0:3} == "3.8" ]; then pip install -e ".[adapter]"; pytype slack_bolt/; fi
+  - if [ ${TRAVIS_PYTHON_VERSION:0:3} == "3.8" ]; then pip install -e ".[adapter]" && pytype slack_bolt/; fi
