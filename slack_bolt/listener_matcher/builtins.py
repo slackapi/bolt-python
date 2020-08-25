@@ -127,8 +127,18 @@ def shortcut(
             return (
                 payload
                 and "callback_id" in payload
-                and payload["type"] == "shortcut"
-                and _matches(callback_id, payload["callback_id"])
+                and (
+                    (
+                        # global shortcut
+                        _is_expected_type(payload, "shortcut")
+                        and _matches(callback_id, payload["callback_id"])
+                    )
+                    or (
+                        # message shortcut
+                        _is_expected_type(payload, "message_action")
+                        and _matches(callback_id, payload["callback_id"])
+                    )
+                )
             )
 
         return build_listener_matcher(func, asyncio)
