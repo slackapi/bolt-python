@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Optional
+from typing import Optional, Tuple
 
 from slack_bolt.auth import AuthorizationResult
 from slack_sdk import WebClient
@@ -41,3 +41,8 @@ class BaseContext(dict):
     @property
     def response_url(self) -> Optional[str]:
         return self.get("response_url", None)
+
+    @property
+    def matches(self) -> Optional[Tuple]:
+        """Returns all the matched parts in message listener's regexp"""
+        return self.get("matches", None)
