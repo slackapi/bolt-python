@@ -100,6 +100,8 @@ class App:
         self._token: Optional[str] = token
 
         if client is not None:
+            if not isinstance(client, WebClient):
+                raise BoltError("client must be a WebClient")
             self._client = client
             self._token = client.token
             if token is not None:
