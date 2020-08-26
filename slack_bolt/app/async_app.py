@@ -1,5 +1,4 @@
 import asyncio
-import copy
 import inspect
 import logging
 import os
@@ -450,9 +449,11 @@ class AsyncApp:
         # None for both means no ack() in the listener
         return None
 
-    def _start_lazy_function(self, lazy_func, request):
+    def _start_lazy_function(
+        self, lazy_func: Callable[..., Awaitable[None]], request: AsyncBoltRequest
+    ):
         # Start a lazy function asynchronously
-        func_name = lazy_func.__name__
+        func_name: str = lazy_func.__name__
         self._framework_logger.debug(f"Running lazy listener: {func_name} ...")
         copied_request = self._build_lazy_request(request, func_name)
         self.lazy_listener_runner.start(function=lazy_func, request=copied_request)

@@ -1,4 +1,3 @@
-import copy
 import inspect
 import json
 import logging
@@ -418,10 +417,11 @@ class App:
         # None for both means no ack() in the listener
         return None
 
-    # TODO: type
-    def _start_lazy_function(self, lazy_func, request):
+    def _start_lazy_function(
+        self, lazy_func: Callable[..., None], request: BoltRequest
+    ):
         # Start a lazy function asynchronously
-        func_name = lazy_func.__name__
+        func_name: str = lazy_func.__name__
         self._framework_logger.debug(f"Running lazy listener: {func_name} ...")
         copied_request = self._build_lazy_request(request, func_name)
         self.lazy_listener_runner.start(function=lazy_func, request=copied_request)
