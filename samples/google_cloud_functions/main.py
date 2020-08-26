@@ -39,6 +39,7 @@ def hello_bolt_app(request):
     """
     return handler.handle(request)
 
+
 # Step1: Create a new Slack App: https://api.slack.com/apps
 # Bot Token Scopes: chat:write, commands, app_mentions:read
 
