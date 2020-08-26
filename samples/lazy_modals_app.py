@@ -155,7 +155,7 @@ app.action("a")(ack=ack_button_click, lazy=[respond_5_seconds_later])
 if __name__ == "__main__":
     app.start(3000)
 
-# pip install -i https://test.pypi.org/simple/ slack_bolt
+# pip install slack_bolt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
 # python modals_app.py
