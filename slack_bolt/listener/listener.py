@@ -10,7 +10,8 @@ from slack_bolt.response import BoltResponse
 class Listener(metaclass=ABCMeta):
     matchers: List[ListenerMatcher]
     middleware: List[Middleware]  # type: ignore
-    func: Callable[..., BoltResponse]
+    ack_function: Callable[..., BoltResponse]
+    lazy_functions: List[Callable[..., None]]
     auto_acknowledgement: bool
 
     def matches(self, *, req: BoltRequest, resp: BoltResponse,) -> bool:

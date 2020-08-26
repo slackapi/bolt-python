@@ -2,6 +2,9 @@ import logging
 
 from chalice.app import Request, Response, Chalice
 
+from slack_bolt.adapter.aws_lambda.chalice_lazy_listener_runner import (
+    ChaliceLazyListenerRunner,
+)
 from slack_bolt.adapter.aws_lambda.internals import _first_value
 from slack_bolt.app import App
 from slack_bolt.logger import get_bolt_app_logger
@@ -15,6 +18,7 @@ class ChaliceSlackRequestHandler:
         self.app = app
         self.chalice = chalice
         self.logger = get_bolt_app_logger(app.name, ChaliceSlackRequestHandler)
+        self.app.lazy_listener_runner = ChaliceLazyListenerRunner(logger=self.logger)
 
     @classmethod
     def clear_all_log_handlers(cls):
@@ -50,6 +54,15 @@ class ChaliceSlackRequestHandler:
                     bolt_resp = oauth_flow.handle_installation(bolt_req)
                     return to_chalice_response(bolt_resp)
         elif method == "POST":
+            bolt_req: BoltRequest = to_bolt_request(request, body)
+            # https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
+            aws_lambda_function_name = self.chalice.lambda_context.function_name
+            bolt_req.context["aws_lambda_function_name"] = aws_lambda_function_name
+            bolt_req.context["chalice_request"] = request.to_dict()
+            bolt_resp = self.app.dispatch(bolt_req)
+            aws_response = to_chalice_response(bolt_resp)
+            return aws_response
+        elif method == "NONE":
             bolt_req: BoltRequest = to_bolt_request(request, body)
             bolt_resp = self.app.dispatch(bolt_req)
             aws_response = to_chalice_response(bolt_resp)

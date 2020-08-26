@@ -7,13 +7,21 @@ script_dir=`dirname $0`
 cd ${script_dir}/..
 
 test_target="$1"
+python_version=`python --version | awk '{print $2}'`
 
 if [[ $test_target != "" ]]
 then
   black slack_bolt/ tests/ && \
     pytest $1
 else
-  black slack_bolt/ tests/ && \
-    pytest && \
-    pytype slack_bolt/
+  if [ ${python_version:0:3} == "3.8" ]
+  then
+    # pytype's behavior can be different in older Python versions
+    black slack_bolt/ tests/ \
+      && pytest \
+      && pip install -e ".[adapter]" \
+      && pytype slack_bolt/
+  else
+    black slack_bolt/ tests/ && pytest
+  fi
 fi

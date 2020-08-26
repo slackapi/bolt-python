@@ -60,7 +60,9 @@ def handle_command(
                     text="You can add a button alongside text in your message. "
                 ),
                 accessory=ButtonElement(
-                    action_id="a", text=PlainTextObject(text="Button"), value="click_me_123",
+                    action_id="a",
+                    text=PlainTextObject(text="Button"),
+                    value="click_me_123",
                 ),
             ),
         ]

@@ -3,6 +3,7 @@ import logging
 from typing import List, Dict, Any
 
 from slack_bolt.adapter.aws_lambda.internals import _first_value
+from slack_bolt.adapter.aws_lambda.lazy_listener_runner import LambdaLazyListenerRunner
 from slack_bolt.app import App
 from slack_bolt.logger import get_bolt_app_logger
 from slack_bolt.oauth import OAuthFlow
@@ -14,6 +15,7 @@ class SlackRequestHandler:
     def __init__(self, app: App):  # type: ignore
         self.app = app
         self.logger = get_bolt_app_logger(app.name, SlackRequestHandler)
+        self.app.lazy_listener_runner = LambdaLazyListenerRunner(self.logger)
 
     @classmethod
     def clear_all_log_handlers(cls):
@@ -48,6 +50,15 @@ class SlackRequestHandler:
                     bolt_resp = oauth_flow.handle_installation(bolt_req)
                     return to_aws_response(bolt_resp)
         elif method == "POST":
+            bolt_req = to_bolt_request(event)
+            # https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
+            aws_lambda_function_name = context.function_name
+            bolt_req.context["aws_lambda_function_name"] = aws_lambda_function_name
+            bolt_req.context["lambda_request"] = event
+            bolt_resp = self.app.dispatch(bolt_req)
+            aws_response = to_aws_response(bolt_resp)
+            return aws_response
+        elif method == "NONE":
             bolt_req = to_bolt_request(event)
             bolt_resp = self.app.dispatch(bolt_req)
             aws_response = to_aws_response(bolt_resp)

@@ -1,16 +1,15 @@
 # ------------------------------------------------
 # instead of slack_bolt in requirements.txt
-import asyncio
 import sys
 
 sys.path.insert(1, "..")
 # ------------------------------------------------
 
+import asyncio
 import logging
+from slack_bolt.async_app import AsyncApp
 
 logging.basicConfig(level=logging.DEBUG)
-
-from slack_bolt.async_app import AsyncApp
 
 app = AsyncApp()
 
@@ -21,11 +20,12 @@ async def log_request(logger, payload, next):
     return await next()
 
 
-@app.command("/hello-bolt-python")
-async def handle_command(payload, ack, respond, client, logger):
+async def ack_command(payload, ack, logger):
     logger.info(payload)
-    await ack("Accepted!")
+    await ack("Thanks!")
 
+
+async def post_button_message(respond):
     await respond(
         blocks=[
             {
@@ -45,6 +45,8 @@ async def handle_command(payload, ack, respond, client, logger):
         ]
     )
 
+
+async def open_modal(payload, client, logger):
     res = await client.views_open(
         trigger_id=payload["trigger_id"],
         view={
@@ -66,6 +68,7 @@ async def handle_command(payload, ack, respond, client, logger):
                         "type": "external_select",
                         "action_id": "es_a",
                         "placeholder": {"type": "plain_text", "text": "Select an item"},
+                        "min_query_length": 0,
                     },
                     "label": {"type": "plain_text", "text": "Search"},
                 },
@@ -76,6 +79,7 @@ async def handle_command(payload, ack, respond, client, logger):
                         "type": "multi_external_select",
                         "action_id": "mes_a",
                         "placeholder": {"type": "plain_text", "text": "Select an item"},
+                        "min_query_length": 0,
                     },
                     "label": {"type": "plain_text", "text": "Search (multi)"},
                 },
@@ -83,6 +87,11 @@ async def handle_command(payload, ack, respond, client, logger):
         },
     )
     logger.info(res)
+
+
+app.command("/hello-bolt-python")(
+    ack=ack_command, lazy=[post_button_message, open_modal],
+)
 
 
 @app.options("es_a")
@@ -125,19 +134,22 @@ async def show_multi_options(ack):
 
 
 @app.view("view-id")
-async def view_submission(ack, payload, logger):
+async def handle_view_submission(ack, payload, logger):
     await ack()
     logger.info(payload["view"]["state"]["values"])
 
 
-@app.action("a")
-async def button_click(ack, respond):
+async def ack_button_click(ack, respond):
     await ack()
-    await asyncio.sleep(5)
-    await respond(
-        {"response_type": "in_channel", "text": "Clicked!",}
-    )
+    await respond("Loading ...")
 
+
+async def respond_5_seconds_later(respond):
+    await asyncio.sleep(5)
+    await respond("Completed!")
+
+
+app.action("a")(ack=ack_button_click, lazy=[respond_5_seconds_later])
 
 if __name__ == "__main__":
     app.start(3000)

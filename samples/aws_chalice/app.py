@@ -6,10 +6,7 @@ from slack_bolt import App
 from slack_bolt.adapter.aws_lambda.chalice_handler import ChaliceSlackRequestHandler
 
 # process_before_response must be True when running on FaaS
-bolt_app = App(
-    process_before_response=True,
-    authorization_test_enabled=False,
-)
+bolt_app = App(process_before_response=True, authorization_test_enabled=False,)
 
 
 @bolt_app.event("app_mention")

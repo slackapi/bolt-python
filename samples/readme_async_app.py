@@ -1,4 +1,5 @@
 import logging
+
 # requires `pip install "aiohttp>=3,<4"`
 from slack_bolt.async_app import AsyncApp
 
@@ -34,29 +35,18 @@ async def open_modal(ack, client, logger, payload):
         view={
             "type": "modal",
             "callback_id": "view-id",
-            "title": {
-                "type": "plain_text",
-                "text": "My App",
-            },
-            "submit": {
-                "type": "plain_text",
-                "text": "Submit",
-            },
+            "title": {"type": "plain_text", "text": "My App",},
+            "submit": {"type": "plain_text", "text": "Submit",},
             "blocks": [
                 {
                     "type": "input",
                     "block_id": "b",
-                    "element": {
-                        "type": "plain_text_input",
-                        "action_id": "a"
-                    },
-                    "label": {
-                        "type": "plain_text",
-                        "text": "Label",
-                    }
+                    "element": {"type": "plain_text_input", "action_id": "a"},
+                    "label": {"type": "plain_text", "text": "Label",},
                 }
-            ]
-        })
+            ],
+        },
+    )
     logger.debug(api_response)
 
 

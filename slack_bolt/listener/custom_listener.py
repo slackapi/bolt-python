@@ -1,6 +1,6 @@
 import inspect
 from logging import Logger
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 from slack_bolt.kwargs_injection import build_required_kwargs
 from slack_bolt.listener_matcher import ListenerMatcher
@@ -13,7 +13,8 @@ from ..middleware import Middleware
 
 class CustomListener(Listener):
     app_name: str
-    func: Callable[..., BoltResponse]
+    ack_function: Callable[..., Optional[BoltResponse]]
+    lazy_functions: List[Callable[..., None]]
     matchers: List[ListenerMatcher]
     middleware: List[Middleware]  # type: ignore
     auto_acknowledgement: bool
@@ -24,23 +25,25 @@ class CustomListener(Listener):
         self,
         *,
         app_name: str,
-        func: Callable[..., BoltResponse],
+        ack_function: Callable[..., Optional[BoltResponse]],
+        lazy_functions: List[Callable[..., None]],
         matchers: List[ListenerMatcher],
         middleware: List[Middleware],  # type: ignore
         auto_acknowledgement: bool = False,
     ):
         self.app_name = app_name
-        self.func = func
+        self.ack_function = ack_function
+        self.lazy_functions = lazy_functions
         self.matchers = matchers
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
-        self.arg_names = inspect.getfullargspec(func).args
-        self.logger = get_bolt_app_logger(app_name, self.func)
+        self.arg_names = inspect.getfullargspec(ack_function).args
+        self.logger = get_bolt_app_logger(app_name, self.ack_function)
 
     def run_ack_function(
         self, *, request: BoltRequest, response: BoltResponse,
-    ) -> BoltResponse:
-        return self.func(
+    ) -> Optional[BoltResponse]:
+        return self.ack_function(
             **build_required_kwargs(
                 logger=self.logger,
                 required_arg_names=self.arg_names,
