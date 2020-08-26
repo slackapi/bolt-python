@@ -1,4 +1,5 @@
 import pytest
+from slack_sdk import WebClient
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 
@@ -36,6 +37,12 @@ class TestAsyncApp:
         app = AsyncApp(signing_secret="valid", token="xoxb-xxx")
         with pytest.raises(BoltError):
             app.action({"type": "invalid_type", "action_id": "a"})(self.simple_listener)
+
+    # NOTE: We intentionally don't have this test in scenario_tests
+    # to avoid having async dependencies in the tests.
+    def test_invalid_client_type(self):
+        with pytest.raises(BoltError):
+            AsyncApp(signing_secret="valid", client=WebClient(token="xoxb-xxx"))
 
     # --------------------------
     # single team auth
