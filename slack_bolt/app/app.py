@@ -15,6 +15,11 @@ from slack_sdk.web import WebClient
 from slack_bolt.error import BoltError
 from slack_bolt.listener.custom_listener import CustomListener
 from slack_bolt.listener.listener import Listener
+from slack_bolt.listener.listener_error_handler import (
+    ListenerErrorHandler,
+    DefaultListenerErrorHandler,
+    CustomListenerErrorHandler,
+)
 from slack_bolt.listener_matcher import CustomListenerMatcher
 from slack_bolt.listener_matcher import builtins as builtin_matchers
 from slack_bolt.listener_matcher.listener_matcher import ListenerMatcher
@@ -180,6 +185,9 @@ class App:
         self._middleware_list: List[Union[Callable, Middleware]] = []
         self._listeners: List[Listener] = []
         self._listener_executor = ThreadPoolExecutor(max_workers=5)  # TODO: shutdown
+        self._listener_error_handler = DefaultListenerErrorHandler(
+            logger=self._framework_logger
+        )
         self._process_before_response = process_before_response
 
         self._init_middleware_list_done = False
@@ -237,6 +245,10 @@ class App:
     @property
     def oauth_state_store(self) -> Optional[OAuthStateStore]:
         return self._oauth_state_store
+
+    @property
+    def listener_error_handler(self) -> ListenerErrorHandler:
+        return self._listener_error_handler
 
     # -------------------------
     # standalone server
@@ -301,13 +313,24 @@ class App:
         ack = request.context.ack
         starting_time = time.time()
         if self._process_before_response:
-            returned_value = listener.run_ack_function(
-                request=request, response=response
-            )
-            if isinstance(returned_value, BoltResponse):
-                response = returned_value
-            if ack.response is None and listener.auto_acknowledgement:
-                ack()  # automatic ack() call if the call is not yet done
+            try:
+                returned_value = listener.run_ack_function(
+                    request=request, response=response
+                )
+                if isinstance(returned_value, BoltResponse):
+                    response = returned_value
+                if ack.response is None and listener.auto_acknowledgement:
+                    ack()  # automatic ack() call if the call is not yet done
+            except Exception as e:
+                # The default response status code is 500 in this case.
+                # You can customize this by passing your own error handler.
+                if response is None:
+                    response = BoltResponse(status=500)
+                response.status = 500
+                self._listener_error_handler.handle(
+                    error=e, request=request, response=response,
+                )
+                ack.response = response
 
             if response is not None:
                 self._debug_log_completion(starting_time, response)
@@ -318,13 +341,22 @@ class App:
         else:
             # start the listener function asynchronously
             def run_ack_function_asynchronously():
+                nonlocal ack, request, response
                 try:
                     listener.run_ack_function(request=request, response=response)
                 except Exception as e:
-                    # TODO: error handler
-                    self._framework_logger.exception(
-                        f"Failed to run listener function (error: {e})"
+                    # The default response status code is 500 in this case.
+                    # You can customize this by passing your own error handler.
+                    if response is None:
+                        response = BoltResponse(status=500)
+                    response.status = 500
+                    if ack.response is not None:  # already acknowledged
+                        response = None
+
+                    self._listener_error_handler.handle(
+                        error=e, request=request, response=response,
                     )
+                    ack.response = response
 
             self._listener_executor.submit(run_ack_function_asynchronously)
 
@@ -336,12 +368,17 @@ class App:
                 while ack.response is None and time.time() - starting_time <= 3:
                     time.sleep(0.01)
 
+            if response is None and ack.response is None:
+                self._framework_logger.warning(f"{listener_name} didn't call ack()")
+                return None
+
             if response is None and ack.response is not None:
                 response = ack.response
                 self._debug_log_completion(starting_time, response)
                 return response
-            else:
-                self._framework_logger.warning(f"{listener_name} didn't call ack()")
+
+            if response is not None:
+                return response
 
         # None for both means no ack() in the listener
         return None
@@ -365,6 +402,16 @@ class App:
             func = args[0]
             self._middleware_list.append(
                 CustomMiddleware(app_name=self.name, func=func)
+            )
+
+    # -------------------------
+    # global error handler
+
+    def error(self, *args):
+        if len(args) > 0:
+            func = args[0]
+            self._listener_error_handler = CustomListenerErrorHandler(
+                logger=self._framework_logger, func=func,
             )
 
     # -------------------------

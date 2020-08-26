@@ -15,8 +15,14 @@ from slack_sdk.oauth.state_store import FileOAuthStateStore
 from slack_sdk.oauth.state_store.async_state_store import AsyncOAuthStateStore
 from slack_sdk.web.async_client import AsyncWebClient
 
+from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.error import BoltError
 from slack_bolt.listener.async_listener import AsyncListener, AsyncCustomListener
+from slack_bolt.listener.async_listener_error_handler import (
+    AsyncDefaultListenerErrorHandler,
+    AsyncListenerErrorHandler,
+    AsyncCustomListenerErrorHandler,
+)
 from slack_bolt.listener_matcher import builtins as builtin_matchers
 from slack_bolt.listener_matcher.async_listener_matcher import (
     AsyncListenerMatcher,
@@ -199,6 +205,9 @@ class AsyncApp:
 
         self._async_middleware_list: List[Union[Callable, AsyncMiddleware]] = []
         self._async_listeners: List[AsyncListener] = []
+        self._async_listener_error_handler = AsyncDefaultListenerErrorHandler(
+            logger=self._framework_logger
+        )
         self._process_before_response = process_before_response
 
         self._init_middleware_list_done = False
@@ -255,6 +264,10 @@ class AsyncApp:
     @property
     def oauth_state_store(self) -> Optional[AsyncOAuthStateStore]:
         return self._async_oauth_state_store
+
+    @property
+    def listener_error_handler(self) -> AsyncListenerErrorHandler:
+        return self._async_listener_error_handler
 
     # -------------------------
     # standalone server
@@ -325,13 +338,24 @@ class AsyncApp:
         ack = request.context.ack
         starting_time = time.time()
         if self._process_before_response:
-            returned_value = await async_listener.run_ack_function(
-                request=request, response=response
-            )
-            if isinstance(returned_value, BoltResponse):
-                response = returned_value
-            if ack.response is None and async_listener.auto_acknowledgement:
-                await ack()  # automatic ack() call if the call is not yet done
+            try:
+                returned_value = await async_listener.run_ack_function(
+                    request=request, response=response
+                )
+                if isinstance(returned_value, BoltResponse):
+                    response = returned_value
+                if ack.response is None and async_listener.auto_acknowledgement:
+                    await ack()  # automatic ack() call if the call is not yet done
+            except Exception as e:
+                # The default response status code is 500 in this case.
+                # You can customize this by passing your own error handler.
+                if response is None:
+                    response = BoltResponse(status=500)
+                response.status = 500
+                await self._async_listener_error_handler.handle(
+                    error=e, request=request, response=response,
+                )
+                ack.response = response
 
             if response is not None:
                 self._debug_log_completion(starting_time, response)
@@ -347,20 +371,28 @@ class AsyncApp:
             # start the listener function asynchronously
             # NOTE: intentionally
             async def run_ack_function_asynchronously(
-                request: AsyncBoltRequest, response: BoltResponse,
+                ack: AsyncAck, request: AsyncBoltRequest, response: BoltResponse,
             ):
                 try:
                     await async_listener.run_ack_function(
                         request=request, response=response
                     )
                 except Exception as e:
-                    # TODO: error handler
-                    self._framework_logger.exception(
-                        f"Failed to run listener function (error: {e})"
+                    # The default response status code is 500 in this case.
+                    # You can customize this by passing your own error handler.
+                    if response is None:
+                        response = BoltResponse(status=500)
+                    response.status = 500
+                    if ack.response is not None:  # already acknowledged
+                        response = None
+
+                    await self._async_listener_error_handler.handle(
+                        error=e, request=request, response=response,
                     )
+                    ack.response = response
 
             _f: Future = asyncio.ensure_future(
-                run_ack_function_asynchronously(request, response)
+                run_ack_function_asynchronously(ack, request, response)
             )
             self._framework_logger.debug(f"Async listener: {listener_name} started..")
 
@@ -368,12 +400,17 @@ class AsyncApp:
             while ack.response is None and time.time() - starting_time <= 3:
                 await asyncio.sleep(0.01)
 
-            if ack.response is not None:
+            if response is None and ack.response is None:
+                self._framework_logger.warning(f"{listener_name} didn't call ack()")
+                return None
+
+            if response is None and ack.response is not None:
                 response = ack.response
                 self._debug_log_completion(starting_time, response)
                 return response
-            else:
-                self._framework_logger.warning(f"{listener_name} didn't call ack()")
+
+            if response is not None:
+                return response
 
         # None for both means no ack() in the listener
         return None
@@ -397,6 +434,16 @@ class AsyncApp:
             func = args[0]
             self._async_middleware_list.append(
                 AsyncCustomMiddleware(app_name=self.name, func=func)
+            )
+
+    # -------------------------
+    # global error handler
+
+    def error(self, *args):
+        if len(args) > 0:
+            func = args[0]
+            self._async_listener_error_handler = AsyncCustomListenerErrorHandler(
+                logger=self._framework_logger, func=func,
             )
 
     # -------------------------

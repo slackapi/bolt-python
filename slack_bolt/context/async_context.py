@@ -1,5 +1,7 @@
 from typing import Optional
 
+from slack_sdk.web.async_client import AsyncWebClient
+
 from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.context.base_context import BaseContext
 from slack_bolt.context.respond.async_respond import AsyncRespond
@@ -7,6 +9,10 @@ from slack_bolt.context.say.async_say import AsyncSay
 
 
 class AsyncBoltContext(BaseContext):
+    @property
+    def client(self) -> Optional[AsyncWebClient]:
+        return self.get("client", None)
+
     @property
     def ack(self) -> AsyncAck:
         if "ack" not in self:

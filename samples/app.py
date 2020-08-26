@@ -26,6 +26,12 @@ def event_test(payload, say, logger):
     say("What's up?")
 
 
+@app.error
+def global_error_handler(error, payload, logger):
+    logger.exception(error)
+    logger.info(payload)
+
+
 if __name__ == "__main__":
     app.start(3000)
 

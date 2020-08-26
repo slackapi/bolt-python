@@ -1,6 +1,8 @@
 # pytype: skip-file
 from typing import Optional
 
+from slack_sdk import WebClient
+
 from slack_bolt.context.ack import Ack
 from slack_bolt.context.base_context import BaseContext
 from slack_bolt.context.respond import Respond
@@ -8,6 +10,10 @@ from slack_bolt.context.say import Say
 
 
 class BoltContext(BaseContext):
+    @property
+    def client(self) -> Optional[WebClient]:
+        return self.get("client", None)
+
     @property
     def ack(self) -> Ack:
         if "ack" not in self:
