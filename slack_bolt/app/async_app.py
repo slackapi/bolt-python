@@ -117,6 +117,8 @@ class AsyncApp:
         self._token: Optional[str] = token
 
         if client is not None:
+            if not isinstance(client, AsyncWebClient):
+                raise BoltError("client must be an AsyncWebClient")
             self._async_client = client
             self._token = client.token
             if token is not None:
