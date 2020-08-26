@@ -38,10 +38,7 @@ def process_request(respond, payload):
     respond(f"Completed! (task: {title})")
 
 
-app.command(command)(
-    ack=respond_to_slack_within_3_seconds,
-    lazy=[process_request]
-)
+app.command(command)(ack=respond_to_slack_within_3_seconds, lazy=[process_request])
 
 SlackRequestHandler.clear_all_log_handlers()
 logging.basicConfig(format="%(asctime)s %(message)s", level=logging.DEBUG)
@@ -50,6 +47,7 @@ logging.basicConfig(format="%(asctime)s %(message)s", level=logging.DEBUG)
 def handler(event, context):
     slack_handler = SlackRequestHandler(app=app)
     return slack_handler.handle(event, context)
+
 
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
