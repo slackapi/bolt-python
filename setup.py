@@ -49,6 +49,7 @@ setuptools.setup(
             "aiohttp>=3,<4",
             # used only under src/slack_bolt/adapter
             "boto3<=2",
+            "moto<=2", # For AWS tests
             "bottle>=0.12,<1",
             "chalice>=1,<2",
             "click>=7,<8",  # for chalice
@@ -59,6 +60,7 @@ setuptools.setup(
             "pyramid>=1,<2",
             "sanic>=20,<21",
             "starlette>=0.13,<1",
+            "requests>=2,<3",  # For starlette's TestClient
             "tornado>=6,<7",
             # server
             "uvicorn<1",

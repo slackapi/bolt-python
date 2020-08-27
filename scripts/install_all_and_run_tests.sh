@@ -11,10 +11,12 @@ test_target="$1"
 if [[ $test_target != "" ]]
 then
   pip install -e ".[testing]" && \
+    pip install -e ".[adapter]" && \
     black slack_bolt/ tests/ && \
     pytest $1
 else
   pip install -e ".[testing]" && \
+    pip install -e ".[adapter]" && \
     black slack_bolt/ tests/ && \
     pytest && \
     pytype slack_bolt/
