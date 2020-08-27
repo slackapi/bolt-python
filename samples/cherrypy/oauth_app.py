@@ -7,7 +7,7 @@ sys.path.insert(1, "../../src")
 
 import logging
 from slack_bolt import App
-from slack_bolt.adapter.bottle import SlackRequestHandler
+from slack_bolt.adapter.cherrypy import SlackRequestHandler
 
 logging.basicConfig(level=logging.DEBUG)
 app = App()
@@ -19,34 +19,42 @@ def log_request(logger, payload, next):
     return next()
 
 
+@app.command("/hello-bolt-python")
+def hello_command(ack):
+    ack("Hi from CherryPy")
+
+
 @app.event("app_mention")
-def event_test(ack, payload, say, logger):
+def event_test(payload, say, logger):
     logger.info(payload)
     say("What's up?")
 
 
-from bottle import get, post, request, response, run
+import cherrypy
 
 handler = SlackRequestHandler(app)
 
 
-@post("/slack/events")
-def slack_events():
-    return handler.handle(request, response)
+class SlackApp(object):
+    @cherrypy.expose
+    @cherrypy.tools.slack_in()
+    def events(self, **kwargs):
+        return handler.handle()
 
+    @cherrypy.expose
+    @cherrypy.tools.slack_in()
+    def install(self, **kwargs):
+        return handler.handle()
 
-@get("/slack/install")
-def install():
-    return handler.handle(request, response)
-
-
-@get("/slack/oauth_redirect")
-def oauth_redirect():
-    return handler.handle(request, response)
+    @cherrypy.expose
+    @cherrypy.tools.slack_in()
+    def oauth_redirect(self, **kwargs):
+        return handler.handle()
 
 
 if __name__ == "__main__":
-    run(host="0.0.0.0", port=3000, reloader=True)
+    cherrypy.config.update({"server.socket_port": 3000})
+    cherrypy.quickstart(SlackApp(), "/slack")
 
 # pip install -r requirements.txt
 
