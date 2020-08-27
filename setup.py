@@ -59,6 +59,7 @@ setuptools.setup(
             "pyramid>=1,<2",
             "sanic>=20,<21",
             "starlette>=0.13,<1",
+            "requests>=2,<3",  # For starlette's TestClient
             "tornado>=6,<7",
             # server
             "uvicorn<1",
