@@ -16,6 +16,8 @@ class SlackRequestHandler:
         self.app = app
         self.logger = get_bolt_app_logger(app.name, SlackRequestHandler)
         self.app.lazy_listener_runner = LambdaLazyListenerRunner(self.logger)
+        if self.app.oauth_flow is not None:
+            self.app.oauth_flow.redirect_uri_page_renderer.install_path = "?"
 
     @classmethod
     def clear_all_log_handlers(cls):
