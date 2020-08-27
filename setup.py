@@ -49,6 +49,7 @@ setuptools.setup(
             "aiohttp>=3,<4",
             # used only under src/slack_bolt/adapter
             "boto3<=2",
+            "moto<=2", # For AWS tests
             "bottle>=0.12,<1",
             "chalice>=1,<2",
             "click>=7,<8",  # for chalice

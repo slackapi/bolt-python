@@ -1,4 +1,5 @@
 import json
+import re
 from time import time
 
 from slack_sdk.signature import SignatureVerifier
@@ -171,3 +172,29 @@ class TestAsyncStarlette:
         )
         assert response.status_code == 200
         assert self.mock_received_requests["/auth.test"] == 1
+
+    def test_oauth(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            client_id="111.111",
+            client_secret="xxx",
+            scopes=["chat:write", "commands"],
+        )
+        app_handler = AsyncSlackRequestHandler(app)
+
+        async def endpoint(req: Request):
+            return await app_handler.handle(req)
+
+        api = Starlette(
+            debug=True,
+            routes=[Route("/slack/install", endpoint=endpoint, methods=["GET"])],
+        )
+
+        client = TestClient(api)
+        response = client.get("/slack/install", allow_redirects=False)
+        assert response.status_code == 302
+        assert re.match(
+            "https://slack.com/oauth/v2/authorize\\?state=[^&]+&client_id=111.111&scope=chat:write,commands&user_scope=",
+            response.headers["Location"],
+        )

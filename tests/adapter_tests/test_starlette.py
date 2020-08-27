@@ -1,11 +1,12 @@
 import json
+import re
 from time import time
 
-from starlette.applications import Starlette
-from starlette.routing import Route
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
+from starlette.applications import Starlette
 from starlette.requests import Request
+from starlette.routing import Route
 from starlette.testclient import TestClient
 
 from slack_bolt.adapter.starlette import SlackRequestHandler
@@ -52,6 +53,8 @@ class TestStarlette:
 
         app.event("app_mention")(event_handler)
 
+        app_handler = SlackRequestHandler(app)
+
         payload = {
             "token": "verification_token",
             "team_id": "T111",
@@ -81,8 +84,6 @@ class TestStarlette:
             debug=True,
             routes=[Route("/slack/events", endpoint=endpoint, methods=["POST"])],
         )
-        app_handler = SlackRequestHandler(app)
-
         client = TestClient(api)
         response = client.post(
             "/slack/events", data=body, headers=self.build_headers(timestamp, body),
@@ -97,6 +98,8 @@ class TestStarlette:
             ack()
 
         app.shortcut("test-shortcut")(shortcut_handler)
+
+        app_handler = SlackRequestHandler(app)
 
         payload = {
             "type": "shortcut",
@@ -122,8 +125,6 @@ class TestStarlette:
             debug=True,
             routes=[Route("/slack/events", endpoint=endpoint, methods=["POST"])],
         )
-        app_handler = SlackRequestHandler(app)
-
         client = TestClient(api)
         response = client.post(
             "/slack/events", data=body, headers=self.build_headers(timestamp, body),
@@ -138,6 +139,8 @@ class TestStarlette:
             ack()
 
         app.command("/hello-world")(command_handler)
+
+        app_handler = SlackRequestHandler(app)
 
         payload = (
             "token=verification_token"
@@ -163,11 +166,34 @@ class TestStarlette:
             debug=True,
             routes=[Route("/slack/events", endpoint=endpoint, methods=["POST"])],
         )
-        app_handler = SlackRequestHandler(app)
-
         client = TestClient(api)
         response = client.post(
             "/slack/events", data=body, headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
         assert self.mock_received_requests["/auth.test"] == 1
+
+    def test_oauth(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            client_id="111.111",
+            client_secret="xxx",
+            scopes=["chat:write", "commands"],
+        )
+        app_handler = SlackRequestHandler(app)
+
+        async def endpoint(req: Request):
+            return await app_handler.handle(req)
+
+        api = Starlette(
+            debug=True,
+            routes=[Route("/slack/install", endpoint=endpoint, methods=["GET"])],
+        )
+        client = TestClient(api)
+        response = client.get("/slack/install", allow_redirects=False)
+        assert response.status_code == 302
+        assert re.match(
+            "https://slack.com/oauth/v2/authorize\\?state=[^&]+&client_id=111.111&scope=chat:write,commands&user_scope=",
+            response.headers["Location"],
+        )

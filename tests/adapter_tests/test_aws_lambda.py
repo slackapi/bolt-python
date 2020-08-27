@@ -11,6 +11,7 @@ from tests.mock_web_api_server import (
     cleanup_mock_web_api_server,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
+from moto import mock_lambda
 
 
 class LambdaContext:
@@ -49,6 +50,7 @@ class TestAWSLambda:
             "x-slack-request-timestamp": [timestamp],
         }
 
+    @mock_lambda
     def test_events(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
 
@@ -89,6 +91,7 @@ class TestAWSLambda:
         assert response["statusCode"] == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
+    @mock_lambda
     def test_shortcuts(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
 
@@ -124,6 +127,7 @@ class TestAWSLambda:
         assert response["statusCode"] == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
+    @mock_lambda
     def test_commands(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
 
@@ -158,3 +162,23 @@ class TestAWSLambda:
         response = SlackRequestHandler(app).handle(event, self.context)
         assert response["statusCode"] == 200
         assert self.mock_received_requests["/auth.test"] == 1
+
+    @mock_lambda
+    def test_oauth(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            client_id="111.111",
+            client_secret="xxx",
+            scopes=["chat:write", "commands"],
+        )
+
+        event = {
+            "body": "",
+            "queryStringParameters": {},
+            "headers": {},
+            "requestContext": {"http": {"method": "GET"}},
+            "isBase64Encoded": False,
+        }
+        response = SlackRequestHandler(app).handle(event, self.context)
+        assert response["statusCode"] == 302

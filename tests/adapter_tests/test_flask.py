@@ -159,3 +159,21 @@ class TestFlask:
             )
             assert rv.status_code == 200
             assert self.mock_received_requests["/auth.test"] == 1
+
+    def test_oauth(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            client_id="111.111",
+            client_secret="xxx",
+            scopes=["chat:write", "commands"],
+        )
+        flask_app = Flask(__name__)
+
+        @flask_app.route("/slack/install", methods=["GET"])
+        def endpoint():
+            return SlackRequestHandler(app).handle(request)
+
+        with flask_app.test_client() as client:
+            rv = client.get("/slack/install")
+            assert rv.status_code == 302
