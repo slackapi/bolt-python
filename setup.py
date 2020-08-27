@@ -53,6 +53,7 @@ setuptools.setup(
             "bottle>=0.12,<1",
             "chalice>=1,<2",
             "click>=7,<8",  # for chalice
+            "CherryPy>=18,<19",
             "Django>=3,<4",
             "falcon>=2,<3",
             "fastapi<1",
