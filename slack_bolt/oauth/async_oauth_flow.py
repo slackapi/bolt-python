@@ -124,16 +124,21 @@ class AsyncOAuthFlow:
     def sqlite3(
         cls,
         database: str,
-        client_id: Optional[str] = os.environ.get("SLACK_CLIENT_ID", None),
-        client_secret: Optional[str] = os.environ.get("SLACK_CLIENT_SECRET", None),
-        scopes: List[str] = os.environ.get("SLACK_SCOPES", "").split(","),
-        user_scopes: List[str] = os.environ.get("SLACK_USER_SCOPES", "").split(","),
-        redirect_uri: Optional[str] = os.environ.get("SLACK_REDIRECT_URI", None),
+        client_id: Optional[str] = None,  # required
+        client_secret: Optional[str] = None,  # required
+        scopes: Optional[List[str]] = None,
+        user_scopes: Optional[List[str]] = None,
+        redirect_uri: Optional[str] = None,
         oauth_state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         oauth_state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
         logger: Optional[Logger] = None,
     ) -> "AsyncOAuthFlow":
 
+        client_id = client_id or os.environ["SLACK_CLIENT_ID"]  # required
+        client_secret = client_secret or os.environ["SLACK_CLIENT_SECRET"]  # required
+        scopes = scopes or os.environ.get("SLACK_SCOPES", "").split(",")
+        user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", "").split(",")
+        redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI", None)
         return AsyncOAuthFlow(
             client=create_async_web_client(),
             logger=logger,

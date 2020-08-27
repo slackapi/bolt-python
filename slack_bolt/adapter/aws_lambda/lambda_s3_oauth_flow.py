@@ -19,19 +19,17 @@ class LambdaS3OAuthFlow(OAuthFlow):
         *,
         client: Optional[WebClient] = None,
         logger: Optional[Logger] = None,
-        oauth_state_bucket_name: str = os.environ["SLACK_STATE_S3_BUCKET_NAME"],
-        installation_bucket_name: str = os.environ["SLACK_INSTALLATION_S3_BUCKET_NAME"],
+        oauth_state_bucket_name: Optional[str] = None,  # required
+        installation_bucket_name: Optional[str] = None,  # required
         oauth_state_cookie_name: str = "slack-app-oauth-state",
         oauth_state_expiration_seconds: int = 60 * 10,  # 10 minutes
-        client_id: str = os.environ["SLACK_CLIENT_ID"],
-        client_secret: str = os.environ["SLACK_CLIENT_SECRET"],
-        scopes: Optional[str] = os.environ.get("SLACK_SCOPES", None),
-        user_scopes: Optional[str] = os.environ.get("SLACK_USER_SCOPES", None),
-        redirect_uri: Optional[str] = os.environ.get("SLACK_REDIRECT_URI", None),
-        install_path: str = os.environ.get("SLACK_LAMBDA_PATH", "/slack/install"),
-        redirect_uri_path: str = os.environ.get(
-            "SLACK_LAMBDA_PATH", "/slack/oauth_redirect"
-        ),
+        client_id: Optional[str] = None,  # required
+        client_secret: Optional[str] = None,  # required
+        scopes: Optional[str] = None,  # required
+        user_scopes: Optional[str] = None,
+        redirect_uri: Optional[str] = None,
+        install_path: Optional[str] = None,  # required
+        redirect_uri_path: Optional[str] = None,  # required
         success_url: Optional[str] = None,
         failure_url: Optional[str] = None,
     ):
@@ -39,6 +37,27 @@ class LambdaS3OAuthFlow(OAuthFlow):
         self._logger = logger
 
         self.s3_client = boto3.client("s3")
+
+        oauth_state_bucket_name = (
+            oauth_state_bucket_name
+            or os.environ["SLACK_STATE_S3_BUCKET_NAME"]  # required
+        )
+        installation_bucket_name = (
+            installation_bucket_name
+            or os.environ["SLACK_INSTALLATION_S3_BUCKET_NAME"]  # required
+        )
+
+        client_id = client_id or os.environ["SLACK_CLIENT_ID"]  # required
+        client_secret = client_secret or os.environ["SLACK_CLIENT_SECRET"]  # required
+        scopes = scopes or os.environ.get("SLACK_SCOPES", None)
+        user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", None)
+        redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI", None)
+        install_path = install_path or os.environ.get(
+            "SLACK_LAMBDA_PATH", "/slack/install"
+        )
+        redirect_uri_path = redirect_uri_path or os.environ.get(
+            "SLACK_LAMBDA_PATH", "/slack/oauth_redirect"
+        )
 
         self.oauth_state_store = AmazonS3OAuthStateStore(
             logger=self.logger,
