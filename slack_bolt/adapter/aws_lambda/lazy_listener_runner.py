@@ -10,7 +10,7 @@ from slack_bolt.lazy_listener import LazyListenerRunner
 
 class LambdaLazyListenerRunner(LazyListenerRunner):
     def __init__(self, logger: Logger):
-        self.lambda_client = boto3.client("lambda")
+        self.lambda_client = None
         self.logger = logger
 
     def start(self, function: Callable[..., None], request: BoltRequest) -> None:
@@ -21,6 +21,9 @@ class LambdaLazyListenerRunner(LazyListenerRunner):
             "x-slack-bolt-lazy-function-name"
         ] = request.lazy_function_name  # not an array
         event["method"] = "NONE"
+        if self.lambda_client is None:
+            self.lambda_client = boto3.client("lambda")
+
         invocation = self.lambda_client.invoke(
             FunctionName=request.context["aws_lambda_function_name"],
             InvocationType="Event",
