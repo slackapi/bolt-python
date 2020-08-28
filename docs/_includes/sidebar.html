@@ -13,9 +13,8 @@
     {% assign localized_base_url = page.lang | prepend: "/" | remove_first: "/en" %}
 
     <span class="version">
-        {% assign release = site.github.releases | where_exp: "release", 
-          "release.prerelease == false" | sort: "created_at" | reverse | pop %}
-        <a href="{{ release[0].html_url }}">v{{ release[0].tag_name | remove: "@slack/bolt@" }}</a>
+        {% assign release = site.github.releases | sort: "created_at" | reverse | pop %}
+        <a href="{{ release[0].html_url }}">{{ release[0].tag_name }}</a>
     </span>
   </div>
 
