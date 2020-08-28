@@ -212,7 +212,7 @@ class App:
                 self._middleware_list.append(SingleTeamAuthorization())
             else:
                 raise BoltError(
-                    "OAuthFlow not found, so could not initialize the Bolt app."
+                    "Either an env variable SLACK_BOT_TOKEN or token argument in constructor is required."
                 )
         else:
             self._middleware_list.append(

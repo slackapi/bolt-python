@@ -233,7 +233,7 @@ class AsyncApp:
                 self._async_middleware_list.append(AsyncSingleTeamAuthorization())
             else:
                 raise BoltError(
-                    "AsyncOAuthFlow not found, so could not initialize the Bolt app."
+                    "Either an env variable SLACK_BOT_TOKEN or token argument in constructor is required."
                 )
         else:
             self._async_middleware_list.append(
