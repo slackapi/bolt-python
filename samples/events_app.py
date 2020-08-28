@@ -37,33 +37,6 @@ def mention_bug(logger, payload):
     logger.info(payload)
 
 
-@app.event(
-    event={"type": "message", "subtype": "message_deleted"},
-    matchers=[
-        lambda payload: payload["event"]["previous_message"].get("bot_id", None) is None
-    ],
-)
-def deleted(payload, say):
-    message = payload["event"]["previous_message"]["text"]
-    say(f"I've noticed you deleted: {message}")
-
-
-def print_bot(req, resp, next):
-    bot_id = req.global_shortcut_payload["event"]["previous_message"]["bot_id"]
-    logger = logging.getLogger(__name__)
-    logger.info(f"bot_id surely exists here: {bot_id}")
-    return next()
-
-
-@app.event(
-    event={"type": "message", "subtype": "message_deleted"},
-    matchers=[lambda payload: payload["event"]["previous_message"].get("bot_id", None)],
-    middleware=[print_bot],
-)
-def bot_message_deleted(logger):
-    logger.info("A bot message has been deleted")
-
-
 if __name__ == "__main__":
     app.start(3000)
 

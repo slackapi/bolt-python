@@ -23,6 +23,8 @@ class AsyncSay:
         blocks: Optional[List[Union[Dict, Block]]] = None,
         attachments: Optional[List[Union[Dict, Attachment]]] = None,
         channel: Optional[str] = None,
+        thread_ts: Optional[str] = None,
+        **kwargs,
     ) -> AsyncSlackResponse:
         if _can_say(self, channel):
             text_or_whole_response: Union[str, dict] = text
@@ -33,6 +35,8 @@ class AsyncSay:
                     text=text,
                     blocks=blocks,
                     attachments=attachments,
+                    thread_ts=thread_ts,
+                    **kwargs,
                 )
             elif isinstance(text_or_whole_response, dict):
                 message: dict = text_or_whole_response
