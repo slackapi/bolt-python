@@ -458,12 +458,10 @@ class App:
     # -------------------------
     # global error handler
 
-    def error(self, *args):
-        if len(args) > 0:
-            func = args[0]
-            self._listener_error_handler = CustomListenerErrorHandler(
-                logger=self._framework_logger, func=func,
-            )
+    def error(self, func: Callable[..., None]):
+        self._listener_error_handler = CustomListenerErrorHandler(
+            logger=self._framework_logger, func=func,
+        )
 
     # -------------------------
     # events
