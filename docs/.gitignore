@@ -1,0 +1,7 @@
+_site
+Gemfile.lock
+.env
+.jekyll-metadata
+.vscode/
+.bundle/
+vendor/
