@@ -8,7 +8,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 from starlette.requests import Request
 from starlette.testclient import TestClient
 
-from slack_bolt.adapter.fastapi import AsyncSlackRequestHandler
+from slack_bolt.adapter.fastapi.async_handler import AsyncSlackRequestHandler
 from slack_bolt.app.async_app import AsyncApp
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
