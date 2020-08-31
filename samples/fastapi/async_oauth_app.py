@@ -6,7 +6,7 @@ sys.path.insert(1, "../..")
 # ------------------------------------------------
 
 from slack_bolt.async_app import AsyncApp
-from slack_bolt.adapter.fastapi import AsyncSlackRequestHandler
+from slack_bolt.adapter.fastapi.async_handler import AsyncSlackRequestHandler
 
 app = AsyncApp()
 app_handler = AsyncSlackRequestHandler(app)

@@ -1,2 +1,2 @@
-from ..starlette.async_handler import AsyncSlackRequestHandler  # noqa
+# Don't add async module imports here
 from ..starlette.handler import SlackRequestHandler  # noqa
