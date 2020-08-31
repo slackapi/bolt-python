@@ -1,7 +1,7 @@
 from typing import Callable, Awaitable
 
-from . import RequestVerification
-from .async_middleware import AsyncMiddleware
+from slack_bolt.middleware import RequestVerification
+from slack_bolt.middleware.async_middleware import AsyncMiddleware
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 
