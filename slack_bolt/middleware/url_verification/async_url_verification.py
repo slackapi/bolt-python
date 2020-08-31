@@ -1,8 +1,8 @@
 from typing import Callable, Awaitable
 
 from slack_bolt.logger import get_bolt_logger
-from . import UrlVerification
-from .async_middleware import AsyncMiddleware
+from .url_verification import UrlVerification
+from slack_bolt.middleware.async_middleware import AsyncMiddleware
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 

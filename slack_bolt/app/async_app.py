@@ -36,13 +36,11 @@ from slack_bolt.middleware.async_builtins import (
     AsyncRequestVerification,
     AsyncIgnoringSelfEvents,
     AsyncUrlVerification,
+    AsyncMessageListenerMatches,
 )
 from slack_bolt.middleware.async_custom_middleware import (
     AsyncMiddleware,
     AsyncCustomMiddleware,
-)
-from slack_bolt.middleware.async_message_listener_matches import (
-    AsyncMessageListenerMatches,
 )
 from slack_bolt.middleware.authorization.async_multi_teams_authorization import (
     AsyncMultiTeamsAuthorization,
