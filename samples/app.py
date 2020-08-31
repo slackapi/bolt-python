@@ -20,6 +20,12 @@ def log_request(logger, payload, next):
     return next()
 
 
+@app.command("/hello-bolt-python")
+def hello_command(ack, payload):
+    user_id = payload["user_id"]
+    ack(f"Hi <@{user_id}>!")
+
+
 @app.event("app_mention")
 def event_test(payload, say, logger):
     logger.info(payload)

@@ -10,6 +10,11 @@ class AsyncSlackAppServer:
     def __init__(
         self, port: int, path: str, app,  # AsyncApp
     ):
+        """Standalone AIOHTTP Web Server
+
+        Refer to AIOHTTP documents for details.
+        https://docs.aiohttp.org/en/stable/web.html
+        """
         self._port = port
         self._endpoint_path = path
         self._bolt_app: "AsyncApp" = app
