@@ -302,6 +302,10 @@ class AsyncApp:
                 req=req, resp=resp, next=async_middleware_next
             )
             if not middleware_state["next_called"]:
+                if resp is None:
+                    return BoltResponse(
+                        status=404, body={"error": "no next() calls in middleware"}
+                    )
                 return resp
 
         for listener in self._async_listeners:
