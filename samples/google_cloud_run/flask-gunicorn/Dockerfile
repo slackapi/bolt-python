@@ -5,7 +5,7 @@
 # export SLACK_SIGNING_SECRET=
 # export SLACK_BOT_TOKEN=
 # gcloud builds submit --tag gcr.io/$PROJECT_ID/helloworld
-# gcloud run deploy --image gcr.io/$PROJECT_ID/helloworld --platform managed --update-env-vars SLACK_SIGNING_SECRET=$SLACK_SIGNING_SECRET,SLACK_BOT_TOKEN=$SLACK_BOT_TOKEN
+# gcloud run deploy helloworld --image gcr.io/$PROJECT_ID/helloworld --platform managed --update-env-vars SLACK_SIGNING_SECRET=$SLACK_SIGNING_SECRET,SLACK_BOT_TOKEN=$SLACK_BOT_TOKEN
 #
 
 # ----------------------------------------------
@@ -15,6 +15,7 @@ FROM python:3.8.5-slim-buster
 
 # Allow statements and log messages to immediately appear in the Knative logs
 ENV PYTHONUNBUFFERED True
+
 # Copy local code to the container image.
 ENV APP_HOME /app
 WORKDIR $APP_HOME
@@ -23,8 +24,5 @@ COPY . ./
 # Install production dependencies.
 RUN pip install -U pip && pip install -r requirements.txt
 
-# Run the web service on container startup. Here we use the gunicorn
-# webserver, with one worker process and 8 threads.
-# For environments with multiple CPU cores, increase the number of workers
-# to be equal to the cores available.
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 main:flask_app
+# Run the web service on container startup.
+ENTRYPOINT gunicorn --bind :$PORT --workers 1 --threads 2 --timeout 0 main:flask_app

@@ -17,7 +17,7 @@ COPY --from=builder /src/ /app/
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
 COPY --from=builder /usr/local/lib/ /usr/local/lib/
 EXPOSE 3000
-ENTRYPOINT uwsgi --ini uwsgi.ini
+ENTRYPOINT uwsgi --ini uwsgi.ini --http :$PORT
 
 #
 # docker run -e SLACK_SIGNING_SECRET=$SLACK_SIGNING_SECRET -e SLACK_BOT_TOKEN=$SLACK_BOT_TOKEN -p 3000:3000 -it your-repo/hello-bolt
