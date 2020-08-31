@@ -9,7 +9,7 @@ app = App()
 @app.command("/hello-bolt-python")
 def hello(payload, ack):
     user_id = payload["user_id"]
-    ack(f"Hi! <@{user_id}>")
+    ack(f"Hi <@{user_id}>!")
 
 
 from flask import Flask, request
