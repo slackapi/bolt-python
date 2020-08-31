@@ -1,24 +1,28 @@
 import re
-from typing import Callable, Pattern, Union
+from typing import Callable, Awaitable, Union, Pattern
 
-from slack_bolt.request import BoltRequest
+from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
-from .middleware import Middleware
+from slack_bolt.middleware.async_middleware import AsyncMiddleware
 
 
-class MessageListenerMatches(Middleware):  # type: ignore
+class AsyncMessageListenerMatches(AsyncMiddleware):
     def __init__(self, keyword: Union[str, Pattern]):
         self.keyword = keyword
 
-    def process(
-        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
+    async def async_process(
+        self,
+        *,
+        req: AsyncBoltRequest,
+        resp: BoltResponse,
+        next: Callable[[], Awaitable[BoltResponse]],
     ) -> BoltResponse:
         text = req.payload.get("event", {}).get("text", "")
         if text:
             m = re.search(self.keyword, text)
             if m is not None:
                 req.context["matches"] = m.groups()  # tuple
-                return next()
+                return await next()
 
         # As the text doesn't match, skip running the listener
         return resp

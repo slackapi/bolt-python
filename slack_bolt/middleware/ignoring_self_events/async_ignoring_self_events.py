@@ -2,8 +2,8 @@ from typing import Callable, Awaitable
 
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
-from . import IgnoringSelfEvents
-from .async_middleware import AsyncMiddleware
+from .ignoring_self_events import IgnoringSelfEvents
+from slack_bolt.middleware.async_middleware import AsyncMiddleware
 
 
 class AsyncIgnoringSelfEvents(IgnoringSelfEvents, AsyncMiddleware):

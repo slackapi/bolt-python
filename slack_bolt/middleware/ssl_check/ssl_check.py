@@ -1,7 +1,7 @@
 from typing import Callable
 
 from slack_bolt.logger import get_bolt_logger
-from .middleware import Middleware
+from slack_bolt.middleware.middleware import Middleware
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
