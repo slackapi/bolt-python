@@ -16,7 +16,7 @@ from fastapi import FastAPI, Request
 
 api = FastAPI()
 
-from slack_bolt.adapter.fastapi import AsyncSlackRequestHandler
+from slack_bolt.adapter.fastapi.async_handler import AsyncSlackRequestHandler
 
 app_handler = AsyncSlackRequestHandler(app)
 
