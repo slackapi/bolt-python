@@ -28,8 +28,9 @@ async def event_test(payload, say, logger):
 
 @app.command("/hello-bolt-python")
 # or app.command(re.compile(r"/hello-.+"))(test_command)
-async def command(ack):
-    await ack("Thanks!")
+async def command(ack, payload):
+    user_id = payload["user_id"]
+    await ack(f"Hi <@{user_id}>!")
 
 
 if __name__ == "__main__":

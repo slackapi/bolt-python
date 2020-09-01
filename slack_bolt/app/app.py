@@ -260,10 +260,10 @@ class App:
     # standalone server
 
     def start(self, port: int = 3000, path: str = "/slack/events") -> None:
-        self.server = SlackAppServer(
+        self._development_server = SlackAppDevelopmentServer(
             port=port, path=path, app=self, oauth_flow=self.oauth_flow,
         )
-        self.server.start()
+        self._development_server.start()
 
     # -------------------------
     # main dispatcher
@@ -803,10 +803,20 @@ class App:
 # -------------------------
 
 
-class SlackAppServer:
+class SlackAppDevelopmentServer:
     def __init__(
         self, port: int, path: str, app: App, oauth_flow: Optional[OAuthFlow] = None,
     ):
+        """Slack App Development Server
+
+        This is a thin wrapper of http.server.HTTPServer and is good enough
+        for your local development or prototyping.
+
+        However, as mentioned in Python official documents, using http.server module in production
+        is not recommended. Please consider using an adapter (refer to slack_bolt.adapter.*)
+        along with a production-grade server when running the app for end users.
+        https://docs.python.org/3/library/http.server.html#http.server.HTTPServer
+        """
         self._port: int = port
         self._bolt_endpoint_path: str = path
         self._bolt_app: App = app
@@ -881,9 +891,9 @@ class SlackAppServer:
 
     def start(self):
         if self._bolt_app.logger.level > logging.INFO:
-            print("⚡️ Bolt app is running!")
+            print("⚡️ Bolt app is running! (development server)")
         else:
-            self._bolt_app.logger.info("⚡️ Bolt app is running!")
+            self._bolt_app.logger.info("⚡️ Bolt app is running! (development server)")
 
         try:
             self._server.serve_forever(0.05)
