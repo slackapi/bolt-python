@@ -35,9 +35,6 @@ def build_async_required_kwargs(
         # payload
         "payload": request.payload,
         "body": request.payload,
-        # payload
-        "payload": request.payload,
-        "body": request.payload,
         "options": to_options(request.payload),
         "shortcut": to_shortcut(request.payload),
         "action": to_action(request.payload),
