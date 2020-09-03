@@ -203,6 +203,11 @@ def action(
         if action_type == "dialog_cancellation":
             return dialog_cancellation(constraints["callback_id"], asyncio)
 
+        # Still in beta
+        # https://api.slack.com/workflows/steps
+        if action_type == "workflow_step_edit":
+            return workflow_step_edit(constraints["callback_id"], asyncio)
+
         raise BoltError(f"type: {action_type} is unsupported")
 
     raise BoltError(
@@ -258,6 +263,19 @@ def dialog_cancellation(
         return (
             payload
             and _is_expected_type(payload, "dialog_cancellation")
+            and _matches(callback_id, payload["callback_id"])
+        )
+
+    return build_listener_matcher(func, asyncio)
+
+
+def workflow_step_edit(
+    callback_id: Union[str, Pattern], asyncio: bool = False,
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+    def func(payload: dict) -> bool:
+        return (
+            payload
+            and _is_expected_type(payload, "workflow_step_edit")
             and _matches(callback_id, payload["callback_id"])
         )
 
