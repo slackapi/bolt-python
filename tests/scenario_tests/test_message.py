@@ -177,7 +177,8 @@ message_payload2 = {
 }
 
 
-def verify_matches(context, say):
+def verify_matches(context, say, body, message):
     assert context["matches"] == ("103", "you")
     assert context.matches == ("103", "you")
+    assert body["event"] == message
     say("Thanks!")

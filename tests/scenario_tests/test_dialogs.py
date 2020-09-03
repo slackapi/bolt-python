@@ -326,9 +326,11 @@ options_response = {
 }
 
 
-def handle_suggestion(ack):
+def handle_suggestion(ack, body, options):
+    assert body == options
     ack(options_response)
 
 
-def handle_cancellation(ack):
+def handle_cancellation(ack, body, action):
+    assert body == action
     ack()

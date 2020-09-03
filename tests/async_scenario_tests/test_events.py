@@ -136,15 +136,17 @@ app_mention_payload = {
 }
 
 
-async def random_sleeper(payload, say):
+async def random_sleeper(payload, say, event):
     assert payload == app_mention_payload
+    assert payload["event"] == event
     seconds = random() + 2  # 2-3 seconds
     await asyncio.sleep(seconds)
     await say(f"Sending this message after sleeping for {seconds} seconds")
 
 
-async def whats_up(payload, say):
+async def whats_up(payload, say, event):
     assert payload == app_mention_payload
+    assert payload["event"] == event
     await say("What's up?")
 
 
