@@ -110,5 +110,6 @@ slash_command_payload = (
 )
 
 
-async def commander(ack):
+async def commander(ack, body, command):
+    assert body == command
     await ack()

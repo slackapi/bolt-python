@@ -343,9 +343,11 @@ options_response = {
 }
 
 
-async def handle_suggestion(ack):
+async def handle_suggestion(ack, body, options):
+    assert body == options
     await ack(options_response)
 
 
-async def handle_cancellation(ack):
+async def handle_cancellation(ack, body, action):
+    assert body == action
     await ack()

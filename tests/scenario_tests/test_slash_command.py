@@ -100,5 +100,6 @@ slash_command_payload = (
 )
 
 
-def commander(ack):
+def commander(ack, body, command):
+    assert body == command
     ack()

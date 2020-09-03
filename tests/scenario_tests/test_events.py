@@ -68,8 +68,9 @@ class TestEvents:
         app = App(client=self.web_client, signing_secret=self.signing_secret)
 
         @app.event("app_mention")
-        def handle_app_mention(payload, say):
+        def handle_app_mention(payload, say, event):
             assert payload == self.valid_event_payload
+            assert payload["event"] == event
             say("What's up?")
 
         timestamp, body = str(int(time())), json.dumps(self.valid_event_payload)
@@ -90,7 +91,8 @@ class TestEvents:
             pass
 
         @app.event("app_mention", middleware=[skip_middleware])
-        def handle_app_mention(payload, logger):
+        def handle_app_mention(payload, logger, event):
+            assert payload["event"] == event
             logger.info(payload)
 
         timestamp, body = str(int(time())), json.dumps(self.valid_event_payload)

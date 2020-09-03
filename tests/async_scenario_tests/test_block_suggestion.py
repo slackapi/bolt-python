@@ -278,9 +278,11 @@ multi_response = {
 expected_multi_response_body = json.dumps(multi_response)
 
 
-async def show_options(ack):
+async def show_options(ack, body, options):
+    assert body == options
     await ack(response)
 
 
-async def show_multi_options(ack):
+async def show_multi_options(ack, body, options):
+    assert body == options
     await ack(multi_response)

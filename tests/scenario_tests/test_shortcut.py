@@ -220,5 +220,6 @@ global_shortcut_raw_body = f"payload={quote(json.dumps(global_shortcut_payload))
 message_shortcut_raw_body = f"payload={quote(json.dumps(message_shortcut_payload))}"
 
 
-def simple_listener(ack):
+def simple_listener(ack, body, shortcut):
+    assert body == shortcut
     ack()

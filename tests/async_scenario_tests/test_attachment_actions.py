@@ -191,6 +191,7 @@ payload = {
 raw_body = f"payload={quote(json.dumps(payload))}"
 
 
-async def simple_listener(ack, body):
+async def simple_listener(ack, body, action):
+    assert body == action
     assert body["trigger_id"] == "111.222.valid"
     await ack()

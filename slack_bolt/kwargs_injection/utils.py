@@ -5,6 +5,15 @@ from typing import Callable, Dict, Optional, List, Any
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from .args import Args
+from slack_bolt.util.payload_utils import (
+    to_options,
+    to_shortcut,
+    to_action,
+    to_view,
+    to_command,
+    to_event,
+    to_message,
+)
 
 
 def build_required_kwargs(
@@ -23,11 +32,21 @@ def build_required_kwargs(
         "resp": response,
         "response": response,
         "context": request.context,
+        # payload
         "payload": request.payload,
         "body": request.payload,
+        "options": to_options(request.payload),
+        "shortcut": to_shortcut(request.payload),
+        "action": to_action(request.payload),
+        "view": to_view(request.payload),
+        "command": to_command(request.payload),
+        "event": to_event(request.payload),
+        "message": to_message(request.payload),
+        # utilities
         "ack": request.context.ack,
         "say": request.context.say,
         "respond": request.context.respond,
+        # middleware
         "next": next_func,
     }
     kwargs: Dict[str, Any] = {

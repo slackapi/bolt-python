@@ -263,9 +263,11 @@ multi_response = {
 expected_multi_response_body = json.dumps(multi_response)
 
 
-def show_options(ack):
+def show_options(ack, body, options):
+    assert body == options
     ack(response)
 
 
-def show_multi_options(ack):
+def show_multi_options(ack, body, options):
+    assert body == options
     ack(multi_response)

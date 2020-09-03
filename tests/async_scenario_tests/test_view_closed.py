@@ -183,6 +183,7 @@ payload = {
 raw_body = f"payload={quote(json.dumps(payload))}"
 
 
-async def simple_listener(ack, body):
-    assert body["view"]["private_metadata"] == "This is for you!"
+async def simple_listener(ack, body, view):
+    assert body["view"] == view
+    assert view["private_metadata"] == "This is for you!"
     await ack()
