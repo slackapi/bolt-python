@@ -13,15 +13,15 @@ app = App()
 
 
 @app.event("app_mention")
-def event_test(payload, say, logger):
-    logger.info(payload)
+def event_test(body, say, logger):
+    logger.info(body)
     say("What's up?")
 
 
 @app.command("/hello-bolt-python")
 # or app.command(re.compile(r"/hello-.+"))(test_command)
-def test_command(payload, respond, client, ack, logger):
-    logger.info(payload)
+def test_command(body, respond, client, ack, logger):
+    logger.info(body)
     ack("Thanks!")
 
     respond(
@@ -44,7 +44,7 @@ def test_command(payload, respond, client, ack, logger):
     )
 
     res = client.views_open(
-        trigger_id=payload["trigger_id"],
+        trigger_id=body["trigger_id"],
         view={
             "type": "modal",
             "callback_id": "view-id",
@@ -64,14 +64,14 @@ def test_command(payload, respond, client, ack, logger):
 
 
 @app.view("view-id")
-def view_submission(ack, payload, logger):
-    logger.info(payload)
+def view_submission(ack, body, logger):
+    logger.info(body)
     return ack()
 
 
 @app.action("a")
-def button_click(logger, payload, ack, respond):
-    logger.info(payload)
+def button_click(logger, body, ack, respond):
+    logger.info(body)
     respond("respond!")
     ack()
 

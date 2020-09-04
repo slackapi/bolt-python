@@ -14,8 +14,8 @@ app = App()
 
 
 @app.middleware  # or app.use(log_request)
-def log_request(logger, payload, next):
-    logger.debug(payload)
+def log_request(logger, body, next):
+    logger.debug(body)
     return next()
 
 
@@ -25,8 +25,8 @@ def hello_command(ack):
 
 
 @app.event("app_mention")
-def event_test(payload, say, logger):
-    logger.info(payload)
+def event_test(body, say, logger):
+    logger.info(body)
     say("What's up?")
 
 

@@ -10,8 +10,8 @@ app_handler = AsyncSlackRequestHandler(app)
 
 
 @app.command("/hey-google")
-async def hello(payload, ack):
-    user_id = payload["user_id"]
+async def hello(body, ack):
+    user_id = body["user_id"]
     await ack(f"Hi <@{user_id}>!")
 
 

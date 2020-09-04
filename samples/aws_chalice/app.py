@@ -10,8 +10,8 @@ bolt_app = App(process_before_response=True, authorization_test_enabled=False,)
 
 
 @bolt_app.event("app_mention")
-def handle_app_mentions(payload, say, logger):
-    logger.info(payload)
+def handle_app_mentions(body, say, logger):
+    logger.info(body)
     say("What's up? I'm a Chalice app :wave:")
 
 

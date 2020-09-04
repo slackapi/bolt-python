@@ -16,8 +16,8 @@ app = App(oauth_flow=OAuthFlow.sqlite3(database="./slackapp.db"))
 
 
 @app.event("app_mention")
-def handle_app_mentions(payload, say, logger):
-    logger.info(payload)
+def handle_app_mentions(body, say, logger):
+    logger.info(body)
     say("What's up?")
 
 

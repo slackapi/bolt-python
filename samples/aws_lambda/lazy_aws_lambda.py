@@ -16,25 +16,25 @@ app = App(process_before_response=True)
 
 
 @app.middleware  # or app.use(log_request)
-def log_request(logger, payload, next):
-    logger.debug(payload)
+def log_request(logger, body, next):
+    logger.debug(body)
     return next()
 
 
 command = "/hello-bolt-python-lambda"
 
 
-def respond_to_slack_within_3_seconds(payload, ack):
-    if payload.get("text", None) is None:
+def respond_to_slack_within_3_seconds(body, ack):
+    if body.get("text", None) is None:
         ack(f":x: Usage: {command} (description here)")
     else:
-        title = payload["text"]
+        title = body["text"]
         ack(f"Accepted! (task: {title})")
 
 
-def process_request(respond, payload):
+def process_request(respond, body):
     time.sleep(5)
-    title = payload["text"]
+    title = body["text"]
     respond(f"Completed! (task: {title})")
 
 
