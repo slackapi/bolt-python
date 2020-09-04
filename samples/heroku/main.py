@@ -27,7 +27,7 @@ def slack_events():
 # heroku create
 # git remote add heroku https://git.heroku.com/xxx.git
 
-# export $SLACK_BOT_TOKEN=xxx
+# export SLACK_BOT_TOKEN=xxx
 # export SLACK_SIGNING_SECRET=xxx
 # heroku config:set SLACK_BOT_TOKEN=$SLACK_BOT_TOKEN
 # heroku config:set SLACK_SIGNING_SECRET=$SLACK_SIGNING_SECRET
