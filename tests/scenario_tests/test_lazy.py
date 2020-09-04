@@ -46,7 +46,7 @@ class TestErrorHandler:
         }
 
     def build_valid_request(self) -> BoltRequest:
-        payload = {
+        body = {
             "type": "block_actions",
             "user": {"id": "W111",},
             "api_app_id": "A111",
@@ -66,7 +66,7 @@ class TestErrorHandler:
                 }
             ],
         }
-        raw_body = f"payload={quote(json.dumps(payload))}"
+        raw_body = f"payload={quote(json.dumps(body))}"
         timestamp = str(int(time.time()))
         return BoltRequest(
             body=raw_body, headers=self.build_headers(timestamp, raw_body)

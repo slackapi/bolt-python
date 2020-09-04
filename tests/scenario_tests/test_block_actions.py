@@ -107,7 +107,7 @@ class TestBlockActions:
         assert self.mock_received_requests["/auth.test"] == 2
 
 
-payload = {
+body = {
     "type": "block_actions",
     "user": {
         "id": "W111",
@@ -144,11 +144,12 @@ payload = {
     ],
 }
 
-raw_body = f"payload={quote(json.dumps(payload))}"
+raw_body = f"payload={quote(json.dumps(body))}"
 
 
-def simple_listener(ack, body, action):
+def simple_listener(ack, body, payload, action):
     assert body["trigger_id"] == "111.222.valid"
-    assert body["actions"][0] == action
+    assert body["actions"][0] == payload
+    assert payload == action
     assert action["action_id"] == "a"
     ack()

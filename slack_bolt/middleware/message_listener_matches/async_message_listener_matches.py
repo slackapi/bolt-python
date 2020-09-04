@@ -17,7 +17,7 @@ class AsyncMessageListenerMatches(AsyncMiddleware):
         resp: BoltResponse,
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> BoltResponse:
-        text = req.payload.get("event", {}).get("text", "")
+        text = req.body.get("event", {}).get("text", "")
         if text:
             m = re.search(self.keyword, text)
             if m is not None:

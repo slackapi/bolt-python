@@ -55,7 +55,7 @@ class TestStarlette:
 
         app_handler = SlackRequestHandler(app)
 
-        payload = {
+        input = {
             "token": "verification_token",
             "team_id": "T111",
             "enterprise_id": "E111",
@@ -75,7 +75,7 @@ class TestStarlette:
             "event_time": 1595926230,
             "authed_users": ["W111"],
         }
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), json.dumps(input)
 
         async def endpoint(req: Request):
             return await app_handler.handle(req)
@@ -101,7 +101,7 @@ class TestStarlette:
 
         app_handler = SlackRequestHandler(app)
 
-        payload = {
+        input = {
             "type": "shortcut",
             "token": "verification_token",
             "action_ts": "111.111",
@@ -116,7 +116,7 @@ class TestStarlette:
             "trigger_id": "111.111.xxxxxx",
         }
 
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), json.dumps(input)
 
         async def endpoint(req: Request):
             return await app_handler.handle(req)
@@ -142,7 +142,7 @@ class TestStarlette:
 
         app_handler = SlackRequestHandler(app)
 
-        payload = (
+        input = (
             "token=verification_token"
             "&team_id=T111"
             "&team_domain=test-domain"
@@ -157,7 +157,7 @@ class TestStarlette:
             "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
             "&trigger_id=111.111.xxx"
         )
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), json.dumps(input)
 
         async def endpoint(req: Request):
             return await app_handler.handle(req)

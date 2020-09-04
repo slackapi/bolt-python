@@ -48,7 +48,7 @@ class TestAsyncEvents:
         }
 
     def build_valid_app_mention_request(self) -> AsyncBoltRequest:
-        timestamp, body = str(int(time())), json.dumps(app_mention_payload)
+        timestamp, body = str(int(time())), json.dumps(app_mention_body)
         return AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
     @pytest.mark.asyncio
@@ -114,7 +114,7 @@ class TestAsyncEvents:
         assert self.mock_received_requests["/chat.postMessage"] == times
 
 
-app_mention_payload = {
+app_mention_body = {
     "token": "verification_token",
     "team_id": "T111",
     "enterprise_id": "E111",
@@ -136,17 +136,19 @@ app_mention_payload = {
 }
 
 
-async def random_sleeper(payload, say, event):
-    assert payload == app_mention_payload
-    assert payload["event"] == event
+async def random_sleeper(body, say, payload, event):
+    assert body == app_mention_body
+    assert body["event"] == payload
+    assert payload == event
     seconds = random() + 2  # 2-3 seconds
     await asyncio.sleep(seconds)
     await say(f"Sending this message after sleeping for {seconds} seconds")
 
 
-async def whats_up(payload, say, event):
-    assert payload == app_mention_payload
-    assert payload["event"] == event
+async def whats_up(body, say, payload, event):
+    assert body == app_mention_body
+    assert body["event"] == payload
+    assert payload == event
     await say("What's up?")
 
 
