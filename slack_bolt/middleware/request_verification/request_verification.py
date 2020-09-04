@@ -16,10 +16,10 @@ class RequestVerification(Middleware):  # type: ignore
     def process(
         self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
     ) -> BoltResponse:
-        if self._can_skip(req.payload):
+        if self._can_skip(req.body):
             return next()
 
-        body = req.body
+        body = req.raw_body
         timestamp = req.headers.get("x-slack-request-timestamp", ["0"])[0]
         signature = req.headers.get("x-slack-signature", [""])[0]
         if self.verifier.is_valid(body, timestamp, signature):
@@ -31,8 +31,8 @@ class RequestVerification(Middleware):  # type: ignore
     # -----------------------------------------
 
     @staticmethod
-    def _can_skip(payload: Dict[str, Any]) -> bool:
-        return payload is not None and payload.get("ssl_check", None) == "1"
+    def _can_skip(body: Dict[str, Any]) -> bool:
+        return body is not None and body.get("ssl_check", None) == "1"
 
     @staticmethod
     def _build_error_response() -> BoltResponse:

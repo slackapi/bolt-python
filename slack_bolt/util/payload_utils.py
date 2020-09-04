@@ -10,22 +10,22 @@ from typing import Dict, Any, Optional
 # -------------------
 
 
-def to_event(payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    return payload["event"] if is_event(payload) else None
+def to_event(body: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    return body["event"] if is_event(body) else None
 
 
-def to_message(payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    if is_event(payload) and payload["event"]["type"] == "message":
-        return to_event(payload)
+def to_message(body: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    if is_event(body) and body["event"]["type"] == "message":
+        return to_event(body)
     return None
 
 
-def is_event(payload: Dict[str, Any]) -> bool:
+def is_event(body: Dict[str, Any]) -> bool:
     return (
-        payload is not None
-        and _is_expected_type(payload, "event_callback")
-        and "event" in payload
-        and "type" in payload["event"]
+        body is not None
+        and _is_expected_type(body, "event_callback")
+        and "event" in body
+        and "type" in body["event"]
     )
 
 
@@ -34,12 +34,12 @@ def is_event(payload: Dict[str, Any]) -> bool:
 # -------------------
 
 
-def to_command(payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    return payload if is_slash_command(payload) else None
+def to_command(body: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    return body if is_slash_command(body) else None
 
 
-def is_slash_command(payload: Dict[str, Any]) -> bool:
-    return payload is not None and "command" in payload
+def is_slash_command(body: Dict[str, Any]) -> bool:
+    return body is not None and "command" in body
 
 
 # -------------------
@@ -47,62 +47,62 @@ def is_slash_command(payload: Dict[str, Any]) -> bool:
 # -------------------
 
 
-def to_action(payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    if is_action(payload):
-        if is_block_actions(payload):
-            return payload["actions"][0]
+def to_action(body: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    if is_action(body):
+        if is_block_actions(body) or is_attachment_action(body):
+            return body["actions"][0]
         else:
-            return payload
+            return body
     return None
 
 
-def is_action(payload: Dict[str, Any]) -> bool:
+def is_action(body: Dict[str, Any]) -> bool:
     return (
-        is_attachment_action(payload)
-        or is_block_actions(payload)
-        or is_dialog_submission(payload)
-        or is_dialog_cancellation(payload)
-        or is_workflow_step_edit(payload)
+        is_attachment_action(body)
+        or is_block_actions(body)
+        or is_dialog_submission(body)
+        or is_dialog_cancellation(body)
+        or is_workflow_step_edit(body)
     )
 
 
-def is_attachment_action(payload: Dict[str, Any]) -> bool:
+def is_attachment_action(body: Dict[str, Any]) -> bool:
     return (
-        payload is not None
-        and _is_expected_type(payload, "interactive_message")
-        and "callback_id" in payload
+        body is not None
+        and _is_expected_type(body, "interactive_message")
+        and "callback_id" in body
     )
 
 
-def is_block_actions(payload: Dict[str, Any]) -> bool:
+def is_block_actions(body: Dict[str, Any]) -> bool:
     return (
-        payload is not None
-        and _is_expected_type(payload, "block_actions")
-        and "actions" in payload
+        body is not None
+        and _is_expected_type(body, "block_actions")
+        and "actions" in body
     )
 
 
-def is_dialog_submission(payload: Dict[str, Any]) -> bool:
+def is_dialog_submission(body: Dict[str, Any]) -> bool:
     return (
-        payload is not None
-        and _is_expected_type(payload, "dialog_submission")
-        and "callback_id" in payload
+        body is not None
+        and _is_expected_type(body, "dialog_submission")
+        and "callback_id" in body
     )
 
 
-def is_dialog_cancellation(payload: Dict[str, Any]) -> bool:
+def is_dialog_cancellation(body: Dict[str, Any]) -> bool:
     return (
-        payload is not None
-        and _is_expected_type(payload, "dialog_cancellation")
-        and "callback_id" in payload
+        body is not None
+        and _is_expected_type(body, "dialog_cancellation")
+        and "callback_id" in body
     )
 
 
-def is_workflow_step_edit(payload: Dict[str, Any]) -> bool:
+def is_workflow_step_edit(body: Dict[str, Any]) -> bool:
     return (
-        payload is not None
-        and _is_expected_type(payload, "workflow_step_edit")
-        and "callback_id" in payload
+        body is not None
+        and _is_expected_type(body, "workflow_step_edit")
+        and "callback_id" in body
     )
 
 
@@ -111,29 +111,29 @@ def is_workflow_step_edit(payload: Dict[str, Any]) -> bool:
 # -------------------
 
 
-def to_options(payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    if is_options(payload):
-        return payload
+def to_options(body: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    if is_options(body):
+        return body
     return None
 
 
-def is_options(payload: Dict[str, Any]) -> bool:
-    return is_block_suggestion(payload) or is_dialog_suggestion(payload)
+def is_options(body: Dict[str, Any]) -> bool:
+    return is_block_suggestion(body) or is_dialog_suggestion(body)
 
 
-def is_block_suggestion(payload: Dict[str, Any]) -> bool:
+def is_block_suggestion(body: Dict[str, Any]) -> bool:
     return (
-        payload is not None
-        and _is_expected_type(payload, "block_suggestion")
-        and "action_id" in payload
+        body is not None
+        and _is_expected_type(body, "block_suggestion")
+        and "action_id" in body
     )
 
 
-def is_dialog_suggestion(payload: Dict[str, Any]) -> bool:
+def is_dialog_suggestion(body: Dict[str, Any]) -> bool:
     return (
-        payload is not None
-        and _is_expected_type(payload, "dialog_suggestion")
-        and "callback_id" in payload
+        body is not None
+        and _is_expected_type(body, "dialog_suggestion")
+        and "callback_id" in body
     )
 
 
@@ -142,29 +142,29 @@ def is_dialog_suggestion(payload: Dict[str, Any]) -> bool:
 # -------------------
 
 
-def to_shortcut(payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    if is_shortcut(payload):
-        return payload
+def to_shortcut(body: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    if is_shortcut(body):
+        return body
     return None
 
 
-def is_shortcut(payload: Dict[str, Any]) -> bool:
-    return is_global_shortcut(payload) or is_message_shortcut(payload)
+def is_shortcut(body: Dict[str, Any]) -> bool:
+    return is_global_shortcut(body) or is_message_shortcut(body)
 
 
-def is_global_shortcut(payload: Dict[str, Any]) -> bool:
+def is_global_shortcut(body: Dict[str, Any]) -> bool:
     return (
-        payload is not None
-        and _is_expected_type(payload, "shortcut")
-        and "callback_id" in payload
+        body is not None
+        and _is_expected_type(body, "shortcut")
+        and "callback_id" in body
     )
 
 
-def is_message_shortcut(payload: Dict[str, Any]) -> bool:
+def is_message_shortcut(body: Dict[str, Any]) -> bool:
     return (
-        payload is not None
-        and _is_expected_type(payload, "message_action")
-        and "callback_id" in payload
+        body is not None
+        and _is_expected_type(body, "message_action")
+        and "callback_id" in body
     )
 
 
@@ -173,31 +173,31 @@ def is_message_shortcut(payload: Dict[str, Any]) -> bool:
 # -------------------
 
 
-def to_view(payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    if is_view(payload):
-        return payload["view"]
+def to_view(body: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    if is_view(body):
+        return body["view"]
     return None
 
 
-def is_view(payload: Dict[str, Any]) -> bool:
-    return is_view_submission(payload) or is_view_closed(payload)
+def is_view(body: Dict[str, Any]) -> bool:
+    return is_view_submission(body) or is_view_closed(body)
 
 
-def is_view_submission(payload: Dict[str, Any]) -> bool:
+def is_view_submission(body: Dict[str, Any]) -> bool:
     return (
-        payload is not None
-        and _is_expected_type(payload, "view_submission")
-        and "view" in payload
-        and "callback_id" in payload["view"]
+        body is not None
+        and _is_expected_type(body, "view_submission")
+        and "view" in body
+        and "callback_id" in body["view"]
     )
 
 
-def is_view_closed(payload: Dict[str, Any]) -> bool:
+def is_view_closed(body: Dict[str, Any]) -> bool:
     return (
-        payload is not None
-        and _is_expected_type(payload, "view_closed")
-        and "view" in payload
-        and "callback_id" in payload["view"]
+        body is not None
+        and _is_expected_type(body, "view_closed")
+        and "view" in body
+        and "callback_id" in body["view"]
     )
 
 
@@ -206,5 +206,5 @@ def is_view_closed(payload: Dict[str, Any]) -> bool:
 # ------------------------------------------
 
 
-def _is_expected_type(payload: dict, expected: str) -> bool:
-    return payload is not None and "type" in payload and payload["type"] == expected
+def _is_expected_type(body: dict, expected: str) -> bool:
+    return body is not None and "type" in body and body["type"] == expected

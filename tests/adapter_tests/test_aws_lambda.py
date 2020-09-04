@@ -59,7 +59,7 @@ class TestAWSLambda:
 
         app.event("app_mention")(event_handler)
 
-        payload = {
+        input = {
             "token": "verification_token",
             "team_id": "T111",
             "enterprise_id": "E111",
@@ -79,7 +79,7 @@ class TestAWSLambda:
             "event_time": 1595926230,
             "authed_users": ["W111"],
         }
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), json.dumps(input)
         event = {
             "body": body,
             "queryStringParameters": {},
@@ -100,7 +100,7 @@ class TestAWSLambda:
 
         app.shortcut("test-shortcut")(shortcut_handler)
 
-        payload = {
+        input = {
             "type": "shortcut",
             "token": "verification_token",
             "action_ts": "111.111",
@@ -115,7 +115,7 @@ class TestAWSLambda:
             "trigger_id": "111.111.xxxxxx",
         }
 
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), json.dumps(input)
         event = {
             "body": body,
             "queryStringParameters": {},
@@ -136,7 +136,7 @@ class TestAWSLambda:
 
         app.command("/hello-world")(command_handler)
 
-        payload = (
+        input = (
             "token=verification_token"
             "&team_id=T111"
             "&team_domain=test-domain"
@@ -151,7 +151,7 @@ class TestAWSLambda:
             "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
             "&trigger_id=111.111.xxx"
         )
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), json.dumps(input)
         event = {
             "body": body,
             "queryStringParameters": {},

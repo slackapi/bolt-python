@@ -158,7 +158,7 @@ class TestBlockSuggestion:
         assert self.mock_received_requests["/auth.test"] == 2
 
 
-payload = {
+body = {
     "type": "block_suggestion",
     "user": {
         "id": "W111",
@@ -231,12 +231,12 @@ payload = {
     },
 }
 
-raw_body = f"payload={quote(json.dumps(payload))}"
+raw_body = f"payload={quote(json.dumps(body))}"
 
-multi_payload = copy.deepcopy(payload)
-multi_payload["block_id"] = "mes_b"
-multi_payload["action_id"] = "mes_a"
-raw_multi_body = f"payload={quote(json.dumps(multi_payload))}"
+multi_body = copy.deepcopy(body)
+multi_body["block_id"] = "mes_b"
+multi_body["action_id"] = "mes_a"
+raw_multi_body = f"payload={quote(json.dumps(multi_body))}"
 
 response = {
     "options": [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]
@@ -263,11 +263,13 @@ multi_response = {
 expected_multi_response_body = json.dumps(multi_response)
 
 
-def show_options(ack, body, options):
+def show_options(ack, body, payload, options):
     assert body == options
+    assert payload == options
     ack(response)
 
 
-def show_multi_options(ack, body, options):
+def show_multi_options(ack, body, payload, options):
     assert body == options
+    assert payload == options
     ack(multi_response)

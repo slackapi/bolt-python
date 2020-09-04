@@ -39,7 +39,7 @@ class TestEvents:
             "x-slack-request-timestamp": [timestamp],
         }
 
-    valid_event_payload = {
+    valid_event_body = {
         "token": "verification_token",
         "team_id": "T111",
         "enterprise_id": "E111",
@@ -68,12 +68,13 @@ class TestEvents:
         app = App(client=self.web_client, signing_secret=self.signing_secret)
 
         @app.event("app_mention")
-        def handle_app_mention(payload, say, event):
-            assert payload == self.valid_event_payload
-            assert payload["event"] == event
+        def handle_app_mention(body, say, payload, event):
+            assert body == self.valid_event_body
+            assert body["event"] == payload
+            assert payload == event
             say("What's up?")
 
-        timestamp, body = str(int(time())), json.dumps(self.valid_event_payload)
+        timestamp, body = str(int(time())), json.dumps(self.valid_event_body)
         request: BoltRequest = BoltRequest(
             body=body, headers=self.build_headers(timestamp, body)
         )
@@ -91,11 +92,12 @@ class TestEvents:
             pass
 
         @app.event("app_mention", middleware=[skip_middleware])
-        def handle_app_mention(payload, logger, event):
-            assert payload["event"] == event
+        def handle_app_mention(body, logger, payload, event):
+            assert body["event"] == payload
+            assert payload == event
             logger.info(payload)
 
-        timestamp, body = str(int(time())), json.dumps(self.valid_event_payload)
+        timestamp, body = str(int(time())), json.dumps(self.valid_event_body)
         request: BoltRequest = BoltRequest(
             body=body, headers=self.build_headers(timestamp, body)
         )

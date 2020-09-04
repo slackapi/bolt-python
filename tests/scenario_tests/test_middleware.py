@@ -30,7 +30,7 @@ class TestMiddleware:
         restore_os_env(self.old_os_env)
 
     def build_request(self) -> BoltRequest:
-        payload = {
+        body = {
             "type": "shortcut",
             "token": "verification_token",
             "action_ts": "111.111",
@@ -44,7 +44,7 @@ class TestMiddleware:
             "callback_id": "test-shortcut",
             "trigger_id": "111.111.xxxxxx",
         }
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), json.dumps(body)
         return BoltRequest(
             body=body,
             headers={

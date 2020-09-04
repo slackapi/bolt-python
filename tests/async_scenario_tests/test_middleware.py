@@ -35,7 +35,7 @@ class TestAsyncMiddleware:
             restore_os_env(old_os_env)
 
     def build_request(self) -> AsyncBoltRequest:
-        payload = {
+        body = {
             "type": "shortcut",
             "token": "verification_token",
             "action_ts": "111.111",
@@ -49,7 +49,7 @@ class TestAsyncMiddleware:
             "callback_id": "test-shortcut",
             "trigger_id": "111.111.xxxxxx",
         }
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), json.dumps(body)
         return AsyncBoltRequest(
             body=body,
             headers={

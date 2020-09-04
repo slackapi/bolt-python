@@ -13,7 +13,7 @@ class MessageListenerMatches(Middleware):  # type: ignore
     def process(
         self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
     ) -> BoltResponse:
-        text = req.payload.get("event", {}).get("text", "")
+        text = req.body.get("event", {}).get("text", "")
         if text:
             m = re.search(self.keyword, text)
             if m is not None:

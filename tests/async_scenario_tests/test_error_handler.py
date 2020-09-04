@@ -52,7 +52,7 @@ class TestAsyncErrorHandler:
         }
 
     def build_valid_request(self) -> AsyncBoltRequest:
-        payload = {
+        body = {
             "type": "block_actions",
             "user": {"id": "W111",},
             "api_app_id": "A111",
@@ -72,7 +72,7 @@ class TestAsyncErrorHandler:
                 }
             ],
         }
-        raw_body = f"payload={quote(json.dumps(payload))}"
+        raw_body = f"payload={quote(json.dumps(body))}"
         timestamp = str(int(time()))
         return AsyncBoltRequest(
             body=raw_body, headers=self.build_headers(timestamp, raw_body)

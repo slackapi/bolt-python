@@ -18,7 +18,7 @@ class AsyncUrlVerification(UrlVerification, AsyncMiddleware):
         resp: BoltResponse,
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> BoltResponse:
-        if self._is_url_verification_request(req.payload):
-            return self._build_success_response(req.payload)
+        if self._is_url_verification_request(req.body):
+            return self._build_success_response(req.body)
         else:
             return await next()

@@ -20,6 +20,7 @@ class Args:
     request: BoltRequest
     response: BoltResponse
     context: BoltContext
+    body: Dict[str, Any]
     # payload
     payload: Dict[str, Any]
     options: Optional[Dict[str, Any]]
@@ -44,6 +45,7 @@ class Args:
         req: BoltRequest,
         resp: BoltResponse,
         context: BoltContext,
+        body: Dict[str, Any],
         payload: Dict[str, Any],
         options: Optional[Dict[str, Any]] = None,
         shortcut: Optional[Dict[str, Any]] = None,
@@ -64,8 +66,8 @@ class Args:
         self.response = self.resp = resp
         self.context: BoltContext = context
 
+        self.body: Dict[str, Any] = body
         self.payload: Dict[str, Any] = payload
-        self.body: Dict[str, Any] = payload
         self.options: Optional[Dict[str, Any]] = options
         self.shortcut: Optional[Dict[str, Any]] = shortcut
         self.action: Optional[Dict[str, Any]] = action

@@ -17,7 +17,7 @@ class IgnoringSelfEvents(Middleware):
     ) -> BoltResponse:
         auth_result = req.context.authorization_result
         if self._is_self_event(auth_result, req.context.user_id):
-            self._debug_log(req.payload)
+            self._debug_log(req.body)
             return req.context.ack()
         else:
             return next()
@@ -28,7 +28,7 @@ class IgnoringSelfEvents(Middleware):
     def _is_self_event(auth_result: AuthorizationResult, user_id: str):
         return auth_result is not None and user_id == auth_result.bot_user_id
 
-    def _debug_log(self, payload: dict):
+    def _debug_log(self, body: dict):
         if self.logger.level <= logging.DEBUG:
-            event = payload["event"]
+            event = body["event"]
             self.logger.debug(f"Skipped self event: {event}")
