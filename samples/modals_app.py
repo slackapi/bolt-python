@@ -15,14 +15,14 @@ app = App()
 
 
 @app.middleware  # or app.use(log_request)
-def log_request(logger, payload, next):
-    logger.debug(payload)
+def log_request(logger, body, next):
+    logger.debug(body)
     return next()
 
 
 @app.command("/hello-bolt-python")
-def handle_command(payload, ack, respond, client, logger):
-    logger.info(payload)
+def handle_command(body, ack, respond, client, logger):
+    logger.info(body)
     ack(
         text="Accepted!",
         blocks=[
@@ -54,7 +54,7 @@ def handle_command(payload, ack, respond, client, logger):
     )
 
     res = client.views_open(
-        trigger_id=payload["trigger_id"],
+        trigger_id=body["trigger_id"],
         view={
             "type": "modal",
             "callback_id": "view-id",
@@ -135,16 +135,16 @@ def show_multi_options(ack):
 
 
 @app.view("view-id")
-def view_submission(ack, payload, logger):
+def view_submission(ack, body, logger):
     ack()
-    logger.info(payload["view"]["state"]["values"])
+    logger.info(body["view"]["state"]["values"])
 
 
 @app.action("a")
-def button_click(ack, payload, respond):
+def button_click(ack, body, respond):
     ack()
 
-    user_id = payload["user"]["id"]
+    user_id = body["user"]["id"]
     # in_channel / dict
     respond(
         {

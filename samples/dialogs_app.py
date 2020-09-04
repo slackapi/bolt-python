@@ -15,17 +15,17 @@ app = App()
 
 
 @app.middleware  # or app.use(log_request)
-def log_request(logger, payload, next):
-    logger.debug(payload)
+def log_request(logger, body, next):
+    logger.debug(body)
     return next()
 
 
 @app.command("/hello-bolt-python")
-def test_command(payload, client, ack, logger):
-    logger.info(payload)
+def test_command(body, client, ack, logger):
+    logger.info(body)
     ack("I got it!")
     res = client.dialog_open(
-        trigger_id=payload["trigger_id"],
+        trigger_id=body["trigger_id"],
         dialog={
             "callback_id": "dialog-callback-id",
             "title": "Request a Ride",
