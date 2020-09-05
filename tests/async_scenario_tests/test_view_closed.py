@@ -132,7 +132,7 @@ class TestAsyncViewClosed:
         assert self.mock_received_requests["/auth.test"] == 2
 
 
-payload = {
+body = {
     "type": "view_closed",
     "team": {
         "id": "T111",
@@ -180,10 +180,11 @@ payload = {
     "response_urls": [],
 }
 
-raw_body = f"payload={quote(json.dumps(payload))}"
+raw_body = f"payload={quote(json.dumps(body))}"
 
 
-async def simple_listener(ack, body, view):
+async def simple_listener(ack, body, payload, view):
     assert body["view"] == view
+    assert payload == view
     assert view["private_metadata"] == "This is for you!"
     await ack()

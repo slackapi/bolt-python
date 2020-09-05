@@ -41,7 +41,7 @@ class TestSlashCommand:
         }
 
     def build_valid_request(self) -> BoltRequest:
-        timestamp, body = str(int(time())), json.dumps(slash_command_payload)
+        timestamp, body = str(int(time())), json.dumps(slash_command_body)
         return BoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
     def test_mock_server_is_running(self):
@@ -83,7 +83,7 @@ class TestSlashCommand:
         assert self.mock_received_requests["/auth.test"] == 2
 
 
-slash_command_payload = (
+slash_command_body = (
     "token=verification_token"
     "&team_id=T111"
     "&team_domain=test-domain"
@@ -100,6 +100,7 @@ slash_command_payload = (
 )
 
 
-def commander(ack, body, command):
+def commander(ack, body, payload, command):
     assert body == command
+    assert payload == command
     ack()

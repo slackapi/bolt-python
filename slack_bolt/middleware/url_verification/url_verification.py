@@ -13,17 +13,17 @@ class UrlVerification(Middleware):  # type: ignore
     def process(
         self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
     ) -> BoltResponse:
-        if self._is_url_verification_request(req.payload):
-            return self._build_success_response(req.payload)
+        if self._is_url_verification_request(req.body):
+            return self._build_success_response(req.body)
         else:
             return next()
 
     # -----------------------------------------
 
     @staticmethod
-    def _is_url_verification_request(payload: dict) -> bool:
-        return payload is not None and payload.get("type", None) == "url_verification"
+    def _is_url_verification_request(body: dict) -> bool:
+        return body is not None and body.get("type", None) == "url_verification"
 
     @staticmethod
-    def _build_success_response(payload: dict) -> BoltResponse:
-        return BoltResponse(status=200, body={"challenge": payload.get("challenge")})
+    def _build_success_response(body: dict) -> BoltResponse:
+        return BoltResponse(status=200, body={"challenge": body.get("challenge")})

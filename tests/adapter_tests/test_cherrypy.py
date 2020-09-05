@@ -73,7 +73,7 @@ class TestCherryPy(helper.CPWebCase):
         ]
 
     def test_events(self):
-        payload = {
+        input = {
             "token": "verification_token",
             "team_id": "T111",
             "enterprise_id": "E111",
@@ -93,7 +93,7 @@ class TestCherryPy(helper.CPWebCase):
             "event_time": 1595926230,
             "authed_users": ["W111"],
         }
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), json.dumps(input)
         cherrypy.request.process_request_body = True
         self.getPage(
             "/slack/events",
@@ -105,7 +105,7 @@ class TestCherryPy(helper.CPWebCase):
         self.assertBody("")
 
     def test_shortcuts(self):
-        payload = {
+        input = {
             "type": "shortcut",
             "token": "verification_token",
             "action_ts": "111.111",
@@ -120,7 +120,7 @@ class TestCherryPy(helper.CPWebCase):
             "trigger_id": "111.111.xxxxxx",
         }
 
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), json.dumps(input)
         cherrypy.request.process_request_body = True
         self.getPage(
             "/slack/events",
@@ -132,7 +132,7 @@ class TestCherryPy(helper.CPWebCase):
         self.assertBody("")
 
     def test_commands(self):
-        payload = (
+        input = (
             "token=verification_token"
             "&team_id=T111"
             "&team_domain=test-domain"
@@ -147,7 +147,7 @@ class TestCherryPy(helper.CPWebCase):
             "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
             "&trigger_id=111.111.xxx"
         )
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), json.dumps(input)
         cherrypy.request.process_request_body = True
         self.getPage(
             "/slack/events",

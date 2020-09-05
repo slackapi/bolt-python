@@ -21,6 +21,7 @@ app = App()
 
 # https://api.slack.com/tutorials/workflow-builder-steps
 
+
 @app.action({"type": "workflow_step_edit", "callback_id": "copy_review"})
 def edit(body: dict, ack: Ack, client: WebClient):
     ack()
@@ -35,8 +36,8 @@ def edit(body: dict, ack: Ack, client: WebClient):
                     "block_id": "intro-section",
                     "text": {
                         "type": "plain_text",
-                        "text": "Create a task in one of the listed projects. The link to the task and other details will be available as variable data in later steps."
-                    }
+                        "text": "Create a task in one of the listed projects. The link to the task and other details will be available as variable data in later steps.",
+                    },
                 },
                 {
                     "type": "input",
@@ -46,13 +47,10 @@ def edit(body: dict, ack: Ack, client: WebClient):
                         "action_id": "task_name",
                         "placeholder": {
                             "type": "plain_text",
-                            "text": "Write a task name"
-                        }
+                            "text": "Write a task name",
+                        },
                     },
-                    "label": {
-                        "type": "plain_text",
-                        "text": "Task name"
-                    }
+                    "label": {"type": "plain_text", "text": "Task name"},
                 },
                 {
                     "type": "input",
@@ -62,13 +60,10 @@ def edit(body: dict, ack: Ack, client: WebClient):
                         "action_id": "task_description",
                         "placeholder": {
                             "type": "plain_text",
-                            "text": "Write a description for your task"
-                        }
+                            "text": "Write a description for your task",
+                        },
                     },
-                    "label": {
-                        "type": "plain_text",
-                        "text": "Task description"
-                    }
+                    "label": {"type": "plain_text", "text": "Task description"},
                 },
                 {
                     "type": "input",
@@ -78,15 +73,12 @@ def edit(body: dict, ack: Ack, client: WebClient):
                         "action_id": "task_author",
                         "placeholder": {
                             "type": "plain_text",
-                            "text": "Write a task name"
-                        }
+                            "text": "Write a task name",
+                        },
                     },
-                    "label": {
-                        "type": "plain_text",
-                        "text": "Task author"
-                    }
+                    "label": {"type": "plain_text", "text": "Task author"},
                 },
-            ]
+            ],
         },
     )
 
@@ -103,18 +95,16 @@ def save(ack: Ack, client: WebClient, body: dict):
                     "value": state_values["task_name_input"]["task_name"]["value"],
                 },
                 "taskDescription": {
-                    "value": state_values["task_description_input"]["task_description"]["value"],
+                    "value": state_values["task_description_input"]["task_description"][
+                        "value"
+                    ],
                 },
                 "taskAuthorEmail": {
                     "value": state_values["task_author_input"]["task_author"]["value"],
-                }
+                },
             },
             "outputs": [
-                {
-                    "name": "taskName",
-                    "type": "text",
-                    "label": "Task Name",
-                },
+                {"name": "taskName", "type": "text", "label": "Task Name",},
                 {
                     "name": "taskDescription",
                     "type": "text",
@@ -125,8 +115,8 @@ def save(ack: Ack, client: WebClient, body: dict):
                     "type": "text",
                     "label": "Task Author Email",
                 },
-            ]
-        }
+            ],
+        },
     )
     ack()
 
@@ -145,10 +135,12 @@ def execute(body: dict, client: WebClient):
                 "taskName": step["inputs"]["taskName"]["value"],
                 "taskDescription": step["inputs"]["taskDescription"]["value"],
                 "taskAuthorEmail": step["inputs"]["taskAuthorEmail"]["value"],
-            }
-        }
+            },
+        },
     )
-    user: SlackResponse = client.users_lookupByEmail(email=step["inputs"]["taskAuthorEmail"]["value"])
+    user: SlackResponse = client.users_lookupByEmail(
+        email=step["inputs"]["taskAuthorEmail"]["value"]
+    )
     user_id = user["user"]["id"]
     new_task = {
         "task_name": step["inputs"]["taskName"]["value"],
@@ -160,19 +152,21 @@ def execute(body: dict, client: WebClient):
 
     blocks = []
     for task in tasks:
-        blocks.append({"type": "section", "text": {"type": "plain_text", "text": task["task_name"]}})
+        blocks.append(
+            {
+                "type": "section",
+                "text": {"type": "plain_text", "text": task["task_name"]},
+            }
+        )
         blocks.append({"type": "divider"})
 
     home_tab_update: SlackResponse = client.views_publish(
         user_id=user_id,
         view={
             "type": "home",
-            "title": {
-                "type": 'plain_text',
-                "text": 'Your tasks!'
-            },
-            "blocks": blocks
-        }
+            "title": {"type": "plain_text", "text": "Your tasks!"},
+            "blocks": blocks,
+        },
     )
 
 

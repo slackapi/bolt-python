@@ -14,8 +14,8 @@ class SslCheck(Middleware):  # type: ignore
     def process(
         self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
     ) -> BoltResponse:
-        if self._is_ssl_check_request(req.payload):
-            if self._verify_token_if_needed(req.payload):
+        if self._is_ssl_check_request(req.body):
+            if self._verify_token_if_needed(req.body):
                 return self._build_error_response()
             return self._build_success_response()
         else:
@@ -24,11 +24,11 @@ class SslCheck(Middleware):  # type: ignore
     # -----------------------------------------
 
     @staticmethod
-    def _is_ssl_check_request(payload: dict):
-        return "ssl_check" in payload and payload["ssl_check"] == "1"
+    def _is_ssl_check_request(body: dict):
+        return "ssl_check" in body and body["ssl_check"] == "1"
 
-    def _verify_token_if_needed(self, payload: dict):
-        return self.verification_token and self.verification_token == payload["token"]
+    def _verify_token_if_needed(self, body: dict):
+        return self.verification_token and self.verification_token == body["token"]
 
     @staticmethod
     def _build_success_response() -> BoltResponse:

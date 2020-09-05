@@ -48,11 +48,11 @@ class TestAsyncMessage:
         }
 
     def build_request(self) -> AsyncBoltRequest:
-        timestamp, body = str(int(time())), json.dumps(message_payload)
+        timestamp, body = str(int(time())), json.dumps(message_body)
         return AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
     def build_request2(self) -> AsyncBoltRequest:
-        timestamp, body = str(int(time())), json.dumps(message_payload2)
+        timestamp, body = str(int(time())), json.dumps(message_body2)
         return AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
     @pytest.mark.asyncio
@@ -126,7 +126,7 @@ class TestAsyncMessage:
         assert self.mock_received_requests["/auth.test"] == 1
 
 
-message_payload = {
+message_body = {
     "token": "verification_token",
     "team_id": "T111",
     "enterprise_id": "E111",
@@ -161,12 +161,12 @@ message_payload = {
 }
 
 
-async def whats_up(payload, say):
-    assert payload == message_payload
+async def whats_up(body, say):
+    assert body == message_body
     await say("What's up?")
 
 
-message_payload2 = {
+message_body2 = {
     "token": "verification_token",
     "team_id": "T111",
     "enterprise_id": "E111",

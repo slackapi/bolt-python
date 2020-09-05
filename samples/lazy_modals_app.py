@@ -16,13 +16,13 @@ app = App()
 
 
 @app.middleware  # or app.use(log_request)
-def log_request(logger, payload, next):
-    logger.debug(payload)
+def log_request(logger, body, next):
+    logger.debug(body)
     return next()
 
 
-def ack_command(payload, ack, logger):
-    logger.info(payload)
+def ack_command(body, ack, logger):
+    logger.info(body)
     ack("Thanks!")
 
 
@@ -47,9 +47,9 @@ def post_button_message(respond):
     )
 
 
-def open_modal(payload, client, logger):
+def open_modal(body, client, logger):
     res = client.views_open(
-        trigger_id=payload["trigger_id"],
+        trigger_id=body["trigger_id"],
         view={
             "type": "modal",
             "callback_id": "view-id",
@@ -135,9 +135,9 @@ def show_multi_options(ack):
 
 
 @app.view("view-id")
-def handle_view_submission(ack, payload, logger):
+def handle_view_submission(ack, body, logger):
     ack()
-    logger.info(payload["view"]["state"]["values"])
+    logger.info(body["view"]["state"]["values"])
 
 
 def ack_button_click(ack, respond):

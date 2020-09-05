@@ -11,8 +11,8 @@ app = App()
 
 # Middleware
 @app.middleware  # or app.use(log_request)
-def log_request(logger, payload, next):
-    logger.info(payload)
+def log_request(logger, body, next):
+    logger.info(body)
     return next()
 
 
@@ -25,12 +25,12 @@ def event_test(say):
 # Interactivity: https://api.slack.com/interactivity
 @app.shortcut("callback-id-here")
 # @app.command("/hello-bolt-python")
-def open_modal(ack, client, logger, payload):
+def open_modal(ack, client, logger, body):
     # acknowledge the incoming request from Slack immediately
     ack()
     # open a modal
     api_response = client.views_open(
-        trigger_id=payload["trigger_id"],
+        trigger_id=body["trigger_id"],
         view={
             "type": "modal",
             "callback_id": "view-id",
@@ -50,10 +50,10 @@ def open_modal(ack, client, logger, payload):
 
 
 @app.view("view-id")
-def view_submission(ack, payload, logger):
+def view_submission(ack, body, logger):
     ack()
     # Prints {'b': {'a': {'type': 'plain_text_input', 'value': 'Your Input'}}}
-    logger.info(payload["view"]["state"]["values"])
+    logger.info(body["view"]["state"]["values"])
 
 
 if __name__ == "__main__":

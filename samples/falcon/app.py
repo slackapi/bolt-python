@@ -16,9 +16,9 @@ logging.basicConfig(level=logging.DEBUG)
 app = App()
 
 
-# @app.command("/bolt-py-proto", [lambda payload: payload["team_id"] == "T03E94MJU"])
-def test_command(logger: logging.Logger, payload: dict, ack: Ack, respond: Respond):
-    logger.info(payload)
+# @app.command("/bolt-py-proto", [lambda body: body["team_id"] == "T03E94MJU"])
+def test_command(logger: logging.Logger, body: dict, ack: Ack, respond: Respond):
+    logger.info(body)
     ack("thanks!")
     respond(
         blocks=[
@@ -40,15 +40,15 @@ def test_command(logger: logging.Logger, payload: dict, ack: Ack, respond: Respo
     )
 
 
-app.command(re.compile(r"/bolt-.+"))(test_command)
+app.command(re.compile(r"/hello-bolt-.+"))(test_command)
 
 
 @app.shortcut("test-shortcut")
-def test_shortcut(ack, client: WebClient, logger, payload):
-    logger.info(payload)
+def test_shortcut(ack, client: WebClient, logger, body):
+    logger.info(body)
     ack()
     res = client.views_open(
-        trigger_id=payload["trigger_id"],
+        trigger_id=body["trigger_id"],
         view={
             "type": "modal",
             "callback_id": "view-id",
@@ -68,22 +68,21 @@ def test_shortcut(ack, client: WebClient, logger, payload):
 
 
 @app.view("view-id")
-def view_submission(ack, payload, logger):
-    logger.info(payload)
+def view_submission(ack, body, logger):
+    logger.info(body)
     ack()
 
 
 @app.action("a")
-def button_click(logger, payload, say, ack, respond):
-    logger.info(payload)
+def button_click(logger, action, ack, respond):
+    logger.info(action)
     ack()
-    respond("respond!")
-    # say(text="say!")
+    respond("Here is my response")
 
 
 @app.event("app_mention")
-def handle_app_mentions(payload, say, logger):
-    logger.info(payload)
+def handle_app_mentions(body, say, logger):
+    logger.info(body)
     say("What's up?")
 
 

@@ -8,8 +8,8 @@ app = App()
 
 
 @app.event("app_mention")
-def event_test(ack, payload, say, logger):
-    logger.info(payload)
+def event_test(ack, body, say, logger):
+    logger.info(body)
     say("What's up?")
 
 

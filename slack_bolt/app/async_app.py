@@ -333,7 +333,7 @@ class AsyncApp:
                 if listener_response is not None:
                     return listener_response
 
-        self._framework_logger.warning(f"Unhandled request ({req.payload})")
+        self._framework_logger.warning(f"Unhandled request ({req.body})")
         return BoltResponse(status=404, body={"error": "unhandled request"})
 
     async def run_async_listener(

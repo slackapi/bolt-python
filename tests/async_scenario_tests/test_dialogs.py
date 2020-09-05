@@ -265,7 +265,7 @@ class TestAsyncAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 2
 
 
-suggestion_payload = {
+suggestion_body = {
     "type": "dialog_suggestion",
     "token": "verification_token",
     "action_ts": "1596603332.676855",
@@ -283,7 +283,7 @@ suggestion_payload = {
     "state": "Limo",
 }
 
-submission_payload = {
+submission_body = {
     "type": "dialog_submission",
     "token": "verification_token",
     "action_ts": "1596603334.328193",
@@ -305,7 +305,7 @@ submission_payload = {
     "state": "Limo",
 }
 
-cancellation_payload = {
+cancellation_body = {
     "type": "dialog_cancellation",
     "token": "verification_token",
     "action_ts": "1596603453.047897",
@@ -322,9 +322,9 @@ cancellation_payload = {
     "state": "Limo",
 }
 
-suggestion_raw_body = f"payload={quote(json.dumps(suggestion_payload))}"
-submission_raw_body = f"payload={quote(json.dumps(submission_payload))}"
-cancellation_raw_body = f"payload={quote(json.dumps(cancellation_payload))}"
+suggestion_raw_body = f"payload={quote(json.dumps(suggestion_body))}"
+submission_raw_body = f"payload={quote(json.dumps(submission_body))}"
+cancellation_raw_body = f"payload={quote(json.dumps(cancellation_body))}"
 
 
 async def handle_submission(ack):
@@ -343,11 +343,13 @@ options_response = {
 }
 
 
-async def handle_suggestion(ack, body, options):
+async def handle_suggestion(ack, body, payload, options):
     assert body == options
+    assert payload == options
     await ack(options_response)
 
 
-async def handle_cancellation(ack, body, action):
+async def handle_cancellation(ack, body, payload, action):
     assert body == action
+    assert payload == action
     await ack()

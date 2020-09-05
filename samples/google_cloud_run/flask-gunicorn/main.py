@@ -8,8 +8,8 @@ app = App()
 
 
 @app.command("/hey-google")
-def hello(payload, ack):
-    user_id = payload["user_id"]
+def hello(body, ack):
+    user_id = body["user_id"]
     ack(f"Hi <@{user_id}>!")
 
 

@@ -28,7 +28,7 @@ def parse_query(
         raise ValueError(f"Unsupported type of query detected ({type(query)})")
 
 
-def parse_payload(body: str, content_type: Optional[str]) -> Dict[str, Any]:
+def parse_body(body: str, content_type: Optional[str]) -> Dict[str, Any]:
     if not body:
         return {}
     if content_type == "application/json" or body.startswith("{"):

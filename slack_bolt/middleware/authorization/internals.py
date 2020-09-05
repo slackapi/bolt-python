@@ -5,16 +5,16 @@ from slack_bolt.response import BoltResponse
 def _is_url_verification(req: BoltRequest) -> bool:
     return (
         req is not None
-        and req.payload is not None
-        and req.payload.get("type", None) == "url_verification"
+        and req.body is not None
+        and req.body.get("type", None) == "url_verification"
     )
 
 
 def _is_ssl_check(req: BoltRequest) -> bool:
     return (
         req is not None
-        and req.payload is not None
-        and req.payload.get("type", None) == "ssl_check"
+        and req.body is not None
+        and req.body.get("type", None) == "ssl_check"
     )
 
 

@@ -140,7 +140,7 @@ class TestAsyncAttachmentActions:
 
 
 # https://api.slack.com/legacy/interactive-messages
-payload = {
+body = {
     "type": "interactive_message",
     "actions": [
         {
@@ -188,10 +188,11 @@ payload = {
     "trigger_id": "111.222.valid",
 }
 
-raw_body = f"payload={quote(json.dumps(payload))}"
+raw_body = f"payload={quote(json.dumps(body))}"
 
 
-async def simple_listener(ack, body, action):
-    assert body == action
+async def simple_listener(ack, body, payload, action):
+    assert body != payload
+    assert payload == action
     assert body["trigger_id"] == "111.222.valid"
     await ack()

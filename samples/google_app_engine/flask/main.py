@@ -8,8 +8,8 @@ bolt_app = App()
 
 
 @bolt_app.command("/hey-google-app-engine")
-def hello(payload, ack):
-    user_id = payload["user_id"]
+def hello(body, ack):
+    user_id = body["user_id"]
     ack(f"Hi <@{user_id}>!")
 
 
@@ -20,7 +20,7 @@ app = Flask(__name__)
 handler = SlackRequestHandler(bolt_app)
 
 
-@app.route('/_ah/warmup')
+@app.route("/_ah/warmup")
 def warmup():
     # Handle your warmup logic here, e.g. set up a database connection pool
     return "", 200, {}

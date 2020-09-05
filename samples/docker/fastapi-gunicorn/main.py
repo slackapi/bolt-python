@@ -7,8 +7,8 @@ app = AsyncApp()
 
 
 @app.command("/hello-bolt-python")
-async def hello(payload, ack):
-    user_id = payload["user_id"]
+async def hello(body, ack):
+    user_id = body["user_id"]
     await ack(f"Hi <@{user_id}>!")
 
 

@@ -14,10 +14,10 @@ class AsyncRequestVerification(RequestVerification, AsyncMiddleware):
         resp: BoltResponse,
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> BoltResponse:
-        if self._can_skip(req.payload):
+        if self._can_skip(req.body):
             return await next()
 
-        body = req.body
+        body = req.raw_body
         timestamp = req.headers.get("x-slack-request-timestamp", ["0"])[0]
         signature = req.headers.get("x-slack-signature", [""])[0]
         if self.verifier.is_valid(body, timestamp, signature):

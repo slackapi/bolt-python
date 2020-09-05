@@ -33,15 +33,14 @@ def build_required_kwargs(
         "response": response,
         "context": request.context,
         # payload
-        "payload": request.payload,
-        "body": request.payload,
-        "options": to_options(request.payload),
-        "shortcut": to_shortcut(request.payload),
-        "action": to_action(request.payload),
-        "view": to_view(request.payload),
-        "command": to_command(request.payload),
-        "event": to_event(request.payload),
-        "message": to_message(request.payload),
+        "body": request.body,
+        "options": to_options(request.body),
+        "shortcut": to_shortcut(request.body),
+        "action": to_action(request.body),
+        "view": to_view(request.body),
+        "command": to_command(request.body),
+        "event": to_event(request.body),
+        "message": to_message(request.body),
         # utilities
         "ack": request.context.ack,
         "say": request.context.say,
@@ -49,6 +48,17 @@ def build_required_kwargs(
         # middleware
         "next": next_func,
     }
+    all_available_args["payload"] = (
+        all_available_args["options"]
+        or all_available_args["shortcut"]
+        or all_available_args["action"]
+        or all_available_args["view"]
+        or all_available_args["command"]
+        or all_available_args["event"]
+        or all_available_args["message"]
+        or request.body
+    )
+
     kwargs: Dict[str, Any] = {
         k: v for k, v in all_available_args.items() if k in required_arg_names
     }
