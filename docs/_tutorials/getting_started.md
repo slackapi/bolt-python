@@ -122,3 +122,47 @@ python app.py
 ```
 
 Your app should let you know that it's up and running.
+
+---
+
+### Setting up events
+Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and more. To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api).
+
+To enable events for your app, start by going back to your app configuration page (click on the app [from your app management page](https://api.slack.com/apps)). Click **Event Subscriptions** on the left sidebar. Toggle the switch labeled **Enable Events**.
+
+You'll see a text input labeled **Request URL**. The Request URL is a public URL where Slack will send HTTP POST requests corresponding to events you specify.
+
+> ⚙️We've collected some of the most common hosting providers Slack developers use to host their apps [on our API site](https://api.slack.com/docs/hosting)
+
+When an event occurs, Slack will send your app some information about the event, like the user that triggered it and the channel it occurred in. Your app will process the details and can respond accordingly.
+
+<details>
+<summary markdown="0">
+<h4>Using a local Request URL for development</h4>
+</summary>
+
+If you’re just getting started with your app's development, you probably don’t have a publicly accessible URL yet. Eventually, you’ll want to set one up, but for now a development proxy like [ngrok](https://ngrok.com/) will create a public URL and tunnel requests to your own development environment. We've written a separate tutorial about [using ngrok with Slack for local development](https://api.slack.com/tutorials/tunneling-with-ngrok) that should help you get everything set up.
+
+Once you’ve installed a development proxy, run it to begin forwarding requests to a specific port (we’re using port `3000` for this example, but if you customized the port used to initialize your app use that port instead):
+
+```shell
+ngrok http 3000
+```
+
+![Running ngrok](../assets/ngrok.gif "Running ngrok")
+
+The output should show a generated URL that you can use (we recommend the one that starts with `https://`). This URL will be the base of your request URL, in this case `https://8e8ec2d7.ngrok.io`.
+
+---
+</details>
+
+Now you have a public-facing URL for your app that tunnels to your local machine. The Request URL that you use in your app configuration is composed of your public-facing URL combined with the URL your app is listening on. By default, Bolt apps listen at `/slack/events` so our full request URL would be `https://8e8ec2d7.ngrok.io/slack/events`.
+
+> ⚙️Bolt uses the `/slack/events` endpoint to listen to all incoming requests (whether shortcuts, events, or interactivity payloads). When configuring endpoints within your app configuration, you'll append `/slack/events` to all request URLs.
+
+Under the **Enable Events** switch in the **Request URL** box, go ahead and paste in your URL. As long as your Bolt app is still running, your URL should become verified.
+
+<!-- TODO - Should this be done as a list? -->
+After your request URL is verified, scroll down to **Subscribe to Bot Events**. There are four events related to messages: `message.channels` (listens for messages in public channels), `message.groups` (listens for messages in private channels), `message.im` (listens for messages in the App Home/DM space), and `message.mpim` (listens for messages in multi-person DMs).
+
+If you want your bot to listen to messages from everywhere it is, choose all four message events. After you’ve added the events you want your bot to listen to, click the green **Save Changes** button.
