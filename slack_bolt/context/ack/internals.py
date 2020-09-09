@@ -78,14 +78,11 @@ def _set_response(
             body["options"] = convert_to_dict_list(body["options"])
         if "option_groups" in body:
             body["option_groups"] = convert_to_dict_list(body["option_groups"])
-        if "response_type" in body:
-            body["response_type"] = body["response_type"]
-        if "response_action" in body:
-            body["response_action"] = body["response_action"]
         if "errors" in body:
             body["errors"] = convert_to_dict(body["errors"])
         if "view" in body:
             body["view"] = convert_to_dict(body["view"])
+        # no modification for response_type, response_action here
 
         self.response = BoltResponse(status=200, body=body)
         return self.response
