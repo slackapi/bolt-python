@@ -104,6 +104,9 @@ def extract_channel_id(payload: Dict[str, Any]) -> Optional[str]:
         return payload.get("channel_id")
     if "event" in payload:
         return extract_channel_id(payload["event"])
+    if "item" in payload:
+        # reaction_added: body["event"]["item"]
+        return extract_channel_id(payload["item"])
     return None
 
 

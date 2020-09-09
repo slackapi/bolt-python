@@ -113,6 +113,22 @@ class TestAsyncEvents:
         assert self.mock_received_requests["/auth.test"] == times
         assert self.mock_received_requests["/chat.postMessage"] == times
 
+    def build_valid_reaction_added_request(self) -> AsyncBoltRequest:
+        timestamp, body = str(int(time())), json.dumps(reaction_added_body)
+        return AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
+
+    @pytest.mark.asyncio
+    async def test_reaction_added(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.event("reaction_added")(whats_up)
+
+        request = self.build_valid_reaction_added_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+        await asyncio.sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
 
 app_mention_body = {
     "token": "verification_token",
@@ -135,6 +151,25 @@ app_mention_body = {
     "authed_users": ["W111"],
 }
 
+reaction_added_body = {
+    "token": "verification_token",
+    "team_id": "T111",
+    "enterprise_id": "E111",
+    "api_app_id": "A111",
+    "event": {
+        "type": "reaction_added",
+        "user": "W111",
+        "item": {"type": "message", "channel": "C111", "ts": "1599529504.000400"},
+        "reaction": "heart_eyes",
+        "item_user": "W111",
+        "event_ts": "1599616881.000800",
+    },
+    "type": "event_callback",
+    "event_id": "Ev111",
+    "event_time": 1599616881,
+    "authed_users": ["W111"],
+}
+
 
 async def random_sleeper(body, say, payload, event):
     assert body == app_mention_body
@@ -146,7 +181,6 @@ async def random_sleeper(body, say, payload, event):
 
 
 async def whats_up(body, say, payload, event):
-    assert body == app_mention_body
     assert body["event"] == payload
     assert payload == event
     await say("What's up?")
