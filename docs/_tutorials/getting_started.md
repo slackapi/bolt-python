@@ -166,3 +166,36 @@ Under the **Enable Events** switch in the **Request URL** box, go ahead and past
 After your request URL is verified, scroll down to **Subscribe to Bot Events**. There are four events related to messages: `message.channels` (listens for messages in public channels), `message.groups` (listens for messages in private channels), `message.im` (listens for messages in the App Home/DM space), and `message.mpim` (listens for messages in multi-person DMs).
 
 If you want your bot to listen to messages from everywhere it is, choose all four message events. After you’ve added the events you want your bot to listen to, click the green **Save Changes** button.
+
+---
+
+### Listening and responding to a message
+Your app is now ready for some logic. Let's start by using the `message()` method to attach a listener for messages.
+
+The following example listens to all messages that contain the lower-case word "hello" and responds with "Hey there @user!"
+
+<!-- TODO - Suggestions on the `reply_to_hello` function name? `message_hello`? -->
+```python
+import os
+from slack_bolt import App
+
+# Initializes your app with your bot token and signing secret
+app = App(
+  token=os.environ.get("SLACK_BOT_TOKEN"),
+  signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+)
+
+# Listens to incoming messages that contain "hello"
+@app.message("hello")
+def reply_to_hello(message, say):
+    # say() sends a message to the channel where the event was triggered
+    say(f"Hey there <@{message['user']}>")
+
+# Start your app
+if __name__ == "__main__":
+    app.start(port=int(os.environ.get("PORT", 3000)))
+```
+
+If you restart your app, you should be able to add your bot user to a channel, send any message that contains the lower-case "hello", and it will respond.
+
+This is a basic example, but it gives you a place to start customizing your app based on your own goals. Let's try something a little more interactive by sending a button rather than plain text.
