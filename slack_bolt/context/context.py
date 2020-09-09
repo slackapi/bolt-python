@@ -12,7 +12,9 @@ from slack_bolt.context.say import Say
 class BoltContext(BaseContext):
     @property
     def client(self) -> Optional[WebClient]:
-        return self.get("client", None)
+        if "client" not in self:
+            self["client"] = WebClient(token=None)
+        return self["client"]
 
     @property
     def ack(self) -> Ack:
