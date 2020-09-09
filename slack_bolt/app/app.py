@@ -590,13 +590,13 @@ class App:
 
     def block_action(
         self,
-        action_id: Union[str, Pattern],
+        constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.block_action(action_id)
+            primary_matcher = builtin_matchers.block_action(constraints)
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )

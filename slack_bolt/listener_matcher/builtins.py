@@ -183,7 +183,7 @@ def action(
     elif "type" in constraints:
         action_type = constraints["type"]
         if action_type == "block_actions":
-            return block_action(constraints["action_id"], asyncio)
+            return block_action(constraints, asyncio)
         if action_type == "interactive_message":
             return attachment_action(constraints["callback_id"], asyncio)
         if action_type == "dialog_submission":
@@ -197,6 +197,9 @@ def action(
             return workflow_step_edit(constraints["callback_id"], asyncio)
 
         raise BoltError(f"type: {action_type} is unsupported")
+    elif "action_id" in constraints:
+        # The default value is "block_actions"
+        return block_action(constraints, asyncio)
 
     raise BoltError(
         f"action ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
@@ -204,12 +207,25 @@ def action(
 
 
 def block_action(
-    action_id: Union[str, Pattern], asyncio: bool = False,
+    constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
+    asyncio: bool = False,
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(body: Dict[str, Any]) -> bool:
-        return is_block_actions(body) and _matches(
-            action_id, to_action(body)["action_id"]
-        )
+        if is_block_actions(body) is False:
+            return False
+
+        action = to_action(body)
+        if isinstance(constraints, (str, Pattern)):
+            action_id = constraints
+            return _matches(action_id, action["action_id"])
+        elif isinstance(constraints, dict):
+            # block_id matching is optional
+            block_id: Optional[Union[str, Pattern]] = constraints.get("block_id")
+            block_id_matched = block_id is None or _matches(
+                block_id, action.get("block_id")
+            )
+            action_id_matched = _matches(constraints["action_id"], action["action_id"])
+            return block_id_matched and action_id_matched
 
     return build_listener_matcher(func, asyncio)
 
@@ -347,7 +363,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -> bool:
         return input == exact_match_str
     elif isinstance(str_or_pattern, Pattern):
         pattern: Pattern = str_or_pattern
-        return pattern.search(input)
+        return pattern.search(input) is not None
     else:
         raise BoltError(
             f"{str_or_pattern} ({type(str_or_pattern)}) must be either str or Pattern"

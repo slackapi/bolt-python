@@ -79,6 +79,36 @@ class TestAsyncBlockActions:
         assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
+    async def test_default_type(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.action({"action_id": "a", "block_id": "b"})(simple_listener)
+
+        request = self.build_valid_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+    @pytest.mark.asyncio
+    async def test_default_type_no_block_id(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.action({"action_id": "a"})(simple_listener)
+
+        request = self.build_valid_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+    @pytest.mark.asyncio
+    async def test_default_type_unmatched_block_id(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.action({"action_id": "a", "block_id": "bbb"})(simple_listener)
+
+        request = self.build_valid_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
+
+    @pytest.mark.asyncio
     async def test_process_before_response(self):
         app = AsyncApp(
             client=self.web_client,
