@@ -1,4 +1,6 @@
 import pytest
+from slack_sdk.models.blocks import PlainTextObject, DividerBlock
+from slack_sdk.models.views import View
 
 from slack_bolt import BoltResponse
 from slack_bolt.context.ack.async_ack import AsyncAck
@@ -71,6 +73,33 @@ class TestAsyncAsyncAck:
             '"title": {"type": "plain_text", "text": "My App"}, '
             '"close": {"type": "plain_text", "text": "Cancel"}, '
             '"blocks": [{"type": "divider", "block_id": "b"}]'
+            "}"
+            "}",
+        )
+
+    @pytest.mark.asyncio
+    async def test_view_update_2(self):
+        ack = AsyncAck()
+        response: BoltResponse = await ack(
+            response_action="update",
+            view=View(
+                type="modal",
+                callback_id="view-id",
+                title=PlainTextObject(text="My App"),
+                close=PlainTextObject(text="Cancel"),
+                blocks=[DividerBlock(block_id="b")],
+            ),
+        )
+        assert (response.status, response.body) == (
+            200,
+            ""
+            '{"response_action": "update", '
+            '"view": {'
+            '"blocks": [{"block_id": "b", "type": "divider"}], '
+            '"callback_id": "view-id", '
+            '"close": {"text": "Cancel", "type": "plain_text"}, '
+            '"title": {"text": "My App", "type": "plain_text"}, '
+            '"type": "modal"'
             "}"
             "}",
         )
