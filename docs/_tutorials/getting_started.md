@@ -47,6 +47,78 @@ Scroll up to the top of the OAuth & Permissions page and click **Install App to 
 
 Once you authorize the installation, you'll land on the **OAuth & Permissions** page and see a **Bot User OAuth Access Token**.
 
+<!--TODO - Update image to match the latest App Directory sidebar (but remove the Workflows beta) -->
 ![OAuth Tokens](../assets/bot-token.png "Bot OAuth Token")
 
 > 💡 Treat your token like a password and [keep it safe](https://api.slack.com/docs/oauth-safety). Your app uses it to post and retrieve information from Slack workspaces.
+
+---
+
+### Setting up your local project
+With the initial configuration handled, it's time to set up a new Bolt project. This is where you'll write the code that handles the logic for your app.
+
+If you don’t already have a project, let’s create a new one. Create an empty directory:
+
+```shell
+mkdir first-bolt-app
+cd first-bolt-app
+```
+
+Next, we recommend using a Python virtual environment to manage your project's dependencies. Create and activate a new virtual environment:
+
+<!-- TODO - Details on installing Python version manager, virtual environment, adding it to the git ignore, etc -->
+<!-- TODO - Do we use python or python3? -->
+<!-- TODO - Should we confirm that the virtual environment is active? -->
+```shell
+python3 -m venv env
+source env/bin/activate
+```
+
+Before we install the Bolt for Python package to your new project, let's save the bot token and signing secret that was generated when you configured your app. These should be stored as environment variables and should *not* be saved in version control.
+
+1. **Copy your Signing Secret from the Basic Information page** and then store it in a new environment variable. The following example works on Linux and MacOS; but [similar commands are available on Windows](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153).
+
+```shell
+export SLACK_SIGNING_SECRET=<your-signing-secret>
+```
+
+2. **Copy your bot (xoxb) token from the OAuth & Permissions page** and store it in another environment variable.
+
+```shell
+export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
+```
+
+<!-- TODO - Is `slack_bolt` called a package in Python? -->
+Now, lets create your app. Install the `slack_bolt` package to your virtual environment using the following command:
+
+```shell
+pip install slack_bolt
+```
+<!-- TODO - Do we want to mention that it will be installed to env/.../site-packages? -->
+
+Create a new file called `app.py` in this directory and add the following code:
+
+<!-- TODO - Is it best practice to separate imports and froms with a new line? -->
+```python
+import os
+from slack_bolt import App
+
+# Initializes your app with your bot token and signing secret
+app = App(
+  token=os.environ.get("SLACK_BOT_TOKEN"),
+  signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+)
+
+# Start your app
+if __name__ == "__main__":
+    app.start(port=int(os.environ.get("PORT", 3000)))
+```
+
+Your token and signing secret are enough to create your first Bolt app. Save your `app.py` file then on the command line run the following:
+
+<!-- TODO - Should we make a note that there is no need to use python3 after init a virtual environment? -->
+```script
+python app.py
+```
+
+Your app should let you know that it's up and running.
