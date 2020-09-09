@@ -29,10 +29,41 @@ class MockHandler(SimpleHTTPRequestHandler):
         "error": "invalid_auth",
     }
 
+    oauth_v2_access_response = """
+{
+    "ok": true,
+    "access_token": "xoxb-17653672481-19874698323-pdFZKVeTuE8sk7oOcBrzbqgy",
+    "token_type": "bot",
+    "scope": "chat:write,commands",
+    "bot_user_id": "U0KRQLJ9H",
+    "app_id": "A0KRD7HC3",
+    "team": {
+        "name": "Slack Softball Team",
+        "id": "T9TK3CUKW"
+    },
+    "enterprise": {
+        "name": "slack-sports",
+        "id": "E12345678"
+    },
+    "authed_user": {
+        "id": "U1234",
+        "scope": "chat:write",
+        "access_token": "xoxp-1234",
+        "token_type": "user"
+    }
+}
+                """
+
     def _handle(self):
         self.received_requests[self.path] = self.received_requests.get(self.path, 0) + 1
         try:
             body = {"ok": True}
+            if self.path == "/oauth.v2.access":
+                self.send_response(200)
+                self.set_common_headers()
+                self.wfile.write(self.oauth_v2_access_response.encode("utf-8"))
+                return
+
             if self.is_valid_token():
                 parsed_path = urlparse(self.path)
 

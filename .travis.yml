@@ -9,13 +9,15 @@ install:
   - pip install -U pip
   # https://discuss.python.org/t/announcement-pip-20-2-release/4863
   - pip config set global.use-feature 2020-resolver
-  - pip install "pytest>=5,<6"
+  - pip install "pytest>=5,<6" "pytest-cov>=2,<3"
 script:
   # testing without aiohttp
+  - travis_retry pytest tests/slack_bolt/
   - travis_retry pytest tests/scenario_tests/
   # testing with aiohttp
   - pip install -e ".[async]"
   - pip install "pytest-asyncio<1"
+  - travis_retry pytest tests/slack_bolt_async/
   - travis_retry pytest tests/async_scenario_tests/
   # testing for adapters
   - pip install -e ".[adapter]"
@@ -24,3 +26,4 @@ script:
   - travis_retry python setup.py test
   # Run pytype only for Python 3.8
   - if [ ${TRAVIS_PYTHON_VERSION:0:3} == "3.8" ]; then pip install "pytype" && pytype slack_bolt/; fi
+  - if [ ${TRAVIS_PYTHON_VERSION:0:3} == "3.8" ]; then pytest --cov=slack_bolt/ && bash <(curl -s https://codecov.io/bash); fi
