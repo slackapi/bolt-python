@@ -13,6 +13,7 @@ with open(f"{here}/README.md", "r") as fh:
 
 test_dependencies = [
     "pytest>=5,<6",
+    "pytest-cov>=2,<3",
     "pytest-asyncio<1",  # for async
     "aiohttp>=3,<4",  # for async
     "black==19.10b0",
