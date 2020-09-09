@@ -40,7 +40,7 @@ from slack_bolt.middleware.url_verification import UrlVerification
 from slack_bolt.oauth import OAuthFlow
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
-from slack_bolt.util.utils import create_web_client, _copy_object
+from slack_bolt.util.utils import create_web_client, create_copy
 
 
 class App:
@@ -432,7 +432,7 @@ class App:
 
     @staticmethod
     def _build_lazy_request(request: BoltRequest, lazy_func_name: str) -> BoltRequest:
-        copied_request = _copy_object(request)
+        copied_request = create_copy(request)
         copied_request.method = "NONE"
         copied_request.lazy_only = True
         copied_request.lazy_function_name = lazy_func_name

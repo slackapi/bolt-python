@@ -52,7 +52,7 @@ from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_bolt.util.async_utils import create_async_web_client
-from slack_bolt.util.utils import _copy_object
+from slack_bolt.util.utils import create_copy
 
 
 class AsyncApp:
@@ -464,7 +464,7 @@ class AsyncApp:
     def _build_lazy_request(
         request: AsyncBoltRequest, lazy_func_name: str
     ) -> AsyncBoltRequest:
-        copied_request = _copy_object(request)
+        copied_request = create_copy(request)
         copied_request.method = "NONE"
         copied_request.lazy_only = True
         copied_request.lazy_function_name = lazy_func_name

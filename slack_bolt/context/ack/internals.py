@@ -6,7 +6,7 @@ from slack_sdk.models.views import View
 
 from slack_bolt.error import BoltError
 from slack_bolt.response import BoltResponse
-from slack_bolt.util.utils import convert_to_dict_list, _to_dict
+from slack_bolt.util.utils import convert_to_dict_list, convert_to_dict
 
 
 def _set_response(
@@ -50,7 +50,7 @@ def _set_response(
                         status=200,
                         body={
                             "response_action": response_action,
-                            "errors": _to_dict(errors),
+                            "errors": convert_to_dict(errors),
                         },
                     )
                 else:
@@ -60,7 +60,7 @@ def _set_response(
             else:
                 body = {"response_action": response_action}
                 if view:
-                    body["view"] = _to_dict(view)
+                    body["view"] = convert_to_dict(view)
                 self.response = BoltResponse(status=200, body=body)
         else:
             if len(body) == 1 and "text" in body:
@@ -83,9 +83,9 @@ def _set_response(
         if "response_action" in body:
             body["response_action"] = body["response_action"]
         if "errors" in body:
-            body["errors"] = _to_dict(body["errors"])
+            body["errors"] = convert_to_dict(body["errors"])
         if "view" in body:
-            body["view"] = _to_dict(body["view"])
+            body["view"] = convert_to_dict(body["view"])
 
         self.response = BoltResponse(status=200, body=body)
         return self.response

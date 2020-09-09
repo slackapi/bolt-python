@@ -14,10 +14,10 @@ def create_web_client(token: Optional[str] = None) -> WebClient:
 
 
 def convert_to_dict_list(objects: List[Union[Dict, JsonObject]]) -> List[Dict]:
-    return [_to_dict(elm) for elm in objects]
+    return [convert_to_dict(elm) for elm in objects]
 
 
-def _to_dict(obj: Union[Dict, JsonObject]) -> Dict:
+def convert_to_dict(obj: Union[Dict, JsonObject]) -> Dict:
     if isinstance(obj, dict):
         return obj
     if isinstance(obj, JsonObject) or hasattr(obj, "to_dict"):
@@ -25,7 +25,7 @@ def _to_dict(obj: Union[Dict, JsonObject]) -> Dict:
     raise BoltError(f"{obj} (type: {type(obj)}) is unsupported")
 
 
-def _copy_object(original: Any) -> Any:
+def create_copy(original: Any) -> Any:
     if sys.version_info.major == 3 and sys.version_info.minor <= 6:
         # NOTE: Unfortunately, copy.deepcopy doesn't work in Python 3.6.5.
         # --------------------
