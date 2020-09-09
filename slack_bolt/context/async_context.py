@@ -11,7 +11,9 @@ from slack_bolt.context.say.async_say import AsyncSay
 class AsyncBoltContext(BaseContext):
     @property
     def client(self) -> Optional[AsyncWebClient]:
-        return self.get("client", None)
+        if "client" not in self:
+            self["client"] = AsyncWebClient(token=None)
+        return self["client"]
 
     @property
     def ack(self) -> AsyncAck:
