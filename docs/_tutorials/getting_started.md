@@ -328,3 +328,18 @@ if __name__ == "__main__":
 ```
 
 You can see that we used the `action_id` to add a listener for our button action. If you restart your app and click the button, you'll see a new message from your app that says you clicked the button.
+
+---
+
+### Next steps
+You just built your first Bolt for Python app! 🎉
+
+Now that you have a basic app up and running, you can start exploring how to make your Bolt app stand out. Here are some ideas about what to explore next:
+
+* Read through the [Basic concepts](/bolt-python/concepts#basic) to learn about the different methods and features your Bolt app has access to.
+
+* Explore the different events your bot can listen to with the [`events()` method](/bolt-python/concepts#event-listening). All of the events are listed [on the API site](https://api.slack.com/events).
+
+* Bolt allows you to [call Web API methods](/bolt-python/concepts#web-api) with the client attached to your app. There are [over 130 methods](https://api.slack.com/methods) on our API site.
+
+* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform.
