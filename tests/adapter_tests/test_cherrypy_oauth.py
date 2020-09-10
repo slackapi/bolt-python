@@ -5,10 +5,7 @@ from slack_sdk.web import WebClient
 
 from slack_bolt.adapter.cherrypy import SlackRequestHandler
 from slack_bolt.app import App
-from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
-)
+from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
@@ -28,9 +25,11 @@ class TestCherryPy(helper.CPWebCase):
         app = App(
             client=web_client,
             signing_secret=signing_secret,
-            client_id="111.111",
-            client_secret="xxx",
-            scopes=["chat:write", "commands"],
+            oauth_settings=OAuthSettings(
+                client_id="111.111",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+            ),
         )
         handler = SlackRequestHandler(app)
 

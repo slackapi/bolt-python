@@ -6,13 +6,10 @@ import time
 from asyncio import Future
 from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable
 
-from slack_sdk.oauth import OAuthStateUtils
-from slack_sdk.oauth.installation_store import FileInstallationStore
+from slack_sdk.oauth import OAuthStateStore
 from slack_sdk.oauth.installation_store.async_installation_store import (
     AsyncInstallationStore,
 )
-from slack_sdk.oauth.state_store import FileOAuthStateStore
-from slack_sdk.oauth.state_store.async_state_store import AsyncOAuthStateStore
 from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.context.ack.async_ack import AsyncAck
@@ -49,6 +46,7 @@ from slack_bolt.middleware.authorization.async_single_team_authorization import 
     AsyncSingleTeamAuthorization,
 )
 from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
+from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_bolt.util.async_utils import create_async_web_client
@@ -70,20 +68,11 @@ class AsyncApp:
         client: Optional[AsyncWebClient] = None,
         # for multi-workspace apps
         installation_store: Optional[AsyncInstallationStore] = None,
-        oauth_state_store: Optional[AsyncOAuthStateStore] = None,
-        oauth_state_cookie_name: str = OAuthStateUtils.default_cookie_name,
-        oauth_state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
         # for the OAuth flow
+        oauth_state_store: Optional[OAuthStateStore] = None,
+        oauth_settings: Optional[AsyncOAuthSettings] = None,
         oauth_flow: Optional[AsyncOAuthFlow] = None,
-        client_id: Optional[str] = None,
-        client_secret: Optional[str] = None,
-        scopes: Optional[List[str]] = None,
-        user_scopes: Optional[List[str]] = None,
-        redirect_uri: Optional[str] = None,
-        oauth_install_path: Optional[str] = None,
-        oauth_redirect_uri_path: Optional[str] = None,
-        oauth_success_url: Optional[str] = None,
-        oauth_failure_url: Optional[str] = None,
+        authorization_test_enabled: bool = True,
         # No need to set (the value is used only in response to ssl_check requests)
         verification_token: Optional[str] = None,
     ):
@@ -97,19 +86,6 @@ class AsyncApp:
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret: str = signing_secret
-
-        client_id = client_id or os.environ.get("SLACK_CLIENT_ID", None)
-        client_secret = client_secret or os.environ.get("SLACK_CLIENT_SECRET", None)
-        scopes = scopes or os.environ.get("SLACK_SCOPES", "").split(",")
-        user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", "").split(",")
-        redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI", None)
-        oauth_install_path = oauth_install_path or os.environ.get(
-            "SLACK_INSTALL_PATH", "/slack/install"
-        )
-        oauth_redirect_uri_path = oauth_redirect_uri_path or os.environ.get(
-            "SLACK_REDIRECT_URI_PATH", "/slack/oauth_redirect"
-        )
-
         self._verification_token: Optional[str] = verification_token or os.environ.get(
             "SLACK_VERIFICATION_TOKEN", None
         )
@@ -130,73 +106,31 @@ class AsyncApp:
             # NOTE: the token here can be None
             self._async_client = create_async_web_client(token)
 
+        self._authorization_test_enabled = authorization_test_enabled
+
         self._async_installation_store: Optional[
             AsyncInstallationStore
         ] = installation_store
-        self._async_oauth_state_store: Optional[
-            AsyncOAuthStateStore
-        ] = oauth_state_store
-
-        self._oauth_state_cookie_name = oauth_state_cookie_name
-        self._oauth_state_expiration_seconds = oauth_state_expiration_seconds
 
         self._async_oauth_flow: Optional[AsyncOAuthFlow] = None
         if oauth_flow:
             self._async_oauth_flow = oauth_flow
             if self._async_installation_store is None:
                 self._async_installation_store = (
-                    self._async_oauth_flow.installation_store
+                    self._async_oauth_flow.settings.installation_store
                 )
-            if self._async_oauth_state_store is None:
-                self._async_oauth_state_store = self._async_oauth_flow.oauth_state_store
             if self._async_oauth_flow._async_client is None:
                 self._async_oauth_flow._async_client = self._async_client
-        else:
-            if client_id is not None and client_secret is not None:
-                # The OAuth flow support is enabled
-                if (
-                    self._async_installation_store is None
-                    and self._async_oauth_state_store is None
-                ):
-                    # use the default ones
-                    self._async_installation_store = FileInstallationStore(
-                        client_id=client_id,
-                    )
-                    self._async_oauth_state_store = FileOAuthStateStore(
-                        expiration_seconds=self._oauth_state_expiration_seconds,
-                        client_id=client_id,
-                    )
+        elif oauth_settings is not None:
+            # The OAuth flow support is enabled
+            if self._async_installation_store:
+                oauth_settings.installation_store = self._async_installation_store
+            if oauth_state_store:
+                oauth_settings.state_store = oauth_state_store
 
-                if (
-                    self._async_installation_store is not None
-                    and self._async_oauth_state_store is None
-                ):
-                    raise ValueError(
-                        f"Configure an appropriate OAuthStateStore for {self._async_installation_store}"
-                    )
-
-                self._async_oauth_flow = AsyncOAuthFlow(
-                    client=create_async_web_client(),
-                    logger=self._framework_logger,
-                    # required storage implementations
-                    installation_store=self._async_installation_store,
-                    oauth_state_store=self._async_oauth_state_store,
-                    oauth_state_cookie_name=self._oauth_state_cookie_name,
-                    oauth_state_expiration_seconds=self._oauth_state_expiration_seconds,
-                    # used for oauth.v2.access calls
-                    client_id=client_id,
-                    client_secret=client_secret,
-                    # installation url parameters
-                    scopes=scopes,
-                    user_scopes=user_scopes,
-                    redirect_uri=redirect_uri,
-                    # path in this app
-                    install_path=oauth_install_path,
-                    redirect_uri_path=oauth_redirect_uri_path,
-                    # urls after callback
-                    success_url=oauth_success_url,
-                    failure_url=oauth_failure_url,
-                )
+            self._async_oauth_flow = AsyncOAuthFlow(
+                client=self._async_client, logger=self.logger, settings=oauth_settings
+            )
 
         if self._async_installation_store is not None and self._token is not None:
             self._token = None
@@ -235,7 +169,10 @@ class AsyncApp:
                 )
         else:
             self._async_middleware_list.append(
-                AsyncMultiTeamsAuthorization(self._async_installation_store)
+                AsyncMultiTeamsAuthorization(
+                    installation_store=self._async_installation_store,
+                    verification_enabled=self._authorization_test_enabled,
+                )
             )
 
         self._async_middleware_list.append(AsyncIgnoringSelfEvents())
@@ -264,10 +201,6 @@ class AsyncApp:
     @property
     def installation_store(self) -> Optional[AsyncInstallationStore]:
         return self._async_installation_store
-
-    @property
-    def oauth_state_store(self) -> Optional[AsyncOAuthStateStore]:
-        return self._async_oauth_state_store
 
     @property
     def listener_error_handler(self) -> AsyncListenerErrorHandler:

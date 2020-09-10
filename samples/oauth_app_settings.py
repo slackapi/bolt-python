@@ -6,20 +6,42 @@ sys.path.insert(1, "..")
 # ------------------------------------------------
 
 import logging
-from slack_bolt import App
+import os
+from slack_bolt import App, BoltResponse
+from slack_bolt.oauth.callback_options import CallbackOptions, SuccessArgs, FailureArgs
+from slack_bolt.oauth.oauth_settings import OAuthSettings
+
+from slack_sdk.oauth.installation_store import FileInstallationStore
+from slack_sdk.oauth.state_store import FileOAuthStateStore
 
 logging.basicConfig(level=logging.DEBUG)
-app = App()
 
+def success(args: SuccessArgs) -> BoltResponse:
+    return BoltResponse(status=200, body="Thanks!")
 
-@app.event("app_mention")
-def event_test(body, say, logger):
-    logger.info(body)
-    say("What's up?")
+def failure(args: FailureArgs) -> BoltResponse:
+    return BoltResponse(status=args.suggested_status_code, body=args.reason)
 
+app = App(
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
+    installation_store=FileInstallationStore(),
+    oauth_settings=OAuthSettings(
+        client_id=os.environ.get("SLACK_CLIENT_ID"),
+        client_secret=os.environ.get("SLACK_CLIENT_SECRET"),
+        scopes=["app_mentions:read","channels:history","im:history","chat:write"],
+        user_scopes=[],
+        redirect_uri=None,
+        install_path="/slack/install",
+        redirect_uri_path="/slack/oauth_redirect",
+        state_store=FileOAuthStateStore(expiration_seconds=600),
+        callback_options=CallbackOptions(
+            success=success,
+            failure=failure
+        )
+    )
+)
 
 @app.command("/hello-bolt-python")
-# or app.command(re.compile(r"/hello-.+"))(test_command)
 def test_command(body, respond, client, ack, logger):
     logger.info(body)
     ack("Thanks!")
@@ -83,5 +105,4 @@ if __name__ == "__main__":
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_CLIENT_ID=111.111
 # export SLACK_CLIENT_SECRET=***
-# export SLACK_SCOPES=app_mentions:read,channels:history,im:history,chat:write
 # python oauth_app.py

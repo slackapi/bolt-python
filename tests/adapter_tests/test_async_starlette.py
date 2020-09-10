@@ -11,6 +11,7 @@ from starlette.testclient import TestClient
 
 from slack_bolt.adapter.starlette.async_handler import AsyncSlackRequestHandler
 from slack_bolt.app.async_app import AsyncApp
+from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -177,9 +178,11 @@ class TestAsyncStarlette:
         app = AsyncApp(
             client=self.web_client,
             signing_secret=self.signing_secret,
-            client_id="111.111",
-            client_secret="xxx",
-            scopes=["chat:write", "commands"],
+            oauth_settings=AsyncOAuthSettings(
+                client_id="111.111",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+            ),
         )
         app_handler = AsyncSlackRequestHandler(app)
 

@@ -10,6 +10,7 @@ from starlette.testclient import TestClient
 
 from slack_bolt.adapter.fastapi import SlackRequestHandler
 from slack_bolt.app import App
+from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -170,9 +171,11 @@ class TestFastAPI:
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
-            client_id="111.111",
-            client_secret="xxx",
-            scopes=["chat:write", "commands"],
+            oauth_settings=OAuthSettings(
+                client_id="111.111",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+            ),
         )
         api = FastAPI()
         app_handler = SlackRequestHandler(app)
