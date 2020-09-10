@@ -127,8 +127,8 @@ from slack_bolt import App
 
 # Initializes your app with your bot token and signing secret
 app = App(
-  token=os.environ.get("SLACK_BOT_TOKEN"),
-  signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
 )
 
 # Start your app
@@ -203,8 +203,8 @@ from slack_bolt import App
 
 # Initializes your app with your bot token and signing secret
 app = App(
-  token=os.environ.get("SLACK_BOT_TOKEN"),
-  signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
 )
 
 # Listens to incoming messages that contain "hello"
@@ -246,8 +246,8 @@ from slack_bolt import App
 
 # Initializes your app with your bot token and signing secret
 app = App(
-  token=os.environ.get("SLACK_BOT_TOKEN"),
-  signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
 )
 
 # Listens to incoming messages that contain "hello"
@@ -298,8 +298,8 @@ from slack_bolt import App
 
 # Initializes your app with your bot token and signing secret
 app = App(
-  token=os.environ.get("SLACK_BOT_TOKEN"),
-  signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
 )
 
 # Listens to incoming messages that contain "hello"
