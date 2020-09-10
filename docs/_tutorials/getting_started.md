@@ -99,8 +99,7 @@ export SLACK_SIGNING_SECRET=<your-signing-secret>
 export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
 
-<!-- TODO - Is `slack_bolt` called a package in Python? -->
-Now, lets create your app. Install the `slack_bolt` package to your virtual environment using the following command:
+Now, lets create your app. Install the `slack_bolt` Python package to your virtual environment using the following command:
 
 ```shell
 pip install slack_bolt
