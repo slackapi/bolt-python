@@ -77,7 +77,6 @@ TODO - This is where we explain how to installing a Python version manager, virt
 </details>
 
 <!-- TODO - Details on installing Python version manager, virtual environment, adding it to the git ignore, etc -->
-<!-- TODO - Do we use python or python3? -->
 <!-- TODO - Should we confirm that the virtual environment is active? -->
 ```shell
 python3 -m venv env
@@ -104,22 +103,10 @@ Now, lets create your app. Install the `slack_bolt` Python package to your virtu
 ```shell
 pip install slack_bolt
 ```
-<!-- TODO - Do we want to mention that it will be installed to env/.../site-packages? -->
 
 Create a new file called `app.py` in this directory and add the following code:
 
 <!-- TODO - Is it best practice to separate imports and froms with a new line? -->
-<!-- TODO - Is it best practice to have 2 new lines after the imports? -->
-<!--
-  TODO - Should the code sample include the Logger middleware that's common in many of the samples?
-  ```python
-  # Middleware
-  @app.middleware  # or app.use(log_request)
-  def log_request(logger, body, next):
-      logger.info(body)
-      return next()
-  ```
--->
 ```python
 import os
 from slack_bolt import App
@@ -137,7 +124,6 @@ if __name__ == "__main__":
 
 Your token and signing secret are enough to create your first Bolt app. Save your `app.py` file then on the command line run the following:
 
-<!-- TODO - Should we make a note that there is no need to use python3 after init a virtual environment? -->
 ```script
 python3 app.py
 ```
