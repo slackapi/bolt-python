@@ -139,7 +139,7 @@ Your token and signing secret are enough to create your first Bolt app. Save you
 
 <!-- TODO - Should we make a note that there is no need to use python3 after init a virtual environment? -->
 ```script
-python app.py
+python3 app.py
 ```
 
 Your app should let you know that it's up and running.
