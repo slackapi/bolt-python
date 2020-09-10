@@ -210,7 +210,7 @@ app = App(
 @app.message("hello")
 def reply_to_hello(message, say):
     # say() sends a message to the channel where the event was triggered
-    say(f"Hey there <@{message['user']}>")
+    say(f"Hey there <@{message['user']}>!")
 
 # Start your app
 if __name__ == "__main__":
