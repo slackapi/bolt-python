@@ -99,6 +99,17 @@ pip install slack_bolt
 Create a new file called `app.py` in this directory and add the following code:
 
 <!-- TODO - Is it best practice to separate imports and froms with a new line? -->
+<!-- TODO - Is it best practice to have 2 new lines after the imports? -->
+<!--
+  TODO - Should the code sample include the Logger middleware that's common in many of the samples?
+  ```python
+  # Middleware
+  @app.middleware  # or app.use(log_request)
+  def log_request(logger, body, next):
+      logger.info(body)
+      return next()
+  ```
+-->
 ```python
 import os
 from slack_bolt import App
@@ -199,3 +210,121 @@ if __name__ == "__main__":
 If you restart your app, you should be able to add your bot user to a channel, send any message that contains the lower-case "hello", and it will respond.
 
 This is a basic example, but it gives you a place to start customizing your app based on your own goals. Let's try something a little more interactive by sending a button rather than plain text.
+
+---
+
+### Sending and responding to actions
+
+To use features like buttons, select menus, datepickers, dialogs, and shortcuts, you’ll need to enable interactivity. Similar to events, you'll need to specify a URL for Slack to send the action (such as *user clicked a button*).
+
+Back on your app configuration page, click on **Interactivity & Shortcuts** on the left side. You'll see that there's another **Request URL** box.
+
+By default, Bolt is configured to use the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up for interactivity!
+
+![Configuring a Request URL](../assets/request-url-config.png "Configuring a Request URL")
+
+Now, let's go back to your app's code and add interactivity. This will consist of two steps:
+- First, your app will send a message that contains a button.
+- Next, your app will listen to the action of a user clicking the button and respond
+
+Below, I've modified the app code we wrote in the last section to send a message with a button rather than a string:
+
+```python
+import os
+from slack_bolt import App
+
+# Initializes your app with your bot token and signing secret
+app = App(
+  token=os.environ.get("SLACK_BOT_TOKEN"),
+  signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+)
+
+# Listens to incoming messages that contain "hello"
+@app.message("hello")
+def reply_to_hello(message, say):
+    # say() sends a message to the channel where the event was triggered
+    say(
+        blocks=[
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"Hey there <@{message['user']}>!"
+                },
+                "accessory": {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Click Me"
+                    },
+                    "action_id": "button_click"
+                }
+            }
+        ],
+        text=f"Hey there <@{message['user']}>!"
+    )
+
+# Start your app
+if __name__ == "__main__":
+    app.start(port=int(os.environ.get("PORT", 3000)))
+```
+
+<!-- TODO - Review my usage of "List" (Array?) and clarification of the role of `text` -->
+The values passed to `say()` are now a list of `blocks` and a string of `text`. Blocks are the building components of a Slack message and can range from text to images to datepickers. In this case, your app will respond with a section block that includes a button as an accessory. Since we're using `blocks`, the `text` is a fallback string to display in notifications.
+
+You'll notice in the button `accessory` object, there is an `action_id`. This will act as a unique identifier for the button so your app can specify what action it wants to respond to.
+
+> 💡 The [Block Kit Builder](https://api.slack.com/tools/block-kit-builder) is an simple way to prototype your interactive messages. The builder lets you (or anyone on your team) mockup messages and generates the corresponding JSON that you can paste directly in your app.
+
+Now, if you restart your app and say "hello" in a channel your app is in, you'll see a message with a button. But if you click the button, nothing happens (*yet!*).
+
+Let's add a handler to send a followup message when someone clicks the button:
+
+<!-- TODO - I matched the ordering of the (ack, body, say) with JavaScript. Is this the ideal order? -->
+```python
+import os
+from slack_bolt import App
+
+# Initializes your app with your bot token and signing secret
+app = App(
+  token=os.environ.get("SLACK_BOT_TOKEN"),
+  signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+)
+
+# Listens to incoming messages that contain "hello"
+@app.message("hello")
+def reply_to_hello(message, say):
+    # say() sends a message to the channel where the event was triggered
+    say(
+        blocks=[
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"Hey there <@{message['user']}>!"
+                },
+                "accessory": {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Click Me"
+                    },
+                    "action_id": "button_click"
+                }
+            }
+        ],
+        text=f"Hey there <@{message['user']}>!"
+    )
+
+@app.action("button_click")
+def action_button_click(body, ack, say):
+    # Acknowledge the action
+    ack()
+    say(f"<@{body['user']['id']}> clicked the button")
+
+# Start your app
+if __name__ == "__main__":
+    app.start(port=int(os.environ.get("PORT", 3000)))
+```
+
+You can see that we used the `action_id` to add a listener for our button action. If you restart your app and click the button, you'll see a new message from your app that says you clicked the button.
