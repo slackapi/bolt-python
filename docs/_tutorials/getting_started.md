@@ -66,6 +66,16 @@ cd first-bolt-app
 
 Next, we recommend using a Python virtual environment to manage your project's dependencies. Create and activate a new virtual environment:
 
+<details>
+<summary markdown="0">
+<h4>Setting up a Python virtual environment</h4>
+</summary>
+
+TODO - This is where we explain how to installing a Python version manager, virtual environment, and adding it to gitignore.
+
+---
+</details>
+
 <!-- TODO - Details on installing Python version manager, virtual environment, adding it to the git ignore, etc -->
 <!-- TODO - Do we use python or python3? -->
 <!-- TODO - Should we confirm that the virtual environment is active? -->
@@ -82,6 +92,7 @@ Before we install the Bolt for Python package to your new project, let's save th
 export SLACK_SIGNING_SECRET=<your-signing-secret>
 ```
 
+<!-- TODO - Fix the bullet displaying 1. -->
 2. **Copy your bot (xoxb) token from the OAuth & Permissions page** and store it in another environment variable.
 
 ```shell
