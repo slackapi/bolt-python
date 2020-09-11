@@ -74,7 +74,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-We can confirm that the virtual environment is active by checking that the path to `python3` is inside your project ([a similar command is available on Windows](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#activating-a-virtual-environment)):
+We can confirm that the virtual environment is active by checking that the path to `python3` is _inside_ your project ([a similar command is available on Windows](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#activating-a-virtual-environment)):
 
 ```shell
 which python3
