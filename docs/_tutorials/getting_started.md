@@ -178,7 +178,6 @@ Your app is now ready for some logic. Let's start by using the `message()` metho
 
 The following example listens and responds to all messages in channels/DMs where your app has been added that contain the word "hello":
 
-<!-- TODO - Suggestions on the `reply_to_hello` function name? `message_hello`? -->
 ```python
 import os
 from slack_bolt import App
@@ -191,7 +190,7 @@ app = App(
 
 # Listens to incoming messages that contain "hello"
 @app.message("hello")
-def reply_to_hello(message, say):
+def message_hello(message, say):
     # say() sends a message to the channel where the event was triggered
     say(f"Hey there <@{message['user']}>!")
 
@@ -234,7 +233,7 @@ app = App(
 
 # Listens to incoming messages that contain "hello"
 @app.message("hello")
-def reply_to_hello(message, say):
+def message_hello(message, say):
     # say() sends a message to the channel where the event was triggered
     say(
         blocks=[
@@ -286,7 +285,7 @@ app = App(
 
 # Listens to incoming messages that contain "hello"
 @app.message("hello")
-def reply_to_hello(message, say):
+def message_hello(message, say):
     # say() sends a message to the channel where the event was triggered
     say(
         blocks=[
