@@ -1,10 +1,14 @@
+import json
 import re
+from time import time
+from urllib.parse import quote
 
 from slack_sdk import WebClient
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
+from slack_sdk.signature import SignatureVerifier
 
-from slack_bolt import BoltRequest, BoltResponse
+from slack_bolt import BoltRequest, BoltResponse, App
 from slack_bolt.oauth import OAuthFlow
 from slack_bolt.oauth.callback_options import CallbackOptions, SuccessArgs, FailureArgs
 from slack_bolt.oauth.oauth_settings import OAuthSettings
@@ -83,6 +87,36 @@ class TestOAuthFlow:
         resp = oauth_flow.handle_callback(req)
         assert resp.status == 200
         assert "https://www.example.com/completion" in resp.body
+
+        app = App(signing_secret="signing_secret", oauth_flow=oauth_flow)
+        global_shortcut_body = {
+            "type": "shortcut",
+            "token": "verification_token",
+            "action_ts": "111.111",
+            "team": {
+                "id": "T111",
+                "domain": "workspace-domain",
+                "enterprise_id": "E111",
+                "enterprise_name": "Org Name",
+            },
+            "user": {"id": "W111", "username": "primary-owner", "team_id": "T111"},
+            "callback_id": "test-shortcut",
+            "trigger_id": "111.111.xxxxxx",
+        }
+        body = f"payload={quote(json.dumps(global_shortcut_body))}"
+        timestamp = str(int(time()))
+        signature_verifier = SignatureVerifier("signing_secret")
+        headers = {
+            "content-type": ["application/x-www-form-urlencoded"],
+            "x-slack-signature": [
+                signature_verifier.generate_signature(body=body, timestamp=timestamp)
+            ],
+            "x-slack-request-timestamp": [timestamp],
+        }
+        request = BoltRequest(body=body, headers=headers)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_handle_callback_invalid_state(self):
         oauth_flow = OAuthFlow(
