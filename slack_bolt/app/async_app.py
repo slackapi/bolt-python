@@ -69,7 +69,6 @@ class AsyncApp:
         # for multi-workspace apps
         installation_store: Optional[AsyncInstallationStore] = None,
         # for the OAuth flow
-        oauth_state_store: Optional[OAuthStateStore] = None,
         oauth_settings: Optional[AsyncOAuthSettings] = None,
         oauth_flow: Optional[AsyncOAuthFlow] = None,
         authorization_test_enabled: bool = True,
@@ -122,11 +121,9 @@ class AsyncApp:
             if self._async_oauth_flow._async_client is None:
                 self._async_oauth_flow._async_client = self._async_client
         elif oauth_settings is not None:
-            # The OAuth flow support is enabled
             if self._async_installation_store:
+                # Consistently use a single installation_store
                 oauth_settings.installation_store = self._async_installation_store
-            if oauth_state_store:
-                oauth_settings.state_store = oauth_state_store
 
             self._async_oauth_flow = AsyncOAuthFlow(
                 client=self._async_client, logger=self.logger, settings=oauth_settings

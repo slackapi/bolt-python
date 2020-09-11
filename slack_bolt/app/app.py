@@ -59,7 +59,6 @@ class App:
         # for multi-workspace apps
         installation_store: Optional[InstallationStore] = None,
         # for the OAuth flow
-        oauth_state_store: Optional[OAuthStateStore] = None,
         oauth_settings: Optional[OAuthSettings] = None,
         oauth_flow: Optional[OAuthFlow] = None,
         authorization_test_enabled: bool = True,
@@ -97,7 +96,6 @@ class App:
             self._client = create_web_client(token)  # NOTE: the token here can be None
 
         self._installation_store: Optional[InstallationStore] = installation_store
-        self._oauth_state_store: Optional[OAuthStateStore] = oauth_state_store
 
         self._oauth_flow: Optional[OAuthFlow] = None
         self._authorization_test_enabled = authorization_test_enabled
@@ -108,11 +106,9 @@ class App:
             if self._oauth_flow._client is None:
                 self._oauth_flow._client = self._client
         elif oauth_settings is not None:
-            # The OAuth flow support is enabled
             if self._installation_store:
+                # Consistently use a single installation_store
                 oauth_settings.installation_store = self._installation_store
-            if oauth_state_store:
-                oauth_settings.state_store = oauth_state_store
 
             self._oauth_flow = OAuthFlow(
                 client=self.client, logger=self.logger, settings=oauth_settings
