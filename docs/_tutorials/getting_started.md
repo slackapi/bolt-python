@@ -25,7 +25,6 @@ After you fill out an app name (_you can change it later_) and pick a workspace 
 
 This page contains an overview of your app in addition to important credentials you'll need later, like the `Signing Secret` under the **App Credentials** header. 
 
-<!--TODO - Update image to match the latest App Directory sidebar (but remove the Workflows beta) -->
 ![Basic Information page](../assets/basic-information-page.png "Basic Information page")
 
 Look around, add an app icon and description, and then let's start configuring your app 🔩
@@ -47,7 +46,6 @@ Scroll up to the top of the OAuth & Permissions page and click **Install App to 
 
 Once you authorize the installation, you'll land on the **OAuth & Permissions** page and see a **Bot User OAuth Access Token**.
 
-<!--TODO - Update image to match the latest App Directory sidebar (but remove the Workflows beta) -->
 ![OAuth Tokens](../assets/bot-token.png "Bot OAuth Token")
 
 > 💡 Treat your token like a password and [keep it safe](https://api.slack.com/docs/oauth-safety). Your app uses it to post and retrieve information from Slack workspaces.
@@ -64,11 +62,9 @@ mkdir first-bolt-app
 cd first-bolt-app
 ```
 
-<!-- Do we want to explain how to install the `pyenv` runtime management in a <details> section? -->
+<!-- TODO - Do we want to explain how to install the `pyenv` runtime management in a <details> section? -->
 Next, we recommend using a [Python virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment) to manage your project's dependencies. This is a great way to prevent conflicts with your system's Python packages. Let's create and activate a new virtual environment:
 
-<!-- TODO - Details on installing Python version manager, virtual environment, adding it to the git ignore, etc -->
-<!-- TODO - Should we confirm that the virtual environment is active? -->
 ```shell
 python3 -m venv .venv
 source .venv/bin/activate
