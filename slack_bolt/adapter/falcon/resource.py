@@ -1,4 +1,5 @@
 from datetime import datetime
+from http import HTTPStatus
 
 from falcon import Request, Response
 
@@ -50,7 +51,8 @@ class SlackAppResource:
 
     def _write_response(self, bolt_resp: BoltResponse, resp: Response):
         resp.body = bolt_resp.body
-        resp.status = str(bolt_resp.status)
+        status = HTTPStatus(bolt_resp.status)
+        resp.status = str(f"{status.value} {status.phrase}")
         resp.set_headers(bolt_resp.first_headers_without_set_cookie())
         for cookie in bolt_resp.cookies():
             for name, c in cookie.items():
