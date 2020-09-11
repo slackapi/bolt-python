@@ -1,6 +1,7 @@
 import json
 import re
 from time import time
+from urllib.parse import quote
 
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
@@ -40,8 +41,13 @@ class TestAsyncStarlette:
         )
 
     def build_headers(self, timestamp: str, body: str):
+        content_type = (
+            "application/json"
+            if body.startswith("{")
+            else "application/x-www-form-urlencoded"
+        )
         return {
-            "content-type": "application/x-www-form-urlencoded",
+            "content-type": content_type,
             "x-slack-signature": self.generate_signature(body, timestamp),
             "x-slack-request-timestamp": timestamp,
         }
@@ -115,7 +121,7 @@ class TestAsyncStarlette:
             "trigger_id": "111.111.xxxxxx",
         }
 
-        timestamp, body = str(int(time())), json.dumps(input)
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
 
         async def endpoint(req: Request):
             return await app_handler.handle(req)
@@ -156,7 +162,7 @@ class TestAsyncStarlette:
             "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
             "&trigger_id=111.111.xxx"
         )
-        timestamp, body = str(int(time())), json.dumps(input)
+        timestamp, body = str(int(time())), input
 
         async def endpoint(req: Request):
             return await app_handler.handle(req)

@@ -1,5 +1,6 @@
 import json
 from time import time
+from urllib.parse import quote
 
 import cherrypy
 from cherrypy.test import helper
@@ -120,7 +121,7 @@ class TestCherryPy(helper.CPWebCase):
             "trigger_id": "111.111.xxxxxx",
         }
 
-        timestamp, body = str(int(time())), json.dumps(input)
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
         cherrypy.request.process_request_body = True
         self.getPage(
             "/slack/events",
@@ -147,7 +148,7 @@ class TestCherryPy(helper.CPWebCase):
             "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
             "&trigger_id=111.111.xxx"
         )
-        timestamp, body = str(int(time())), json.dumps(input)
+        timestamp, body = str(int(time())), input
         cherrypy.request.process_request_body = True
         self.getPage(
             "/slack/events",
