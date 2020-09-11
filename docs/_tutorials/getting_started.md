@@ -64,20 +64,12 @@ mkdir first-bolt-app
 cd first-bolt-app
 ```
 
-Next, we recommend using a Python virtual environment to manage your project's dependencies. Create and activate a new virtual environment:
-
-<details>
-<summary markdown="0">
-<h4>Setting up a Python virtual environment</h4>
-</summary>
-
-TODO - This is where we explain how to installing a Python version manager, virtual environment, and adding it to gitignore.
-
----
-</details>
+<!-- Do we want to explain how to install the `pyenv` runtime management in a <details> section? -->
+Next, we recommend using a [Python virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment) to manage your project's dependencies. This is a great way to prevent conflicts with your system's Python packages. Let's create and activate a new virtual environment:
 
 <!-- TODO - Details on installing Python version manager, virtual environment, adding it to the git ignore, etc -->
 <!-- TODO - Should we confirm that the virtual environment is active? -->
+<!-- TODO - What is the best practice for the name of a virtual environment directory? -->
 ```shell
 python3 -m venv env
 source env/bin/activate
