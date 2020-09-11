@@ -69,10 +69,16 @@ Next, we recommend using a [Python virtual environment](https://packaging.python
 
 <!-- TODO - Details on installing Python version manager, virtual environment, adding it to the git ignore, etc -->
 <!-- TODO - Should we confirm that the virtual environment is active? -->
-<!-- TODO - What is the best practice for the name of a virtual environment directory? -->
 ```shell
-python3 -m venv env
-source env/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+We can confirm that the virtual environment is active by checking that the path to `python3` is inside your project ([a similar command is available on Windows](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#activating-a-virtual-environment)):
+
+```shell
+which python3
+# Output: /path/to/first-bolt-app/.venv/bin/python3
 ```
 
 Before we install the Bolt for Python package to your new project, let's save the bot token and signing secret that was generated when you configured your app. These should be stored as environment variables and should *not* be saved in version control.
