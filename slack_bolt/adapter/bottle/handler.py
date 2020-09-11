@@ -7,9 +7,10 @@ from slack_bolt.response import BoltResponse
 
 
 def to_bolt_request(req: Request) -> BoltRequest:
-    return BoltRequest(
-        body=req.body.read(), query=req.query_string, headers=req.headers,
-    )
+    body = req.body.read()
+    if isinstance(body, bytes):
+        body = body.decode("utf-8")
+    return BoltRequest(body=body, query=req.query_string, headers=req.headers,)
 
 
 def set_response(bolt_resp: BoltResponse, resp: Response) -> None:
