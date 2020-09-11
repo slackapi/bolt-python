@@ -95,6 +95,7 @@ class AsyncOAuthFlow:
         # state parameter related configurations
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
+        client: Optional[AsyncWebClient] = None,
         logger: Optional[Logger] = None,
     ) -> "AsyncOAuthFlow":
 
@@ -104,7 +105,7 @@ class AsyncOAuthFlow:
         user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", "").split(",")
         redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI", None)
         return AsyncOAuthFlow(
-            client=AsyncWebClient(),
+            client=client or AsyncWebClient(),
             logger=logger,
             settings=AsyncOAuthSettings(
                 # OAuth flow parameters/credentials

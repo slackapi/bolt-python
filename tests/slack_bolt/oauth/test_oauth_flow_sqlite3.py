@@ -14,7 +14,7 @@ from tests.mock_web_api_server import (
 )
 
 
-class TestOAuthFlow:
+class TestOAuthFlowSQLite3:
     mock_api_server_base_url = "http://localhost:8888"
 
     def setup_method(self):
@@ -24,28 +24,23 @@ class TestOAuthFlow:
         cleanup_mock_web_api_server(self)
 
     def test_instantiation(self):
-        oauth_flow = OAuthFlow(
-            settings=OAuthSettings(
-                client_id="111.222",
-                client_secret="xxx",
-                scopes=["chat:write", "commands"],
-                installation_store=FileInstallationStore(),
-                state_store=FileOAuthStateStore(expiration_seconds=120),
-            )
+        oauth_flow = OAuthFlow.sqlite3(
+            database="./logs/test_db",
+            client_id="111.222",
+            client_secret="xxx",
+            scopes=["chat:write", "commands"],
         )
         assert oauth_flow is not None
         assert oauth_flow.logger is not None
         assert oauth_flow.client is not None
 
     def test_handle_installation(self):
-        oauth_flow = OAuthFlow(
-            settings=OAuthSettings(
-                client_id="111.222",
-                client_secret="xxx",
-                scopes=["chat:write", "commands"],
-                installation_store=FileInstallationStore(),
-                state_store=FileOAuthStateStore(expiration_seconds=120),
-            )
+        oauth_flow = OAuthFlow.sqlite3(
+            client=WebClient(base_url=self.mock_api_server_base_url),
+            database="./logs/test_db",
+            client_id="111.222",
+            client_secret="xxx",
+            scopes=["chat:write", "commands"],
         )
         req = BoltRequest(body="")
         resp = oauth_flow.handle_installation(req)
@@ -62,17 +57,14 @@ class TestOAuthFlow:
         )
 
     def test_handle_callback(self):
-        oauth_flow = OAuthFlow(
+        oauth_flow = OAuthFlow.sqlite3(
             client=WebClient(base_url=self.mock_api_server_base_url),
-            settings=OAuthSettings(
-                client_id="111.222",
-                client_secret="xxx",
-                scopes=["chat:write", "commands"],
-                installation_store=FileInstallationStore(),
-                state_store=FileOAuthStateStore(expiration_seconds=120),
-                success_url="https://www.example.com/completion",
-                failure_url="https://www.example.com/failure",
-            ),
+            database="./logs/test_db",
+            client_id="111.222",
+            client_secret="xxx",
+            scopes=["chat:write", "commands"],
+            success_url="https://www.example.com/completion",
+            failure_url="https://www.example.com/failure",
         )
         state = oauth_flow.issue_new_state(None)
         req = BoltRequest(
@@ -85,14 +77,12 @@ class TestOAuthFlow:
         assert "https://www.example.com/completion" in resp.body
 
     def test_handle_callback_invalid_state(self):
-        oauth_flow = OAuthFlow(
-            settings=OAuthSettings(
-                client_id="111.222",
-                client_secret="xxx",
-                scopes=["chat:write", "commands"],
-                installation_store=FileInstallationStore(),
-                state_store=FileOAuthStateStore(expiration_seconds=120),
-            )
+        oauth_flow = OAuthFlow.sqlite3(
+            client=WebClient(base_url=self.mock_api_server_base_url),
+            database="./logs/test_db",
+            client_id="111.222",
+            client_secret="xxx",
+            scopes=["chat:write", "commands"],
         )
         state = oauth_flow.issue_new_state(None)
         req = BoltRequest(
@@ -113,16 +103,13 @@ class TestOAuthFlow:
             assert args.reason is not None
             return BoltResponse(status=502, body="customized")
 
-        oauth_flow = OAuthFlow(
+        oauth_flow = OAuthFlow.sqlite3(
             client=WebClient(base_url=self.mock_api_server_base_url),
-            settings=OAuthSettings(
-                client_id="111.222",
-                client_secret="xxx",
-                scopes=["chat:write", "commands"],
-                installation_store=FileInstallationStore(),
-                state_store=FileOAuthStateStore(expiration_seconds=120),
-                callback_options=CallbackOptions(success=success, failure=failure),
-            ),
+            database="./logs/test_db",
+            client_id="111.222",
+            client_secret="xxx",
+            scopes=["chat:write", "commands"],
+            callback_options=CallbackOptions(success=success, failure=failure),
         )
         state = oauth_flow.issue_new_state(None)
         req = BoltRequest(
