@@ -31,9 +31,11 @@ def parse_query(
 def parse_body(body: str, content_type: Optional[str]) -> Dict[str, Any]:
     if not body:
         return {}
-    if content_type == "application/json" or body.startswith("{"):
+    if (
+        content_type is not None and content_type == "application/json"
+    ) or body.startswith("{"):
         return json.loads(body)
-    elif content_type == "application/x-www-form-urlencoded":
+    else:
         if "payload" in body:
             params = dict(parse_qsl(body))
             if "payload" in params:
@@ -42,8 +44,6 @@ def parse_body(body: str, content_type: Optional[str]) -> Dict[str, Any]:
                 return {}
         else:
             return dict(parse_qsl(body))
-    else:
-        return {}
 
 
 def extract_enterprise_id(payload: Dict[str, Any]) -> Optional[str]:
