@@ -7,9 +7,8 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from typing import List, Union, Pattern, Callable, Dict, Optional
 
-from slack_sdk.oauth import OAuthStateUtils
-from slack_sdk.oauth.installation_store import InstallationStore, FileInstallationStore
-from slack_sdk.oauth.state_store import OAuthStateStore, FileOAuthStateStore
+from slack_sdk.oauth.installation_store import InstallationStore
+from slack_sdk.oauth.state_store import OAuthStateStore
 from slack_sdk.web import WebClient
 
 from slack_bolt.error import BoltError
@@ -38,6 +37,7 @@ from slack_bolt.middleware import (
 from slack_bolt.middleware.message_listener_matches import MessageListenerMatches
 from slack_bolt.middleware.url_verification import UrlVerification
 from slack_bolt.oauth import OAuthFlow
+from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_bolt.util.utils import create_web_client, create_copy
@@ -58,21 +58,10 @@ class App:
         client: Optional[WebClient] = None,
         # for multi-workspace apps
         installation_store: Optional[InstallationStore] = None,
-        oauth_state_store: Optional[OAuthStateStore] = None,
-        oauth_state_cookie_name: str = OAuthStateUtils.default_cookie_name,
-        oauth_state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
         # for the OAuth flow
+        oauth_settings: Optional[OAuthSettings] = None,
         oauth_flow: Optional[OAuthFlow] = None,
         authorization_test_enabled: bool = True,
-        client_id: Optional[str] = None,
-        client_secret: Optional[str] = None,
-        scopes: Optional[List[str]] = None,
-        user_scopes: Optional[List[str]] = None,
-        redirect_uri: Optional[str] = None,
-        oauth_install_path: Optional[str] = None,
-        oauth_redirect_uri_path: Optional[str] = None,
-        oauth_success_url: Optional[str] = None,
-        oauth_failure_url: Optional[str] = None,
         # No need to set (the value is used only in response to ssl_check requests)
         verification_token: Optional[str] = None,
     ):
@@ -86,18 +75,6 @@ class App:
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret: str = signing_secret
-
-        client_id = client_id or os.environ.get("SLACK_CLIENT_ID", None)
-        client_secret = client_secret or os.environ.get("SLACK_CLIENT_SECRET", None)
-        scopes = scopes or os.environ.get("SLACK_SCOPES", "").split(",")
-        user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", "").split(",")
-        redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI", None)
-        oauth_install_path = oauth_install_path or os.environ.get(
-            "SLACK_INSTALL_PATH", "/slack/install"
-        )
-        oauth_redirect_uri_path = oauth_redirect_uri_path or os.environ.get(
-            "SLACK_REDIRECT_URI_PATH", "/slack/oauth_redirect"
-        )
 
         self._verification_token: Optional[str] = verification_token or os.environ.get(
             "SLACK_VERIFICATION_TOKEN", None
@@ -119,64 +96,23 @@ class App:
             self._client = create_web_client(token)  # NOTE: the token here can be None
 
         self._installation_store: Optional[InstallationStore] = installation_store
-        self._oauth_state_store: Optional[OAuthStateStore] = oauth_state_store
-
-        self._oauth_state_cookie_name = oauth_state_cookie_name
-        self._oauth_state_expiration_seconds = oauth_state_expiration_seconds
 
         self._oauth_flow: Optional[OAuthFlow] = None
         self._authorization_test_enabled = authorization_test_enabled
         if oauth_flow:
             self._oauth_flow = oauth_flow
             if self._installation_store is None:
-                self._installation_store = self._oauth_flow.installation_store
-            if self._oauth_state_store is None:
-                self._oauth_state_store = self._oauth_flow.oauth_state_store
+                self._installation_store = self._oauth_flow.settings.installation_store
             if self._oauth_flow._client is None:
                 self._oauth_flow._client = self._client
-        else:
-            if client_id is not None and client_secret is not None:
-                # The OAuth flow support is enabled
-                if self._installation_store is None and self._oauth_state_store is None:
-                    # use the default ones
-                    self._installation_store = FileInstallationStore(
-                        client_id=client_id,
-                    )
-                    self._oauth_state_store = FileOAuthStateStore(
-                        expiration_seconds=self._oauth_state_expiration_seconds,
-                        client_id=client_id,
-                    )
+        elif oauth_settings is not None:
+            if self._installation_store:
+                # Consistently use a single installation_store
+                oauth_settings.installation_store = self._installation_store
 
-                if (
-                    self._installation_store is not None
-                    and self._oauth_state_store is None
-                ):
-                    raise ValueError(
-                        f"Configure an appropriate OAuthStateStore for {self._installation_store}"
-                    )
-
-                self._oauth_flow = OAuthFlow(
-                    client=create_web_client(),
-                    logger=self._framework_logger,
-                    # required storage implementations
-                    installation_store=self._installation_store,
-                    oauth_state_store=self._oauth_state_store,
-                    oauth_state_cookie_name=self._oauth_state_cookie_name,
-                    oauth_state_expiration_seconds=self._oauth_state_expiration_seconds,
-                    # used for oauth.v2.access calls
-                    client_id=client_id,
-                    client_secret=client_secret,
-                    # installation url parameters
-                    scopes=scopes,
-                    user_scopes=user_scopes,
-                    redirect_uri=redirect_uri,
-                    # path in this app
-                    install_path=oauth_install_path,
-                    redirect_uri_path=oauth_redirect_uri_path,
-                    # urls after callback
-                    success_url=oauth_success_url,
-                    failure_url=oauth_failure_url,
-                )
+            self._oauth_flow = OAuthFlow(
+                client=self.client, logger=self.logger, settings=oauth_settings
+            )
 
         if self._installation_store is not None and self._token is not None:
             self._token = None
@@ -247,10 +183,6 @@ class App:
     @property
     def installation_store(self) -> Optional[InstallationStore]:
         return self._installation_store
-
-    @property
-    def oauth_state_store(self) -> Optional[OAuthStateStore]:
-        return self._oauth_state_store
 
     @property
     def listener_error_handler(self) -> ListenerErrorHandler:

@@ -5,6 +5,7 @@ from slack_sdk.oauth.state_store import FileOAuthStateStore
 from slack_bolt import App
 from slack_bolt.error import BoltError
 from slack_bolt.oauth import OAuthFlow
+from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
@@ -48,23 +49,34 @@ class TestApp:
     # --------------------------
 
     def test_valid_multi_auth(self):
-        app = App(signing_secret="valid", client_id="111.222", client_secret="valid")
+        app = App(
+            signing_secret="valid",
+            oauth_settings=OAuthSettings(client_id="111.222", client_secret="valid"),
+        )
         assert app != None
 
     def test_valid_multi_auth_oauth_flow(self):
         oauth_flow = OAuthFlow(
-            client_id="111.222",
-            client_secret="valid",
-            installation_store=FileInstallationStore(),
-            oauth_state_store=FileOAuthStateStore(expiration_seconds=120),
+            settings=OAuthSettings(
+                client_id="111.222",
+                client_secret="valid",
+                installation_store=FileInstallationStore(),
+                state_store=FileOAuthStateStore(expiration_seconds=120),
+            )
         )
         app = App(signing_secret="valid", oauth_flow=oauth_flow)
         assert app != None
 
     def test_valid_multi_auth_client_id_absence(self):
         with pytest.raises(BoltError):
-            App(signing_secret="valid", client_id=None, client_secret="valid")
+            App(
+                signing_secret="valid",
+                oauth_settings=OAuthSettings(client_id=None, client_secret="valid"),
+            )
 
     def test_valid_multi_auth_secret_absence(self):
         with pytest.raises(BoltError):
-            App(signing_secret="valid", client_id="111.222", client_secret=None)
+            App(
+                signing_secret="valid",
+                oauth_settings=OAuthSettings(client_id="111.222", client_secret=None),
+            )
