@@ -1,4 +1,5 @@
 import logging
+import os
 from logging import Logger
 from typing import Optional
 
@@ -19,27 +20,42 @@ class LambdaS3OAuthFlow(OAuthFlow):
         *,
         client: Optional[WebClient] = None,
         logger: Optional[Logger] = None,
-        settings: OAuthSettings,
+        settings: Optional[OAuthSettings] = None,
         oauth_state_bucket_name: Optional[str] = None,  # required
         installation_bucket_name: Optional[str] = None,  # required
     ):
-        super(OAuthFlow, self).__init__(
-            client=client, logger=logger, settings=settings,
+        logger = logger or logging.getLogger(__name__)
+        settings = settings or OAuthSettings(
+            client_id=os.environ["SLACK_CLIENT_ID"],
+            client_secret=os.environ["SLACK_CLIENT_SECRET"],
         )
-
+        oauth_state_bucket_name = (
+            oauth_state_bucket_name or os.environ["SLACK_STATE_S3_BUCKET_NAME"]
+        )
+        installation_bucket_name = (
+            installation_bucket_name or os.environ["SLACK_INSTALLATION_S3_BUCKET_NAME"]
+        )
         self.s3_client = boto3.client("s3")
-        self.oauth_state_store = AmazonS3OAuthStateStore(
-            logger=self.logger,
-            s3_client=self.s3_client,
-            bucket_name=oauth_state_bucket_name,
-            expiration_seconds=self.settings.state_expiration_seconds,
-        )
-        self.installation_store = AmazonS3InstallationStore(
-            logger=self.logger,
-            s3_client=self.s3_client,
-            bucket_name=installation_bucket_name,
-            client_id=self.settings.client_id,
-        )
+        if settings.state_store is None or not isinstance(
+            settings.state_store, AmazonS3OAuthStateStore
+        ):
+            settings.state_store = AmazonS3OAuthStateStore(
+                logger=logger,
+                s3_client=self.s3_client,
+                bucket_name=oauth_state_bucket_name,
+                expiration_seconds=settings.state_expiration_seconds,
+            )
+
+        if settings.installation_store is None or not isinstance(
+            settings.installation_store, AmazonS3InstallationStore
+        ):
+            settings.installation_store = AmazonS3InstallationStore(
+                logger=logger,
+                s3_client=self.s3_client,
+                bucket_name=installation_bucket_name,
+                client_id=settings.client_id,
+            )
+        OAuthFlow.__init__(self, client=client, logger=logger, settings=settings)
 
     @property
     def client(self) -> WebClient:
