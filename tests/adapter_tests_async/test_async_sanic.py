@@ -1,8 +1,10 @@
+import asyncio
 import json
 import re
 from time import time
 from urllib.parse import quote
 
+import pytest
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 from sanic import Sanic
@@ -25,13 +27,17 @@ class TestSanic:
     signature_verifier = SignatureVerifier(signing_secret)
     web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
 
-    def setup_method(self):
-        self.old_os_env = remove_os_env_temporarily()
-        setup_mock_web_api_server(self)
-
-    def teardown_method(self):
-        cleanup_mock_web_api_server(self)
-        restore_os_env(self.old_os_env)
+    @pytest.fixture
+    def event_loop(self):
+        old_os_env = remove_os_env_temporarily()
+        try:
+            setup_mock_web_api_server(self)
+            loop = asyncio.get_event_loop()
+            yield loop
+            loop.close()
+            cleanup_mock_web_api_server(self)
+        finally:
+            restore_os_env(old_os_env)
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
@@ -50,7 +56,8 @@ class TestSanic:
             "x-slack-request-timestamp": timestamp,
         }
 
-    def test_events(self):
+    @pytest.mark.asyncio
+    async def test_events(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
 
         async def event_handler():
@@ -87,13 +94,14 @@ class TestSanic:
         async def endpoint(req: Request):
             return await app_handler.handle(req)
 
-        _, response = api.test_client.post(
-            uri="/slack/events", data=body, headers=self.build_headers(timestamp, body),
+        _, response = await api.asgi_client.post(
+            url="/slack/events", data=body, headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
-    def test_shortcuts(self):
+    @pytest.mark.asyncio
+    async def test_shortcuts(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
 
         async def shortcut_handler(ack):
@@ -125,13 +133,14 @@ class TestSanic:
         async def endpoint(req: Request):
             return await app_handler.handle(req)
 
-        _, response = api.test_client.post(
-            "/slack/events", data=body, headers=self.build_headers(timestamp, body),
+        _, response = await api.asgi_client.post(
+            url="/slack/events", data=body, headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
-    def test_commands(self):
+    @pytest.mark.asyncio
+    async def test_commands(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
 
         async def command_handler(ack):
@@ -163,13 +172,14 @@ class TestSanic:
         async def endpoint(req: Request):
             return await app_handler.handle(req)
 
-        _, response = api.test_client.post(
-            "/slack/events", data=body, headers=self.build_headers(timestamp, body),
+        _, response = await api.asgi_client.post(
+            url="/slack/events", data=body, headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
-    def test_oauth(self):
+    @pytest.mark.asyncio
+    async def test_oauth(self):
         app = AsyncApp(
             client=self.web_client,
             signing_secret=self.signing_secret,
@@ -186,7 +196,9 @@ class TestSanic:
         async def endpoint(req: Request):
             return await app_handler.handle(req)
 
-        _, response = api.test_client.get("/slack/install", allow_redirects=False)
+        _, response = await api.asgi_client.get(
+            url="/slack/install", allow_redirects=False
+        )
         assert response.status_code == 302
         assert re.match(
             "https://slack.com/oauth/v2/authorize\\?state=[^&]+&client_id=111.111&scope=chat:write,commands&user_scope=",
