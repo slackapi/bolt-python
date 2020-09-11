@@ -45,9 +45,8 @@ setuptools.setup(
             "aiohttp>=3,<4",
         ],
         # pip install -e ".[adapter]"
+        # NOTE: any of async ones requires pip install -e ".[async]" too
         "adapter": [
-            # any of async ones
-            "aiohttp>=3,<4",
             # used only under src/slack_bolt/adapter
             "boto3<=2",
             "moto<=2", # For AWS tests
