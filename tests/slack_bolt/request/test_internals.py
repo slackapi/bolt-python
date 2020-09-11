@@ -1,8 +1,12 @@
+import pytest
+
 from slack_bolt.request.internals import (
     extract_channel_id,
     extract_user_id,
     extract_team_id,
     extract_enterprise_id,
+    parse_query,
+    parse_body,
 )
 
 
@@ -65,3 +69,18 @@ class TestRequestInternals:
         for req in self.requests:
             team_id = extract_enterprise_id(req)
             assert team_id == "E111"
+
+    def test_parse_query(self):
+        expected = {"foo": ["bar"], "baz": ["123"]}
+
+        q = parse_query("foo=bar&baz=123")
+        assert q == expected
+
+        q = parse_query({"foo": "bar", "baz": "123"})
+        assert q == expected
+
+        q = parse_query({"foo": ["bar"], "baz": ["123"]})
+        assert q == expected
+
+        with pytest.raises(ValueError):
+            parse_query({"foo": {"bar": "ZZZ"}, "baz": {"123": "111"}})

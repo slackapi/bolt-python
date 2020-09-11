@@ -16,6 +16,36 @@ class TestAck:
         response: BoltResponse = ack(text="foo")
         assert (response.status, response.body) == (200, "foo")
 
+    sample_attachments = [
+        {
+            "fallback": "Plain-text summary of the attachment.",
+            "color": "#2eb886",
+            "pretext": "Optional text that appears above the attachment block",
+            "author_name": "Bobby Tables",
+            "author_link": "http://flickr.com/bobby/",
+            "author_icon": "http://flickr.com/icons/bobby.jpg",
+            "title": "Slack API Documentation",
+            "title_link": "https://api.slack.com/",
+            "text": "Optional text that appears within the attachment",
+            "fields": [{"title": "Priority", "value": "High", "short": False}],
+            "image_url": "http://my-website.com/path/to/image.jpg",
+            "thumb_url": "http://example.com/path/to/thumb.png",
+            "footer": "Slack API",
+            "footer_icon": "https://platform.slack-edge.com/img/default_application_icon.png",
+            "ts": 123456789,
+        }
+    ]
+
+    def test_attachments(self):
+        ack = Ack()
+        response: BoltResponse = ack(text="foo", attachments=self.sample_attachments)
+        assert (response.status, response.body) == (
+            200,
+            '{"text": "foo", '
+            '"attachments": [{"fallback": "Plain-text summary of the attachment.", "color": "#2eb886", "pretext": "Optional text that appears above the attachment block", "author_name": "Bobby Tables", "author_link": "http://flickr.com/bobby/", "author_icon": "http://flickr.com/icons/bobby.jpg", "title": "Slack API Documentation", "title_link": "https://api.slack.com/", "text": "Optional text that appears within the attachment", "fields": [{"title": "Priority", "value": "High", "short": false}], "image_url": "http://my-website.com/path/to/image.jpg", "thumb_url": "http://example.com/path/to/thumb.png", "footer": "Slack API", "footer_icon": "https://platform.slack-edge.com/img/default_application_icon.png", "ts": 123456789}]'
+            "}",
+        )
+
     def test_blocks(self):
         ack = Ack()
         response: BoltResponse = ack(text="foo", blocks=[{"type": "divider"}])
@@ -23,6 +53,41 @@ class TestAck:
             200,
             '{"text": "foo", "blocks": [{"type": "divider"}]}',
         )
+
+    sample_options = [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]
+
+    def test_options(self):
+        ack = Ack()
+        response: BoltResponse = ack(text="foo", options=self.sample_options)
+        assert response.status == 200
+        assert (
+            response.body
+            == '{"options": [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]}'
+        )
+
+    sample_option_groups = [
+        {
+            "label": {"type": "plain_text", "text": "Group 1"},
+            "options": [
+                {"text": {"type": "plain_text", "text": "Option 1"}, "value": "1-1"},
+                {"text": {"type": "plain_text", "text": "Option 2"}, "value": "1-2"},
+            ],
+        },
+        {
+            "label": {"type": "plain_text", "text": "Group 2"},
+            "options": [
+                {"text": {"type": "plain_text", "text": "Option 1"}, "value": "2-1"},
+            ],
+        },
+    ]
+
+    def test_option_groups(self):
+        ack = Ack()
+        response: BoltResponse = ack(
+            text="foo", option_groups=self.sample_option_groups
+        )
+        assert response.status == 200
+        assert response.body.startswith('{"option_groups":')
 
     def test_response_type(self):
         ack = Ack()
