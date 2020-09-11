@@ -21,7 +21,7 @@ from tests.mock_web_api_server import (
 )
 
 
-class TestAsyncOAuthFlow:
+class TestAsyncOAuthFlowSQLite3:
     mock_api_server_base_url = "http://localhost:8888"
 
     @pytest.fixture
@@ -37,14 +37,11 @@ class TestAsyncOAuthFlow:
 
     @pytest.mark.asyncio
     async def test_instantiation(self):
-        oauth_flow = AsyncOAuthFlow(
-            settings=AsyncOAuthSettings(
-                client_id="111.222",
-                client_secret="xxx",
-                scopes=["chat:write", "commands"],
-                installation_store=FileInstallationStore(),
-                state_store=FileOAuthStateStore(expiration_seconds=120),
-            )
+        oauth_flow = AsyncOAuthFlow.sqlite3(
+            database="./logs/test_db",
+            client_id="111.222",
+            client_secret="xxx",
+            scopes=["chat:write", "commands"],
         )
         assert oauth_flow is not None
         assert oauth_flow.logger is not None
@@ -52,14 +49,11 @@ class TestAsyncOAuthFlow:
 
     @pytest.mark.asyncio
     async def test_handle_installation(self):
-        oauth_flow = AsyncOAuthFlow(
-            settings=AsyncOAuthSettings(
-                client_id="111.222",
-                client_secret="xxx",
-                scopes=["chat:write", "commands"],
-                installation_store=FileInstallationStore(),
-                state_store=FileOAuthStateStore(expiration_seconds=120),
-            )
+        oauth_flow = AsyncOAuthFlow.sqlite3(
+            database="./logs/test_db",
+            client_id="111.222",
+            client_secret="xxx",
+            scopes=["chat:write", "commands"],
         )
         req = AsyncBoltRequest(body="")
         resp = await oauth_flow.handle_installation(req)
@@ -77,17 +71,14 @@ class TestAsyncOAuthFlow:
 
     @pytest.mark.asyncio
     async def test_handle_callback(self):
-        oauth_flow = AsyncOAuthFlow(
+        oauth_flow = AsyncOAuthFlow.sqlite3(
+            database="./logs/test_db",
             client=AsyncWebClient(base_url=self.mock_api_server_base_url),
-            settings=AsyncOAuthSettings(
-                client_id="111.222",
-                client_secret="xxx",
-                scopes=["chat:write", "commands"],
-                installation_store=FileInstallationStore(),
-                state_store=FileOAuthStateStore(expiration_seconds=120),
-                success_url="https://www.example.com/completion",
-                failure_url="https://www.example.com/failure",
-            ),
+            client_id="111.222",
+            client_secret="xxx",
+            scopes=["chat:write", "commands"],
+            success_url="https://www.example.com/completion",
+            failure_url="https://www.example.com/failure",
         )
         state = await oauth_flow.issue_new_state(None)
         req = AsyncBoltRequest(
@@ -101,14 +92,11 @@ class TestAsyncOAuthFlow:
 
     @pytest.mark.asyncio
     async def test_handle_callback_invalid_state(self):
-        oauth_flow = AsyncOAuthFlow(
-            settings=AsyncOAuthSettings(
-                client_id="111.222",
-                client_secret="xxx",
-                scopes=["chat:write", "commands"],
-                installation_store=FileInstallationStore(),
-                state_store=FileOAuthStateStore(expiration_seconds=120),
-            )
+        oauth_flow = AsyncOAuthFlow.sqlite3(
+            database="./logs/test_db",
+            client_id="111.222",
+            client_secret="xxx",
+            scopes=["chat:write", "commands"],
         )
         state = await oauth_flow.issue_new_state(None)
         req = AsyncBoltRequest(
@@ -130,18 +118,13 @@ class TestAsyncOAuthFlow:
             assert args.reason is not None
             return BoltResponse(status=502, body="customized")
 
-        oauth_flow = AsyncOAuthFlow(
+        oauth_flow = AsyncOAuthFlow.sqlite3(
             client=AsyncWebClient(base_url=self.mock_api_server_base_url),
-            settings=AsyncOAuthSettings(
-                client_id="111.222",
-                client_secret="xxx",
-                scopes=["chat:write", "commands"],
-                installation_store=FileInstallationStore(),
-                state_store=FileOAuthStateStore(expiration_seconds=120),
-                callback_options=AsyncCallbackOptions(
-                    success=success, failure=failure,
-                ),
-            ),
+            database="./logs/test_db",
+            client_id="111.222",
+            client_secret="xxx",
+            scopes=["chat:write", "commands"],
+            callback_options=AsyncCallbackOptions(success=success, failure=failure,),
         )
         state = await oauth_flow.issue_new_state(None)
         req = AsyncBoltRequest(

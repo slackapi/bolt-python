@@ -53,6 +53,17 @@ class MockHandler(SimpleHTTPRequestHandler):
     }
 }
                 """
+    auth_test_response = """
+{
+    "ok": true,
+    "url": "https://subarachnoid.slack.com/",
+    "team": "Subarachnoid Workspace",
+    "user": "bot",
+    "team_id": "T0G9PQBBK",
+    "user_id": "W23456789",
+    "bot_id": "BZYBOTHED"
+}
+"""
 
     def _handle(self):
         self.received_requests[self.path] = self.received_requests.get(self.path, 0) + 1
@@ -66,6 +77,12 @@ class MockHandler(SimpleHTTPRequestHandler):
 
             if self.is_valid_token():
                 parsed_path = urlparse(self.path)
+
+                if self.path == "/auth.test":
+                    self.send_response(200)
+                    self.set_common_headers()
+                    self.wfile.write(self.auth_test_response.encode("utf-8"))
+                    return
 
                 len_header = self.headers.get("Content-Length") or 0
                 content_len = int(len_header)

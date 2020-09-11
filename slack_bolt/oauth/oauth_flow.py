@@ -95,6 +95,7 @@ class OAuthFlow:
         # state parameter related configurations
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
+        client: Optional[WebClient] = None,
         logger: Optional[Logger] = None,
     ) -> "OAuthFlow":
 
@@ -104,7 +105,7 @@ class OAuthFlow:
         user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", "").split(",")
         redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI", None)
         return OAuthFlow(
-            client=WebClient(),
+            client=client or WebClient(),
             logger=logger,
             settings=OAuthSettings(
                 # OAuth flow parameters/credentials
