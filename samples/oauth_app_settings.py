@@ -16,11 +16,14 @@ from slack_sdk.oauth.state_store import FileOAuthStateStore
 
 logging.basicConfig(level=logging.DEBUG)
 
+
 def success(args: SuccessArgs) -> BoltResponse:
     return BoltResponse(status=200, body="Thanks!")
 
+
 def failure(args: FailureArgs) -> BoltResponse:
     return BoltResponse(status=args.suggested_status_code, body=args.reason)
+
 
 app = App(
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
@@ -28,18 +31,16 @@ app = App(
     oauth_settings=OAuthSettings(
         client_id=os.environ.get("SLACK_CLIENT_ID"),
         client_secret=os.environ.get("SLACK_CLIENT_SECRET"),
-        scopes=["app_mentions:read","channels:history","im:history","chat:write"],
+        scopes=["app_mentions:read", "channels:history", "im:history", "chat:write"],
         user_scopes=[],
         redirect_uri=None,
         install_path="/slack/install",
         redirect_uri_path="/slack/oauth_redirect",
         state_store=FileOAuthStateStore(expiration_seconds=600),
-        callback_options=CallbackOptions(
-            success=success,
-            failure=failure
-        )
-    )
+        callback_options=CallbackOptions(success=success, failure=failure),
+    ),
 )
+
 
 @app.command("/hello-bolt-python")
 def test_command(body, respond, client, ack, logger):
