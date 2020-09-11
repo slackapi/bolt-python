@@ -1,5 +1,6 @@
 import json
 from time import time
+from urllib.parse import quote
 
 from flask import Flask, request
 from slack_sdk.signature import SignatureVerifier
@@ -36,8 +37,13 @@ class TestFlask:
         )
 
     def build_headers(self, timestamp: str, body: str):
+        content_type = (
+            "application/json"
+            if body.startswith("{")
+            else "application/x-www-form-urlencoded"
+        )
         return {
-            "content-type": ["application/x-www-form-urlencoded"],
+            "content-type": [content_type],
             "x-slack-signature": [self.generate_signature(body, timestamp)],
             "x-slack-request-timestamp": [timestamp],
         }
@@ -108,7 +114,7 @@ class TestFlask:
             "trigger_id": "111.111.xxxxxx",
         }
 
-        timestamp, body = str(int(time())), json.dumps(input)
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
 
         flask_app = Flask(__name__)
 
@@ -146,7 +152,7 @@ class TestFlask:
             "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
             "&trigger_id=111.111.xxx"
         )
-        timestamp, body = str(int(time())), json.dumps(input)
+        timestamp, body = str(int(time())), input
 
         flask_app = Flask(__name__)
 
