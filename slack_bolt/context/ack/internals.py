@@ -62,6 +62,10 @@ def _set_response(
                 if view:
                     body["view"] = convert_to_dict(view)
                 self.response = BoltResponse(status=200, body=body)
+        elif errors:
+            # dialogs: errors without response_action
+            body = {"errors": convert_to_dict_list(errors)}
+            self.response = BoltResponse(status=200, body=body)
         else:
             if len(body) == 1 and "text" in body:
                 self.response = BoltResponse(status=200, body=body["text"])
@@ -79,7 +83,12 @@ def _set_response(
         if "option_groups" in body:
             body["option_groups"] = convert_to_dict_list(body["option_groups"])
         if "errors" in body:
-            body["errors"] = convert_to_dict(body["errors"])
+            if body.get("response_action", "") == "errors":
+                # modal
+                body["errors"] = convert_to_dict(body["errors"])
+            else:
+                # dialog
+                body["errors"] = convert_to_dict_list(body["errors"])
         if "view" in body:
             body["view"] = convert_to_dict(body["view"])
         # no modification for response_type, response_action here

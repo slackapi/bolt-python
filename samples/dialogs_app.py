@@ -9,7 +9,7 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG)
 
-from slack_bolt import App
+from slack_bolt import App, Ack
 
 app = App()
 
@@ -52,8 +52,21 @@ def test_command(body, client, ack, logger):
 
 
 @app.action({"type": "dialog_submission", "callback_id": "dialog-callback-id"})
-def dialog_submission(ack):
-    ack()
+def dialog_submission(ack: Ack, body: dict):
+    errors = []
+    submission = body["submission"]
+    if len(submission["loc_origin"]) <= 3:
+        errors = [
+            {
+                "name": "loc_origin",
+                "error": "Pickup Location must be longer than 3 characters"
+            }
+        ]
+    if len(errors) > 0:
+        # or ack({"errors": errors})
+        ack(errors=errors)
+    else:
+        ack()
 
 
 @app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-id"})

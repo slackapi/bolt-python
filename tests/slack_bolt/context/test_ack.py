@@ -97,6 +97,21 @@ class TestAck:
             '{"text": "foo", "response_type": "in_channel"}',
         )
 
+    def test_dialog_errors(self):
+        expected_body = '{"errors": [{"name": "loc_origin", "error": "Pickup Location must be longer than 3 characters"}]}'
+        errors = [
+            {
+                "name": "loc_origin",
+                "error": "Pickup Location must be longer than 3 characters",
+            }
+        ]
+
+        ack = Ack()
+        response: BoltResponse = ack(errors=errors)
+        assert (response.status, response.body) == (200, expected_body)
+        response: BoltResponse = ack({"errors": errors})
+        assert (response.status, response.body) == (200, expected_body)
+
     def test_view_errors(self):
         ack = Ack()
         response: BoltResponse = ack(

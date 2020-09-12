@@ -102,6 +102,22 @@ class TestAsyncAsyncAck:
         )
 
     @pytest.mark.asyncio
+    async def test_dialog_errors(self):
+        expected_body = '{"errors": [{"name": "loc_origin", "error": "Pickup Location must be longer than 3 characters"}]}'
+        errors = [
+            {
+                "name": "loc_origin",
+                "error": "Pickup Location must be longer than 3 characters",
+            }
+        ]
+
+        ack = AsyncAck()
+        response: BoltResponse = await ack(errors=errors)
+        assert (response.status, response.body) == (200, expected_body)
+        response: BoltResponse = await ack({"errors": errors})
+        assert (response.status, response.body) == (200, expected_body)
+
+    @pytest.mark.asyncio
     async def test_view_errors(self):
         ack = AsyncAck()
         response: BoltResponse = await ack(
