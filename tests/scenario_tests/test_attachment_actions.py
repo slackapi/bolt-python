@@ -51,6 +51,15 @@ class TestAttachmentActions:
         resp = self.web_client.api_test()
         assert resp != None
 
+    def test_success_without_type(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app.action("pick_channel_for_fun")(simple_listener)
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
     def test_success(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
         app.action(
@@ -85,6 +94,18 @@ class TestAttachmentActions:
         response = app.dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
+
+    def test_failure_without_type(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app.action("unknown")(simple_listener)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
 
     def test_failure(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)

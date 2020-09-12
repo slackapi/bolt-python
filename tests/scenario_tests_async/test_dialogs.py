@@ -57,6 +57,31 @@ class TestAsyncAttachmentActions:
         assert resp != None
 
     @pytest.mark.asyncio
+    async def test_success_without_type(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.options("dialog-callback-id")(handle_suggestion)
+        app.action("dialog-callback-id")(handle_submission_or_cancellation)
+
+        request = self.build_valid_request(suggestion_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert response.body != ""
+        assert response.headers["content-type"][0] == "application/json;charset=utf-8"
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        request = self.build_valid_request(submission_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert response.body == ""
+        assert self.mock_received_requests["/auth.test"] == 2
+
+        request = self.build_valid_request(cancellation_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert response.body == ""
+        assert self.mock_received_requests["/auth.test"] == 3
+
+    @pytest.mark.asyncio
     async def test_success(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
         app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-id"})(
@@ -181,6 +206,19 @@ class TestAsyncAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 3
 
     @pytest.mark.asyncio
+    async def test_suggestion_failure_without_type(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        request = self.build_valid_request(suggestion_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app.options("dialog-callback-iddddd")(handle_suggestion)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    @pytest.mark.asyncio
     async def test_suggestion_failure(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
         request = self.build_valid_request(suggestion_raw_body)
@@ -209,6 +247,19 @@ class TestAsyncAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 2
 
     @pytest.mark.asyncio
+    async def test_submission_failure_without_type(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        request = self.build_valid_request(suggestion_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app.action("dialog-callback-iddddd")(handle_submission)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    @pytest.mark.asyncio
     async def test_submission_failure(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
         request = self.build_valid_request(suggestion_raw_body)
@@ -232,6 +283,19 @@ class TestAsyncAttachmentActions:
         app.action(
             {"type": "dialog_submission", "callback_id": "dialog-callback-iddddd"}
         )(handle_submission)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    @pytest.mark.asyncio
+    async def test_cancellation_failure_without_type(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        request = self.build_valid_request(suggestion_raw_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app.action("dialog-callback-iddddd")(handle_cancellation)
         response = await app.async_dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 2
@@ -350,6 +414,12 @@ async def handle_suggestion(ack, body, payload, options):
 
 
 async def handle_cancellation(ack, body, payload, action):
+    assert body == action
+    assert payload == action
+    await ack()
+
+
+async def handle_submission_or_cancellation(ack, body, payload, action):
     assert body == action
     assert payload == action
     await ack()
