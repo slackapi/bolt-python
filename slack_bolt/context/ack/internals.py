@@ -20,7 +20,7 @@ def _set_response(
     option_groups: Optional[List[Union[dict, OptionGroup]]] = None,
     # view_submission
     response_action: Optional[str] = None,
-    errors: Optional[Dict[str, str]] = None,
+    errors: Optional[Union[Dict[str, str], List[Dict[str, str]]]] = None,
     view: Optional[Union[dict, View]] = None,
 ) -> BoltResponse:
     if isinstance(text_or_whole_response, str):
