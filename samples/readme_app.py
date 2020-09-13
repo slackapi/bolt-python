@@ -50,10 +50,10 @@ def open_modal(ack, client, logger, body):
 
 
 @app.view("view-id")
-def view_submission(ack, body, logger):
+def view_submission(ack, view, logger):
     ack()
     # Prints {'b': {'a': {'type': 'plain_text_input', 'value': 'Your Input'}}}
-    logger.info(body["view"]["state"]["values"])
+    logger.info(view["state"]["values"])
 
 
 if __name__ == "__main__":

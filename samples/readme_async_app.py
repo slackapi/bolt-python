@@ -10,6 +10,15 @@ logging.basicConfig(level=logging.DEBUG)
 app = AsyncApp()
 
 
+from slack_bolt.async_app import AsyncApp
+
+app = AsyncApp()
+
+@app.command("/hello-bolt-python")
+async def command(ack, body, respond):
+    await ack()
+    await respond(f"Hi <@{body['user_id']}>!")
+
 # Middleware
 @app.middleware  # or app.use(log_request)
 async def log_request(logger, body, next):
@@ -51,10 +60,10 @@ async def open_modal(ack, client, logger, body):
 
 
 @app.view("view-id")
-async def view_submission(ack, body, logger):
+async def view_submission(ack, view, logger):
     await ack()
     # Prints {'b': {'a': {'type': 'plain_text_input', 'value': 'Your Input'}}}
-    logger.info(body["view"]["state"]["values"])
+    logger.info(view["state"]["values"])
 
 
 if __name__ == "__main__":
