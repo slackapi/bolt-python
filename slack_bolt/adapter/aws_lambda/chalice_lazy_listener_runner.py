@@ -30,7 +30,7 @@ class ChaliceLazyListenerRunner(LazyListenerRunner):
             "pathParameters": {},
             "stageVariables": {},
             "requestContext": chalice_request["context"],
-            "body": request.body,
+            "body": request.raw_body,
             "isBase64Encoded": False,
         }
         invocation = self.lambda_client.invoke(
