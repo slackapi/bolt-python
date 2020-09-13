@@ -300,9 +300,11 @@ class AsyncApp:
                 if request.lazy_function_name:
                     func_name = lazy_func.__name__
                     if func_name == request.lazy_function_name:
-                        return await self.lazy_listener_runner.run(
+                        await self.lazy_listener_runner.run(
                             function=lazy_func, request=request
                         )
+                        # This HTTP response won't be sent to Slack API servers.
+                        return BoltResponse(status=200)
                     else:
                         continue
                 else:
@@ -354,9 +356,11 @@ class AsyncApp:
                 if request.lazy_function_name:
                     func_name = lazy_func.__name__
                     if func_name == request.lazy_function_name:
-                        return await self.lazy_listener_runner.run(
+                        await self.lazy_listener_runner.run(
                             function=lazy_func, request=request
                         )
+                        # This HTTP response won't be sent to Slack API servers.
+                        return BoltResponse(status=200)
                     else:
                         continue
                 else:

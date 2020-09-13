@@ -282,7 +282,8 @@ class App:
                         self.lazy_listener_runner.run(
                             function=lazy_func, request=request
                         )
-                        return None
+                        # This HTTP response won't be sent to Slack API servers.
+                        return BoltResponse(status=200)
                     else:
                         continue
                 else:
@@ -328,7 +329,8 @@ class App:
                         self.lazy_listener_runner.run(
                             function=lazy_func, request=request
                         )
-                        return None
+                        # This HTTP response won't be sent to Slack API servers.
+                        return BoltResponse(status=200)
                     else:
                         continue
                 else:
