@@ -1,16 +1,27 @@
-from typing import Callable
+from typing import Callable, Optional
 
-from slack_bolt.auth import AuthorizationResult
 from slack_bolt.logger import get_bolt_logger
 from slack_bolt.middleware.authorization import Authorization
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
-from .internals import _build_error_response, _is_no_auth_required
+from slack_sdk.web import SlackResponse
+from .internals import (
+    _build_error_response,
+    _is_no_auth_required,
+    _to_authorization_result,
+)
 
 
 class SingleTeamAuthorization(Authorization):
-    def __init__(self):
+    def __init__(
+        self,
+        *,
+        auth_test_result: Optional[SlackResponse] = None,
+        verification_enabled: bool = True,
+    ):
+        self.auth_test_result = auth_test_result
+        self.verification_enabled = verification_enabled
         self.logger = get_bolt_logger(SingleTeamAuthorization)
 
     def process(
@@ -18,16 +29,23 @@ class SingleTeamAuthorization(Authorization):
     ) -> BoltResponse:
         if _is_no_auth_required(req):
             return next()
+
+        if not self.verification_enabled:
+            # Skip calling auth.test every time the app receives requests
+            req.context["authorization_result"] = _to_authorization_result(
+                auth_test_result=self.auth_test_result,
+                bot_token=req.context.client.token,
+                request_user_id=req.context.user_id,
+            )
+            return next()
+
         try:
             auth_result = req.context.client.auth_test()
             if auth_result:
-                req.context["authorization_result"] = AuthorizationResult(
-                    enterprise_id=auth_result.get("enterprise_id", None),
-                    team_id=auth_result.get("team_id", None),
-                    bot_user_id=auth_result.get("user_id", None),
-                    bot_id=auth_result.get("bot_id", None),
+                req.context["authorization_result"] = _to_authorization_result(
+                    auth_test_result=auth_result,
                     bot_token=req.context.client.token,
-                    user_id=req.context.user_id,
+                    request_user_id=req.context.user_id,
                 )
                 return next()
             else:

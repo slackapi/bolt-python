@@ -6,7 +6,6 @@ import time
 from asyncio import Future
 from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable
 
-from slack_sdk.oauth import OAuthStateStore
 from slack_sdk.oauth.installation_store.async_installation_store import (
     AsyncInstallationStore,
 )
@@ -159,7 +158,11 @@ class AsyncApp:
         )
         if self._async_oauth_flow is None:
             if self._token:
-                self._async_middleware_list.append(AsyncSingleTeamAuthorization())
+                self._async_middleware_list.append(
+                    AsyncSingleTeamAuthorization(
+                        verification_enabled=self._authorization_test_enabled
+                    )
+                )
             else:
                 raise BoltError(
                     "Either an env variable SLACK_BOT_TOKEN or token argument in constructor is required."

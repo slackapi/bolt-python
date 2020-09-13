@@ -7,8 +7,8 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from typing import List, Union, Pattern, Callable, Dict, Optional
 
+from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import InstallationStore
-from slack_sdk.oauth.state_store import OAuthStateStore
 from slack_sdk.web import WebClient
 
 from slack_bolt.error import BoltError
@@ -145,7 +145,21 @@ class App:
 
         if self._oauth_flow is None:
             if self._token:
-                self._middleware_list.append(SingleTeamAuthorization())
+                if self._authorization_test_enabled:
+                    self._middleware_list.append(SingleTeamAuthorization())
+                else:
+                    try:
+                        auth_test_result = self._client.auth_test(token=self._token)
+                        self._middleware_list.append(
+                            SingleTeamAuthorization(
+                                auth_test_result=auth_test_result,
+                                verification_enabled=self._authorization_test_enabled,
+                            )
+                        )
+                    except SlackApiError as err:
+                        raise BoltError(
+                            f"token is invalid (auth.test result: {err.response})"
+                        )
             else:
                 raise BoltError(
                     "Either an env variable SLACK_BOT_TOKEN or token argument in constructor is required."
