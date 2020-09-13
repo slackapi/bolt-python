@@ -1,13 +1,17 @@
 import json
 from time import time
+from typing import Dict, Any
 from urllib.parse import quote
 
+from chalice import Chalice, Response
+from chalice.app import Request
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 
-from slack_bolt.adapter.aws_lambda import SlackRequestHandler
-from slack_bolt.adapter.aws_lambda.handler import not_found
-from slack_bolt.adapter.aws_lambda.internals import _first_value
+from slack_bolt.adapter.aws_lambda.chalice_handler import (
+    ChaliceSlackRequestHandler,
+    not_found,
+)
 from slack_bolt.app import App
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
@@ -15,24 +19,16 @@ from tests.mock_web_api_server import (
     cleanup_mock_web_api_server,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
-from moto import mock_lambda
+from chalice.config import Config
+from chalice.local import LocalGateway
 
 
-class LambdaContext:
-    function_name: str
-
-    def __init__(self, function_name: str):
-        self.function_name = function_name
-
-
-class TestAWSLambda:
+class TestAwsChalice:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
-
-    context = LambdaContext(function_name="test-function")
+    web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url)
 
     def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()
@@ -54,34 +50,21 @@ class TestAWSLambda:
             else "application/x-www-form-urlencoded"
         )
         return {
-            "content-type": [content_type],
-            "x-slack-signature": [self.generate_signature(body, timestamp)],
-            "x-slack-request-timestamp": [timestamp],
+            "content-type": content_type,
+            "x-slack-signature": self.generate_signature(body, timestamp),
+            "x-slack-request-timestamp": timestamp,
         }
 
     def test_not_found(self):
         response = not_found()
-        assert response["statusCode"] == 404
+        assert response.status_code == 404
 
-    def test_first_value(self):
-        assert _first_value({"foo": [1, 2, 3]}, "foo") == 1
-        assert _first_value({"foo": []}, "foo") is None
-        assert _first_value({}, "foo") is None
-
-    @mock_lambda
-    def test_clear_all_log_handlers(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
-        handler = SlackRequestHandler(app)
-        handler.clear_all_log_handlers()
-
-    @mock_lambda
     def test_events(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
 
+        @app.event("app_mention")
         def event_handler():
             pass
-
-        app.event("app_mention")(event_handler)
 
         input = {
             "token": "verification_token",
@@ -104,25 +87,33 @@ class TestAWSLambda:
             "authed_users": ["W111"],
         }
         timestamp, body = str(int(time())), json.dumps(input)
-        event = {
-            "body": body,
-            "queryStringParameters": {},
-            "headers": self.build_headers(timestamp, body),
-            "requestContext": {"http": {"method": "POST"}},
-            "isBase64Encoded": False,
-        }
-        response = SlackRequestHandler(app).handle(event, self.context)
+
+        chalice_app = Chalice(app_name="bolt-python-chalice")
+        slack_handler = ChaliceSlackRequestHandler(app=app, chalice=chalice_app)
+
+        @chalice_app.route(
+            "/slack/events",
+            methods=["POST"],
+            content_types=["application/x-www-form-urlencoded", "application/json"],
+        )
+        def events() -> Response:
+            return slack_handler.handle(chalice_app.current_request)
+
+        response: Dict[str, Any] = LocalGateway(chalice_app, Config()).handle_request(
+            method="POST",
+            path="/slack/events",
+            body=body,
+            headers=self.build_headers(timestamp, body),
+        )
         assert response["statusCode"] == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
-    @mock_lambda
     def test_shortcuts(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
 
+        @app.shortcut("test-shortcut")
         def shortcut_handler(ack):
             ack()
-
-        app.shortcut("test-shortcut")(shortcut_handler)
 
         input = {
             "type": "shortcut",
@@ -140,25 +131,33 @@ class TestAWSLambda:
         }
 
         timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
-        event = {
-            "body": body,
-            "queryStringParameters": {},
-            "headers": self.build_headers(timestamp, body),
-            "requestContext": {"http": {"method": "POST"}},
-            "isBase64Encoded": False,
-        }
-        response = SlackRequestHandler(app).handle(event, self.context)
+
+        chalice_app = Chalice(app_name="bolt-python-chalice")
+        slack_handler = ChaliceSlackRequestHandler(app=app, chalice=chalice_app)
+
+        @chalice_app.route(
+            "/slack/events",
+            methods=["POST"],
+            content_types=["application/x-www-form-urlencoded", "application/json"],
+        )
+        def events() -> Response:
+            return slack_handler.handle(chalice_app.current_request)
+
+        response: Dict[str, Any] = LocalGateway(chalice_app, Config()).handle_request(
+            method="POST",
+            path="/slack/events",
+            body=body,
+            headers=self.build_headers(timestamp, body),
+        )
         assert response["statusCode"] == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
-    @mock_lambda
     def test_commands(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
 
+        @app.command("/hello-world")
         def command_handler(ack):
             ack()
-
-        app.command("/hello-world")(command_handler)
 
         input = (
             "token=verification_token"
@@ -176,18 +175,27 @@ class TestAWSLambda:
             "&trigger_id=111.111.xxx"
         )
         timestamp, body = str(int(time())), input
-        event = {
-            "body": body,
-            "queryStringParameters": {},
-            "headers": self.build_headers(timestamp, body),
-            "requestContext": {"http": {"method": "POST"}},
-            "isBase64Encoded": False,
-        }
-        response = SlackRequestHandler(app).handle(event, self.context)
+
+        chalice_app = Chalice(app_name="bolt-python-chalice")
+        slack_handler = ChaliceSlackRequestHandler(app=app, chalice=chalice_app)
+
+        @chalice_app.route(
+            "/slack/events",
+            methods=["POST"],
+            content_types=["application/x-www-form-urlencoded", "application/json"],
+        )
+        def events() -> Response:
+            return slack_handler.handle(chalice_app.current_request)
+
+        response: Dict[str, Any] = LocalGateway(chalice_app, Config()).handle_request(
+            method="POST",
+            path="/slack/events",
+            body=body,
+            headers=self.build_headers(timestamp, body),
+        )
         assert response["statusCode"] == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
-    @mock_lambda
     def test_lazy_listeners(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
 
@@ -215,22 +223,29 @@ class TestAWSLambda:
             "&trigger_id=111.111.xxx"
         )
         timestamp, body = str(int(time())), input
+
+        chalice_app = Chalice(app_name="bolt-python-chalice")
+        slack_handler = ChaliceSlackRequestHandler(app=app, chalice=chalice_app)
+
         headers = self.build_headers(timestamp, body)
         headers["x-slack-bolt-lazy-only"] = "1"
         headers["x-slack-bolt-lazy-function-name"] = "say_it"
-        event = {
-            "body": body,
-            "queryStringParameters": {},
-            "headers": headers,
-            "requestContext": {"http": {"method": "NONE"}},
-            "isBase64Encoded": False,
-        }
-        response = SlackRequestHandler(app).handle(event, self.context)
-        assert response["statusCode"] == 200
+
+        request: Request = Request(
+            method="NONE",
+            query_params={},
+            uri_params={},
+            context={},
+            stage_vars=None,
+            is_base64_encoded=False,
+            body=body,
+            headers=headers,
+        )
+        response: Response = slack_handler.handle(request)
+        assert response.status_code == 200
         assert self.mock_received_requests["/auth.test"] == 1
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
-    @mock_lambda
     def test_oauth(self):
         app = App(
             client=self.web_client,
@@ -242,12 +257,14 @@ class TestAWSLambda:
             ),
         )
 
-        event = {
-            "body": "",
-            "queryStringParameters": {},
-            "headers": {},
-            "requestContext": {"http": {"method": "GET"}},
-            "isBase64Encoded": False,
-        }
-        response = SlackRequestHandler(app).handle(event, self.context)
+        chalice_app = Chalice(app_name="bolt-python-chalice")
+        slack_handler = ChaliceSlackRequestHandler(app=app, chalice=chalice_app)
+
+        @chalice_app.route("/slack/install", methods=["GET"])
+        def install() -> Response:
+            return slack_handler.handle(chalice_app.current_request)
+
+        response: Dict[str, Any] = LocalGateway(chalice_app, Config()).handle_request(
+            method="GET", path="/slack/install", body="", headers={}
+        )
         assert response["statusCode"] == 302
