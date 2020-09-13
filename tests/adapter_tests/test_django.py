@@ -16,7 +16,6 @@ from tests.mock_web_api_server import (
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 from django.test import TestCase
-from django.core.wsgi import get_wsgi_application
 
 
 class TestDjango(TestCase):
@@ -27,8 +26,6 @@ class TestDjango(TestCase):
     web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
 
     os.environ["DJANGO_SETTINGS_MODULE"] = "tests.adapter_tests.test_django_settings"
-    application = get_wsgi_application()
-    databases = "__all__"
     rf = RequestFactory()
 
     def setUp(self):
