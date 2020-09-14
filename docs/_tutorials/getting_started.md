@@ -97,7 +97,6 @@ pip install slack_bolt
 
 Create a new file called `app.py` in this directory and add the following code:
 
-<!-- TODO - Is it best practice to separate imports and froms with a new line? -->
 ```python
 import os
 from slack_bolt import App
@@ -160,7 +159,6 @@ Now you have a public-facing URL for your app that tunnels to your local machine
 
 Under the **Enable Events** switch in the **Request URL** box, go ahead and paste in your URL. As long as your Bolt app is still running, your URL should become verified.
 
-<!-- TODO - Should this be done as a list? -->
 After your request URL is verified, scroll down to **Subscribe to Bot Events**. There are four events related to messages:
 - `message.channels` listens for messages in public channels that your app is added to
 - `message.groups` listens for messages in private channels that your app is added to
