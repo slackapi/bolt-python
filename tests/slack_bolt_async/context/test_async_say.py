@@ -31,3 +31,21 @@ class TestAsyncSay:
         say = AsyncSay(client=self.web_client, channel="C111")
         response: AsyncSlackResponse = await say(text="Hi there!")
         assert response.status_code == 200
+
+    @pytest.mark.asyncio
+    async def test_say_dict(self):
+        say = AsyncSay(client=self.web_client, channel="C111")
+        response: AsyncSlackResponse = await say({"text": "Hi!"})
+        assert response.status_code == 200
+
+    @pytest.mark.asyncio
+    async def test_say_dict_channel(self):
+        say = AsyncSay(client=self.web_client, channel="C111")
+        response: AsyncSlackResponse = await say({"text": "Hi!", "channel": "C111"})
+        assert response.status_code == 200
+
+    @pytest.mark.asyncio
+    async def test_say_invalid(self):
+        say = AsyncSay(client=self.web_client, channel="C111")
+        with pytest.raises(ValueError):
+            await say([])

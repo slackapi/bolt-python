@@ -1,3 +1,4 @@
+import pytest
 from slack_sdk import WebClient
 from slack_sdk.web import SlackResponse
 
@@ -24,3 +25,18 @@ class TestSay:
         say = Say(client=self.web_client, channel="C111")
         response: SlackResponse = say(text="Hi there!")
         assert response.status_code == 200
+
+    def test_say_dict(self):
+        say = Say(client=self.web_client, channel="C111")
+        response: SlackResponse = say({"text": "Hi!"})
+        assert response.status_code == 200
+
+    def test_say_dict_channel(self):
+        say = Say(client=self.web_client, channel="C111")
+        response: SlackResponse = say({"text": "Hi!", "channel": "C111"})
+        assert response.status_code == 200
+
+    def test_say_invalid(self):
+        say = Say(client=self.web_client, channel="C111")
+        with pytest.raises(ValueError):
+            say([])

@@ -27,3 +27,19 @@ class TestRespondInternals:
         assert message is not None
         assert isinstance(message["blocks"][0], dict)
         assert message["blocks"][0]["block_id"] == "foo"
+
+    def test_build_message_attachments(self):
+        message = _build_message(attachments=[{}])
+        assert message is not None
+
+    def test_build_message_response_type(self):
+        message = _build_message(response_type="in_channel")
+        assert message is not None
+
+    def test_build_message_replace_original(self):
+        message = _build_message(replace_original=True)
+        assert message is not None
+
+    def test_build_message_delete_original(self):
+        message = _build_message(delete_original=True)
+        assert message is not None
