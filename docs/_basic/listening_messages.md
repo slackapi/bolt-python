@@ -16,8 +16,8 @@ To listen to messages that [your app has access to receive](https://api.slack.co
 ```python
 # This will match any message that contains 👋
 @app.message(":wave:")
-def say_hello(payload, say):
-    user = payload['event']['user']
+def say_hello(message, say):
+    user = message['user']
     say(f"Hi there, <@{user}>!")
 ```
 
@@ -35,7 +35,7 @@ The `re.compile()` method can be used instead of a string for more granular matc
 ```python
 @app.message(re.compile("(hi|hello|hey)"))
 def say_hello_regex(say, context):
-    # RegExp matches are inside of context.matches
+    # RegEx matches are inside of context.matches
     greeting = context['matches'][0]
     say(f"{greeting}, how are you?")
 ```

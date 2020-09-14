@@ -18,6 +18,10 @@ To learn more about the OAuth installation flow with Slack, [read the API docume
 </div>
 
 ```python
+from slack_bolt.oauth.oauth_settings import OAuthSettings
+from slack_sdk.oauth.installation_store import FileInstallationStore
+from slack_sdk.oauth.state_store import FileOAuthStateStore
+
 oauth_settings = OAuthSettings(
     client_id=os.environ["SLACK_CLIENT_ID"],
     client_secret=os.environ["SLACK_CLIENT_SECRET"],
@@ -38,29 +42,31 @@ app = App(signing_secret=os.environ["SIGNING_SECRET"],
 <div class="secondary-content" markdown="0">
 You can override the default OAuth using `oauth_settings`, which can be passed in during the initialization of App. You can override the following:
 
-- `authorization_url`: Used to toggle between new Slack Apps and Classic Slack Apps
 - `install_path`: Override default path for "Add to Slack" button
 - `redirect_uri`: Override default redirect url path
 - `callback_options`: Provide custom success and failure pages at the end of the OAuth flow
-- `state_store`: Provide a custom state store instead of using the built in `OAuthStateStore`
+- `state_store`: Provide a custom state store instead of using the built in `FileOAuthStateStore`
+- `installation_store`: Provide a custom installation store instead of the built-in `FileInstallationStore`
 
 </div>
 
 ```python
-oauth_settings = OAuthSettings(
-    client_id=os.environ["SLACK_CLIENT_ID"],
-    client_secret=os.environ["SLACK_CLIENT_SECRET"],
-    scopes=["channels:read", "groups:read", "chat:write", "incoming-webhook"],
+app = App(
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
     installation_store=FileInstallationStore(),
-    state_store=FileOAuthStateStore(expiration_seconds=120),
-    install_path="/slack/install_app",
-    redirect_uri_path="/slack/redirect",
-    callback_options=CallbackOptions(success=success_handler,
-                                     failure=failure_handler)
+    oauth_settings=OAuthSettings(
+        client_id=os.environ.get("SLACK_CLIENT_ID"),
+        client_secret=os.environ.get("SLACK_CLIENT_SECRET"),
+        scopes=["app_mentions:read", "channels:history", "im:history", "chat:write"],
+        user_scopes=[],
+        redirect_uri=None,
+        install_path="/slack/install",
+        redirect_uri_path="/slack/oauth_redirect",
+        state_store=FileOAuthStateStore(expiration_seconds=600),
+        callback_options=CallbackOptions(success=success,
+                                         failure=failure),
+    ),
 )
-
-app = App(signing_secret=os.environ["SIGNING_SECRET"],
-          oauth_settings=oauth_settings)
 ```
 
 </details>

@@ -16,7 +16,7 @@ In the case that you’d like to send a message outside of a listener or you wan
 ```python
 # Listens for messages containing "knock knock" and responds with an italicized "who's there?"
 @app.message("knock knock")
-def ask_who(logger, payload, say):
+def ask_who(message, say):
     say("_Who's there?_")
 ```
 
@@ -35,8 +35,8 @@ To explore adding rich message layouts to your app, read through [the guide on o
 ```python
 # Sends a section block with datepicker when someone reacts with a 📅 emoji
 @app.event("reaction_added")
-def show_datepicker(logger, payload, say):
-  reaction = payload["event"]["reaction"]
+def show_datepicker(event, say):
+  reaction = event["reaction"]
   if reaction == "calendar":
       blocks = [{
           "type": "section",
@@ -55,8 +55,7 @@ def show_datepicker(logger, payload, say):
           }
       }]
 
-      channel_id = payload["event"]["item"]["channel"]
-      say(blocks=blocks, channel=channel_id)
+      say(blocks=blocks)
 ```
 
 </details>

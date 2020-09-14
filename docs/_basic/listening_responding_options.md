@@ -30,5 +30,5 @@ def show_options(ack):
         },
     ]
 
-    ack({"options": options})
+    ack(options=options)
 ```

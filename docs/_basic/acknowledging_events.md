@@ -16,6 +16,8 @@ We recommend calling `ack()` right away before sending a new message or fetching
 </div>
 
 ```python
+import re
+
 # Listen for dialog submissions with a callback_id of ticket_submit
 @app.action("ticket_submit")
 def process_submission(ack, action):
@@ -31,5 +33,5 @@ def process_submission(ack, action):
             "name": "email_address",
             "error": "Sorry, this isn’t a valid email"
         }]
-        ack({"errors": errors})
+        ack(errors=errors)
 ```

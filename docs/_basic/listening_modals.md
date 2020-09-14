@@ -7,7 +7,7 @@ order: 12
 
 <div class="section-content">
 
-If a <a href="https://api.slack.com/reference/block-kit/views">view payload</a> contains any input blocks, you must listen to `view_submission` events to receive their values. To listen to `view_submission` events, you can use the built-in `view()` method. `view()` requires a `callback_id` of type `str` or `RegExp`.
+If a <a href="https://api.slack.com/reference/block-kit/views">view payload</a> contains any input blocks, you must listen to `view_submission` events to receive their values. To listen to `view_submission` events, you can use the built-in `view()` method. `view()` requires a `callback_id` of type `str` or `re.Pattern`.
 
 You can access the value of the `input` blocks by accessing the `state` object. `state` contains a `values` object that uses the `block_id` and unique `action_id` to store the input values.
 
