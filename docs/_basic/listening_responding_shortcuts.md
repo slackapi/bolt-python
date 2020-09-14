@@ -9,7 +9,7 @@ order: 8
 
 The `shortcut()` method supports both [global shortcuts](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts) and [message shortcuts](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts).
 
-Shortcuts are invokable entry points to apps. Global shortcuts are available from within search in Slack. Message shortcuts are available in the context menus of messages. Your app can use the `shortcut()` method to listen to incoming shortcut events. The method requires a `callback_id` parameter of type `str` or `RegExp`.
+Shortcuts are invokable entry points to apps. Global shortcuts are available from within search in Slack. Message shortcuts are available in the context menus of messages. Your app can use the `shortcut()` method to listen to incoming shortcut events. The method requires a `callback_id` parameter of type `str` or `re.Pattern`.
 
 Shortcuts must be acknowledged with `ack()` to inform Slack that your app has received the event.
 
@@ -25,12 +25,12 @@ When configuring shortcuts within your app configuration, you'll continue to app
 
 # The open_modal shortcut opens a plain old modal
 @app.shortcut("open_modal")
-def open_modal(ack, client):
+def open_modal(ack, shortcut, client):
     # Acknowledge the shortcut request
     ack()
     # Call the views_open method using one of the built-in WebClients
     client.views_open(
-        trigger_id=payload["trigger_id"],
+        trigger_id=shortcut["trigger_id"],
         view={
             "type": "modal",
             "title": {
@@ -69,19 +69,19 @@ def open_modal(ack, client):
   </summary>
 
   <div class="secondary-content" markdown="0">
-  You can use a constraints object to listen to `callback_id`s, and `type`s. Constraints in the object can be of type `str` or `RegExp` object.
+  You can use a constraints object to listen to `callback_id`s, and `type`s. Constraints in the object can be of type `str` or `re.Pattern`.
   </div>
 
 ```python
 
 # Your middleware will only be called when the callback_id matches 'open_modal' AND the type matches 'message_action'
-@app.shortcut({"callback_id": "open_modal", "type": "message_action"})
-def open_modal(ack, client):
-    # acknowledge the shortcut request
+@app.message_shortcut("open_modal")
+def open_modal(ack, shortcut, client):
+    # Acknowledge the shortcut request
     ack()
-    # call the views_open method using one of the built-in WebClients
+    # Call the views_open method using one of the built-in WebClients
     client.views_open(
-        trigger_id=payload["trigger_id"],
+        trigger_id=shortcut["trigger_id"],
         view={
             "type": "modal",
             "title": {
