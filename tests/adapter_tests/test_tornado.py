@@ -11,7 +11,6 @@ from tornado.web import Application
 
 from slack_bolt.adapter.tornado import SlackEventsHandler
 from slack_bolt.app import App
-from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,

@@ -4,11 +4,11 @@ import re
 from time import time
 
 import pytest
+from slack_sdk.signature import SignatureVerifier
+from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.request.async_request import AsyncBoltRequest
-from slack_sdk.signature import SignatureVerifier
-from slack_sdk.web.async_client import AsyncWebClient
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,

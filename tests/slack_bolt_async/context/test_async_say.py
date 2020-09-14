@@ -1,8 +1,8 @@
 import asyncio
 
 import pytest
-from slack_sdk.web.async_slack_response import AsyncSlackResponse
 from slack_sdk.web.async_client import AsyncWebClient
+from slack_sdk.web.async_slack_response import AsyncSlackResponse
 
 from slack_bolt.context.say.async_say import AsyncSay
 from tests.mock_web_api_server import (

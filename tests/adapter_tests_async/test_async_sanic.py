@@ -5,10 +5,10 @@ from time import time
 from urllib.parse import quote
 
 import pytest
-from slack_sdk.signature import SignatureVerifier
-from slack_sdk.web.async_client import AsyncWebClient
 from sanic import Sanic
 from sanic.request import Request
+from slack_sdk.signature import SignatureVerifier
+from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.adapter.sanic.async_handler import AsyncSlackRequestHandler
 from slack_bolt.app.async_app import AsyncApp

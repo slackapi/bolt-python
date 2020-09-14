@@ -6,7 +6,6 @@ from slack_bolt.request.internals import (
     extract_team_id,
     extract_enterprise_id,
     parse_query,
-    parse_body,
 )
 
 

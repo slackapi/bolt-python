@@ -1,4 +1,3 @@
-import pytest
 import tornado
 from tornado.httpclient import HTTPRequest, HTTPResponse
 from tornado.testing import AsyncHTTPTestCase

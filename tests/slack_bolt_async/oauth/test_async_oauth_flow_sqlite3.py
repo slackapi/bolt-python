@@ -2,8 +2,6 @@ import asyncio
 import re
 
 import pytest
-from slack_sdk.oauth.installation_store import FileInstallationStore
-from slack_sdk.oauth.state_store import FileOAuthStateStore
 from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt import BoltResponse
@@ -13,7 +11,6 @@ from slack_bolt.oauth.async_callback_options import (
     AsyncCallbackOptions,
 )
 from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
-from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
     cleanup_mock_web_api_server,

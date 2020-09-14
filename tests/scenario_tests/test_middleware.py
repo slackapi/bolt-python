@@ -1,6 +1,5 @@
 import json
 from time import time
-from urllib.parse import quote
 
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient

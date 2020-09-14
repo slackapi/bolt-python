@@ -5,6 +5,8 @@ from urllib.parse import quote
 
 from chalice import Chalice, Response
 from chalice.app import Request
+from chalice.config import Config
+from chalice.local import LocalGateway
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 
@@ -19,8 +21,6 @@ from tests.mock_web_api_server import (
     cleanup_mock_web_api_server,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
-from chalice.config import Config
-from chalice.local import LocalGateway
 
 
 class TestAwsChalice:

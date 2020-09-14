@@ -1,13 +1,10 @@
 import re
 
 from slack_sdk import WebClient
-from slack_sdk.oauth.installation_store import FileInstallationStore
-from slack_sdk.oauth.state_store import FileOAuthStateStore
 
 from slack_bolt import BoltRequest, BoltResponse
 from slack_bolt.oauth import OAuthFlow
 from slack_bolt.oauth.callback_options import CallbackOptions, SuccessArgs, FailureArgs
-from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
     cleanup_mock_web_api_server,
     setup_mock_web_api_server,
