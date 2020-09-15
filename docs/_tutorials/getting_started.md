@@ -206,7 +206,7 @@ To use features like buttons, select menus, datepickers, modals, and shortcuts, 
 
 Back on your app configuration page, click on **Interactivity & Shortcuts** on the left side. You'll see that there's another **Request URL** box.
 
-By default, Bolt is configured to use the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up for interactivity!
+By default, Bolt is configured to use the same endpoint for interactive components that it uses for events, so use the same request URL as above (in the example, it was `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up to handle interactivity!
 
 ![Configuring a Request URL](../assets/request-url-config.png "Configuring a Request URL")
 
