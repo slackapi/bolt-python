@@ -256,8 +256,7 @@ if __name__ == "__main__":
     app.start(port=int(os.environ.get("PORT", 3000)))
 ```
 
-<!-- TODO - Review my usage of "List" (Array?) and clarification of the role of `text` -->
-The values passed to `say()` are now a list of `blocks` and a string of `text`. Blocks are the building components of a Slack message and can range from text to images to datepickers. In this case, your app will respond with a section block that includes a button as an accessory. Since we're using `blocks`, the `text` is a fallback string to display in notifications.
+The value inside of `say()` is now an object that contains an array of `blocks`. Blocks are the building components of a Slack message and can range from text to images to datepickers. In this case, your app will respond with a section block that includes a button as an accessory. Since we're using `blocks`, the `text` is a fallback for notifications and accessibility.
 
 You'll notice in the button `accessory` object, there is an `action_id`. This will act as a unique identifier for the button so your app can specify what action it wants to respond to.
 
