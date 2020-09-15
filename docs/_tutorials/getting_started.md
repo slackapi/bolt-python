@@ -214,7 +214,7 @@ Now, let's go back to your app's code and add interactivity. This will consist o
 - First, your app will send a message that contains a button.
 - Next, your app will listen to the action of a user clicking the button and respond
 
-Below, I've modified the app code we wrote in the last section to send a message with a button rather than a string:
+Below, the code from the last section is modified to send a message containing a button rather than just a string:
 
 ```python
 import os
