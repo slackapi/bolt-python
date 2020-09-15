@@ -267,7 +267,6 @@ Now, if you restart your app and say "hello" in a channel your app is in, you'll
 
 Let's add a handler to send a followup message when someone clicks the button:
 
-<!-- TODO - I matched the ordering of the (ack, body, say) with JavaScript. Is this the ideal order? -->
 ```python
 import os
 from slack_bolt import App
