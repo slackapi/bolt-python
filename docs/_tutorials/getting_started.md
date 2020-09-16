@@ -14,6 +14,8 @@ redirect_from:
 This guide is meant to walk you through getting up and running with a Slack app using Bolt for Python. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
 </div>
 
+When you're finished, you'll have this ⚡️[Getting Started with Slack app](https://github.com/slackapi/bolt-python/tree/main/samples/getting_started) to run, modify, and make your own.
+
 ---
 
 ### Create an app
@@ -317,7 +319,7 @@ You can see that we used the `action_id` to add a listener for our button action
 ---
 
 ### Next steps
-You just built your first Bolt for Python app! 🎉
+You just built your first [Bolt for Python app](https://github.com/slackapi/bolt-python/tree/main/samples/getting_started)! 🎉
 
 Now that you have a basic app up and running, you can start exploring how to make your Bolt app stand out. Here are some ideas about what to explore next:
 
