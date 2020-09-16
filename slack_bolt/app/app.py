@@ -323,16 +323,20 @@ class App:
                     except Exception as e:
                         # The default response status code is 500 in this case.
                         # You can customize this by passing your own error handler.
-                        if response is None:
-                            response = BoltResponse(status=500)
-                        response.status = 500
-                        if ack.response is not None:  # already acknowledged
-                            response = None
-
-                        self._listener_error_handler.handle(
-                            error=e, request=request, response=response,
-                        )
-                        ack.response = response
+                        if listener.auto_acknowledgement:
+                            self._listener_error_handler.handle(
+                                error=e, request=request, response=response,
+                            )
+                        else:
+                            if response is None:
+                                response = BoltResponse(status=500)
+                            response.status = 500
+                            if ack.response is not None:  # already acknowledged
+                                response = None
+                            self._listener_error_handler.handle(
+                                error=e, request=request, response=response,
+                            )
+                            ack.response = response
 
                 self._listener_executor.submit(run_ack_function_asynchronously)
 

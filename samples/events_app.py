@@ -32,6 +32,10 @@ def say_something_to_reaction(say):
     say("OK!")
 
 
+@app.event("message")
+def foo(body, logger):
+    logger.info(body)
+
 @app.message("test")
 def test_message(logger, body):
     logger.info(body)

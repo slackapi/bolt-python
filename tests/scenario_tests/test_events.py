@@ -143,3 +143,21 @@ class TestEvents:
         assert self.mock_received_requests["/auth.test"] == 1
         sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
+
+    def test_stable_auto_ack(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+
+        @app.event("reaction_added")
+        def handle_app_mention():
+            raise Exception("something wrong!")
+
+        for _ in range(10):
+            timestamp, body = (
+                str(int(time())),
+                json.dumps(self.valid_reaction_added_body),
+            )
+            request: BoltRequest = BoltRequest(
+                body=body, headers=self.build_headers(timestamp, body)
+            )
+            response = app.dispatch(request)
+            assert response.status == 200
