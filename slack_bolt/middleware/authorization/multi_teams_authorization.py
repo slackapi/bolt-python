@@ -6,7 +6,7 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import InstallationStore, Bot
-from . import Authorization
+from .authorization import Authorization
 from .internals import _build_error_response, _is_no_auth_required
 from ...util.utils import create_web_client
 

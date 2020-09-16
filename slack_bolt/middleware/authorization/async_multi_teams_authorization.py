@@ -73,7 +73,7 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
                 # TODO: bot -> user token
                 req.context["token"] = bot.bot_token
                 req.context["client"] = create_async_web_client(bot.bot_token)
-                return next()
+                return await next()
 
         except SlackApiError as e:
             self.logger.error(f"Failed to authorize with the given token ({e})")

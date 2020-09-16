@@ -1,7 +1,7 @@
 from typing import Callable, Optional
 
 from slack_bolt.logger import get_bolt_logger
-from slack_bolt.middleware.authorization import Authorization
+from .authorization import Authorization
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError

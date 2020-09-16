@@ -772,12 +772,12 @@ class SlackAppDevelopmentServer:
         self._port: int = port
         self._bolt_endpoint_path: str = path
         self._bolt_app: App = app
-        self._bolt_oauth_flow: OAuthFlow = oauth_flow
+        self._bolt_oauth_flow: Optional[OAuthFlow] = oauth_flow
 
         _port: int = self._port
         _bolt_endpoint_path: str = self._bolt_endpoint_path
         _bolt_app: App = self._bolt_app
-        _bolt_oauth_flow: OAuthFlow = self._bolt_oauth_flow
+        _bolt_oauth_flow: Optional[OAuthFlow] = self._bolt_oauth_flow
 
         class SlackAppHandler(SimpleHTTPRequestHandler):
             def do_GET(self):
