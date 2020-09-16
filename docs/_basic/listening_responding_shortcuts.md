@@ -15,9 +15,9 @@ Shortcuts must be acknowledged with `ack()` to inform Slack that your app has re
 
 Shortcuts include a `trigger_id` which an app can use to [open a modal](#creating-modals) that confirms the action the user is taking.
 
-When configuring shortcuts within your app configuration, you'll continue to append `/slack/events` to your request URL.
+When setting up shortcuts within your app configuration, as with other URLs, you'll append `/slack/events` to your request URL.
 
-⚠️ Note that global shortcuts do **not** include a channel ID. If your app needs access to a channel ID, you may use a [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) element within a modal. Message shortcuts do include channel ID.
+⚠️ Note that global shortcuts do **not** include a channel ID. If your app needs access to a channel ID, you may use a [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) element within a modal. Message shortcuts do include a channel ID.
 
 </div>
 
