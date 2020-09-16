@@ -149,7 +149,7 @@ class TestEvents:
 
         @app.event("reaction_added")
         def handle_app_mention():
-            raise Exception("something wrong!")
+            raise Exception("Something wrong!")
 
         for _ in range(10):
             timestamp, body = (
