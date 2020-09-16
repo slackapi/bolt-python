@@ -9,29 +9,25 @@ order: 7
 
 Actions, commands, and options events must **always** be acknowledged using the `ack()` function. This lets Slack know that the event was received and updates the Slack user interface accordingly.
 
-Depending on the type of event, your acknowledgement may be different. For example, when acknowledging a dialog submission you will call `ack()` with validation errors if the submission contains errors, or with no parameters if the submission is valid.
+Depending on the type of event, your acknowledgement may be different. For example, when acknowledging a menu selection associated with an external data source, you would call `ack()` with a list of relevant [options](https://api.slack.com/reference/block-kit/composition-objects#option).
 
 We recommend calling `ack()` right away before sending a new message or fetching information from your database since you only have 3 seconds to respond.
 
 </div>
 
 ```python
-import re
-
-# Listen for dialog submissions with a callback_id of ticket_submit
-@app.action("ticket_submit")
-def process_submission(ack, action):
-    # Regex to determine if this is a valid email
-    is_email = "^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
-
-    if re.match(is_email, action["submission"]["email"]):
-        # It’s a valid email, accept the submission
-        ack()
-    else:
-        # If it isn’t a valid email, acknowledge with an error
-        errors = [{
-            "name": "email_address",
-            "error": "Sorry, this isn’t a valid email"
-        }]
-        ack(errors=errors)
+# Example of responding to an external_select options request
+@app.options("menu_selection")
+def show_menu_options(ack):
+    options = [
+        {
+            "text": {"type": "plain_text", "text": "Option 1"},
+            "value": "1-1",
+        },
+        {
+            "text": {"type": "plain_text", "text": "Option 2"},
+            "value": "1-2",
+        },
+    ]
+    ack(options=options)
 ```
