@@ -129,6 +129,16 @@ class TestAsyncEvents:
         await asyncio.sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
+    @pytest.mark.asyncio
+    async def test_stable_auto_ack(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.event("reaction_added")(always_failing)
+
+        for _ in range(10):
+            request = self.build_valid_reaction_added_request()
+            response = await app.async_dispatch(request)
+            assert response.status == 200
+
 
 app_mention_body = {
     "token": "verification_token",
@@ -189,3 +199,7 @@ async def whats_up(body, say, payload, event):
 async def skip_middleware(req, resp, next):
     # return next()
     pass
+
+
+async def always_failing():
+    raise Exception("Something wrong!")

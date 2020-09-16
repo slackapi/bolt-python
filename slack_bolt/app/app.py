@@ -323,16 +323,20 @@ class App:
                     except Exception as e:
                         # The default response status code is 500 in this case.
                         # You can customize this by passing your own error handler.
-                        if response is None:
-                            response = BoltResponse(status=500)
-                        response.status = 500
-                        if ack.response is not None:  # already acknowledged
-                            response = None
-
-                        self._listener_error_handler.handle(
-                            error=e, request=request, response=response,
-                        )
-                        ack.response = response
+                        if listener.auto_acknowledgement:
+                            self._listener_error_handler.handle(
+                                error=e, request=request, response=response,
+                            )
+                        else:
+                            if response is None:
+                                response = BoltResponse(status=500)
+                            response.status = 500
+                            if ack.response is not None:  # already acknowledged
+                                response = None
+                            self._listener_error_handler.handle(
+                                error=e, request=request, response=response,
+                            )
+                            ack.response = response
 
                 self._listener_executor.submit(run_ack_function_asynchronously)
 
@@ -768,12 +772,12 @@ class SlackAppDevelopmentServer:
         self._port: int = port
         self._bolt_endpoint_path: str = path
         self._bolt_app: App = app
-        self._bolt_oauth_flow: OAuthFlow = oauth_flow
+        self._bolt_oauth_flow: Optional[OAuthFlow] = oauth_flow
 
         _port: int = self._port
         _bolt_endpoint_path: str = self._bolt_endpoint_path
         _bolt_app: App = self._bolt_app
-        _bolt_oauth_flow: OAuthFlow = self._bolt_oauth_flow
+        _bolt_oauth_flow: Optional[OAuthFlow] = self._bolt_oauth_flow
 
         class SlackAppHandler(SimpleHTTPRequestHandler):
             def do_GET(self):

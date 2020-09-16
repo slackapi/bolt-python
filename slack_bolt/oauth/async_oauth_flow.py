@@ -11,7 +11,7 @@ from slack_bolt.oauth.async_callback_options import (
     AsyncFailureArgs,
 )
 from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
-from slack_bolt.request import BoltRequest
+from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth import OAuthStateUtils
@@ -140,18 +140,18 @@ class AsyncOAuthFlow:
     # Installation
     # -----------------------------
 
-    async def handle_installation(self, request: BoltRequest) -> BoltResponse:
+    async def handle_installation(self, request: AsyncBoltRequest) -> BoltResponse:
         state = await self.issue_new_state(request)
         return await self.build_authorize_url_redirection(request, state)
 
     # ----------------------
     # Internal methods for Installation
 
-    async def issue_new_state(self, request: BoltRequest) -> str:
+    async def issue_new_state(self, request: AsyncBoltRequest) -> str:
         return await self.settings.state_store.async_issue()
 
     async def build_authorize_url_redirection(
-        self, request: BoltRequest, state: str
+        self, request: AsyncBoltRequest, state: str
     ) -> BoltResponse:
         return BoltResponse(
             status=302,
@@ -167,7 +167,7 @@ class AsyncOAuthFlow:
     # Callback
     # -----------------------------
 
-    async def handle_callback(self, request: BoltRequest) -> BoltResponse:
+    async def handle_callback(self, request: AsyncBoltRequest) -> BoltResponse:
 
         # failure due to end-user's cancellation or invalid redirection to slack.com
         error = request.query.get("error", [None])[0]
@@ -175,14 +175,14 @@ class AsyncOAuthFlow:
             return await self.failure_handler(
                 AsyncFailureArgs(
                     request=request,
-                    reason=error,
+                    reason=error,  # type: ignore
                     suggested_status_code=200,
                     settings=self.settings,
                 )
             )
 
         # state parameter verification
-        state = request.query.get("state", [None])[0]
+        state: Optional[str] = request.query.get("state", [None])[0]
         if not self.settings.state_utils.is_valid_browser(state, request.headers):
             return await self.failure_handler(
                 AsyncFailureArgs(
@@ -302,7 +302,7 @@ class AsyncOAuthFlow:
             return None
 
     async def store_installation(
-        self, request: BoltRequest, installation: Installation
+        self, request: AsyncBoltRequest, installation: Installation
     ):
         # may raise BoltError
         await self.settings.installation_store.async_save(installation)
