@@ -314,7 +314,7 @@ if __name__ == "__main__":
     app.start(port=int(os.environ.get("PORT", 3000)))
 ```
 
-You can see that we used the `action_id` to add a listener for our button action. If you restart your app and click the button, you'll see a new message from your app that says you clicked the button.
+You can see that we used `app.action()` to listen for the `action_id` that we named `button_click`. If you restart your app and click the button, you'll see a new message from your app that says you clicked the button.
 
 ---
 
