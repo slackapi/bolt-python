@@ -7,12 +7,12 @@ order: 13
 
 <div class="section-content">
 The `options()` method listens for incoming option request payloads from Slack. [Similar to `action()`](#action-listening),
-an `action_id` or constraints object is required. In order to load external data into your select menus, you must provide an options load URL in your app configuration.
+an `action_id` or constraints object is required. In order to load external data into your select menus, you must provide an options load URL in your app configuration, appended with `/slack/events`.
 
-While it's recommended to use `action_id` for `external_select` menus, dialogs do not yet support Block Kit so you'll have to 
-use the constraints object to filter on a `callback_id`.
+While it's recommended to use `action_id` for `external_select` menus, dialogs do not support Block Kit so you'll have to use the constraints object to filter on a `callback_id`.
 
-To respond to options requests, you'll need to `ack()` with valid options. Both [external select response examples](https://api.slack.com/reference/messaging/block-elements#external-select) and [dialog response examples](https://api.slack.com/dialogs#dynamic_select_elements_external) can be found on our API site.
+To respond to options requests, you'll need to call `ack()` with a valid `options` or `option_groups` list. Both [external select response examples](https://api.slack.com/reference/messaging/block-elements#external-select) and [dialog response examples](https://api.slack.com/dialogs#dynamic_select_elements_external) can be found on our API site.
+
 </div>
 
 ```python
@@ -29,6 +29,5 @@ def show_options(ack):
             "value": "1-2",
         },
     ]
-
     ack(options=options)
 ```
