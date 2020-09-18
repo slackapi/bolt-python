@@ -5,6 +5,7 @@ import sys
 sys.path.insert(1, "../..")
 # ------------------------------------------------
 
+import os
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.adapter.sanic import AsyncSlackRequestHandler
 
@@ -13,15 +14,15 @@ app_handler = AsyncSlackRequestHandler(app)
 
 
 @app.event("app_mention")
-async def handle_app_mentions(payload, say, logger):
-    logger.info(payload)
+async def handle_app_mentions(body, say, logger):
+    logger.info(body)
     await say("What's up?")
 
 
 from sanic import Sanic
 from sanic.request import Request
 
-api = Sanic()
+api = Sanic(name="awesome-slack-app")
 
 
 @api.post("/slack/events")
@@ -37,6 +38,10 @@ async def install(req: Request):
 @api.get("/slack/oauth_redirect")
 async def oauth_redirect(req: Request):
     return await app_handler.handle(req)
+
+
+if __name__ == "__main__":
+    api.run(host="0.0.0.0", port=int(os.environ.get("PORT", 3000)))
 
 
 # pip install -r requirements.txt

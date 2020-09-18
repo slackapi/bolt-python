@@ -13,8 +13,8 @@ app_handler = AsyncSlackRequestHandler(app)
 
 
 @app.event("app_mention")
-async def handle_app_mentions(payload, say, logger):
-    logger.info(payload)
+async def handle_app_mentions(body, say, logger):
+    logger.info(body)
     await say("What's up?")
 
 

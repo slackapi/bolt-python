@@ -7,9 +7,8 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from typing import List, Union, Pattern, Callable, Dict, Optional
 
-from slack_sdk.oauth import OAuthStateUtils
-from slack_sdk.oauth.installation_store import InstallationStore, FileInstallationStore
-from slack_sdk.oauth.state_store import OAuthStateStore, FileOAuthStateStore
+from slack_sdk.errors import SlackApiError
+from slack_sdk.oauth.installation_store import InstallationStore
 from slack_sdk.web import WebClient
 
 from slack_bolt.error import BoltError
@@ -38,9 +37,10 @@ from slack_bolt.middleware import (
 from slack_bolt.middleware.message_listener_matches import MessageListenerMatches
 from slack_bolt.middleware.url_verification import UrlVerification
 from slack_bolt.oauth import OAuthFlow
+from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
-from slack_bolt.util.utils import create_web_client, _copy_object
+from slack_bolt.util.utils import create_web_client, create_copy
 
 
 class App:
@@ -58,21 +58,10 @@ class App:
         client: Optional[WebClient] = None,
         # for multi-workspace apps
         installation_store: Optional[InstallationStore] = None,
-        oauth_state_store: Optional[OAuthStateStore] = None,
-        oauth_state_cookie_name: str = OAuthStateUtils.default_cookie_name,
-        oauth_state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
         # for the OAuth flow
+        oauth_settings: Optional[OAuthSettings] = None,
         oauth_flow: Optional[OAuthFlow] = None,
         authorization_test_enabled: bool = True,
-        client_id: Optional[str] = None,
-        client_secret: Optional[str] = None,
-        scopes: Optional[List[str]] = None,
-        user_scopes: Optional[List[str]] = None,
-        redirect_uri: Optional[str] = None,
-        oauth_install_path: Optional[str] = None,
-        oauth_redirect_uri_path: Optional[str] = None,
-        oauth_success_url: Optional[str] = None,
-        oauth_failure_url: Optional[str] = None,
         # No need to set (the value is used only in response to ssl_check requests)
         verification_token: Optional[str] = None,
     ):
@@ -86,18 +75,6 @@ class App:
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret: str = signing_secret
-
-        client_id = client_id or os.environ.get("SLACK_CLIENT_ID", None)
-        client_secret = client_secret or os.environ.get("SLACK_CLIENT_SECRET", None)
-        scopes = scopes or os.environ.get("SLACK_SCOPES", "").split(",")
-        user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", "").split(",")
-        redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI", None)
-        oauth_install_path = oauth_install_path or os.environ.get(
-            "SLACK_INSTALL_PATH", "/slack/install"
-        )
-        oauth_redirect_uri_path = oauth_redirect_uri_path or os.environ.get(
-            "SLACK_REDIRECT_URI_PATH", "/slack/oauth_redirect"
-        )
 
         self._verification_token: Optional[str] = verification_token or os.environ.get(
             "SLACK_VERIFICATION_TOKEN", None
@@ -119,64 +96,23 @@ class App:
             self._client = create_web_client(token)  # NOTE: the token here can be None
 
         self._installation_store: Optional[InstallationStore] = installation_store
-        self._oauth_state_store: Optional[OAuthStateStore] = oauth_state_store
-
-        self._oauth_state_cookie_name = oauth_state_cookie_name
-        self._oauth_state_expiration_seconds = oauth_state_expiration_seconds
 
         self._oauth_flow: Optional[OAuthFlow] = None
         self._authorization_test_enabled = authorization_test_enabled
         if oauth_flow:
             self._oauth_flow = oauth_flow
             if self._installation_store is None:
-                self._installation_store = self._oauth_flow.installation_store
-            if self._oauth_state_store is None:
-                self._oauth_state_store = self._oauth_flow.oauth_state_store
+                self._installation_store = self._oauth_flow.settings.installation_store
             if self._oauth_flow._client is None:
                 self._oauth_flow._client = self._client
-        else:
-            if client_id is not None and client_secret is not None:
-                # The OAuth flow support is enabled
-                if self._installation_store is None and self._oauth_state_store is None:
-                    # use the default ones
-                    self._installation_store = FileInstallationStore(
-                        client_id=client_id,
-                    )
-                    self._oauth_state_store = FileOAuthStateStore(
-                        expiration_seconds=self._oauth_state_expiration_seconds,
-                        client_id=client_id,
-                    )
+        elif oauth_settings is not None:
+            if self._installation_store:
+                # Consistently use a single installation_store
+                oauth_settings.installation_store = self._installation_store
 
-                if (
-                    self._installation_store is not None
-                    and self._oauth_state_store is None
-                ):
-                    raise ValueError(
-                        f"Configure an appropriate OAuthStateStore for {self._installation_store}"
-                    )
-
-                self._oauth_flow = OAuthFlow(
-                    client=create_web_client(),
-                    logger=self._framework_logger,
-                    # required storage implementations
-                    installation_store=self._installation_store,
-                    oauth_state_store=self._oauth_state_store,
-                    oauth_state_cookie_name=self._oauth_state_cookie_name,
-                    oauth_state_expiration_seconds=self._oauth_state_expiration_seconds,
-                    # used for oauth.v2.access calls
-                    client_id=client_id,
-                    client_secret=client_secret,
-                    # installation url parameters
-                    scopes=scopes,
-                    user_scopes=user_scopes,
-                    redirect_uri=redirect_uri,
-                    # path in this app
-                    install_path=oauth_install_path,
-                    redirect_uri_path=oauth_redirect_uri_path,
-                    # urls after callback
-                    success_url=oauth_success_url,
-                    failure_url=oauth_failure_url,
-                )
+            self._oauth_flow = OAuthFlow(
+                client=self.client, logger=self.logger, settings=oauth_settings
+            )
 
         if self._installation_store is not None and self._token is not None:
             self._token = None
@@ -209,7 +145,21 @@ class App:
 
         if self._oauth_flow is None:
             if self._token:
-                self._middleware_list.append(SingleTeamAuthorization())
+                if self._authorization_test_enabled:
+                    self._middleware_list.append(SingleTeamAuthorization())
+                else:
+                    try:
+                        auth_test_result = self._client.auth_test(token=self._token)
+                        self._middleware_list.append(
+                            SingleTeamAuthorization(
+                                auth_test_result=auth_test_result,
+                                verification_enabled=self._authorization_test_enabled,
+                            )
+                        )
+                    except SlackApiError as err:
+                        raise BoltError(
+                            f"token is invalid (auth.test result: {err.response})"
+                        )
             else:
                 raise BoltError(
                     "Either an env variable SLACK_BOT_TOKEN or token argument in constructor is required."
@@ -249,10 +199,6 @@ class App:
         return self._installation_store
 
     @property
-    def oauth_state_store(self) -> Optional[OAuthStateStore]:
-        return self._oauth_state_store
-
-    @property
     def listener_error_handler(self) -> ListenerErrorHandler:
         return self._listener_error_handler
 
@@ -260,10 +206,10 @@ class App:
     # standalone server
 
     def start(self, port: int = 3000, path: str = "/slack/events") -> None:
-        self.server = SlackAppServer(
+        self._development_server = SlackAppDevelopmentServer(
             port=port, path=path, app=self, oauth_flow=self.oauth_flow,
         )
-        self.server.start()
+        self._development_server.start()
 
     # -------------------------
     # main dispatcher
@@ -283,6 +229,10 @@ class App:
                 self._framework_logger.debug(f"Applying {middleware.name}")
             resp = middleware.process(req=req, resp=resp, next=middleware_next)
             if not middleware_state["next_called"]:
+                if resp is None:
+                    return BoltResponse(
+                        status=404, body={"error": "no next() calls in middleware"}
+                    )
                 return resp
 
         for listener in self._listeners:
@@ -306,7 +256,7 @@ class App:
                 if listener_response is not None:
                     return listener_response
 
-        self._framework_logger.warning(f"Unhandled request ({req.payload})")
+        self._framework_logger.warning(f"Unhandled request ({req.body})")
         return BoltResponse(status=404, body={"error": "unhandled request"})
 
     def run_listener(
@@ -346,7 +296,8 @@ class App:
                         self.lazy_listener_runner.run(
                             function=lazy_func, request=request
                         )
-                        return None
+                        # This HTTP response won't be sent to Slack API servers.
+                        return BoltResponse(status=200)
                     else:
                         continue
                 else:
@@ -372,16 +323,20 @@ class App:
                     except Exception as e:
                         # The default response status code is 500 in this case.
                         # You can customize this by passing your own error handler.
-                        if response is None:
-                            response = BoltResponse(status=500)
-                        response.status = 500
-                        if ack.response is not None:  # already acknowledged
-                            response = None
-
-                        self._listener_error_handler.handle(
-                            error=e, request=request, response=response,
-                        )
-                        ack.response = response
+                        if listener.auto_acknowledgement:
+                            self._listener_error_handler.handle(
+                                error=e, request=request, response=response,
+                            )
+                        else:
+                            if response is None:
+                                response = BoltResponse(status=500)
+                            response.status = 500
+                            if ack.response is not None:  # already acknowledged
+                                response = None
+                            self._listener_error_handler.handle(
+                                error=e, request=request, response=response,
+                            )
+                            ack.response = response
 
                 self._listener_executor.submit(run_ack_function_asynchronously)
 
@@ -392,7 +347,8 @@ class App:
                         self.lazy_listener_runner.run(
                             function=lazy_func, request=request
                         )
-                        return None
+                        # This HTTP response won't be sent to Slack API servers.
+                        return BoltResponse(status=200)
                     else:
                         continue
                 else:
@@ -428,7 +384,7 @@ class App:
 
     @staticmethod
     def _build_lazy_request(request: BoltRequest, lazy_func_name: str) -> BoltRequest:
-        copied_request = _copy_object(request)
+        copied_request = create_copy(request)
         copied_request.method = "NONE"
         copied_request.lazy_only = True
         copied_request.lazy_function_name = lazy_func_name
@@ -586,13 +542,13 @@ class App:
 
     def block_action(
         self,
-        action_id: Union[str, Pattern],
+        constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
     ):
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.block_action(action_id)
+            primary_matcher = builtin_matchers.block_action(constraints)
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -799,19 +755,29 @@ class App:
 # -------------------------
 
 
-class SlackAppServer:
+class SlackAppDevelopmentServer:
     def __init__(
         self, port: int, path: str, app: App, oauth_flow: Optional[OAuthFlow] = None,
     ):
+        """Slack App Development Server
+
+        This is a thin wrapper of http.server.HTTPServer and is good enough
+        for your local development or prototyping.
+
+        However, as mentioned in Python official documents, using http.server module in production
+        is not recommended. Please consider using an adapter (refer to slack_bolt.adapter.*)
+        along with a production-grade server when running the app for end users.
+        https://docs.python.org/3/library/http.server.html#http.server.HTTPServer
+        """
         self._port: int = port
         self._bolt_endpoint_path: str = path
         self._bolt_app: App = app
-        self._bolt_oauth_flow: OAuthFlow = oauth_flow
+        self._bolt_oauth_flow: Optional[OAuthFlow] = oauth_flow
 
         _port: int = self._port
         _bolt_endpoint_path: str = self._bolt_endpoint_path
         _bolt_app: App = self._bolt_app
-        _bolt_oauth_flow: OAuthFlow = self._bolt_oauth_flow
+        _bolt_oauth_flow: Optional[OAuthFlow] = self._bolt_oauth_flow
 
         class SlackAppHandler(SimpleHTTPRequestHandler):
             def do_GET(self):
@@ -877,9 +843,9 @@ class SlackAppServer:
 
     def start(self):
         if self._bolt_app.logger.level > logging.INFO:
-            print("⚡️ Bolt app is running!")
+            print("⚡️ Bolt app is running! (development server)")
         else:
-            self._bolt_app.logger.info("⚡️ Bolt app is running!")
+            self._bolt_app.logger.info("⚡️ Bolt app is running! (development server)")
 
         try:
             self._server.serve_forever(0.05)

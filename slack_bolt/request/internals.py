@@ -28,12 +28,14 @@ def parse_query(
         raise ValueError(f"Unsupported type of query detected ({type(query)})")
 
 
-def parse_payload(body: str, content_type: Optional[str]) -> Dict[str, Any]:
+def parse_body(body: str, content_type: Optional[str]) -> Dict[str, Any]:
     if not body:
         return {}
-    if content_type == "application/json" or body.startswith("{"):
+    if (
+        content_type is not None and content_type == "application/json"
+    ) or body.startswith("{"):
         return json.loads(body)
-    elif content_type == "application/x-www-form-urlencoded":
+    else:
         if "payload" in body:
             params = dict(parse_qsl(body))
             if "payload" in params:
@@ -42,8 +44,6 @@ def parse_payload(body: str, content_type: Optional[str]) -> Dict[str, Any]:
                 return {}
         else:
             return dict(parse_qsl(body))
-    else:
-        return {}
 
 
 def extract_enterprise_id(payload: Dict[str, Any]) -> Optional[str]:
@@ -104,6 +104,9 @@ def extract_channel_id(payload: Dict[str, Any]) -> Optional[str]:
         return payload.get("channel_id")
     if "event" in payload:
         return extract_channel_id(payload["event"])
+    if "item" in payload:
+        # reaction_added: body["event"]["item"]
+        return extract_channel_id(payload["item"])
     return None
 
 

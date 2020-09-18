@@ -1,6 +1,7 @@
 import json
 import re
 from time import time
+from urllib.parse import quote
 
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
@@ -11,6 +12,7 @@ from starlette.testclient import TestClient
 
 from slack_bolt.adapter.starlette import SlackRequestHandler
 from slack_bolt.app import App
+from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -39,8 +41,13 @@ class TestStarlette:
         )
 
     def build_headers(self, timestamp: str, body: str):
+        content_type = (
+            "application/json"
+            if body.startswith("{")
+            else "application/x-www-form-urlencoded"
+        )
         return {
-            "content-type": "application/x-www-form-urlencoded",
+            "content-type": content_type,
             "x-slack-signature": self.generate_signature(body, timestamp),
             "x-slack-request-timestamp": timestamp,
         }
@@ -55,7 +62,7 @@ class TestStarlette:
 
         app_handler = SlackRequestHandler(app)
 
-        payload = {
+        input = {
             "token": "verification_token",
             "team_id": "T111",
             "enterprise_id": "E111",
@@ -75,7 +82,7 @@ class TestStarlette:
             "event_time": 1595926230,
             "authed_users": ["W111"],
         }
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), json.dumps(input)
 
         async def endpoint(req: Request):
             return await app_handler.handle(req)
@@ -101,7 +108,7 @@ class TestStarlette:
 
         app_handler = SlackRequestHandler(app)
 
-        payload = {
+        input = {
             "type": "shortcut",
             "token": "verification_token",
             "action_ts": "111.111",
@@ -116,7 +123,7 @@ class TestStarlette:
             "trigger_id": "111.111.xxxxxx",
         }
 
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
 
         async def endpoint(req: Request):
             return await app_handler.handle(req)
@@ -142,7 +149,7 @@ class TestStarlette:
 
         app_handler = SlackRequestHandler(app)
 
-        payload = (
+        input = (
             "token=verification_token"
             "&team_id=T111"
             "&team_domain=test-domain"
@@ -157,7 +164,7 @@ class TestStarlette:
             "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
             "&trigger_id=111.111.xxx"
         )
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), input
 
         async def endpoint(req: Request):
             return await app_handler.handle(req)
@@ -177,9 +184,11 @@ class TestStarlette:
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
-            client_id="111.111",
-            client_secret="xxx",
-            scopes=["chat:write", "commands"],
+            oauth_settings=OAuthSettings(
+                client_id="111.111",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+            ),
         )
         app_handler = SlackRequestHandler(app)
 

@@ -42,11 +42,11 @@ class TestMessage:
         }
 
     def build_request(self) -> BoltRequest:
-        timestamp, body = str(int(time.time())), json.dumps(message_payload)
+        timestamp, body = str(int(time.time())), json.dumps(message_body)
         return BoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
     def build_request2(self) -> BoltRequest:
-        timestamp, body = str(int(time.time())), json.dumps(message_payload2)
+        timestamp, body = str(int(time.time())), json.dumps(message_body2)
         return BoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
     def test_string_keyword(self):
@@ -114,7 +114,7 @@ class TestMessage:
         assert self.mock_received_requests["/auth.test"] == 1
 
 
-message_payload = {
+message_body = {
     "token": "verification_token",
     "team_id": "T111",
     "enterprise_id": "E111",
@@ -149,12 +149,13 @@ message_payload = {
 }
 
 
-def whats_up(payload, say):
-    assert payload == message_payload
+def whats_up(body, payload, message, say):
+    assert body == message_body
+    assert payload == message
     say("What's up?")
 
 
-message_payload2 = {
+message_body2 = {
     "token": "verification_token",
     "team_id": "T111",
     "enterprise_id": "E111",
@@ -177,7 +178,9 @@ message_payload2 = {
 }
 
 
-def verify_matches(context, say):
+def verify_matches(context, say, body, payload, message):
     assert context["matches"] == ("103", "you")
     assert context.matches == ("103", "you")
+    assert body["event"] == message
+    assert payload == message
     say("Thanks!")

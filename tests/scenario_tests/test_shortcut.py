@@ -160,7 +160,7 @@ class TestShortcut:
         assert self.mock_received_requests["/auth.test"] == 3
 
 
-global_shortcut_payload = {
+global_shortcut_body = {
     "type": "shortcut",
     "token": "verification_token",
     "action_ts": "111.111",
@@ -175,7 +175,7 @@ global_shortcut_payload = {
     "trigger_id": "111.111.xxxxxx",
 }
 
-message_shortcut_payload = {
+message_shortcut_body = {
     "type": "message_action",
     "token": "verification_token",
     "action_ts": "1583637157.207593",
@@ -216,9 +216,11 @@ message_shortcut_payload = {
     "response_url": "https://hooks.slack.com/app/T111/111/xxx",
 }
 
-global_shortcut_raw_body = f"payload={quote(json.dumps(global_shortcut_payload))}"
-message_shortcut_raw_body = f"payload={quote(json.dumps(message_shortcut_payload))}"
+global_shortcut_raw_body = f"payload={quote(json.dumps(global_shortcut_body))}"
+message_shortcut_raw_body = f"payload={quote(json.dumps(message_shortcut_body))}"
 
 
-def simple_listener(ack):
+def simple_listener(ack, body, payload, shortcut):
+    assert body == shortcut
+    assert payload == shortcut
     ack()

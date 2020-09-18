@@ -10,10 +10,19 @@ logging.basicConfig(level=logging.DEBUG)
 app = AsyncApp()
 
 
+from slack_bolt.async_app import AsyncApp
+
+app = AsyncApp()
+
+@app.command("/hello-bolt-python")
+async def command(ack, body, respond):
+    await ack()
+    await respond(f"Hi <@{body['user_id']}>!")
+
 # Middleware
 @app.middleware  # or app.use(log_request)
-async def log_request(logger, payload, next):
-    logger.info(payload)
+async def log_request(logger, body, next):
+    logger.info(body)
     return await next()
 
 
@@ -26,12 +35,12 @@ async def event_test(say):
 # Interactivity: https://api.slack.com/interactivity
 @app.shortcut("callback-id-here")
 # @app.command("/hello-bolt-python")
-async def open_modal(ack, client, logger, payload):
+async def open_modal(ack, client, logger, body):
     # acknowledge the incoming request from Slack immediately
     await ack()
     # open a modal
     api_response = await client.views_open(
-        trigger_id=payload["trigger_id"],
+        trigger_id=body["trigger_id"],
         view={
             "type": "modal",
             "callback_id": "view-id",
@@ -51,10 +60,10 @@ async def open_modal(ack, client, logger, payload):
 
 
 @app.view("view-id")
-async def view_submission(ack, payload, logger):
+async def view_submission(ack, view, logger):
     await ack()
     # Prints {'b': {'a': {'type': 'plain_text_input', 'value': 'Your Input'}}}
-    logger.info(payload["view"]["state"]["values"])
+    logger.info(view["state"]["values"])
 
 
 if __name__ == "__main__":

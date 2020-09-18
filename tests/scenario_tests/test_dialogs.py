@@ -49,6 +49,30 @@ class TestAttachmentActions:
         resp = self.web_client.api_test()
         assert resp != None
 
+    def test_success_without_type(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app.options("dialog-callback-id")(handle_suggestion)
+        app.action("dialog-callback-id")(handle_submission_cancellation)
+
+        request = self.build_valid_request(suggestion_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert response.body != ""
+        assert response.headers["content-type"][0] == "application/json;charset=utf-8"
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        request = self.build_valid_request(submission_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert response.body == ""
+        assert self.mock_received_requests["/auth.test"] == 2
+
+        request = self.build_valid_request(cancellation_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert response.body == ""
+        assert self.mock_received_requests["/auth.test"] == 3
+
     def test_success(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
         app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-id"})(
@@ -169,6 +193,18 @@ class TestAttachmentActions:
         assert response.body == ""
         assert self.mock_received_requests["/auth.test"] == 3
 
+    def test_suggestion_failure_without_type(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        request = self.build_valid_request(suggestion_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app.options("dialog-callback-iddddd")(handle_suggestion)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
     def test_suggestion_failure(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
         request = self.build_valid_request(suggestion_raw_body)
@@ -195,6 +231,18 @@ class TestAttachmentActions:
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 2
 
+    def test_submission_failure_without_type(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        request = self.build_valid_request(suggestion_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app.action("dialog-callback-iddddd")(handle_submission)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
     def test_submission_failure(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
         request = self.build_valid_request(suggestion_raw_body)
@@ -217,6 +265,18 @@ class TestAttachmentActions:
         app.action(
             {"type": "dialog_submission", "callback_id": "dialog-callback-iddddd"}
         )(handle_submission)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    def test_cancellation_failure_without_type(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        request = self.build_valid_request(suggestion_raw_body)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app.action("dialog-callback-iddddd")(handle_cancellation)
         response = app.dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 2
@@ -248,7 +308,7 @@ class TestAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 2
 
 
-suggestion_payload = {
+suggestion_body = {
     "type": "dialog_suggestion",
     "token": "verification_token",
     "action_ts": "1596603332.676855",
@@ -266,7 +326,7 @@ suggestion_payload = {
     "state": "Limo",
 }
 
-submission_payload = {
+submission_body = {
     "type": "dialog_submission",
     "token": "verification_token",
     "action_ts": "1596603334.328193",
@@ -288,7 +348,7 @@ submission_payload = {
     "state": "Limo",
 }
 
-cancellation_payload = {
+cancellation_body = {
     "type": "dialog_cancellation",
     "token": "verification_token",
     "action_ts": "1596603453.047897",
@@ -305,9 +365,9 @@ cancellation_payload = {
     "state": "Limo",
 }
 
-suggestion_raw_body = f"payload={quote(json.dumps(suggestion_payload))}"
-submission_raw_body = f"payload={quote(json.dumps(submission_payload))}"
-cancellation_raw_body = f"payload={quote(json.dumps(cancellation_payload))}"
+suggestion_raw_body = f"payload={quote(json.dumps(suggestion_body))}"
+submission_raw_body = f"payload={quote(json.dumps(submission_body))}"
+cancellation_raw_body = f"payload={quote(json.dumps(cancellation_body))}"
 
 
 def handle_submission(ack):
@@ -326,9 +386,19 @@ options_response = {
 }
 
 
-def handle_suggestion(ack):
+def handle_suggestion(ack, body, payload, options):
+    assert body == options
+    assert payload == options
     ack(options_response)
 
 
-def handle_cancellation(ack):
+def handle_cancellation(ack, body, payload, action):
+    assert body == action
+    assert payload == action
+    ack()
+
+
+def handle_submission_cancellation(ack, body, payload, action):
+    assert body == action
+    assert payload == action
     ack()

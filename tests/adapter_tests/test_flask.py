@@ -1,5 +1,6 @@
 import json
 from time import time
+from urllib.parse import quote
 
 from flask import Flask, request
 from slack_sdk.signature import SignatureVerifier
@@ -7,6 +8,7 @@ from slack_sdk.web import WebClient
 
 from slack_bolt.adapter.flask import SlackRequestHandler
 from slack_bolt.app import App
+from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -35,8 +37,13 @@ class TestFlask:
         )
 
     def build_headers(self, timestamp: str, body: str):
+        content_type = (
+            "application/json"
+            if body.startswith("{")
+            else "application/x-www-form-urlencoded"
+        )
         return {
-            "content-type": ["application/x-www-form-urlencoded"],
+            "content-type": [content_type],
             "x-slack-signature": [self.generate_signature(body, timestamp)],
             "x-slack-request-timestamp": [timestamp],
         }
@@ -49,7 +56,7 @@ class TestFlask:
 
         app.event("app_mention")(event_handler)
 
-        payload = {
+        input = {
             "token": "verification_token",
             "team_id": "T111",
             "enterprise_id": "E111",
@@ -69,7 +76,7 @@ class TestFlask:
             "event_time": 1595926230,
             "authed_users": ["W111"],
         }
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), json.dumps(input)
 
         flask_app = Flask(__name__)
 
@@ -92,7 +99,7 @@ class TestFlask:
 
         app.shortcut("test-shortcut")(shortcut_handler)
 
-        payload = {
+        input = {
             "type": "shortcut",
             "token": "verification_token",
             "action_ts": "111.111",
@@ -107,7 +114,7 @@ class TestFlask:
             "trigger_id": "111.111.xxxxxx",
         }
 
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
 
         flask_app = Flask(__name__)
 
@@ -130,7 +137,7 @@ class TestFlask:
 
         app.command("/hello-world")(command_handler)
 
-        payload = (
+        input = (
             "token=verification_token"
             "&team_id=T111"
             "&team_domain=test-domain"
@@ -145,7 +152,7 @@ class TestFlask:
             "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
             "&trigger_id=111.111.xxx"
         )
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), input
 
         flask_app = Flask(__name__)
 
@@ -164,9 +171,11 @@ class TestFlask:
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
-            client_id="111.111",
-            client_secret="xxx",
-            scopes=["chat:write", "commands"],
+            oauth_settings=OAuthSettings(
+                client_id="111.111",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+            ),
         )
         flask_app = Flask(__name__)
 

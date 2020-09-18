@@ -1,4 +1,5 @@
 import logging
+import time
 
 from chalice import Chalice, Response
 
@@ -10,15 +11,22 @@ bolt_app = App(process_before_response=True, authorization_test_enabled=False,)
 
 
 @bolt_app.event("app_mention")
-def handle_app_mentions(payload, say, logger):
-    logger.info(payload)
+def handle_app_mentions(body, say, logger):
+    logger.info(body)
     say("What's up? I'm a Chalice app :wave:")
 
 
-@bolt_app.command("/hello-bolt-python-chalice")
 def respond_to_slack_within_3_seconds(ack):
-    ack("Thanks!")
+    ack("Accepted!")
 
+def say_it(say):
+    time.sleep(5)
+    say("Done!")
+
+bolt_app.command("/hello-bolt-python-chalice")(
+    ack=respond_to_slack_within_3_seconds,
+    lazy=[say_it]
+)
 
 ChaliceSlackRequestHandler.clear_all_log_handlers()
 logging.basicConfig(format="%(asctime)s %(message)s", level=logging.DEBUG)

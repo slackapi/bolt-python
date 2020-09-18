@@ -1,17 +1,21 @@
 import json
 from time import time
+from urllib.parse import quote
 
+from moto import mock_lambda
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 
 from slack_bolt.adapter.aws_lambda import SlackRequestHandler
+from slack_bolt.adapter.aws_lambda.handler import not_found
+from slack_bolt.adapter.aws_lambda.internals import _first_value
 from slack_bolt.app import App
+from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
-from moto import mock_lambda
 
 
 class LambdaContext:
@@ -44,11 +48,31 @@ class TestAWSLambda:
         )
 
     def build_headers(self, timestamp: str, body: str):
+        content_type = (
+            "application/json"
+            if body.startswith("{")
+            else "application/x-www-form-urlencoded"
+        )
         return {
-            "content-type": ["application/x-www-form-urlencoded"],
+            "content-type": [content_type],
             "x-slack-signature": [self.generate_signature(body, timestamp)],
             "x-slack-request-timestamp": [timestamp],
         }
+
+    def test_not_found(self):
+        response = not_found()
+        assert response["statusCode"] == 404
+
+    def test_first_value(self):
+        assert _first_value({"foo": [1, 2, 3]}, "foo") == 1
+        assert _first_value({"foo": []}, "foo") is None
+        assert _first_value({}, "foo") is None
+
+    @mock_lambda
+    def test_clear_all_log_handlers(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        handler = SlackRequestHandler(app)
+        handler.clear_all_log_handlers()
 
     @mock_lambda
     def test_events(self):
@@ -59,7 +83,7 @@ class TestAWSLambda:
 
         app.event("app_mention")(event_handler)
 
-        payload = {
+        input = {
             "token": "verification_token",
             "team_id": "T111",
             "enterprise_id": "E111",
@@ -79,7 +103,7 @@ class TestAWSLambda:
             "event_time": 1595926230,
             "authed_users": ["W111"],
         }
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), json.dumps(input)
         event = {
             "body": body,
             "queryStringParameters": {},
@@ -100,7 +124,7 @@ class TestAWSLambda:
 
         app.shortcut("test-shortcut")(shortcut_handler)
 
-        payload = {
+        input = {
             "type": "shortcut",
             "token": "verification_token",
             "action_ts": "111.111",
@@ -115,7 +139,7 @@ class TestAWSLambda:
             "trigger_id": "111.111.xxxxxx",
         }
 
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
         event = {
             "body": body,
             "queryStringParameters": {},
@@ -136,7 +160,7 @@ class TestAWSLambda:
 
         app.command("/hello-world")(command_handler)
 
-        payload = (
+        input = (
             "token=verification_token"
             "&team_id=T111"
             "&team_domain=test-domain"
@@ -151,7 +175,7 @@ class TestAWSLambda:
             "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
             "&trigger_id=111.111.xxx"
         )
-        timestamp, body = str(int(time())), json.dumps(payload)
+        timestamp, body = str(int(time())), input
         event = {
             "body": body,
             "queryStringParameters": {},
@@ -164,13 +188,58 @@ class TestAWSLambda:
         assert self.mock_received_requests["/auth.test"] == 1
 
     @mock_lambda
+    def test_lazy_listeners(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+
+        def command_handler(ack):
+            ack()
+
+        def say_it(say):
+            say("Done!")
+
+        app.command("/hello-world")(ack=command_handler, lazy=[say_it])
+
+        input = (
+            "token=verification_token"
+            "&team_id=T111"
+            "&team_domain=test-domain"
+            "&channel_id=C111"
+            "&channel_name=random"
+            "&user_id=W111"
+            "&user_name=primary-owner"
+            "&command=%2Fhello-world"
+            "&text=Hi"
+            "&enterprise_id=E111"
+            "&enterprise_name=Org+Name"
+            "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
+            "&trigger_id=111.111.xxx"
+        )
+        timestamp, body = str(int(time())), input
+        headers = self.build_headers(timestamp, body)
+        headers["x-slack-bolt-lazy-only"] = "1"
+        headers["x-slack-bolt-lazy-function-name"] = "say_it"
+        event = {
+            "body": body,
+            "queryStringParameters": {},
+            "headers": headers,
+            "requestContext": {"http": {"method": "NONE"}},
+            "isBase64Encoded": False,
+        }
+        response = SlackRequestHandler(app).handle(event, self.context)
+        assert response["statusCode"] == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
+    @mock_lambda
     def test_oauth(self):
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
-            client_id="111.111",
-            client_secret="xxx",
-            scopes=["chat:write", "commands"],
+            oauth_settings=OAuthSettings(
+                client_id="111.111",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+            ),
         )
 
         event = {

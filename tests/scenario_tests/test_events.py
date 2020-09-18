@@ -39,7 +39,7 @@ class TestEvents:
             "x-slack-request-timestamp": [timestamp],
         }
 
-    valid_event_payload = {
+    valid_event_body = {
         "token": "verification_token",
         "team_id": "T111",
         "enterprise_id": "E111",
@@ -68,11 +68,13 @@ class TestEvents:
         app = App(client=self.web_client, signing_secret=self.signing_secret)
 
         @app.event("app_mention")
-        def handle_app_mention(payload, say):
-            assert payload == self.valid_event_payload
+        def handle_app_mention(body, say, payload, event):
+            assert body == self.valid_event_body
+            assert body["event"] == payload
+            assert payload == event
             say("What's up?")
 
-        timestamp, body = str(int(time())), json.dumps(self.valid_event_payload)
+        timestamp, body = str(int(time())), json.dumps(self.valid_event_body)
         request: BoltRequest = BoltRequest(
             body=body, headers=self.build_headers(timestamp, body)
         )
@@ -90,13 +92,72 @@ class TestEvents:
             pass
 
         @app.event("app_mention", middleware=[skip_middleware])
-        def handle_app_mention(payload, logger):
+        def handle_app_mention(body, logger, payload, event):
+            assert body["event"] == payload
+            assert payload == event
             logger.info(payload)
 
-        timestamp, body = str(int(time())), json.dumps(self.valid_event_payload)
+        timestamp, body = str(int(time())), json.dumps(self.valid_event_body)
         request: BoltRequest = BoltRequest(
             body=body, headers=self.build_headers(timestamp, body)
         )
         response = app.dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 1
+
+    valid_reaction_added_body = {
+        "token": "verification_token",
+        "team_id": "T111",
+        "enterprise_id": "E111",
+        "api_app_id": "A111",
+        "event": {
+            "type": "reaction_added",
+            "user": "W111",
+            "item": {"type": "message", "channel": "C111", "ts": "1599529504.000400"},
+            "reaction": "heart_eyes",
+            "item_user": "W111",
+            "event_ts": "1599616881.000800",
+        },
+        "type": "event_callback",
+        "event_id": "Ev111",
+        "event_time": 1599616881,
+        "authed_users": ["W111"],
+    }
+
+    def test_reaction_added(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+
+        @app.event("reaction_added")
+        def handle_app_mention(body, say, payload, event):
+            assert body == self.valid_reaction_added_body
+            assert body["event"] == payload
+            assert payload == event
+            say("What's up?")
+
+        timestamp, body = str(int(time())), json.dumps(self.valid_reaction_added_body)
+        request: BoltRequest = BoltRequest(
+            body=body, headers=self.build_headers(timestamp, body)
+        )
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+        sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
+    def test_stable_auto_ack(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+
+        @app.event("reaction_added")
+        def handle_app_mention():
+            raise Exception("Something wrong!")
+
+        for _ in range(10):
+            timestamp, body = (
+                str(int(time())),
+                json.dumps(self.valid_reaction_added_body),
+            )
+            request: BoltRequest = BoltRequest(
+                body=body, headers=self.build_headers(timestamp, body)
+            )
+            response = app.dispatch(request)
+            assert response.status == 200

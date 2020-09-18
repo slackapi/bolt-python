@@ -31,17 +31,17 @@ app = App()
 
 @app.middleware  # or app.use(log_request)
 def log_request(
-    logger: Logger, payload: dict, next: Callable[[], BoltResponse]
+    logger: Logger, body: dict, next: Callable[[], BoltResponse]
 ) -> BoltResponse:
-    logger.debug(payload)
+    logger.debug(body)
     return next()
 
 
 @app.command("/hello-bolt-python")
 def handle_command(
-    payload: dict, ack: Ack, respond: Respond, client: WebClient, logger: Logger
+    body: dict, ack: Ack, respond: Respond, client: WebClient, logger: Logger
 ) -> None:
-    logger.info(payload)
+    logger.info(body)
     ack(
         text="Accepted!",
         blocks=[
@@ -69,7 +69,7 @@ def handle_command(
     )
 
     res = client.views_open(
-        trigger_id=payload["trigger_id"],
+        trigger_id=body["trigger_id"],
         view=View(
             type="modal",
             callback_id="view-id",
@@ -130,16 +130,16 @@ def show_multi_options(ack: Ack) -> None:
 
 
 @app.view("view-id")
-def view_submission(ack: Ack, payload: dict, logger: Logger) -> None:
+def view_submission(ack: Ack, body: dict, logger: Logger) -> None:
     ack()
-    logger.info(payload["view"]["state"]["values"])
+    logger.info(body["view"]["state"]["values"])
 
 
 @app.action("a")
-def button_click(ack: Ack, payload: dict, respond: Respond) -> None:
+def button_click(ack: Ack, body: dict, respond: Respond) -> None:
     ack()
 
-    user_id: str = payload["user"]["id"]
+    user_id: str = body["user"]["id"]
     # in_channel / dict
     respond(
         response_type="in_channel",

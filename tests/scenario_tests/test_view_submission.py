@@ -107,7 +107,7 @@ class TestViewSubmission:
         assert self.mock_received_requests["/auth.test"] == 2
 
 
-payload = {
+body = {
     "type": "view_submission",
     "team": {
         "id": "T111",
@@ -158,10 +158,12 @@ payload = {
     "response_urls": [],
 }
 
-raw_body = f"payload={quote(json.dumps(payload))}"
+raw_body = f"payload={quote(json.dumps(body))}"
 
 
-def simple_listener(ack, body):
+def simple_listener(ack, body, payload, view):
     assert body["trigger_id"] == "111.222.valid"
-    assert body["view"]["private_metadata"] == "This is for you!"
+    assert body["view"] == payload
+    assert payload == view
+    assert view["private_metadata"] == "This is for you!"
     ack()

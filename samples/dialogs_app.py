@@ -9,23 +9,23 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG)
 
-from slack_bolt import App
+from slack_bolt import App, Ack
 
 app = App()
 
 
 @app.middleware  # or app.use(log_request)
-def log_request(logger, payload, next):
-    logger.debug(payload)
+def log_request(logger, body, next):
+    logger.debug(body)
     return next()
 
 
 @app.command("/hello-bolt-python")
-def test_command(payload, client, ack, logger):
-    logger.info(payload)
+def test_command(body, client, ack, logger):
+    logger.info(body)
     ack("I got it!")
     res = client.dialog_open(
-        trigger_id=payload["trigger_id"],
+        trigger_id=body["trigger_id"],
         dialog={
             "callback_id": "dialog-callback-id",
             "title": "Request a Ride",
@@ -51,12 +51,53 @@ def test_command(payload, client, ack, logger):
     logger.info(res)
 
 
-@app.action({"type": "dialog_submission", "callback_id": "dialog-callback-id"})
-def dialog_submission(ack):
-    ack()
+@app.action("dialog-callback-id")
+def dialog_submission_or_cancellation(ack: Ack, body: dict):
+    if body["type"] == "dialog_cancellation":
+        # This can be sent only when notify_on_cancel is True
+        ack()
+        return
+
+    errors = []
+    submission = body["submission"]
+    if len(submission["loc_origin"]) <= 3:
+        errors = [
+            {
+                "name": "loc_origin",
+                "error": "Pickup Location must be longer than 3 characters"
+            }
+        ]
+    if len(errors) > 0:
+        # or ack({"errors": errors})
+        ack(errors=errors)
+    else:
+        ack()
 
 
-@app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-id"})
+# @app.action({"type": "dialog_submission", "callback_id": "dialog-callback-id"})
+# def dialog_submission_or_cancellation(ack: Ack, body: dict):
+#     errors = []
+#     submission = body["submission"]
+#     if len(submission["loc_origin"]) <= 3:
+#         errors = [
+#             {
+#                 "name": "loc_origin",
+#                 "error": "Pickup Location must be longer than 3 characters"
+#             }
+#         ]
+#     if len(errors) > 0:
+#         # or ack({"errors": errors})
+#         ack(errors=errors)
+#     else:
+#         ack()
+#
+# @app.action({"type": "dialog_cancellation", "callback_id": "dialog-callback-id"})
+# def dialog_cancellation(ack):
+#     ack()
+
+
+# @app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-id"})
+@app.options("dialog-callback-id")
 def dialog_suggestion(ack):
     ack(
         {
@@ -74,10 +115,6 @@ def dialog_suggestion(ack):
         }
     )
 
-
-@app.action({"type": "dialog_cancellation", "callback_id": "dialog-callback-id"})
-def dialog_cancellation(ack):
-    ack()
 
 
 if __name__ == "__main__":

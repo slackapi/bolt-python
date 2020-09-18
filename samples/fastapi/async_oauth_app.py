@@ -6,16 +6,21 @@ sys.path.insert(1, "../..")
 # ------------------------------------------------
 
 from slack_bolt.async_app import AsyncApp
-from slack_bolt.adapter.fastapi import AsyncSlackRequestHandler
+from slack_bolt.adapter.fastapi.async_handler import AsyncSlackRequestHandler
 
 app = AsyncApp()
 app_handler = AsyncSlackRequestHandler(app)
 
 
 @app.event("app_mention")
-async def handle_app_mentions(payload, say, logger):
-    logger.info(payload)
+async def handle_app_mentions(body, say, logger):
+    logger.info(body)
     await say("What's up?")
+
+
+@app.event("message")
+async def handle_message():
+    pass
 
 
 from fastapi import FastAPI, Request

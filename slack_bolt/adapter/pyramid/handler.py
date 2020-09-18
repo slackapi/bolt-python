@@ -8,10 +8,14 @@ from slack_bolt.oauth import OAuthFlow
 
 
 def to_bolt_request(request: Request) -> BoltRequest:
+    body: str = ""
+    if request.body is not None:
+        if isinstance(request.body, bytes):
+            body = request.body.decode("utf-8")
+        else:
+            body = request.body
     bolt_req = BoltRequest(
-        body=request.body.decode("utf-8"),
-        query=request.query_string,
-        headers=request.headers,
+        body=body, query=request.query_string, headers=request.headers,
     )
     return bolt_req
 

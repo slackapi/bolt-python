@@ -1,11 +1,12 @@
-from typing import Optional, List, Union, Any
+from typing import Optional, List, Union, Any, Dict
 
 from slack_sdk.models.attachments import Attachment
 from slack_sdk.models.blocks import Block, Option, OptionGroup
+from slack_sdk.models.views import View
 
 from slack_bolt.error import BoltError
 from slack_bolt.response import BoltResponse
-from slack_bolt.util.utils import convert_to_dict_list
+from slack_bolt.util.utils import convert_to_dict_list, convert_to_dict
 
 
 def _set_response(
@@ -13,30 +14,63 @@ def _set_response(
     text_or_whole_response: Union[str, dict] = "",
     blocks: Optional[List[Union[dict, Block]]] = None,
     attachments: Optional[List[Union[dict, Attachment]]] = None,
+    response_type: Optional[str] = None,  # in_channel / ephemeral
+    # block_suggestion / dialog_suggestion
     options: Optional[List[Union[dict, Option]]] = None,
     option_groups: Optional[List[Union[dict, OptionGroup]]] = None,
+    # view_submission
+    response_action: Optional[str] = None,
+    errors: Optional[Union[Dict[str, str], List[Dict[str, str]]]] = None,
+    view: Optional[Union[dict, View]] = None,
 ) -> BoltResponse:
     if isinstance(text_or_whole_response, str):
         text: str = text_or_whole_response
+        body = {"text": text}
+        if response_type:
+            body["response_type"] = response_type
         if attachments and len(attachments) > 0:
-            self.response = BoltResponse(
-                status=200,
-                body={"text": text, "attachments": convert_to_dict_list(attachments),},
+            body.update(
+                {"text": text, "attachments": convert_to_dict_list(attachments)}
             )
+            self.response = BoltResponse(status=200, body=body)
         elif blocks and len(blocks) > 0:
-            self.response = BoltResponse(
-                status=200, body={"text": text, "blocks": convert_to_dict_list(blocks),}
-            )
+            body.update({"text": text, "blocks": convert_to_dict_list(blocks)})
+            self.response = BoltResponse(status=200, body=body)
         elif options and len(options) > 0:
-            self.response = BoltResponse(
-                status=200, body={"options": convert_to_dict_list(options),}
-            )
+            body = {"options": convert_to_dict_list(options)}
+            self.response = BoltResponse(status=200, body=body)
         elif option_groups and len(option_groups) > 0:
-            self.response = BoltResponse(
-                status=200, body={"option_groups": convert_to_dict_list(option_groups),}
-            )
+            body = {"option_groups": convert_to_dict_list(option_groups)}
+            self.response = BoltResponse(status=200, body=body)
+        elif response_action:
+            # These patterns are in response to view_submission requests
+            if response_action == "errors":
+                if errors:
+                    self.response = BoltResponse(
+                        status=200,
+                        body={
+                            "response_action": response_action,
+                            "errors": convert_to_dict(errors),
+                        },
+                    )
+                else:
+                    raise ValueError(
+                        f"errors field is required for response_action: errors"
+                    )
+            else:
+                body = {"response_action": response_action}
+                if view:
+                    body["view"] = convert_to_dict(view)
+                self.response = BoltResponse(status=200, body=body)
+        elif errors:
+            # dialogs: errors without response_action
+            body = {"errors": convert_to_dict_list(errors)}
+            self.response = BoltResponse(status=200, body=body)
         else:
-            self.response = BoltResponse(status=200, body=text)
+            if len(body) == 1 and "text" in body:
+                self.response = BoltResponse(status=200, body=body["text"])
+            else:
+                self.response = BoltResponse(status=200, body=body)
         return self.response
     elif isinstance(text_or_whole_response, dict):
         body = text_or_whole_response
@@ -48,6 +82,16 @@ def _set_response(
             body["options"] = convert_to_dict_list(body["options"])
         if "option_groups" in body:
             body["option_groups"] = convert_to_dict_list(body["option_groups"])
+        if "errors" in body:
+            if body.get("response_action", "") == "errors":
+                # modal
+                body["errors"] = convert_to_dict(body["errors"])
+            else:
+                # dialog
+                body["errors"] = convert_to_dict_list(body["errors"])
+        if "view" in body:
+            body["view"] = convert_to_dict(body["view"])
+        # no modification for response_type, response_action here
 
         self.response = BoltResponse(status=200, body=body)
         return self.response

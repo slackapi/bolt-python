@@ -20,7 +20,7 @@ class ChaliceSlackRequestHandler:
         self.logger = get_bolt_app_logger(app.name, ChaliceSlackRequestHandler)
         self.app.lazy_listener_runner = ChaliceLazyListenerRunner(logger=self.logger)
         if self.app.oauth_flow is not None:
-            self.app.oauth_flow.redirect_uri_page_renderer.install_path = "?"
+            self.app.oauth_flow.settings.redirect_uri_page_renderer.install_path = "?"
 
     @classmethod
     def clear_all_log_handlers(cls):

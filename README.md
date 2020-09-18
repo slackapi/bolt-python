@@ -9,6 +9,7 @@ This project is **still in alpha**, and may have bugs in it. Also, the public AP
 [![Python Version][python-version]][pypi-url]
 [![pypi package][pypi-image]][pypi-url]
 [![Build Status][travis-image]][travis-url]
+[![Codecov][codecov-image]][codecov-url]
 
 A Python framework to build Slack apps in a flash with the latest platform features. Check the [samples](https://github.com/slackapi/bolt-python/tree/main/samples) to know how to use this framework.
 
@@ -34,12 +35,6 @@ from slack_bolt import App
 # export SLACK_BOT_TOKEN=xoxb-***
 app = App()
 
-# Middleware
-@app.middleware  # or app.use(log_request)
-def log_request(logger, payload, next):
-    logger.info(payload)
-    return next()
-
 # Events API: https://api.slack.com/events-api
 @app.event("app_mention")
 def event_test(say):
@@ -48,12 +43,12 @@ def event_test(say):
 # Interactivity: https://api.slack.com/interactivity
 @app.shortcut("callback-id-here")
 # @app.command("/hello-bolt-python")
-def open_modal(ack, client, logger, payload):
+def open_modal(ack, client, logger, body):
     # acknowledge the incoming request from Slack immediately
     ack()
     # open a modal
     api_response = client.views_open(
-        trigger_id=payload["trigger_id"],
+        trigger_id=body["trigger_id"],
         view={
             "type": "modal",
             "callback_id": "view-id",
@@ -83,10 +78,10 @@ def open_modal(ack, client, logger, payload):
     logger.debug(api_response)
 
 @app.view("view-id")
-def view_submission(ack, payload, logger):
+def view_submission(ack, view, logger):
     ack()
     # Prints {'b': {'a': {'type': 'plain_text_input', 'value': 'Your Input'}}}
-    logger.info(payload["view"]["state"]["values"])
+    logger.info(view["state"]["values"])
 
 if __name__ == "__main__":
     app.start(3000)  # POST http://localhost:3000/slack/events
@@ -103,6 +98,53 @@ python app.py
 ngrok http 3000
 ```
 
+## AsyncApp Setup
+
+If you prefer building Slack apps using [asyncio](https://docs.python.org/3/library/asyncio.html), you can go with `AsyncApp` instead. You can use async/await style for everything in the app. To use `AsyncApp`, [AIOHTTP](https://docs.aiohttp.org/en/stable/) library is required for asynchronous Slack Web API calls and the default web server.
+
+```bash
+python -m venv env
+source env/bin/activate
+pip install slack_bolt aiohttp
+```
+
+Import `slack_bolt.async_app.AsyncApp` instead of `slack_bolt.App`. All middleware/listeners must be async functions. Inside the functions, all utility methods such as `ack`, `say`, and `respond` requires `await` keyword.
+
+```python
+from slack_bolt.async_app import AsyncApp
+
+app = AsyncApp()
+
+@app.event("app_mention")
+async def event_test(body, say, logger):
+    logger.info(body)
+    await say("What's up?")
+
+@app.command("/hello-bolt-python")
+async def command(ack, body, respond):
+    await ack()
+    await respond(f"Hi <@{body['user_id']}>!")
+
+if __name__ == "__main__":
+    app.start(3000)
+```
+
+Starting the app is exactly the same with the way using `slack_bolt.App`.
+
+```bash
+export SLACK_SIGNING_SECRET=***
+export SLACK_BOT_TOKEN=xoxb-***
+python app.py
+
+# in another terminal
+ngrok http 3000
+```
+
+If you want to use another async Web framework (e.g., Sanic, FastAPI, Starlette), take a look at the built-in adapters and their samples.
+
+* [The Bolt app samples](https://github.com/slackapi/bolt-python/tree/main/samples)
+* [The built-in adapters](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter)
+
 # Feedback
 
 We are keen to hear your feedback. Please feel free to [submit an issue](https://github.com/slackapi/bolt-python/issues)!
@@ -115,4 +157,6 @@ The MIT License
 [pypi-url]: https://pypi.org/project/slack-bolt/
 [travis-image]: https://travis-ci.org/slackapi/bolt-python.svg?branch=main
 [travis-url]: https://travis-ci.org/slackapi/bolt-python
+[codecov-image]: https://codecov.io/gh/slackapi/bolt-python/branch/main/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/slackapi/bolt-python
 [python-version]: https://img.shields.io/pypi/pyversions/slack-bolt.svg

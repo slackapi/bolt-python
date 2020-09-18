@@ -4,18 +4,18 @@ from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.request.async_internals import build_async_context
 from slack_bolt.request.internals import (
     parse_query,
-    parse_payload,
+    parse_body,
     build_normalized_headers,
     extract_content_type,
 )
 
 
 class AsyncBoltRequest:
-    body: str
+    raw_body: str
+    body: Dict[str, Any]
     query: Dict[str, List[str]]
     headers: Dict[str, List[str]]
     content_type: Optional[str]
-    payload: Dict[str, Any]
     context: AsyncBoltContext
     lazy_only: bool
     lazy_function_name: Optional[str]
@@ -29,13 +29,13 @@ class AsyncBoltRequest:
         headers: Optional[Dict[str, Union[str, List[str]]]] = None,
         context: Optional[Dict[str, str]] = None,
     ):
-        self.body = body
+        self.raw_body = body
         self.query = parse_query(query)
         self.headers = build_normalized_headers(headers)
         self.content_type = extract_content_type(self.headers)
-        self.payload = parse_payload(self.body, self.content_type)
+        self.body = parse_body(self.raw_body, self.content_type)
         self.context = build_async_context(
-            AsyncBoltContext(context if context else {}), self.payload
+            AsyncBoltContext(context if context else {}), self.body
         )
         self.lazy_only = self.headers.get("x-slack-bolt-lazy-only", [False])[0]
         self.lazy_function_name = self.headers.get(

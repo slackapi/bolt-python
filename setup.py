@@ -13,6 +13,7 @@ with open(f"{here}/README.md", "r") as fh:
 
 test_dependencies = [
     "pytest>=5,<6",
+    "pytest-cov>=2,<3",
     "pytest-asyncio<1",  # for async
     "aiohttp>=3,<4",  # for async
     "black==19.10b0",
@@ -44,13 +45,13 @@ setuptools.setup(
             "aiohttp>=3,<4",
         ],
         # pip install -e ".[adapter]"
+        # NOTE: any of async ones requires pip install -e ".[async]" too
         "adapter": [
-            # any of async ones
-            "aiohttp>=3,<4",
             # used only under src/slack_bolt/adapter
             "boto3<=2",
             "moto<=2", # For AWS tests
             "bottle>=0.12,<1",
+            "boddle>=0.2,<0.3",  # For Bottle app tests
             "chalice>=1,<2",
             "click>=7,<8",  # for chalice
             "CherryPy>=18,<19",

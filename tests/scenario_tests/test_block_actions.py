@@ -82,6 +82,33 @@ class TestBlockActions:
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
+    def test_default_type(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        app.action({"action_id": "a", "block_id": "b"})(simple_listener)
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+    def test_default_type_no_block_id(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        app.action({"action_id": "a"})(simple_listener)
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+    def test_default_type_and_unmatched_block_id(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        app.action({"action_id": "a", "block_id": "bbb"})(simple_listener)
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert self.mock_received_requests["/auth.test"] == 1
+
     def test_failure(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
         request = self.build_valid_request()
@@ -107,7 +134,7 @@ class TestBlockActions:
         assert self.mock_received_requests["/auth.test"] == 2
 
 
-payload = {
+body = {
     "type": "block_actions",
     "user": {
         "id": "W111",
@@ -144,9 +171,12 @@ payload = {
     ],
 }
 
-raw_body = f"payload={quote(json.dumps(payload))}"
+raw_body = f"payload={quote(json.dumps(body))}"
 
 
-def simple_listener(ack, body):
+def simple_listener(ack, body, payload, action):
     assert body["trigger_id"] == "111.222.valid"
+    assert body["actions"][0] == payload
+    assert payload == action
+    assert action["action_id"] == "a"
     ack()

@@ -18,8 +18,8 @@ app = App()
 
 
 @app.middleware
-def log_request(logger: logging.Logger, payload: dict, next: Callable):
-    logger.debug(payload)
+def log_request(logger: logging.Logger, body: dict, next: Callable):
+    logger.debug(body)
     return next()
 
 
@@ -34,8 +34,8 @@ def mention_bug(say):
 
 
 # middleware function
-def extract_subtype(payload: dict, context: BoltContext, next: Callable):
-    context["subtype"] = payload.get("event", {}).get("subtype", None)
+def extract_subtype(body: dict, context: BoltContext, next: Callable):
+    context["subtype"] = body.get("event", {}).get("subtype", None)
     next()
 
 
@@ -43,8 +43,8 @@ def extract_subtype(payload: dict, context: BoltContext, next: Callable):
 # Newly posted messages only
 # or @app.event("message")
 @app.event({"type": "message", "subtype": None})
-def reply_in_thread(payload: dict, say: Say):
-    event = payload["event"]
+def reply_in_thread(body: dict, say: Say):
+    event = body["event"]
     thread_ts = event.get("thread_ts", None) or event["ts"]
     say(text="Hey, what's up?", thread_ts=thread_ts)
 
@@ -53,11 +53,12 @@ def reply_in_thread(payload: dict, say: Say):
     event={"type": "message", "subtype": "message_deleted"},
     matchers=[
         # Skip the deletion of messages by this listener
-        lambda payload: "You've deleted a message: " not in payload["event"]["previous_message"]["text"]
-    ]
+        lambda body: "You've deleted a message: "
+        not in body["event"]["previous_message"]["text"]
+    ],
 )
-def detect_deletion(say: Say, payload: dict):
-    text = payload["event"]["previous_message"]["text"]
+def detect_deletion(say: Say, body: dict):
+    text = body["event"]["previous_message"]["text"]
     say(f"You've deleted a message: {text}")
 
 
@@ -68,18 +69,13 @@ def detect_deletion(say: Say, payload: dict):
     middleware=[extract_subtype],
 )
 def add_reaction(
-    payload: dict,
-    client: WebClient,
-    context: BoltContext,
-    logger: logging.Logger
+    body: dict, client: WebClient, context: BoltContext, logger: logging.Logger
 ):
     subtype = context["subtype"]  # by extract_subtype
     logger.info(f"subtype: {subtype}")
-    message_ts = payload["event"]["ts"]
+    message_ts = body["event"]["ts"]
     api_response = client.reactions_add(
-        channel=context.channel_id,
-        timestamp=message_ts,
-        name="eyes",
+        channel=context.channel_id, timestamp=message_ts, name="eyes",
     )
     logger.info(f"api_response: {api_response}")
 
