@@ -38,8 +38,8 @@ pip install -r requirements.txt
 [Setup ngrok][3] to create a local requests URL for development.
 
 ```zsh
-npm run ngrok
-npm run start
+ngrok http 3000
+python3 app.py
 ```
 
 [1]: https://slack.dev/bolt-python/tutorial/getting-started
