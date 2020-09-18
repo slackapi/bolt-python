@@ -1,5 +1,9 @@
 #!/bin/bash
 
+script_dir=`dirname $0`
+cd ${script_dir}/..
+rm -rf ./slack_bolt.egg-info
+
 pip install -U pip && \
   python setup.py test && \
   pip install twine wheel && \

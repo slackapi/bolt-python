@@ -232,14 +232,19 @@ class TestAwsChalice:
         headers["x-slack-bolt-lazy-function-name"] = "say_it"
 
         request: Request = Request(
-            method="NONE",
-            query_params={},
-            uri_params={},
-            context={},
-            stage_vars=None,
-            is_base64_encoded=False,
-            body=body,
-            headers=headers,
+            {
+                "requestContext": {
+                    "httpMethod": "NONE",
+                    "resourcePath": "/slack/events",
+                },
+                "multiValueQueryStringParameters": {},
+                "pathParameters": {},
+                "context": {},
+                "stageVariables": None,
+                "isBase64Encoded": False,
+                "body": body,
+                "headers": headers,
+            }
         )
         response: Response = slack_handler.handle(request)
         assert response.status_code == 200

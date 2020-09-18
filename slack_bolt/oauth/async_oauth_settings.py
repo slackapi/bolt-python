@@ -106,13 +106,12 @@ class AsyncOAuthSettings:
             cookie_name=self.state_cookie_name,
             expiration_seconds=self.state_expiration_seconds,
         )
-        # TODO: add authorization_url support on the slack-sdk side
         self.authorize_url_generator = AuthorizeUrlGenerator(
             client_id=self.client_id,
-            client_secret=self.client_secret,
             redirect_uri=self.redirect_uri,
             scopes=self.scopes,
             user_scopes=self.user_scopes,
+            authorization_url=self.authorization_url,
         )
         self.redirect_uri_page_renderer = RedirectUriPageRenderer(
             install_path=self.install_path,
