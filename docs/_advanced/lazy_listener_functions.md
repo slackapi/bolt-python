@@ -63,6 +63,7 @@ def handler(event, context):
 <div class="secondary-content" markdown="0">
 
 For common Bolt apps, you can call `ack()` at the beginning of a listener function this way:
+</div>
 
 ```python
 @app.shortcut("callback-id-here")
@@ -71,7 +72,9 @@ def open_modal(ack, body, client):
     run_time_consuming_operation_here()
 ```
 
+<div class="secondary-content" markdown="0">
 However, if you run your app on FaaS or a similar runtime (that doesn't allow running threads/processes after returning an HTTP response), you will use the `process_before_response=True` option to hold off sending an HTTP response util completing all the tasks in a listener. In this case, all your listener functions must complete within 3 seconds.
+</div>
 
 ```python
 app = App(process_before_response=True)
@@ -82,12 +85,14 @@ def this_always_times_out(ack):
     time.sleep(5)
 ```
 
+<div class="secondary-content" markdown="0">
 To deal with this, you can use keyword args `ack: Callable` and `lazy: List[Callable]`:
 
 * `ack: Callable` is responsible for calling `ack()`
 * `lazy: List[Callable]`  are unable to call `ack()` but can do any time consuming operations in a separate execution (in a thread, another AWS Lambda invocation, and so on)
 
 Instead of acting as a decorator for a method, `App`/`AsyncApp`'s methods takes keyword args as below.
+</div>
 
 ```python
 app.command("/start-process")(
@@ -97,6 +102,5 @@ app.command("/start-process")(
     lazy=[run_long_process]
 )
 ```
-</div>
 
 </details>
