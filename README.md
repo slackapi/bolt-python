@@ -1,23 +1,20 @@
-# ⚠️ Important Notice ⚠️
-
-## 🔄 Still Work In Progress 🔄
-
-This project is **still in alpha**, and may have bugs in it. Also, the public APIs can be changed until the v1 release. We are keen to hear your feedback. Please feel free to [submit an issue](https://github.com/slackapi/bolt-python/issues)!
-
-# Bolt for Python (still in alpha)
+# Bolt for Python (still in beta)
 
 [![Python Version][python-version]][pypi-url]
 [![pypi package][pypi-image]][pypi-url]
 [![Build Status][travis-image]][travis-url]
 [![Codecov][codecov-image]][codecov-url]
 
-A Python framework to build Slack apps in a flash with the latest platform features. Check the [samples](https://github.com/slackapi/bolt-python/tree/main/samples) to know how to use this framework.
+A Python framework to build Slack apps in a flash with the latest platform features. Check the [document](https://slack.dev/bolt-python/) and [samples](https://github.com/slackapi/bolt-python/tree/main/samples) to know how to use this framework.
 
 ## Setup
 
 ```bash
-python -m venv env
-source env/bin/activate
+# Python 3.6+ required
+python -m venv .venv
+source .venv/bin/activate
+
+pip install -U pip
 pip install slack_bolt
 ```
 
@@ -103,8 +100,12 @@ ngrok http 3000
 If you prefer building Slack apps using [asyncio](https://docs.python.org/3/library/asyncio.html), you can go with `AsyncApp` instead. You can use async/await style for everything in the app. To use `AsyncApp`, [AIOHTTP](https://docs.aiohttp.org/en/stable/) library is required for asynchronous Slack Web API calls and the default web server.
 
 ```bash
-python -m venv env
-source env/bin/activate
+# Python 3.6+ required
+python -m venv .venv
+source .venv/bin/activate
+
+pip install -U pip
+# aiohttp is required
 pip install slack_bolt aiohttp
 ```
 

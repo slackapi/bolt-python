@@ -13,6 +13,7 @@ assignees: ''
 * [ ] **slack_bolt.App** and/or its core components
 * [ ] **slack_bolt.async_app.AsyncApp** and/or its core components
 * [ ] Adapters in **slack_bolt.adapter**
+* [ ] Others
 
 ## Requirements
 

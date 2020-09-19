@@ -62,10 +62,24 @@ use-feature = 2020-resolver
 
 #### Run All the Unit Tests
 
-If you make some changes to this SDK, please write corresponding unit tests as much as possible. You can easily run all the tests by running the following script
+If you make some changes to this SDK, please write corresponding unit tests as much as possible. You can easily run all the tests by running the following script.
+
+If this is your first time to run tests, although it may take a bit long time, running the following script is the easiest.
+
+```bash
+$ ./scripts/install_all_and_run_tests.sh
+```
+
+Once you installed all the required dependencies, you can use the following one.
 
 ```bash
 $ ./scripts/run_tests.sh
+```
+
+Also, you can run a single test this way.
+
+```bash
+$ ./scripts/run_tests.sh tests/scenario_tests/test_app.py
 ```
 
 #### Run the Samples
