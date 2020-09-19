@@ -36,9 +36,9 @@ To explore adding rich message layouts to your app, read through [the guide on o
 # Sends a section block with datepicker when someone reacts with a 📅 emoji
 @app.event("reaction_added")
 def show_datepicker(event, say):
-  reaction = event["reaction"]
-  if reaction == "calendar":
-      blocks = [{
+    reaction = event["reaction"]
+    if reaction == "calendar":
+        blocks = [{
           "type": "section",
           "text": {
               "type": "mrkdwn",
@@ -53,9 +53,11 @@ def show_datepicker(event, say):
                   "text": "Select a date"
               }
           }
-      }]
-
-      say(blocks=blocks)
+        }]
+        say(
+            blocks=blocks,
+            text="Pick a date for me to remind you"
+        )
 ```
 
 </details>

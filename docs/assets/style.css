@@ -241,7 +241,7 @@ span.beta {
 pre {
   background-color: var(--light-grey) !important;
   background-image: none;
-  padding: 2em;
+  padding: 1.5em;
   border: 1px solid #DDDDDD;
 }
 
