@@ -75,7 +75,7 @@ def open_modal(ack, shortcut, client):
 ```python
 
 # Your middleware will only be called when the callback_id matches 'open_modal' AND the type matches 'message_action'
-@app.message_shortcut("open_modal")
+@app.shortcut({"callback_id": "open_modal", "type": "message_action"})
 def open_modal(ack, shortcut, client):
     # Acknowledge the shortcut request
     ack()

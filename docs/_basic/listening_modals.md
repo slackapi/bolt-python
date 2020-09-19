@@ -17,28 +17,37 @@ Read more about view submissions in our <a href="https://api.slack.com/surfaces/
 
 ```python
 # Handle a view_submission event
-​​@app.view("view_b")
-​​def handle_submission(ack, body, client, view):
-​​    # Acknowledge the view_submission event
-​​    ack()
-​​
-​​    # Do whatever you want with the input data - here we're saving it to a DB
-    # then sending the user a verifcation of their submission
-​​
-​​    # Assume there's an input block with `block_1` as the block_id and `input_a`
-​​    val = view["state"]["values"]["block_1"]["input_a"]
-​​    user = body["user"]["id"]
-​​
-​​    # Message to send user
-​​    msg = ""
-​​
-​​    try:
-​​      # Save to DB
-​​      msg = f"Your submission of {val} was successful"
-​​    except Exception as e:
-​​      # Handle error
-​​      msg = "There was an error with your submission"
-​​    finally:
-​​      # Message the user
-​​      client.chat_postMessage(channel=user, text=msg)
+@app.view("view_b")
+def handle_submission(ack, body, client, view):
+
+    # Assume there's an input block with `block_1` as the block_id and `input_a`
+    val = view["state"]["values"]["block_1"]["input_a"]
+    user = body["user"]["id"]
+
+    # Validate the inputs
+    errors = {}
+    if val is not None and len(val) <= 5:
+        errors["block_1"] = "The value must be longer than 5 characters"
+    if len(errors) > 0:
+        ack(response_action="errors", errors=errors)
+        return
+
+    # Acknowledge the view_submission event and close the modal
+    ack()
+
+    # Do whatever you want with the input data - here we're saving it to a DB
+    # then sending the user a verification of their submission
+
+    # Message to send user
+    msg = ""
+
+    try:
+      # Save to DB
+      msg = f"Your submission of {val} was successful"
+    except Exception as e:
+      # Handle error
+      msg = "There was an error with your submission"
+    finally:
+      # Message the user
+      client.chat_postMessage(channel=user, text=msg)
 ```

@@ -18,6 +18,7 @@ To learn more about the OAuth installation flow with Slack, [read the API docume
 </div>
 
 ```python
+import os
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
@@ -26,12 +27,14 @@ oauth_settings = OAuthSettings(
     client_id=os.environ["SLACK_CLIENT_ID"],
     client_secret=os.environ["SLACK_CLIENT_SECRET"],
     scopes=["channels:read", "groups:read", "chat:write"],
-    installation_store=FileInstallationStore(),
-    state_store=FileOAuthStateStore(expiration_seconds=120)
+    installation_store=FileInstallationStore(base_dir="./data"),
+    state_store=FileOAuthStateStore(expiration_seconds=600, base_dir="./data")
 )
 
-app = App(signing_secret=os.environ["SIGNING_SECRET"],
-          oauth_settings=oauth_settings)
+app = App(
+    signing_secret=os.environ["SIGNING_SECRET"],
+    oauth_settings=oauth_settings
+)
 ```
 
 <details class="secondary-wrapper">
@@ -51,9 +54,29 @@ You can override the default OAuth using `oauth_settings`, which can be passed i
 </div>
 
 ```python
+from slack_bolt.oauth.callback_options import CallbackOptions, SuccessArgs, FailureArgs
+import slack_bolt.response.BoltResponse
+
+def success(args: SuccessArgs) -> BoltResponse:
+    assert args.request is not None
+    return BoltResponse(
+        status=200,  # you can redirect users too
+        body="Your own response to end-users here"
+    )
+
+def failure(args: FailureArgs) -> BoltResponse:
+    assert args.request is not None
+    assert args.reason is not None
+    return BoltResponse(
+        status=args.suggested_status_code,
+        body="Your own response to end-users here"
+    )
+
+callback_options = CallbackOptions(success=success, failure=failure)
+
 app = App(
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
-    installation_store=FileInstallationStore(),
+    installation_store=FileInstallationStore(base_dir="./data"),
     oauth_settings=OAuthSettings(
         client_id=os.environ.get("SLACK_CLIENT_ID"),
         client_secret=os.environ.get("SLACK_CLIENT_SECRET"),
@@ -62,9 +85,8 @@ app = App(
         redirect_uri=None,
         install_path="/slack/install",
         redirect_uri_path="/slack/oauth_redirect",
-        state_store=FileOAuthStateStore(expiration_seconds=600),
-        callback_options=CallbackOptions(success=success,
-                                         failure=failure),
+        state_store=FileOAuthStateStore(expiration_seconds=600, base_dir="./data"),
+        callback_options=callback_options,
     ),
 )
 ```

@@ -18,7 +18,9 @@ def say_hello(client, message):
     # Unix Epoch time for September 30, 2020 11:59:59 PM
     when_september_ends = 1601510399
     channel_id = message["channel"]
-    client.chat_scheduleMessage(channel=channel_id,
-                                post_at=when_september_ends,
-                                text="Summer has come and passed")
+    client.chat_scheduleMessage(
+        channel=channel_id,
+        post_at=when_september_ends,
+        text="Summer has come and passed"
+    )
 ```
