@@ -212,7 +212,7 @@ span.beta {
   margin: 1em 0 0 33%;
   padding-bottom: 2em;
   font-size: 1em;
-  line-height: 1.75em;
+  line-height: 1.5em;
 }
 
 .tutorial img {
@@ -241,7 +241,7 @@ span.beta {
 pre {
   background-color: var(--light-grey) !important;
   background-image: none;
-  padding: 1.5em;
+  padding: 1.2em;
   border: 1px solid #DDDDDD;
 }
 
@@ -252,7 +252,7 @@ pre code {
 .content .section-wrapper .section-content {
   grid-area: body;
   font-size: 1em;
-  line-height: 2em;
+  line-height: 1.5em;
 }
 
 .content .section-wrapper h3 {

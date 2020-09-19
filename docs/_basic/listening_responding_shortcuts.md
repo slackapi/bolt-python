@@ -84,14 +84,8 @@ def open_modal(ack, shortcut, client):
         trigger_id=shortcut["trigger_id"],
         view={
             "type": "modal",
-            "title": {
-                "type": "plain_text",
-                "text": "My App"
-            },
-            "close": {
-                "type": "plain_text",
-                "text": "Close"
-            },
+            "title": {"type": "plain_text", "text": "My App"},
+            "close": {"type": "plain_text", "text": "Close"},
             "blocks": [
                 {
                     "type": "section",

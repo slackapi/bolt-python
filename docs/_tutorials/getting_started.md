@@ -236,16 +236,10 @@ def message_hello(message, say):
         blocks=[
             {
                 "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"Hey there <@{message['user']}>!"
-                },
+                "text": {"type": "mrkdwn", "text": f"Hey there <@{message['user']}>!"},
                 "accessory": {
                     "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Click Me"
-                    },
+                    "text": {"type": "plain_text", "text": "Click Me"},
                     "action_id": "button_click"
                 }
             }
@@ -286,16 +280,10 @@ def message_hello(message, say):
         blocks=[
             {
                 "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"Hey there <@{message['user']}>!"
-                },
+                "text": {"type": "mrkdwn", "text": f"Hey there <@{message['user']}>!"},
                 "accessory": {
                     "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Click Me"
-                    },
+                    "text": {"type": "plain_text", "text": "Click Me"},
                     "action_id": "button_click"
                 }
             }
