@@ -35,17 +35,11 @@ def update_modal(ack, view, client):
             "type": "modal",
             # View identifier
             "callback_id": "view_1",
-            "title": {
-                "type": "plain_text",
-                "text": "Updated modal"
-            },
+            "title": {"type": "plain_text", "text": "Updated modal"},
             "blocks": [
                 {
                     "type": "section",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "You updated the modal!"
-                    }
+                    "text": {"type": "plain_text", "text": "You updated the modal!"}
                 },
                 {
                     "type": "image",
