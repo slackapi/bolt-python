@@ -40,18 +40,12 @@ def show_datepicker(event, say):
     if reaction == "calendar":
         blocks = [{
           "type": "section",
-          "text": {
-              "type": "mrkdwn",
-              "text": "Pick a date for me to remind you"
-          },
+          "text": {"type": "mrkdwn", "text": "Pick a date for me to remind you"},
           "accessory": {
               "type": "datepicker",
               "action_id": "datepicker_remind",
               "initial_date": "2020-05-04",
-              "placeholder": {
-                  "type": "plain_text",
-                  "text": "Select a date"
-              }
+              "placeholder": {"type": "plain_text", "text": "Select a date"}
           }
         }]
         say(

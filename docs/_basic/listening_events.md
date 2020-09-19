@@ -38,9 +38,13 @@ You can filter on subtypes of events by passing in the additional key `subtype`.
 
 ```python
 # Matches all messages from bot users
-@app.event({"type": "message", "subtype": "message_changed"})
+@app.event({
+    "type": "message",
+    "subtype": "message_changed"
+})
 def log_message_change(logger, event):
-    logger.info(f"The user {event['user']} changed the message to {event['text']}")
+    user, text = event["user"], event["text"]
+    logger.info(f"The user {user} changed the message to {text}")
 ```
 
 </details>

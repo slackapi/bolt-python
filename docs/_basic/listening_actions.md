@@ -35,12 +35,19 @@ You can use a constraints object to listen to `callback_id`s, `block_id`s, and `
 
 ```python
 # Your function will only be called when the action_id matches 'select_user' AND the block_id matches 'assign_ticket'
-@app.action({"action_id": "select_user", "block_id": "assign_ticket"})
-def update_message(ack, action, body, client):
+@app.action({
+    "block_id": "assign_ticket",
+    "action_id": "select_user"
+})
+def update_message(ack, body, client):
     ack()
-    client.reactions_add(name='white_check_mark',
-                         timestamp=action['action_ts'],
-                         channel=body['channel']['id'])
+
+    if "container" in body and "message_ts" in body["container"]:
+        client.reactions_add(
+            name="white_check_mark",
+            channel=body["channel"]["id"],
+            timestamp=body["container"]["message_ts"],
+        )
 ```
 
 </details>
