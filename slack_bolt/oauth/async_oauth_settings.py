@@ -65,6 +65,24 @@ class AsyncOAuthSettings:
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
     ):
+        """The settings for Slack App installation (OAuth flow).
+
+        :param client_id: Check the value in Settings > Basic Information > App Credentials
+        :param client_secret: Check the value in Settings > Basic Information > App Credentials
+        :param scopes: Check the value in Settings > Manage Distribution
+        :param user_scopes: Check the value in Settings > Manage Distribution
+        :param redirect_uri: Check the value in Features > OAuth & Permissions > Redirect URLs
+        :param install_path: The endpoint to start an OAuth flow (Default: /slack/install)
+        :param redirect_uri_path: The path of Redirect URL (Default: /slack/oauth_redirect)
+        :param callback_options: Give success/failure functions f you want to customize callback functions.
+        :param success_url: Set a complete URL if you want to redirect end-users when an installation completes.
+        :param failure_url: Set a complete URL if you want to redirect end-users when an installation fails.
+        :param authorization_url: Set a URL if you want to customize the URL https://slack.com/oauth/v2/authorize
+        :param installation_store: Specify the instance of InstallationStore (Default: FileInstallationStore)
+        :param state_store: Specify the instance of InstallationStore (Default: FileOAuthStateStore)
+        :param state_cookie_name: The cookie name that is set for installers' browser. (Default: slack-app-oauth-state)
+        :param state_expiration_seconds: The seconds that the state value is alive (Default: 600 seconds)
+        """
         # OAuth flow parameters/credentials
         self.client_id = client_id or os.environ.get("SLACK_CLIENT_ID", None)
         self.client_secret = client_secret or os.environ.get(

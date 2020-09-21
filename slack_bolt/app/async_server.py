@@ -63,7 +63,11 @@ class AsyncSlackAppServer:
         bolt_resp: BoltResponse = await self._bolt_app.async_dispatch(bolt_req)
         return await to_aiohttp_response(bolt_resp)
 
-    def start(self):
+    def start(self) -> None:
+        """ Starts a new web server process.
+
+        :return: None
+        """
         if self._bolt_app.logger.level > logging.INFO:
             print("⚡️ Bolt app is running!")
         else:

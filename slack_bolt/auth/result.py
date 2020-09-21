@@ -23,6 +23,16 @@ class AuthorizationResult(dict):
         user_id: Optional[str] = None,
         user_token: Optional[str] = None,
     ):
+        """The `auth.test` API result for an incoming request.
+
+        :param enterprise_id: Organization ID (Enterprise Grid)
+        :param team_id: Workspace ID
+        :param bot_user_id: Bot user's User ID
+        :param bot_id: Bot ID
+        :param bot_token: Bot user access token starting with xoxb-
+        :param user_id: The request user ID
+        :param user_token: User access token starting with xoxp-
+        """
         self.enterprise_id: Optional[str] = enterprise_id
         self.team_id: Optional[str] = team_id
         # bot

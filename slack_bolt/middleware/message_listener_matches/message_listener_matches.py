@@ -8,6 +8,7 @@ from slack_bolt.middleware.middleware import Middleware
 
 class MessageListenerMatches(Middleware):  # type: ignore
     def __init__(self, keyword: Union[str, Pattern]):
+        """Captures matched keywords and saves the values in context."""
         self.keyword = keyword
 
     def process(

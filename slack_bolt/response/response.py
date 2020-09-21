@@ -15,6 +15,12 @@ class BoltResponse:
         body: Union[str, dict] = "",
         headers: Optional[Dict[str, Union[str, List[str]]]] = None,
     ):
+        """The response from a Bolt app.
+
+        :param status: HTTP status code
+        :param body: The response body  (plain text response is supported)
+        :param headers: The response headers.
+        """
         self.status: int = status
         self.body: str = json.dumps(body) if isinstance(body, dict) else body
         self.headers: Dict[str, List[str]] = {}

@@ -28,11 +28,11 @@ class AsyncListener(metaclass=ABCMeta):
     async def run_async_middleware(
         self, *, req: AsyncBoltRequest, resp: BoltResponse,
     ) -> Tuple[BoltResponse, bool]:
-        """
+        """Runs an async middleware.
 
-        :param req: the incoming request
-        :param resp: the current response
-        :return: a tuple of the processed response and a flag indicating termination
+        :param req: The incoming request
+        :param resp: Thee current response
+        :return: A tuple of the processed response and a flag indicating termination
         """
         for m in self.middleware:
             middleware_state = {"next_called": False}
@@ -52,9 +52,9 @@ class AsyncListener(metaclass=ABCMeta):
     ) -> BoltResponse:
         """Runs all the registered middleware and then run the listener function.
 
-        :param request: the incoming request
-        :param response: the current response
-        :return: the processed response
+        :param request: The incoming request
+        :param response: The current response
+        :return: The processed response
         """
         raise NotImplementedError()
 
