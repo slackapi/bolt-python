@@ -18,6 +18,12 @@ class MultiTeamsAuthorization(Authorization):
     def __init__(
         self, installation_store: InstallationStore, verification_enabled: bool = True,
     ):
+        """Multi-workspace authorization.
+
+        :param installation_store: The module offering find/save operations of installation data.
+        :param verification_enabled:
+            Calls auth.test for every single incoming request from Slack if True (Default: True)
+        """
         self.installation_store = installation_store
         self.verification_enabled = verification_enabled
         self.logger = get_bolt_logger(MultiTeamsAuthorization)

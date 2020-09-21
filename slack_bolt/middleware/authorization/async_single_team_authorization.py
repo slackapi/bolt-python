@@ -12,6 +12,11 @@ from .internals import _to_authorization_result
 
 class AsyncSingleTeamAuthorization(AsyncAuthorization):
     def __init__(self, *, verification_enabled: bool = True):
+        """Single-workspace authorization.
+
+        :param verification_enabled:
+            Calls auth.test for every single incoming request from Slack if True (Default: True)
+        """
         self.verification_enabled = verification_enabled
         self.auth_result: Optional[AsyncSlackResponse] = None
         self.logger = get_bolt_logger(AsyncSingleTeamAuthorization)

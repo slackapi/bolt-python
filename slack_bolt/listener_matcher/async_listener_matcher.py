@@ -7,6 +7,12 @@ from slack_bolt.response import BoltResponse
 class AsyncListenerMatcher(metaclass=ABCMeta):
     @abstractmethod
     async def async_matches(self, req: AsyncBoltRequest, resp: BoltResponse) -> bool:
+        """Matches against the request and returns True if matched.
+
+        :param req: The request
+        :param resp: The response
+        :return: True if matched.
+        """
         raise NotImplementedError()
 
 

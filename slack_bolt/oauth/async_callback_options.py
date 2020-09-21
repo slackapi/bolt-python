@@ -18,6 +18,12 @@ class AsyncSuccessArgs:
         installation: Installation,
         settings: "AsyncOAuthSettings",
     ):
+        """The arguments for a success function.
+
+        :param request: The request.
+        :param installation: The installation data.
+        :param settings: The settings for OAuth flow.
+        """
         self.request = request
         self.installation = installation
         self.settings = settings
@@ -33,6 +39,14 @@ class AsyncFailureArgs:
         suggested_status_code: int,
         settings: "AsyncOAuthSettings",
     ):
+        """The arguments for a failure function.
+
+        :param request: The request.
+        :param reason: The response.
+        :param error: An exception if exists.
+        :param suggested_status_code: The recommended HTTP status code for the failure.
+        :param settings: The settings for OAuth flow.
+        """
         self.request = request
         self.reason = reason
         self.error = error

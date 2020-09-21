@@ -22,13 +22,13 @@ class AsyncArgs:
     body: Dict[str, Any]
     # payload
     payload: Dict[str, Any]
-    options: Optional[Dict[str, Any]]
-    shortcut: Optional[Dict[str, Any]]
-    action: Optional[Dict[str, Any]]
-    view: Optional[Dict[str, Any]]
-    command: Optional[Dict[str, Any]]
-    event: Optional[Dict[str, Any]]
-    message: Optional[Dict[str, Any]]
+    options: Optional[Dict[str, Any]]  # payload alias
+    shortcut: Optional[Dict[str, Any]]  # payload alias
+    action: Optional[Dict[str, Any]]  # payload alias
+    view: Optional[Dict[str, Any]]  # payload alias
+    command: Optional[Dict[str, Any]]  # payload alias
+    event: Optional[Dict[str, Any]]  # payload alias
+    message: Optional[Dict[str, Any]]  # payload alias
     # utilities
     ack: AsyncAck
     say: AsyncSay

@@ -29,6 +29,13 @@ class BoltRequest:
         headers: Optional[Dict[str, Union[str, List[str]]]] = None,
         context: Optional[Dict[str, str]] = None,
     ):
+        """Request to a Bolt app.
+
+        :param body: The raw request body (only plain text is supported)
+        :param query: The query string data in any data format.
+        :param headers: The request headers.
+        :param context: The context in this request.
+        """
         self.raw_body = body
         self.query = parse_query(query)
         self.headers = build_normalized_headers(headers)

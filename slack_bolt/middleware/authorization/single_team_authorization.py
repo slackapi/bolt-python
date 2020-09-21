@@ -20,6 +20,12 @@ class SingleTeamAuthorization(Authorization):
         auth_test_result: Optional[SlackResponse] = None,
         verification_enabled: bool = True,
     ):
+        """Single-workspace authorization.
+
+        :param auth_test_result: The initial `auth.test` API call result.
+        :param verification_enabled:
+            Calls auth.test for every single incoming request from Slack if True (Default: True)
+        """
         self.auth_test_result = auth_test_result
         self.verification_enabled = verification_enabled
         self.logger = get_bolt_logger(SingleTeamAuthorization)

@@ -18,6 +18,12 @@ class SuccessArgs:
         installation: Installation,
         settings: "OAuthSettings",
     ):
+        """The arguments for a success function.
+
+        :param request: The request.
+        :param installation: The installation data.
+        :param settings: The settings for OAuth flow.
+        """
         self.request = request
         self.installation = installation
         self.settings = settings
@@ -33,6 +39,14 @@ class FailureArgs:
         suggested_status_code: int,
         settings: "OAuthSettings",
     ):
+        """The arguments for a failure function.
+
+        :param request: The request.
+        :param reason: The response.
+        :param error: An exception if exists.
+        :param suggested_status_code: The recommended HTTP status code for the failure.
+        :param settings: The settings for OAuth flow.
+        """
         self.request = request
         self.reason = reason
         self.error = error
@@ -49,6 +63,11 @@ class CallbackOptions:
         success: Callable[[SuccessArgs], BoltResponse],
         failure: Callable[[FailureArgs], BoltResponse],
     ):
+        """The configurations for OAuth flow.
+
+        :param success: A handler for successful installation.
+        :param failure: A handler for any types of installation failures.
+        """
         self.success = success
         self.failure = failure
 
