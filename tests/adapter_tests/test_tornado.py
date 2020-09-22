@@ -20,22 +20,16 @@ from tests.utils import remove_os_env_temporarily, restore_os_env
 signing_secret = "secret"
 valid_token = "xoxb-valid"
 mock_api_server_base_url = "http://localhost:8888"
-web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
-
-app = App(client=web_client, signing_secret=signing_secret)
 
 
-@app.event("app_mention")
 def event_handler():
     pass
 
 
-@app.shortcut("test-shortcut")
 def shortcut_handler(ack):
     ack()
 
 
-@app.command("/hello-world")
 def command_handler(ack):
     ack()
 
@@ -44,9 +38,16 @@ class TestTornado(AsyncHTTPTestCase):
     signature_verifier = SignatureVerifier(signing_secret)
 
     def setUp(self):
-        AsyncHTTPTestCase.setUp(self)
         self.old_os_env = remove_os_env_temporarily()
         setup_mock_web_api_server(self)
+
+        web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
+        self.app = App(client=web_client, signing_secret=signing_secret,)
+        self.app.event("app_mention")(event_handler)
+        self.app.shortcut("test-shortcut")(shortcut_handler)
+        self.app.command("/hello-world")(command_handler)
+
+        AsyncHTTPTestCase.setUp(self)
 
     def tearDown(self):
         AsyncHTTPTestCase.tearDown(self)
@@ -54,7 +55,7 @@ class TestTornado(AsyncHTTPTestCase):
         restore_os_env(self.old_os_env)
 
     def get_app(self):
-        return Application([("/slack/events", SlackEventsHandler, dict(app=app))])
+        return Application([("/slack/events", SlackEventsHandler, dict(app=self.app))])
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(

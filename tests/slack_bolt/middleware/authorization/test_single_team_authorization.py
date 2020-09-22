@@ -22,10 +22,8 @@ class TestSingleTeamAuthorization:
     def teardown_method(self):
         cleanup_mock_web_api_server(self)
 
-    def test_normal_pattern(self):
-        authorization = SingleTeamAuthorization(
-            auth_test_result={}, verification_enabled=True,
-        )
+    def test_success_pattern(self):
+        authorization = SingleTeamAuthorization(auth_test_result={})
         req = BoltRequest(body="payload={}", headers={})
         req.context["client"] = WebClient(
             base_url=self.mock_api_server_base_url, token="xoxb-valid"
@@ -38,9 +36,7 @@ class TestSingleTeamAuthorization:
         assert resp.body == ""
 
     def test_failure_pattern(self):
-        authorization = SingleTeamAuthorization(
-            auth_test_result={}, verification_enabled=True,
-        )
+        authorization = SingleTeamAuthorization(auth_test_result={})
         req = BoltRequest(body="payload={}", headers={})
         req.context["client"] = WebClient(
             base_url=self.mock_api_server_base_url, token="dummy"
@@ -51,18 +47,3 @@ class TestSingleTeamAuthorization:
 
         assert resp.status == 200
         assert resp.body == ":x: Please install this app into the workspace :bow:"
-
-    def test_normal_pattern_disabled(self):
-        authorization = SingleTeamAuthorization(
-            auth_test_result={"ok": True}, verification_enabled=False,
-        )
-        req = BoltRequest(body="payload={}", headers={})
-        req.context["client"] = WebClient(
-            base_url=self.mock_api_server_base_url, token="xoxb-valid"
-        )
-        resp = BoltResponse(status=404)
-
-        resp = authorization.process(req=req, resp=resp, next=next)
-
-        assert resp.status == 200
-        assert resp.body == ""

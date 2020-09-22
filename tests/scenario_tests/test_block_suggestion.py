@@ -131,7 +131,7 @@ class TestBlockSuggestion:
         app.options("mes_a")(show_multi_options)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_failure_2(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -143,7 +143,7 @@ class TestBlockSuggestion:
         app.block_suggestion("mes_a")(show_multi_options)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_failure_multi(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -155,7 +155,7 @@ class TestBlockSuggestion:
         app.options("es_a")(show_options)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
 
 body = {

@@ -85,7 +85,6 @@ class AsyncApp:
         # for the OAuth flow
         oauth_settings: Optional[AsyncOAuthSettings] = None,
         oauth_flow: Optional[AsyncOAuthFlow] = None,
-        authorization_test_enabled: bool = True,
         # No need to set (the value is used only in response to ssl_check requests)
         verification_token: Optional[str] = None,
     ):
@@ -101,8 +100,6 @@ class AsyncApp:
         :param oauth_settings: The settings related to Slack app installation flow (OAuth flow)
         :param oauth_flow: Manually instantiated slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow.
             This is always prioritized over oauth_settings.
-        :param authorization_test_enabled: Set False if you want to skip auth.test calls
-            for every single incoming request from Slack (default: True)
         :param verification_token: Deprecated verification mechanism.
             This can used only for ssl_check requests.
         """
@@ -133,8 +130,6 @@ class AsyncApp:
         else:
             # NOTE: the token here can be None
             self._async_client = create_async_web_client(token)
-
-        self._authorization_test_enabled = authorization_test_enabled
 
         self._async_installation_store: Optional[
             AsyncInstallationStore
@@ -188,18 +183,13 @@ class AsyncApp:
         )
         if self._async_oauth_flow is None:
             if self._token:
-                self._async_middleware_list.append(
-                    AsyncSingleTeamAuthorization(
-                        verification_enabled=self._authorization_test_enabled
-                    )
-                )
+                self._async_middleware_list.append(AsyncSingleTeamAuthorization())
             else:
                 raise BoltError(error_token_required())
         else:
             self._async_middleware_list.append(
                 AsyncMultiTeamsAuthorization(
-                    installation_store=self._async_installation_store,
-                    verification_enabled=self._authorization_test_enabled,
+                    installation_store=self._async_installation_store
                 )
             )
 

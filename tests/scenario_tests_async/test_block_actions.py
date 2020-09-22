@@ -147,7 +147,7 @@ class TestAsyncBlockActions:
         app.action("aaa")(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
     async def test_failure_2(self):
@@ -160,7 +160,7 @@ class TestAsyncBlockActions:
         app.block_action("aaa")(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
 
 body = {

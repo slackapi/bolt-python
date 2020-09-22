@@ -35,8 +35,8 @@ class TestSingleTeamAuthorization:
             restore_os_env(old_os_env)
 
     @pytest.mark.asyncio
-    async def test_normal_pattern(self):
-        authorization = AsyncSingleTeamAuthorization(verification_enabled=True,)
+    async def test_success_pattern(self):
+        authorization = AsyncSingleTeamAuthorization()
         req = AsyncBoltRequest(body="payload={}", headers={})
         req.context["client"] = AsyncWebClient(
             base_url=self.mock_api_server_base_url, token="xoxb-valid"
@@ -50,7 +50,7 @@ class TestSingleTeamAuthorization:
 
     @pytest.mark.asyncio
     async def test_failure_pattern(self):
-        authorization = AsyncSingleTeamAuthorization(verification_enabled=True,)
+        authorization = AsyncSingleTeamAuthorization()
         req = AsyncBoltRequest(body="payload={}", headers={})
         req.context["client"] = AsyncWebClient(
             base_url=self.mock_api_server_base_url, token="dummy"
@@ -61,17 +61,3 @@ class TestSingleTeamAuthorization:
 
         assert resp.status == 200
         assert resp.body == ":x: Please install this app into the workspace :bow:"
-
-    @pytest.mark.asyncio
-    async def test_normal_pattern_disabled(self):
-        authorization = AsyncSingleTeamAuthorization(verification_enabled=False,)
-        req = AsyncBoltRequest(body="payload={}", headers={})
-        req.context["client"] = AsyncWebClient(
-            base_url=self.mock_api_server_base_url, token="xoxb-valid"
-        )
-        resp = BoltResponse(status=404)
-
-        resp = await authorization.async_process(req=req, resp=resp, next=next)
-
-        assert resp.status == 200
-        assert resp.body == ""
