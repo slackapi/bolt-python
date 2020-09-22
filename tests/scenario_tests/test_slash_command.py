@@ -80,7 +80,7 @@ class TestSlashCommand:
         app.command("/another-one")(commander)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
 
 slash_command_body = (

@@ -119,7 +119,7 @@ class TestBlockActions:
         app.action("aaa")(simple_listener)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_failure_2(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -131,7 +131,7 @@ class TestBlockActions:
         app.block_action("aaa")(simple_listener)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
 
 body = {

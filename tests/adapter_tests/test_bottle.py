@@ -1,5 +1,6 @@
 import json
 from time import time
+from typing import Optional
 from urllib.parse import quote
 
 from slack_sdk.signature import SignatureVerifier
@@ -16,22 +17,16 @@ from tests.utils import remove_os_env_temporarily, restore_os_env
 signing_secret = "secret"
 valid_token = "xoxb-valid"
 mock_api_server_base_url = "http://localhost:8888"
-web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
-app = App(client=web_client, signing_secret=signing_secret,)
-handler = SlackRequestHandler(app)
 
 
-@app.event("app_mention")
 def event_handler():
     pass
 
 
-@app.shortcut("test-shortcut")
 def shortcut_handler(ack):
     ack()
 
 
-@app.command("/hello-world")
 def command_handler(ack):
     ack()
 
@@ -42,15 +37,23 @@ from boddle import boddle
 
 @post("/slack/events")
 def slack_events():
-    return handler.handle(request, response)
+    return TestBottle.handler.handle(request, response)
 
 
 class TestBottle:
     signature_verifier = SignatureVerifier(signing_secret)
+    handler: Optional[SlackRequestHandler] = None
 
     def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()
         setup_mock_web_api_server(self)
+
+        web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
+        app = App(client=web_client, signing_secret=signing_secret,)
+        TestBottle.handler = SlackRequestHandler(app)
+        app.event("app_mention")(event_handler)
+        app.shortcut("test-shortcut")(shortcut_handler)
+        app.command("/hello-world")(command_handler)
 
     def teardown_method(self):
         cleanup_mock_web_api_server(self)

@@ -65,13 +65,13 @@ class TestAttachmentActions:
         response = app.dispatch(request)
         assert response.status == 200
         assert response.body == ""
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
         request = self.build_valid_request(cancellation_raw_body)
         response = app.dispatch(request)
         assert response.status == 200
         assert response.body == ""
-        assert self.mock_received_requests["/auth.test"] == 3
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_success(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -96,13 +96,13 @@ class TestAttachmentActions:
         response = app.dispatch(request)
         assert response.status == 200
         assert response.body == ""
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
         request = self.build_valid_request(cancellation_raw_body)
         response = app.dispatch(request)
         assert response.status == 200
         assert response.body == ""
-        assert self.mock_received_requests["/auth.test"] == 3
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_success_2(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -121,13 +121,13 @@ class TestAttachmentActions:
         response = app.dispatch(request)
         assert response.status == 200
         assert response.body == ""
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
         request = self.build_valid_request(cancellation_raw_body)
         response = app.dispatch(request)
         assert response.status == 200
         assert response.body == ""
-        assert self.mock_received_requests["/auth.test"] == 3
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_process_before_response(self):
         app = App(
@@ -156,13 +156,13 @@ class TestAttachmentActions:
         response = app.dispatch(request)
         assert response.status == 200
         assert response.body == ""
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
         request = self.build_valid_request(cancellation_raw_body)
         response = app.dispatch(request)
         assert response.status == 200
         assert response.body == ""
-        assert self.mock_received_requests["/auth.test"] == 3
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_process_before_response_2(self):
         app = App(
@@ -185,13 +185,13 @@ class TestAttachmentActions:
         response = app.dispatch(request)
         assert response.status == 200
         assert response.body == ""
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
         request = self.build_valid_request(cancellation_raw_body)
         response = app.dispatch(request)
         assert response.status == 200
         assert response.body == ""
-        assert self.mock_received_requests["/auth.test"] == 3
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_suggestion_failure_without_type(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -203,7 +203,7 @@ class TestAttachmentActions:
         app.options("dialog-callback-iddddd")(handle_suggestion)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_suggestion_failure(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -215,7 +215,7 @@ class TestAttachmentActions:
         app.dialog_suggestion("dialog-callback-iddddd")(handle_suggestion)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_suggestion_failure_2(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -229,7 +229,7 @@ class TestAttachmentActions:
         )(handle_suggestion)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_submission_failure_without_type(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -241,7 +241,7 @@ class TestAttachmentActions:
         app.action("dialog-callback-iddddd")(handle_submission)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_submission_failure(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -253,7 +253,7 @@ class TestAttachmentActions:
         app.dialog_submission("dialog-callback-iddddd")(handle_submission)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_submission_failure_2(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -267,7 +267,7 @@ class TestAttachmentActions:
         )(handle_submission)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_cancellation_failure_without_type(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -279,7 +279,7 @@ class TestAttachmentActions:
         app.action("dialog-callback-iddddd")(handle_cancellation)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_cancellation_failure(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -291,7 +291,7 @@ class TestAttachmentActions:
         app.dialog_cancellation("dialog-callback-iddddd")(handle_cancellation)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_cancellation_failure_2(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -305,7 +305,7 @@ class TestAttachmentActions:
         )(handle_cancellation)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
 
 suggestion_body = {

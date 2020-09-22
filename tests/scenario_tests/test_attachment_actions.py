@@ -105,7 +105,7 @@ class TestAttachmentActions:
         app.action("unknown")(simple_listener)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_failure(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -119,7 +119,7 @@ class TestAttachmentActions:
         )
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_failure_2(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -131,7 +131,7 @@ class TestAttachmentActions:
         app.attachment_action("unknown")(simple_listener)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
 
 # https://api.slack.com/legacy/interactive-messages

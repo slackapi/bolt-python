@@ -14,20 +14,12 @@ from .internals import (
 
 
 class SingleTeamAuthorization(Authorization):
-    def __init__(
-        self,
-        *,
-        auth_test_result: Optional[SlackResponse] = None,
-        verification_enabled: bool = True,
-    ):
+    def __init__(self, *, auth_test_result: Optional[SlackResponse] = None):
         """Single-workspace authorization.
 
         :param auth_test_result: The initial `auth.test` API call result.
-        :param verification_enabled:
-            Calls auth.test for every single incoming request from Slack if True (Default: True)
         """
         self.auth_test_result = auth_test_result
-        self.verification_enabled = verification_enabled
         self.logger = get_bolt_logger(SingleTeamAuthorization)
 
     def process(
@@ -36,20 +28,13 @@ class SingleTeamAuthorization(Authorization):
         if _is_no_auth_required(req):
             return next()
 
-        if not self.verification_enabled:
-            # Skip calling auth.test every time the app receives requests
-            req.context["authorization_result"] = _to_authorization_result(
-                auth_test_result=self.auth_test_result,
-                bot_token=req.context.client.token,
-                request_user_id=req.context.user_id,
-            )
-            return next()
-
         try:
-            auth_result = req.context.client.auth_test()
-            if auth_result:
+            if not self.auth_test_result:
+                self.auth_test_result = req.context.client.auth_test()
+
+            if self.auth_test_result:
                 req.context["authorization_result"] = _to_authorization_result(
-                    auth_test_result=auth_result,
+                    auth_test_result=self.auth_test_result,
                     bot_token=req.context.client.token,
                     request_user_id=req.context.user_id,
                 )

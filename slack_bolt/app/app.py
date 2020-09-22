@@ -77,7 +77,6 @@ class App:
         # for the OAuth flow
         oauth_settings: Optional[OAuthSettings] = None,
         oauth_flow: Optional[OAuthFlow] = None,
-        authorization_test_enabled: bool = True,
         # No need to set (the value is used only in response to ssl_check requests)
         verification_token: Optional[str] = None,
     ):
@@ -93,8 +92,6 @@ class App:
         :param oauth_settings: The settings related to Slack app installation flow (OAuth flow)
         :param oauth_flow: Manually instantiated slack_bolt.oauth.OAuthFlow.
             This is always prioritized over oauth_settings.
-        :param authorization_test_enabled: Set False if you want to skip auth.test calls
-            for every single incoming request from Slack (default: True)
         :param verification_token: Deprecated verification mechanism.
             This can used only for ssl_check requests.
         """
@@ -129,7 +126,6 @@ class App:
         self._installation_store: Optional[InstallationStore] = installation_store
 
         self._oauth_flow: Optional[OAuthFlow] = None
-        self._authorization_test_enabled = authorization_test_enabled
         if oauth_flow:
             self._oauth_flow = oauth_flow
             if self._installation_store is None:
@@ -176,27 +172,18 @@ class App:
 
         if self._oauth_flow is None:
             if self._token:
-                if self._authorization_test_enabled:
-                    self._middleware_list.append(SingleTeamAuthorization())
-                else:
-                    try:
-                        auth_test_result = self._client.auth_test(token=self._token)
-                        self._middleware_list.append(
-                            SingleTeamAuthorization(
-                                auth_test_result=auth_test_result,
-                                verification_enabled=self._authorization_test_enabled,
-                            )
-                        )
-                    except SlackApiError as err:
-                        raise BoltError(error_auth_test_failure(err.response))
+                try:
+                    auth_test_result = self._client.auth_test(token=self._token)
+                    self._middleware_list.append(
+                        SingleTeamAuthorization(auth_test_result=auth_test_result)
+                    )
+                except SlackApiError as err:
+                    raise BoltError(error_auth_test_failure(err.response))
             else:
                 raise BoltError(error_token_required())
         else:
             self._middleware_list.append(
-                MultiTeamsAuthorization(
-                    installation_store=self._installation_store,
-                    verification_enabled=self._authorization_test_enabled,
-                )
+                MultiTeamsAuthorization(installation_store=self._installation_store)
             )
         self._middleware_list.append(IgnoringSelfEvents())
         self._middleware_list.append(UrlVerification())

@@ -131,7 +131,7 @@ class TestAsyncAttachmentActions:
         app.action("unknown")(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
     async def test_failure(self):
@@ -146,7 +146,7 @@ class TestAsyncAttachmentActions:
         )
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
     async def test_failure_2(self):
@@ -159,7 +159,7 @@ class TestAsyncAttachmentActions:
         app.attachment_action("unknown")(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
 
 # https://api.slack.com/legacy/interactive-messages
