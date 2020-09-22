@@ -1,4 +1,6 @@
+import logging
 import os
+from logging import Logger
 from typing import List, Optional
 
 from slack_sdk.oauth import (
@@ -13,6 +15,10 @@ from slack_sdk.oauth.installation_store.async_installation_store import (
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 from slack_sdk.oauth.state_store.async_state_store import AsyncOAuthStateStore
 
+from slack_bolt.authorization.async_authorize import (
+    AsyncInstallationStoreAuthorize,
+    AsyncAuthorize,
+)
 from slack_bolt.error import BoltError
 from slack_bolt.oauth.callback_options import CallbackOptions
 
@@ -33,6 +39,7 @@ class AsyncOAuthSettings:
     authorization_url: str  # default: https://slack.com/oauth/v2/authorize
     # Installation Management
     installation_store: AsyncInstallationStore
+    authorize: AsyncAuthorize
     # state parameter related configurations
     state_store: AsyncOAuthStateStore
     state_cookie_name: str
@@ -41,6 +48,8 @@ class AsyncOAuthSettings:
     state_utils: OAuthStateUtils
     authorize_url_generator: AuthorizeUrlGenerator
     redirect_uri_page_renderer: RedirectUriPageRenderer
+    # Others
+    logger: Logger
 
     def __init__(
         self,
@@ -64,6 +73,8 @@ class AsyncOAuthSettings:
         state_store: Optional[AsyncOAuthStateStore] = None,
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
+        # Others
+        logger: Logger = logging.getLogger(__name__),
     ):
         """The settings for Slack App installation (OAuth flow).
 
@@ -82,6 +93,7 @@ class AsyncOAuthSettings:
         :param state_store: Specify the instance of InstallationStore (Default: FileOAuthStateStore)
         :param state_cookie_name: The cookie name that is set for installers' browser. (Default: slack-app-oauth-state)
         :param state_expiration_seconds: The seconds that the state value is alive (Default: 600 seconds)
+        :param logger: The logger that will be used internally
         """
         # OAuth flow parameters/credentials
         self.client_id = client_id or os.environ.get("SLACK_CLIENT_ID", None)
@@ -112,6 +124,9 @@ class AsyncOAuthSettings:
         # Installation Management
         self.installation_store = installation_store or FileInstallationStore(
             client_id=client_id
+        )
+        self.authorize = AsyncInstallationStoreAuthorize(
+            logger=logger, installation_store=self.installation_store,
         )
         # state parameter related configurations
         self.state_store = state_store or FileOAuthStateStore(

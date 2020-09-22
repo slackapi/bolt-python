@@ -11,23 +11,13 @@ from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import InstallationStore
 from slack_sdk.web import WebClient
 
-from slack_bolt.error import BoltError
-from slack_bolt.logger.messages import (
-    error_signing_secret_not_found,
-    warning_client_prioritized_and_token_skipped,
-    warning_installation_store_prioritized_and_token_skipped,
-    error_auth_test_failure,
-    error_token_required,
-    warning_unhandled_request,
-    debug_checking_listener,
-    debug_applying_middleware,
-    debug_running_listener,
-    warning_did_not_call_ack,
-    debug_running_lazy_listener,
-    debug_responding,
-    error_unexpected_listener_middleware,
-    error_client_invalid_type,
+from slack_bolt.authorization import AuthorizationResult
+from slack_bolt.authorization.authorize import (
+    Authorize,
+    InstallationStoreAuthorize,
+    CallableAuthorize,
 )
+from slack_bolt.error import BoltError
 from slack_bolt.lazy_listener.runner import LazyListenerRunner
 from slack_bolt.lazy_listener.thread_runner import ThreadLazyListenerRunner
 from slack_bolt.listener.custom_listener import CustomListener
@@ -41,6 +31,22 @@ from slack_bolt.listener_matcher import CustomListenerMatcher
 from slack_bolt.listener_matcher import builtins as builtin_matchers
 from slack_bolt.listener_matcher.listener_matcher import ListenerMatcher
 from slack_bolt.logger import get_bolt_app_logger, get_bolt_logger
+from slack_bolt.logger.messages import (
+    error_signing_secret_not_found,
+    warning_client_prioritized_and_token_skipped,
+    warning_token_skipped,
+    error_auth_test_failure,
+    error_token_required,
+    warning_unhandled_request,
+    debug_checking_listener,
+    debug_applying_middleware,
+    debug_running_listener,
+    warning_did_not_call_ack,
+    debug_running_lazy_listener,
+    debug_responding,
+    error_unexpected_listener_middleware,
+    error_client_invalid_type,
+)
 from slack_bolt.middleware import (
     Middleware,
     SslCheck,
@@ -73,6 +79,7 @@ class App:
         token: Optional[str] = None,
         client: Optional[WebClient] = None,
         # for multi-workspace apps
+        authorize: Optional[Callable[..., AuthorizationResult]] = None,
         installation_store: Optional[InstallationStore] = None,
         # for the OAuth flow
         oauth_settings: Optional[OAuthSettings] = None,
@@ -88,6 +95,8 @@ class App:
         :param signing_secret: The Signing Secret value used for verifying requests from Slack.
         :param token: The bot access token required only for single-workspace app.
         :param client: The singleton slack_sdk.WebClient instance for this app.
+        :param authorize: The function to authorize an incoming request from Slack
+            by checking if there is a team/user in the installation data.
         :param installation_store: The module offering save/find operations of installation data
         :param oauth_settings: The settings related to Slack app installation flow (OAuth flow)
         :param oauth_flow: Manually instantiated slack_bolt.oauth.OAuthFlow.
@@ -123,7 +132,18 @@ class App:
         else:
             self._client = create_web_client(token)  # NOTE: the token here can be None
 
+        self._authorize: Optional[Authorize] = None
+        if authorize is not None:
+            self._authorize = CallableAuthorize(
+                logger=self._framework_logger, func=authorize
+            )
+
         self._installation_store: Optional[InstallationStore] = installation_store
+        if self._installation_store is not None and self._authorize is None:
+            self._authorize = InstallationStoreAuthorize(
+                installation_store=self._installation_store,
+                logger=self._framework_logger,
+            )
 
         self._oauth_flow: Optional[OAuthFlow] = None
         if oauth_flow:
@@ -132,6 +152,8 @@ class App:
                 self._installation_store = self._oauth_flow.settings.installation_store
             if self._oauth_flow._client is None:
                 self._oauth_flow._client = self._client
+            if self._authorize is None:
+                self._authorize = self._oauth_flow.settings.authorize
         elif oauth_settings is not None:
             if self._installation_store:
                 # Consistently use a single installation_store
@@ -140,12 +162,14 @@ class App:
             self._oauth_flow = OAuthFlow(
                 client=self.client, logger=self.logger, settings=oauth_settings
             )
+            if self._authorize is None:
+                self._authorize = self._oauth_flow.settings.authorize
 
-        if self._installation_store is not None and self._token is not None:
+        if (
+            self._installation_store is not None or self._authorize is not None
+        ) and self._token is not None:
             self._token = None
-            self._framework_logger.warning(
-                warning_installation_store_prioritized_and_token_skipped()
-            )
+            self._framework_logger.warning(warning_token_skipped())
 
         self._middleware_list: List[Union[Callable, Middleware]] = []
         self._listeners: List[Listener] = []
@@ -171,7 +195,7 @@ class App:
         self._middleware_list.append(RequestVerification(self._signing_secret))
 
         if self._oauth_flow is None:
-            if self._token:
+            if self._token is not None:
                 try:
                     auth_test_result = self._client.auth_test(token=self._token)
                     self._middleware_list.append(
@@ -179,11 +203,15 @@ class App:
                     )
                 except SlackApiError as err:
                     raise BoltError(error_auth_test_failure(err.response))
+            elif self._authorize is not None:
+                self._middleware_list.append(
+                    MultiTeamsAuthorization(authorize=self._authorize)
+                )
             else:
                 raise BoltError(error_token_required())
         else:
             self._middleware_list.append(
-                MultiTeamsAuthorization(installation_store=self._installation_store)
+                MultiTeamsAuthorization(authorize=self._authorize)
             )
         self._middleware_list.append(IgnoringSelfEvents())
         self._middleware_list.append(UrlVerification())

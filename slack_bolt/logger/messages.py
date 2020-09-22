@@ -54,8 +54,10 @@ def warning_client_prioritized_and_token_skipped() -> str:
     return "As you gave `client` as well, `token` will be unused."
 
 
-def warning_installation_store_prioritized_and_token_skipped() -> str:
-    return "As you gave `installation_store` as well, `token` will be unused."
+def warning_token_skipped() -> str:
+    return (
+        "As you gave `installation_store`/`authorize` as well, `token` will be unused."
+    )
 
 
 def warning_unhandled_request(req: Union[BoltRequest, "AsyncBoltRequest"]) -> str:  # type: ignore

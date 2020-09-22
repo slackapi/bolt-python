@@ -1,7 +1,7 @@
 from logging import Logger
 from typing import Optional, Tuple
 
-from slack_bolt.auth import AuthorizationResult
+from slack_bolt.authorization import AuthorizationResult
 
 
 class BaseContext(dict):
