@@ -62,6 +62,8 @@ class OAuthFlow:
         self._client = client
         self._logger = logger
         self.settings = settings
+        self.settings.logger = self._logger
+
         self.client_id = self.settings.client_id
         self.redirect_uri = self.settings.redirect_uri
         self.install_path = self.settings.install_path

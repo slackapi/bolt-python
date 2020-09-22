@@ -11,12 +11,18 @@ from slack_sdk.oauth.installation_store.async_installation_store import (
 )
 from slack_sdk.web.async_client import AsyncWebClient
 
+from slack_bolt.authorization import AuthorizationResult
+from slack_bolt.authorization.async_authorize import (
+    AsyncAuthorize,
+    AsyncCallableAuthorize,
+    AsyncInstallationStoreAuthorize,
+)
 from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.error import BoltError
 from slack_bolt.logger.messages import (
     error_signing_secret_not_found,
     warning_client_prioritized_and_token_skipped,
-    warning_installation_store_prioritized_and_token_skipped,
+    warning_token_skipped,
     error_token_required,
     warning_unhandled_request,
     debug_checking_listener,
@@ -82,6 +88,7 @@ class AsyncApp:
         client: Optional[AsyncWebClient] = None,
         # for multi-workspace apps
         installation_store: Optional[AsyncInstallationStore] = None,
+        authorize: Optional[Callable[..., Awaitable[AuthorizationResult]]] = None,
         # for the OAuth flow
         oauth_settings: Optional[AsyncOAuthSettings] = None,
         oauth_flow: Optional[AsyncOAuthFlow] = None,
@@ -97,6 +104,8 @@ class AsyncApp:
         :param token: The bot access token required only for single-workspace app.
         :param client: The singleton slack_sdk.web.async_client.AsyncWebClient instance for this app.
         :param installation_store: The module offering save/find operations of installation data
+        :param authorize: The function to authorize an incoming request from Slack
+            by checking if there is a team/user in the installation data.
         :param oauth_settings: The settings related to Slack app installation flow (OAuth flow)
         :param oauth_flow: Manually instantiated slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow.
             This is always prioritized over oauth_settings.
@@ -131,9 +140,20 @@ class AsyncApp:
             # NOTE: the token here can be None
             self._async_client = create_async_web_client(token)
 
+        self._async_authorize: Optional[AsyncAuthorize] = None
+        if authorize is not None:
+            self._async_authorize = AsyncCallableAuthorize(
+                logger=self._framework_logger, func=authorize
+            )
+
         self._async_installation_store: Optional[
             AsyncInstallationStore
         ] = installation_store
+        if self._async_installation_store is not None and self._async_authorize is None:
+            self._async_authorize = AsyncInstallationStoreAuthorize(
+                installation_store=self._async_installation_store,
+                logger=self._framework_logger,
+            )
 
         self._async_oauth_flow: Optional[AsyncOAuthFlow] = None
         if oauth_flow:
@@ -144,6 +164,8 @@ class AsyncApp:
                 )
             if self._async_oauth_flow._async_client is None:
                 self._async_oauth_flow._async_client = self._async_client
+            if self._async_authorize is None:
+                self._async_authorize = self._async_oauth_flow.settings.authorize
         elif oauth_settings is not None:
             if self._async_installation_store:
                 # Consistently use a single installation_store
@@ -152,12 +174,15 @@ class AsyncApp:
             self._async_oauth_flow = AsyncOAuthFlow(
                 client=self._async_client, logger=self.logger, settings=oauth_settings
             )
+            if self._async_authorize is None:
+                self._async_authorize = self._async_oauth_flow.settings.authorize
 
-        if self._async_installation_store is not None and self._token is not None:
+        if (
+            self._async_installation_store is not None
+            or self._async_authorize is not None
+        ) and self._token is not None:
             self._token = None
-            self._framework_logger.warning(
-                warning_installation_store_prioritized_and_token_skipped()
-            )
+            self._framework_logger.warning(warning_token_skipped())
 
         self._async_middleware_list: List[Union[Callable, AsyncMiddleware]] = []
         self._async_listeners: List[AsyncListener] = []
@@ -184,13 +209,15 @@ class AsyncApp:
         if self._async_oauth_flow is None:
             if self._token:
                 self._async_middleware_list.append(AsyncSingleTeamAuthorization())
+            elif self._async_authorize is not None:
+                self._async_middleware_list.append(
+                    AsyncMultiTeamsAuthorization(authorize=self._async_authorize)
+                )
             else:
                 raise BoltError(error_token_required())
         else:
             self._async_middleware_list.append(
-                AsyncMultiTeamsAuthorization(
-                    installation_store=self._async_installation_store
-                )
+                AsyncMultiTeamsAuthorization(authorize=self._async_authorize)
             )
 
         self._async_middleware_list.append(AsyncIgnoringSelfEvents())

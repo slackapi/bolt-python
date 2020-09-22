@@ -2,7 +2,7 @@ from typing import Optional, Union
 
 from slack_sdk.web import SlackResponse
 
-from slack_bolt.auth import AuthorizationResult
+from slack_bolt.authorization import AuthorizationResult
 from slack_bolt.request.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
