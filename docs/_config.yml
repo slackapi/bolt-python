@@ -11,6 +11,8 @@ url: https://slack.dev
 collections:
   basic:
     output: false
+  steps:
+    output: false
   advanced:
     output: false
   tutorials:
@@ -29,11 +31,14 @@ defaults:
 t:
   en:
     basic: Basic concepts
+    steps: Workflow steps
     advanced: Advanced concepts
     start: Getting started
     contribute: Contributing
   ja-jp:
     basic: 基本的な概念
+    # TODO: translate this title
+    steps: Workflow steps
     advanced: 応用コンセプト
     start: Bolt 入門ガイド
     contribute: 貢献
