@@ -23,7 +23,7 @@ When setting up shortcuts within your app configuration, as with other URLs, you
 
 ```python
 
-# The open_modal shortcut opens a plain old modal
+# The open_modal shortcut listens to a shortcut with the callback_id "open_modal"
 @app.shortcut("open_modal")
 def open_modal(ack, shortcut, client):
     # Acknowledge the shortcut request
@@ -31,6 +31,7 @@ def open_modal(ack, shortcut, client):
     # Call the views_open method using one of the built-in WebClients
     client.views_open(
         trigger_id=shortcut["trigger_id"],
+        # A simple view payload for a modal
         view={
             "type": "modal",
             "title": {"type": "plain_text", "text": "My App"},

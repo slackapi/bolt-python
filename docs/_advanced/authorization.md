@@ -2,7 +2,7 @@
 title: Authorization
 lang: en
 slug: authorization
-order: 3
+order: 5
 ---
 
 <div class="section-content">
@@ -44,7 +44,7 @@ installations = [
     }
 ]
 
-def authorizeFn(enterprise_id, team_id, client: WebClient, logger):
+def authorizeFn(enterprise_id, team_id, logger):
     logger.info(f"{enterprise_id},{team_id}")
     
     # You can implement your own logic to fetch token here
