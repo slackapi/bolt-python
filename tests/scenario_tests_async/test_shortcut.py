@@ -70,7 +70,7 @@ class TestAsyncShortcut:
         request = self.build_valid_request(message_shortcut_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
     async def test_success_global(self):
@@ -95,7 +95,7 @@ class TestAsyncShortcut:
         request = self.build_valid_request(message_shortcut_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
     async def test_success_message(self):
@@ -112,7 +112,7 @@ class TestAsyncShortcut:
         request = self.build_valid_request(global_shortcut_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
     async def test_success_message_2(self):
@@ -127,7 +127,7 @@ class TestAsyncShortcut:
         request = self.build_valid_request(global_shortcut_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
     async def test_process_before_response_global(self):
@@ -154,7 +154,7 @@ class TestAsyncShortcut:
         app.shortcut("another-one")(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
     async def test_failure_2(self):
@@ -167,12 +167,12 @@ class TestAsyncShortcut:
         app.global_shortcut("another-one")(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
         request = self.build_valid_request(message_shortcut_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 3
+        assert self.mock_received_requests["/auth.test"] == 1
 
 
 global_shortcut_body = {

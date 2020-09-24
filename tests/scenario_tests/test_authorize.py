@@ -7,16 +7,35 @@ from slack_sdk.signature import SignatureVerifier
 
 from slack_bolt import BoltRequest
 from slack_bolt.app import App
+from slack_bolt.authorization import AuthorizationResult
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
+valid_token = "xoxb-valid"
 
-class TestBlockActions:
+
+def authorize(enterprise_id, team_id, user_id, client: WebClient):
+    assert enterprise_id == "E111"
+    assert team_id == "T111"
+    assert user_id == "W111"
+    auth_test = client.auth_test(token=valid_token)
+    return AuthorizationResult.from_auth_test_response(
+        auth_test_response=auth_test, bot_token=valid_token,
+    )
+
+
+def error_authorize(enterprise_id, team_id, user_id):
+    assert enterprise_id == "E111"
+    assert team_id == "T111"
+    assert user_id == "W111"
+    return None
+
+
+class TestAuthorize:
     signing_secret = "secret"
-    valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
     web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
@@ -47,91 +66,33 @@ class TestBlockActions:
             body=raw_body, headers=self.build_headers(timestamp, raw_body)
         )
 
-    def test_mock_server_is_running(self):
-        resp = self.web_client.api_test()
-        assert resp != None
-
     def test_success(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
-        app.action("a")(simple_listener)
-
-        request = self.build_valid_request()
-        response = app.dispatch(request)
-        assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
-
-    def test_success_2(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
-        app.block_action("a")(simple_listener)
-
-        request = self.build_valid_request()
-        response = app.dispatch(request)
-        assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
-
-    def test_process_before_response(self):
         app = App(
             client=self.web_client,
+            authorize=authorize,
             signing_secret=self.signing_secret,
-            process_before_response=True,
         )
         app.action("a")(simple_listener)
 
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
-
-    def test_default_type(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret)
-        app.action({"action_id": "a", "block_id": "b"})(simple_listener)
-
-        request = self.build_valid_request()
-        response = app.dispatch(request)
-        assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
-
-    def test_default_type_no_block_id(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret)
-        app.action({"action_id": "a"})(simple_listener)
-
-        request = self.build_valid_request()
-        response = app.dispatch(request)
-        assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
-
-    def test_default_type_and_unmatched_block_id(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret)
-        app.action({"action_id": "a", "block_id": "bbb"})(simple_listener)
-
-        request = self.build_valid_request()
-        response = app.dispatch(request)
-        assert response.status == 404
+        assert response.body == ""
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_failure(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            authorize=error_authorize,
+            signing_secret=self.signing_secret,
+        )
+        app.action("a")(simple_listener)
+
         request = self.build_valid_request()
         response = app.dispatch(request)
-        assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
-
-        app.action("aaa")(simple_listener)
-        response = app.dispatch(request)
-        assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
-
-    def test_failure_2(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
-        request = self.build_valid_request()
-        response = app.dispatch(request)
-        assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
-
-        app.block_action("aaa")(simple_listener)
-        response = app.dispatch(request)
-        assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert response.status == 200
+        assert response.body == ":x: Please install this app into the workspace :bow:"
+        assert self.mock_received_requests.get("/auth.test") == None
 
 
 body = {

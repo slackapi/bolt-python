@@ -1,4 +1,5 @@
 import pytest
+from slack_sdk import WebClient
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 
@@ -6,14 +7,25 @@ from slack_bolt import App
 from slack_bolt.error import BoltError
 from slack_bolt.oauth import OAuthFlow
 from slack_bolt.oauth.oauth_settings import OAuthSettings
+from tests.mock_web_api_server import (
+    setup_mock_web_api_server,
+    cleanup_mock_web_api_server,
+)
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
 class TestApp:
+    signing_secret = "secret"
+    valid_token = "xoxb-valid"
+    mock_api_server_base_url = "http://localhost:8888"
+    web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
+
     def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()
+        setup_mock_web_api_server(self)
 
     def teardown_method(self):
+        cleanup_mock_web_api_server(self)
         restore_os_env(self.old_os_env)
 
     def test_signing_secret_absence(self):
@@ -26,7 +38,7 @@ class TestApp:
         ack()
 
     def test_listener_registration_error(self):
-        app = App(signing_secret="valid", token="xoxb-xxx")
+        app = App(signing_secret="valid", client=self.web_client)
         with pytest.raises(BoltError):
             app.action({"type": "invalid_type", "action_id": "a"})(self.simple_listener)
 
@@ -35,7 +47,7 @@ class TestApp:
     # --------------------------
 
     def test_valid_single_auth(self):
-        app = App(signing_secret="valid", token="xoxb-xxx")
+        app = App(signing_secret="valid", client=self.web_client)
         assert app != None
 
     def test_token_absence(self):

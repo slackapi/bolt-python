@@ -8,6 +8,7 @@ from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.app.async_app import AsyncApp
+from slack_bolt.authorization import AuthorizationResult
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
@@ -15,10 +16,28 @@ from tests.mock_web_api_server import (
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
+valid_token = "xoxb-valid"
 
-class TestAsyncBlockActions:
+
+async def authorize(enterprise_id, team_id, user_id, client: AsyncWebClient):
+    assert enterprise_id == "E111"
+    assert team_id == "T111"
+    assert user_id == "W111"
+    auth_test = await client.auth_test(token=valid_token)
+    return AuthorizationResult.from_auth_test_response(
+        auth_test_response=auth_test, bot_token=valid_token,
+    )
+
+
+async def error_authorize(enterprise_id, team_id, user_id):
+    assert enterprise_id == "E111"
+    assert team_id == "T111"
+    assert user_id == "W111"
+    return None
+
+
+class TestAsyncAuthorize:
     signing_secret = "secret"
-    valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
     web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
@@ -54,113 +73,34 @@ class TestAsyncBlockActions:
         )
 
     @pytest.mark.asyncio
-    async def test_mock_server_is_running(self):
-        resp = await self.web_client.api_test()
-        assert resp != None
-
-    @pytest.mark.asyncio
     async def test_success(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
-        app.action("a")(simple_listener)
-
-        request = self.build_valid_request()
-        response = await app.async_dispatch(request)
-        assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
-
-    @pytest.mark.asyncio
-    async def test_success_2(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
-        app.block_action("a")(simple_listener)
-
-        request = self.build_valid_request()
-        response = await app.async_dispatch(request)
-        assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
-
-    @pytest.mark.asyncio
-    async def test_default_type(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
-        app.action({"action_id": "a", "block_id": "b"})(simple_listener)
-
-        request = self.build_valid_request()
-        response = await app.async_dispatch(request)
-        assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
-
-    @pytest.mark.asyncio
-    async def test_default_type_no_block_id(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
-        app.action({"action_id": "a"})(simple_listener)
-
-        request = self.build_valid_request()
-        response = await app.async_dispatch(request)
-        assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
-
-    @pytest.mark.asyncio
-    async def test_default_type_unmatched_block_id(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
-        app.action({"action_id": "a", "block_id": "bbb"})(simple_listener)
-
-        request = self.build_valid_request()
-        response = await app.async_dispatch(request)
-        assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
-
-    @pytest.mark.asyncio
-    async def test_process_before_response(self):
         app = AsyncApp(
             client=self.web_client,
+            authorize=authorize,
             signing_secret=self.signing_secret,
-            process_before_response=True,
         )
         app.action("a")(simple_listener)
 
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
-
-    @pytest.mark.asyncio
-    async def test_process_before_response_2(self):
-        app = AsyncApp(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
-            process_before_response=True,
-        )
-        app.block_action("a")(simple_listener)
-
-        request = self.build_valid_request()
-        response = await app.async_dispatch(request)
-        assert response.status == 200
+        assert response.body == ""
         assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
     async def test_failure(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            authorize=error_authorize,
+            signing_secret=self.signing_secret,
+        )
+        app.block_action("a")(simple_listener)
+
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
-        assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
-
-        app.action("aaa")(simple_listener)
-        response = await app.async_dispatch(request)
-        assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
-
-    @pytest.mark.asyncio
-    async def test_failure_2(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
-        request = self.build_valid_request()
-        response = await app.async_dispatch(request)
-        assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
-
-        app.block_action("aaa")(simple_listener)
-        response = await app.async_dispatch(request)
-        assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert response.status == 200
+        assert response.body == ":x: Please install this app into the workspace :bow:"
+        assert self.mock_received_requests.get("/auth.test") == None
 
 
 body = {

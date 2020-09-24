@@ -2,22 +2,26 @@ import inspect
 import json
 import logging
 import os
-import time
 from concurrent.futures.thread import ThreadPoolExecutor
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from typing import List, Union, Pattern, Callable, Dict, Optional
 
+from slack_bolt.listener.thread_runner import ThreadListenerRunner
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import InstallationStore
 from slack_sdk.web import WebClient
 
+from slack_bolt.authorization import AuthorizationResult
+from slack_bolt.authorization.authorize import (
+    Authorize,
+    InstallationStoreAuthorize,
+    CallableAuthorize,
+)
 from slack_bolt.error import BoltError
-from slack_bolt.lazy_listener.runner import LazyListenerRunner
 from slack_bolt.lazy_listener.thread_runner import ThreadLazyListenerRunner
 from slack_bolt.listener.custom_listener import CustomListener
 from slack_bolt.listener.listener import Listener
 from slack_bolt.listener.listener_error_handler import (
-    ListenerErrorHandler,
     DefaultListenerErrorHandler,
     CustomListenerErrorHandler,
 )
@@ -25,6 +29,19 @@ from slack_bolt.listener_matcher import CustomListenerMatcher
 from slack_bolt.listener_matcher import builtins as builtin_matchers
 from slack_bolt.listener_matcher.listener_matcher import ListenerMatcher
 from slack_bolt.logger import get_bolt_app_logger, get_bolt_logger
+from slack_bolt.logger.messages import (
+    error_signing_secret_not_found,
+    warning_client_prioritized_and_token_skipped,
+    warning_token_skipped,
+    error_auth_test_failure,
+    error_token_required,
+    warning_unhandled_request,
+    debug_checking_listener,
+    debug_applying_middleware,
+    debug_running_listener,
+    error_unexpected_listener_middleware,
+    error_client_invalid_type,
+)
 from slack_bolt.middleware import (
     Middleware,
     SslCheck,
@@ -40,7 +57,7 @@ from slack_bolt.oauth import OAuthFlow
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
-from slack_bolt.util.utils import create_web_client, create_copy
+from slack_bolt.util.utils import create_web_client
 
 
 class App:
@@ -57,21 +74,36 @@ class App:
         token: Optional[str] = None,
         client: Optional[WebClient] = None,
         # for multi-workspace apps
+        authorize: Optional[Callable[..., AuthorizationResult]] = None,
         installation_store: Optional[InstallationStore] = None,
         # for the OAuth flow
         oauth_settings: Optional[OAuthSettings] = None,
         oauth_flow: Optional[OAuthFlow] = None,
-        authorization_test_enabled: bool = True,
         # No need to set (the value is used only in response to ssl_check requests)
         verification_token: Optional[str] = None,
     ):
+        """Bolt App that provides functionalities to register middleware/listeners
+
+        :param name: The application name that will be used in logging.
+            If absent, the source file name will be used instead.
+        :param process_before_response: True if this app runs on Function as a Service. (Default: False)
+        :param signing_secret: The Signing Secret value used for verifying requests from Slack.
+        :param token: The bot access token required only for single-workspace app.
+        :param client: The singleton slack_sdk.WebClient instance for this app.
+        :param authorize: The function to authorize an incoming request from Slack
+            by checking if there is a team/user in the installation data.
+        :param installation_store: The module offering save/find operations of installation data
+        :param oauth_settings: The settings related to Slack app installation flow (OAuth flow)
+        :param oauth_flow: Manually instantiated slack_bolt.oauth.OAuthFlow.
+            This is always prioritized over oauth_settings.
+        :param verification_token: Deprecated verification mechanism.
+            This can used only for ssl_check requests.
+        """
         signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET", None)
         token = token or os.environ.get("SLACK_BOT_TOKEN", None)
 
         if signing_secret is None or signing_secret == "":
-            raise BoltError(
-                "Signing secret not found, so could not initialize the Bolt app."
-            )
+            raise BoltError(error_signing_secret_not_found())
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret: str = signing_secret
@@ -85,26 +117,38 @@ class App:
 
         if client is not None:
             if not isinstance(client, WebClient):
-                raise BoltError("client must be a WebClient")
+                raise BoltError(error_client_invalid_type())
             self._client = client
             self._token = client.token
             if token is not None:
                 self._framework_logger.warning(
-                    "As you gave client as well, the bot token will be unused."
+                    warning_client_prioritized_and_token_skipped()
                 )
         else:
             self._client = create_web_client(token)  # NOTE: the token here can be None
 
+        self._authorize: Optional[Authorize] = None
+        if authorize is not None:
+            self._authorize = CallableAuthorize(
+                logger=self._framework_logger, func=authorize
+            )
+
         self._installation_store: Optional[InstallationStore] = installation_store
+        if self._installation_store is not None and self._authorize is None:
+            self._authorize = InstallationStoreAuthorize(
+                installation_store=self._installation_store,
+                logger=self._framework_logger,
+            )
 
         self._oauth_flow: Optional[OAuthFlow] = None
-        self._authorization_test_enabled = authorization_test_enabled
         if oauth_flow:
             self._oauth_flow = oauth_flow
             if self._installation_store is None:
                 self._installation_store = self._oauth_flow.settings.installation_store
             if self._oauth_flow._client is None:
                 self._oauth_flow._client = self._client
+            if self._authorize is None:
+                self._authorize = self._oauth_flow.settings.authorize
         elif oauth_settings is not None:
             if self._installation_store:
                 # Consistently use a single installation_store
@@ -113,23 +157,29 @@ class App:
             self._oauth_flow = OAuthFlow(
                 client=self.client, logger=self.logger, settings=oauth_settings
             )
+            if self._authorize is None:
+                self._authorize = self._oauth_flow.settings.authorize
 
-        if self._installation_store is not None and self._token is not None:
+        if (
+            self._installation_store is not None or self._authorize is not None
+        ) and self._token is not None:
             self._token = None
-            self._framework_logger.warning(
-                "As you gave installation_store as well, the bot token will be unused."
-            )
+            self._framework_logger.warning(warning_token_skipped())
 
         self._middleware_list: List[Union[Callable, Middleware]] = []
         self._listeners: List[Listener] = []
-        self._listener_executor = ThreadPoolExecutor(max_workers=5)  # TODO: shutdown
-        self._listener_error_handler = DefaultListenerErrorHandler(
-            logger=self._framework_logger
-        )
-        self._process_before_response = process_before_response
 
-        self.lazy_listener_runner: LazyListenerRunner = ThreadLazyListenerRunner(
-            logger=self._framework_logger, executor=self._listener_executor,
+        listener_executor = ThreadPoolExecutor(max_workers=5)
+        self._listener_runner = ThreadListenerRunner(
+            logger=self._framework_logger,
+            process_before_response=process_before_response,
+            listener_error_handler=DefaultListenerErrorHandler(
+                logger=self._framework_logger
+            ),
+            listener_executor=listener_executor,
+            lazy_listener_runner=ThreadLazyListenerRunner(
+                logger=self._framework_logger, executor=listener_executor,
+            ),
         )
 
         self._init_middleware_list_done = False
@@ -144,32 +194,23 @@ class App:
         self._middleware_list.append(RequestVerification(self._signing_secret))
 
         if self._oauth_flow is None:
-            if self._token:
-                if self._authorization_test_enabled:
-                    self._middleware_list.append(SingleTeamAuthorization())
-                else:
-                    try:
-                        auth_test_result = self._client.auth_test(token=self._token)
-                        self._middleware_list.append(
-                            SingleTeamAuthorization(
-                                auth_test_result=auth_test_result,
-                                verification_enabled=self._authorization_test_enabled,
-                            )
-                        )
-                    except SlackApiError as err:
-                        raise BoltError(
-                            f"token is invalid (auth.test result: {err.response})"
-                        )
-            else:
-                raise BoltError(
-                    "Either an env variable SLACK_BOT_TOKEN or token argument in constructor is required."
+            if self._token is not None:
+                try:
+                    auth_test_result = self._client.auth_test(token=self._token)
+                    self._middleware_list.append(
+                        SingleTeamAuthorization(auth_test_result=auth_test_result)
+                    )
+                except SlackApiError as err:
+                    raise BoltError(error_auth_test_failure(err.response))
+            elif self._authorize is not None:
+                self._middleware_list.append(
+                    MultiTeamsAuthorization(authorize=self._authorize)
                 )
+            else:
+                raise BoltError(error_token_required())
         else:
             self._middleware_list.append(
-                MultiTeamsAuthorization(
-                    installation_store=self._installation_store,
-                    verification_enabled=self._authorization_test_enabled,
-                )
+                MultiTeamsAuthorization(authorize=self._authorize)
             )
         self._middleware_list.append(IgnoringSelfEvents())
         self._middleware_list.append(UrlVerification())
@@ -199,13 +240,21 @@ class App:
         return self._installation_store
 
     @property
-    def listener_error_handler(self) -> ListenerErrorHandler:
-        return self._listener_error_handler
+    def listener_runner(self) -> ThreadListenerRunner:
+        return self._listener_runner
 
     # -------------------------
     # standalone server
 
     def start(self, port: int = 3000, path: str = "/slack/events") -> None:
+        """Start a web server for local development.
+        This method internally starts a Web server process built with the http.server module.'
+        For production, consider using a production-ready WSGI server such as Gunicorn.
+
+        :param port: The port to listen on (Default: 3000)
+        :param path: The path to handle request from Slack (Default: /slack/events)
+        :return: None
+        """
         self._development_server = SlackAppDevelopmentServer(
             port=port, path=path, app=self, oauth_flow=self.oauth_flow,
         )
@@ -215,6 +264,11 @@ class App:
     # main dispatcher
 
     def dispatch(self, req: BoltRequest) -> BoltResponse:
+        """Applies all middleware and dispatches an incoming request from Slack to the right code path.
+
+        :param req: An incoming request from Slack.
+        :return: The response generated by this Bolt app.
+        """
         self._init_context(req)
 
         resp: BoltResponse = BoltResponse(status=200, body="")
@@ -226,7 +280,7 @@ class App:
         for middleware in self._middleware_list:
             middleware_state["next_called"] = False
             if self._framework_logger.level <= logging.DEBUG:
-                self._framework_logger.debug(f"Applying {middleware.name}")
+                self._framework_logger.debug(debug_applying_middleware(middleware.name))
             resp = middleware.process(req=req, resp=resp, next=middleware_next)
             if not middleware_state["next_called"]:
                 if resp is None:
@@ -237,7 +291,7 @@ class App:
 
         for listener in self._listeners:
             listener_name = listener.ack_function.__name__
-            self._framework_logger.debug(f"Checking listener: {listener_name} ...")
+            self._framework_logger.debug(debug_checking_listener(listener_name))
             if listener.matches(req=req, resp=resp):
                 # run all the middleware attached to this listener first
                 resp, next_was_not_called = listener.run_middleware(req=req, resp=resp)
@@ -246,8 +300,8 @@ class App:
                     # This means the listener is not for this incoming request.
                     continue
 
-                self._framework_logger.debug(f"Running listener: {listener_name} ...")
-                listener_response: Optional[BoltResponse] = self.run_listener(
+                self._framework_logger.debug(debug_running_listener(listener_name))
+                listener_response: Optional[BoltResponse] = self._listener_runner.run(
                     request=req,
                     response=resp,
                     listener_name=listener_name,
@@ -256,166 +310,42 @@ class App:
                 if listener_response is not None:
                     return listener_response
 
-        self._framework_logger.warning(f"Unhandled request ({req.body})")
+        self._framework_logger.warning(warning_unhandled_request(req))
         return BoltResponse(status=404, body={"error": "unhandled request"})
-
-    def run_listener(
-        self,
-        request: BoltRequest,
-        response: BoltResponse,
-        listener_name: str,
-        listener: Listener,
-    ) -> Optional[BoltResponse]:
-        ack = request.context.ack
-        starting_time = time.time()
-        if self._process_before_response:
-            if not request.lazy_only:
-                try:
-                    returned_value = listener.run_ack_function(
-                        request=request, response=response
-                    )
-                    if isinstance(returned_value, BoltResponse):
-                        response = returned_value
-                    if ack.response is None and listener.auto_acknowledgement:
-                        ack()  # automatic ack() call if the call is not yet done
-                except Exception as e:
-                    # The default response status code is 500 in this case.
-                    # You can customize this by passing your own error handler.
-                    if response is None:
-                        response = BoltResponse(status=500)
-                    response.status = 500
-                    self._listener_error_handler.handle(
-                        error=e, request=request, response=response,
-                    )
-                    ack.response = response
-
-            for lazy_func in listener.lazy_functions:
-                if request.lazy_function_name:
-                    func_name = lazy_func.__name__
-                    if func_name == request.lazy_function_name:
-                        self.lazy_listener_runner.run(
-                            function=lazy_func, request=request
-                        )
-                        # This HTTP response won't be sent to Slack API servers.
-                        return BoltResponse(status=200)
-                    else:
-                        continue
-                else:
-                    self._start_lazy_function(lazy_func, request)
-
-            if response is not None:
-                self._debug_log_completion(starting_time, response)
-                return response
-            elif ack.response is not None:
-                self._debug_log_completion(starting_time, ack.response)
-                return ack.response
-        else:
-            if listener.auto_acknowledgement:
-                # acknowledge immediately in case of Events API
-                ack()
-
-            if not request.lazy_only:
-                # start the listener function asynchronously
-                def run_ack_function_asynchronously():
-                    nonlocal ack, request, response
-                    try:
-                        listener.run_ack_function(request=request, response=response)
-                    except Exception as e:
-                        # The default response status code is 500 in this case.
-                        # You can customize this by passing your own error handler.
-                        if listener.auto_acknowledgement:
-                            self._listener_error_handler.handle(
-                                error=e, request=request, response=response,
-                            )
-                        else:
-                            if response is None:
-                                response = BoltResponse(status=500)
-                            response.status = 500
-                            if ack.response is not None:  # already acknowledged
-                                response = None
-                            self._listener_error_handler.handle(
-                                error=e, request=request, response=response,
-                            )
-                            ack.response = response
-
-                self._listener_executor.submit(run_ack_function_asynchronously)
-
-            for lazy_func in listener.lazy_functions:
-                if request.lazy_function_name:
-                    func_name = lazy_func.__name__
-                    if func_name == request.lazy_function_name:
-                        self.lazy_listener_runner.run(
-                            function=lazy_func, request=request
-                        )
-                        # This HTTP response won't be sent to Slack API servers.
-                        return BoltResponse(status=200)
-                    else:
-                        continue
-                else:
-                    self._start_lazy_function(lazy_func, request)
-
-            # await for the completion of ack() in the async listener execution
-            while ack.response is None and time.time() - starting_time <= 3:
-                time.sleep(0.01)
-
-            if response is None and ack.response is None:
-                self._framework_logger.warning(f"{listener_name} didn't call ack()")
-                return None
-
-            if response is None and ack.response is not None:
-                response = ack.response
-                self._debug_log_completion(starting_time, response)
-                return response
-
-            if response is not None:
-                return response
-
-        # None for both means no ack() in the listener
-        return None
-
-    def _start_lazy_function(
-        self, lazy_func: Callable[..., None], request: BoltRequest
-    ):
-        # Start a lazy function asynchronously
-        func_name: str = lazy_func.__name__
-        self._framework_logger.debug(f"Running lazy listener: {func_name} ...")
-        copied_request = self._build_lazy_request(request, func_name)
-        self.lazy_listener_runner.start(function=lazy_func, request=copied_request)
-
-    @staticmethod
-    def _build_lazy_request(request: BoltRequest, lazy_func_name: str) -> BoltRequest:
-        copied_request = create_copy(request)
-        copied_request.method = "NONE"
-        copied_request.lazy_only = True
-        copied_request.lazy_function_name = lazy_func_name
-        return copied_request
-
-    def _debug_log_completion(
-        self, starting_time: float, response: BoltResponse
-    ) -> None:
-        millis = int((time.time() - starting_time) * 1000)
-        self._framework_logger.debug(
-            f'Responding with status: {response.status} body: "{response.body}" ({millis} millis)'
-        )
 
     # -------------------------
     # middleware
 
-    def use(self, *args):
+    def use(self, *args) -> None:
+        """Refer to middleware method's docstring for details."""
         return self.middleware(*args)
 
-    def middleware(self, *args):
+    def middleware(self, *args) -> None:
+        """Registers a new middleware to this Bolt app.
+
+        :param args: a list of middleware. Passing a single middleware is supported.
+        :return: None
+        """
         if len(args) > 0:
-            func = args[0]
-            self._middleware_list.append(
-                CustomMiddleware(app_name=self.name, func=func)
-            )
+            middleware_or_callable = args[0]
+            if isinstance(middleware_or_callable, Middleware):
+                self._middleware_list.append(middleware_or_callable)
+            else:
+                self._middleware_list.append(
+                    CustomMiddleware(app_name=self.name, func=middleware_or_callable)
+                )
 
     # -------------------------
     # global error handler
 
-    def error(self, func: Callable[..., None]):
-        self._listener_error_handler = CustomListenerErrorHandler(
+    def error(self, func: Callable[..., None]) -> None:
+        """Updates the global error handler.
+
+        :param func: The function that is supposed to be executed
+            when getting an unhandled error in Bolt app.
+        :return: None
+        """
+        self._listener_runner.listener_error_handler = CustomListenerErrorHandler(
             logger=self._framework_logger, func=func,
         )
 
@@ -427,7 +357,15 @@ class App:
         event: Union[str, Pattern, Dict[str, str]],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new event listener.
+
+        :param event: The conditions to match against a request payload
+        :param matchers: A list of listener matcher functions.
+        :param middleware: A list of lister middleware functions.
+        :return: None
+        """
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.event(event)
@@ -442,7 +380,10 @@ class App:
         keyword: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new message event listener.
+        Check the #event method's docstring for details.
+        """
         matchers = matchers if matchers else []
         middleware = middleware if middleware else []
 
@@ -464,7 +405,15 @@ class App:
         command: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new slash command listener.
+
+        :param command: The conditions to match against a request payload
+        :param matchers: A list of listener matcher functions.
+        :param middleware: A list of lister middleware functions.
+        :return: None
+        """
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.command(command)
@@ -482,7 +431,15 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new shortcut listener.
+
+        :param constraints: The conditions to match against a request payload
+        :param matchers: A list of listener matcher functions.
+        :param middleware: A list of lister middleware functions.
+        :return: None
+        """
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.shortcut(constraints)
@@ -497,7 +454,9 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new global shortcut listener."""
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.global_shortcut(callback_id)
@@ -512,7 +471,9 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new message shortcut listener."""
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.message_shortcut(callback_id)
@@ -530,7 +491,15 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new action listener.
+
+        :param constraints: The conditions to match against a request payload
+        :param matchers: A list of listener matcher functions.
+        :param middleware: A list of lister middleware functions.
+        :return: None
+        """
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.action(constraints)
@@ -545,7 +514,9 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new block_actions listener."""
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.block_action(constraints)
@@ -560,7 +531,9 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new interactive_message listener."""
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.attachment_action(callback_id)
@@ -575,7 +548,9 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new dialog_submission listener."""
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.dialog_submission(callback_id)
@@ -590,7 +565,9 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new dialog_cancellation listener."""
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.dialog_cancellation(callback_id)
@@ -608,7 +585,15 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new view submission/closed event listener.
+
+        :param constraints: The conditions to match against a request payload
+        :param matchers: A list of listener matcher functions.
+        :param middleware: A list of lister middleware functions.
+        :return: None
+        """
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.view(constraints)
@@ -623,7 +608,9 @@ class App:
         constraints: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new view_submission listener."""
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.view_submission(constraints)
@@ -638,7 +625,9 @@ class App:
         constraints: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new view_closed listener."""
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.view_closed(constraints)
@@ -656,7 +645,15 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new options listener.
+
+        :param constraints: The conditions to match against a request payload
+        :param matchers: A list of listener matcher functions.
+        :param middleware: A list of lister middleware functions.
+        :return: None
+        """
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.options(constraints)
@@ -671,7 +668,9 @@ class App:
         action_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new block_suggestion listener."""
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.block_suggestion(action_id)
@@ -686,7 +685,9 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ):
+    ) -> Callable[..., None]:
+        """Registers a new dialog_submission listener."""
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.dialog_suggestion(callback_id)
@@ -736,9 +737,7 @@ class App:
             elif isinstance(m, Callable):
                 listener_middleware.append(CustomMiddleware(app_name=self.name, func=m))
             else:
-                raise ValueError(
-                    f"Unexpected value for a listener middleware: {type(m)}"
-                )
+                raise ValueError(error_unexpected_listener_middleware(type(m)))
 
         self._listeners.append(
             CustomListener(
@@ -841,7 +840,11 @@ class SlackAppDevelopmentServer:
 
         self._server = HTTPServer(("0.0.0.0", self._port), SlackAppHandler)
 
-    def start(self):
+    def start(self) -> None:
+        """Starts a new web server process.
+
+        :return: None
+        """
         if self._bolt_app.logger.level > logging.INFO:
             print("⚡️ Bolt app is running! (development server)")
         else:

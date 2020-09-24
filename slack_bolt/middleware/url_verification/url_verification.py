@@ -8,6 +8,10 @@ from slack_bolt.response import BoltResponse
 
 class UrlVerification(Middleware):  # type: ignore
     def __init__(self):
+        """Handles url_verification requests.
+
+        Refer to https://api.slack.com/events/url_verification for details.
+        """
         self.logger = get_bolt_logger(UrlVerification)
 
     def process(

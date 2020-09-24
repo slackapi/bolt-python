@@ -1,4 +1,6 @@
+import logging
 import os
+from logging import Logger
 from typing import List, Optional
 
 from slack_sdk.oauth import (
@@ -11,6 +13,7 @@ from slack_sdk.oauth import (
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 
+from slack_bolt.authorization.authorize import Authorize, InstallationStoreAuthorize
 from slack_bolt.error import BoltError
 from slack_bolt.oauth.callback_options import CallbackOptions
 
@@ -31,6 +34,7 @@ class OAuthSettings:
     authorization_url: str  # default: https://slack.com/oauth/v2/authorize
     # Installation Management
     installation_store: InstallationStore
+    authorize: Authorize
     # state parameter related configurations
     state_store: OAuthStateStore
     state_cookie_name: str
@@ -39,6 +43,8 @@ class OAuthSettings:
     state_utils: OAuthStateUtils
     authorize_url_generator: AuthorizeUrlGenerator
     redirect_uri_page_renderer: RedirectUriPageRenderer
+    # Others
+    logger: Logger
 
     def __init__(
         self,
@@ -62,7 +68,28 @@ class OAuthSettings:
         state_store: Optional[OAuthStateStore] = None,
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
+        # Others
+        logger: Logger = logging.getLogger(__name__),
     ):
+        """The settings for Slack App installation (OAuth flow).
+
+        :param client_id: Check the value in Settings > Basic Information > App Credentials
+        :param client_secret: Check the value in Settings > Basic Information > App Credentials
+        :param scopes: Check the value in Settings > Manage Distribution
+        :param user_scopes: Check the value in Settings > Manage Distribution
+        :param redirect_uri: Check the value in Features > OAuth & Permissions > Redirect URLs
+        :param install_path: The endpoint to start an OAuth flow (Default: /slack/install)
+        :param redirect_uri_path: The path of Redirect URL (Default: /slack/oauth_redirect)
+        :param callback_options: Give success/failure functions f you want to customize callback functions.
+        :param success_url: Set a complete URL if you want to redirect end-users when an installation completes.
+        :param failure_url: Set a complete URL if you want to redirect end-users when an installation fails.
+        :param authorization_url: Set a URL if you want to customize the URL https://slack.com/oauth/v2/authorize
+        :param installation_store: Specify the instance of InstallationStore (Default: FileInstallationStore)
+        :param state_store: Specify the instance of InstallationStore (Default: FileOAuthStateStore)
+        :param state_cookie_name: The cookie name that is set for installers' browser. (Default: slack-app-oauth-state)
+        :param state_expiration_seconds: The seconds that the state value is alive (Default: 600 seconds)
+        :param logger: The logger that will be used internally
+        """
         self.client_id = client_id or os.environ.get("SLACK_CLIENT_ID", None)
         self.client_secret = client_secret or os.environ.get(
             "SLACK_CLIENT_SECRET", None
@@ -91,6 +118,9 @@ class OAuthSettings:
         # Installation Management
         self.installation_store = installation_store or FileInstallationStore(
             client_id=client_id
+        )
+        self.authorize = InstallationStoreAuthorize(
+            logger=logger, installation_store=self.installation_store,
         )
         # state parameter related configurations
         self.state_store = state_store or FileOAuthStateStore(

@@ -11,8 +11,8 @@ from .internals import _to_authorization_result
 
 
 class AsyncSingleTeamAuthorization(AsyncAuthorization):
-    def __init__(self, *, verification_enabled: bool = True):
-        self.verification_enabled = verification_enabled
+    def __init__(self):
+        """Single-workspace authorization."""
         self.auth_result: Optional[AsyncSlackResponse] = None
         self.logger = get_bolt_logger(AsyncSingleTeamAuthorization)
 
@@ -27,20 +27,12 @@ class AsyncSingleTeamAuthorization(AsyncAuthorization):
             return await next()
 
         try:
-            if not self.verification_enabled:
-                if self.auth_result is None:
-                    self.auth_result = await req.context.client.auth_test()
+            if self.auth_result is None:
+                self.auth_result = await req.context.client.auth_test()
+
+            if self.auth_result:
                 req.context["authorization_result"] = _to_authorization_result(
                     auth_test_result=self.auth_result,
-                    bot_token=req.context.client.token,
-                    request_user_id=req.context.user_id,
-                )
-                return await next()
-
-            auth_result = await req.context.client.auth_test()
-            if auth_result:
-                req.context["authorization_result"] = _to_authorization_result(
-                    auth_test_result=auth_result,
                     bot_token=req.context.client.token,
                     request_user_id=req.context.user_id,
                 )

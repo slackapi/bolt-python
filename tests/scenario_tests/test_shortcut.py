@@ -62,7 +62,7 @@ class TestShortcut:
         request = self.build_valid_request(message_shortcut_raw_body)
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_success_global(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -85,7 +85,7 @@ class TestShortcut:
         request = self.build_valid_request(message_shortcut_raw_body)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_success_message(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -101,7 +101,7 @@ class TestShortcut:
         request = self.build_valid_request(global_shortcut_raw_body)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_success_message_2(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -115,7 +115,7 @@ class TestShortcut:
         request = self.build_valid_request(global_shortcut_raw_body)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_process_before_response_global(self):
         app = App(
@@ -140,7 +140,7 @@ class TestShortcut:
         app.shortcut("another-one")(simple_listener)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     def test_failure_2(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -152,12 +152,12 @@ class TestShortcut:
         app.global_shortcut("another-one")(simple_listener)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
         request = self.build_valid_request(message_shortcut_raw_body)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 3
+        assert self.mock_received_requests["/auth.test"] == 1
 
 
 global_shortcut_body = {

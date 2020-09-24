@@ -53,9 +53,17 @@ class OAuthFlow:
         logger: Optional[Logger] = None,
         settings: OAuthSettings,
     ):
+        """The module to run the Slack app installation flow (OAuth flow).
+
+        :param client: The WebClient.
+        :param logger: The logger.
+        :param settings: OAuth settings to configure this module.
+        """
         self._client = client
         self._logger = logger
         self.settings = settings
+        self.settings.logger = self._logger
+
         self.client_id = self.settings.client_id
         self.redirect_uri = self.settings.redirect_uri
         self.install_path = self.settings.install_path

@@ -22,6 +22,13 @@ class ListenerErrorHandler(metaclass=ABCMeta):
     def handle(
         self, error: Exception, request: BoltRequest, response: Optional[BoltResponse],
     ) -> None:
+        """Handles an unhandled exception.
+
+        :param error: The raised exception.
+        :param request: The request.
+        :param response: The response.
+        :return: None
+        """
         raise NotImplementedError()
 
 

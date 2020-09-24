@@ -201,6 +201,10 @@ def is_view_closed(body: Dict[str, Any]) -> bool:
     )
 
 
+def is_workflow_step_save(body: Dict[str, Any]) -> bool:
+    return is_view_submission(body) and body["view"]["type"] == "workflow_step"
+
+
 # ------------------------------------------
 # Internal Utilities
 # ------------------------------------------

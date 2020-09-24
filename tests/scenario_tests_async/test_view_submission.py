@@ -103,7 +103,7 @@ class TestAsyncViewSubmission:
         app.view("view-idddd")(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
     async def test_failure_2(self):
@@ -116,7 +116,7 @@ class TestAsyncViewSubmission:
         app.view_submission("view-idddd")(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert self.mock_received_requests["/auth.test"] == 1
 
 
 body = {
