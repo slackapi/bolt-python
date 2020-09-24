@@ -6,9 +6,9 @@ from slack_sdk.web import SlackResponse
 class AuthorizationResult(dict):
     enterprise_id: Optional[str]
     team_id: Optional[str]
-    bot_id: str
-    bot_user_id: str
-    bot_token: str
+    bot_id: Optional[str]
+    bot_user_id: Optional[str]
+    bot_token: Optional[str]
     user_id: Optional[str]
     user_token: Optional[str]
 
@@ -18,9 +18,9 @@ class AuthorizationResult(dict):
         enterprise_id: Optional[str],
         team_id: Optional[str],
         # bot
-        bot_user_id: str,
-        bot_id: str,
-        bot_token: str,
+        bot_user_id: Optional[str] = None,
+        bot_id: Optional[str] = None,
+        bot_token: Optional[str] = None,
         # user
         user_id: Optional[str] = None,
         user_token: Optional[str] = None,
