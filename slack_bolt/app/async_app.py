@@ -7,6 +7,8 @@ from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
 from slack_bolt.middleware.message_listener_matches.async_message_listener_matches import (
     AsyncMessageListenerMatches,
 )
+from slack_bolt.workflows.step.async_step import AsyncWorkflowStep
+from slack_bolt.workflows.step.async_step_middleware import AsyncWorkflowStepMiddleware
 from slack_sdk.oauth.installation_store.async_installation_store import (
     AsyncInstallationStore,
 )
@@ -355,6 +357,38 @@ class AsyncApp:
                         app_name=self.name, func=middleware_or_callable
                     )
                 )
+
+    # -------------------------
+    # Workflows: Steps from Apps
+
+    def step(
+        self,
+        callback_id: Union[str, Pattern, AsyncWorkflowStep],
+        save_callback_id: Optional[Union[str, Pattern]] = None,
+        edit: Optional[
+            Union[Callable[..., Optional[BoltResponse]], AsyncListener]
+        ] = None,
+        save: Optional[
+            Union[Callable[..., Optional[BoltResponse]], AsyncListener]
+        ] = None,
+        execute: Optional[
+            Union[Callable[..., Optional[BoltResponse]], AsyncListener]
+        ] = None,
+    ):
+        """Registers a new Workflow Steps from Apps listeners."""
+        step = callback_id
+        if isinstance(callback_id, (str, Pattern)):
+            step = AsyncWorkflowStep(
+                callback_id=callback_id,
+                save_callback_id=save_callback_id,
+                edit=edit,
+                save=save,
+                execute=execute,
+            )
+        elif not isinstance(step, AsyncWorkflowStep):
+            raise BoltError("Invalid step object")
+
+        self.use(AsyncWorkflowStepMiddleware(step, self._async_listener_runner))
 
     # -------------------------
     # global error handler
