@@ -17,19 +17,19 @@ def fetchTasks(context, event, next):
     user = event["user"]
 
     try:
-        # Assume getTasks fetchs tasks from DB corresponding to user ID
+        # Assume getTasks fetchs list of tasks from DB corresponding to user ID
         user_tasks = db.getTasks(user)
         tasks = user_tasks
-    except Exception as e:
+    except Exception:
         # getTasks() raises exception because no tasks are found
         tasks = []
     finally:
         # Put user's tasks in context
         context["tasks"] = tasks
-    next()
+        next()
 
 # Listener middleware to create a list of section blocks
-def createSections(context, next)
+def createSections(context, next):
     taskBlocks = []
 
     # Loops through tasks added to context in previous middleware
@@ -39,7 +39,7 @@ def createSections(context, next)
               "type": "section",
               "text": {
                   "type": "mrkdwn",
-                  "text": f"{task["title"]}\\n{task["body"]}"
+                  "text": f"*{task['title']}*\n{task['body']}"
               },
               "accessory": {
                   "type": "button",
@@ -54,24 +54,21 @@ def createSections(context, next)
 
     # Put list of blocks in context
     context["blocks"] = taskBlocks
-
     next()
 
 # Listen for user opening app home
 # Include fetchTasks middleware
 @app.event(
-  "type"= "app_home_opened",
-  "middleware"=[fetchTasks, createSections]
+  event = "app_home_opened",
+  middleware = [fetchTasks, createSections]
 )
 def showTasks(event, client, context):
-    blocks=context.taskBlocks
-
     # Publish view to user's home tab
     client.views_publish(
-        user=event["user"]
+        user_id=event["user"],
         view={
             "type": "home",
-            "blocks": blocks
+            "blocks": context["blocks"]
         }
     )
 ```

@@ -17,7 +17,10 @@ The full list adapters, as well as configuration and sample usage, can be found 
 
 ```python
 from slack_bolt import App
-app = App()
+app = App(
+    signing_secret=os.environ.get("SIGNING_SECRET"),
+    token=os.environ.get("SLACK_BOT_TOKEN")
+)
 
 # There is nothing specific to Flask here!
 # App is completely framework/runtime agnostic

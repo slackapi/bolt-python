@@ -1,7 +1,7 @@
 ---
 title: Publishing views to App Home
 lang: en
-slug: async
+slug: app-home
 order: 13
 ---
 
@@ -18,10 +18,10 @@ def openModal(client, event, logger):
         # Call views.publish with the built-in client
         client.views_publish(
             # Use the user ID associated with the event
-            user_id: event["user"]
-            # Home tabs much be enabled in your app configuration
-            view: {
-                "type": "home"
+            user_id=event["user"],
+            # Home tabs must be enabled in your app configuration
+            view={
+                "type": "home",
                 "blocks": [
                     {
                         "type": "section",

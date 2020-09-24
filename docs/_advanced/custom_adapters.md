@@ -27,7 +27,6 @@ For more in-depth examples of custom adapters, look at the implementations of th
 
 ```python
 # Necessary imports for Flask
-# make_reponse() is used 
 from flask import Request, Response, make_response
 
 from slack_bolt.app import App
@@ -70,6 +69,4 @@ class SlackRequestHandler:
             return to_flask_response(bolt_resp)
 
         return make_response("Not Found", 404)
-
-
 ```

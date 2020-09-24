@@ -61,7 +61,6 @@ def authorizeFn(enterprise_id, team_id, logger):
           )
 
     logger.error(f"No authorization information was found")
-    return
 
 app = App(
     signing_secret=os.environ["SLACK_SIGNING_SECRET"],
