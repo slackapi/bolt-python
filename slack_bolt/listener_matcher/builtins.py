@@ -19,6 +19,7 @@ from ..util.payload_utils import (
     is_dialog_suggestion,
     is_shortcut,
     to_action,
+    is_workflow_step_save,
 )
 
 if sys.version_info.major == 3 and sys.version_info.minor <= 6:
@@ -110,6 +111,19 @@ def event(
     raise BoltError(
         f"event ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
     )
+
+
+def workflow_step_execute(
+    asyncio: bool = False,
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+    def func(body: Dict[str, Any]) -> bool:
+        return (
+            is_event(body)
+            and _matches("workflow_step_execute", body["event"]["type"])
+            and "workflow_step" in body["event"]
+        )
+
+    return build_listener_matcher(func, asyncio)
 
 
 # -------------
@@ -341,6 +355,17 @@ def view_closed(
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(body: Dict[str, Any]) -> bool:
         return is_view_closed(body) and _matches(
+            callback_id, body["view"]["callback_id"]
+        )
+
+    return build_listener_matcher(func, asyncio)
+
+
+def workflow_step_save(
+    callback_id: Union[str, Pattern], asyncio: bool = False,
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+    def func(body: Dict[str, Any]) -> bool:
+        return is_workflow_step_save(body) and _matches(
             callback_id, body["view"]["callback_id"]
         )
 

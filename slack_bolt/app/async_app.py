@@ -1,11 +1,12 @@
-import asyncio
 import inspect
 import logging
 import os
-import time
-from asyncio import Future
 from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable
 
+from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
+from slack_bolt.middleware.message_listener_matches.async_message_listener_matches import (
+    AsyncMessageListenerMatches,
+)
 from slack_sdk.oauth.installation_store.async_installation_store import (
     AsyncInstallationStore,
 )
@@ -17,7 +18,6 @@ from slack_bolt.authorization.async_authorize import (
     AsyncCallableAuthorize,
     AsyncInstallationStoreAuthorize,
 )
-from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.error import BoltError
 from slack_bolt.logger.messages import (
     error_signing_secret_not_found,
@@ -27,19 +27,14 @@ from slack_bolt.logger.messages import (
     warning_unhandled_request,
     debug_checking_listener,
     debug_running_listener,
-    warning_did_not_call_ack,
-    debug_running_lazy_listener,
-    debug_responding,
     error_unexpected_listener_middleware,
     error_listener_function_must_be_coro_func,
     error_client_invalid_type_async,
 )
-from slack_bolt.lazy_listener.async_runner import AsyncLazyListenerRunner
 from slack_bolt.lazy_listener.asyncio_runner import AsyncioLazyListenerRunner
 from slack_bolt.listener.async_listener import AsyncListener, AsyncCustomListener
 from slack_bolt.listener.async_listener_error_handler import (
     AsyncDefaultListenerErrorHandler,
-    AsyncListenerErrorHandler,
     AsyncCustomListenerErrorHandler,
 )
 from slack_bolt.listener_matcher import builtins as builtin_matchers
@@ -53,7 +48,6 @@ from slack_bolt.middleware.async_builtins import (
     AsyncRequestVerification,
     AsyncIgnoringSelfEvents,
     AsyncUrlVerification,
-    AsyncMessageListenerMatches,
 )
 from slack_bolt.middleware.async_custom_middleware import (
     AsyncMiddleware,
@@ -70,7 +64,6 @@ from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_bolt.util.async_utils import create_async_web_client
-from slack_bolt.util.utils import create_copy
 
 
 class AsyncApp:
@@ -186,12 +179,16 @@ class AsyncApp:
 
         self._async_middleware_list: List[Union[Callable, AsyncMiddleware]] = []
         self._async_listeners: List[AsyncListener] = []
-        self._async_listener_error_handler = AsyncDefaultListenerErrorHandler(
-            logger=self._framework_logger
-        )
-        self._process_before_response = process_before_response
-        self.lazy_listener_runner: AsyncLazyListenerRunner = AsyncioLazyListenerRunner(
+
+        self._async_listener_runner = AsyncioListenerRunner(
             logger=self._framework_logger,
+            process_before_response=process_before_response,
+            listener_error_handler=AsyncDefaultListenerErrorHandler(
+                logger=self._framework_logger
+            ),
+            lazy_listener_runner=AsyncioLazyListenerRunner(
+                logger=self._framework_logger,
+            ),
         )
 
         self._init_middleware_list_done = False
@@ -248,8 +245,8 @@ class AsyncApp:
         return self._async_installation_store
 
     @property
-    def listener_error_handler(self) -> AsyncListenerErrorHandler:
-        return self._async_listener_error_handler
+    def listener_runner(self) -> AsyncioListenerRunner:
+        return self._async_listener_runner
 
     # -------------------------
     # standalone server
@@ -313,160 +310,17 @@ class AsyncApp:
                 self._framework_logger.debug(debug_running_listener(listener_name))
                 listener_response: Optional[
                     BoltResponse
-                ] = await self._run_async_listener(
+                ] = await self._async_listener_runner.run(
                     request=req,
                     response=resp,
                     listener_name=listener_name,
-                    async_listener=listener,
+                    listener=listener,
                 )
                 if listener_response is not None:
                     return listener_response
 
         self._framework_logger.warning(warning_unhandled_request(req))
         return BoltResponse(status=404, body={"error": "unhandled request"})
-
-    async def _run_async_listener(
-        self,
-        request: AsyncBoltRequest,
-        response: BoltResponse,
-        listener_name: str,
-        async_listener: AsyncListener,
-    ) -> Optional[BoltResponse]:
-        ack = request.context.ack
-        starting_time = time.time()
-        if self._process_before_response:
-            if not request.lazy_only:
-                try:
-                    returned_value = await async_listener.run_ack_function(
-                        request=request, response=response
-                    )
-                    if isinstance(returned_value, BoltResponse):
-                        response = returned_value
-                    if ack.response is None and async_listener.auto_acknowledgement:
-                        await ack()  # automatic ack() call if the call is not yet done
-                except Exception as e:
-                    # The default response status code is 500 in this case.
-                    # You can customize this by passing your own error handler.
-                    if response is None:
-                        response = BoltResponse(status=500)
-                    response.status = 500
-                    await self._async_listener_error_handler.handle(
-                        error=e, request=request, response=response,
-                    )
-                    ack.response = response
-
-            for lazy_func in async_listener.lazy_functions:
-                if request.lazy_function_name:
-                    func_name = lazy_func.__name__
-                    if func_name == request.lazy_function_name:
-                        await self.lazy_listener_runner.run(
-                            function=lazy_func, request=request
-                        )
-                        # This HTTP response won't be sent to Slack API servers.
-                        return BoltResponse(status=200)
-                    else:
-                        continue
-                else:
-                    self._start_lazy_function(lazy_func, request)
-
-            if response is not None:
-                self._debug_log_completion(starting_time, response)
-                return response
-            elif ack.response is not None:
-                self._debug_log_completion(starting_time, ack.response)
-                return ack.response
-        else:
-            if async_listener.auto_acknowledgement:
-                # acknowledge immediately in case of Events API
-                await ack()
-
-            if not request.lazy_only:
-                # start the listener function asynchronously
-                # NOTE: intentionally
-                async def run_ack_function_asynchronously(
-                    ack: AsyncAck, request: AsyncBoltRequest, response: BoltResponse,
-                ):
-                    try:
-                        await async_listener.run_ack_function(
-                            request=request, response=response
-                        )
-                    except Exception as e:
-                        # The default response status code is 500 in this case.
-                        # You can customize this by passing your own error handler.
-                        if response is None:
-                            response = BoltResponse(status=500)
-                        response.status = 500
-                        if ack.response is not None:  # already acknowledged
-                            response = None
-
-                        await self._async_listener_error_handler.handle(
-                            error=e, request=request, response=response,
-                        )
-                        ack.response = response
-
-                _f: Future = asyncio.ensure_future(
-                    run_ack_function_asynchronously(ack, request, response)
-                )
-
-            for lazy_func in async_listener.lazy_functions:
-                if request.lazy_function_name:
-                    func_name = lazy_func.__name__
-                    if func_name == request.lazy_function_name:
-                        await self.lazy_listener_runner.run(
-                            function=lazy_func, request=request
-                        )
-                        # This HTTP response won't be sent to Slack API servers.
-                        return BoltResponse(status=200)
-                    else:
-                        continue
-                else:
-                    self._start_lazy_function(lazy_func, request)
-
-            # await for the completion of ack() in the async listener execution
-            while ack.response is None and time.time() - starting_time <= 3:
-                await asyncio.sleep(0.01)
-
-            if response is None and ack.response is None:
-                self._framework_logger.warning(warning_did_not_call_ack(listener_name))
-                return None
-
-            if response is None and ack.response is not None:
-                response = ack.response
-                self._debug_log_completion(starting_time, response)
-                return response
-
-            if response is not None:
-                return response
-
-        # None for both means no ack() in the listener
-        return None
-
-    def _start_lazy_function(
-        self, lazy_func: Callable[..., Awaitable[None]], request: AsyncBoltRequest
-    ) -> None:
-        # Start a lazy function asynchronously
-        func_name: str = lazy_func.__name__
-        self._framework_logger.debug(debug_running_lazy_listener(func_name))
-        copied_request = self._build_lazy_request(request, func_name)
-        self.lazy_listener_runner.start(function=lazy_func, request=copied_request)
-
-    @staticmethod
-    def _build_lazy_request(
-        request: AsyncBoltRequest, lazy_func_name: str
-    ) -> AsyncBoltRequest:
-        copied_request = create_copy(request)
-        copied_request.method = "NONE"
-        copied_request.lazy_only = True
-        copied_request.lazy_function_name = lazy_func_name
-        return copied_request
-
-    def _debug_log_completion(
-        self, starting_time: float, response: BoltResponse
-    ) -> None:
-        millis = int((time.time() - starting_time) * 1000)
-        self._framework_logger.debug(
-            debug_responding(response.status, response.body, millis)
-        )
 
     # -------------------------
     # middleware
@@ -482,10 +336,15 @@ class AsyncApp:
         :return: None
         """
         if len(args) > 0:
-            func = args[0]
-            self._async_middleware_list.append(
-                AsyncCustomMiddleware(app_name=self.name, func=func)
-            )
+            middleware_or_callable = args[0]
+            if isinstance(middleware_or_callable, AsyncMiddleware):
+                self._async_middleware_list.append(middleware_or_callable)
+            else:
+                self._async_middleware_list.append(
+                    AsyncCustomMiddleware(
+                        app_name=self.name, func=middleware_or_callable
+                    )
+                )
 
     # -------------------------
     # global error handler
@@ -497,7 +356,7 @@ class AsyncApp:
             when getting an unhandled error in Bolt app.
         :return: None
         """
-        self._async_listener_error_handler = AsyncCustomListenerErrorHandler(
+        self._async_listener_runner.listener_error_handler = AsyncCustomListenerErrorHandler(
             logger=self._framework_logger, func=func,
         )
 
