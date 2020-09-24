@@ -58,6 +58,9 @@ def build_required_kwargs(
         or all_available_args["message"]
         or request.body
     )
+    for k, v in request.context.items():
+        if k not in all_available_args:
+            all_available_args[k] = v
 
     kwargs: Dict[str, Any] = {
         k: v for k, v in all_available_args.items() if k in required_arg_names

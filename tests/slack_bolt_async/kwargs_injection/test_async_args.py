@@ -42,3 +42,19 @@ class TestAsyncArgs:
         assert args.request is not None
         assert args.response is not None
         assert args.client is not None
+
+    def test_all_values_from_context(self):
+        req = AsyncBoltRequest(body="", headers={})
+        req.context["foo"] = "FOO"
+        req.context["bar"] = 123
+        required_args = ["foo", "bar", "ack"]
+        arg_params: dict = build_async_required_kwargs(
+            logger=logging.getLogger(__name__),
+            required_arg_names=required_args,
+            request=req,
+            response=BoltResponse(status=200),
+            next_func=next,
+        )
+        assert arg_params["foo"] == "FOO"
+        assert arg_params["bar"] == 123
+        assert arg_params["ack"] is not None

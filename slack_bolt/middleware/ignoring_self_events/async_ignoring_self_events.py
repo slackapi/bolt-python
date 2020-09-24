@@ -15,7 +15,7 @@ class AsyncIgnoringSelfEvents(IgnoringSelfEvents, AsyncMiddleware):
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> BoltResponse:
         auth_result = req.context.authorization_result
-        if self._is_self_event(auth_result, req.context.user_id):
+        if self._is_self_event(auth_result, req.context.user_id, req.body):
             self._debug_log(req.body)
             return await req.context.ack()
         else:
