@@ -7,6 +7,7 @@ from http.server import SimpleHTTPRequestHandler, HTTPServer
 from typing import List, Union, Pattern, Callable, Dict, Optional
 
 from slack_bolt.listener.thread_runner import ThreadListenerRunner
+from slack_bolt.workflows.step import WorkflowStep, WorkflowStepMiddleware
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import InstallationStore
 from slack_sdk.web import WebClient
@@ -334,6 +335,34 @@ class App:
                 self._middleware_list.append(
                     CustomMiddleware(app_name=self.name, func=middleware_or_callable)
                 )
+
+    # -------------------------
+    # Workflows: Steps from Apps
+
+    def step(
+        self,
+        callback_id: Union[str, Pattern, WorkflowStep],
+        save_callback_id: Optional[Union[str, Pattern]] = None,
+        edit: Optional[Union[Callable[..., Optional[BoltResponse]], Listener]] = None,
+        save: Optional[Union[Callable[..., Optional[BoltResponse]], Listener]] = None,
+        execute: Optional[
+            Union[Callable[..., Optional[BoltResponse]], Listener]
+        ] = None,
+    ):
+        """Registers a new Workflow Steps from Apps listeners."""
+        step = callback_id
+        if isinstance(callback_id, (str, Pattern)):
+            step = WorkflowStep(
+                callback_id=callback_id,
+                save_callback_id=save_callback_id,
+                edit=edit,
+                save=save,
+                execute=execute,
+            )
+        elif not isinstance(step, WorkflowStep):
+            raise BoltError("Invalid step object")
+
+        self.use(WorkflowStepMiddleware(step, self.listener_runner))
 
     # -------------------------
     # global error handler
