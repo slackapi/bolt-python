@@ -149,6 +149,15 @@ class AsyncApp:
             )
 
         self._async_oauth_flow: Optional[AsyncOAuthFlow] = None
+
+        if (
+            oauth_settings is None
+            and os.environ.get("SLACK_CLIENT_ID") is not None
+            and os.environ.get("SLACK_CLIENT_SECRET") is not None
+        ):
+            # initialize with the default settings
+            oauth_settings = AsyncOAuthSettings()
+
         if oauth_flow:
             self._async_oauth_flow = oauth_flow
             if self._async_installation_store is None:
@@ -398,7 +407,9 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.event("message", True)
+            primary_matcher = builtin_matchers.event(
+                {"type": "message", "subtype": None}, True
+            )
             middleware.append(AsyncMessageListenerMatches(keyword))
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware, True

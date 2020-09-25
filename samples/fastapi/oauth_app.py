@@ -19,7 +19,7 @@ def handle_app_mentions(body, say, logger):
 
 
 @app.event("message")
-async def handle_message():
+def handle_message():
     pass
 
 

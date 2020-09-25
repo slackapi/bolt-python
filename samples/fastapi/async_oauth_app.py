@@ -5,6 +5,9 @@ import sys
 sys.path.insert(1, "../..")
 # ------------------------------------------------
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.adapter.fastapi.async_handler import AsyncSlackRequestHandler
 

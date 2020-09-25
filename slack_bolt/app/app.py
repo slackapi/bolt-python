@@ -141,6 +141,15 @@ class App:
             )
 
         self._oauth_flow: Optional[OAuthFlow] = None
+
+        if (
+            oauth_settings is None
+            and os.environ.get("SLACK_CLIENT_ID") is not None
+            and os.environ.get("SLACK_CLIENT_SECRET") is not None
+        ):
+            # initialize with the default settings
+            oauth_settings = OAuthSettings()
+
         if oauth_flow:
             self._oauth_flow = oauth_flow
             if self._installation_store is None:
@@ -389,7 +398,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.event("message")
+            primary_matcher = builtin_matchers.event(
+                {"type": "message", "subtype": None}
+            )
             middleware.append(MessageListenerMatches(keyword))
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware, True

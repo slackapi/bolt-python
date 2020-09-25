@@ -50,8 +50,8 @@ class OAuthSettings:
         self,
         *,
         # OAuth flow parameters/credentials
-        client_id: str,
-        client_secret: str,
+        client_id: Optional[str] = None,  # required
+        client_secret: Optional[str] = None,  # required
         scopes: Optional[List[str]] = None,
         user_scopes: Optional[List[str]] = None,
         redirect_uri: Optional[str] = None,
