@@ -6,7 +6,7 @@ from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from .async_authorization import AsyncAuthorization
 from .async_internals import _build_error_response, _is_no_auth_required
-from ...authorization import AuthorizationResult
+from ...authorization import AuthorizeResult
 from ...authorization.async_authorize import AsyncAuthorize
 from ...util.async_utils import create_async_web_client
 
@@ -32,14 +32,14 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
         if _is_no_auth_required(req):
             return await next()
         try:
-            auth_result: Optional[AuthorizationResult] = await self.authorize(
+            auth_result: Optional[AuthorizeResult] = await self.authorize(
                 context=req.context,
                 enterprise_id=req.context.enterprise_id,
                 team_id=req.context.team_id,
                 user_id=req.context.user_id,
             )
             if auth_result:
-                req.context["authorization_result"] = auth_result
+                req.context["authorize_result"] = auth_result
                 token = auth_result.bot_token or auth_result.user_token
                 req.context["token"] = token
                 req.context["client"] = create_async_web_client(token)

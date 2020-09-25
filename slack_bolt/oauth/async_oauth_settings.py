@@ -96,7 +96,7 @@ class AsyncOAuthSettings:
         :param logger: The logger that will be used internally
         """
         # OAuth flow parameters/credentials
-        self.client_id = client_id or os.environ.get("SLACK_CLIENT_ID", None)
+        self.client_id = client_id or os.environ.get("SLACK_CLIENT_ID")
         self.client_secret = client_secret or os.environ.get(
             "SLACK_CLIENT_SECRET", None
         )
@@ -107,7 +107,7 @@ class AsyncOAuthSettings:
         self.user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", "").split(
             ","
         )
-        self.redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI", None)
+        self.redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI")
         # Handler configuration
         self.install_path = install_path or os.environ.get(
             "SLACK_INSTALL_PATH", "/slack/install"

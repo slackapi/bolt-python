@@ -1,13 +1,13 @@
 from logging import Logger
 from typing import Optional, Tuple
 
-from slack_bolt.authorization import AuthorizationResult
+from slack_bolt.authorization import AuthorizeResult
 
 
 class BaseContext(dict):
     @property
-    def authorization_result(self) -> Optional[AuthorizationResult]:
-        return self.get("authorization_result", None)
+    def authorize_result(self) -> Optional[AuthorizeResult]:
+        return self.get("authorize_result")
 
     @property
     def logger(self) -> Logger:
@@ -15,11 +15,11 @@ class BaseContext(dict):
 
     @property
     def token(self) -> Optional[str]:
-        return self.get("token", None)
+        return self.get("token")
 
     @property
     def enterprise_id(self) -> Optional[str]:
-        return self.get("enterprise_id", None)
+        return self.get("enterprise_id")
 
     @property
     def team_id(self) -> str:
@@ -27,17 +27,17 @@ class BaseContext(dict):
 
     @property
     def user_id(self) -> Optional[str]:
-        return self.get("user_id", None)
+        return self.get("user_id")
 
     @property
     def channel_id(self) -> Optional[str]:
-        return self.get("channel_id", None)
+        return self.get("channel_id")
 
     @property
     def response_url(self) -> Optional[str]:
-        return self.get("response_url", None)
+        return self.get("response_url")
 
     @property
     def matches(self) -> Optional[Tuple]:
         """Returns all the matched parts in message listener's regexp"""
-        return self.get("matches", None)
+        return self.get("matches")

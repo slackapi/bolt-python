@@ -29,10 +29,10 @@ async def to_aiohttp_response(bolt_resp: BoltResponse) -> web.Response:
             resp.set_cookie(
                 name=name,
                 value=c.value,
-                max_age=c.get("max-age", None),
-                expires=c.get("expires", None),
-                path=c.get("path", None),
-                domain=c.get("domain", None),
+                max_age=c.get("max-age"),
+                expires=c.get("expires"),
+                path=c.get("path"),
+                domain=c.get("domain"),
                 secure=True,
                 httponly=True,
             )

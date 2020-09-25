@@ -23,15 +23,15 @@ def to_django_response(bolt_resp: BoltResponse) -> HttpResponse:
 
     for cookie in bolt_resp.cookies():
         for name, c in cookie.items():
-            str_max_age: Optional[str] = c.get("max-age", None)
+            str_max_age: Optional[str] = c.get("max-age")
             max_age: Optional[int] = int(str_max_age) if str_max_age else None
             resp.set_cookie(
                 key=name,
                 value=c.value,
-                expires=c.get("expires", None),
+                expires=c.get("expires"),
                 max_age=max_age,
-                domain=c.get("domain", None),
-                path=c.get("path", None),
+                domain=c.get("domain"),
+                path=c.get("path"),
                 secure=True,
                 httponly=True,
             )

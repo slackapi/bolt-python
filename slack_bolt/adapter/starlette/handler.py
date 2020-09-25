@@ -22,10 +22,10 @@ def to_starlette_response(bolt_resp: BoltResponse) -> Response:
             resp.set_cookie(
                 key=name,
                 value=c.value,
-                max_age=c.get("max-age", None),
-                expires=c.get("expires", None),
-                path=c.get("path", None),
-                domain=c.get("domain", None),
+                max_age=c.get("max-age"),
+                expires=c.get("expires"),
+                path=c.get("path"),
+                domain=c.get("domain"),
                 secure=True,
                 httponly=True,
             )

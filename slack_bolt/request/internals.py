@@ -57,7 +57,7 @@ def extract_enterprise_id(payload: Dict[str, Any]) -> Optional[str]:
         return payload.get("enterprise_id")
     if "team" in payload and "enterprise_id" in payload["team"]:
         # In the case where the type is view_submission
-        return payload["team"].get("enterprise_id", None)
+        return payload["team"].get("enterprise_id")
     if "event" in payload:
         return extract_enterprise_id(payload["event"])
     return None

@@ -12,7 +12,7 @@ from slack_sdk.oauth.installation_store.async_installation_store import (
 )
 from slack_sdk.web.async_client import AsyncWebClient
 
-from slack_bolt.authorization import AuthorizationResult
+from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.authorization.async_authorize import (
     AsyncAuthorize,
     AsyncCallableAuthorize,
@@ -81,7 +81,7 @@ class AsyncApp:
         client: Optional[AsyncWebClient] = None,
         # for multi-workspace apps
         installation_store: Optional[AsyncInstallationStore] = None,
-        authorize: Optional[Callable[..., Awaitable[AuthorizationResult]]] = None,
+        authorize: Optional[Callable[..., Awaitable[AuthorizeResult]]] = None,
         # for the OAuth flow
         oauth_settings: Optional[AsyncOAuthSettings] = None,
         oauth_flow: Optional[AsyncOAuthFlow] = None,
@@ -105,8 +105,8 @@ class AsyncApp:
         :param verification_token: Deprecated verification mechanism.
             This can used only for ssl_check requests.
         """
-        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET", None)
-        token = token or os.environ.get("SLACK_BOT_TOKEN", None)
+        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET")
+        token = token or os.environ.get("SLACK_BOT_TOKEN")
 
         if signing_secret is None or signing_secret == "":
             raise BoltError(error_signing_secret_not_found())

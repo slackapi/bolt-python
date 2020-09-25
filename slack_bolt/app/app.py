@@ -11,7 +11,7 @@ from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import InstallationStore
 from slack_sdk.web import WebClient
 
-from slack_bolt.authorization import AuthorizationResult
+from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.authorization.authorize import (
     Authorize,
     InstallationStoreAuthorize,
@@ -74,7 +74,7 @@ class App:
         token: Optional[str] = None,
         client: Optional[WebClient] = None,
         # for multi-workspace apps
-        authorize: Optional[Callable[..., AuthorizationResult]] = None,
+        authorize: Optional[Callable[..., AuthorizeResult]] = None,
         installation_store: Optional[InstallationStore] = None,
         # for the OAuth flow
         oauth_settings: Optional[OAuthSettings] = None,
@@ -99,8 +99,8 @@ class App:
         :param verification_token: Deprecated verification mechanism.
             This can used only for ssl_check requests.
         """
-        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET", None)
-        token = token or os.environ.get("SLACK_BOT_TOKEN", None)
+        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET")
+        token = token or os.environ.get("SLACK_BOT_TOKEN")
 
         if signing_secret is None or signing_secret == "":
             raise BoltError(error_signing_secret_not_found())

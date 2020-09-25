@@ -11,14 +11,14 @@ logging.basicConfig(level=logging.DEBUG)
 
 import os
 from slack_sdk.web.async_client import AsyncWebClient
-from slack_bolt.authorization import AuthorizationResult
+from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.async_app import AsyncApp
 
 async def authorize(enterprise_id, team_id, user_id, client: AsyncWebClient, logger):
     logger.info(f"{enterprise_id},{team_id},{user_id}")
     # You can implement your own logic here
     token = os.environ["MY_TOKEN"]
-    return AuthorizationResult.from_auth_test_response(
+    return AuthorizeResult.from_auth_test_response(
         auth_test_response=await client.auth_test(token=token),
         bot_token=token,
     )

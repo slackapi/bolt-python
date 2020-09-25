@@ -54,7 +54,7 @@ def set_response(self, bolt_resp) -> None:
         self.set_header(name, value)
     for cookie in bolt_resp.cookies():
         for name, c in cookie.items():
-            expire_value = c.get("expires", None)
+            expire_value = c.get("expires")
             expire = (
                 datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z")
                 if expire_value
@@ -63,10 +63,10 @@ def set_response(self, bolt_resp) -> None:
             self.set_cookie(
                 name=name,
                 value=c.value,
-                max_age=c.get("max-age", None),
+                max_age=c.get("max-age"),
                 expires=expire,
-                path=c.get("path", None),
-                domain=c.get("domain", None),
+                path=c.get("path"),
+                domain=c.get("domain"),
                 secure=True,
                 httponly=True,
             )
