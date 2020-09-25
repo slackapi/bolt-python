@@ -14,8 +14,8 @@ For a more custom solution, you can set the `authorize` parameter to a function 
 
 `AuthorizeResult` should have a few specific properties, all of type `str`:
 - Either **`bot_token`** (xoxb) *or* **`user_token`** (xoxp) are **required**. Most apps will use `bot_token` by default. Passing a token allows built-in functions (like `say()`) to work.
-- **`bot_user_id`** and **`bot_id`**, if using a `bot_token`. You can fetch this information by using the `from_auth_test_response()` function, which is a method on `AuthorizeResult`.
-- **`enterprise_id`** and **`team_id`**, which can be found in many events that are sent to your app.
+- **`bot_user_id`** and **`bot_id`**, if using a `bot_token`.
+- **`enterprise_id`** and **`team_id`**, which can be found in events sent to your app.
 - **`user_id`** only when using `user_token`.
 </div>
 
@@ -29,18 +29,18 @@ from slack_bolt.authorization import AuthorizationResult
 # You should store authorizations in a secure DB
 installations = [
     {
-      enterprise_id: "E1234A12AB",
-      team_id: "T12345",
-      bot_token: "xoxb-123abc",
-      bot_id: "B1251",
-      bot_user_id: "U12385"
+      "enterprise_id": "E1234A12AB",
+      "team_id": "T12345",
+      "bot_token": "xoxb-123abc",
+      "bot_id": "B1251",
+      "bot_user_id": "U12385"
     },
     {
-      team_id: "T77712",
-      bot_token: "xoxb-102anc",
-      bot_id: "B5910",
-      bot_user_id: "U1239",
-      enterprise_id: "E1234A12AB"
+      "team_id": "T77712",
+      "bot_token": "xoxb-102anc",
+      "bot_id": "B5910",
+      "bot_user_id": "U1239",
+      "enterprise_id": "E1234A12AB"
     }
 ]
 
@@ -49,7 +49,7 @@ def authorizeFn(enterprise_id, team_id, logger):
     
     # You can implement your own logic to fetch token here
     for (team in installations):
-        if (team["enterprise_id"] == enterprise_id and team["team_id"] == team_id):
+        if ((team["enterprise_id"] == enterprise_id) and (team["team_id"] == team_id)):
           # Return an instance of AuthorizationResult
           # If you don't store bot_id and bot_user_id, could also call `from_auth_test_response` with your bot_token to automatically fetch them
           return AuthorizationResult(
@@ -60,7 +60,7 @@ def authorizeFn(enterprise_id, team_id, logger):
               bot_user_id=team["bot_user_id"]
           )
 
-    logger.error(f"No authorization information was found")
+    logger.error("No authorization information was found")
 
 app = App(
     signing_secret=os.environ["SLACK_SIGNING_SECRET"],

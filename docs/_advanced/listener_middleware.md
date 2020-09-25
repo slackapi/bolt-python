@@ -6,7 +6,7 @@ order: 5
 ---
 
 <div class="section-content">
-Listener middleware is run only for the listener in which it’s passed. You can pass any number of custom listener middleware of type `CustomMiddleware` instances to the listener after the first (required) parameter.
+Listener middleware is only run for the listener in which it's passed. You can pass any number of middleware functions to the listener using the `middleware` parameter, which must be a list that contains one to many middleware functions.
 </div>
 
 ```python
