@@ -36,7 +36,6 @@ class MultiTeamsAuthorization(Authorization):
                 team_id=req.context.team_id,
                 user_id=req.context.user_id,
             )
-            self.logger.info(auth_result)
             if auth_result is not None:
                 req.context["authorize_result"] = auth_result
                 token = auth_result.bot_token or auth_result.user_token
