@@ -70,6 +70,7 @@ class AsyncApp:
     def __init__(
         self,
         *,
+        logger: Optional[logging.Logger] = None,
         # Used in logger
         name: Optional[str] = None,
         # Set True when you run this app on a FaaS platform
@@ -116,7 +117,7 @@ class AsyncApp:
         self._verification_token: Optional[str] = verification_token or os.environ.get(
             "SLACK_VERIFICATION_TOKEN", None
         )
-        self._framework_logger = get_bolt_logger(AsyncApp)
+        self._framework_logger = logger or get_bolt_logger(AsyncApp)
 
         self._token: Optional[str] = token
 
