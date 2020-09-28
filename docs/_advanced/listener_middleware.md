@@ -11,13 +11,13 @@ Listener middleware is only run for the listener in which it's passed. You can p
 
 ```python
 # Listener middleware which filters out messages with "bot_message" subtype
-def noBotMessages(message, next):
+def no_bot_messages(message, next):
     subtype = message.get("subtype", None)
     if subtype != "bot_message":
        next()
 
 # This listener only receives messages from humans
-@app.event(event="message", middleware=[noBotMessages])
+@app.event(event="message", middleware=[no_bot_messages])
 def log_message(logger, event):
     logger.info(f"(MSG) User: {event['user']}\nMessage: {event['text']}")
 ```

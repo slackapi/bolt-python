@@ -13,20 +13,20 @@ Both global and listener middleware must call `next()` to pass control of the ex
 
 ```python
 @app.use
-def authWithAcme(client, context, logger, payload, next):
-    slackUserId = payload["user"]
-    helpChannelId = "C12345"
+def auth_acme(client, context, logger, payload, next):
+    slack_user_id = payload["user"]
+    help_channel_id = "C12345"
 
     try:
         # Look up user in external system using their Slack user ID
-        user = acme.lookupBySlackId(slackUserId)
+        user = acme.lookup_by_id(slack_user_id)
         # Add that to context
         context.user = user
     except Exception:
         client.chat_postEphemeral(
             channel=payload["channel"],
-            user=slackUserId,
-            text=f"Sorry <@{slackUserId}>, you aren't registered in Acme or there was an error with authentication. Please post in <#{helpChannelId}> for assistance"
+            user=slack_user_id,
+            text=f"Sorry <@{slack_user_id}>, you aren't registered in Acme or there was an error with authentication. Please post in <#{help_channel_id}> for assistance"
         )
 
     # Pass control to the next middleware

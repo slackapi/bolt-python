@@ -44,7 +44,7 @@ installations = [
     }
 ]
 
-def authorizeFn(enterprise_id, team_id, logger):
+def authorize(enterprise_id, team_id, logger):
     logger.info(f"{enterprise_id},{team_id}")
     
     # You can implement your own logic to fetch token here
@@ -64,6 +64,6 @@ def authorizeFn(enterprise_id, team_id, logger):
 
 app = App(
     signing_secret=os.environ["SLACK_SIGNING_SECRET"],
-    authorize=authorizeFn
+    authorize=authorize
 )
 ```
