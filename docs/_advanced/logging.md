@@ -8,7 +8,7 @@ order: 4
 <div class="section-content">
 By default, Bolt will log information from your app to the output destination. After you've imported the logging module, you can customize the root log level by passing the `level` parameter to `basicConfig()`. The available log levels in order of least to most severe are `debug`, `info`, `warning`, `error`, and `critical`. 
 
-Outside of a global context, you can also log a single message corresponding to a specific level. Because Bolt uses Python’s [standard logging module](https://docs.python.org/2/library/logging.html), you can use any its features.
+Outside of a global context, you can also log a single message corresponding to a specific level. Because Bolt uses Python’s [standard logging module](https://docs.python.org/3/library/logging.html), you can use any its features.
 </div>
 
 ```python
