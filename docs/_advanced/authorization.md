@@ -56,7 +56,7 @@ def authorize(enterprise_id, team_id, logger):
         if ((is_valid_enterprise == True) and (team["team_id"] == team_id)):
           # Return an instance of AuthorizeResult
           # If you don't store bot_id and bot_user_id, could also call `from_auth_test_response` with your bot_token to automatically fetch them
-          return AuthorizationResult(
+          return AuthorizeResult(
               enterprise_id=enterprise_id,
               team_id=team_id,
               bot_token=team["bot_token"],
