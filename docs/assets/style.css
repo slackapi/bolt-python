@@ -256,7 +256,7 @@ pre code span {
   height: 0;
 }
 
-pre tbody, pre tbody td, pre tbody td pre {
+table, pre tbody, pre tbody td, pre tbody td pre {
   padding: 0;
   border: 0;
   margin: 0;
