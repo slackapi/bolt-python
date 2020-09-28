@@ -21,7 +21,7 @@ def auth_acme(client, context, logger, payload, next):
         # Look up user in external system using their Slack user ID
         user = acme.lookup_by_id(slack_user_id)
         # Add that to context
-        context.user = user
+        context["user"] = user
     except Exception:
         client.chat_postEphemeral(
             channel=payload["channel"],

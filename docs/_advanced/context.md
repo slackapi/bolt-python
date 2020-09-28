@@ -62,7 +62,7 @@ def create_sections(context, next):
   event = "app_home_opened",
   middleware = [fetch_tasks, create_sections]
 )
-def showTasks(event, client, context):
+def show_tasks(event, client, context):
     # Publish view to user's home tab
     client.views_publish(
         user_id=event["user"],

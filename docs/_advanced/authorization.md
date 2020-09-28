@@ -45,10 +45,9 @@ installations = [
 ]
 
 def authorize(enterprise_id, team_id, logger):
-    logger.info(f"{enterprise_id},{team_id}")
-
 
     # You can implement your own logic to fetch token here
+    
     for (team in installations):
         # enterprise_id doesn't exist for some teams
         is_valid_enterprise = True if (("enterprise_id" not in team) or (enterprise_id == team["enterprise_id"])) else False
