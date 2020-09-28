@@ -10,7 +10,7 @@ Authorization is the process of determining which Slack credentials should be av
 
 Apps installed on a single workspace can simply pass their bot token into the `App` constructor using the `token` parameter. However, if your app will be installed on multiple workspaces, you have two options. The easier option is to use the built-in OAuth support. This will handle setting up OAuth routes and verifying state. Read the section on [authenticating with OAuth](#authenticating-oauth) for details.
 
-For a more custom solution, you can set the `authorize` parameter to a function upon `App` instantiation. The `authorize` function should return [an instance of `AuthorizeResult`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/authorization/authorization_result.py#L6), which contains information about who and where the event is coming from.
+For a more custom solution, you can set the `authorize` parameter to a function upon `App` instantiation. The `authorize` function should return [an instance of `AuthorizeResult`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/authorization/authorize_result.py), which contains information about who and where the event is coming from.
 
 `AuthorizeResult` should have a few specific properties, all of type `str`:
 - Either **`bot_token`** (xoxb) *or* **`user_token`** (xoxp) are **required**. Most apps will use `bot_token` by default. Passing a token allows built-in functions (like `say()`) to work.
@@ -46,10 +46,14 @@ installations = [
 
 def authorize(enterprise_id, team_id, logger):
     logger.info(f"{enterprise_id},{team_id}")
-    
+
+
     # You can implement your own logic to fetch token here
     for (team in installations):
-        if (((team["enterprise_id"] == None) or (team["enterprise_id"] == enterprise_id)) and (team["team_id"] == team_id)):
+        # enterprise_id doesn't exist for some teams
+        is_valid_enterprise = True if (("enterprise_id" not in team) or (enterprise == team["enterprise_id"])) else False
+
+        if ((is_valid_enterprise == True) and (team["team_id"] == team_id)):
           # Return an instance of AuthorizationResult
           # If you don't store bot_id and bot_user_id, could also call `from_auth_test_response` with your bot_token to automatically fetch them
           return AuthorizationResult(
