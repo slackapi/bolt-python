@@ -32,7 +32,7 @@ app.command("/start-process")(
 </summary>
 
 <div class="secondary-content" markdown="0">
-This example deploys the code to [AWS Lambda](https://aws.amazon.com/lambda/), but lazy listener functions work well in most FaaS enviornments. There are more examples within the [`sample` folder](https://github.com/slackapi/bolt-python/tree/main/adapter).
+This example deploys the code to [AWS Lambda](https://aws.amazon.com/lambda/). There are more examples within the [`sample` folder](https://github.com/slackapi/bolt-python/tree/main/adapter).
 
 ```bash
 pip install slack_bolt
