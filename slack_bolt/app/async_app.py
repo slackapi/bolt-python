@@ -12,7 +12,7 @@ from slack_sdk.oauth.installation_store.async_installation_store import (
 )
 from slack_sdk.web.async_client import AsyncWebClient
 
-from slack_bolt.authorization import AuthorizationResult
+from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.authorization.async_authorize import (
     AsyncAuthorize,
     AsyncCallableAuthorize,
@@ -70,6 +70,7 @@ class AsyncApp:
     def __init__(
         self,
         *,
+        logger: Optional[logging.Logger] = None,
         # Used in logger
         name: Optional[str] = None,
         # Set True when you run this app on a FaaS platform
@@ -81,7 +82,7 @@ class AsyncApp:
         client: Optional[AsyncWebClient] = None,
         # for multi-workspace apps
         installation_store: Optional[AsyncInstallationStore] = None,
-        authorize: Optional[Callable[..., Awaitable[AuthorizationResult]]] = None,
+        authorize: Optional[Callable[..., Awaitable[AuthorizeResult]]] = None,
         # for the OAuth flow
         oauth_settings: Optional[AsyncOAuthSettings] = None,
         oauth_flow: Optional[AsyncOAuthFlow] = None,
@@ -105,8 +106,8 @@ class AsyncApp:
         :param verification_token: Deprecated verification mechanism.
             This can used only for ssl_check requests.
         """
-        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET", None)
-        token = token or os.environ.get("SLACK_BOT_TOKEN", None)
+        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET")
+        token = token or os.environ.get("SLACK_BOT_TOKEN")
 
         if signing_secret is None or signing_secret == "":
             raise BoltError(error_signing_secret_not_found())
@@ -116,7 +117,7 @@ class AsyncApp:
         self._verification_token: Optional[str] = verification_token or os.environ.get(
             "SLACK_VERIFICATION_TOKEN", None
         )
-        self._framework_logger = get_bolt_logger(AsyncApp)
+        self._framework_logger = logger or get_bolt_logger(AsyncApp)
 
         self._token: Optional[str] = token
 
@@ -149,6 +150,15 @@ class AsyncApp:
             )
 
         self._async_oauth_flow: Optional[AsyncOAuthFlow] = None
+
+        if (
+            oauth_settings is None
+            and os.environ.get("SLACK_CLIENT_ID") is not None
+            and os.environ.get("SLACK_CLIENT_SECRET") is not None
+        ):
+            # initialize with the default settings
+            oauth_settings = AsyncOAuthSettings()
+
         if oauth_flow:
             self._async_oauth_flow = oauth_flow
             if self._async_installation_store is None:
@@ -398,7 +408,9 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.event("message", True)
+            primary_matcher = builtin_matchers.event(
+                {"type": "message", "subtype": None}, True
+            )
             middleware.append(AsyncMessageListenerMatches(keyword))
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware, True

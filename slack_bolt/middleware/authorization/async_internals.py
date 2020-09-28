@@ -6,15 +6,13 @@ def _is_url_verification(req: AsyncBoltRequest) -> bool:
     return (
         req is not None
         and req.body is not None
-        and req.body.get("type", None) == "url_verification"
+        and req.body.get("type") == "url_verification"
     )
 
 
 def _is_ssl_check(req: AsyncBoltRequest) -> bool:
     return (
-        req is not None
-        and req.body is not None
-        and req.body.get("type", None) == "ssl_check"
+        req is not None and req.body is not None and req.body.get("type") == "ssl_check"
     )
 
 

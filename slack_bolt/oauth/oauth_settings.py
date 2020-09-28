@@ -50,8 +50,8 @@ class OAuthSettings:
         self,
         *,
         # OAuth flow parameters/credentials
-        client_id: str,
-        client_secret: str,
+        client_id: Optional[str] = None,  # required
+        client_secret: Optional[str] = None,  # required
         scopes: Optional[List[str]] = None,
         user_scopes: Optional[List[str]] = None,
         redirect_uri: Optional[str] = None,
@@ -90,7 +90,7 @@ class OAuthSettings:
         :param state_expiration_seconds: The seconds that the state value is alive (Default: 600 seconds)
         :param logger: The logger that will be used internally
         """
-        self.client_id = client_id or os.environ.get("SLACK_CLIENT_ID", None)
+        self.client_id = client_id or os.environ.get("SLACK_CLIENT_ID")
         self.client_secret = client_secret or os.environ.get(
             "SLACK_CLIENT_SECRET", None
         )
@@ -101,7 +101,7 @@ class OAuthSettings:
         self.user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", "").split(
             ","
         )
-        self.redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI", None)
+        self.redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI")
         # Handler configuration
         self.install_path = install_path or os.environ.get(
             "SLACK_INSTALL_PATH", "/slack/install"

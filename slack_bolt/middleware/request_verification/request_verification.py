@@ -37,7 +37,7 @@ class RequestVerification(Middleware):  # type: ignore
 
     @staticmethod
     def _can_skip(body: Dict[str, Any]) -> bool:
-        return body is not None and body.get("ssl_check", None) == "1"
+        return body is not None and body.get("ssl_check") == "1"
 
     @staticmethod
     def _build_error_response() -> BoltResponse:

@@ -7,7 +7,7 @@ from slack_sdk.signature import SignatureVerifier
 
 from slack_bolt import BoltRequest
 from slack_bolt.app import App
-from slack_bolt.authorization import AuthorizationResult
+from slack_bolt.authorization import AuthorizeResult
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -22,7 +22,7 @@ def authorize(enterprise_id, team_id, user_id, client: WebClient):
     assert team_id == "T111"
     assert user_id == "W111"
     auth_test = client.auth_test(token=valid_token)
-    return AuthorizationResult.from_auth_test_response(
+    return AuthorizeResult.from_auth_test_response(
         auth_test_response=auth_test, bot_token=valid_token,
     )
 

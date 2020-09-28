@@ -1,7 +1,7 @@
 import logging
 from typing import Callable, Dict, Any
 
-from slack_bolt.authorization import AuthorizationResult
+from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.logger import get_bolt_logger
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
@@ -16,7 +16,7 @@ class IgnoringSelfEvents(Middleware):
     def process(
         self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
     ) -> BoltResponse:
-        auth_result = req.context.authorization_result
+        auth_result = req.context.authorize_result
         if self._is_self_event(auth_result, req.context.user_id, req.body):
             self._debug_log(req.body)
             return req.context.ack()
@@ -27,7 +27,7 @@ class IgnoringSelfEvents(Middleware):
 
     @staticmethod
     def _is_self_event(
-        auth_result: AuthorizationResult, user_id: str, body: Dict[str, Any]
+        auth_result: AuthorizeResult, user_id: str, body: Dict[str, Any]
     ):
         return (
             auth_result is not None

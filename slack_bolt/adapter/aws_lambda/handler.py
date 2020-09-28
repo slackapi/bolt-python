@@ -30,7 +30,7 @@ class SlackRequestHandler:
     def handle(self, event, context):
         self.logger.debug(f"Incoming event: {event}, context: {context}")
 
-        method = event.get("requestContext", {}).get("http", {}).get("method", None)
+        method = event.get("requestContext", {}).get("http", {}).get("method")
         if method is None:
             return not_found()
         if method == "GET":

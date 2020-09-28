@@ -87,6 +87,16 @@ def handle_app_mentions(body, say, logger):
     say("What's up?")
 
 
+@app.message("What")
+def handle_matched_messages(event, logger):
+    logger.info(f"message matched: {event['text']}")
+
+
+@app.event("message")
+def handle_messages(event, logger):
+    logger.info(f"subtype: {event.get('subytype')}")
+
+
 api = falcon.API()
 resource = SlackAppResource(app)
 api.add_route("/slack/events", resource)

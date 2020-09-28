@@ -1,1 +1,1 @@
-from .authorization_result import AuthorizationResult
+from .authorize_result import AuthorizeResult

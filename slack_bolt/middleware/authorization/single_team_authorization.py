@@ -9,7 +9,7 @@ from slack_sdk.web import SlackResponse
 from .internals import (
     _build_error_response,
     _is_no_auth_required,
-    _to_authorization_result,
+    _to_authorize_result,
 )
 
 
@@ -33,9 +33,9 @@ class SingleTeamAuthorization(Authorization):
                 self.auth_test_result = req.context.client.auth_test()
 
             if self.auth_test_result:
-                req.context["authorization_result"] = _to_authorization_result(
+                req.context["authorize_result"] = _to_authorize_result(
                     auth_test_result=self.auth_test_result,
-                    bot_token=req.context.client.token,
+                    token=req.context.client.token,
                     request_user_id=req.context.user_id,
                 )
                 return next()

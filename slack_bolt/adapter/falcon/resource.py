@@ -56,7 +56,7 @@ class SlackAppResource:
         resp.set_headers(bolt_resp.first_headers_without_set_cookie())
         for cookie in bolt_resp.cookies():
             for name, c in cookie.items():
-                expire_value = c.get("expires", None)
+                expire_value = c.get("expires")
                 expire = (
                     datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z")
                     if expire_value
@@ -66,9 +66,9 @@ class SlackAppResource:
                     name=name,
                     value=c.value,
                     expires=expire,
-                    max_age=c.get("max-age", None),
-                    domain=c.get("domain", None),
-                    path=c.get("path", None),
+                    max_age=c.get("max-age"),
+                    domain=c.get("domain"),
+                    path=c.get("path"),
                     secure=True,
                     http_only=True,
                 )

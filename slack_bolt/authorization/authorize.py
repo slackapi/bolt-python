@@ -7,7 +7,7 @@ from slack_sdk.oauth import InstallationStore
 from slack_sdk.oauth.installation_store import Bot
 
 from slack_bolt.authorization.authorize_args import AuthorizeArgs
-from slack_bolt.authorization.authorization_result import AuthorizationResult
+from slack_bolt.authorization.authorize_result import AuthorizeResult
 from slack_bolt.context.context import BoltContext
 
 
@@ -22,13 +22,13 @@ class Authorize:
         enterprise_id: Optional[str],
         team_id: str,
         user_id: Optional[str],
-    ) -> Optional[AuthorizationResult]:
+    ) -> Optional[AuthorizeResult]:
         raise NotImplementedError()
 
 
 class CallableAuthorize(Authorize):
     def __init__(
-        self, *, logger: Logger, func: Callable[..., AuthorizationResult],
+        self, *, logger: Logger, func: Callable[..., AuthorizeResult],
     ):
         self.logger = logger
         self.func = func
@@ -41,7 +41,7 @@ class CallableAuthorize(Authorize):
         enterprise_id: Optional[str],
         team_id: str,
         user_id: Optional[str],
-    ) -> Optional[AuthorizationResult]:
+    ) -> Optional[AuthorizeResult]:
         try:
             all_available_args = {
                 "args": AuthorizeArgs(
@@ -57,6 +57,10 @@ class CallableAuthorize(Authorize):
                 "team_id": team_id,
                 "user_id": user_id,
             }
+            for k, v in context.items():
+                if k not in all_available_args:
+                    all_available_args[k] = v
+
             kwargs: Dict[str, Any] = {  # type: ignore
                 k: v for k, v in all_available_args.items() if k in self.arg_names  # type: ignore
             }
@@ -70,7 +74,7 @@ class CallableAuthorize(Authorize):
             if auth_result is None:
                 return auth_result
 
-            if isinstance(auth_result, AuthorizationResult):
+            if isinstance(auth_result, AuthorizeResult):
                 return auth_result
             else:
                 raise ValueError(
@@ -98,7 +102,7 @@ class InstallationStoreAuthorize(Authorize):
         enterprise_id: Optional[str],
         team_id: str,
         user_id: Optional[str],
-    ) -> Optional[AuthorizationResult]:
+    ) -> Optional[AuthorizeResult]:
         bot: Optional[Bot] = self.installation_store.find_bot(
             enterprise_id=enterprise_id, team_id=team_id,
         )
@@ -111,7 +115,7 @@ class InstallationStoreAuthorize(Authorize):
 
         try:
             auth_result = context.client.auth_test(token=bot.bot_token)
-            return AuthorizationResult.from_auth_test_response(
+            return AuthorizeResult.from_auth_test_response(
                 auth_test_response=auth_result,
                 bot_token=bot.bot_token,
                 user_token=None,  # Not yet supported
