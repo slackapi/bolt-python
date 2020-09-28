@@ -9,7 +9,7 @@ order: 1
 [Adapters](#adapters) are flexible and can be adjusted based on the framework you prefer. There are two necessary components of adapters:
 
 - `__init__(app: App)`: Constructor that accepts and stores an instance of the Bolt `App`.
-- `handle(req: Request)`: Function (typically named `handle()`) that receives incoming Slack requests, parses them to conform to an instance of [`BoltRequest`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/request/request.py#L23), then dispatches them to the stored Bolt app.
+- `handle(req: Request)`: Function (typically named `handle()`) that receives incoming Slack requests, parses them to conform to an instance of [`BoltRequest`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/request/request.py), then dispatches them to the stored Bolt app.
 
 `BoltRequest` instantiation accepts four parameters:
 
