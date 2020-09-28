@@ -13,7 +13,7 @@ You can subscribe to the <a href="https://api.slack.com/events/app_home_opened">
 
 ```python
 @app.event("app_home_opened")
-def openModal(client, event, logger):
+def open_modal(client, event, logger):
     try:
         # Call views.publish with the built-in client
         client.views_publish(
