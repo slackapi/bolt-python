@@ -21,11 +21,17 @@ To respond to options requests, you'll need to call `ack()` with a valid `option
 def show_options(ack):
     options = [
         {
-            "text": {"type": "plain_text", "text": "Option 1"},
+            "text": {
+                "type": "plain_text",
+                "text": "Option 1"
+            },
             "value": "1-1",
         },
         {
-            "text": {"type": "plain_text", "text": "Option 2"},
+            "text": {
+                "type": "plain_text",
+                "text": "Option 2"
+            },
             "value": "1-2",
         },
     ]

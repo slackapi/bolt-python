@@ -248,6 +248,7 @@ pre code pre {
   padding: 0;
   font-size: 0.9em;
   line-height: 2.2em;
+  white-space: pre-wrap;
 }
 
 pre code span {
