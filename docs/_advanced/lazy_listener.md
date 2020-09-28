@@ -10,7 +10,7 @@ order: 9
 
 Typically you'd call `ack()` as the first step of your listener functions. Calling `ack()` tells Slack that you've received the event and are handling it in within reasonable amount of time (3 seconds).
 
-However, apps running on FaaS or similar runtimes that don't allow you to run threads or processes after returning an HTTP response cannot follow this pattern. Instead, you should set the `process_before_response` flag to `true`. This allows you to call ack() and handle the event in seperate threads or processes. For events that do not require acknowledgement, you can create the listener as you normally would.
+However, apps running on FaaS or similar runtimes that don't allow you to run threads or processes after returning an HTTP response cannot follow this pattern. Instead, you should set the `process_before_response` flag to `true`. This allows you to create a listener that calls `ack()` and handles the event in seperate threads or processes. For events that do not require acknowledgement, you can create listeners as you normally would.
 
 Rather than acting as a decorator, lazy listeners take two keyword args:
 * `ack: Callable`: Responsible for calling `ack()`

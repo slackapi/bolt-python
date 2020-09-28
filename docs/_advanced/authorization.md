@@ -49,7 +49,7 @@ def authorize(enterprise_id, team_id, logger):
     
     # You can implement your own logic to fetch token here
     for (team in installations):
-        if ((team["enterprise_id"] == enterprise_id) and (team["team_id"] == team_id)):
+        if (((team["enterprise_id"] == None) or (team["enterprise_id"] == enterprise_id)) and (team["team_id"] == team_id)):
           # Return an instance of AuthorizationResult
           # If you don't store bot_id and bot_user_id, could also call `from_auth_test_response` with your bot_token to automatically fetch them
           return AuthorizationResult(
