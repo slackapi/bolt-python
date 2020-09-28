@@ -23,6 +23,6 @@ def handle_mention(body, say, logger):
     user = body["event"]["user"]
     # single logger call
     # global logger is passed to listener
-    logger.info(body)
+    logger.debug(body)
     say(f"{user} mentioned your app")
 ```
