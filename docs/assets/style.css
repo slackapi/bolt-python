@@ -150,7 +150,7 @@ span.beta {
   width: 90%;
   margin: 0 auto 30px auto;
   display: grid;
-  grid-gap: 25px;
+  grid-gap: 20px;
   grid-template-areas: 
     "head"
     "body"
@@ -280,7 +280,7 @@ pre tbody td.gl pre {
 
 .content .section-wrapper h3 {
   grid-area: head;
-  font-size: 1.75em;
+  font-size: 1.45em;
   font-weight: 600;
 }
 
@@ -299,7 +299,7 @@ a:hover {
 .secondary-wrapper {
   width: 100%;
   grid-area: secondary;
-  margin: 1em auto 0 auto;
+  margin: 0.6em auto 0 auto;
 }
 
 .secondary-wrapper div.highlighter-rouge {
