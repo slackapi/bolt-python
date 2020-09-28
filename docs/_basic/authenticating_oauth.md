@@ -2,12 +2,12 @@
 title: Authenticating with OAuth
 lang: en
 slug: authenticating-oauth
-order: 14
+order: 15
 ---
 
 <div class="section-content">
 
-Slack apps installed on multiple workspaces will need to implement OAuth, then store installation information (like access tokens) securely. By providing `client_id`, `client_secret`, `scopes`, `installation_store`, and `state_store` when initializing App, Bolt for Python will handle the work of setting up OAuth routes and verifying state. If you’re implementing a custom receiver, you can make use of our [OAuth library](https://slack.dev/python-slack-sdk/oauth/), which is what Bolt for Python uses under the hood.
+Slack apps installed on multiple workspaces will need to implement OAuth, then store installation information (like access tokens) securely. By providing `client_id`, `client_secret`, `scopes`, `installation_store`, and `state_store` when initializing App, Bolt for Python will handle the work of setting up OAuth routes and verifying state. If you’re implementing a custom adapter, you can make use of our [OAuth library](https://slack.dev/python-slack-sdk/oauth/), which is what Bolt for Python uses under the hood.
 
 Bolt for Python will create a **Redirect URL** `slack/oauth_redirect`, which Slack uses to redirect users after they complete your app’s installation flow. You will need to add this **Redirect URL** in your app configuration settings under **OAuth and Permissions**. This path can be configured in the `OAuthSettings` argument described below.
 

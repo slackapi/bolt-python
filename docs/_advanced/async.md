@@ -1,23 +1,18 @@
 ---
-title: Async Bolt
+title: Using async
 lang: en
-slug: advanced-async
-order: 1
+slug: async
+order: 2
 ---
 
 <div class="section-content">
-In the Basic concepts section, all the code snippets are not in the asynchronous programming style. You may be wondering if Bolt for Python is not available for asynchronous frameworks and their runtime such as the standard `asyncio` library.
+To use the async version of Bolt, you can import and initialize an `AsyncApp` instance (rather than `App`). `AsyncApp` relies on <a href="https://docs.aiohttp.org/">AIOHTTP</a> to make API requests, which means you'll need to install `aiohttp` (by adding to `requirements.txt` or running `pip install aiohttp`).
 
-No worries! You can use Bolt with [Starlette](https://www.starlette.io/), [FastAPI](https://fastapi.tiangolo.com/), [Sanic](https://sanicframework.org/), [AIOHTTP](https://docs.aiohttp.org/), and whatever you want to use.
-
-`AsyncApp` internally relies on AIOHTTP for making HTTP requests to Slack API servers. So, to use the async version of Bolt, add `aiohttp` to `requirements.txt` or run `pip install aiohttp`.
-
-You can find sample projects in [samples](https://github.com/slackapi/bolt-python/tree/main/samples) directory in the GitHub repository.
-
+Sample async projects can be found within the repository's <a href="https://github.com/slackapi/bolt-python/tree/main/samples">`samples` folder</a>.
 </div>
 
 ```python
-# required: pip install aiohttp
+# Requirement: install aiohttp
 from slack_bolt.async_app import AsyncApp
 app = AsyncApp()
 
@@ -36,25 +31,23 @@ if __name__ == "__main__":
 
 <details class="secondary-wrapper">
 <summary class="section-head" markdown="0">
-<h4 class="section-head">Using other async frameworks</h4>
+<h4 class="section-head">Using other frameworks</h4>
 </summary>
 
 <div class="secondary-content" markdown="0">
 
-`AsyncApp#start()` internally uses [AIOHTTP](https://docs.aiohttp.org/)'s web server feature. However, this doesn't mean you have to use AIOHTTP. `AsyncApp` can handle incoming requests from Slack using any other frameworks.
+Internally `AsyncApp#start()` implements a [`AIOHTTP`](https://docs.aiohttp.org/) web server. If you prefer, you can use a framework other than `AIOHTTP` to handle incoming requests.
 
-The code snippet in this section is an example using [Sanic](https://sanicframework.org/). You can start your Slack app server-side built with Sanic only by running the following commands.
+This example uses [Sanic](https://sanicframework.org/), but the full list of adapters are in the [`adapter` folder](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter).
+
+The following commands install the necessary requirements and starts the Sanic server on port 3000.
 
 ```bash
+# Install requirements
 pip install slack_bolt sanic uvicorn
-export SLACK_SIGNING_SECRET=***
-export SLACK_BOT_TOKEN=xoxb-***
-# save the source as async_app.py
+# Save the source as async_app.py
 uvicorn async_app:api --reload --port 3000 --log-level debug
 ```
-
-If you would like to use other frameworks, check the list of the built-in adapters [here](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter). If your favorite framework is available there, you can use Bolt with it in a similar way.
-
 </div>
 
 ```python
@@ -85,5 +78,4 @@ async def endpoint(req: Request):
 if __name__ == "__main__":
     api.run(host="0.0.0.0", port=int(os.environ.get("PORT", 3000)))
 ```
-
 </details>
