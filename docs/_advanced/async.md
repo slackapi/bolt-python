@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
 <div class="secondary-content" markdown="0">
 
-Internally `AsyncApp#start()` implements a [`AIOHTTP`](https://docs.aiohttp.org/) web server. If you prefer, you can use a framework other than `AIHTTP` to handle incoming requests.
+Internally `AsyncApp#start()` implements a [`AIOHTTP`](https://docs.aiohttp.org/) web server. If you prefer, you can use a framework other than `AIOHTTP` to handle incoming requests.
 
 This example uses [Sanic](https://sanicframework.org/), but the full list of adapters are in the [`adapter` folder](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter).
 
