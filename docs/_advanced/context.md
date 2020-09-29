@@ -15,7 +15,6 @@ All listeners have access to a `context` dictionary, which can be used to enrich
 # Listener middleware to fetch tasks from external system using userId
 def fetch_tasks(context, event, next):
     user = event["user"]
-
     try:
         # Assume get_tasks fetchs list of tasks from DB corresponding to user ID
         user_tasks = db.get_tasks(user)
@@ -31,7 +30,6 @@ def fetch_tasks(context, event, next):
 # Listener middleware to create a list of section blocks
 def create_sections(context, next):
     task_blocks = []
-
     # Loops through tasks added to context in previous middleware
     for task in context["tasks"]:
         task_blocks.append(
@@ -51,7 +49,6 @@ def create_sections(context, next):
                 }
             }
         )
-
     # Put list of blocks in context
     context["blocks"] = task_blocks
     next()
