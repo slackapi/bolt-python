@@ -315,6 +315,10 @@ a:hover {
   margin-top: 1em;
 }
 
+.content .section-wrapper .secondary-content div.highlighter-rouge {
+  width: 100%;
+}
+
 summary h4 {
   display: inline;
 }
