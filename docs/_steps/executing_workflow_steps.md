@@ -16,16 +16,16 @@ Within the `execute` callback, your app must either call `complete()` to indicat
 </div>
 
 ```python
-def execute_handler(step, complete, fail):
+def execute(step, complete, fail):
     inputs = step["inputs"]
 
     outputs = {
-      "task_name": inputs["task_name"]["value"],
-      "task_description": inputs["task_description"]["value"],
+        "task_name": inputs["task_name"]["value"],
+        "task_description": inputs["task_description"]["value"],
     }
 
     error = {
-      "message": "Just testing step failure!"
+        "message": "Just testing step failure!"
     }
 
     # if everything was successful
@@ -34,11 +34,12 @@ def execute_handler(step, complete, fail):
     # if something went wrong
     fail(error=error)
 
-ws = WorkflowStep(callback_id="add_task", config={
-  "edit": edit_handler,
-  "save": save_handler,
-  "execute": execute_handler,
-})
+ws = WorkflowStep(
+    callback_id="add_task",
+    edit=edit,
+    save=save,
+    execute=execute,
+)
 
 app.step(ws)
 ```
