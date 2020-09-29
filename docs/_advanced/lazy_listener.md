@@ -18,6 +18,17 @@ Rather than acting as a decorator, lazy listeners take two keyword args:
 </div>
 
 ```python
+def respond_to_slack_within_3_seconds(body, ack):
+    if "text" in body:
+        ack(":x: Usage: /start-process (description here)")
+    else:
+        ack(f"Accepted! (task: {body['text']})")
+
+import time
+def run_long_process(respond, body):
+    time.sleep(5)  # longer than 3 seconds
+    respond(f"Completed! (task: {body['text']})")
+
 app.command("/start-process")(
     # ack() is still called within 3 seconds
     ack=respond_to_slack_within_3_seconds,
