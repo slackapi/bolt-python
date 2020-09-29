@@ -342,19 +342,17 @@ class App:
     def step(
         self,
         callback_id: Union[str, Pattern, WorkflowStep],
-        save_callback_id: Optional[Union[str, Pattern]] = None,
         edit: Optional[Union[Callable[..., Optional[BoltResponse]], Listener]] = None,
         save: Optional[Union[Callable[..., Optional[BoltResponse]], Listener]] = None,
         execute: Optional[
             Union[Callable[..., Optional[BoltResponse]], Listener]
         ] = None,
     ):
-        """Registers a new Workflow Steps from Apps listeners."""
+        """Registers a new Workflow Step listener"""
         step = callback_id
         if isinstance(callback_id, (str, Pattern)):
             step = WorkflowStep(
                 callback_id=callback_id,
-                save_callback_id=save_callback_id,
                 edit=edit,
                 save=save,
                 execute=execute,

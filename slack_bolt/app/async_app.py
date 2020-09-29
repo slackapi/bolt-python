@@ -354,7 +354,6 @@ class AsyncApp:
     def step(
         self,
         callback_id: Union[str, Pattern, AsyncWorkflowStep],
-        save_callback_id: Optional[Union[str, Pattern]] = None,
         edit: Optional[
             Union[Callable[..., Optional[BoltResponse]], AsyncListener]
         ] = None,
@@ -365,12 +364,11 @@ class AsyncApp:
             Union[Callable[..., Optional[BoltResponse]], AsyncListener]
         ] = None,
     ):
-        """Registers a new Workflow Steps from Apps listeners."""
+        """Registers a new Workflow Step listener"""
         step = callback_id
         if isinstance(callback_id, (str, Pattern)):
             step = AsyncWorkflowStep(
                 callback_id=callback_id,
-                save_callback_id=save_callback_id,
                 edit=edit,
                 save=save,
                 execute=execute,
