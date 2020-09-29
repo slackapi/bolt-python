@@ -26,15 +26,14 @@ app = App(
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
 )
 
-# Define the step's configuration
-ws_config = {
-  "edit": edit_handler,
-  "save": save_handler,
-  "execute": execute_handler,
-}
-
 # Create a new WorkflowStep instance
-ws = WorkflowStep(callback_id="add_task", config=ws_config)
+ws = WorkflowStep(
+    callback_id="add_task",
+    edit=edit,
+    save=save,
+    execute=execute,
+)
 
+# Pass Step to set up listeners
 app.step(ws)
 ```

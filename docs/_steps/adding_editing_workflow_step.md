@@ -18,51 +18,52 @@ To learn more about opening configuration modals, [read the documentation](https
 </div>
 
 ```python
-def edit_handler(ack, step, configure):
-  ack()
+def edit(ack, step, configure):
+    ack()
 
-  blocks = [
-      {
-        "type": "input",
-        "block_id": "task_name_input",
-        "element": {
-          "type": "plain_text_input",
-          "action_id": "name",
-          "placeholder": {
-            "type": "plain_text",
-            "text": "Add a task name",
-          },
+    blocks = [
+        {
+            "type": "input",
+            "block_id": "task_name_input",
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "name",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Add a task name",
+                },
+            },
+            "label": {
+                "type": "plain_text",
+                "text": "Task name",
+            },
         },
-        "label": {
-          "type": "plain_text",
-          "text": "Task name",
+        {
+            "type": "input",
+            "block_id": "task_description_input",
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "description",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Add a task description",
+            },
+            },
+            "label": {
+                "type": "plain_text",
+                "text": "Task description",
+            },
         },
-      },
-      {
-        "type": "input",
-        "block_id": "task_description_input",
-        "element": {
-          "type": "plain_text_input",
-          "action_id": "description",
-          "placeholder": {
-            "type": "plain_text",
-            "text": "Add a task description",
-          },
-        },
-        "label": {
-          "type": "plain_text",
-          "text": "Task description",
-        },
-      },
     ]
 
     configure(blocks=blocks)
-  
-ws = WorkflowStep(callback_id="add_task", config={
-  "edit": edit_handler,
-  "save": save_handler,
-  "execute": execute_handler,
-})
+
+ws = WorkflowStep(
+    callback_id="add_task",
+    edit=edit,
+    save=save,
+    execute=execute,
+)
 
 app.step(ws)
 ```

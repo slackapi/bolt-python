@@ -21,42 +21,43 @@ To learn more about how to structure these parameters, [read the documentation](
 </div>
 
 ```python
-def save_handler(ack, view, update):
+def save(ack, view, update):
     ack()
 
-    values = view.state
+    values = view["state"]["values"]
     task_name = values["task_name_input"]["name"]
     task_description = values["task_description_input"]["description"]
                 
     inputs = {
-      "task_name": { 
-        "value": task_name.value 
-      },
-      "task_description": { 
-        "value": task_description.value 
-      },
+        "task_name": { 
+            "value": task_name.value 
+        },
+        "task_description": { 
+            "value": task_description.value 
+        },
     }
 
     outputs = [
-      {
-        "type": "text",
-        "name": "task_name",
-        "label": "Task name",
-      },
-      {
-        "type": "text",
-        "name": "task_description",
-        "label": "Task description",
-      }
+        {
+            "type": "text",
+            "name": "task_name",
+            "label": "Task name",
+        },
+        {
+            "type": "text",
+            "name": "task_description",
+            "label": "Task description",
+        }
     ]
 
     update(inputs=inputs, outputs=outputs);
 
-ws = WorkflowStep(callback_id="add_task", config={
-  "edit": edit_handler,
-  "save": save_handler,
-  "execute": execute_handler,
-})
+ws = WorkflowStep(
+    callback_id="add_task",
+    edit=edit,
+    save=save,
+    execute=execute,
+)
 
 app.step(ws)
 ```
