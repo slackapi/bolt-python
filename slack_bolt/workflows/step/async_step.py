@@ -29,15 +29,12 @@ class AsyncWorkflowStep:
         edit: Union[Callable[..., Awaitable[BoltResponse]], AsyncListener],
         save: Union[Callable[..., Awaitable[BoltResponse]], AsyncListener],
         execute: Union[Callable[..., Awaitable[BoltResponse]], AsyncListener],
-        save_callback_id: Optional[str] = None,  # TODO: better approach?
         app_name: Optional[str] = None,
     ):
         self.callback_id = callback_id
         app_name = app_name or __name__
         self.edit = self._build_listener(callback_id, app_name, edit, "edit")
-        self.save = self._build_listener(
-            save_callback_id or callback_id, app_name, save, "save"
-        )
+        self.save = self._build_listener(callback_id, app_name, save, "save")
         self.execute = self._build_listener(callback_id, app_name, execute, "execute")
 
     @classmethod
@@ -125,7 +122,7 @@ def _build_save_listener_middleware():
 
 
 def _build_execute_listener_middleware():
-    async def save_listener_middleware(
+    async def execute_listener_middleware(
         context: AsyncBoltContext,
         client: AsyncWebClient,
         body: dict,
@@ -135,4 +132,4 @@ def _build_execute_listener_middleware():
         context["fail"] = AsyncFail(client=client, body=body,)
         return await next()
 
-    return AsyncCustomMiddleware(app_name=__name__, func=save_listener_middleware)
+    return AsyncCustomMiddleware(app_name=__name__, func=execute_listener_middleware)
