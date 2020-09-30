@@ -18,7 +18,8 @@ After instantiating a `WorkflowStep`, you can pass it into `app.step()`. Behind 
 </div>
 
 ```python
-from slack_bolt import App, WorkflowStep
+from slack_bolt import App
+from slack_bolt.workflows.step import WorkflowStep
 
 # Initiate the Bolt app as you normally would
 app = App(
