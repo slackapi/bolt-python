@@ -6,10 +6,10 @@ class AsyncComplete:
         self.client = client
         self.body = body
 
-    async def __call__(self, *, outputs: dict,) -> None:
+    async def __call__(self, **kwargs) -> None:
         await self.client.workflows_stepCompleted(
             workflow_step_execute_id=self.body["event"]["workflow_step"][
                 "workflow_step_execute_id"
             ],
-            outputs=outputs,
+            **kwargs,
         )
