@@ -6,9 +6,8 @@ class Update:
         self.client = client
         self.body = body
 
-    def __call__(self, *, inputs: dict, outputs: list,) -> None:
+    def __call__(self, **kwargs) -> None:
         self.client.workflows_updateStep(
             workflow_step_edit_id=self.body["workflow_step"]["workflow_step_edit_id"],
-            inputs=inputs,
-            outputs=outputs,
+            **kwargs,
         )
