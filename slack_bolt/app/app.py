@@ -12,7 +12,7 @@ from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import InstallationStore
 from slack_sdk.web import WebClient
 
-from slack_bolt.authorization import AuthorizationResult
+from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.authorization.authorize import (
     Authorize,
     InstallationStoreAuthorize,
@@ -65,6 +65,7 @@ class App:
     def __init__(
         self,
         *,
+        logger: Optional[logging.Logger] = None,
         # Used in logger
         name: Optional[str] = None,
         # Set True when you run this app on a FaaS platform
@@ -75,7 +76,7 @@ class App:
         token: Optional[str] = None,
         client: Optional[WebClient] = None,
         # for multi-workspace apps
-        authorize: Optional[Callable[..., AuthorizationResult]] = None,
+        authorize: Optional[Callable[..., AuthorizeResult]] = None,
         installation_store: Optional[InstallationStore] = None,
         # for the OAuth flow
         oauth_settings: Optional[OAuthSettings] = None,
@@ -100,8 +101,8 @@ class App:
         :param verification_token: Deprecated verification mechanism.
             This can used only for ssl_check requests.
         """
-        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET", None)
-        token = token or os.environ.get("SLACK_BOT_TOKEN", None)
+        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET")
+        token = token or os.environ.get("SLACK_BOT_TOKEN")
 
         if signing_secret is None or signing_secret == "":
             raise BoltError(error_signing_secret_not_found())
@@ -112,7 +113,7 @@ class App:
         self._verification_token: Optional[str] = verification_token or os.environ.get(
             "SLACK_VERIFICATION_TOKEN", None
         )
-        self._framework_logger = get_bolt_logger(App)
+        self._framework_logger = logger or get_bolt_logger(App)
 
         self._token: Optional[str] = token
 
@@ -142,6 +143,15 @@ class App:
             )
 
         self._oauth_flow: Optional[OAuthFlow] = None
+
+        if (
+            oauth_settings is None
+            and os.environ.get("SLACK_CLIENT_ID") is not None
+            and os.environ.get("SLACK_CLIENT_SECRET") is not None
+        ):
+            # initialize with the default settings
+            oauth_settings = OAuthSettings()
+
         if oauth_flow:
             self._oauth_flow = oauth_flow
             if self._installation_store is None:
@@ -416,7 +426,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.event("message")
+            primary_matcher = builtin_matchers.event(
+                {"type": "message", "subtype": None}
+            )
             middleware.append(MessageListenerMatches(keyword))
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware, True

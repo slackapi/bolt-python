@@ -111,7 +111,7 @@ class AsyncOAuthFlow:
         client_secret = client_secret or os.environ["SLACK_CLIENT_SECRET"]  # required
         scopes = scopes or os.environ.get("SLACK_SCOPES", "").split(",")
         user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", "").split(",")
-        redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI", None)
+        redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI")
         return AsyncOAuthFlow(
             client=client or AsyncWebClient(),
             logger=logger,
@@ -277,7 +277,7 @@ class AsyncOAuthFlow:
                 "incoming_webhook"
             ) or {}
 
-            bot_token: Optional[str] = oauth_response.get("access_token", None)
+            bot_token: Optional[str] = oauth_response.get("access_token")
             # NOTE: oauth.v2.access doesn't include bot_id in response
             bot_id: Optional[str] = None
             if bot_token is not None:
@@ -285,18 +285,18 @@ class AsyncOAuthFlow:
                 bot_id = auth_test["bot_id"]
 
             return Installation(
-                app_id=oauth_response.get("app_id", None),
-                enterprise_id=installed_enterprise.get("id", None),
-                team_id=installed_team.get("id", None),
+                app_id=oauth_response.get("app_id"),
+                enterprise_id=installed_enterprise.get("id"),
+                team_id=installed_team.get("id"),
                 bot_token=bot_token,
                 bot_id=bot_id,
-                bot_user_id=oauth_response.get("bot_user_id", None),
-                bot_scopes=oauth_response.get("scope", None),  # comma-separated string
-                user_id=installer.get("id", None),
-                user_token=installer.get("access_token", None),
-                user_scopes=installer.get("scope", None),  # comma-separated string
-                incoming_webhook_url=incoming_webhook.get("url", None),
-                incoming_webhook_channel_id=incoming_webhook.get("channel_id", None),
+                bot_user_id=oauth_response.get("bot_user_id"),
+                bot_scopes=oauth_response.get("scope"),  # comma-separated string
+                user_id=installer.get("id"),
+                user_token=installer.get("access_token"),
+                user_scopes=installer.get("scope"),  # comma-separated string
+                incoming_webhook_url=incoming_webhook.get("url"),
+                incoming_webhook_channel_id=incoming_webhook.get("channel_id"),
                 incoming_webhook_configuration_url=incoming_webhook.get(
                     "configuration_url", None
                 ),

@@ -20,14 +20,14 @@ def set_response_status_and_headers(bolt_resp: BoltResponse) -> None:
         cherrypy.response.headers[k] = v
     for cookie in bolt_resp.cookies():
         for name, c in cookie.items():
-            str_max_age: Optional[str] = c.get("max-age", None)
+            str_max_age: Optional[str] = c.get("max-age")
             max_age: Optional[int] = int(str_max_age) if str_max_age else None
             cherrypy_cookie = cherrypy.response.cookie
             cherrypy_cookie[name] = c.value
-            cherrypy_cookie[name]["expires"] = c.get("expires", None)
+            cherrypy_cookie[name]["expires"] = c.get("expires")
             cherrypy_cookie[name]["max-age"] = max_age
-            cherrypy_cookie[name]["domain"] = c.get("domain", None)
-            cherrypy_cookie[name]["path"] = c.get("path", None)
+            cherrypy_cookie[name]["domain"] = c.get("domain")
+            cherrypy_cookie[name]["path"] = c.get("path")
             cherrypy_cookie[name]["secure"] = True
             cherrypy_cookie[name]["httponly"] = True
 

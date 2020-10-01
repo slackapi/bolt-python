@@ -9,7 +9,7 @@ from slack_sdk.oauth.installation_store.async_installation_store import (
 )
 
 from slack_bolt.authorization.async_authorize_args import AsyncAuthorizeArgs
-from slack_bolt.authorization import AuthorizationResult
+from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.context.async_context import AsyncBoltContext
 
 
@@ -24,13 +24,13 @@ class AsyncAuthorize:
         enterprise_id: Optional[str],
         team_id: str,
         user_id: Optional[str],
-    ) -> Optional[AuthorizationResult]:
+    ) -> Optional[AuthorizeResult]:
         raise NotImplementedError()
 
 
 class AsyncCallableAuthorize(AsyncAuthorize):
     def __init__(
-        self, *, logger: Logger, func: Callable[..., Awaitable[AuthorizationResult]]
+        self, *, logger: Logger, func: Callable[..., Awaitable[AuthorizeResult]]
     ):
         self.logger = logger
         self.func = func
@@ -43,7 +43,7 @@ class AsyncCallableAuthorize(AsyncAuthorize):
         enterprise_id: Optional[str],
         team_id: str,
         user_id: Optional[str],
-    ) -> Optional[AuthorizationResult]:
+    ) -> Optional[AuthorizeResult]:
         try:
             all_available_args = {
                 "args": AsyncAuthorizeArgs(
@@ -59,6 +59,10 @@ class AsyncCallableAuthorize(AsyncAuthorize):
                 "team_id": team_id,
                 "user_id": user_id,
             }
+            for k, v in context.items():
+                if k not in all_available_args:
+                    all_available_args[k] = v
+
             kwargs: Dict[str, Any] = {  # type: ignore
                 k: v for k, v in all_available_args.items() if k in self.arg_names  # type: ignore
             }
@@ -68,11 +72,11 @@ class AsyncCallableAuthorize(AsyncAuthorize):
                     self.logger.warning(f"{name} is not a valid argument")
                     kwargs[name] = None
 
-            auth_result: Optional[AuthorizationResult] = await self.func(**kwargs)
+            auth_result: Optional[AuthorizeResult] = await self.func(**kwargs)
             if auth_result is None:
                 return auth_result
 
-            if isinstance(auth_result, AuthorizationResult):
+            if isinstance(auth_result, AuthorizeResult):
                 return auth_result
             else:
                 raise ValueError(
@@ -100,7 +104,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
         enterprise_id: Optional[str],
         team_id: str,
         user_id: Optional[str],
-    ) -> Optional[AuthorizationResult]:
+    ) -> Optional[AuthorizeResult]:
         bot: Optional[Bot] = await self.installation_store.async_find_bot(
             enterprise_id=enterprise_id, team_id=team_id,
         )
@@ -113,7 +117,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
 
         try:
             auth_result = await context.client.auth_test(token=bot.bot_token)
-            return AuthorizationResult.from_auth_test_response(
+            return AuthorizeResult.from_auth_test_response(
                 auth_test_response=auth_result,
                 bot_token=bot.bot_token,
                 user_token=None,  # Not yet supported

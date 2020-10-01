@@ -11,9 +11,10 @@
   --black: #1D1C1D;
 }
 
-body {
+html, body {
   background-color: var(--white);
   font-family: 'Noto Sans JP', 'Slack-Lato', sans-serif;
+  font-size: 100%;
 }
 
 .content {
@@ -49,18 +50,18 @@ span.beta {
 }
 
 .panel .sidebar-content .logo {
-  padding-top: 1em;
+  padding-top: 1.15em;
   position: relative;
 }
 
 .panel .sidebar-content .logo .icon img {
-  width: 30px;
+  width: 2.15em;
   margin-right: 6px;
 }
 
 .panel .sidebar-content .logo .name {
   font-weight: 800;
-  font-size: 1.7em;
+  font-size: 2em;
   vertical-align: bottom;
 }
 
@@ -84,14 +85,14 @@ span.beta {
   list-style: none;
   list-style-position: inside;
   padding-top: 0.9em;
-  margin: 0 0 0 -8px;
-  font-size: 0.80em;
+  margin: 0 0 0 -0.5em;
+  font-size: 0.95em;
 }
 
 .panel .sidebar-content ul.sidebar-section li {
   border-radius: 8px;
   padding: 2px 0 2px 8px;
-  margin: 3px 0;
+  margin: 0.1em 0;
   color: var(--black);
 }
 
@@ -119,8 +120,8 @@ span.beta {
 /* Main page */
 .header {
   width: 95%;
-  margin: 0 auto 1em auto;
-  height: 5rem;
+  margin: 0 auto 0.8em auto;
+  height: 5em;
   padding-top: 1.5em;
 }
 
@@ -132,7 +133,7 @@ span.beta {
   color: var(--grey);
   font-weight: 700;
   padding: 6px 14px 9px;
-  font-size: 15px;
+  font-size 0.9em;
 }
 
 .header a.language-switcher:hover {
@@ -149,7 +150,7 @@ span.beta {
   width: 90%;
   margin: 0 auto 30px auto;
   display: grid;
-  grid-gap: 25px;
+  grid-gap: 20px;
   grid-template-areas: 
     "head"
     "body"
@@ -189,7 +190,7 @@ span.beta {
 }
 
 .completed {
-  background: #58AF7F;
+  background: #53b3e1;
 }
 
 .tutorial-nav ul li {
@@ -198,7 +199,7 @@ span.beta {
 
 .tutorial-nav a {
   font-weight: 700;
-  font-size: 0.8em;
+  font-size: 0.9em;
   color: #757575;
 }
 
@@ -211,8 +212,6 @@ span.beta {
   width: 55%;
   margin: 1em 0 0 33%;
   padding-bottom: 2em;
-  font-size: 1em;
-  line-height: 1.5em;
 }
 
 .tutorial img {
@@ -224,17 +223,17 @@ span.beta {
 
 .tutorial blockquote {
   margin: 0 0 0 1em;
-  padding: 0 6em 0 1.5em;
+  padding: 0 6em 0 2em;
   border-radius: 6px;
   border-left: 6px solid #DDD;
-  font-size: 0.95em;
+  font-size: 1em;
 }
 
 .tutorial h3 {
   padding-bottom: 1em;
 }
 
-.content .section-wrapper .language-python {
+.content .section-wrapper .highlighter-rouge {
   grid-area: code;
 }
 
@@ -245,19 +244,43 @@ pre {
   border: 1px solid #DDDDDD;
 }
 
-pre code {
-  font-size: 0.85em !important;
+pre code pre {
+  padding: 0;
+  font-size: 0.9em;
+  line-height: 2.2em;
+}
+
+pre code span {
+  padding: 0;
+  margin: 0;
+  height: 0;
+}
+
+table, pre tbody, pre tbody td, pre tbody td pre {
+  padding: 0;
+  border: 0;
+  margin: 0;
+  text-align: left;
+}
+
+pre tbody td.gl pre {
+  color: #999988;
+  padding-right: 1.6em;
+  user-select: none;
 }
 
 .content .section-wrapper .section-content {
   grid-area: body;
-  font-size: 1em;
-  line-height: 1.5em;
+}
+
+.content .section-wrapper, .tutorial {
+  font-size: 1.15em;
+  line-height: 1.9em;
 }
 
 .content .section-wrapper h3 {
   grid-area: head;
-  font-size: 1.4em;
+  font-size: 1.45em;
   font-weight: 600;
 }
 
@@ -276,12 +299,10 @@ a:hover {
 .secondary-wrapper {
   width: 100%;
   grid-area: secondary;
-  margin: 1em auto 0 auto;
-  font-size: 1em;
-  line-height: 1.75em;
+  margin: 0.6em auto 0 auto;
 }
 
-.secondary-wrapper .language-python {
+.secondary-wrapper div.highlighter-rouge {
   width: 50%;
   float: left;
   margin-top: 1em;
@@ -292,6 +313,10 @@ a:hover {
   float: left;
   margin-right: 5%;
   margin-top: 1em;
+}
+
+.content .section-wrapper .secondary-content div.highlighter-rouge {
+  width: 100%;
 }
 
 summary h4 {

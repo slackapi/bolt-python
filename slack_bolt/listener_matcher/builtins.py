@@ -75,10 +75,6 @@ def build_listener_matcher(
 def event(
     constraints: Union[str, Pattern, Dict[str, str]], asyncio: bool = False,
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
-    if constraints == "message":
-        # matches message events that don't have subtype in body
-        constraints = {"type": "message", "subtype": None}
-
     if isinstance(constraints, (str, Pattern)):
         event_type: Union[str, Pattern] = constraints
 

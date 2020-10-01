@@ -23,6 +23,7 @@ LOGGING = {
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
             "propagate": False,
         },
+        "django.db.backends": {"level": "DEBUG",},
         "slack_bolt": {"handlers": ["console"], "level": "DEBUG", "propagate": False,},
     },
 }
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "slackapp.apps.SlackAppConfig",
 ]
 
 MIDDLEWARE = [

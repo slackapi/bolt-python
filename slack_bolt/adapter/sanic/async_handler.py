@@ -23,13 +23,13 @@ def to_sanic_response(bolt_resp: BoltResponse) -> HTTPResponse:
     for cookie in bolt_resp.cookies():
         for name, c in cookie.items():
             resp.cookies[name] = c.value
-            expire_value = c.get("expires", None)
+            expire_value = c.get("expires")
             if expire_value is not None and expire_value != "":
                 expire = datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z")
                 resp.cookies[name]["expires"] = expire
-            resp.cookies[name]["path"] = c.get("path", None)
-            resp.cookies[name]["domain"] = c.get("domain", None)
-            resp.cookies[name]["max-age"] = c.get("max-age", None)
+            resp.cookies[name]["path"] = c.get("path")
+            resp.cookies[name]["domain"] = c.get("domain")
+            resp.cookies[name]["max-age"] = c.get("max-age")
             resp.cookies[name]["secure"] = True
             resp.cookies[name]["httponly"] = True
     return resp

@@ -26,7 +26,7 @@ class UrlVerification(Middleware):  # type: ignore
 
     @staticmethod
     def _is_url_verification_request(body: dict) -> bool:
-        return body is not None and body.get("type", None) == "url_verification"
+        return body is not None and body.get("type") == "url_verification"
 
     @staticmethod
     def _build_success_response(body: dict) -> BoltResponse:

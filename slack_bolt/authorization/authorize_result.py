@@ -3,7 +3,7 @@ from typing import Optional
 from slack_sdk.web import SlackResponse
 
 
-class AuthorizationResult(dict):
+class AuthorizeResult(dict):
     enterprise_id: Optional[str]
     team_id: Optional[str]
     bot_id: Optional[str]
@@ -52,8 +52,8 @@ class AuthorizationResult(dict):
         bot_token: Optional[str] = None,
         user_token: Optional[str] = None,
         auth_test_response: SlackResponse,
-    ) -> "AuthorizationResult":
-        return AuthorizationResult(
+    ) -> "AuthorizeResult":
+        return AuthorizeResult(
             enterprise_id=auth_test_response.get("enterprise_id"),
             team_id=auth_test_response.get("team_id"),
             bot_user_id=auth_test_response.get("user_id"),
