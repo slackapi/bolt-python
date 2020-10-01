@@ -62,7 +62,7 @@ class AsyncWorkflowStep:
         elif name == "save":
             return [workflow_step_save(callback_id, asyncio=True)]
         elif name == "execute":
-            return [workflow_step_execute(asyncio=True)]
+            return [workflow_step_execute(callback_id, asyncio=True)]
         else:
             raise ValueError(f"Invalid name {name}")
 

@@ -2,7 +2,6 @@
 # instead of slack_bolt in requirements.txt
 import sys
 
-
 sys.path.insert(1, "..")
 # ------------------------------------------------
 
@@ -30,7 +29,7 @@ def log_request(logger, body, next):
 # https://api.slack.com/tutorials/workflow-builder-steps
 
 
-def edit(ack: Ack, configure: Configure):
+def edit(ack: Ack, step, configure: Configure):
     ack()
     configure(
         blocks=[
@@ -85,8 +84,8 @@ def edit(ack: Ack, configure: Configure):
     )
 
 
-def save(ack: Ack, body: dict, update: Update):
-    state_values = body["view"]["state"]["values"]
+def save(ack: Ack, view: dict, update: Update):
+    state_values = view["state"]["values"]
     update(
         inputs={
             "taskName": {
@@ -121,15 +120,14 @@ def save(ack: Ack, body: dict, update: Update):
 pseudo_database = {}
 
 
-def execute(body: dict, client: WebClient, complete: Complete, fail: Fail):
-    step = body["event"]["workflow_step"]
+def execute(step: dict, client: WebClient, complete: Complete, fail: Fail):
     try:
         complete(
             outputs={
-                    "taskName": step["inputs"]["taskName"]["value"],
-                    "taskDescription": step["inputs"]["taskDescription"]["value"],
-                    "taskAuthorEmail": step["inputs"]["taskAuthorEmail"]["value"],
-                }
+                "taskName": step["inputs"]["taskName"]["value"],
+                "taskDescription": step["inputs"]["taskDescription"]["value"],
+                "taskAuthorEmail": step["inputs"]["taskAuthorEmail"]["value"],
+            }
         )
 
         user: SlackResponse = client.users_lookupByEmail(
@@ -166,6 +164,7 @@ def execute(body: dict, client: WebClient, complete: Complete, fail: Fail):
         fail(error={
             "message": "Something wrong!"
         })
+
 
 app.step(
     callback_id="copy_review",

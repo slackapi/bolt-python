@@ -35,8 +35,7 @@ class WorkflowStep:
         app_name = app_name or __name__
         self.edit = self._build_listener(callback_id, app_name, edit, "edit")
         self.save = self._build_listener(callback_id, app_name, save, "save")
-        self.execute = self._build_listener(
-            callback_id, app_name, execute, "execute")
+        self.execute = self._build_listener(callback_id, app_name, execute, "execute")
 
     @classmethod
     def _build_listener(cls, callback_id, app_name, listener, name):
@@ -61,7 +60,7 @@ class WorkflowStep:
         elif name == "save":
             return [workflow_step_save(callback_id)]
         elif name == "execute":
-            return [workflow_step_execute()]
+            return [workflow_step_execute(callback_id)]
         else:
             raise ValueError(f"Invalid name {name}")
 

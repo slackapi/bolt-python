@@ -110,13 +110,14 @@ def event(
 
 
 def workflow_step_execute(
-    asyncio: bool = False,
+    callback_id: Union[str, Pattern], asyncio: bool = False,
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(body: Dict[str, Any]) -> bool:
         return (
             is_event(body)
             and _matches("workflow_step_execute", body["event"]["type"])
             and "workflow_step" in body["event"]
+            and _matches(callback_id, body["event"]["callback_id"])
         )
 
     return build_listener_matcher(func, asyncio)

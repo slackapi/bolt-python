@@ -29,6 +29,14 @@ def is_event(body: Dict[str, Any]) -> bool:
     )
 
 
+def is_workflow_step_execute(body: Dict[str, Any]) -> bool:
+    return (
+        is_event(body)
+        and body["event"]["type"] == "workflow_step_edit"
+        and "workflow_step" in body["event"]
+    )
+
+
 # -------------------
 # Slash Commands
 # -------------------
@@ -203,6 +211,21 @@ def is_view_closed(body: Dict[str, Any]) -> bool:
 
 def is_workflow_step_save(body: Dict[str, Any]) -> bool:
     return is_view_submission(body) and body["view"]["type"] == "workflow_step"
+
+
+# -------------------
+# Workflow Steps
+# -------------------
+
+
+def to_step(body: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    # edit
+    if is_workflow_step_edit(body):
+        return body["workflow_step"]
+    # execute
+    if is_workflow_step_execute(body):
+        return body["event"]["workflow_step"]
+    return None
 
 
 # ------------------------------------------

@@ -362,10 +362,7 @@ class App:
         step = callback_id
         if isinstance(callback_id, (str, Pattern)):
             step = WorkflowStep(
-                callback_id=callback_id,
-                edit=edit,
-                save=save,
-                execute=execute,
+                callback_id=callback_id, edit=edit, save=save, execute=execute,
             )
         elif not isinstance(step, WorkflowStep):
             raise BoltError("Invalid step object")

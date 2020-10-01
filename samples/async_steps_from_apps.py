@@ -21,7 +21,7 @@ app = AsyncApp()
 # https://api.slack.com/tutorials/workflow-builder-steps
 
 
-async def edit(ack: AsyncAck, configure: AsyncConfigure):
+async def edit(ack: AsyncAck, step: dict, configure: AsyncConfigure):
     await ack()
     await configure(
         blocks=[
@@ -76,8 +76,8 @@ async def edit(ack: AsyncAck, configure: AsyncConfigure):
     )
 
 
-async def save(ack: AsyncAck, body: dict, update: AsyncUpdate):
-    state_values = body["view"]["state"]["values"]
+async def save(ack: AsyncAck, view: dict, update: AsyncUpdate):
+    state_values = view["state"]["values"]
     await update(
         inputs={
             "taskName": {
@@ -112,9 +112,8 @@ async def save(ack: AsyncAck, body: dict, update: AsyncUpdate):
 pseudo_database = {}
 
 
-async def execute(body: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail):
+async def execute(step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail):
     try:
-        step = body["event"]["workflow_step"]
         await complete(
             outputs={
                 "taskName": step["inputs"]["taskName"]["value"],

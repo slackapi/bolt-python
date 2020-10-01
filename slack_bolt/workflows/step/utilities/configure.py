@@ -10,7 +10,9 @@ class Configure:
         self.client = client
         self.body = body
 
-    def __call__(self, *, blocks: Optional[List[Union[dict, Block]]] = None, **kwargs) -> None:
+    def __call__(
+        self, *, blocks: Optional[List[Union[dict, Block]]] = None, **kwargs
+    ) -> None:
         self.client.views_open(
             trigger_id=self.body["trigger_id"],
             view={

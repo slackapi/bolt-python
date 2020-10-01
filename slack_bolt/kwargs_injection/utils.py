@@ -13,6 +13,7 @@ from slack_bolt.util.payload_utils import (
     to_command,
     to_event,
     to_message,
+    to_step,
 )
 
 
@@ -41,6 +42,7 @@ def build_required_kwargs(
         "command": to_command(request.body),
         "event": to_event(request.body),
         "message": to_message(request.body),
+        "step": to_step(request.body),
         # utilities
         "ack": request.context.ack,
         "say": request.context.say,
@@ -56,6 +58,7 @@ def build_required_kwargs(
         or all_available_args["command"]
         or all_available_args["event"]
         or all_available_args["message"]
+        or all_available_args["step"]
         or request.body
     )
     for k, v in request.context.items():

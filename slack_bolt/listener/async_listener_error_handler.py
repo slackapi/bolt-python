@@ -14,6 +14,7 @@ from slack_bolt.util.payload_utils import (
     to_command,
     to_event,
     to_message,
+    to_step,
 )
 
 
@@ -66,6 +67,7 @@ class AsyncCustomListenerErrorHandler(AsyncListenerErrorHandler):
             "command": to_command(request.body),
             "event": to_event(request.body),
             "message": to_message(request.body),
+            "step": to_step(request.body),
             # utilities
             "say": request.context.say,
             "respond": request.context.respond,
@@ -78,6 +80,7 @@ class AsyncCustomListenerErrorHandler(AsyncListenerErrorHandler):
             or all_available_args["command"]
             or all_available_args["event"]
             or all_available_args["message"]
+            or all_available_args["step"]
             or request.body
         )
 
