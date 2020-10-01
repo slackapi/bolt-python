@@ -13,8 +13,9 @@
     {% assign localized_base_url = page.lang | prepend: "/" | remove_first: "/en" %}
 
     <span class="version">
-      {% assign release = site.github.releases | sort: "created_at" | reverse | pop %}
-      <a href="{{ release[0].html_url }}">{{ release[0].tag_name }}</a>
+      <!-- TODO: Fix this to skip pre-releases after v1.0 release -->
+      {% assign release = site.github.releases[0] %}
+      <a href="{{ release.html_url }}">{{ release.tag_name }}</a>
     </span>
   </div>
 
