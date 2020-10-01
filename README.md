@@ -1,4 +1,4 @@
-# Bolt for Python (still in beta)
+# Bolt for Python
 
 [![Python Version][python-version]][pypi-url]
 [![pypi package][pypi-image]][pypi-url]
