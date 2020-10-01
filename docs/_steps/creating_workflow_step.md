@@ -18,6 +18,7 @@ After instantiating a `WorkflowStep`, you can pass it into `app.step()`. Behind 
 </div>
 
 ```python
+import os
 from slack_bolt import App
 from slack_bolt.workflows.step import WorkflowStep
 
@@ -27,6 +28,15 @@ app = App(
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
 )
 
+def edit(ack, step, configure):
+    pass
+
+def save(ack, view, update):
+    pass
+
+def execute(step, complete, fail):
+    pass
+
 # Create a new WorkflowStep instance
 ws = WorkflowStep(
     callback_id="add_task",
@@ -34,7 +44,6 @@ ws = WorkflowStep(
     save=save,
     execute=execute,
 )
-
 # Pass Step to set up listeners
 app.step(ws)
 ```

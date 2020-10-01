@@ -28,15 +28,9 @@ def edit(ack, step, configure):
             "element": {
                 "type": "plain_text_input",
                 "action_id": "name",
-                "placeholder": {
-                    "type": "plain_text",
-                    "text": "Add a task name",
-                },
+                "placeholder": {"type": "plain_text", "text": "Add a task name"},
             },
-            "label": {
-                "type": "plain_text",
-                "text": "Task name",
-            },
+            "label": {"type": "plain_text", "text": "Task name"},
         },
         {
             "type": "input",
@@ -44,18 +38,11 @@ def edit(ack, step, configure):
             "element": {
                 "type": "plain_text_input",
                 "action_id": "description",
-                "placeholder": {
-                    "type": "plain_text",
-                    "text": "Add a task description",
+                "placeholder": {"type": "plain_text", "text": "Add a task description"},
             },
-            },
-            "label": {
-                "type": "plain_text",
-                "text": "Task description",
-            },
+            "label": {"type": "plain_text", "text": "Task description"},
         },
     ]
-
     configure(blocks=blocks)
 
 ws = WorkflowStep(
@@ -64,6 +51,5 @@ ws = WorkflowStep(
     save=save,
     execute=execute,
 )
-
 app.step(ws)
 ```

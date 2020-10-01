@@ -18,20 +18,17 @@ Within the `execute` callback, your app must either call `complete()` to indicat
 ```python
 def execute(step, complete, fail):
     inputs = step["inputs"]
-
+    # if everything was successful
     outputs = {
         "task_name": inputs["task_name"]["value"],
         "task_description": inputs["task_description"]["value"],
     }
-
-    error = {
-        "message": "Just testing step failure!"
-    }
-
-    # if everything was successful
     complete(outputs=outputs)
 
     # if something went wrong
+    error = {
+        "message": "Just testing step failure!"
+    }
     fail(error=error)
 
 ws = WorkflowStep(
@@ -40,6 +37,5 @@ ws = WorkflowStep(
     save=save,
     execute=execute,
 )
-
 app.step(ws)
 ```
