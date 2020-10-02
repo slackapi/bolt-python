@@ -22,14 +22,15 @@ Learn more about updating and pushing views in our <a href="https://api.slack.co
 ```python
 # Listen for a button invocation with action_id `button_abc` (assume it's inside of a modal)
 @app.action("button_abc")
-def update_modal(ack, view, client):
+def update_modal(ack, body, client):
     # Acknowledge the button request
     ack()
+    # Call views_update with the built-in client
     client.views_update(
         # Pass the view_id
-        view_id=view["id"],
+        view_id=body["view"]["id"],
         # String that represents view state to protect against race conditions
-        hash=view["hash"],
+        hash=body["view"]["hash"],
         # View payload with updated blocks
         view={
             "type": "modal",

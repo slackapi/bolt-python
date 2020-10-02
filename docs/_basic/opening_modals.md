@@ -21,7 +21,6 @@ Read more about modal composition in the <a href="https://api.slack.com/surfaces
 def open_modal(ack, body, client):
     # Acknowledge the command request
     ack();
-
     # Call views_open with the built-in client
     client.views_open(
         # Pass a valid trigger_id within 3 seconds of receiving it
