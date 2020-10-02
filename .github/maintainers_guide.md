@@ -84,7 +84,7 @@ $ ./scripts/run_tests.sh tests/scenario_tests/test_app.py
 
 #### Run the Samples
 
-If you make changes to `slack_bolt/adapter/*`, please verify if it surely works by running the apps under `samples` directory.
+If you make changes to `slack_bolt/adapter/*`, please verify if it surely works by running the apps under `examples` directory.
 
 ```bash
 # Install all optional dependencies
@@ -95,12 +95,12 @@ $ export SLACK_SIGNING_SECRET=***
 $ export SLACK_BOT_TOKEN=xoxb-***
 
 # Standalone apps
-$ cd samples/
+$ cd examples/
 $ python app.py
 $ python async_app.py
 
 # Flask apps
-$ cd samples/flask
+$ cd examples/flask
 $ FLASK_APP=app.py FLASK_ENV=development flask run -p 3000
 
 # In another terminal

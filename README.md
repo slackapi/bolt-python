@@ -5,7 +5,7 @@
 [![Build Status][travis-image]][travis-url]
 [![Codecov][codecov-image]][codecov-url]
 
-A Python framework to build Slack apps in a flash with the latest platform features. Check the [document](https://slack.dev/bolt-python/) and [samples](https://github.com/slackapi/bolt-python/tree/main/samples) to know how to use this framework.
+A Python framework to build Slack apps in a flash with the latest platform features. Check the [document](https://slack.dev/bolt-python/) and [examples](https://github.com/slackapi/bolt-python/tree/main/examples) to know how to use this framework.
 
 ## Setup
 
@@ -141,9 +141,9 @@ python app.py
 ngrok http 3000
 ```
 
-If you want to use another async Web framework (e.g., Sanic, FastAPI, Starlette), take a look at the built-in adapters and their samples.
+If you want to use another async Web framework (e.g., Sanic, FastAPI, Starlette), take a look at the built-in adapters and their examples.
 
-* [The Bolt app samples](https://github.com/slackapi/bolt-python/tree/main/samples)
+* [The Bolt app examples](https://github.com/slackapi/bolt-python/tree/main/examples)
 * [The built-in adapters](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter)
 
 # Feedback

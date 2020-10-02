@@ -31,7 +31,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/slackapi/bolt-python",
     packages=setuptools.find_packages(
-        exclude=["samples", "integration_tests", "tests", "tests.*",]
+        exclude=["examples", "integration_tests", "tests", "tests.*",]
     ),
     include_package_data=True,  # MANIFEST.in
     install_requires=["slack_sdk>=3.0.0a9",],

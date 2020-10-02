@@ -23,7 +23,7 @@ export SLACK_SIGNING_SECRET=<your-signing-secret>
 git clone https://github.com/slackapi/bolt-python.git
 
 # Change into this project
-cd bolt-python/samples/getting_started/
+cd bolt-python/examples/getting_started/
 
 # Setup virtual environment
 python3 -m venv .venv
