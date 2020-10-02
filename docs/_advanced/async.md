@@ -8,7 +8,7 @@ order: 2
 <div class="section-content">
 To use the async version of Bolt, you can import and initialize an `AsyncApp` instance (rather than `App`). `AsyncApp` relies on <a href="https://docs.aiohttp.org/">AIOHTTP</a> to make API requests, which means you'll need to install `aiohttp` (by adding to `requirements.txt` or running `pip install aiohttp`).
 
-Sample async projects can be found within the repository's <a href="https://github.com/slackapi/bolt-python/tree/main/samples">`samples` folder</a>.
+Sample async projects can be found within the repository's <a href="https://github.com/slackapi/bolt-python/tree/main/examples">`examples` folder</a>.
 </div>
 
 ```python

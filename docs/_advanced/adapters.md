@@ -12,7 +12,7 @@ By default, Bolt will use the built-in <a href="https://docs.python.org/3/librar
 
 To use an adapter, you'll create an app with the framework of your choosing and import its corresponding adapter. Then you'll initalize the adapter instance and call its function that handles and parses incoming events.
 
-The full list adapters, as well as configuration and sample usage, can be found within the repository's <a href="https://github.com/slackapi/bolt-python/tree/main/samples">`samples` folder</a>.
+The full list adapters, as well as configuration and sample usage, can be found within the repository's <a href="https://github.com/slackapi/bolt-python/tree/main/examples">`examples` folder</a>.
 </div>
 
 ```python
