@@ -325,7 +325,9 @@ def edit(ack: Ack, step, configure: Configure):
     )
 
 
-def save(ack: Ack, view: dict, update: Update):
+def save(ack: Ack, step: dict, view: dict, update: Update):
+    assert step is not None
+    assert view is not None
     state_values = view["state"]["values"]
     update(
         inputs={

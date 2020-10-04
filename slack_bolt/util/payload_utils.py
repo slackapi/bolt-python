@@ -222,6 +222,9 @@ def to_step(body: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     # edit
     if is_workflow_step_edit(body):
         return body["workflow_step"]
+    # save
+    if is_workflow_step_save(body):
+        return body["workflow_step"]
     # execute
     if is_workflow_step_execute(body):
         return body["event"]["workflow_step"]
