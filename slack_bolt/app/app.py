@@ -327,11 +327,11 @@ class App:
     # -------------------------
     # middleware
 
-    def use(self, *args) -> None:
+    def use(self, *args) -> Optional[Callable]:
         """Refer to middleware method's docstring for details."""
         return self.middleware(*args)
 
-    def middleware(self, *args) -> None:
+    def middleware(self, *args) -> Optional[Callable]:
         """Registers a new middleware to this Bolt app.
 
         :param args: a list of middleware. Passing a single middleware is supported.
@@ -341,10 +341,16 @@ class App:
             middleware_or_callable = args[0]
             if isinstance(middleware_or_callable, Middleware):
                 self._middleware_list.append(middleware_or_callable)
-            else:
+            elif isinstance(middleware_or_callable, Callable):
                 self._middleware_list.append(
                     CustomMiddleware(app_name=self.name, func=middleware_or_callable)
                 )
+                return middleware_or_callable
+            else:
+                raise BoltError(
+                    f"Unexpected type for a middleware ({type(middleware_or_callable)})"
+                )
+        return None
 
     # -------------------------
     # Workflows: Steps from Apps
@@ -372,7 +378,9 @@ class App:
     # -------------------------
     # global error handler
 
-    def error(self, func: Callable[..., None]) -> None:
+    def error(
+        self, func: Callable[..., None]
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Updates the global error handler.
 
         :param func: The function that is supposed to be executed
@@ -382,6 +390,7 @@ class App:
         self._listener_runner.listener_error_handler = CustomListenerErrorHandler(
             logger=self._framework_logger, func=func,
         )
+        return func
 
     # -------------------------
     # events
@@ -391,7 +400,7 @@ class App:
         event: Union[str, Pattern, Dict[str, str]],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new event listener.
 
         :param event: The conditions to match against a request payload
@@ -414,7 +423,7 @@ class App:
         keyword: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new message event listener.
         Check the #event method's docstring for details.
         """
@@ -441,7 +450,7 @@ class App:
         command: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new slash command listener.
 
         :param command: The conditions to match against a request payload
@@ -467,7 +476,7 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new shortcut listener.
 
         :param constraints: The conditions to match against a request payload
@@ -490,7 +499,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new global shortcut listener."""
 
         def __call__(*args, **kwargs):
@@ -507,7 +516,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new message shortcut listener."""
 
         def __call__(*args, **kwargs):
@@ -527,7 +536,7 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new action listener.
 
         :param constraints: The conditions to match against a request payload
@@ -550,7 +559,7 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new block_actions listener."""
 
         def __call__(*args, **kwargs):
@@ -567,7 +576,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new interactive_message listener."""
 
         def __call__(*args, **kwargs):
@@ -584,7 +593,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new dialog_submission listener."""
 
         def __call__(*args, **kwargs):
@@ -601,7 +610,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new dialog_cancellation listener."""
 
         def __call__(*args, **kwargs):
@@ -621,7 +630,7 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new view submission/closed event listener.
 
         :param constraints: The conditions to match against a request payload
@@ -644,7 +653,7 @@ class App:
         constraints: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new view_submission listener."""
 
         def __call__(*args, **kwargs):
@@ -661,7 +670,7 @@ class App:
         constraints: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new view_closed listener."""
 
         def __call__(*args, **kwargs):
@@ -681,7 +690,7 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new options listener.
 
         :param constraints: The conditions to match against a request payload
@@ -704,7 +713,7 @@ class App:
         action_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new block_suggestion listener."""
 
         def __call__(*args, **kwargs):
@@ -721,7 +730,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., bool]]] = None,
         middleware: Optional[List[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new dialog_submission listener."""
 
         def __call__(*args, **kwargs):
@@ -758,9 +767,14 @@ class App:
         matchers: Optional[List[Callable[..., bool]]],
         middleware: Optional[List[Union[Callable, Middleware]]],
         auto_acknowledgement: bool = False,
-    ) -> None:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+        value_to_return = None
         if not isinstance(functions, list):
             functions = list(functions)
+        if len(functions) == 1:
+            # In the case where the function is registered using decorator,
+            # the registration should return the original function.
+            value_to_return = functions[0]
 
         listener_matchers = [
             CustomListenerMatcher(app_name=self.name, func=f) for f in (matchers or [])
@@ -785,6 +799,7 @@ class App:
                 auto_acknowledgement=auto_acknowledgement,
             )
         )
+        return value_to_return
 
 
 # -------------------------

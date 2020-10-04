@@ -337,11 +337,11 @@ class AsyncApp:
     # -------------------------
     # middleware
 
-    def use(self, *args) -> None:
+    def use(self, *args) -> Optional[Callable]:
         """Refer to middleware method's docstring for details."""
         return self.middleware(*args)
 
-    def middleware(self, *args) -> None:
+    def middleware(self, *args) -> Optional[Callable]:
         """Registers a new middleware to this Bolt app.
 
         :param args: a list of middleware. Passing a single middleware is supported.
@@ -351,12 +351,18 @@ class AsyncApp:
             middleware_or_callable = args[0]
             if isinstance(middleware_or_callable, AsyncMiddleware):
                 self._async_middleware_list.append(middleware_or_callable)
-            else:
+            elif isinstance(middleware_or_callable, Callable):
                 self._async_middleware_list.append(
                     AsyncCustomMiddleware(
                         app_name=self.name, func=middleware_or_callable
                     )
                 )
+                return middleware_or_callable
+            else:
+                raise BoltError(
+                    f"Unexpected type for a middleware ({type(middleware_or_callable)})"
+                )
+        return None
 
     # -------------------------
     # Workflows: Steps from Apps
@@ -388,7 +394,9 @@ class AsyncApp:
     # -------------------------
     # global error handler
 
-    def error(self, func: Callable[..., Awaitable[None]]) -> None:
+    def error(
+        self, func: Callable[..., Awaitable[None]]
+    ) -> Callable[..., Awaitable[None]]:
         """Updates the global error handler.
 
         :param func: The function that is supposed to be executed
@@ -398,6 +406,7 @@ class AsyncApp:
         self._async_listener_runner.listener_error_handler = AsyncCustomListenerErrorHandler(
             logger=self._framework_logger, func=func,
         )
+        return func
 
     # -------------------------
     # events
@@ -407,7 +416,7 @@ class AsyncApp:
         event: Union[str, Pattern, Dict[str, str]],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new event listener.
 
         :param event: The conditions to match against a request payload
@@ -430,7 +439,7 @@ class AsyncApp:
         keyword: Union[str, Pattern],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Register a new message event listener."""
         matchers = matchers if matchers else []
         middleware = middleware if middleware else []
@@ -455,7 +464,7 @@ class AsyncApp:
         command: Union[str, Pattern],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new slash command listener.
 
         :param command: The conditions to match against a request payload
@@ -481,7 +490,7 @@ class AsyncApp:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new shortcut listener.
 
         :param constraints: The conditions to match against a request payload
@@ -504,7 +513,7 @@ class AsyncApp:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new global shortcut listener."""
 
         def __call__(*args, **kwargs):
@@ -521,7 +530,7 @@ class AsyncApp:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new message shortcut listener."""
 
         def __call__(*args, **kwargs):
@@ -541,7 +550,7 @@ class AsyncApp:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new action listener.
 
         :param constraints: The conditions to match against a request payload
@@ -564,7 +573,7 @@ class AsyncApp:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new block_actions listener."""
 
         def __call__(*args, **kwargs):
@@ -581,7 +590,7 @@ class AsyncApp:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new interactive_message listener."""
 
         def __call__(*args, **kwargs):
@@ -598,7 +607,7 @@ class AsyncApp:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new dialog_submission listener."""
 
         def __call__(*args, **kwargs):
@@ -615,7 +624,7 @@ class AsyncApp:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new dialog_cancellation listener."""
 
         def __call__(*args, **kwargs):
@@ -635,7 +644,7 @@ class AsyncApp:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new view submission/closed listener.
 
         :param constraints: The conditions to match against a request payload
@@ -658,7 +667,7 @@ class AsyncApp:
         constraints: Union[str, Pattern],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new view_submission listener."""
 
         def __call__(*args, **kwargs):
@@ -675,7 +684,7 @@ class AsyncApp:
         constraints: Union[str, Pattern],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new view_closed listener."""
 
         def __call__(*args, **kwargs):
@@ -695,7 +704,7 @@ class AsyncApp:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new options listener.
 
         :param constraints: The conditions to match against a request payload
@@ -718,7 +727,7 @@ class AsyncApp:
         action_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new block_suggestion listener."""
 
         def __call__(*args, **kwargs):
@@ -735,7 +744,7 @@ class AsyncApp:
         callback_id: Union[str, Pattern],
         matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
-    ) -> Callable[..., None]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new dialog_submission listener."""
 
         def __call__(*args, **kwargs):
@@ -772,7 +781,14 @@ class AsyncApp:
         matchers: Optional[List[Callable[..., Awaitable[bool]]]],
         middleware: Optional[List[Union[Callable, AsyncMiddleware]]],
         auto_acknowledgement: bool = False,
-    ) -> None:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
+        value_to_return = None
+        if not isinstance(functions, list):
+            functions = list(functions)
+        if len(functions) == 1:
+            # In the case where the function is registered using decorator,
+            # the registration should return the original function.
+            value_to_return = functions[0]
 
         for func in functions:
             if not inspect.iscoroutinefunction(func):
@@ -805,3 +821,5 @@ class AsyncApp:
                 auto_acknowledgement=auto_acknowledgement,
             )
         )
+
+        return value_to_return
