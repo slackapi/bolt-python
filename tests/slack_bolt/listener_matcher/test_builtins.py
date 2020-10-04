@@ -3,7 +3,11 @@ import re
 from urllib.parse import quote
 
 from slack_bolt import BoltRequest, BoltResponse
-from slack_bolt.listener_matcher.builtins import block_action, action
+from slack_bolt.listener_matcher.builtins import (
+    block_action,
+    action,
+    workflow_step_execute,
+)
 
 
 class TestBuiltins:
@@ -95,3 +99,39 @@ class TestBuiltins:
             )
             is False
         )
+
+    def test_workflow_step_execute(self):
+        payload = {
+            "team_id": "T111",
+            "enterprise_id": "E111",
+            "api_app_id": "A111",
+            "event": {
+                "type": "workflow_step_execute",
+                "callback_id": "copy_review",
+                "workflow_step": {
+                    "workflow_step_execute_id": "zzz-execution",
+                    "workflow_id": "12345",
+                    "workflow_instance_id": "11111",
+                    "step_id": "111-222-333-444-555",
+                    "inputs": {"taskName": {"value": "a"}},
+                    "outputs": [
+                        {"name": "taskName", "type": "text", "label": "Task Name"}
+                    ],
+                },
+                "event_ts": "1601541373.225894",
+            },
+            "type": "event_callback",
+            "event_id": "Ev111",
+            "event_time": 1601541373,
+        }
+
+        request = BoltRequest(body=f"payload={quote(json.dumps(payload))}")
+
+        m = workflow_step_execute("copy_review")
+        assert m.matches(request, None) == True
+
+        m = workflow_step_execute("copy_review_2")
+        assert m.matches(request, None) == False
+
+        m = workflow_step_execute(re.compile("copy_.+"))
+        assert m.matches(request, None) == True

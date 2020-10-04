@@ -1,4 +1,5 @@
 import json
+import time as time_module
 from time import time
 from urllib.parse import quote
 
@@ -85,6 +86,8 @@ class TestWorkflowSteps:
         response = self.app.dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
+        time_module.sleep(0.5)
+        assert self.mock_received_requests["/workflows.stepCompleted"] == 1
 
         self.app = App(client=self.web_client, signing_secret=self.signing_secret)
         self.app.step(

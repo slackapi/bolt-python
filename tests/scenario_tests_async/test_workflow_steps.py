@@ -105,6 +105,8 @@ class TestAsyncEvents:
         response = await self.app.async_dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
+        await asyncio.sleep(0.5)
+        assert self.mock_received_requests["/workflows.stepCompleted"] == 1
 
         self.app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
         self.app.step(

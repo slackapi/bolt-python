@@ -32,7 +32,7 @@ def is_event(body: Dict[str, Any]) -> bool:
 def is_workflow_step_execute(body: Dict[str, Any]) -> bool:
     return (
         is_event(body)
-        and body["event"]["type"] == "workflow_step_edit"
+        and body["event"]["type"] == "workflow_step_execute"
         and "workflow_step" in body["event"]
     )
 
