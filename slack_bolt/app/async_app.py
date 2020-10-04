@@ -1,13 +1,23 @@
 import inspect
 import logging
 import os
-from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable
+import sys
+
+if sys.version_info.major == 3 and sys.version_info.minor <= 6:
+    from re import _pattern_type as Pattern
+else:
+    from re import Pattern
+
+from typing import Optional, List, Union, Callable, Dict, Awaitable
 
 from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
 from slack_bolt.middleware.message_listener_matches.async_message_listener_matches import (
     AsyncMessageListenerMatches,
 )
-from slack_bolt.workflows.step.async_step import AsyncWorkflowStep
+from slack_bolt.workflows.step.async_step import (
+    AsyncWorkflowStep,
+    AsyncWorkflowStepBuilder,
+)
 from slack_bolt.workflows.step.async_step_middleware import AsyncWorkflowStepMiddleware
 from slack_sdk.oauth.installation_store.async_installation_store import (
     AsyncInstallationStore,
@@ -380,14 +390,20 @@ class AsyncApp:
             Union[Callable[..., Optional[BoltResponse]], AsyncListener]
         ] = None,
     ):
-        """Registers a new Workflow Step listener"""
+        """Registers a new Workflow Step listener
+
+        Unlike others, this method doesn't behave as a decorator. If you want to register a workflow step
+        by a decorator, use AsyncWorkflowStepBuilder's methods.
+        """
         step = callback_id
         if isinstance(callback_id, (str, Pattern)):
             step = AsyncWorkflowStep(
                 callback_id=callback_id, edit=edit, save=save, execute=execute,
             )
+        elif isinstance(step, AsyncWorkflowStepBuilder):
+            step = step.build()
         elif not isinstance(step, AsyncWorkflowStep):
-            raise BoltError("Invalid step object")
+            raise BoltError(f"Invalid step object ({type(step)})")
 
         self.use(AsyncWorkflowStepMiddleware(step, self._async_listener_runner))
 

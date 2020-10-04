@@ -2,9 +2,16 @@ import inspect
 import json
 import logging
 import os
+import sys
 from concurrent.futures.thread import ThreadPoolExecutor
 from http.server import SimpleHTTPRequestHandler, HTTPServer
-from typing import List, Union, Pattern, Callable, Dict, Optional
+
+if sys.version_info.major == 3 and sys.version_info.minor <= 6:
+    from re import _pattern_type as Pattern
+else:
+    from re import Pattern
+
+from typing import List, Union, Callable, Dict, Optional
 
 from slack_bolt.listener.thread_runner import ThreadListenerRunner
 from slack_bolt.workflows.step import WorkflowStep, WorkflowStepMiddleware
@@ -59,6 +66,7 @@ from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_bolt.util.utils import create_web_client
+from slack_bolt.workflows.step.step import WorkflowStepBuilder
 
 
 class App:
@@ -357,21 +365,27 @@ class App:
 
     def step(
         self,
-        callback_id: Union[str, Pattern, WorkflowStep],
+        callback_id: Union[str, Pattern, WorkflowStep, WorkflowStepBuilder],
         edit: Optional[Union[Callable[..., Optional[BoltResponse]], Listener]] = None,
         save: Optional[Union[Callable[..., Optional[BoltResponse]], Listener]] = None,
         execute: Optional[
             Union[Callable[..., Optional[BoltResponse]], Listener]
         ] = None,
     ):
-        """Registers a new Workflow Step listener"""
+        """Registers a new Workflow Step listener
+
+        Unlike others, this method doesn't behave as a decorator. If you want to register a workflow step
+        by a decorator, use WorkflowStepBuilder's methods.
+        """
         step = callback_id
         if isinstance(callback_id, (str, Pattern)):
             step = WorkflowStep(
                 callback_id=callback_id, edit=edit, save=save, execute=execute,
             )
+        elif isinstance(step, WorkflowStepBuilder):
+            step = step.build()
         elif not isinstance(step, WorkflowStep):
-            raise BoltError("Invalid step object")
+            raise BoltError(f"Invalid step object ({type(step)})")
 
         self.use(WorkflowStepMiddleware(step, self.listener_runner))
 

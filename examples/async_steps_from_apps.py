@@ -9,7 +9,12 @@ import logging
 
 from slack_sdk.web.async_client import AsyncSlackResponse, AsyncWebClient
 from slack_bolt.async_app import AsyncApp, AsyncAck
-from slack_bolt.workflows.step.async_step import AsyncConfigure, AsyncUpdate, AsyncComplete, AsyncFail
+from slack_bolt.workflows.step.async_step import (
+    AsyncConfigure,
+    AsyncUpdate,
+    AsyncComplete,
+    AsyncFail,
+)
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -39,10 +44,7 @@ async def edit(ack: AsyncAck, step: dict, configure: AsyncConfigure):
                 "element": {
                     "type": "plain_text_input",
                     "action_id": "task_name",
-                    "placeholder": {
-                        "type": "plain_text",
-                        "text": "Write a task name",
-                    },
+                    "placeholder": {"type": "plain_text", "text": "Write a task name",},
                 },
                 "label": {"type": "plain_text", "text": "Task name"},
             },
@@ -65,10 +67,7 @@ async def edit(ack: AsyncAck, step: dict, configure: AsyncConfigure):
                 "element": {
                     "type": "plain_text_input",
                     "action_id": "task_author",
-                    "placeholder": {
-                        "type": "plain_text",
-                        "text": "Write a task name",
-                    },
+                    "placeholder": {"type": "plain_text", "text": "Write a task name",},
                 },
                 "label": {"type": "plain_text", "text": "Task author"},
             },
@@ -93,18 +92,10 @@ async def save(ack: AsyncAck, view: dict, update: AsyncUpdate):
             },
         },
         outputs=[
-            {"name": "taskName", "type": "text", "label": "Task Name", },
-            {
-                "name": "taskDescription",
-                "type": "text",
-                "label": "Task Description",
-            },
-            {
-                "name": "taskAuthorEmail",
-                "type": "text",
-                "label": "Task Author Email",
-            },
-        ]
+            {"name": "taskName", "type": "text", "label": "Task Name",},
+            {"name": "taskDescription", "type": "text", "label": "Task Description",},
+            {"name": "taskAuthorEmail", "type": "text", "label": "Task Author Email",},
+        ],
     )
     await ack()
 
@@ -112,7 +103,9 @@ async def save(ack: AsyncAck, view: dict, update: AsyncUpdate):
 pseudo_database = {}
 
 
-async def execute(step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail):
+async def execute(
+    step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail
+):
     try:
         await complete(
             outputs={
@@ -121,10 +114,10 @@ async def execute(step: dict, client: AsyncWebClient, complete: AsyncComplete, f
                 "taskAuthorEmail": step["inputs"]["taskAuthorEmail"]["value"],
             }
         )
-        user: AsyncSlackResponse = await client.users_lookupByEmail(
+        user_lookup: AsyncSlackResponse = await client.users_lookupByEmail(
             email=step["inputs"]["taskAuthorEmail"]["value"]
         )
-        user_id = user["user"]["id"]
+        user_id = user_lookup["user"]["id"]
         new_task = {
             "task_name": step["inputs"]["taskName"]["value"],
             "task_description": step["inputs"]["taskDescription"]["value"],
@@ -143,7 +136,7 @@ async def execute(step: dict, client: AsyncWebClient, complete: AsyncComplete, f
             )
             blocks.append({"type": "divider"})
 
-        home_tab_update: AsyncSlackResponse = await client.views_publish(
+        await client.views_publish(
             user_id=user_id,
             view={
                 "type": "home",
@@ -151,17 +144,12 @@ async def execute(step: dict, client: AsyncWebClient, complete: AsyncComplete, f
                 "blocks": blocks,
             },
         )
-    except:
-        await fail(error={
-            "message": "Something wrong!"
-        })
+    except Exception as err:
+        await fail(error={"message": f"Something wrong! {err}"})
 
 
 app.step(
-    callback_id="copy_review",
-    edit=edit,
-    save=save,
-    execute=execute,
+    callback_id="copy_review", edit=edit, save=save, execute=execute,
 )
 
 if __name__ == "__main__":

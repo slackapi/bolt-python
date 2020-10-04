@@ -11,6 +11,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.request.async_request import AsyncBoltRequest
+from slack_bolt.workflows.step.async_step import AsyncWorkflowStep
 from slack_bolt.workflows.step.utilities.async_complete import AsyncComplete
 from slack_bolt.workflows.step.utilities.async_configure import AsyncConfigure
 from slack_bolt.workflows.step.utilities.async_fail import AsyncFail
@@ -22,7 +23,7 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-class TestAsyncWorkflowSteps:
+class TestAsyncWorkflowStepsDecorator:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -37,9 +38,7 @@ class TestAsyncWorkflowSteps:
             self.app = AsyncApp(
                 client=self.web_client, signing_secret=self.signing_secret
             )
-            self.app.step(
-                callback_id="copy_review", edit=edit, save=save, execute=execute
-            )
+            self.app.step(copy_review_step)
 
             loop = asyncio.get_event_loop()
             yield loop
@@ -293,7 +292,14 @@ execute_payload = {
 
 # https://api.slack.com/tutorials/workflow-builder-steps
 
+copy_review_step = AsyncWorkflowStep.builder("copy_review")
 
+
+async def noop_middleware(next):
+    return await next()
+
+
+@copy_review_step.edit(middleware=[noop_middleware])
 async def edit(ack: AsyncAck, step, configure: AsyncConfigure):
     assert step is not None
     await ack()
@@ -344,6 +350,7 @@ async def edit(ack: AsyncAck, step, configure: AsyncConfigure):
     )
 
 
+@copy_review_step.save(middleware=[noop_middleware])
 async def save(ack: AsyncAck, step: dict, view: dict, update: AsyncUpdate):
     assert step is not None
     assert view is not None
@@ -374,6 +381,7 @@ async def save(ack: AsyncAck, step: dict, view: dict, update: AsyncUpdate):
 pseudo_database = {}
 
 
+@copy_review_step.execute(middleware=[noop_middleware])
 async def execute(
     step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail
 ):

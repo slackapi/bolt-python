@@ -1,6 +1,7 @@
 # ------------------------------------------------
 # instead of slack_bolt in requirements.txt
 import sys
+import time
 
 sys.path.insert(1, "..")
 # ------------------------------------------------
@@ -11,7 +12,7 @@ from slack_sdk import WebClient
 from slack_sdk.web import SlackResponse
 
 from slack_bolt import App, Ack
-from slack_bolt.workflows.step import Configure, Update, Complete, Fail
+from slack_bolt.workflows.step import Configure, Update, Complete, Fail, WorkflowStep
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -28,7 +29,10 @@ def log_request(logger, body, next):
 
 # https://api.slack.com/tutorials/workflow-builder-steps
 
+copy_review_step = WorkflowStep.builder("copy_review")
 
+
+@copy_review_step.edit
 def edit(ack: Ack, step, configure: Configure):
     ack()
     configure(
@@ -78,7 +82,8 @@ def edit(ack: Ack, step, configure: Configure):
     )
 
 
-def save(ack: Ack, view: dict, update: Update):
+@copy_review_step.save
+def save(ack: Ack, step: dict, view: dict, update: Update):
     state_values = view["state"]["values"]
     update(
         inputs={
@@ -106,6 +111,27 @@ def save(ack: Ack, view: dict, update: Update):
 pseudo_database = {}
 
 
+def additional_matcher(step):
+    email = str(step.get("inputs", {}).get("taskAuthorEmail"))
+    if "@" not in email:
+        return False
+    return True
+
+
+def noop_middleware(next):
+    return next()
+
+
+def notify_execution(client: WebClient, step: dict):
+    time.sleep(5)
+    client.chat_postMessage(channel="#random", text=f"Step execution: ```{step}```")
+
+
+@copy_review_step.execute(
+    matchers=[additional_matcher],
+    middleware=[noop_middleware],
+    lazy=[notify_execution],
+)
 def execute(step: dict, client: WebClient, complete: Complete, fail: Fail):
     try:
         complete(
@@ -116,10 +142,10 @@ def execute(step: dict, client: WebClient, complete: Complete, fail: Fail):
             }
         )
 
-        user: SlackResponse = client.users_lookupByEmail(
+        user_lookup: SlackResponse = client.users_lookupByEmail(
             email=step["inputs"]["taskAuthorEmail"]["value"]
         )
-        user_id = user["user"]["id"]
+        user_id = user_lookup["user"]["id"]
         new_task = {
             "task_name": step["inputs"]["taskName"]["value"],
             "task_description": step["inputs"]["taskDescription"]["value"],
@@ -138,7 +164,7 @@ def execute(step: dict, client: WebClient, complete: Complete, fail: Fail):
             )
             blocks.append({"type": "divider"})
 
-        home_tab_update: SlackResponse = client.views_publish(
+        client.views_publish(
             user_id=user_id,
             view={
                 "type": "home",
@@ -150,9 +176,7 @@ def execute(step: dict, client: WebClient, complete: Complete, fail: Fail):
         fail(error={"message": f"Something wrong! {err}"})
 
 
-app.step(
-    callback_id="copy_review", edit=edit, save=save, execute=execute,
-)
+app.step(copy_review_step)
 
 if __name__ == "__main__":
     app.start(3000)  # POST http://localhost:3000/slack/events

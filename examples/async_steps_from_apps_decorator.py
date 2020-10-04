@@ -1,5 +1,6 @@
 # ------------------------------------------------
 # instead of slack_bolt in requirements.txt
+import asyncio
 import sys
 
 sys.path.insert(1, "..")
@@ -7,31 +8,32 @@ sys.path.insert(1, "..")
 
 import logging
 
-from slack_sdk import WebClient
-from slack_sdk.web import SlackResponse
-
-from slack_bolt import App, Ack
-from slack_bolt.workflows.step import Configure, Update, Complete, Fail
+from slack_sdk.web.async_client import AsyncSlackResponse, AsyncWebClient
+from slack_bolt.async_app import AsyncApp, AsyncAck
+from slack_bolt.workflows.step.async_step import (
+    AsyncConfigure,
+    AsyncUpdate,
+    AsyncComplete,
+    AsyncFail,
+    AsyncWorkflowStep,
+)
 
 logging.basicConfig(level=logging.DEBUG)
 
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
-app = App()
-
-
-@app.middleware  # or app.use(log_request)
-def log_request(logger, body, next):
-    logger.debug(body)
-    return next()
+app = AsyncApp()
 
 
 # https://api.slack.com/tutorials/workflow-builder-steps
 
+copy_review_step = AsyncWorkflowStep.builder("copy_review")
 
-def edit(ack: Ack, step, configure: Configure):
-    ack()
-    configure(
+
+@copy_review_step.edit
+async def edit(ack: AsyncAck, step: dict, configure: AsyncConfigure):
+    await ack()
+    await configure(
         blocks=[
             {
                 "type": "section",
@@ -78,9 +80,10 @@ def edit(ack: Ack, step, configure: Configure):
     )
 
 
-def save(ack: Ack, view: dict, update: Update):
+@copy_review_step.save
+async def save(ack: AsyncAck, view: dict, update: AsyncUpdate):
     state_values = view["state"]["values"]
-    update(
+    await update(
         inputs={
             "taskName": {
                 "value": state_values["task_name_input"]["task_name"]["value"],
@@ -100,26 +103,49 @@ def save(ack: Ack, view: dict, update: Update):
             {"name": "taskAuthorEmail", "type": "text", "label": "Task Author Email",},
         ],
     )
-    ack()
+    await ack()
 
 
 pseudo_database = {}
 
 
-def execute(step: dict, client: WebClient, complete: Complete, fail: Fail):
+
+async def additional_matcher(step):
+    email = str(step.get("inputs", {}).get("taskAuthorEmail"))
+    if "@" not in email:
+        return False
+    return True
+
+
+async def noop_middleware(next):
+    return await next()
+
+
+async def notify_execution(client: AsyncWebClient, step: dict):
+    await asyncio.sleep(5)
+    await client.chat_postMessage(channel="#random", text=f"Step execution: ```{step}```")
+
+
+@copy_review_step.execute(
+    matchers=[additional_matcher],
+    middleware=[noop_middleware],
+    lazy=[notify_execution],
+)
+async def execute(
+    step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail
+):
     try:
-        complete(
+        await complete(
             outputs={
                 "taskName": step["inputs"]["taskName"]["value"],
                 "taskDescription": step["inputs"]["taskDescription"]["value"],
                 "taskAuthorEmail": step["inputs"]["taskAuthorEmail"]["value"],
             }
         )
-
-        user: SlackResponse = client.users_lookupByEmail(
+        user_lookup: AsyncSlackResponse = await client.users_lookupByEmail(
             email=step["inputs"]["taskAuthorEmail"]["value"]
         )
-        user_id = user["user"]["id"]
+        user_id = user_lookup["user"]["id"]
         new_task = {
             "task_name": step["inputs"]["taskName"]["value"],
             "task_description": step["inputs"]["taskDescription"]["value"],
@@ -138,7 +164,7 @@ def execute(step: dict, client: WebClient, complete: Complete, fail: Fail):
             )
             blocks.append({"type": "divider"})
 
-        home_tab_update: SlackResponse = client.views_publish(
+        await client.views_publish(
             user_id=user_id,
             view={
                 "type": "home",
@@ -147,12 +173,10 @@ def execute(step: dict, client: WebClient, complete: Complete, fail: Fail):
             },
         )
     except Exception as err:
-        fail(error={"message": f"Something wrong! {err}"})
+        await fail(error={"message": f"Something wrong! {err}"})
 
 
-app.step(
-    callback_id="copy_review", edit=edit, save=save, execute=execute,
-)
+app.step(copy_review_step)
 
 if __name__ == "__main__":
     app.start(3000)  # POST http://localhost:3000/slack/events

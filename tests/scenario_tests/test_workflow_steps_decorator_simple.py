@@ -1,20 +1,13 @@
-import asyncio
 import json
+import time as time_module
 from time import time
 from urllib.parse import quote
 
-import pytest
 from slack_sdk.signature import SignatureVerifier
-from slack_sdk.web import SlackResponse
-from slack_sdk.web.async_client import AsyncWebClient
+from slack_sdk.web import WebClient, SlackResponse
 
-from slack_bolt.app.async_app import AsyncApp
-from slack_bolt.context.ack.async_ack import AsyncAck
-from slack_bolt.request.async_request import AsyncBoltRequest
-from slack_bolt.workflows.step.utilities.async_complete import AsyncComplete
-from slack_bolt.workflows.step.utilities.async_configure import AsyncConfigure
-from slack_bolt.workflows.step.utilities.async_fail import AsyncFail
-from slack_bolt.workflows.step.utilities.async_update import AsyncUpdate
+from slack_bolt import App, BoltRequest, Ack
+from slack_bolt.workflows.step import Complete, Fail, Update, Configure, WorkflowStep
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -22,97 +15,85 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-class TestAsyncWorkflowSteps:
+class TestWorkflowStepsDecorator:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url)
 
-    @pytest.fixture
-    def event_loop(self):
-        old_os_env = remove_os_env_temporarily()
-        try:
-            setup_mock_web_api_server(self)
-            self.app = AsyncApp(
-                client=self.web_client, signing_secret=self.signing_secret
-            )
-            self.app.step(
-                callback_id="copy_review", edit=edit, save=save, execute=execute
-            )
+    def setup_method(self):
+        self.old_os_env = remove_os_env_temporarily()
+        setup_mock_web_api_server(self)
+        self.app = App(client=self.web_client, signing_secret=self.signing_secret)
+        self.app.step(copy_review_step)
 
-            loop = asyncio.get_event_loop()
-            yield loop
-            loop.close()
-            cleanup_mock_web_api_server(self)
-        finally:
-            restore_os_env(old_os_env)
+    def teardown_method(self):
+        cleanup_mock_web_api_server(self)
+        restore_os_env(self.old_os_env)
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
             body=body, timestamp=timestamp,
         )
 
-    @pytest.mark.asyncio
-    async def test_edit(self):
+    def test_edit(self):
         timestamp, body = str(int(time())), f"payload={quote(json.dumps(edit_payload))}"
         headers = {
             "content-type": ["application/x-www-form-urlencoded"],
             "x-slack-signature": [self.generate_signature(body, timestamp)],
             "x-slack-request-timestamp": [timestamp],
         }
-        request = AsyncBoltRequest(body=body, headers=headers)
-        response = await self.app.async_dispatch(request)
+        request: BoltRequest = BoltRequest(body=body, headers=headers)
+        response = self.app.dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
-        self.app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
+        self.app = App(client=self.web_client, signing_secret=self.signing_secret)
         self.app.step(
             callback_id="copy_review___", edit=edit, save=save, execute=execute
         )
-        response = await self.app.async_dispatch(request)
+        response = self.app.dispatch(request)
         assert response.status == 404
 
-    @pytest.mark.asyncio
-    async def test_save(self):
+    def test_save(self):
         timestamp, body = str(int(time())), f"payload={quote(json.dumps(save_payload))}"
         headers = {
             "content-type": ["application/x-www-form-urlencoded"],
             "x-slack-signature": [self.generate_signature(body, timestamp)],
             "x-slack-request-timestamp": [timestamp],
         }
-        request = AsyncBoltRequest(body=body, headers=headers)
-        response = await self.app.async_dispatch(request)
+        request: BoltRequest = BoltRequest(body=body, headers=headers)
+        response = self.app.dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
-        self.app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
+        self.app = App(client=self.web_client, signing_secret=self.signing_secret)
         self.app.step(
             callback_id="copy_review___", edit=edit, save=save, execute=execute
         )
-        response = await self.app.async_dispatch(request)
+        response = self.app.dispatch(request)
         assert response.status == 404
 
-    @pytest.mark.asyncio
-    async def test_execute(self):
+    def test_execute(self):
         timestamp, body = str(int(time())), json.dumps(execute_payload)
         headers = {
             "content-type": ["application/json"],
             "x-slack-signature": [self.generate_signature(body, timestamp)],
             "x-slack-request-timestamp": [timestamp],
         }
-        request = AsyncBoltRequest(body=body, headers=headers)
-        response = await self.app.async_dispatch(request)
+        request: BoltRequest = BoltRequest(body=body, headers=headers)
+        response = self.app.dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
-        await asyncio.sleep(0.5)
+        time_module.sleep(0.5)
         assert self.mock_received_requests["/workflows.stepCompleted"] == 1
 
-        self.app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
+        self.app = App(client=self.web_client, signing_secret=self.signing_secret)
         self.app.step(
             callback_id="copy_review___", edit=edit, save=save, execute=execute
         )
-        response = await self.app.async_dispatch(request)
+        response = self.app.dispatch(request)
         assert response.status == 404
 
 
@@ -294,10 +275,14 @@ execute_payload = {
 # https://api.slack.com/tutorials/workflow-builder-steps
 
 
-async def edit(ack: AsyncAck, step, configure: AsyncConfigure):
+copy_review_step = WorkflowStep.builder("copy_review")
+
+
+@copy_review_step.edit
+def edit(ack: Ack, step, configure: Configure):
     assert step is not None
-    await ack()
-    await configure(
+    ack()
+    configure(
         blocks=[
             {
                 "type": "section",
@@ -344,11 +329,12 @@ async def edit(ack: AsyncAck, step, configure: AsyncConfigure):
     )
 
 
-async def save(ack: AsyncAck, step: dict, view: dict, update: AsyncUpdate):
+@copy_review_step.save
+def save(ack: Ack, step: dict, view: dict, update: Update):
     assert step is not None
     assert view is not None
     state_values = view["state"]["values"]
-    await update(
+    update(
         inputs={
             "taskName": {
                 "value": state_values["task_name_input"]["task_name"]["value"],
@@ -368,18 +354,17 @@ async def save(ack: AsyncAck, step: dict, view: dict, update: AsyncUpdate):
             {"name": "taskAuthorEmail", "type": "text", "label": "Task Author Email",},
         ],
     )
-    await ack()
+    ack()
 
 
 pseudo_database = {}
 
 
-async def execute(
-    step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail
-):
+@copy_review_step.execute
+def execute(step: dict, client: WebClient, complete: Complete, fail: Fail):
     assert step is not None
     try:
-        await complete(
+        complete(
             outputs={
                 "taskName": step["inputs"]["taskName"]["value"],
                 "taskDescription": step["inputs"]["taskDescription"]["value"],
@@ -387,7 +372,7 @@ async def execute(
             }
         )
 
-        user: SlackResponse = await client.users_lookupByEmail(
+        user: SlackResponse = client.users_lookupByEmail(
             email=step["inputs"]["taskAuthorEmail"]["value"]
         )
         user_id = user["user"]["id"]
@@ -409,7 +394,7 @@ async def execute(
             )
             blocks.append({"type": "divider"})
 
-        await client.views_publish(
+        client.views_publish(
             user_id=user_id,
             view={
                 "type": "home",
@@ -418,4 +403,4 @@ async def execute(
             },
         )
     except Exception as err:
-        await fail(error={"message": f"Something wrong! {err}"})
+        fail(error={"message": f"Something wrong! {err}"})
