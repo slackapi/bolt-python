@@ -344,7 +344,9 @@ async def edit(ack: AsyncAck, step, configure: AsyncConfigure):
     )
 
 
-async def save(ack: AsyncAck, view: dict, update: AsyncUpdate):
+async def save(ack: AsyncAck, step: dict, view: dict, update: AsyncUpdate):
+    assert step is not None
+    assert view is not None
     state_values = view["state"]["values"]
     await update(
         inputs={
