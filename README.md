@@ -64,7 +64,7 @@ request, there's a method to build a listener function.
 @app.action(action_id, fn);
 
 // Listen for dialog submissions
-@app.action({ callback_id: callbackId, block_id: blockId, action_id: actionId }, fn);
+app.action({ "callback_id": callback_id, "block_id": block_id, "action_id": action_id }, fn);
 
 // Listen for a global or message shortcuts
 @app.shortcut(callback_id, fn);
