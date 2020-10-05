@@ -70,7 +70,7 @@ request, there's a method to build a listener function.
 @app.shortcut(callback_id, fn);
 
 // Listen for slash commands
-@app.command(/command_name, fn);
+@app.command(command_name, fn);
 
 // Listen for view_submission modal events
 @app.view(callback_id, fn);
