@@ -64,7 +64,7 @@ app.message([pattern ,] fn)
 app.action(action_id, fn)
 
 # Listen for dialog submissions
-app.action({ callback_id: callbackId }, fn)
+app.action({"callback_id": callbackId}, fn)
 
 # Listen for a global or message shortcuts
 app.shortcut(callback_id, fn)
