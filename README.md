@@ -1,11 +1,11 @@
-# Bolt for Python
+# Bolt ![Bolt logo](docs/assets/bolt-logo.svg) for Python (beta)
 
 [![Python Version][python-version]][pypi-url]
 [![pypi package][pypi-image]][pypi-url]
 [![Build Status][travis-image]][travis-url]
 [![Codecov][codecov-image]][codecov-url]
 
-A Python framework to build Slack apps in a flash with the latest platform features. Check the [document](https://slack.dev/bolt-python/) and [examples](https://github.com/slackapi/bolt-python/tree/main/examples) to know how to use this framework.
+A Python framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://slack.dev/bolt-python/tutorial/getting-started) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt.
 
 ## Setup
 
@@ -18,9 +18,9 @@ pip install -U pip
 pip install slack_bolt
 ```
 
-## First Bolt App (app.py)
+## Creating an app
 
-Create an app by calling a constructor, which is a top-level export.
+Create a Bolt for Python app by calling a constructor, which is a top-level export. If you'd prefer, you can create an [async app](#creating-an-async-app).
 
 ```python
 import logging
@@ -32,59 +32,13 @@ from slack_bolt import App
 # export SLACK_BOT_TOKEN=xoxb-***
 app = App()
 
-# Events API: https://api.slack.com/events-api
-@app.event("app_mention")
-def event_test(say):
-    say("What's up?")
-
-# Interactivity: https://api.slack.com/interactivity
-@app.shortcut("callback-id-here")
-# @app.command("/hello-bolt-python")
-def open_modal(ack, client, logger, body):
-    # acknowledge the incoming request from Slack immediately
-    ack()
-    # open a modal
-    api_response = client.views_open(
-        trigger_id=body["trigger_id"],
-        view={
-            "type": "modal",
-            "callback_id": "view-id",
-            "title": {
-                "type": "plain_text",
-                "text": "My App",
-            },
-            "submit": {
-                "type": "plain_text",
-                "text": "Submit",
-            },
-            "blocks": [
-                {
-                    "type": "input",
-                    "block_id": "b",
-                    "element": {
-                        "type": "plain_text_input",
-                        "action_id": "a"
-                    },
-                    "label": {
-                        "type": "plain_text",
-                        "text": "Label",
-                    }
-                }
-            ]
-        })
-    logger.debug(api_response)
-
-@app.view("view-id")
-def view_submission(ack, view, logger):
-    ack()
-    # Prints {'b': {'a': {'type': 'plain_text_input', 'value': 'Your Input'}}}
-    logger.info(view["state"]["values"])
+# Add functionality here
 
 if __name__ == "__main__":
     app.start(3000)  # POST http://localhost:3000/slack/events
 ```
 
-## Run the Bolt App
+## Running an app
 
 ```bash
 export SLACK_SIGNING_SECRET=***
@@ -95,9 +49,61 @@ python app.py
 ngrok http 3000
 ```
 
-## AsyncApp Setup
+## Listening for events
+Apps typically react to a collection of incoming events, which can correspond to [Events API events](https://api.slack.com/events-api), [actions](https://api.slack.com/interactivity/components), [shortcuts](https://api.slack.com/interactivity/shortcuts), [slash commands](https://api.slack.com/interactivity/slash-commands) or [options requests](https://api.slack.com/reference/block-kit/block-elements#external_select). For each type of
+request, there's a method to build a listener function.
 
-If you prefer building Slack apps using [asyncio](https://docs.python.org/3/library/asyncio.html), you can go with `AsyncApp` instead. You can use async/await style for everything in the app. To use `AsyncApp`, [AIOHTTP](https://docs.aiohttp.org/en/stable/) library is required for asynchronous Slack Web API calls and the default web server.
+```python
+# Listen for an event from the Events API
+app.event(event_type, fn)
+
+# Convenience method to listen to only `message` events using a string or re.Pattern
+app.message([pattern ,] fn)
+
+# Listen for an action from a Block Kit element (buttons, select menus, date pickers, etc)
+app.action(action_id, fn)
+
+# Listen for dialog submissions
+app.action({"callback_id": callbackId}, fn)
+
+# Listen for a global or message shortcuts
+app.shortcut(callback_id, fn)
+
+# Listen for slash commands
+app.command(command_name, fn)
+
+# Listen for view_submission modal events
+app.view(callback_id, fn)
+
+# Listen for options requests (from select menus with an external data source)
+app.options(action_id, fn)
+```
+
+The recommended way to use these methods are decorators:
+
+```python
+@app.event(event_type)
+def handle_event(event):
+    pass
+```
+
+## Making things happen
+
+Most of the app's functionality will be inside listener functions (the `fn` parameters above). These functions are called with a set of arguments.
+
+| Argument  | Description  |
+| :---: | :--- |
+| `payload` | Contents of the incoming event. The payload structure depends on the listener. For example, for an Events API event, `payload` will be the [event type structure](https://api.slack.com/events-api#event_type_structure). For a block action, it will be the action from within the `actions` list. The `payload` dictionary is also accessible via the alias corresponding to the listener (`message`, `event`, `action`, `shortcut`, `view`, `command`, or `options`). For example, if you were building a `message()` listener, you could use the `payload` and `message` arguments interchangably. **An easy way to understand what's in a payload is to log it**. |
+| `say` | Utility function to send a message to the channel associated with the incoming event. This argument is only available when the listener is triggered for events that contain a `channel_id` (the most common being `message` events). `say` accepts simple strings (for plain-text messages) and dictionaries (for messages containing blocks).
+| `ack` | Function that **must** be called to acknowledge that your app received the incoming event. `ack` exists for all actions, shortcuts, view submissions, slash command and options requests. `ack` returns a promise that resolves when complete. Read more in [Acknowledging events](https://slack.dev/bolt-python/concepts#acknowledge).
+| `client` | Web API client that uses the token associated with the event. For single-workspace installations, the token is provided to the constructor. For multi-workspace installations, the token is returned by using [the OAuth library](https://slack.dev/bolt-python/concepts#authenticating-oauth), or manually using the `authorize` function.
+| `respond` | Utility function that responds to incoming events **if** it contains a `response_url` (shortcuts, actions, and slash commands).
+| `context` | Event context. This dictionary contains data about the event and app, such as the `botId`. Middleware can add additional context before the event is passed to listeners.
+| `body` | Dictionary that contains the entire body of the request (superset of `payload`). Some accessory data is only available outside of the payload (such as `trigger_id` and `authed_users`).
+
+## Creating an async app
+
+If you'd prefer to build your app with [asyncio](https://docs.python.org/3/library/asyncio.html), you can import the [AIOHTTP](https://docs.aiohttp.org/en/stable/) library and call the `AsyncApp` constructor. Within async apps, you can use the async/await pattern.
 
 ```bash
 # Python 3.6+ required
@@ -109,9 +115,10 @@ pip install -U pip
 pip install slack_bolt aiohttp
 ```
 
-Import `slack_bolt.async_app.AsyncApp` instead of `slack_bolt.App`. All middleware/listeners must be async functions. Inside the functions, all utility methods such as `ack`, `say`, and `respond` requires `await` keyword.
+In async apps, all middleware/listeners must be async functions. When calling utility methods (like `ack` and `say`) within these functions, it's required to use the `await` keyword.
 
 ```python
+# Import the async app instead of the regular one
 from slack_bolt.async_app import AsyncApp
 
 app = AsyncApp()
@@ -130,29 +137,21 @@ if __name__ == "__main__":
     app.start(3000)
 ```
 
-Starting the app is exactly the same with the way using `slack_bolt.App`.
-
-```bash
-export SLACK_SIGNING_SECRET=***
-export SLACK_BOT_TOKEN=xoxb-***
-python app.py
-
-# in another terminal
-ngrok http 3000
-```
-
 If you want to use another async Web framework (e.g., Sanic, FastAPI, Starlette), take a look at the built-in adapters and their examples.
 
 * [The Bolt app examples](https://github.com/slackapi/bolt-python/tree/main/examples)
 * [The built-in adapters](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter)
+Apps can be run the same way as the syncronous example above. If you'd prefer another async Web framework (e.g., Sanic, FastAPI, Starlette), take a look at [the built-in adapters](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter) and their corresponding [sample code](https://github.com/slackapi/bolt-python/tree/main/samples).
 
-# Feedback
+## Getting Help
 
-We are keen to hear your feedback. Please feel free to [submit an issue](https://github.com/slackapi/bolt-python/issues)!
+[The documentation](https://slack.dev/bolt-python) has more information on basic and advanced concepts for Bolt for Python.
 
-# License
+If you otherwise get stuck, we're here to help. The following are the best ways to get assistance working through your issue:
 
-The MIT License
+  * [Issue Tracker](http://github.com/slackapi/bolt-python/issues) for questions, bug reports, feature requests, and general discussion related to Bolt for Python. Try searching for an existing issue before creating a new one.
+  * [Email](mailto:support@slack.com) our developer support team: `support@slack.com`
+
 
 [pypi-image]: https://badge.fury.io/py/slack-bolt.svg
 [pypi-url]: https://pypi.org/project/slack-bolt/
