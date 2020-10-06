@@ -13,7 +13,7 @@ from .internals import _to_authorize_result
 class AsyncSingleTeamAuthorization(AsyncAuthorization):
     def __init__(self):
         """Single-workspace authorization."""
-        self.auth_result: Optional[AsyncSlackResponse] = None
+        self.auth_test_result: Optional[AsyncSlackResponse] = None
         self.logger = get_bolt_logger(AsyncSingleTeamAuthorization)
 
     async def async_process(
@@ -27,14 +27,16 @@ class AsyncSingleTeamAuthorization(AsyncAuthorization):
             return await next()
 
         try:
-            if self.auth_result is None:
-                self.auth_result = await req.context.client.auth_test()
+            if self.auth_test_result is None:
+                self.auth_test_result = await req.context.client.auth_test()
 
-            if self.auth_result:
-                req.context["authorize_result"] = _to_authorize_result(
-                    auth_test_result=self.auth_result,
-                    token=req.context.client.token,
-                    request_user_id=req.context.user_id,
+            if self.auth_test_result:
+                req.context.set_authorize_result(
+                    _to_authorize_result(
+                        auth_test_result=self.auth_test_result,
+                        token=req.context.client.token,
+                        request_user_id=req.context.user_id,
+                    )
                 )
                 return await next()
             else:

@@ -5,7 +5,7 @@ from urllib.parse import quote
 from slack_sdk import WebClient
 from slack_sdk.signature import SignatureVerifier
 
-from slack_bolt import BoltRequest
+from slack_bolt import BoltRequest, BoltContext
 from slack_bolt.app import App
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
@@ -174,9 +174,15 @@ body = {
 raw_body = f"payload={quote(json.dumps(body))}"
 
 
-def simple_listener(ack, body, payload, action):
+def simple_listener(ack, body, payload, action, context: BoltContext):
     assert body["trigger_id"] == "111.222.valid"
     assert body["actions"][0] == payload
     assert payload == action
     assert action["action_id"] == "a"
+    assert context.bot_id == "BZYBOTHED"
+    assert context.bot_user_id == "W23456789"
+    assert context.bot_token == "xoxb-valid"
+    assert context.token == "xoxb-valid"
+    assert context.user_id == "W111"
+    assert context.user_token is None
     ack()

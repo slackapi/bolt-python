@@ -33,10 +33,12 @@ class SingleTeamAuthorization(Authorization):
                 self.auth_test_result = req.context.client.auth_test()
 
             if self.auth_test_result:
-                req.context["authorize_result"] = _to_authorize_result(
-                    auth_test_result=self.auth_test_result,
-                    token=req.context.client.token,
-                    request_user_id=req.context.user_id,
+                req.context.set_authorize_result(
+                    _to_authorize_result(
+                        auth_test_result=self.auth_test_result,
+                        token=req.context.client.token,
+                        request_user_id=req.context.user_id,
+                    )
                 )
                 return next()
             else:

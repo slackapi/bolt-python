@@ -6,10 +6,6 @@ from slack_bolt.authorization import AuthorizeResult
 
 class BaseContext(dict):
     @property
-    def authorize_result(self) -> Optional[AuthorizeResult]:
-        return self.get("authorize_result")
-
-    @property
     def logger(self) -> Logger:
         return self["logger"]
 
@@ -41,3 +37,38 @@ class BaseContext(dict):
     def matches(self) -> Optional[Tuple]:
         """Returns all the matched parts in message listener's regexp"""
         return self.get("matches")
+
+    # --------------------------------
+
+    @property
+    def authorize_result(self) -> Optional[AuthorizeResult]:
+        return self.get("authorize_result")
+
+    @property
+    def bot_token(self) -> Optional[str]:
+        return self.get("bot_token")
+
+    @property
+    def bot_id(self) -> Optional[str]:
+        return self.get("bot_id")
+
+    @property
+    def bot_user_id(self) -> Optional[str]:
+        return self.get("bot_user_id")
+
+    @property
+    def user_token(self) -> Optional[str]:
+        return self.get("user_token")
+
+    def set_authorize_result(self, authorize_result: AuthorizeResult):
+        self["authorize_result"] = authorize_result
+        if authorize_result.bot_id is not None:
+            self["bot_id"] = authorize_result.bot_id
+        if authorize_result.bot_user_id is not None:
+            self["bot_user_id"] = authorize_result.bot_user_id
+        if authorize_result.bot_token is not None:
+            self["bot_token"] = authorize_result.bot_token
+        if authorize_result.user_id is not None:
+            self["user_id"] = authorize_result.user_id
+        if authorize_result.user_token is not None:
+            self["user_token"] = authorize_result.user_token

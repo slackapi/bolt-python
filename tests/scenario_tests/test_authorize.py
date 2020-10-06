@@ -15,22 +15,33 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 valid_token = "xoxb-valid"
+valid_user_token = "xoxp-valid"
 
 
 def authorize(enterprise_id, team_id, user_id, client: WebClient):
     assert enterprise_id == "E111"
     assert team_id == "T111"
-    assert user_id == "W111"
+    assert user_id == "W99999"
     auth_test = client.auth_test(token=valid_token)
     return AuthorizeResult.from_auth_test_response(
         auth_test_response=auth_test, bot_token=valid_token,
     )
 
 
+def user_authorize(enterprise_id, team_id, user_id, client: WebClient):
+    assert enterprise_id == "E111"
+    assert team_id == "T111"
+    assert user_id == "W99999"
+    auth_test = client.auth_test(token=valid_user_token)
+    return AuthorizeResult.from_auth_test_response(
+        auth_test_response=auth_test, user_token=valid_user_token,
+    )
+
+
 def error_authorize(enterprise_id, team_id, user_id):
     assert enterprise_id == "E111"
     assert team_id == "T111"
-    assert user_id == "W111"
+    assert user_id == "W99999"
     return None
 
 
@@ -94,11 +105,39 @@ class TestAuthorize:
         assert response.body == ":x: Please install this app into the workspace :bow:"
         assert self.mock_received_requests.get("/auth.test") == None
 
+    def test_bot_context_attributes(self):
+        app = App(
+            client=self.web_client,
+            authorize=authorize,
+            signing_secret=self.signing_secret,
+        )
+        app.action("a")(assert_bot_context_attributes)
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert response.body == ""
+        assert self.mock_received_requests["/auth.test"] == 1
+
+    def test_user_context_attributes(self):
+        app = App(
+            client=self.web_client,
+            authorize=user_authorize,
+            signing_secret=self.signing_secret,
+        )
+        app.action("a")(assert_user_context_attributes)
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert response.body == ""
+        assert self.mock_received_requests["/auth.test"] == 1
+
 
 body = {
     "type": "block_actions",
     "user": {
-        "id": "W111",
+        "id": "W99999",
         "username": "primary-owner",
         "name": "primary-owner",
         "team_id": "T111",
@@ -140,4 +179,24 @@ def simple_listener(ack, body, payload, action):
     assert body["actions"][0] == payload
     assert payload == action
     assert action["action_id"] == "a"
+    ack()
+
+
+def assert_bot_context_attributes(ack, context):
+    assert context["bot_id"] == "BZYBOTHED"
+    assert context["bot_user_id"] == "W23456789"
+    assert context["bot_token"] == "xoxb-valid"
+    assert context["token"] == "xoxb-valid"
+    assert context["user_id"] == "W99999"
+    assert context.get("user_token") is None
+    ack()
+
+
+def assert_user_context_attributes(ack, context):
+    assert context.get("bot_id") is None
+    assert context.get("bot_user_id") is None
+    assert context.get("bot_token") is None
+    assert context["token"] == "xoxp-valid"
+    assert context["user_id"] == "W99999"
+    assert context["user_token"] == "xoxp-valid"
     ack()
