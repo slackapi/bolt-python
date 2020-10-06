@@ -39,7 +39,7 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
                 user_id=req.context.user_id,
             )
             if auth_result:
-                req.context["authorize_result"] = auth_result
+                req.context.set_authorize_result(auth_result)
                 token = auth_result.bot_token or auth_result.user_token
                 req.context["token"] = token
                 req.context["client"] = create_async_web_client(token)

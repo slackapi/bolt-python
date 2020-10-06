@@ -37,7 +37,7 @@ class MultiTeamsAuthorization(Authorization):
                 user_id=req.context.user_id,
             )
             if auth_result is not None:
-                req.context["authorize_result"] = auth_result
+                req.context.set_authorize_result(auth_result)
                 token = auth_result.bot_token or auth_result.user_token
                 req.context["token"] = token
                 req.context["client"] = create_web_client(token)

@@ -8,6 +8,7 @@ from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.app.async_app import AsyncApp
+from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
@@ -203,9 +204,15 @@ body = {
 raw_body = f"payload={quote(json.dumps(body))}"
 
 
-async def simple_listener(ack, body, payload, action):
+async def simple_listener(ack, body, payload, action, context: AsyncBoltContext):
     assert body["trigger_id"] == "111.222.valid"
     assert body["actions"][0] == payload
     assert payload == action
     assert action["action_id"] == "a"
+    assert context.bot_id == "BZYBOTHED"
+    assert context.bot_user_id == "W23456789"
+    assert context.bot_token == "xoxb-valid"
+    assert context.token == "xoxb-valid"
+    assert context.user_id == "W111"
+    assert context.user_token is None
     await ack()

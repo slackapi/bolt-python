@@ -19,6 +19,11 @@ class MockHandler(SimpleHTTPRequestHandler):
             self.headers["Authorization"]
         ).startswith("Bearer xoxb-")
 
+    def is_valid_user_token(self):
+        return "Authorization" in self.headers and str(
+            self.headers["Authorization"]
+        ).startswith("Bearer xoxp-")
+
     def set_common_headers(self):
         self.send_header("content-type", "application/json;charset=utf-8")
         self.send_header("connection", "close")
@@ -53,7 +58,7 @@ class MockHandler(SimpleHTTPRequestHandler):
     }
 }
                 """
-    auth_test_response = """
+    bot_auth_test_response = """
 {
     "ok": true,
     "url": "https://subarachnoid.slack.com/",
@@ -62,6 +67,17 @@ class MockHandler(SimpleHTTPRequestHandler):
     "team_id": "T0G9PQBBK",
     "user_id": "W23456789",
     "bot_id": "BZYBOTHED"
+}
+"""
+
+    user_auth_test_response = """
+{
+    "ok": true,
+    "url": "https://subarachnoid.slack.com/",
+    "team": "Subarachnoid Workspace",
+    "user": "some-user",
+    "team_id": "T0G9PQBBK",
+    "user_id": "W99999"
 }
 """
 
@@ -75,13 +91,20 @@ class MockHandler(SimpleHTTPRequestHandler):
                 self.wfile.write(self.oauth_v2_access_response.encode("utf-8"))
                 return
 
+            if self.is_valid_user_token():
+                if self.path == "/auth.test":
+                    self.send_response(200)
+                    self.set_common_headers()
+                    self.wfile.write(self.user_auth_test_response.encode("utf-8"))
+                    return
+
             if self.is_valid_token():
                 parsed_path = urlparse(self.path)
 
                 if self.path == "/auth.test":
                     self.send_response(200)
                     self.set_common_headers()
-                    self.wfile.write(self.auth_test_response.encode("utf-8"))
+                    self.wfile.write(self.bot_auth_test_response.encode("utf-8"))
                     return
 
                 len_header = self.headers.get("Content-Length") or 0
