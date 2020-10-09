@@ -19,6 +19,7 @@ To learn more about the OAuth installation flow with Slack, [read the API docume
 
 ```python
 import os
+from slack_bolt import App
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
@@ -55,7 +56,7 @@ You can override the default OAuth using `oauth_settings`, which can be passed i
 
 ```python
 from slack_bolt.oauth.callback_options import CallbackOptions, SuccessArgs, FailureArgs
-import slack_bolt.response.BoltResponse
+from slack_bolt.response import BoltResponse
 
 def success(args: SuccessArgs) -> BoltResponse:
     assert args.request is not None
@@ -73,6 +74,12 @@ def failure(args: FailureArgs) -> BoltResponse:
     )
 
 callback_options = CallbackOptions(success=success, failure=failure)
+
+import os
+from slack_bolt import App
+from slack_bolt.oauth.oauth_settings import OAuthSettings
+from slack_sdk.oauth.installation_store import FileInstallationStore
+from slack_sdk.oauth.state_store import FileOAuthStateStore
 
 app = App(
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),

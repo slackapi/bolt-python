@@ -10,7 +10,7 @@ Adapters are responsible for handling and parsing incoming events from Slack to 
 
 By default, Bolt will use the built-in <a href="https://docs.python.org/3/library/http.server.html">`HTTPSever`</a> adapter. While this is okay for local development, <b>it is not recommended for production</b>. Bolt for Python includes a collection of built-in adapters that can be imported and used with your app. The built-in adapters support a variety of popular Python frameworks including Flask, Django, and Starlette among others. Adapters support the use of any production-ready web server of your choice.
 
-To use an adapter, you'll create an app with the framework of your choosing and import its corresponding adapter. Then you'll initalize the adapter instance and call its function that handles and parses incoming events.
+To use an adapter, you'll create an app with the framework of your choosing and import its corresponding adapter. Then you'll initialize the adapter instance and call its function that handles and parses incoming events.
 
 The full list adapters, as well as configuration and sample usage, can be found within the repository's <a href="https://github.com/slackapi/bolt-python/tree/main/examples">`examples` folder</a>.
 </div>

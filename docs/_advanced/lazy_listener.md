@@ -12,7 +12,7 @@ Typically you'd call `ack()` as the first step of your listener functions. Calli
 
 However, apps running on FaaS or similar runtimes that don't allow you to run threads or processes after returning an HTTP response cannot follow this pattern. Instead, you should set the `process_before_response` flag to `True`. This allows you to create a listener that calls `ack()` and handles the event safely, though you still need to complete everything within 3 seconds. For events, while a listener doesn't need `ack()` method call as you normally would, the listener needs to complete within 3 seconds, too.
 
-Rather than acting as a decorator, lazy listeners take two keyword args:
+Lazy listeners can be a solution for this issue. Rather than acting as a decorator, lazy listeners take two keyword args:
 * `ack: Callable`: Responsible for calling `ack()`
 * `lazy: List[Callable]`: Responsible for handling any time-consuming processes related to the event. The lazy function does not have access to `ack()`.
 </div>

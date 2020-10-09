@@ -22,8 +22,8 @@ For a more custom solution, you can set the `authorize` parameter to a function 
 ```python
 import os
 from slack_bolt import App
-# Import the AuthorizationResult class
-from slack_bolt.authorization import AuthorizationResult
+# Import the AuthorizeResult class
+from slack_bolt.authorization import AuthorizeResult
 
 # This is just an example (assumes there are no user tokens)
 # You should store authorizations in a secure DB
@@ -46,7 +46,7 @@ installations = [
 
 def authorize(enterprise_id, team_id, logger):
     # You can implement your own logic to fetch token here
-    for (team in installations):
+    for team in installations:
         # enterprise_id doesn't exist for some teams
         is_valid_enterprise = True if (("enterprise_id" not in team) or (enterprise_id == team["enterprise_id"])) else False
         if ((is_valid_enterprise == True) and (team["team_id"] == team_id)):

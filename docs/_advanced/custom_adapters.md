@@ -18,7 +18,7 @@ order: 1
 | `body: str` | The raw request body | **Yes** |
 | `query: any` | The query string data | No |
 | `headers: Dict[str, Union[str, List[str]]]` | Request headers | No |
-| `context: Dict[str, str]` | Any context for the request | No |
+| `context: BoltContext` | Any context for the request | No |
 
 `BoltRequest` will return [an instance of `BoltResponse`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/response/response.py) from the Bolt app.
 
