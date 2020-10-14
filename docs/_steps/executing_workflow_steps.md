@@ -26,9 +26,7 @@ def execute(step, complete, fail):
     complete(outputs=outputs)
 
     # if something went wrong
-    error = {
-        "message": "Just testing step failure!"
-    }
+    error = {"message": "Just testing step failure!"}
     fail(error=error)
 
 ws = WorkflowStep(
