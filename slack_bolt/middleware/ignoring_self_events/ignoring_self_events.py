@@ -25,14 +25,20 @@ class IgnoringSelfEvents(Middleware):
 
     # -----------------------------------------
 
-    @staticmethod
+    # Its an Events API event that isn't of type message,
+    # but the user ID might match our own app. Filter these out.
+    # However, some events still must be fired, because they can make sense.
+    events_that_should_be_kept = ["member_joined_channel", "member_left_channel"]
+
+    @classmethod
     def _is_self_event(
-        auth_result: AuthorizeResult, user_id: str, body: Dict[str, Any]
+        cls, auth_result: AuthorizeResult, user_id: str, body: Dict[str, Any]
     ):
         return (
             auth_result is not None
             and user_id == auth_result.bot_user_id
             and body.get("event") is not None
+            and body.get("event").get("type") not in cls.events_that_should_be_kept
         )
 
     def _debug_log(self, body: dict):
