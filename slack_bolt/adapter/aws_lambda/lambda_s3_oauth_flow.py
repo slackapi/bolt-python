@@ -62,8 +62,7 @@ class LambdaS3OAuthFlow(OAuthFlow):
         # the settings may already have pre-defined authorize.
         # In this case, the /slack/events endpoint doesn't work along with the OAuth flow.
         settings.authorize = InstallationStoreAuthorize(
-            logger=logger,
-            installation_store=settings.installation_store
+            logger=logger, installation_store=settings.installation_store
         )
 
         OAuthFlow.__init__(self, client=client, logger=logger, settings=settings)
