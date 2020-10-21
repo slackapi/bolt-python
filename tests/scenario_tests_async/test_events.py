@@ -139,6 +139,182 @@ class TestAsyncEvents:
             response = await app.async_dispatch(request)
             assert response.status == 200
 
+    @pytest.mark.asyncio
+    async def test_self_events(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.event("reaction_added")(whats_up)
+
+        self_event = {
+            "token": "verification_token",
+            "team_id": "T111",
+            "enterprise_id": "E111",
+            "api_app_id": "A111",
+            "event": {
+                "type": "reaction_added",
+                "user": "W23456789",  # bot_user_id
+                "item": {
+                    "type": "message",
+                    "channel": "C111",
+                    "ts": "1599529504.000400",
+                },
+                "reaction": "heart_eyes",
+                "item_user": "W111",
+                "event_ts": "1599616881.000800",
+            },
+            "type": "event_callback",
+            "event_id": "Ev111",
+            "event_time": 1599616881,
+            "authed_users": ["W111"],
+        }
+        timestamp, body = str(int(time())), json.dumps(self_event)
+        request = AsyncBoltRequest(
+            body=body, headers=self.build_headers(timestamp, body)
+        )
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+        await asyncio.sleep(1)  # wait a bit after auto ack()
+        # The listener should not be executed
+        assert self.mock_received_requests.get("/chat.postMessage") is None
+
+    @pytest.mark.asyncio
+    async def test_self_joined_left_events(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.event("reaction_added")(whats_up)
+
+        join_event_body = {
+            "token": "verification_token",
+            "team_id": "T111",
+            "enterprise_id": "E111",
+            "api_app_id": "A111",
+            "event": {
+                "type": "member_joined_channel",
+                "user": "W23456789",  # bot_user_id
+                "channel": "C111",
+                "channel_type": "C",
+                "team": "T111",
+                "inviter": "U222",
+            },
+            "type": "event_callback",
+            "event_id": "Ev111",
+            "event_time": 1599616881,
+            "authed_users": ["W111"],
+        }
+
+        left_event_body = {
+            "token": "verification_token",
+            "team_id": "T111",
+            "enterprise_id": "E111",
+            "api_app_id": "A111",
+            "event": {
+                "type": "member_left_channel",
+                "user": "W23456789",  # bot_user_id
+                "channel": "C111",
+                "channel_type": "C",
+                "team": "T111",
+            },
+            "type": "event_callback",
+            "event_id": "Ev111",
+            "event_time": 1599616881,
+            "authed_users": ["W111"],
+        }
+
+        @app.event("member_joined_channel")
+        async def handle_member_joined_channel(say):
+            await say("What's up?")
+
+        @app.event("member_left_channel")
+        async def handle_member_left_channel(say):
+            await say("What's up?")
+
+        timestamp, body = str(int(time())), json.dumps(join_event_body)
+        request = AsyncBoltRequest(
+            body=body, headers=self.build_headers(timestamp, body)
+        )
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        timestamp, body = str(int(time())), json.dumps(left_event_body)
+        request = AsyncBoltRequest(
+            body=body, headers=self.build_headers(timestamp, body)
+        )
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+
+        await asyncio.sleep(1)  # wait a bit after auto ack()
+        # The listeners should be executed
+        assert self.mock_received_requests.get("/chat.postMessage") == 2
+
+    @pytest.mark.asyncio
+    async def test_joined_left_events(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app.event("reaction_added")(whats_up)
+
+        join_event_body = {
+            "token": "verification_token",
+            "team_id": "T111",
+            "enterprise_id": "E111",
+            "api_app_id": "A111",
+            "event": {
+                "type": "member_joined_channel",
+                "user": "W111",  # other user
+                "channel": "C111",
+                "channel_type": "C",
+                "team": "T111",
+                "inviter": "U222",
+            },
+            "type": "event_callback",
+            "event_id": "Ev111",
+            "event_time": 1599616881,
+            "authed_users": ["W111"],
+        }
+
+        left_event_body = {
+            "token": "verification_token",
+            "team_id": "T111",
+            "enterprise_id": "E111",
+            "api_app_id": "A111",
+            "event": {
+                "type": "member_left_channel",
+                "user": "W111",  # other user
+                "channel": "C111",
+                "channel_type": "C",
+                "team": "T111",
+            },
+            "type": "event_callback",
+            "event_id": "Ev111",
+            "event_time": 1599616881,
+            "authed_users": ["W111"],
+        }
+
+        @app.event("member_joined_channel")
+        async def handle_member_joined_channel(say):
+            await say("What's up?")
+
+        @app.event("member_left_channel")
+        async def handle_member_left_channel(say):
+            await say("What's up?")
+
+        timestamp, body = str(int(time())), json.dumps(join_event_body)
+        request = AsyncBoltRequest(
+            body=body, headers=self.build_headers(timestamp, body)
+        )
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        timestamp, body = str(int(time())), json.dumps(left_event_body)
+        request = AsyncBoltRequest(
+            body=body, headers=self.build_headers(timestamp, body)
+        )
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+
+        await asyncio.sleep(1)  # wait a bit after auto ack()
+        # The listeners should be executed
+        assert self.mock_received_requests.get("/chat.postMessage") == 2
+
 
 app_mention_body = {
     "token": "verification_token",
