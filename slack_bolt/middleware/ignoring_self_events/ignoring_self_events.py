@@ -38,7 +38,7 @@ class IgnoringSelfEvents(Middleware):
             auth_result is not None
             and user_id == auth_result.bot_user_id
             and body.get("event") is not None
-            and body.get("event").get("type") not in cls.events_that_should_be_kept
+            and body.get("event", {}).get("type") not in cls.events_that_should_be_kept
         )
 
     def _debug_log(self, body: dict):
