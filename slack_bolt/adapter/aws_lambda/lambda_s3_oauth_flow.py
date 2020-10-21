@@ -5,6 +5,7 @@ from typing import Optional
 
 import boto3
 
+from slack_bolt.authorization.authorize import InstallationStoreAuthorize
 from slack_bolt.oauth import OAuthFlow
 from slack_sdk import WebClient
 from slack_sdk.oauth.installation_store.amazon_s3 import AmazonS3InstallationStore
@@ -55,6 +56,16 @@ class LambdaS3OAuthFlow(OAuthFlow):
                 bucket_name=installation_bucket_name,
                 client_id=settings.client_id,
             )
+
+        # Set up authorize function to surely use this installation_store.
+        # When a developer use a settings initialized outside this constructor,
+        # the settings may already have pre-defined authorize.
+        # In this case, the /slack/events endpoint doesn't work along with the OAuth flow.
+        settings.authorize = InstallationStoreAuthorize(
+            logger=logger,
+            installation_store=settings.installation_store
+        )
+
         OAuthFlow.__init__(self, client=client, logger=logger, settings=settings)
 
     @property
