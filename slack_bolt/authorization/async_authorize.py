@@ -91,11 +91,18 @@ class AsyncCallableAuthorize(AsyncAuthorize):
 
 
 class AsyncInstallationStoreAuthorize(AsyncAuthorize):
+    authorize_result_cache: Dict[str, AuthorizeResult] = {}
+
     def __init__(
-        self, *, logger: Logger, installation_store: AsyncInstallationStore,
+        self,
+        *,
+        logger: Logger,
+        installation_store: AsyncInstallationStore,
+        cache_enabled: bool = False,
     ):
         self.logger = logger
         self.installation_store = installation_store
+        self.cache_enabled = cache_enabled
 
     async def __call__(
         self,
@@ -115,13 +122,18 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
             )
             return None
 
+        if self.cache_enabled and bot.bot_token in self.authorize_result_cache:
+            return self.authorize_result_cache[bot.bot_token]
         try:
             auth_result = await context.client.auth_test(token=bot.bot_token)
-            return AuthorizeResult.from_auth_test_response(
+            authorize_result = AuthorizeResult.from_auth_test_response(
                 auth_test_response=auth_result,
                 bot_token=bot.bot_token,
                 user_token=None,  # Not yet supported
             )
+            if self.cache_enabled:
+                self.authorize_result_cache[bot.bot_token] = authorize_result
+            return authorize_result
         except SlackApiError as err:
             self.logger.debug(
                 f"The stored bot token for enterprise_id: {enterprise_id} team_id: {team_id} "
