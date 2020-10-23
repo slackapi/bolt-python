@@ -45,6 +45,10 @@ def error_listener_function_must_be_coro_func(func_name: str) -> str:
     return f"The listener function ({func_name}) is not a coroutine function."
 
 
+def error_authorize_conflicts() -> str:
+    return "`authorize` in the top-level arguments is not allowed when you pass either `oauth_settings` or `oauth_flow`"
+
+
 # -------------------------------
 # Warning
 # -------------------------------
