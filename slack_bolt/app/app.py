@@ -42,6 +42,7 @@ from slack_bolt.logger.messages import (
     debug_running_listener,
     error_unexpected_listener_middleware,
     error_client_invalid_type,
+    error_authorize_conflicts,
 )
 from slack_bolt.middleware import (
     Middleware,
@@ -131,6 +132,8 @@ class App:
 
         self._authorize: Optional[Authorize] = None
         if authorize is not None:
+            if oauth_settings is not None or oauth_flow is not None:
+                raise BoltError(error_authorize_conflicts())
             self._authorize = CallableAuthorize(
                 logger=self._framework_logger, func=authorize
             )
