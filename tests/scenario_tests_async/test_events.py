@@ -8,6 +8,7 @@ from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.app.async_app import AsyncApp
+from slack_bolt.context.say.async_say import AsyncSay
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
@@ -314,6 +315,65 @@ class TestAsyncEvents:
         await asyncio.sleep(1)  # wait a bit after auto ack()
         # The listeners should be executed
         assert self.mock_received_requests.get("/chat.postMessage") == 2
+
+    @pytest.mark.asyncio
+    async def test_uninstallation_and_revokes(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
+        app._client = AsyncWebClient(
+            token="uninstalled-revoked", base_url=self.mock_api_server_base_url
+        )
+
+        @app.event("app_uninstalled")
+        async def handler1(say: AsyncSay):
+            await say(channel="C111", text="What's up?")
+
+        @app.event("tokens_revoked")
+        async def handler2(say: AsyncSay):
+            await say(channel="C111", text="What's up?")
+
+        app_uninstalled_body = {
+            "token": "verification_token",
+            "team_id": "T111",
+            "enterprise_id": "E111",
+            "api_app_id": "A111",
+            "event": {"type": "app_uninstalled"},
+            "type": "event_callback",
+            "event_id": "Ev111",
+            "event_time": 1599616881,
+        }
+
+        timestamp, body = str(int(time())), json.dumps(app_uninstalled_body)
+        request: AsyncBoltRequest = AsyncBoltRequest(
+            body=body, headers=self.build_headers(timestamp, body)
+        )
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+
+        tokens_revoked_body = {
+            "token": "verification_token",
+            "team_id": "T111",
+            "enterprise_id": "E111",
+            "api_app_id": "A111",
+            "event": {
+                "type": "tokens_revoked",
+                "tokens": {"oauth": ["UXXXXXXXX"], "bot": ["UXXXXXXXX"]},
+            },
+            "type": "event_callback",
+            "event_id": "Ev111",
+            "event_time": 1599616881,
+        }
+
+        timestamp, body = str(int(time())), json.dumps(tokens_revoked_body)
+        request: AsyncBoltRequest = AsyncBoltRequest(
+            body=body, headers=self.build_headers(timestamp, body)
+        )
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+
+        # AsyncApp doesn't call auth.test when booting
+        assert self.mock_received_requests.get("/auth.test") is None
+        await asyncio.sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 2
 
 
 app_mention_body = {

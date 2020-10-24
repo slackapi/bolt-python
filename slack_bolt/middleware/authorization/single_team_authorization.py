@@ -10,7 +10,9 @@ from .internals import (
     _build_error_response,
     _is_no_auth_required,
     _to_authorize_result,
+    _is_no_auth_test_call_required,
 )
+from ...authorization import AuthorizeResult
 
 
 class SingleTeamAuthorization(Authorization):
@@ -26,6 +28,16 @@ class SingleTeamAuthorization(Authorization):
         self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         if _is_no_auth_required(req):
+            return next()
+
+        if _is_no_auth_test_call_required(req):
+            req.context.set_authorize_result(
+                AuthorizeResult(
+                    enterprise_id=req.context.enterprise_id,
+                    team_id=req.context.team_id,
+                    user_id=req.context.user_id,
+                )
+            )
             return next()
 
         try:
