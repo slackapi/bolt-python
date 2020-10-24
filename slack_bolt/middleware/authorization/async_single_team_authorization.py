@@ -7,7 +7,8 @@ from slack_bolt.response import BoltResponse
 from slack_sdk.web.async_slack_response import AsyncSlackResponse
 from slack_sdk.errors import SlackApiError
 from .async_internals import _build_error_response, _is_no_auth_required
-from .internals import _to_authorize_result
+from .internals import _to_authorize_result, _is_no_auth_test_call_required
+from ...authorization import AuthorizeResult
 
 
 class AsyncSingleTeamAuthorization(AsyncAuthorization):
@@ -24,6 +25,16 @@ class AsyncSingleTeamAuthorization(AsyncAuthorization):
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> BoltResponse:
         if _is_no_auth_required(req):
+            return await next()
+
+        if _is_no_auth_test_call_required(req):
+            req.context.set_authorize_result(
+                AuthorizeResult(
+                    enterprise_id=req.context.enterprise_id,
+                    team_id=req.context.team_id,
+                    user_id=req.context.user_id,
+                )
+            )
             return await next()
 
         try:

@@ -21,8 +21,30 @@ def _is_ssl_check(req: BoltRequest) -> bool:
     )
 
 
+def _is_uninstallation_event(req: BoltRequest) -> bool:
+    return (
+        req is not None
+        and req.body is not None
+        and req.body.get("type") == "event_callback"
+        and req.body.get("event", {}).get("type") == "app_uninstalled"
+    )
+
+
+def _is_tokens_revoked_event(req: BoltRequest) -> bool:
+    return (
+        req is not None
+        and req.body is not None
+        and req.body.get("type") == "event_callback"
+        and req.body.get("event", {}).get("type") == "tokens_revoked"
+    )
+
+
 def _is_no_auth_required(req: BoltRequest) -> bool:
     return _is_url_verification(req) or _is_ssl_check(req)
+
+
+def _is_no_auth_test_call_required(req: BoltRequest) -> bool:
+    return _is_uninstallation_event(req) or _is_tokens_revoked_event(req)
 
 
 def _build_error_response() -> BoltResponse:
