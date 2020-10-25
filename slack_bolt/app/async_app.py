@@ -371,13 +371,13 @@ class AsyncApp:
         self,
         callback_id: Union[str, Pattern, AsyncWorkflowStep],
         edit: Optional[
-            Union[Callable[..., Optional[BoltResponse]], AsyncListener]
+            Union[Callable[..., Optional[BoltResponse]], AsyncListener, List[Callable]]
         ] = None,
         save: Optional[
-            Union[Callable[..., Optional[BoltResponse]], AsyncListener]
+            Union[Callable[..., Optional[BoltResponse]], AsyncListener, List[Callable]]
         ] = None,
         execute: Optional[
-            Union[Callable[..., Optional[BoltResponse]], AsyncListener]
+            Union[Callable[..., Optional[BoltResponse]], AsyncListener, List[Callable]]
         ] = None,
     ):
         """Registers a new Workflow Step listener"""

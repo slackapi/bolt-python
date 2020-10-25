@@ -1,4 +1,4 @@
-from typing import Callable, Union, Optional, Awaitable
+from typing import Callable, Union, Optional, Awaitable, List
 
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.listener.async_listener import AsyncListener, AsyncCustomListener
@@ -14,6 +14,8 @@ from .utilities.async_configure import AsyncConfigure
 from .utilities.async_fail import AsyncFail
 from .utilities.async_complete import AsyncComplete
 from .utilities.async_update import AsyncUpdate
+from ...listener_matcher.async_listener_matcher import AsyncListenerMatcher
+from ...middleware.async_middleware import AsyncMiddleware
 
 
 class AsyncWorkflowStep:
@@ -26,9 +28,15 @@ class AsyncWorkflowStep:
         self,
         *,
         callback_id: str,
-        edit: Union[Callable[..., Awaitable[BoltResponse]], AsyncListener],
-        save: Union[Callable[..., Awaitable[BoltResponse]], AsyncListener],
-        execute: Union[Callable[..., Awaitable[BoltResponse]], AsyncListener],
+        edit: Union[
+            Callable[..., Awaitable[BoltResponse]], AsyncListener, List[Callable]
+        ],
+        save: Union[
+            Callable[..., Awaitable[BoltResponse]], AsyncListener, List[Callable]
+        ],
+        execute: Union[
+            Callable[..., Awaitable[BoltResponse]], AsyncListener, List[Callable]
+        ],
         app_name: Optional[str] = None,
     ):
         self.callback_id = callback_id
@@ -40,7 +48,7 @@ class AsyncWorkflowStep:
     @classmethod
     def _build_listener(
         cls, callback_id: str, app_name: str, listener: AsyncListener, name: str,
-    ):
+    ) -> AsyncListener:
         if isinstance(listener, AsyncListener):
             return listener
         elif isinstance(listener, Callable):
@@ -52,11 +60,22 @@ class AsyncWorkflowStep:
                 lazy_functions=[],
                 auto_acknowledgement=name == "execute",
             )
+        elif isinstance(listener, list) and len(listener) > 0:
+            ack = listener.pop(0)
+            lazy = listener
+            return AsyncCustomListener(
+                app_name=app_name,
+                matchers=cls._build_matchers(name, callback_id),
+                middleware=cls._build_middleware(name, callback_id),
+                ack_function=ack,
+                lazy_functions=lazy,
+                auto_acknowledgement=name == "execute",
+            )
         else:
             raise ValueError(f"Invalid `{name}` listener")
 
     @classmethod
-    def _build_matchers(cls, name: str, callback_id: str):
+    def _build_matchers(cls, name: str, callback_id: str) -> List[AsyncListenerMatcher]:
         if name == "edit":
             return [workflow_step_edit(callback_id, asyncio=True)]
         elif name == "save":
@@ -67,7 +86,7 @@ class AsyncWorkflowStep:
             raise ValueError(f"Invalid name {name}")
 
     @classmethod
-    def _build_middleware(cls, name: str, callback_id: str):
+    def _build_middleware(cls, name: str, callback_id: str) -> List[AsyncMiddleware]:
         if name == "edit":
             return [_build_edit_listener_middleware(callback_id)]
         elif name == "save":
@@ -83,7 +102,7 @@ class AsyncWorkflowStep:
 #######################
 
 
-def _build_edit_listener_middleware(callback_id: str):
+def _build_edit_listener_middleware(callback_id: str) -> AsyncMiddleware:
     async def edit_listener_middleware(
         context: AsyncBoltContext,
         client: AsyncWebClient,
@@ -103,7 +122,7 @@ def _build_edit_listener_middleware(callback_id: str):
 #######################
 
 
-def _build_save_listener_middleware():
+def _build_save_listener_middleware() -> AsyncMiddleware:
     async def save_listener_middleware(
         context: AsyncBoltContext,
         client: AsyncWebClient,
@@ -121,7 +140,7 @@ def _build_save_listener_middleware():
 #######################
 
 
-def _build_execute_listener_middleware():
+def _build_execute_listener_middleware() -> AsyncMiddleware:
     async def execute_listener_middleware(
         context: AsyncBoltContext,
         client: AsyncWebClient,

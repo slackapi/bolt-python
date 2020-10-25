@@ -22,7 +22,7 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-class TestAsyncEvents:
+class TestAsyncWorkflowSteps:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -34,13 +34,6 @@ class TestAsyncEvents:
         old_os_env = remove_os_env_temporarily()
         try:
             setup_mock_web_api_server(self)
-            self.app = AsyncApp(
-                client=self.web_client, signing_secret=self.signing_secret
-            )
-            self.app.step(
-                callback_id="copy_review", edit=edit, save=save, execute=execute
-            )
-
             loop = asyncio.get_event_loop()
             yield loop
             loop.close()
@@ -53,8 +46,29 @@ class TestAsyncEvents:
             body=body, timestamp=timestamp,
         )
 
+    def build_app(self, callback_id: str):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
+        app.step(callback_id=callback_id, edit=edit, save=save, execute=execute)
+        return app
+
+    def build_process_before_response_app(self, callback_id: str):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            process_before_response=True,
+        )
+        app.step(
+            callback_id=callback_id,
+            edit=[edit_ack, edit_lazy],
+            save=[save_ack, save_lazy],
+            execute=[execute_ack, execute_lazy],
+        )
+        return app
+
     @pytest.mark.asyncio
     async def test_edit(self):
+        app = self.build_app("copy_review")
+
         timestamp, body = str(int(time())), f"payload={quote(json.dumps(edit_payload))}"
         headers = {
             "content-type": ["application/x-www-form-urlencoded"],
@@ -62,19 +76,37 @@ class TestAsyncEvents:
             "x-slack-request-timestamp": [timestamp],
         }
         request = AsyncBoltRequest(body=body, headers=headers)
-        response = await self.app.async_dispatch(request)
+        response = await app.async_dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
-        self.app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
-        self.app.step(
-            callback_id="copy_review___", edit=edit, save=save, execute=execute
-        )
-        response = await self.app.async_dispatch(request)
+        app = self.build_app("copy_review___")
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+
+    @pytest.mark.asyncio
+    async def test_edit_process_before_response(self):
+        app = self.build_process_before_response_app("copy_review")
+
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(edit_payload))}"
+        headers = {
+            "content-type": ["application/x-www-form-urlencoded"],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
+        }
+        request = AsyncBoltRequest(body=body, headers=headers)
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app = self.build_process_before_response_app("copy_review___")
+        response = await app.async_dispatch(request)
         assert response.status == 404
 
     @pytest.mark.asyncio
     async def test_save(self):
+        app = self.build_app("copy_review")
+
         timestamp, body = str(int(time())), f"payload={quote(json.dumps(save_payload))}"
         headers = {
             "content-type": ["application/x-www-form-urlencoded"],
@@ -82,19 +114,37 @@ class TestAsyncEvents:
             "x-slack-request-timestamp": [timestamp],
         }
         request = AsyncBoltRequest(body=body, headers=headers)
-        response = await self.app.async_dispatch(request)
+        response = await app.async_dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
-        self.app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
-        self.app.step(
-            callback_id="copy_review___", edit=edit, save=save, execute=execute
-        )
-        response = await self.app.async_dispatch(request)
+        app = self.build_app("copy_review___")
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+
+    @pytest.mark.asyncio
+    async def test_save_process_before_response(self):
+        app = self.build_process_before_response_app("copy_review")
+
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(save_payload))}"
+        headers = {
+            "content-type": ["application/x-www-form-urlencoded"],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
+        }
+        request = AsyncBoltRequest(body=body, headers=headers)
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app = self.build_process_before_response_app("copy_review___")
+        response = await app.async_dispatch(request)
         assert response.status == 404
 
     @pytest.mark.asyncio
     async def test_execute(self):
+        app = self.build_app("copy_review")
+
         timestamp, body = str(int(time())), json.dumps(execute_payload)
         headers = {
             "content-type": ["application/json"],
@@ -102,17 +152,35 @@ class TestAsyncEvents:
             "x-slack-request-timestamp": [timestamp],
         }
         request = AsyncBoltRequest(body=body, headers=headers)
-        response = await self.app.async_dispatch(request)
+        response = await app.async_dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
         await asyncio.sleep(0.5)
         assert self.mock_received_requests["/workflows.stepCompleted"] == 1
 
-        self.app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
-        self.app.step(
-            callback_id="copy_review___", edit=edit, save=save, execute=execute
-        )
-        response = await self.app.async_dispatch(request)
+        app = self.build_app("copy_review___")
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+
+    @pytest.mark.asyncio
+    async def test_execute_process_before_response(self):
+        app = self.build_process_before_response_app("copy_review")
+
+        timestamp, body = str(int(time())), json.dumps(execute_payload)
+        headers = {
+            "content-type": ["application/json"],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
+        }
+        request = AsyncBoltRequest(body=body, headers=headers)
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+        await asyncio.sleep(0.5)
+        assert self.mock_received_requests["/workflows.stepCompleted"] == 1
+
+        app = self.build_process_before_response_app("copy_review___")
+        response = await app.async_dispatch(request)
         assert response.status == 404
 
 
@@ -417,5 +485,38 @@ async def execute(
                 "blocks": blocks,
             },
         )
+    except Exception as err:
+        await fail(error={"message": f"Something wrong! {err}"})
+
+
+async def edit_ack(ack: AsyncAck):
+    await ack()
+
+
+async def edit_lazy(step, configure: AsyncConfigure):
+    assert step is not None
+    await configure(blocks=[])
+
+
+async def save_ack(ack: AsyncAck):
+    await ack()
+
+
+async def save_lazy(step: dict, view: dict, update: AsyncUpdate):
+    assert step is not None
+    assert view is not None
+    await update(
+        inputs={}, outputs=[],
+    )
+
+
+async def execute_ack():
+    pass
+
+
+async def execute_lazy(step: dict, complete: AsyncComplete, fail: AsyncFail):
+    assert step is not None
+    try:
+        await complete(outputs={})
     except Exception as err:
         await fail(error={"message": f"Something wrong! {err}"})

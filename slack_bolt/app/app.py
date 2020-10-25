@@ -6,8 +6,6 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from typing import List, Union, Pattern, Callable, Dict, Optional
 
-from slack_bolt.listener.thread_runner import ThreadListenerRunner
-from slack_bolt.workflows.step import WorkflowStep, WorkflowStepMiddleware
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import InstallationStore
 from slack_sdk.web import WebClient
@@ -26,6 +24,7 @@ from slack_bolt.listener.listener_error_handler import (
     DefaultListenerErrorHandler,
     CustomListenerErrorHandler,
 )
+from slack_bolt.listener.thread_runner import ThreadListenerRunner
 from slack_bolt.listener_matcher import CustomListenerMatcher
 from slack_bolt.listener_matcher import builtins as builtin_matchers
 from slack_bolt.listener_matcher.listener_matcher import ListenerMatcher
@@ -59,6 +58,7 @@ from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_bolt.util.utils import create_web_client
+from slack_bolt.workflows.step import WorkflowStep, WorkflowStepMiddleware
 
 
 class App:
@@ -358,10 +358,14 @@ class App:
     def step(
         self,
         callback_id: Union[str, Pattern, WorkflowStep],
-        edit: Optional[Union[Callable[..., Optional[BoltResponse]], Listener]] = None,
-        save: Optional[Union[Callable[..., Optional[BoltResponse]], Listener]] = None,
+        edit: Optional[
+            Union[Callable[..., Optional[BoltResponse]], Listener, List[Callable]]
+        ] = None,
+        save: Optional[
+            Union[Callable[..., Optional[BoltResponse]], Listener, List[Callable]]
+        ] = None,
         execute: Optional[
-            Union[Callable[..., Optional[BoltResponse]], Listener]
+            Union[Callable[..., Optional[BoltResponse]], Listener, List[Callable]]
         ] = None,
     ):
         """Registers a new Workflow Step listener"""
