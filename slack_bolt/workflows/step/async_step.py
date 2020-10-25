@@ -1,5 +1,7 @@
 import sys
 
+from .internals import _is_used_without_argument
+
 if sys.version_info.major == 3 and sys.version_info.minor <= 6:
     from re import _pattern_type as Pattern
 else:
@@ -88,7 +90,7 @@ class AsyncWorkflowStepBuilder:
         def edit_my_step(ack, configure):
             pass
         """
-        if len(args) == 1:
+        if _is_used_without_argument(args):
             func = args[0]
             self._edit = self._to_listener("edit", func, matchers, middleware)
             return func
@@ -128,7 +130,7 @@ class AsyncWorkflowStepBuilder:
             pass
         """
 
-        if len(args) == 1:
+        if _is_used_without_argument(args):
             func = args[0]
             self._save = self._to_listener("save", func, matchers, middleware)
             return func
@@ -168,7 +170,7 @@ class AsyncWorkflowStepBuilder:
             pass
         """
 
-        if len(args) == 1:
+        if _is_used_without_argument(args):
             func = args[0]
             self._execute = self._to_listener("execute", func, matchers, middleware)
             return func
@@ -227,17 +229,6 @@ class AsyncWorkflowStepBuilder:
             matchers=self.to_listener_matchers(self.app_name, matchers),
             middleware=self.to_listener_middleware(self.app_name, middleware),
         )
-
-    @staticmethod
-    def _to_listener_functions(
-        kwargs: dict,
-    ) -> Optional[List[Callable[..., Awaitable[BoltResponse]]]]:
-        if kwargs:
-            functions = [kwargs["ack"]]
-            for sub in kwargs["lazy"]:
-                functions.append(sub)
-            return functions
-        return None
 
     @staticmethod
     def to_listener_matchers(
@@ -324,7 +315,7 @@ class AsyncWorkflowStep:
             middleware = middleware if middleware else []
             middleware.insert(0, cls._build_single_middleware(name, callback_id))
             functions = listener_or_functions
-            ack_function = functions.pop()
+            ack_function = functions.pop(0)
             return AsyncCustomListener(
                 app_name=app_name,
                 matchers=matchers,
