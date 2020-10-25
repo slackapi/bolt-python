@@ -47,6 +47,7 @@ class TestAsyncAuthorize:
         result = await authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
         )
+        assert result.app_id == "A111"
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert self.mock_received_requests["/auth.test"] == 1
@@ -54,6 +55,7 @@ class TestAsyncAuthorize:
         result = await authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
         )
+        assert result.app_id == "A111"
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert self.mock_received_requests["/auth.test"] == 2
@@ -71,6 +73,7 @@ class TestAsyncAuthorize:
         result = await authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
         )
+        assert result.app_id == "A111"
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert self.mock_received_requests["/auth.test"] == 1
@@ -78,6 +81,7 @@ class TestAsyncAuthorize:
         result = await authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
         )
+        assert result.app_id == "A111"
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert self.mock_received_requests["/auth.test"] == 1  # cached

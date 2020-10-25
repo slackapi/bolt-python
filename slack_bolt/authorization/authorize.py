@@ -126,6 +126,7 @@ class InstallationStoreAuthorize(Authorize):
             auth_result = context.client.auth_test(token=bot.bot_token)
             authorize_result = AuthorizeResult.from_auth_test_response(
                 auth_test_response=auth_result,
+                app_id=bot.app_id,
                 bot_token=bot.bot_token,
                 user_token=None,  # Not yet supported
             )

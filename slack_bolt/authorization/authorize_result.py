@@ -6,6 +6,7 @@ from slack_sdk.web import SlackResponse
 class AuthorizeResult(dict):
     enterprise_id: Optional[str]
     team_id: Optional[str]
+    app_id: Optional[str]
     bot_id: Optional[str]
     bot_user_id: Optional[str]
     bot_token: Optional[str]
@@ -17,6 +18,8 @@ class AuthorizeResult(dict):
         *,
         enterprise_id: Optional[str],
         team_id: Optional[str],
+        # app
+        app_id: Optional[str] = None,
         # bot
         bot_user_id: Optional[str] = None,
         bot_id: Optional[str] = None,
@@ -29,6 +32,7 @@ class AuthorizeResult(dict):
 
         :param enterprise_id: Organization ID (Enterprise Grid)
         :param team_id: Workspace ID
+        :param app_id: App ID
         :param bot_user_id: Bot user's User ID
         :param bot_id: Bot ID
         :param bot_token: Bot user access token starting with xoxb-
@@ -37,6 +41,8 @@ class AuthorizeResult(dict):
         """
         self["enterprise_id"] = self.enterprise_id = enterprise_id
         self["team_id"] = self.team_id = team_id
+        # app
+        self["app_id"] = self.app_id = app_id
         # bot
         self["bot_user_id"] = self.bot_user_id = bot_user_id
         self["bot_id"] = self.bot_id = bot_id
@@ -49,6 +55,7 @@ class AuthorizeResult(dict):
     def from_auth_test_response(
         cls,
         *,
+        app_id: Optional[str] = None,
         bot_token: Optional[str] = None,
         user_token: Optional[str] = None,
         auth_test_response: SlackResponse,
@@ -64,6 +71,7 @@ class AuthorizeResult(dict):
             else None
         )
         return AuthorizeResult(
+            app_id=app_id,
             enterprise_id=auth_test_response.get("enterprise_id"),
             team_id=auth_test_response.get("team_id"),
             bot_id=auth_test_response.get("bot_id"),

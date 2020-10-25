@@ -127,6 +127,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
         try:
             auth_result = await context.client.auth_test(token=bot.bot_token)
             authorize_result = AuthorizeResult.from_auth_test_response(
+                app_id=bot.app_id,
                 auth_test_response=auth_result,
                 bot_token=bot.bot_token,
                 user_token=None,  # Not yet supported
