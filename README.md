@@ -89,7 +89,7 @@ def handle_event(event):
 
 ## Making things happen
 
-Most of the app's functionality will be inside listener functions (the `fn` parameters above). These functions are called with a set of arguments. You can place the arguments in random order. Bolt resolves them by the keyword arguments' names. If you'd like to get all arguments in a single object, you can use `args`, a [`slack_bolt.kwargs_injection.Args`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/kwargs_injection/args.py) instance holding all available values in it.
+Most of the app's functionality will be inside listener functions (the `fn` parameters above). These functions are called with a set of arguments, each of which can be used in any order. If you'd like to access arguments off of a single object, you can use `args`, an [`slack_bolt.kwargs_injection.Args`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/kwargs_injection/args.py) instance that contains all available arguments for that event.
 
 | Argument  | Description  |
 | :---: | :--- |
