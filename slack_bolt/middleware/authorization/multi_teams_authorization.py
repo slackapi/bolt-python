@@ -5,7 +5,11 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
 from .authorization import Authorization
-from .internals import _build_error_response, _is_no_auth_required
+from .internals import (
+    _build_error_response,
+    _is_no_auth_required,
+    _is_no_auth_test_call_required,
+)
 from ...authorization import AuthorizeResult
 from ...authorization.authorize import Authorize
 from ...util.utils import create_web_client
@@ -29,6 +33,17 @@ class MultiTeamsAuthorization(Authorization):
     ) -> BoltResponse:
         if _is_no_auth_required(req):
             return next()
+
+        if _is_no_auth_test_call_required(req):
+            req.context.set_authorize_result(
+                AuthorizeResult(
+                    enterprise_id=req.context.enterprise_id,
+                    team_id=req.context.team_id,
+                    user_id=req.context.user_id,
+                )
+            )
+            return next()
+
         try:
             auth_result: Optional[AuthorizeResult] = self.authorize(
                 context=req.context,

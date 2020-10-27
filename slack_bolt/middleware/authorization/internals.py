@@ -6,8 +6,16 @@ from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.request.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
+#
+# NOTE: this source file intentionally avoids having a reference to
+# AsyncBoltRequest, AsyncSlackResponse, and whatever Async-prefixed.
+#
+# The reason why we do so is to enable developers use sync version of Bolt
+# without installing aiohttp library (or any others we may use for async things)
+#
 
-def _is_url_verification(req: BoltRequest) -> bool:
+
+def _is_url_verification(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore
     return (
         req is not None
         and req.body is not None
@@ -15,14 +23,36 @@ def _is_url_verification(req: BoltRequest) -> bool:
     )
 
 
-def _is_ssl_check(req: BoltRequest) -> bool:
+def _is_ssl_check(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore
     return (
         req is not None and req.body is not None and req.body.get("type") == "ssl_check"
     )
 
 
-def _is_no_auth_required(req: BoltRequest) -> bool:
+def _is_uninstallation_event(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore
+    return (
+        req is not None
+        and req.body is not None
+        and req.body.get("type") == "event_callback"
+        and req.body.get("event", {}).get("type") == "app_uninstalled"
+    )
+
+
+def _is_tokens_revoked_event(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore
+    return (
+        req is not None
+        and req.body is not None
+        and req.body.get("type") == "event_callback"
+        and req.body.get("event", {}).get("type") == "tokens_revoked"
+    )
+
+
+def _is_no_auth_required(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore
     return _is_url_verification(req) or _is_ssl_check(req)
+
+
+def _is_no_auth_test_call_required(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore
+    return _is_uninstallation_event(req) or _is_tokens_revoked_event(req)
 
 
 def _build_error_response() -> BoltResponse:

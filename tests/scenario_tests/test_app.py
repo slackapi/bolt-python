@@ -4,6 +4,7 @@ from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 
 from slack_bolt import App
+from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.error import BoltError
 from slack_bolt.oauth import OAuthFlow
 from slack_bolt.oauth.oauth_settings import OAuthSettings
@@ -92,3 +93,31 @@ class TestApp:
                 signing_secret="valid",
                 oauth_settings=OAuthSettings(client_id="111.222", client_secret=None),
             )
+
+    def test_authorize_conflicts(self):
+        oauth_settings = OAuthSettings(
+            client_id="111.222",
+            client_secret="valid",
+            installation_store=FileInstallationStore(),
+            state_store=FileOAuthStateStore(expiration_seconds=120),
+        )
+
+        # no error with this
+        App(signing_secret="valid", oauth_settings=oauth_settings)
+
+        def authorize() -> AuthorizeResult:
+            return AuthorizeResult(enterprise_id="E111", team_id="T111")
+
+        with pytest.raises(BoltError):
+            App(
+                signing_secret="valid",
+                authorize=authorize,
+                oauth_settings=oauth_settings,
+            )
+
+        oauth_flow = OAuthFlow(settings=oauth_settings)
+        # no error with this
+        App(signing_secret="valid", oauth_flow=oauth_flow)
+
+        with pytest.raises(BoltError):
+            App(signing_secret="valid", authorize=authorize, oauth_flow=oauth_flow)

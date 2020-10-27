@@ -25,8 +25,6 @@ class TestWorkflowSteps:
     def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()
         setup_mock_web_api_server(self)
-        self.app = App(client=self.web_client, signing_secret=self.signing_secret)
-        self.app.step(callback_id="copy_review", edit=edit, save=save, execute=execute)
 
     def teardown_method(self):
         cleanup_mock_web_api_server(self)
@@ -37,7 +35,28 @@ class TestWorkflowSteps:
             body=body, timestamp=timestamp,
         )
 
+    def build_app(self, callback_id: str):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        app.step(callback_id=callback_id, edit=edit, save=save, execute=execute)
+        return app
+
+    def build_process_before_response_app(self, callback_id: str):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            process_before_response=True,
+        )
+        app.step(
+            callback_id=callback_id,
+            edit=[edit_ack, edit_lazy],
+            save=[save_ack, save_lazy],
+            execute=[execute_ack, execute_lazy],
+        )
+        return app
+
     def test_edit(self):
+        app = self.build_app("copy_review")
+
         timestamp, body = str(int(time())), f"payload={quote(json.dumps(edit_payload))}"
         headers = {
             "content-type": ["application/x-www-form-urlencoded"],
@@ -45,18 +64,35 @@ class TestWorkflowSteps:
             "x-slack-request-timestamp": [timestamp],
         }
         request: BoltRequest = BoltRequest(body=body, headers=headers)
-        response = self.app.dispatch(request)
+        response = app.dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
-        self.app = App(client=self.web_client, signing_secret=self.signing_secret)
-        self.app.step(
-            callback_id="copy_review___", edit=edit, save=save, execute=execute
-        )
-        response = self.app.dispatch(request)
+        app = self.build_app("copy_review___")
+        response = app.dispatch(request)
+        assert response.status == 404
+
+    def test_edit_process_before_response(self):
+        app = self.build_process_before_response_app("copy_review")
+
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(edit_payload))}"
+        headers = {
+            "content-type": ["application/x-www-form-urlencoded"],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
+        }
+        request: BoltRequest = BoltRequest(body=body, headers=headers)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app = self.build_process_before_response_app("copy_review___")
+        response = app.dispatch(request)
         assert response.status == 404
 
     def test_save(self):
+        app = self.build_app("copy_review")
+
         timestamp, body = str(int(time())), f"payload={quote(json.dumps(save_payload))}"
         headers = {
             "content-type": ["application/x-www-form-urlencoded"],
@@ -64,18 +100,35 @@ class TestWorkflowSteps:
             "x-slack-request-timestamp": [timestamp],
         }
         request: BoltRequest = BoltRequest(body=body, headers=headers)
-        response = self.app.dispatch(request)
+        response = app.dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
-        self.app = App(client=self.web_client, signing_secret=self.signing_secret)
-        self.app.step(
-            callback_id="copy_review___", edit=edit, save=save, execute=execute
-        )
-        response = self.app.dispatch(request)
+        app = self.build_app("copy_review___")
+        response = app.dispatch(request)
+        assert response.status == 404
+
+    def test_save_process_before_response(self):
+        app = self.build_process_before_response_app("copy_review")
+
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(save_payload))}"
+        headers = {
+            "content-type": ["application/x-www-form-urlencoded"],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
+        }
+        request: BoltRequest = BoltRequest(body=body, headers=headers)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        app = self.build_process_before_response_app("copy_review___")
+        response = app.dispatch(request)
         assert response.status == 404
 
     def test_execute(self):
+        app = self.build_app("copy_review")
+
         timestamp, body = str(int(time())), json.dumps(execute_payload)
         headers = {
             "content-type": ["application/json"],
@@ -83,17 +136,34 @@ class TestWorkflowSteps:
             "x-slack-request-timestamp": [timestamp],
         }
         request: BoltRequest = BoltRequest(body=body, headers=headers)
-        response = self.app.dispatch(request)
+        response = app.dispatch(request)
         assert response.status == 200
         assert self.mock_received_requests["/auth.test"] == 1
         time_module.sleep(0.5)
         assert self.mock_received_requests["/workflows.stepCompleted"] == 1
 
-        self.app = App(client=self.web_client, signing_secret=self.signing_secret)
-        self.app.step(
-            callback_id="copy_review___", edit=edit, save=save, execute=execute
-        )
-        response = self.app.dispatch(request)
+        app = self.build_app("copy_review___")
+        response = app.dispatch(request)
+        assert response.status == 404
+
+    def test_execute_process_before_response(self):
+        app = self.build_process_before_response_app("copy_review")
+
+        timestamp, body = str(int(time())), json.dumps(execute_payload)
+        headers = {
+            "content-type": ["application/json"],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
+        }
+        request: BoltRequest = BoltRequest(body=body, headers=headers)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+        time_module.sleep(0.5)
+        assert self.mock_received_requests["/workflows.stepCompleted"] == 1
+
+        app = self.build_process_before_response_app("copy_review___")
+        response = app.dispatch(request)
         assert response.status == 404
 
 
@@ -396,5 +466,38 @@ def execute(step: dict, client: WebClient, complete: Complete, fail: Fail):
                 "blocks": blocks,
             },
         )
+    except Exception as err:
+        fail(error={"message": f"Something wrong! {err}"})
+
+
+def edit_ack(ack: Ack):
+    ack()
+
+
+def edit_lazy(step, configure: Configure):
+    assert step is not None
+    configure(blocks=[])
+
+
+def save_ack(ack: Ack):
+    ack()
+
+
+def save_lazy(step: dict, view: dict, update: Update):
+    assert step is not None
+    assert view is not None
+    update(
+        inputs={}, outputs=[],
+    )
+
+
+def execute_ack():
+    pass
+
+
+def execute_lazy(step: dict, complete: Complete, fail: Fail):
+    assert step is not None
+    try:
+        complete(outputs={})
     except Exception as err:
         fail(error={"message": f"Something wrong! {err}"})

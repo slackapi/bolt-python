@@ -32,6 +32,7 @@ from slack_bolt.logger.messages import (
     error_unexpected_listener_middleware,
     error_listener_function_must_be_coro_func,
     error_client_invalid_type_async,
+    error_authorize_conflicts,
 )
 from slack_bolt.lazy_listener.asyncio_runner import AsyncioLazyListenerRunner
 from slack_bolt.listener.async_listener import AsyncListener, AsyncCustomListener
@@ -138,6 +139,9 @@ class AsyncApp:
 
         self._async_authorize: Optional[AsyncAuthorize] = None
         if authorize is not None:
+            if oauth_settings is not None or oauth_flow is not None:
+                raise BoltError(error_authorize_conflicts())
+
             self._async_authorize = AsyncCallableAuthorize(
                 logger=self._framework_logger, func=authorize
             )
@@ -371,13 +375,13 @@ class AsyncApp:
         self,
         callback_id: Union[str, Pattern, AsyncWorkflowStep],
         edit: Optional[
-            Union[Callable[..., Optional[BoltResponse]], AsyncListener]
+            Union[Callable[..., Optional[BoltResponse]], AsyncListener, List[Callable]]
         ] = None,
         save: Optional[
-            Union[Callable[..., Optional[BoltResponse]], AsyncListener]
+            Union[Callable[..., Optional[BoltResponse]], AsyncListener, List[Callable]]
         ] = None,
         execute: Optional[
-            Union[Callable[..., Optional[BoltResponse]], AsyncListener]
+            Union[Callable[..., Optional[BoltResponse]], AsyncListener, List[Callable]]
         ] = None,
     ):
         """Registers a new Workflow Step listener"""

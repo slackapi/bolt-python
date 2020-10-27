@@ -1,13 +1,14 @@
-from typing import Callable, Union, Optional
+from typing import Callable, Union, Optional, List
 
 from slack_bolt.context import BoltContext
 from slack_bolt.listener import Listener, CustomListener
+from slack_bolt.listener_matcher import ListenerMatcher
 from slack_bolt.listener_matcher.builtins import (
     workflow_step_edit,
     workflow_step_save,
     workflow_step_execute,
 )
-from slack_bolt.middleware import CustomMiddleware
+from slack_bolt.middleware import CustomMiddleware, Middleware
 from slack_bolt.response import BoltResponse
 from slack_bolt.workflows.step.utilities.complete import Complete
 from slack_bolt.workflows.step.utilities.configure import Configure
@@ -26,9 +27,9 @@ class WorkflowStep:
         self,
         *,
         callback_id: str,
-        edit: Union[Callable[..., Optional[BoltResponse]], Listener],
-        save: Union[Callable[..., Optional[BoltResponse]], Listener],
-        execute: Union[Callable[..., Optional[BoltResponse]], Listener],
+        edit: Union[Callable[..., Optional[BoltResponse]], Listener, List[Callable]],
+        save: Union[Callable[..., Optional[BoltResponse]], Listener, List[Callable]],
+        execute: Union[Callable[..., Optional[BoltResponse]], Listener, List[Callable]],
         app_name: Optional[str] = None,
     ):
         self.callback_id = callback_id
@@ -38,7 +39,15 @@ class WorkflowStep:
         self.execute = self._build_listener(callback_id, app_name, execute, "execute")
 
     @classmethod
-    def _build_listener(cls, callback_id, app_name, listener, name):
+    def _build_listener(
+        cls,
+        callback_id: str,
+        app_name: str,
+        listener: Union[
+            Callable[..., Optional[BoltResponse]], Listener, List[Callable]
+        ],
+        name: str,
+    ) -> Listener:
         if isinstance(listener, Listener):
             return listener
         elif isinstance(listener, Callable):
@@ -50,11 +59,22 @@ class WorkflowStep:
                 lazy_functions=[],
                 auto_acknowledgement=name == "execute",
             )
+        elif isinstance(listener, list) and len(listener) > 0:
+            ack = listener.pop(0)
+            lazy = listener
+            return CustomListener(
+                app_name=app_name,
+                matchers=cls._build_matchers(name, callback_id),
+                middleware=cls._build_middleware(name, callback_id),
+                ack_function=ack,
+                lazy_functions=lazy,
+                auto_acknowledgement=name == "execute",
+            )
         else:
             raise ValueError(f"Invalid `{name}` listener")
 
     @classmethod
-    def _build_matchers(cls, name, callback_id):
+    def _build_matchers(cls, name: str, callback_id: str) -> List[ListenerMatcher]:
         if name == "edit":
             return [workflow_step_edit(callback_id)]
         elif name == "save":
@@ -65,7 +85,7 @@ class WorkflowStep:
             raise ValueError(f"Invalid name {name}")
 
     @classmethod
-    def _build_middleware(cls, name, callback_id):
+    def _build_middleware(cls, name: str, callback_id: str) -> List[Middleware]:
         if name == "edit":
             return [_build_edit_listener_middleware(callback_id)]
         elif name == "save":
@@ -81,7 +101,7 @@ class WorkflowStep:
 #######################
 
 
-def _build_edit_listener_middleware(callback_id):
+def _build_edit_listener_middleware(callback_id: str) -> Middleware:
     def edit_listener_middleware(
         context: BoltContext,
         client: WebClient,
@@ -101,7 +121,7 @@ def _build_edit_listener_middleware(callback_id):
 #######################
 
 
-def _build_save_listener_middleware():
+def _build_save_listener_middleware() -> Middleware:
     def save_listener_middleware(
         context: BoltContext,
         client: WebClient,
@@ -119,7 +139,7 @@ def _build_save_listener_middleware():
 #######################
 
 
-def _build_execute_listener_middleware():
+def _build_execute_listener_middleware() -> Middleware:
     def execute_listener_middleware(
         context: BoltContext,
         client: WebClient,

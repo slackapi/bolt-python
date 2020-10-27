@@ -4,7 +4,7 @@ from time import time, sleep
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 
-from slack_bolt import App, BoltRequest
+from slack_bolt import App, BoltRequest, Say
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -334,4 +334,61 @@ class TestEvents:
 
         sleep(1)  # wait a bit after auto ack()
         # the listeners should not be executed
+        assert self.mock_received_requests["/chat.postMessage"] == 2
+
+    def test_uninstallation_and_revokes(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        app._client = WebClient(
+            token="uninstalled-revoked", base_url=self.mock_api_server_base_url
+        )
+
+        @app.event("app_uninstalled")
+        def handler1(say: Say):
+            say(channel="C111", text="What's up?")
+
+        @app.event("tokens_revoked")
+        def handler2(say: Say):
+            say(channel="C111", text="What's up?")
+
+        app_uninstalled_body = {
+            "token": "verification_token",
+            "team_id": "T111",
+            "enterprise_id": "E111",
+            "api_app_id": "A111",
+            "event": {"type": "app_uninstalled"},
+            "type": "event_callback",
+            "event_id": "Ev111",
+            "event_time": 1599616881,
+        }
+
+        timestamp, body = str(int(time())), json.dumps(app_uninstalled_body)
+        request: BoltRequest = BoltRequest(
+            body=body, headers=self.build_headers(timestamp, body)
+        )
+        response = app.dispatch(request)
+        assert response.status == 200
+
+        tokens_revoked_body = {
+            "token": "verification_token",
+            "team_id": "T111",
+            "enterprise_id": "E111",
+            "api_app_id": "A111",
+            "event": {
+                "type": "tokens_revoked",
+                "tokens": {"oauth": ["UXXXXXXXX"], "bot": ["UXXXXXXXX"]},
+            },
+            "type": "event_callback",
+            "event_id": "Ev111",
+            "event_time": 1599616881,
+        }
+
+        timestamp, body = str(int(time())), json.dumps(tokens_revoked_body)
+        request: BoltRequest = BoltRequest(
+            body=body, headers=self.build_headers(timestamp, body)
+        )
+        response = app.dispatch(request)
+        assert response.status == 200
+
+        assert self.mock_received_requests["/auth.test"] == 1
+        sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 2
