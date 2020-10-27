@@ -142,7 +142,7 @@ If you want to use another async Web framework (e.g., Sanic, FastAPI, Starlette)
 
 * [The Bolt app examples](https://github.com/slackapi/bolt-python/tree/main/examples)
 * [The built-in adapters](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter)
-Apps can be run the same way as the syncronous example above. If you'd prefer another async Web framework (e.g., Sanic, FastAPI, Starlette), take a look at [the built-in adapters](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter) and their corresponding [sample code](https://github.com/slackapi/bolt-python/tree/main/samples).
+Apps can be run the same way as the syncronous example above. If you'd prefer another async Web framework (e.g., Sanic, FastAPI, Starlette), take a look at [the built-in adapters](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter) and their corresponding [examples](https://github.com/slackapi/bolt-python/tree/main/examples).
 
 ## Getting Help
 
