@@ -34,6 +34,9 @@ class SlackRequestHandler:
 
         method = event.get("requestContext", {}).get("http", {}).get("method")
         if method is None:
+            method = event.get("requestContext", {}).get("httpMethod")
+
+        if method is None:
             return not_found()
         if method == "GET":
             if self.app.oauth_flow is not None:
