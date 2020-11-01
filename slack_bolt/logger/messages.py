@@ -64,6 +64,10 @@ def warning_token_skipped() -> str:
     )
 
 
+def warning_installation_store_conflicts() -> str:
+    return "As you gave both `installation_store` and `oauth_settings`/`auth_flow`, the top level one is unused."
+
+
 def warning_unhandled_request(req: Union[BoltRequest, "AsyncBoltRequest"]) -> str:  # type: ignore
     return f"Unhandled request ({req.body})"
 

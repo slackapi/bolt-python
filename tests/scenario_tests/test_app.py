@@ -121,3 +121,37 @@ class TestApp:
 
         with pytest.raises(BoltError):
             App(signing_secret="valid", authorize=authorize, oauth_flow=oauth_flow)
+
+    def test_installation_store_conflicts(self):
+        store1 = FileInstallationStore()
+        store2 = FileInstallationStore()
+        app = App(
+            signing_secret="valid",
+            oauth_settings=OAuthSettings(
+                client_id="111.222", client_secret="valid", installation_store=store1,
+            ),
+            installation_store=store2,
+        )
+        assert app.installation_store is store1
+
+        app = App(
+            signing_secret="valid",
+            oauth_flow=OAuthFlow(
+                settings=OAuthSettings(
+                    client_id="111.222",
+                    client_secret="valid",
+                    installation_store=store1,
+                )
+            ),
+            installation_store=store2,
+        )
+        assert app.installation_store is store1
+
+        app = App(
+            signing_secret="valid",
+            oauth_flow=OAuthFlow(
+                settings=OAuthSettings(client_id="111.222", client_secret="valid",)
+            ),
+            installation_store=store1,
+        )
+        assert app.installation_store is store1

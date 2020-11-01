@@ -55,6 +55,7 @@ from slack_bolt.middleware import (
 from slack_bolt.middleware.message_listener_matches import MessageListenerMatches
 from slack_bolt.middleware.url_verification import UrlVerification
 from slack_bolt.oauth import OAuthFlow
+from slack_bolt.oauth.internals import select_consistent_installation_store
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
@@ -157,17 +158,28 @@ class App:
 
         if oauth_flow:
             self._oauth_flow = oauth_flow
-            if self._installation_store is None:
-                self._installation_store = self._oauth_flow.settings.installation_store
+            installation_store = select_consistent_installation_store(
+                client_id=self._oauth_flow.client_id,
+                app_store=self._installation_store,
+                oauth_flow_store=self._oauth_flow.settings.installation_store,
+                logger=self._framework_logger,
+            )
+            self._installation_store = installation_store
+            self._oauth_flow.settings.installation_store = installation_store
+
             if self._oauth_flow._client is None:
                 self._oauth_flow._client = self._client
             if self._authorize is None:
                 self._authorize = self._oauth_flow.settings.authorize
         elif oauth_settings is not None:
-            if self._installation_store:
-                # Consistently use a single installation_store
-                oauth_settings.installation_store = self._installation_store
-
+            installation_store = select_consistent_installation_store(
+                client_id=oauth_settings.client_id,
+                app_store=self._installation_store,
+                oauth_flow_store=oauth_settings.installation_store,
+                logger=self._framework_logger,
+            )
+            self._installation_store = installation_store
+            oauth_settings.installation_store = installation_store
             self._oauth_flow = OAuthFlow(
                 client=self.client, logger=self.logger, settings=oauth_settings
             )
