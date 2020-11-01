@@ -7,6 +7,7 @@ from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
 from slack_bolt.middleware.message_listener_matches.async_message_listener_matches import (
     AsyncMessageListenerMatches,
 )
+from slack_bolt.oauth.async_internals import select_consistent_installation_store
 from slack_bolt.workflows.step.async_step import AsyncWorkflowStep
 from slack_bolt.workflows.step.async_step_middleware import AsyncWorkflowStepMiddleware
 from slack_sdk.oauth.installation_store.async_installation_store import (
@@ -167,18 +168,28 @@ class AsyncApp:
 
         if oauth_flow:
             self._async_oauth_flow = oauth_flow
-            if self._async_installation_store is None:
-                self._async_installation_store = (
-                    self._async_oauth_flow.settings.installation_store
-                )
+            installation_store = select_consistent_installation_store(
+                client_id=self._async_oauth_flow.client_id,
+                app_store=self._async_installation_store,
+                oauth_flow_store=self._async_oauth_flow.settings.installation_store,
+                logger=self._framework_logger,
+            )
+            self._async_installation_store = installation_store
+            self._async_oauth_flow.settings.installation_store = installation_store
+
             if self._async_oauth_flow._async_client is None:
                 self._async_oauth_flow._async_client = self._async_client
             if self._async_authorize is None:
                 self._async_authorize = self._async_oauth_flow.settings.authorize
         elif oauth_settings is not None:
-            if self._async_installation_store:
-                # Consistently use a single installation_store
-                oauth_settings.installation_store = self._async_installation_store
+            installation_store = select_consistent_installation_store(
+                client_id=oauth_settings.client_id,
+                app_store=self._async_installation_store,
+                oauth_flow_store=oauth_settings.installation_store,
+                logger=self._framework_logger,
+            )
+            self._async_installation_store = installation_store
+            oauth_settings.installation_store = installation_store
 
             self._async_oauth_flow = AsyncOAuthFlow(
                 client=self._async_client, logger=self.logger, settings=oauth_settings

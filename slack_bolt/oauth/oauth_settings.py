@@ -10,11 +10,11 @@ from slack_sdk.oauth import (
     AuthorizeUrlGenerator,
     RedirectUriPageRenderer,
 )
-from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 
 from slack_bolt.authorization.authorize import Authorize, InstallationStoreAuthorize
 from slack_bolt.error import BoltError
+from slack_bolt.oauth.internals import get_or_create_default_installation_store
 from slack_bolt.oauth.callback_options import CallbackOptions
 
 
@@ -116,8 +116,8 @@ class OAuthSettings:
             authorization_url or "https://slack.com/oauth/v2/authorize"
         )
         # Installation Management
-        self.installation_store = installation_store or FileInstallationStore(
-            client_id=client_id
+        self.installation_store = (
+            installation_store or get_or_create_default_installation_store(client_id)
         )
         self.authorize = InstallationStoreAuthorize(
             logger=logger, installation_store=self.installation_store,

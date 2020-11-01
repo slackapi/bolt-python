@@ -1,11 +1,15 @@
 from logging import Logger
-from typing import Optional, Union
+from typing import Optional
+from typing import Union
 
+from slack_sdk.oauth import InstallationStore
 from slack_sdk.oauth import OAuthStateUtils, RedirectUriPageRenderer
+from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.installation_store import Installation
 
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
+from ..logger.messages import warning_installation_store_conflicts
 
 
 class CallbackResponseBuilder:
@@ -83,3 +87,40 @@ body {{
 </body>
 </html>
 """
+
+
+# key: client_id, value: InstallationStore
+default_installation_stores = {}
+
+
+def get_or_create_default_installation_store(client_id: str) -> InstallationStore:
+    store = default_installation_stores.get(client_id)
+    if store is None:
+        store = FileInstallationStore(client_id=client_id)
+        default_installation_stores[client_id] = store
+    return store
+
+
+def select_consistent_installation_store(
+    client_id: str,
+    app_store: Optional[InstallationStore],
+    oauth_flow_store: Optional[InstallationStore],
+    logger: Logger,
+) -> Optional[InstallationStore]:
+    default = get_or_create_default_installation_store(client_id)
+    if app_store is not None:
+        if oauth_flow_store is not None:
+            if oauth_flow_store is default:
+                # only app_store is intentionally set in this case
+                return app_store
+
+            # if both are intentionally set, prioritize app_store
+            if oauth_flow_store is not app_store:
+                logger.warning(warning_installation_store_conflicts())
+            return oauth_flow_store
+        else:
+            # only app_store is available
+            return app_store
+    else:
+        # only oauth_flow_store is available
+        return oauth_flow_store
