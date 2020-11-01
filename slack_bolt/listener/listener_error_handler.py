@@ -6,7 +6,7 @@ from typing import Callable, Dict, Any, Optional
 from slack_bolt.request.request import BoltRequest
 from slack_bolt.response.response import BoltResponse
 
-from slack_bolt.util.payload_utils import (
+from slack_bolt.request.payload_utils import (
     to_options,
     to_shortcut,
     to_action,
