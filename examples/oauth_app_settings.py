@@ -18,7 +18,10 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 def success(args: SuccessArgs) -> BoltResponse:
-    return BoltResponse(status=200, body="Thanks!")
+    # Do anything here ...
+    # Call the default handler to return HTTP response
+    return args.default.success(args)
+    # return BoltResponse(status=200, body="Thanks!")
 
 
 def failure(args: FailureArgs) -> BoltResponse:
