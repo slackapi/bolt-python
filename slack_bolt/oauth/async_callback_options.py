@@ -17,16 +17,19 @@ class AsyncSuccessArgs:
         request: AsyncBoltRequest,
         installation: Installation,
         settings: "AsyncOAuthSettings",
+        default: "AsyncCallbackOptions",
     ):
         """The arguments for a success function.
 
         :param request: The request.
         :param installation: The installation data.
         :param settings: The settings for OAuth flow.
+        :param default: The default AsyncCallbackOptions.
         """
         self.request = request
         self.installation = installation
         self.settings = settings
+        self.default = default
 
 
 class AsyncFailureArgs:
@@ -38,6 +41,7 @@ class AsyncFailureArgs:
         error: Optional[Exception] = None,
         suggested_status_code: int,
         settings: "AsyncOAuthSettings",
+        default: "AsyncCallbackOptions",
     ):
         """The arguments for a failure function.
 
@@ -46,12 +50,14 @@ class AsyncFailureArgs:
         :param error: An exception if exists.
         :param suggested_status_code: The recommended HTTP status code for the failure.
         :param settings: The settings for OAuth flow.
+        :param default: The default AsyncCallbackOptions.
         """
         self.request = request
         self.reason = reason
         self.error = error
         self.suggested_status_code = suggested_status_code
         self.settings = settings
+        self.default = default
 
 
 class AsyncCallbackOptions:

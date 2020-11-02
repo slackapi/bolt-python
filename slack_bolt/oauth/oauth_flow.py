@@ -69,12 +69,13 @@ class OAuthFlow:
         self.install_path = self.settings.install_path
         self.redirect_uri_path = self.settings.redirect_uri_path
 
+        self.default_callback_options = DefaultCallbackOptions(
+            logger=logger,
+            state_utils=self.settings.state_utils,
+            redirect_uri_page_renderer=self.settings.redirect_uri_page_renderer,
+        )
         if settings.callback_options is None:
-            settings.callback_options = DefaultCallbackOptions(
-                logger=logger,
-                state_utils=self.settings.state_utils,
-                redirect_uri_page_renderer=self.settings.redirect_uri_page_renderer,
-            )
+            settings.callback_options = self.default_callback_options
         self.success_handler = settings.callback_options.success
         self.failure_handler = settings.callback_options.failure
 
@@ -186,6 +187,7 @@ class OAuthFlow:
                     reason=error,
                     suggested_status_code=200,
                     settings=self.settings,
+                    default=self.default_callback_options,
                 )
             )
 
@@ -198,6 +200,7 @@ class OAuthFlow:
                     reason="invalid_browser",
                     suggested_status_code=400,
                     settings=self.settings,
+                    default=self.default_callback_options,
                 )
             )
 
@@ -209,6 +212,7 @@ class OAuthFlow:
                     reason="invalid_state",
                     suggested_status_code=401,
                     settings=self.settings,
+                    default=self.default_callback_options,
                 )
             )
 
@@ -221,6 +225,7 @@ class OAuthFlow:
                     reason="missing_code",
                     suggested_status_code=401,
                     settings=self.settings,
+                    default=self.default_callback_options,
                 )
             )
 
@@ -233,6 +238,7 @@ class OAuthFlow:
                     reason="invalid_code",
                     suggested_status_code=401,
                     settings=self.settings,
+                    default=self.default_callback_options,
                 )
             )
 
@@ -247,13 +253,17 @@ class OAuthFlow:
                     error=err,
                     suggested_status_code=500,
                     settings=self.settings,
+                    default=self.default_callback_options,
                 )
             )
 
         # display a successful completion page to the end-user
         return self.success_handler(
             SuccessArgs(
-                request=request, installation=installation, settings=self.settings,
+                request=request,
+                installation=installation,
+                settings=self.settings,
+                default=self.default_callback_options,
             )
         )
 
