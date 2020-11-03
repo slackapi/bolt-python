@@ -283,7 +283,10 @@ class TestAWSLambda:
             "isBase64Encoded": False,
         }
         response = SlackRequestHandler(app).handle(event, self.context)
-        assert response["statusCode"] == 302
+        assert response["statusCode"] == 200
+        assert response["headers"]["content-type"] == "text/html; charset=utf-8"
+        assert response["headers"]["content-length"] == "565"
+        assert response.get("body") is not None
 
         event = {
             "body": "",
@@ -293,4 +296,7 @@ class TestAWSLambda:
             "isBase64Encoded": False,
         }
         response = SlackRequestHandler(app).handle(event, self.context)
-        assert response["statusCode"] == 302
+        assert response["statusCode"] == 200
+        assert response["headers"]["content-type"] == "text/html; charset=utf-8"
+        assert response["headers"]["content-length"] == "565"
+        assert response.get("body") is not None
