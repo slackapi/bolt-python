@@ -49,4 +49,4 @@ class TestCherryPy(helper.CPWebCase):
     def test_oauth(self):
         cherrypy.request.process_request_body = False
         self.getPage("/slack/install", method="GET")
-        self.assertStatus("302 Found")
+        self.assertStatus("200 OK")

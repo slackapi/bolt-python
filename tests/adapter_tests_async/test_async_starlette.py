@@ -202,8 +202,8 @@ class TestAsyncStarlette:
 
         client = TestClient(api)
         response = client.get("/slack/install", allow_redirects=False)
-        assert response.status_code == 302
-        assert re.match(
-            "https://slack.com/oauth/v2/authorize\\?state=[^&]+&client_id=111.111&scope=chat:write,commands&user_scope=",
-            response.headers["Location"],
-        )
+        assert response.status_code == 200
+        assert response.status_code == 200
+        assert response.headers.get("content-type") == "text/html; charset=utf-8"
+        assert response.headers.get("content-length") == "565"
+        assert "https://slack.com/oauth/v2/authorize?state=" in response.text

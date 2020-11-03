@@ -53,17 +53,10 @@ class TestOAuthFlow:
         )
         req = BoltRequest(body="")
         resp = oauth_flow.handle_installation(req)
-        assert resp.status == 302
-        url = resp.headers["location"][0]
-        assert (
-            re.compile(
-                "https://slack.com/oauth/v2/authorize\\?state=[-0-9a-z]+."
-                "&client_id=111\\.222"
-                "&scope=chat:write,commands"
-                "&user_scope="
-            ).match(url)
-            is not None
-        )
+        assert resp.status == 200
+        assert resp.headers.get("content-type") == ["text/html; charset=utf-8"]
+        assert resp.headers.get("content-length") == ["565"]
+        assert "https://slack.com/oauth/v2/authorize?state=" in resp.body
 
     def test_handle_callback(self):
         oauth_flow = OAuthFlow(

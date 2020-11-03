@@ -272,4 +272,7 @@ class TestAwsChalice:
         response: Dict[str, Any] = LocalGateway(chalice_app, Config()).handle_request(
             method="GET", path="/slack/install", body="", headers={}
         )
-        assert response["statusCode"] == 302
+        assert response["statusCode"] == 200
+        assert response["headers"]["content-type"] == "text/html; charset=utf-8"
+        assert response["headers"]["content-length"] == "565"
+        assert response.get("body") is not None
