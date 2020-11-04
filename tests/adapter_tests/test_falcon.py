@@ -1,5 +1,4 @@
 import json
-import re
 from time import time
 from urllib.parse import quote
 

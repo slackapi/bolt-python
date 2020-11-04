@@ -1,5 +1,3 @@
-import re
-
 from slack_bolt.adapter.bottle import SlackRequestHandler
 from slack_bolt.app import App
 from slack_bolt.oauth.oauth_settings import OAuthSettings

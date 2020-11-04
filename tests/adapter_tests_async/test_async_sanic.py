@@ -1,6 +1,5 @@
 import asyncio
 import json
-import re
 from time import time
 from urllib.parse import quote
 
@@ -199,7 +198,6 @@ class TestSanic:
         _, response = await api.asgi_client.get(
             url="/slack/install", allow_redirects=False
         )
-        assert response.status_code == 200
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
         assert response.headers.get("content-length") == "565"

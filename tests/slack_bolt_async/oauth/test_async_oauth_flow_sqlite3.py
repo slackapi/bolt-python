@@ -1,5 +1,4 @@
 import asyncio
-import re
 
 import pytest
 from slack_sdk.web.async_client import AsyncWebClient
