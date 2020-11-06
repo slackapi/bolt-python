@@ -22,5 +22,6 @@ else
     pip install -e ".[adapter]" && \
     black slack_bolt/ tests/ && \
     pytest && \
+    pip install -U pytype && \
     pytype slack_bolt/
 fi
