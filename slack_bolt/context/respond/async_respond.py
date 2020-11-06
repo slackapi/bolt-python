@@ -1,4 +1,4 @@
-from typing import Optional, List, Union
+from typing import Optional, Union, Sequence
 
 from slack_sdk.models.attachments import Attachment
 from slack_sdk.models.blocks import Block
@@ -16,8 +16,8 @@ class AsyncRespond:
     async def __call__(
         self,
         text: Union[str, dict] = "",
-        blocks: Optional[List[Union[dict, Block]]] = None,
-        attachments: Optional[List[Union[dict, Attachment]]] = None,
+        blocks: Optional[Sequence[Union[dict, Block]]] = None,
+        attachments: Optional[Sequence[Union[dict, Attachment]]] = None,
         response_type: Optional[str] = None,
         replace_original: Optional[bool] = None,
         delete_original: Optional[bool] = None,

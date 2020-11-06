@@ -1,4 +1,4 @@
-from typing import Optional, List, Union, Any, Dict
+from typing import Optional, Union, Any, Dict, Sequence
 
 from slack_sdk.models.attachments import Attachment
 from slack_sdk.models.blocks import Block, Option, OptionGroup
@@ -12,15 +12,15 @@ from slack_bolt.util.utils import convert_to_dict_list, convert_to_dict
 def _set_response(
     self: Any,
     text_or_whole_response: Union[str, dict] = "",
-    blocks: Optional[List[Union[dict, Block]]] = None,
-    attachments: Optional[List[Union[dict, Attachment]]] = None,
+    blocks: Optional[Sequence[Union[dict, Block]]] = None,
+    attachments: Optional[Sequence[Union[dict, Attachment]]] = None,
     response_type: Optional[str] = None,  # in_channel / ephemeral
     # block_suggestion / dialog_suggestion
-    options: Optional[List[Union[dict, Option]]] = None,
-    option_groups: Optional[List[Union[dict, OptionGroup]]] = None,
+    options: Optional[Sequence[Union[dict, Option]]] = None,
+    option_groups: Optional[Sequence[Union[dict, OptionGroup]]] = None,
     # view_submission
     response_action: Optional[str] = None,
-    errors: Optional[Union[Dict[str, str], List[Dict[str, str]]]] = None,
+    errors: Optional[Union[Dict[str, str], Sequence[Dict[str, str]]]] = None,
     view: Optional[Union[dict, View]] = None,
 ) -> BoltResponse:
     if isinstance(text_or_whole_response, str):

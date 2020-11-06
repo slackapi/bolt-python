@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import Optional, Union, Sequence
 
 from slack_sdk.web import WebClient
 from slack_sdk.models.blocks import Block
@@ -11,7 +11,7 @@ class Configure:
         self.body = body
 
     def __call__(
-        self, *, blocks: Optional[List[Union[dict, Block]]] = None, **kwargs
+        self, *, blocks: Optional[Sequence[Union[dict, Block]]] = None, **kwargs
     ) -> None:
         self.client.views_open(
             trigger_id=self.body["trigger_id"],

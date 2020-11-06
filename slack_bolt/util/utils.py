@@ -1,6 +1,6 @@
 import copy
 import sys
-from typing import Optional, Union, Dict, List, Any
+from typing import Optional, Union, Dict, Any, Sequence
 
 from slack_sdk import WebClient
 from slack_sdk.models import JsonObject
@@ -13,7 +13,7 @@ def create_web_client(token: Optional[str] = None) -> WebClient:
     return WebClient(token=token, user_agent_prefix=f"Bolt/{bolt_version}",)
 
 
-def convert_to_dict_list(objects: List[Union[Dict, JsonObject]]) -> List[Dict]:
+def convert_to_dict_list(objects: Sequence[Union[Dict, JsonObject]]) -> Sequence[Dict]:
     return [convert_to_dict(elm) for elm in objects]
 
 

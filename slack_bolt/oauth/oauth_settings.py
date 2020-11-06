@@ -1,7 +1,7 @@
 import logging
 import os
 from logging import Logger
-from typing import List, Optional
+from typing import Optional, Sequence
 
 from slack_sdk.oauth import (
     OAuthStateStore,
@@ -22,8 +22,8 @@ class OAuthSettings:
     # OAuth flow parameters/credentials
     client_id: str
     client_secret: str
-    scopes: Optional[List[str]]
-    user_scopes: Optional[List[str]]
+    scopes: Optional[Sequence[str]]
+    user_scopes: Optional[Sequence[str]]
     redirect_uri: Optional[str]
     # Handler configuration
     install_path: str
@@ -52,8 +52,8 @@ class OAuthSettings:
         # OAuth flow parameters/credentials
         client_id: Optional[str] = None,  # required
         client_secret: Optional[str] = None,  # required
-        scopes: Optional[List[str]] = None,
-        user_scopes: Optional[List[str]] = None,
+        scopes: Optional[Sequence[str]] = None,
+        user_scopes: Optional[Sequence[str]] = None,
         redirect_uri: Optional[str] = None,
         # Handler configuration
         install_path: str = "/slack/install",

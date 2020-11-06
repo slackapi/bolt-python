@@ -1,7 +1,7 @@
 import logging
 import os
 from logging import Logger
-from typing import Optional, List, Dict, Callable, Awaitable
+from typing import Optional, Dict, Callable, Awaitable, Sequence
 
 from slack_bolt.error import BoltError
 from slack_bolt.oauth.async_callback_options import (
@@ -92,8 +92,8 @@ class AsyncOAuthFlow:
         authorization_url: Optional[str] = None,
         client_id: Optional[str] = None,  # required
         client_secret: Optional[str] = None,  # required
-        scopes: Optional[List[str]] = None,
-        user_scopes: Optional[List[str]] = None,
+        scopes: Optional[Sequence[str]] = None,
+        user_scopes: Optional[Sequence[str]] = None,
         redirect_uri: Optional[str] = None,
         # Handler configuration
         install_path: Optional[str] = None,

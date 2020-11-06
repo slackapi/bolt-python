@@ -1,4 +1,4 @@
-from typing import List, Optional, Union, Dict
+from typing import Optional, Union, Dict, Sequence
 
 from slack_sdk.models.attachments import Attachment
 from slack_sdk.models.blocks import Block, Option, OptionGroup
@@ -17,12 +17,12 @@ class Ack:
     def __call__(
         self,
         text: Union[str, dict] = "",  # text: str or whole_response: dict
-        blocks: Optional[List[Union[dict, Block]]] = None,
-        attachments: Optional[List[Union[dict, Attachment]]] = None,
+        blocks: Optional[Sequence[Union[dict, Block]]] = None,
+        attachments: Optional[Sequence[Union[dict, Attachment]]] = None,
         response_type: Optional[str] = None,  # in_channel / ephemeral
         # block_suggestion / dialog_suggestion
-        options: Optional[List[Union[dict, Option]]] = None,
-        option_groups: Optional[List[Union[dict, OptionGroup]]] = None,
+        options: Optional[Sequence[Union[dict, Option]]] = None,
+        option_groups: Optional[Sequence[Union[dict, OptionGroup]]] = None,
         # view_submission
         response_action: Optional[str] = None,  # errors / update / push / clear
         errors: Optional[Dict[str, str]] = None,

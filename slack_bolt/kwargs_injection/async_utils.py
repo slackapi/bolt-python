@@ -1,6 +1,6 @@
 # pytype: skip-file
 import logging
-from typing import Callable, Dict, Optional, List, Any
+from typing import Callable, Dict, Optional, Any, Sequence
 
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
@@ -20,7 +20,7 @@ from slack_bolt.request.payload_utils import (
 def build_async_required_kwargs(
     *,
     logger: logging.Logger,
-    required_arg_names: List[str],
+    required_arg_names: Sequence[str],
     request: AsyncBoltRequest,
     response: Optional[BoltResponse],
     next_func: Callable[[], None] = None,

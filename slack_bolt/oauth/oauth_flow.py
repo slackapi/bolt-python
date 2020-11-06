@@ -1,7 +1,7 @@
 import logging
 import os
 from logging import Logger
-from typing import Optional, List, Dict, Callable
+from typing import Optional, Dict, Callable, Sequence
 
 from slack_bolt.error import BoltError
 from slack_bolt.oauth.callback_options import (
@@ -91,8 +91,8 @@ class OAuthFlow:
         # OAuth flow parameters/credentials
         client_id: Optional[str] = None,  # required
         client_secret: Optional[str] = None,  # required
-        scopes: Optional[List[str]] = None,
-        user_scopes: Optional[List[str]] = None,
+        scopes: Optional[Sequence[str]] = None,
+        user_scopes: Optional[Sequence[str]] = None,
         redirect_uri: Optional[str] = None,
         # Handler configuration
         install_path: Optional[str] = None,

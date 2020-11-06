@@ -1,6 +1,6 @@
 import inspect
 from logging import Logger
-from typing import Callable, List, Optional
+from typing import Callable, Optional, Sequence
 
 from slack_bolt.kwargs_injection import build_required_kwargs
 from slack_bolt.listener_matcher import ListenerMatcher
@@ -14,11 +14,11 @@ from ..middleware import Middleware
 class CustomListener(Listener):
     app_name: str
     ack_function: Callable[..., Optional[BoltResponse]]
-    lazy_functions: List[Callable[..., None]]
-    matchers: List[ListenerMatcher]
-    middleware: List[Middleware]  # type: ignore
+    lazy_functions: Sequence[Callable[..., None]]
+    matchers: Sequence[ListenerMatcher]
+    middleware: Sequence[Middleware]  # type: ignore
     auto_acknowledgement: bool
-    arg_names: List[str]
+    arg_names: Sequence[str]
     logger: Logger
 
     def __init__(
@@ -26,9 +26,9 @@ class CustomListener(Listener):
         *,
         app_name: str,
         ack_function: Callable[..., Optional[BoltResponse]],
-        lazy_functions: List[Callable[..., None]],
-        matchers: List[ListenerMatcher],
-        middleware: List[Middleware],  # type: ignore
+        lazy_functions: Sequence[Callable[..., None]],
+        matchers: Sequence[ListenerMatcher],
+        middleware: Sequence[Middleware],  # type: ignore
         auto_acknowledgement: bool = False,
     ):
         self.app_name = app_name

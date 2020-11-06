@@ -4,7 +4,7 @@ import logging
 import os
 from concurrent.futures.thread import ThreadPoolExecutor
 from http.server import SimpleHTTPRequestHandler, HTTPServer
-from typing import List, Union, Pattern, Callable, Dict, Optional
+from typing import List, Union, Pattern, Callable, Dict, Optional, Sequence
 
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import InstallationStore
@@ -374,13 +374,13 @@ class App:
         self,
         callback_id: Union[str, Pattern, WorkflowStep],
         edit: Optional[
-            Union[Callable[..., Optional[BoltResponse]], Listener, List[Callable]]
+            Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]
         ] = None,
         save: Optional[
-            Union[Callable[..., Optional[BoltResponse]], Listener, List[Callable]]
+            Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]
         ] = None,
         execute: Optional[
-            Union[Callable[..., Optional[BoltResponse]], Listener, List[Callable]]
+            Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]
         ] = None,
     ):
         """Registers a new Workflow Step listener"""
@@ -417,8 +417,8 @@ class App:
     def event(
         self,
         event: Union[str, Pattern, Dict[str, str]],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new event listener.
 
@@ -440,14 +440,14 @@ class App:
     def message(
         self,
         keyword: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new message event listener.
         Check the #event method's docstring for details.
         """
-        matchers = matchers if matchers else []
-        middleware = middleware if middleware else []
+        matchers = list(matchers) if matchers else []
+        middleware = list(middleware) if middleware else []
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -467,8 +467,8 @@ class App:
     def command(
         self,
         command: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new slash command listener.
 
@@ -493,8 +493,8 @@ class App:
     def shortcut(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new shortcut listener.
 
@@ -516,8 +516,8 @@ class App:
     def global_shortcut(
         self,
         callback_id: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new global shortcut listener."""
 
@@ -533,8 +533,8 @@ class App:
     def message_shortcut(
         self,
         callback_id: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new message shortcut listener."""
 
@@ -553,8 +553,8 @@ class App:
     def action(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new action listener.
 
@@ -576,8 +576,8 @@ class App:
     def block_action(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new block_actions listener."""
 
@@ -593,8 +593,8 @@ class App:
     def attachment_action(
         self,
         callback_id: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new interactive_message listener."""
 
@@ -610,8 +610,8 @@ class App:
     def dialog_submission(
         self,
         callback_id: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new dialog_submission listener."""
 
@@ -627,8 +627,8 @@ class App:
     def dialog_cancellation(
         self,
         callback_id: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new dialog_cancellation listener."""
 
@@ -647,8 +647,8 @@ class App:
     def view(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new view submission/closed event listener.
 
@@ -670,8 +670,8 @@ class App:
     def view_submission(
         self,
         constraints: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new view_submission listener."""
 
@@ -687,8 +687,8 @@ class App:
     def view_closed(
         self,
         constraints: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new view_closed listener."""
 
@@ -707,8 +707,8 @@ class App:
     def options(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new options listener.
 
@@ -730,8 +730,8 @@ class App:
     def block_suggestion(
         self,
         action_id: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new block_suggestion listener."""
 
@@ -747,8 +747,8 @@ class App:
     def dialog_suggestion(
         self,
         callback_id: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., bool]]] = None,
-        middleware: Optional[List[Union[Callable, Middleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         """Registers a new dialog_submission listener."""
 
@@ -771,7 +771,7 @@ class App:
     @staticmethod
     def _to_listener_functions(
         kwargs: dict,
-    ) -> Optional[List[Callable[..., Optional[BoltResponse]]]]:
+    ) -> Optional[Sequence[Callable[..., Optional[BoltResponse]]]]:
         if kwargs:
             functions = [kwargs["ack"]]
             for sub in kwargs["lazy"]:
@@ -781,10 +781,10 @@ class App:
 
     def _register_listener(
         self,
-        functions: List[Callable[..., Optional[BoltResponse]]],
+        functions: Sequence[Callable[..., Optional[BoltResponse]]],
         primary_matcher: ListenerMatcher,
-        matchers: Optional[List[Callable[..., bool]]],
-        middleware: Optional[List[Union[Callable, Middleware]]],
+        matchers: Optional[Sequence[Callable[..., bool]]],
+        middleware: Optional[Sequence[Union[Callable, Middleware]]],
         auto_acknowledgement: bool = False,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         value_to_return = None
@@ -893,7 +893,7 @@ class SlackAppDevelopmentServer:
             def _send_response(
                 self,
                 status: int,
-                headers: Dict[str, List[str]],
+                headers: Dict[str, Sequence[str]],
                 body: Union[str, dict] = "",
             ):
                 self.send_response(status)

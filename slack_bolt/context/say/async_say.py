@@ -1,4 +1,4 @@
-from typing import Optional, List, Union, Dict
+from typing import Optional, Union, Dict, Sequence
 
 from slack_bolt.context.say.internals import _can_say
 from slack_sdk.models.attachments import Attachment
@@ -20,8 +20,8 @@ class AsyncSay:
     async def __call__(
         self,
         text: Union[str, dict] = "",
-        blocks: Optional[List[Union[Dict, Block]]] = None,
-        attachments: Optional[List[Union[Dict, Attachment]]] = None,
+        blocks: Optional[Sequence[Union[Dict, Block]]] = None,
+        attachments: Optional[Sequence[Union[Dict, Attachment]]] = None,
         channel: Optional[str] = None,
         thread_ts: Optional[str] = None,
         **kwargs,
