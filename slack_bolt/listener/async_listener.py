@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABCMeta
-from typing import List, Callable, Awaitable, Tuple, Optional
+from typing import Callable, Awaitable, Tuple, Optional, Sequence
 
 from slack_bolt.listener_matcher.async_listener_matcher import AsyncListenerMatcher
 from slack_bolt.middleware.async_middleware import AsyncMiddleware
@@ -9,10 +9,10 @@ from ..kwargs_injection.async_utils import build_async_required_kwargs
 
 
 class AsyncListener(metaclass=ABCMeta):
-    matchers: List[AsyncListenerMatcher]
-    middleware: List[AsyncMiddleware]
+    matchers: Sequence[AsyncListenerMatcher]
+    middleware: Sequence[AsyncMiddleware]
     ack_function: Callable[..., Awaitable[BoltResponse]]
-    lazy_functions: List[Callable[..., Awaitable[None]]]
+    lazy_functions: Sequence[Callable[..., Awaitable[None]]]
     auto_acknowledgement: bool
 
     async def async_matches(
@@ -61,7 +61,7 @@ class AsyncListener(metaclass=ABCMeta):
 
 import inspect
 from logging import Logger
-from typing import Callable, List, Awaitable
+from typing import Callable, Awaitable
 
 from slack_bolt.listener_matcher.async_listener_matcher import AsyncListenerMatcher
 from slack_bolt.logger import get_bolt_app_logger
@@ -73,11 +73,11 @@ from slack_bolt.response import BoltResponse
 class AsyncCustomListener(AsyncListener):
     app_name: str
     ack_function: Callable[..., Awaitable[Optional[BoltResponse]]]
-    lazy_functions: List[Callable[..., Awaitable[None]]]
-    matchers: List[AsyncListenerMatcher]
-    middleware: List[AsyncMiddleware]
+    lazy_functions: Sequence[Callable[..., Awaitable[None]]]
+    matchers: Sequence[AsyncListenerMatcher]
+    middleware: Sequence[AsyncMiddleware]
     auto_acknowledgement: bool
-    arg_names: List[str]
+    arg_names: Sequence[str]
     logger: Logger
 
     def __init__(
@@ -85,9 +85,9 @@ class AsyncCustomListener(AsyncListener):
         *,
         app_name: str,
         ack_function: Callable[..., Awaitable[Optional[BoltResponse]]],
-        lazy_functions: List[Callable[..., Awaitable[None]]],
-        matchers: List[AsyncListenerMatcher],
-        middleware: List[AsyncMiddleware],
+        lazy_functions: Sequence[Callable[..., Awaitable[None]]],
+        matchers: Sequence[AsyncListenerMatcher],
+        middleware: Sequence[AsyncMiddleware],
         auto_acknowledgement: bool = False,
     ):
         self.app_name = app_name

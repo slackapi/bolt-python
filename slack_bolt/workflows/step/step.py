@@ -1,4 +1,4 @@
-from typing import Callable, Union, Optional, List
+from typing import Callable, Union, Optional, Sequence
 
 from slack_bolt.context import BoltContext
 from slack_bolt.listener import Listener, CustomListener
@@ -27,9 +27,15 @@ class WorkflowStep:
         self,
         *,
         callback_id: str,
-        edit: Union[Callable[..., Optional[BoltResponse]], Listener, List[Callable]],
-        save: Union[Callable[..., Optional[BoltResponse]], Listener, List[Callable]],
-        execute: Union[Callable[..., Optional[BoltResponse]], Listener, List[Callable]],
+        edit: Union[
+            Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]
+        ],
+        save: Union[
+            Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]
+        ],
+        execute: Union[
+            Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]
+        ],
         app_name: Optional[str] = None,
     ):
         self.callback_id = callback_id
@@ -44,7 +50,7 @@ class WorkflowStep:
         callback_id: str,
         app_name: str,
         listener: Union[
-            Callable[..., Optional[BoltResponse]], Listener, List[Callable]
+            Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]
         ],
         name: str,
     ) -> Listener:
@@ -74,7 +80,7 @@ class WorkflowStep:
             raise ValueError(f"Invalid `{name}` listener")
 
     @classmethod
-    def _build_matchers(cls, name: str, callback_id: str) -> List[ListenerMatcher]:
+    def _build_matchers(cls, name: str, callback_id: str) -> Sequence[ListenerMatcher]:
         if name == "edit":
             return [workflow_step_edit(callback_id)]
         elif name == "save":
@@ -85,7 +91,7 @@ class WorkflowStep:
             raise ValueError(f"Invalid name {name}")
 
     @classmethod
-    def _build_middleware(cls, name: str, callback_id: str) -> List[Middleware]:
+    def _build_middleware(cls, name: str, callback_id: str) -> Sequence[Middleware]:
         if name == "edit":
             return [_build_edit_listener_middleware(callback_id)]
         elif name == "save":

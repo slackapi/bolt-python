@@ -1,4 +1,4 @@
-from typing import Dict, Optional, List, Union, Any
+from typing import Dict, Optional, Union, Any, Sequence
 
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.request.async_internals import build_async_context
@@ -13,8 +13,8 @@ from slack_bolt.request.internals import (
 class AsyncBoltRequest:
     raw_body: str
     body: Dict[str, Any]
-    query: Dict[str, List[str]]
-    headers: Dict[str, List[str]]
+    query: Dict[str, Sequence[str]]
+    headers: Dict[str, Sequence[str]]
     content_type: Optional[str]
     context: AsyncBoltContext
     lazy_only: bool
@@ -24,9 +24,8 @@ class AsyncBoltRequest:
         self,
         *,
         body: str,
-        query: Optional[Union[str, Dict[str, str], Dict[str, List[str]]]] = None,
-        # many framework use Dict[str, str] but the reality is Dict[str, List[str]]
-        headers: Optional[Dict[str, Union[str, List[str]]]] = None,
+        query: Optional[Union[str, Dict[str, str], Dict[str, Sequence[str]]]] = None,
+        headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None,
         context: Optional[Dict[str, str]] = None,
     ):
         """Request to a Bolt app.
