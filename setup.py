@@ -28,12 +28,12 @@ setuptools.setup(
     description="The Bolt Framework for Python",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/slackapi/bolt-python",
+    url="https://github.com/slackapi/boseratlt-python",
     packages=setuptools.find_packages(
         exclude=["examples", "integration_tests", "tests", "tests.*",]
     ),
     include_package_data=True,  # MANIFEST.in
-    install_requires=["slack_sdk>=3.0.0rc2",],
+    install_requires=["slack_sdk>=3.0.0rc3",],
     setup_requires=["pytest-runner==5.2"],
     tests_require=test_dependencies,
     test_suite="tests",
