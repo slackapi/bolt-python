@@ -28,7 +28,7 @@ setuptools.setup(
     description="The Bolt Framework for Python",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/slackapi/boseratlt-python",
+    url="https://github.com/slackapi/bolt-python",
     packages=setuptools.find_packages(
         exclude=["examples", "integration_tests", "tests", "tests.*",]
     ),
