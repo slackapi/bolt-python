@@ -185,4 +185,4 @@ class TestFlask:
 
         with flask_app.test_client() as client:
             rv = client.get("/slack/install")
-            assert rv.status_code == 302
+            assert rv.status_code == 200

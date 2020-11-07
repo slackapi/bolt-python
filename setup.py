@@ -17,7 +17,6 @@ test_dependencies = [
     "pytest-asyncio<1",  # for async
     "aiohttp>=3,<4",  # for async
     "black==19.10b0",
-    "pytype",
 ]
 
 setuptools.setup(
@@ -34,7 +33,7 @@ setuptools.setup(
         exclude=["examples", "integration_tests", "tests", "tests.*",]
     ),
     include_package_data=True,  # MANIFEST.in
-    install_requires=["slack_sdk>=3.0.0rc1",],
+    install_requires=["slack_sdk>=3.0.0rc2",],
     setup_requires=["pytest-runner==5.2"],
     tests_require=test_dependencies,
     test_suite="tests",
@@ -75,6 +74,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",

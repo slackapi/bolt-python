@@ -37,6 +37,6 @@ class TestTornado(AsyncHTTPTestCase):
         )
         try:
             response: HTTPResponse = await self.http_client.fetch(request)
-            assert response.code == 302
+            assert response.code == 200
         except tornado.httpclient.HTTPClientError as e:
-            assert e.code == 302
+            assert e.code == 200

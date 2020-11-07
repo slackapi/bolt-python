@@ -1,7 +1,7 @@
 import logging
 import os
 from logging import Logger
-from typing import Optional, List, Dict, Callable, Awaitable
+from typing import Optional, Dict, Callable, Awaitable, Sequence
 
 from slack_bolt.error import BoltError
 from slack_bolt.oauth.async_callback_options import (
@@ -11,6 +11,7 @@ from slack_bolt.oauth.async_callback_options import (
     AsyncFailureArgs,
 )
 from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
+from slack_bolt.oauth.internals import _build_default_install_page_html
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
@@ -69,12 +70,13 @@ class AsyncOAuthFlow:
         self.install_path = self.settings.install_path
         self.redirect_uri_path = self.settings.redirect_uri_path
 
+        self.default_callback_options = DefaultAsyncCallbackOptions(
+            logger=logger,
+            state_utils=self.settings.state_utils,
+            redirect_uri_page_renderer=self.settings.redirect_uri_page_renderer,
+        )
         if settings.callback_options is None:
-            settings.callback_options = DefaultAsyncCallbackOptions(
-                logger=logger,
-                state_utils=self.settings.state_utils,
-                redirect_uri_page_renderer=self.settings.redirect_uri_page_renderer,
-            )
+            settings.callback_options = self.default_callback_options
         self.success_handler = settings.callback_options.success
         self.failure_handler = settings.callback_options.failure
 
@@ -90,8 +92,8 @@ class AsyncOAuthFlow:
         authorization_url: Optional[str] = None,
         client_id: Optional[str] = None,  # required
         client_secret: Optional[str] = None,  # required
-        scopes: Optional[List[str]] = None,
-        user_scopes: Optional[List[str]] = None,
+        scopes: Optional[Sequence[str]] = None,
+        user_scopes: Optional[Sequence[str]] = None,
         redirect_uri: Optional[str] = None,
         # Handler configuration
         install_path: Optional[str] = None,
@@ -150,7 +152,20 @@ class AsyncOAuthFlow:
 
     async def handle_installation(self, request: AsyncBoltRequest) -> BoltResponse:
         state = await self.issue_new_state(request)
-        return await self.build_authorize_url_redirection(request, state)
+        url = await self.build_authorize_url(state, request)
+        html = await self.build_install_page_html(url, request)
+        set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(
+            state
+        )
+        return BoltResponse(
+            status=200,
+            body=html,
+            headers={
+                "Content-Type": "text/html; charset=utf-8",
+                "Content-Length": len(bytes(html, "utf-8")),
+                "Set-Cookie": [set_cookie_value],
+            },
+        )
 
     # ----------------------
     # Internal methods for Installation
@@ -158,18 +173,11 @@ class AsyncOAuthFlow:
     async def issue_new_state(self, request: AsyncBoltRequest) -> str:
         return await self.settings.state_store.async_issue()
 
-    async def build_authorize_url_redirection(
-        self, request: AsyncBoltRequest, state: str
-    ) -> BoltResponse:
-        return BoltResponse(
-            status=302,
-            headers={
-                "Location": [self.settings.authorize_url_generator.generate(state)],
-                "Set-Cookie": [
-                    self.settings.state_utils.build_set_cookie_for_new_state(state)
-                ],
-            },
-        )
+    async def build_authorize_url(self, state: str, request: AsyncBoltRequest) -> str:
+        return self.settings.authorize_url_generator.generate(state)
+
+    async def build_install_page_html(self, url: str, request: AsyncBoltRequest) -> str:
+        return _build_default_install_page_html(url)
 
     # -----------------------------
     # Callback
@@ -186,6 +194,7 @@ class AsyncOAuthFlow:
                     reason=error,  # type: ignore
                     suggested_status_code=200,
                     settings=self.settings,
+                    default=self.default_callback_options,
                 )
             )
 
@@ -198,6 +207,7 @@ class AsyncOAuthFlow:
                     reason="invalid_browser",
                     suggested_status_code=400,
                     settings=self.settings,
+                    default=self.default_callback_options,
                 )
             )
 
@@ -209,6 +219,7 @@ class AsyncOAuthFlow:
                     reason="invalid_state",
                     suggested_status_code=401,
                     settings=self.settings,
+                    default=self.default_callback_options,
                 )
             )
 
@@ -221,6 +232,7 @@ class AsyncOAuthFlow:
                     reason="missing_code",
                     suggested_status_code=401,
                     settings=self.settings,
+                    default=self.default_callback_options,
                 )
             )
 
@@ -233,6 +245,7 @@ class AsyncOAuthFlow:
                     reason="invalid_code",
                     suggested_status_code=401,
                     settings=self.settings,
+                    default=self.default_callback_options,
                 )
             )
 
@@ -247,13 +260,17 @@ class AsyncOAuthFlow:
                     error=err,
                     suggested_status_code=500,
                     settings=self.settings,
+                    default=self.default_callback_options,
                 )
             )
 
         # display a successful completion page to the end-user
         return await self.success_handler(
             AsyncSuccessArgs(
-                request=request, installation=installation, settings=self.settings,
+                request=request,
+                installation=installation,
+                settings=self.settings,
+                default=self.default_callback_options,
             )
         )
 

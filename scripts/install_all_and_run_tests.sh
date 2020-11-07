@@ -6,6 +6,8 @@
 script_dir=`dirname $0`
 cd ${script_dir}/..
 rm -rf ./slack_bolt.egg-info
+# The package causes a conflict with moto
+pip uninstall python-lambda
 
 test_target="$1"
 
@@ -20,5 +22,6 @@ else
     pip install -e ".[adapter]" && \
     black slack_bolt/ tests/ && \
     pytest && \
+    pip install -U pytype && \
     pytype slack_bolt/
 fi

@@ -17,16 +17,19 @@ class SuccessArgs:
         request: BoltRequest,
         installation: Installation,
         settings: "OAuthSettings",
+        default: "CallbackOptions",
     ):
         """The arguments for a success function.
 
         :param request: The request.
         :param installation: The installation data.
         :param settings: The settings for OAuth flow.
+        :param default: The default CallbackOptions.
         """
         self.request = request
         self.installation = installation
         self.settings = settings
+        self.default = default
 
 
 class FailureArgs:
@@ -38,6 +41,7 @@ class FailureArgs:
         error: Optional[Exception] = None,
         suggested_status_code: int,
         settings: "OAuthSettings",
+        default: "CallbackOptions",
     ):
         """The arguments for a failure function.
 
@@ -46,12 +50,14 @@ class FailureArgs:
         :param error: An exception if exists.
         :param suggested_status_code: The recommended HTTP status code for the failure.
         :param settings: The settings for OAuth flow.
+        :param default: The default CallbackOptions.
         """
         self.request = request
         self.reason = reason
         self.error = error
         self.suggested_status_code = suggested_status_code
         self.settings = settings
+        self.default = default
 
 
 class CallbackOptions:

@@ -89,17 +89,18 @@ def handle_event(event):
 
 ## Making things happen
 
-Most of the app's functionality will be inside listener functions (the `fn` parameters above). These functions are called with a set of arguments.
+Most of the app's functionality will be inside listener functions (the `fn` parameters above). These functions are called with a set of arguments, each of which can be used in any order. If you'd like to access arguments off of a single object, you can use `args`, an [`slack_bolt.kwargs_injection.Args`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/kwargs_injection/args.py) instance that contains all available arguments for that event.
 
 | Argument  | Description  |
 | :---: | :--- |
-| `payload` | Contents of the incoming event. The payload structure depends on the listener. For example, for an Events API event, `payload` will be the [event type structure](https://api.slack.com/events-api#event_type_structure). For a block action, it will be the action from within the `actions` list. The `payload` dictionary is also accessible via the alias corresponding to the listener (`message`, `event`, `action`, `shortcut`, `view`, `command`, or `options`). For example, if you were building a `message()` listener, you could use the `payload` and `message` arguments interchangably. **An easy way to understand what's in a payload is to log it**. |
-| `say` | Utility function to send a message to the channel associated with the incoming event. This argument is only available when the listener is triggered for events that contain a `channel_id` (the most common being `message` events). `say` accepts simple strings (for plain-text messages) and dictionaries (for messages containing blocks).
-| `ack` | Function that **must** be called to acknowledge that your app received the incoming event. `ack` exists for all actions, shortcuts, view submissions, slash command and options requests. `ack` returns a promise that resolves when complete. Read more in [Acknowledging events](https://slack.dev/bolt-python/concepts#acknowledge).
-| `client` | Web API client that uses the token associated with the event. For single-workspace installations, the token is provided to the constructor. For multi-workspace installations, the token is returned by using [the OAuth library](https://slack.dev/bolt-python/concepts#authenticating-oauth), or manually using the `authorize` function.
-| `respond` | Utility function that responds to incoming events **if** it contains a `response_url` (shortcuts, actions, and slash commands).
-| `context` | Event context. This dictionary contains data about the event and app, such as the `botId`. Middleware can add additional context before the event is passed to listeners.
 | `body` | Dictionary that contains the entire body of the request (superset of `payload`). Some accessory data is only available outside of the payload (such as `trigger_id` and `authed_users`).
+| `payload` | Contents of the incoming event. The payload structure depends on the listener. For example, for an Events API event, `payload` will be the [event type structure](https://api.slack.com/events-api#event_type_structure). For a block action, it will be the action from within the `actions` list. The `payload` dictionary is also accessible via the alias corresponding to the listener (`message`, `event`, `action`, `shortcut`, `view`, `command`, or `options`). For example, if you were building a `message()` listener, you could use the `payload` and `message` arguments interchangably. **An easy way to understand what's in a payload is to log it**. |
+| `context` | Event context. This dictionary contains data about the event and app, such as the `botId`. Middleware can add additional context before the event is passed to listeners.
+| `ack` | Function that **must** be called to acknowledge that your app received the incoming event. `ack` exists for all actions, shortcuts, view submissions, slash command and options requests. `ack` returns a promise that resolves when complete. Read more in [Acknowledging events](https://slack.dev/bolt-python/concepts#acknowledge).
+| `respond` | Utility function that responds to incoming events **if** it contains a `response_url` (shortcuts, actions, and slash commands).
+| `say` | Utility function to send a message to the channel associated with the incoming event. This argument is only available when the listener is triggered for events that contain a `channel_id` (the most common being `message` events). `say` accepts simple strings (for plain-text messages) and dictionaries (for messages containing blocks).
+| `client` | Web API client that uses the token associated with the event. For single-workspace installations, the token is provided to the constructor. For multi-workspace installations, the token is returned by using [the OAuth library](https://slack.dev/bolt-python/concepts#authenticating-oauth), or manually using the `authorize` function.
+| `logger` | The built-in [`logging.Logger`](https://docs.python.org/3/library/logging.html) instance you can use in middleware/listeners.
 
 ## Creating an async app
 
@@ -141,7 +142,7 @@ If you want to use another async Web framework (e.g., Sanic, FastAPI, Starlette)
 
 * [The Bolt app examples](https://github.com/slackapi/bolt-python/tree/main/examples)
 * [The built-in adapters](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter)
-Apps can be run the same way as the syncronous example above. If you'd prefer another async Web framework (e.g., Sanic, FastAPI, Starlette), take a look at [the built-in adapters](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter) and their corresponding [sample code](https://github.com/slackapi/bolt-python/tree/main/samples).
+Apps can be run the same way as the syncronous example above. If you'd prefer another async Web framework (e.g., Sanic, FastAPI, Starlette), take a look at [the built-in adapters](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter) and their corresponding [examples](https://github.com/slackapi/bolt-python/tree/main/examples).
 
 ## Getting Help
 

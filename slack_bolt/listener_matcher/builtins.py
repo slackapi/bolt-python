@@ -2,8 +2,8 @@
 import inspect
 import sys
 
-from ..error import BoltError
-from ..util.payload_utils import (
+from slack_bolt.error import BoltError
+from slack_bolt.request.payload_utils import (
     is_block_actions,
     is_global_shortcut,
     is_message_shortcut,

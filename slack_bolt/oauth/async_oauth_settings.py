@@ -1,14 +1,13 @@
 import logging
 import os
 from logging import Logger
-from typing import List, Optional
+from typing import Optional, Sequence
 
 from slack_sdk.oauth import (
     OAuthStateUtils,
     AuthorizeUrlGenerator,
     RedirectUriPageRenderer,
 )
-from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.installation_store.async_installation_store import (
     AsyncInstallationStore,
 )
@@ -20,6 +19,7 @@ from slack_bolt.authorization.async_authorize import (
     AsyncAuthorize,
 )
 from slack_bolt.error import BoltError
+from slack_bolt.oauth.async_internals import get_or_create_default_installation_store
 from slack_bolt.oauth.callback_options import CallbackOptions
 
 
@@ -27,8 +27,8 @@ class AsyncOAuthSettings:
     # OAuth flow parameters/credentials
     client_id: str
     client_secret: str
-    scopes: Optional[List[str]]
-    user_scopes: Optional[List[str]]
+    scopes: Optional[Sequence[str]]
+    user_scopes: Optional[Sequence[str]]
     redirect_uri: Optional[str]
     # Handler configuration
     install_path: str
@@ -57,8 +57,8 @@ class AsyncOAuthSettings:
         # OAuth flow parameters/credentials
         client_id: Optional[str] = None,  # required
         client_secret: Optional[str] = None,  # required
-        scopes: Optional[List[str]] = None,
-        user_scopes: Optional[List[str]] = None,
+        scopes: Optional[Sequence[str]] = None,
+        user_scopes: Optional[Sequence[str]] = None,
         redirect_uri: Optional[str] = None,
         # Handler configuration
         install_path: str = "/slack/install",
@@ -122,8 +122,8 @@ class AsyncOAuthSettings:
             authorization_url or "https://slack.com/oauth/v2/authorize"
         )
         # Installation Management
-        self.installation_store = installation_store or FileInstallationStore(
-            client_id=client_id
+        self.installation_store = (
+            installation_store or get_or_create_default_installation_store(client_id)
         )
         self.authorize = AsyncInstallationStoreAuthorize(
             logger=logger, installation_store=self.installation_store,

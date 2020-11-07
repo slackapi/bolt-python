@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABCMeta
-from typing import List, Callable, Tuple
+from typing import Callable, Tuple, Sequence
 
 from slack_bolt.listener_matcher import ListenerMatcher
 from slack_bolt.middleware import Middleware
@@ -8,10 +8,10 @@ from slack_bolt.response import BoltResponse
 
 
 class Listener(metaclass=ABCMeta):
-    matchers: List[ListenerMatcher]
-    middleware: List[Middleware]  # type: ignore
+    matchers: Sequence[ListenerMatcher]
+    middleware: Sequence[Middleware]  # type: ignore
     ack_function: Callable[..., BoltResponse]
-    lazy_functions: List[Callable[..., None]]
+    lazy_functions: Sequence[Callable[..., None]]
     auto_acknowledgement: bool
 
     def matches(self, *, req: BoltRequest, resp: BoltResponse,) -> bool:

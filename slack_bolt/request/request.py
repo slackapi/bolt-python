@@ -1,4 +1,4 @@
-from typing import Dict, Optional, List, Union, Any
+from typing import Dict, Optional, Union, Any, Sequence
 
 from slack_bolt.context.context import BoltContext
 from slack_bolt.request.internals import (
@@ -12,8 +12,8 @@ from slack_bolt.request.internals import (
 
 class BoltRequest:
     raw_body: str
-    query: Dict[str, List[str]]
-    headers: Dict[str, List[str]]
+    query: Dict[str, Sequence[str]]
+    headers: Dict[str, Sequence[str]]
     content_type: Optional[str]
     body: Dict[str, Any]
     context: BoltContext
@@ -24,9 +24,8 @@ class BoltRequest:
         self,
         *,
         body: str,
-        query: Optional[Union[str, Dict[str, str], Dict[str, List[str]]]] = None,
-        # many framework use Dict[str, str] but the reality is Dict[str, List[str]]
-        headers: Optional[Dict[str, Union[str, List[str]]]] = None,
+        query: Optional[Union[str, Dict[str, str], Dict[str, Sequence[str]]]] = None,
+        headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None,
         context: Optional[Dict[str, str]] = None,
     ):
         """Request to a Bolt app.

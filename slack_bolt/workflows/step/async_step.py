@@ -1,4 +1,4 @@
-from typing import Callable, Union, Optional, Awaitable, List
+from typing import Callable, Union, Optional, Awaitable, Sequence
 
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.listener.async_listener import AsyncListener, AsyncCustomListener
@@ -29,13 +29,13 @@ class AsyncWorkflowStep:
         *,
         callback_id: str,
         edit: Union[
-            Callable[..., Awaitable[BoltResponse]], AsyncListener, List[Callable]
+            Callable[..., Awaitable[BoltResponse]], AsyncListener, Sequence[Callable]
         ],
         save: Union[
-            Callable[..., Awaitable[BoltResponse]], AsyncListener, List[Callable]
+            Callable[..., Awaitable[BoltResponse]], AsyncListener, Sequence[Callable]
         ],
         execute: Union[
-            Callable[..., Awaitable[BoltResponse]], AsyncListener, List[Callable]
+            Callable[..., Awaitable[BoltResponse]], AsyncListener, Sequence[Callable]
         ],
         app_name: Optional[str] = None,
     ):
@@ -75,7 +75,9 @@ class AsyncWorkflowStep:
             raise ValueError(f"Invalid `{name}` listener")
 
     @classmethod
-    def _build_matchers(cls, name: str, callback_id: str) -> List[AsyncListenerMatcher]:
+    def _build_matchers(
+        cls, name: str, callback_id: str
+    ) -> Sequence[AsyncListenerMatcher]:
         if name == "edit":
             return [workflow_step_edit(callback_id, asyncio=True)]
         elif name == "save":
@@ -86,7 +88,9 @@ class AsyncWorkflowStep:
             raise ValueError(f"Invalid name {name}")
 
     @classmethod
-    def _build_middleware(cls, name: str, callback_id: str) -> List[AsyncMiddleware]:
+    def _build_middleware(
+        cls, name: str, callback_id: str
+    ) -> Sequence[AsyncMiddleware]:
         if name == "edit":
             return [_build_edit_listener_middleware(callback_id)]
         elif name == "save":

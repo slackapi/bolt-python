@@ -8,7 +8,6 @@ from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.error import BoltError
 from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
 from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
-from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
@@ -90,18 +89,22 @@ class TestAsyncApp:
         with pytest.raises(BoltError):
             AsyncApp(
                 signing_secret="valid",
-                oauth_settings=OAuthSettings(client_id=None, client_secret="valid"),
+                oauth_settings=AsyncOAuthSettings(
+                    client_id=None, client_secret="valid"
+                ),
             )
 
     def test_valid_multi_auth_secret_absence(self):
         with pytest.raises(BoltError):
             AsyncApp(
                 signing_secret="valid",
-                oauth_settings=OAuthSettings(client_id="111.222", client_secret=None),
+                oauth_settings=AsyncOAuthSettings(
+                    client_id="111.222", client_secret=None
+                ),
             )
 
     def test_authorize_conflicts(self):
-        oauth_settings = OAuthSettings(
+        oauth_settings = AsyncOAuthSettings(
             client_id="111.222",
             client_secret="valid",
             installation_store=FileInstallationStore(),
@@ -127,3 +130,37 @@ class TestAsyncApp:
 
         with pytest.raises(BoltError):
             AsyncApp(signing_secret="valid", authorize=authorize, oauth_flow=oauth_flow)
+
+    def test_installation_store_conflicts(self):
+        store1 = FileInstallationStore()
+        store2 = FileInstallationStore()
+        app = AsyncApp(
+            signing_secret="valid",
+            oauth_settings=AsyncOAuthSettings(
+                client_id="111.222", client_secret="valid", installation_store=store1,
+            ),
+            installation_store=store2,
+        )
+        assert app.installation_store is store1
+
+        app = AsyncApp(
+            signing_secret="valid",
+            oauth_flow=AsyncOAuthFlow(
+                settings=AsyncOAuthSettings(
+                    client_id="111.222",
+                    client_secret="valid",
+                    installation_store=store1,
+                )
+            ),
+            installation_store=store2,
+        )
+        assert app.installation_store is store1
+
+        app = AsyncApp(
+            signing_secret="valid",
+            oauth_flow=AsyncOAuthFlow(
+                settings=AsyncOAuthSettings(client_id="111.222", client_secret="valid",)
+            ),
+            installation_store=store1,
+        )
+        assert app.installation_store is store1

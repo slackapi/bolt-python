@@ -1,19 +1,19 @@
 import json
 from http.cookies import SimpleCookie
-from typing import Union, Dict, List, Optional
+from typing import Union, Dict, Optional, Sequence
 
 
 class BoltResponse:
     status: int
     body: str
-    headers: Dict[str, List[str]]
+    headers: Dict[str, Sequence[str]]
 
     def __init__(
         self,
         *,
         status: int,
         body: Union[str, dict] = "",
-        headers: Optional[Dict[str, Union[str, List[str]]]] = None,
+        headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None,
     ):
         """The response from a Bolt app.
 
@@ -23,7 +23,7 @@ class BoltResponse:
         """
         self.status: int = status
         self.body: str = json.dumps(body) if isinstance(body, dict) else body
-        self.headers: Dict[str, List[str]] = {}
+        self.headers: Dict[str, Sequence[str]] = {}
         if headers is not None:
             for name, value in headers.items():
                 if value is None:
@@ -47,7 +47,7 @@ class BoltResponse:
     def first_headers_without_set_cookie(self) -> Dict[str, str]:
         return {k: list(v)[0] for k, v in self.headers.items() if k != "set-cookie"}
 
-    def cookies(self) -> List[SimpleCookie]:
+    def cookies(self) -> Sequence[SimpleCookie]:
         header_values = self.headers.get("set-cookie", [])
         return [self._to_simple_cookie(v) for v in header_values]
 

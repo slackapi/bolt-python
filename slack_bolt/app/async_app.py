@@ -1,12 +1,13 @@
 import inspect
 import logging
 import os
-from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable
+from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable, Sequence
 
 from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
 from slack_bolt.middleware.message_listener_matches.async_message_listener_matches import (
     AsyncMessageListenerMatches,
 )
+from slack_bolt.oauth.async_internals import select_consistent_installation_store
 from slack_bolt.workflows.step.async_step import AsyncWorkflowStep
 from slack_bolt.workflows.step.async_step_middleware import AsyncWorkflowStepMiddleware
 from slack_sdk.oauth.installation_store.async_installation_store import (
@@ -167,18 +168,28 @@ class AsyncApp:
 
         if oauth_flow:
             self._async_oauth_flow = oauth_flow
-            if self._async_installation_store is None:
-                self._async_installation_store = (
-                    self._async_oauth_flow.settings.installation_store
-                )
+            installation_store = select_consistent_installation_store(
+                client_id=self._async_oauth_flow.client_id,
+                app_store=self._async_installation_store,
+                oauth_flow_store=self._async_oauth_flow.settings.installation_store,
+                logger=self._framework_logger,
+            )
+            self._async_installation_store = installation_store
+            self._async_oauth_flow.settings.installation_store = installation_store
+
             if self._async_oauth_flow._async_client is None:
                 self._async_oauth_flow._async_client = self._async_client
             if self._async_authorize is None:
                 self._async_authorize = self._async_oauth_flow.settings.authorize
         elif oauth_settings is not None:
-            if self._async_installation_store:
-                # Consistently use a single installation_store
-                oauth_settings.installation_store = self._async_installation_store
+            installation_store = select_consistent_installation_store(
+                client_id=oauth_settings.client_id,
+                app_store=self._async_installation_store,
+                oauth_flow_store=oauth_settings.installation_store,
+                logger=self._framework_logger,
+            )
+            self._async_installation_store = installation_store
+            oauth_settings.installation_store = installation_store
 
             self._async_oauth_flow = AsyncOAuthFlow(
                 client=self._async_client, logger=self.logger, settings=oauth_settings
@@ -375,13 +386,19 @@ class AsyncApp:
         self,
         callback_id: Union[str, Pattern, AsyncWorkflowStep],
         edit: Optional[
-            Union[Callable[..., Optional[BoltResponse]], AsyncListener, List[Callable]]
+            Union[
+                Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]
+            ]
         ] = None,
         save: Optional[
-            Union[Callable[..., Optional[BoltResponse]], AsyncListener, List[Callable]]
+            Union[
+                Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]
+            ]
         ] = None,
         execute: Optional[
-            Union[Callable[..., Optional[BoltResponse]], AsyncListener, List[Callable]]
+            Union[
+                Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]
+            ]
         ] = None,
     ):
         """Registers a new Workflow Step listener"""
@@ -418,8 +435,8 @@ class AsyncApp:
     def event(
         self,
         event: Union[str, Pattern, Dict[str, str]],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new event listener.
 
@@ -441,12 +458,12 @@ class AsyncApp:
     def message(
         self,
         keyword: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Register a new message event listener."""
-        matchers = matchers if matchers else []
-        middleware = middleware if middleware else []
+        matchers = list(matchers) if matchers else []
+        middleware = list(middleware) if middleware else []
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -466,8 +483,8 @@ class AsyncApp:
     def command(
         self,
         command: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new slash command listener.
 
@@ -492,8 +509,8 @@ class AsyncApp:
     def shortcut(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new shortcut listener.
 
@@ -515,8 +532,8 @@ class AsyncApp:
     def global_shortcut(
         self,
         callback_id: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new global shortcut listener."""
 
@@ -532,8 +549,8 @@ class AsyncApp:
     def message_shortcut(
         self,
         callback_id: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new message shortcut listener."""
 
@@ -552,8 +569,8 @@ class AsyncApp:
     def action(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new action listener.
 
@@ -575,8 +592,8 @@ class AsyncApp:
     def block_action(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new block_actions listener."""
 
@@ -592,8 +609,8 @@ class AsyncApp:
     def attachment_action(
         self,
         callback_id: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new interactive_message listener."""
 
@@ -609,8 +626,8 @@ class AsyncApp:
     def dialog_submission(
         self,
         callback_id: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new dialog_submission listener."""
 
@@ -626,8 +643,8 @@ class AsyncApp:
     def dialog_cancellation(
         self,
         callback_id: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new dialog_cancellation listener."""
 
@@ -646,8 +663,8 @@ class AsyncApp:
     def view(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new view submission/closed listener.
 
@@ -669,8 +686,8 @@ class AsyncApp:
     def view_submission(
         self,
         constraints: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new view_submission listener."""
 
@@ -686,8 +703,8 @@ class AsyncApp:
     def view_closed(
         self,
         constraints: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new view_closed listener."""
 
@@ -706,8 +723,8 @@ class AsyncApp:
     def options(
         self,
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new options listener.
 
@@ -729,8 +746,8 @@ class AsyncApp:
     def block_suggestion(
         self,
         action_id: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new block_suggestion listener."""
 
@@ -746,8 +763,8 @@ class AsyncApp:
     def dialog_suggestion(
         self,
         callback_id: Union[str, Pattern],
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]] = None,
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new dialog_submission listener."""
 
@@ -770,7 +787,7 @@ class AsyncApp:
     @staticmethod
     def _to_listener_functions(
         kwargs: dict,
-    ) -> Optional[List[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
+    ) -> Optional[Sequence[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         if kwargs:
             functions = [kwargs["ack"]]
             for sub in kwargs["lazy"]:
@@ -780,10 +797,10 @@ class AsyncApp:
 
     def _register_listener(
         self,
-        functions: List[Callable[..., Awaitable[Optional[BoltResponse]]]],
+        functions: Sequence[Callable[..., Awaitable[Optional[BoltResponse]]]],
         primary_matcher: AsyncListenerMatcher,
-        matchers: Optional[List[Callable[..., Awaitable[bool]]]],
-        middleware: Optional[List[Union[Callable, AsyncMiddleware]]],
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]],
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]],
         auto_acknowledgement: bool = False,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         value_to_return = None

@@ -115,6 +115,17 @@ class TestAWSLambda:
         assert response["statusCode"] == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
+        event = {
+            "body": body,
+            "queryStringParameters": {},
+            "headers": self.build_headers(timestamp, body),
+            "requestContext": {"httpMethod": "POST"},
+            "isBase64Encoded": False,
+        }
+        response = SlackRequestHandler(app).handle(event, self.context)
+        assert response["statusCode"] == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
     @mock_lambda
     def test_shortcuts(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -151,6 +162,17 @@ class TestAWSLambda:
         assert response["statusCode"] == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
+        event = {
+            "body": body,
+            "queryStringParameters": {},
+            "headers": self.build_headers(timestamp, body),
+            "requestContext": {"httpMethod": "POST"},
+            "isBase64Encoded": False,
+        }
+        response = SlackRequestHandler(app).handle(event, self.context)
+        assert response["statusCode"] == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
     @mock_lambda
     def test_commands(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret,)
@@ -181,6 +203,17 @@ class TestAWSLambda:
             "queryStringParameters": {},
             "headers": self.build_headers(timestamp, body),
             "requestContext": {"http": {"method": "POST"}},
+            "isBase64Encoded": False,
+        }
+        response = SlackRequestHandler(app).handle(event, self.context)
+        assert response["statusCode"] == 200
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        event = {
+            "body": body,
+            "queryStringParameters": {},
+            "headers": self.build_headers(timestamp, body),
+            "requestContext": {"httpMethod": "POST"},
             "isBase64Encoded": False,
         }
         response = SlackRequestHandler(app).handle(event, self.context)
@@ -250,4 +283,20 @@ class TestAWSLambda:
             "isBase64Encoded": False,
         }
         response = SlackRequestHandler(app).handle(event, self.context)
-        assert response["statusCode"] == 302
+        assert response["statusCode"] == 200
+        assert response["headers"]["content-type"] == "text/html; charset=utf-8"
+        assert response["headers"]["content-length"] == "565"
+        assert response.get("body") is not None
+
+        event = {
+            "body": "",
+            "queryStringParameters": {},
+            "headers": {},
+            "requestContext": {"httpMethod": "GET"},
+            "isBase64Encoded": False,
+        }
+        response = SlackRequestHandler(app).handle(event, self.context)
+        assert response["statusCode"] == 200
+        assert response["headers"]["content-type"] == "text/html; charset=utf-8"
+        assert response["headers"]["content-length"] == "565"
+        assert "https://slack.com/oauth/v2/authorize?state=" in response.get("body")

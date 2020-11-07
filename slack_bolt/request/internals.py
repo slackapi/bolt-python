@@ -1,19 +1,19 @@
 import json
-from typing import Optional, Dict, Union, List, Any
+from typing import Optional, Dict, Union, Any, Sequence
 from urllib.parse import parse_qsl, parse_qs
 
 from slack_bolt.context import BoltContext
 
 
 def parse_query(
-    query: Optional[Union[str, Dict[str, str], Dict[str, List[str]]]]
-) -> Dict[str, List[str]]:
+    query: Optional[Union[str, Dict[str, str], Dict[str, Sequence[str]]]]
+) -> Dict[str, Sequence[str]]:
     if query is None:
         return {}
     elif isinstance(query, str):
         return parse_qs(query)
     elif isinstance(query, dict) or hasattr(query, "items"):
-        result: Dict[str, List[str]] = {}
+        result: Dict[str, Sequence[str]] = {}
         for name, value in query.items():
             if isinstance(value, list):
                 result[name] = value
@@ -128,7 +128,7 @@ def build_context(context: BoltContext, payload: Dict[str, Any],) -> BoltContext
     return context
 
 
-def extract_content_type(headers: Dict[str, List[str]]) -> Optional[str]:
+def extract_content_type(headers: Dict[str, Sequence[str]]) -> Optional[str]:
     content_type: Optional[str] = headers.get("content-type", [None])[0]
     if content_type:
         return content_type.split(";")[0]
@@ -136,9 +136,9 @@ def extract_content_type(headers: Dict[str, List[str]]) -> Optional[str]:
 
 
 def build_normalized_headers(
-    headers: Optional[Dict[str, Union[str, List[str]]]]
-) -> Dict[str, List[str]]:
-    normalized_headers: Dict[str, List[str]] = {}
+    headers: Optional[Dict[str, Union[str, Sequence[str]]]]
+) -> Dict[str, Sequence[str]]:
+    normalized_headers: Dict[str, Sequence[str]] = {}
     if headers is not None:
         for key, value in headers.items():
             normalized_name = key.lower()
