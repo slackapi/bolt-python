@@ -1,4 +1,4 @@
-# Bolt ![Bolt logo](docs/assets/bolt-logo.svg) for Python (beta)
+# Bolt ![Bolt logo](docs/assets/bolt-logo.svg) for Python
 
 [![Python Version][python-version]][pypi-url]
 [![pypi package][pypi-image]][pypi-url]
