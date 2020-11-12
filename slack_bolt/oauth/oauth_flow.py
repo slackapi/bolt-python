@@ -297,26 +297,33 @@ class OAuthFlow:
             bot_token: Optional[str] = oauth_response.get("access_token")
             # NOTE: oauth.v2.access doesn't include bot_id in response
             bot_id: Optional[str] = None
+            org_dashboard_grant_access: Optional[str] = None
             if bot_token is not None:
                 auth_test = self.client.auth_test(token=bot_token)
                 bot_id = auth_test["bot_id"]
+                org_dashboard_grant_access = auth_test.get("url")
 
             return Installation(
                 app_id=oauth_response.get("app_id"),
                 enterprise_id=installed_enterprise.get("id"),
+                enterprise_name=installed_enterprise.get("name"),
                 team_id=installed_team.get("id"),
                 bot_token=bot_token,
                 bot_id=bot_id,
                 bot_user_id=oauth_response.get("bot_user_id"),
                 bot_scopes=oauth_response.get("scope"),  # comma-separated string
+                org_dashboard_grant_access=org_dashboard_grant_access,
                 user_id=installer.get("id"),
                 user_token=installer.get("access_token"),
                 user_scopes=installer.get("scope"),  # comma-separated string
                 incoming_webhook_url=incoming_webhook.get("url"),
+                incoming_webhook_channel=incoming_webhook.get("channel"),
                 incoming_webhook_channel_id=incoming_webhook.get("channel_id"),
                 incoming_webhook_configuration_url=incoming_webhook.get(
                     "configuration_url", None
                 ),
+                is_enterprise_install=oauth_response.get("is_enterprise_install"),
+                token_type=oauth_response.get("token_type"),
             )
 
         except SlackApiError as e:
