@@ -766,7 +766,20 @@ class App:
     def _init_context(self, req: BoltRequest):
         req.context["logger"] = get_bolt_app_logger(self.name)
         req.context["token"] = self._token
-        req.context["client"] = self._client
+        if self._token is not None:
+            # This WebClient instance can be safely singleton
+            req.context["client"] = self._client
+        else:
+            # Set a new dedicated instance for this request
+            client_per_request: WebClient = WebClient(
+                token=None,  # the token will be set later
+                base_url=self._client.base_url,
+                timeout=self._client.timeout,
+                ssl=self._client.ssl,
+                proxy=self._client.proxy,
+                headers=self._client.headers,
+            )
+            req.context["client"] = client_per_request
 
     @staticmethod
     def _to_listener_functions(

@@ -9,7 +9,6 @@ from .async_internals import _build_error_response, _is_no_auth_required
 from .internals import _is_no_auth_test_call_required
 from ...authorization import AuthorizeResult
 from ...authorization.async_authorize import AsyncAuthorize
-from ...util.async_utils import create_async_web_client
 
 
 class AsyncMultiTeamsAuthorization(AsyncAuthorization):
@@ -54,7 +53,9 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
                 req.context.set_authorize_result(auth_result)
                 token = auth_result.bot_token or auth_result.user_token
                 req.context["token"] = token
-                req.context["client"] = create_async_web_client(token)
+                # As AsyncApp#_init_context() generates a new AsyncWebClient for this request,
+                # it's safe to modify this instance.
+                req.context.client.token = token
                 return await next()
             else:
                 # Just in case
