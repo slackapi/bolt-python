@@ -782,7 +782,22 @@ class AsyncApp:
     def _init_context(self, req: AsyncBoltRequest):
         req.context["logger"] = get_bolt_app_logger(self.name)
         req.context["token"] = self._token
-        req.context["client"] = self._async_client
+        if self._token is not None:
+            # This AsyncWebClient instance can be safely singleton
+            req.context["client"] = self._async_client
+        else:
+            # Set a new dedicated instance for this request
+            client_per_request: AsyncWebClient = AsyncWebClient(
+                token=None,  # the token will be set later
+                base_url=self._async_client.base_url,
+                timeout=self._async_client.timeout,
+                ssl=self._async_client.ssl,
+                proxy=self._async_client.proxy,
+                session=self._async_client.session,
+                trust_env_in_session=self._async_client.trust_env_in_session,
+                headers=self._async_client.headers,
+            )
+            req.context["client"] = client_per_request
 
     @staticmethod
     def _to_listener_functions(
