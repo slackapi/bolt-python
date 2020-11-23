@@ -21,7 +21,7 @@ class RequestVerification(Middleware):  # type: ignore
     def process(
         self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
     ) -> BoltResponse:
-        if self._can_skip(req.body):
+        if self._can_skip(req.mode, req.body):
             return next()
 
         body = req.raw_body
@@ -36,8 +36,10 @@ class RequestVerification(Middleware):  # type: ignore
     # -----------------------------------------
 
     @staticmethod
-    def _can_skip(body: Dict[str, Any]) -> bool:
-        return body is not None and body.get("ssl_check") == "1"
+    def _can_skip(mode: str, body: Dict[str, Any]) -> bool:
+        return mode == "socket_mode" or (
+            body is not None and body.get("ssl_check") == "1"
+        )
 
     @staticmethod
     def _build_error_response() -> BoltResponse:

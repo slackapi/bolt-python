@@ -18,12 +18,6 @@ class TestAsyncApp:
     def teardown_method(self):
         restore_os_env(self.old_os_env)
 
-    def test_signing_secret_absence(self):
-        with pytest.raises(BoltError):
-            AsyncApp(signing_secret=None, token="xoxb-xxx")
-        with pytest.raises(BoltError):
-            AsyncApp(signing_secret="", token="xoxb-xxx")
-
     def non_coro_func(self, ack):
         ack()
 

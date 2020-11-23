@@ -10,14 +10,6 @@ from slack_bolt.request import BoltRequest
 # -------------------------------
 
 
-def error_signing_secret_not_found() -> str:
-    return (
-        "Signing secret not found, so could not initialize the Bolt app."
-        "Copy your Signing Secret from the Basic Information page "
-        "and then store it in a new environment variable"
-    )
-
-
 def error_client_invalid_type() -> str:
     return "`client` must be a slack_sdk.web.WebClient"
 
