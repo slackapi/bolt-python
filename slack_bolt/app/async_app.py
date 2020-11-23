@@ -34,6 +34,8 @@ from slack_bolt.logger.messages import (
     error_listener_function_must_be_coro_func,
     error_client_invalid_type_async,
     error_authorize_conflicts,
+    error_oauth_settings_invalid_type_async,
+    error_oauth_flow_invalid_type_async,
 )
 from slack_bolt.lazy_listener.asyncio_runner import AsyncioLazyListenerRunner
 from slack_bolt.listener.async_listener import AsyncListener, AsyncCustomListener
@@ -167,6 +169,9 @@ class AsyncApp:
             oauth_settings = AsyncOAuthSettings()
 
         if oauth_flow:
+            if not isinstance(oauth_flow, AsyncOAuthFlow):
+                raise BoltError(error_oauth_flow_invalid_type_async())
+
             self._async_oauth_flow = oauth_flow
             installation_store = select_consistent_installation_store(
                 client_id=self._async_oauth_flow.client_id,
@@ -182,6 +187,9 @@ class AsyncApp:
             if self._async_authorize is None:
                 self._async_authorize = self._async_oauth_flow.settings.authorize
         elif oauth_settings is not None:
+            if not isinstance(oauth_settings, AsyncOAuthSettings):
+                raise BoltError(error_oauth_settings_invalid_type_async())
+
             installation_store = select_consistent_installation_store(
                 client_id=oauth_settings.client_id,
                 app_store=self._async_installation_store,

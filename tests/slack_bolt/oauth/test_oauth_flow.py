@@ -46,6 +46,7 @@ class TestOAuthFlow:
                 client_id="111.222",
                 client_secret="xxx",
                 scopes=["chat:write", "commands"],
+                user_scopes=["search:read"],
                 installation_store=FileInstallationStore(),
                 state_store=FileOAuthStateStore(expiration_seconds=120),
             )
@@ -54,8 +55,18 @@ class TestOAuthFlow:
         resp = oauth_flow.handle_installation(req)
         assert resp.status == 200
         assert resp.headers.get("content-type") == ["text/html; charset=utf-8"]
-        assert resp.headers.get("content-length") == ["565"]
+        assert resp.headers.get("content-length") == ["576"]
         assert "https://slack.com/oauth/v2/authorize?state=" in resp.body
+
+    def test_scopes_as_str(self):
+        settings = OAuthSettings(
+            client_id="111.222",
+            client_secret="xxx",
+            scopes="chat:write,commands",
+            user_scopes="search:read",
+        )
+        assert settings.scopes == ["chat:write", "commands"]
+        assert settings.user_scopes == ["search:read"]
 
     def test_handle_callback(self):
         oauth_flow = OAuthFlow(

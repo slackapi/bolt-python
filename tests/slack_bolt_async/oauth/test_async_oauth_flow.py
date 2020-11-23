@@ -11,6 +11,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt import BoltResponse
 from slack_bolt.app.async_app import AsyncApp
+from slack_bolt.error import BoltError
 from slack_bolt.oauth.async_callback_options import (
     AsyncFailureArgs,
     AsyncSuccessArgs,
@@ -18,6 +19,7 @@ from slack_bolt.oauth.async_callback_options import (
 )
 from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
 from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
+from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
     cleanup_mock_web_api_server,
@@ -46,6 +48,7 @@ class TestAsyncOAuthFlow:
                 client_id="111.222",
                 client_secret="xxx",
                 scopes=["chat:write", "commands"],
+                user_scopes=["search:read"],
                 installation_store=FileInstallationStore(),
                 state_store=FileOAuthStateStore(expiration_seconds=120),
             )
@@ -53,6 +56,40 @@ class TestAsyncOAuthFlow:
         assert oauth_flow is not None
         assert oauth_flow.logger is not None
         assert oauth_flow.client is not None
+
+    @pytest.mark.asyncio
+    async def test_scopes_as_str(self):
+        settings = AsyncOAuthSettings(
+            client_id="111.222",
+            client_secret="xxx",
+            scopes="chat:write,commands",
+            user_scopes="search:read",
+        )
+        assert settings.scopes == ["chat:write", "commands"]
+        assert settings.user_scopes == ["search:read"]
+
+    @pytest.mark.asyncio
+    async def test_instantiation_non_async_settings(self):
+        with pytest.raises(BoltError):
+            AsyncOAuthFlow(
+                settings=OAuthSettings(
+                    client_id="111.222",
+                    client_secret="xxx",
+                    scopes="chat:write,commands",
+                )
+            )
+
+    @pytest.mark.asyncio
+    async def test_instantiation_non_async_settings_to_app(self):
+        with pytest.raises(BoltError):
+            AsyncApp(
+                signing_secret="xxx",
+                oauth_settings=OAuthSettings(
+                    client_id="111.222",
+                    client_secret="xxx",
+                    scopes="chat:write,commands",
+                ),
+            )
 
     @pytest.mark.asyncio
     async def test_handle_installation(self):
