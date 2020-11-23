@@ -23,7 +23,6 @@ from slack_bolt.authorization.async_authorize import (
 )
 from slack_bolt.error import BoltError
 from slack_bolt.logger.messages import (
-    error_signing_secret_not_found,
     warning_client_prioritized_and_token_skipped,
     warning_token_skipped,
     error_token_required,
@@ -112,9 +111,6 @@ class AsyncApp:
         """
         signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET")
         token = token or os.environ.get("SLACK_BOT_TOKEN")
-
-        if signing_secret is None or signing_secret == "":
-            raise BoltError(error_signing_secret_not_found())
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret: str = signing_secret

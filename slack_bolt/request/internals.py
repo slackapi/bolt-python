@@ -151,3 +151,11 @@ def build_normalized_headers(
                     f"Unsupported type ({type(value)}) of element in headers ({headers})"
                 )
     return normalized_headers  # type: ignore
+
+
+def error_message_raw_body_required_in_http_mode() -> str:
+    return "`body` must be a raw string data when running in the HTTP server mode"
+
+
+def error_message_unknown_request_body_type() -> str:
+    return "`body` must be either str or dict"
