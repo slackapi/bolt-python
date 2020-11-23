@@ -26,6 +26,14 @@ def error_client_invalid_type_async() -> str:
     return "`client` must be a slack_sdk.web.async_client.AsyncWebClient"
 
 
+def error_oauth_flow_invalid_type_async() -> str:
+    return "`oauth_flow` must be a slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow"
+
+
+def error_oauth_settings_invalid_type_async() -> str:
+    return "`oauth_settings` must be a slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings"
+
+
 def error_auth_test_failure(error_response: SlackResponse) -> str:
     return f"`token` is invalid (auth.test result: {error_response})"
 
