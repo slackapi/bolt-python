@@ -10,20 +10,20 @@ from slack_bolt.request import BoltRequest
 # -------------------------------
 
 
-def error_signing_secret_not_found() -> str:
-    return (
-        "Signing secret not found, so could not initialize the Bolt app."
-        "Copy your Signing Secret from the Basic Information page "
-        "and then store it in a new environment variable"
-    )
-
-
 def error_client_invalid_type() -> str:
     return "`client` must be a slack_sdk.web.WebClient"
 
 
 def error_client_invalid_type_async() -> str:
     return "`client` must be a slack_sdk.web.async_client.AsyncWebClient"
+
+
+def error_oauth_flow_invalid_type_async() -> str:
+    return "`oauth_flow` must be a slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow"
+
+
+def error_oauth_settings_invalid_type_async() -> str:
+    return "`oauth_settings` must be a slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings"
 
 
 def error_auth_test_failure(error_response: SlackResponse) -> str:

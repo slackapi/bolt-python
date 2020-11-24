@@ -30,7 +30,6 @@ from slack_bolt.listener_matcher import builtins as builtin_matchers
 from slack_bolt.listener_matcher.listener_matcher import ListenerMatcher
 from slack_bolt.logger import get_bolt_app_logger, get_bolt_logger
 from slack_bolt.logger.messages import (
-    error_signing_secret_not_found,
     warning_client_prioritized_and_token_skipped,
     warning_token_skipped,
     error_auth_test_failure,
@@ -105,9 +104,6 @@ class App:
         """
         signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET")
         token = token or os.environ.get("SLACK_BOT_TOKEN")
-
-        if signing_secret is None or signing_secret == "":
-            raise BoltError(error_signing_secret_not_found())
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret: str = signing_secret
@@ -766,7 +762,20 @@ class App:
     def _init_context(self, req: BoltRequest):
         req.context["logger"] = get_bolt_app_logger(self.name)
         req.context["token"] = self._token
-        req.context["client"] = self._client
+        if self._token is not None:
+            # This WebClient instance can be safely singleton
+            req.context["client"] = self._client
+        else:
+            # Set a new dedicated instance for this request
+            client_per_request: WebClient = WebClient(
+                token=None,  # the token will be set later
+                base_url=self._client.base_url,
+                timeout=self._client.timeout,
+                ssl=self._client.ssl,
+                proxy=self._client.proxy,
+                headers=self._client.headers,
+            )
+            req.context["client"] = client_per_request
 
     @staticmethod
     def _to_listener_functions(

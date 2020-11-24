@@ -53,6 +53,10 @@ def extract_enterprise_id(payload: Dict[str, Any]) -> Optional[str]:
             return org
         elif "id" in org:
             return org.get("id")  # type: ignore
+    if "authorizations" in payload and len(payload["authorizations"]) > 0:
+        # To make Events API handling functioning also for shared channels,
+        # we should use .authorizations[0].enterprise_id over .enterprise_id
+        return extract_enterprise_id(payload["authorizations"][0])
     if "enterprise_id" in payload:
         return payload.get("enterprise_id")
     if "team" in payload and "enterprise_id" in payload["team"]:
@@ -70,6 +74,10 @@ def extract_team_id(payload: Dict[str, Any]) -> Optional[str]:
             return team
         elif team and "id" in team:
             return team.get("id")
+    if "authorizations" in payload and len(payload["authorizations"]) > 0:
+        # To make Events API handling functioning also for shared channels,
+        # we should use .authorizations[0].team_id over .team_id
+        return extract_team_id(payload["authorizations"][0])
     if "team_id" in payload:
         return payload.get("team_id")
     if "event" in payload:
@@ -110,21 +118,21 @@ def extract_channel_id(payload: Dict[str, Any]) -> Optional[str]:
     return None
 
 
-def build_context(context: BoltContext, payload: Dict[str, Any],) -> BoltContext:
-    enterprise_id = extract_enterprise_id(payload)
+def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
+    enterprise_id = extract_enterprise_id(body)
     if enterprise_id:
         context["enterprise_id"] = enterprise_id
-    team_id = extract_team_id(payload)
+    team_id = extract_team_id(body)
     if team_id:
         context["team_id"] = team_id
-    user_id = extract_user_id(payload)
+    user_id = extract_user_id(body)
     if user_id:
         context["user_id"] = user_id
-    channel_id = extract_channel_id(payload)
+    channel_id = extract_channel_id(body)
     if channel_id:
         context["channel_id"] = channel_id
-    if "response_url" in payload:
-        context["response_url"] = payload["response_url"]
+    if "response_url" in body:
+        context["response_url"] = body["response_url"]
     return context
 
 
@@ -151,3 +159,11 @@ def build_normalized_headers(
                     f"Unsupported type ({type(value)}) of element in headers ({headers})"
                 )
     return normalized_headers  # type: ignore
+
+
+def error_message_raw_body_required_in_http_mode() -> str:
+    return "`body` must be a raw string data when running in the HTTP server mode"
+
+
+def error_message_unknown_request_body_type() -> str:
+    return "`body` must be either str or dict"

@@ -1,7 +1,7 @@
 import logging
 import os
 from logging import Logger
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Union
 
 from slack_sdk.oauth import (
     OAuthStateUtils,
@@ -57,8 +57,8 @@ class AsyncOAuthSettings:
         # OAuth flow parameters/credentials
         client_id: Optional[str] = None,  # required
         client_secret: Optional[str] = None,  # required
-        scopes: Optional[Sequence[str]] = None,
-        user_scopes: Optional[Sequence[str]] = None,
+        scopes: Optional[Union[Sequence[str], str]] = None,
+        user_scopes: Optional[Union[Sequence[str], str]] = None,
         redirect_uri: Optional[str] = None,
         # Handler configuration
         install_path: str = "/slack/install",
@@ -104,9 +104,13 @@ class AsyncOAuthSettings:
             raise BoltError("Both client_id and client_secret are required")
 
         self.scopes = scopes or os.environ.get("SLACK_SCOPES", "").split(",")
+        if isinstance(self.scopes, str):
+            self.scopes = self.scopes.split(",")
         self.user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", "").split(
             ","
         )
+        if isinstance(self.user_scopes, str):
+            self.user_scopes = self.user_scopes.split(",")
         self.redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI")
         # Handler configuration
         self.install_path = install_path or os.environ.get(

@@ -4,6 +4,7 @@ from logging import Logger
 from typing import Optional, Dict, Callable, Awaitable, Sequence
 
 from slack_bolt.error import BoltError
+from slack_bolt.logger.messages import error_oauth_settings_invalid_type_async
 from slack_bolt.oauth.async_callback_options import (
     AsyncCallbackOptions,
     DefaultAsyncCallbackOptions,
@@ -62,7 +63,11 @@ class AsyncOAuthFlow:
         """
         self._async_client = client
         self._logger = logger
+
+        if not isinstance(settings, AsyncOAuthSettings):
+            raise BoltError(error_oauth_settings_invalid_type_async())
         self.settings = settings
+
         self.settings.logger = self._logger
 
         self.client_id = self.settings.client_id

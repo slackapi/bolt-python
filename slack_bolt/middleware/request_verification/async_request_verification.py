@@ -14,7 +14,7 @@ class AsyncRequestVerification(RequestVerification, AsyncMiddleware):
         resp: BoltResponse,
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> BoltResponse:
-        if self._can_skip(req.body):
+        if self._can_skip(req.mode, req.body):
             return await next()
 
         body = req.raw_body

@@ -1,9 +1,10 @@
 from typing import Callable, Optional
 
+from slack_sdk.errors import SlackApiError
+
 from slack_bolt.logger import get_bolt_logger
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
-from slack_sdk.errors import SlackApiError
 from .authorization import Authorization
 from .internals import (
     _build_error_response,
@@ -12,7 +13,6 @@ from .internals import (
 )
 from ...authorization import AuthorizeResult
 from ...authorization.authorize import Authorize
-from ...util.utils import create_web_client
 
 
 class MultiTeamsAuthorization(Authorization):
@@ -55,7 +55,9 @@ class MultiTeamsAuthorization(Authorization):
                 req.context.set_authorize_result(auth_result)
                 token = auth_result.bot_token or auth_result.user_token
                 req.context["token"] = token
-                req.context["client"] = create_web_client(token)
+                # As App#_init_context() generates a new WebClient for this request,
+                # it's safe to modify this instance.
+                req.context.client.token = token
                 return next()
             else:
                 # Just in case

@@ -23,7 +23,6 @@ from slack_bolt.authorization.async_authorize import (
 )
 from slack_bolt.error import BoltError
 from slack_bolt.logger.messages import (
-    error_signing_secret_not_found,
     warning_client_prioritized_and_token_skipped,
     warning_token_skipped,
     error_token_required,
@@ -34,6 +33,8 @@ from slack_bolt.logger.messages import (
     error_listener_function_must_be_coro_func,
     error_client_invalid_type_async,
     error_authorize_conflicts,
+    error_oauth_settings_invalid_type_async,
+    error_oauth_flow_invalid_type_async,
 )
 from slack_bolt.lazy_listener.asyncio_runner import AsyncioLazyListenerRunner
 from slack_bolt.listener.async_listener import AsyncListener, AsyncCustomListener
@@ -113,9 +114,6 @@ class AsyncApp:
         signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET")
         token = token or os.environ.get("SLACK_BOT_TOKEN")
 
-        if signing_secret is None or signing_secret == "":
-            raise BoltError(error_signing_secret_not_found())
-
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret: str = signing_secret
         self._verification_token: Optional[str] = verification_token or os.environ.get(
@@ -167,6 +165,9 @@ class AsyncApp:
             oauth_settings = AsyncOAuthSettings()
 
         if oauth_flow:
+            if not isinstance(oauth_flow, AsyncOAuthFlow):
+                raise BoltError(error_oauth_flow_invalid_type_async())
+
             self._async_oauth_flow = oauth_flow
             installation_store = select_consistent_installation_store(
                 client_id=self._async_oauth_flow.client_id,
@@ -182,6 +183,9 @@ class AsyncApp:
             if self._async_authorize is None:
                 self._async_authorize = self._async_oauth_flow.settings.authorize
         elif oauth_settings is not None:
+            if not isinstance(oauth_settings, AsyncOAuthSettings):
+                raise BoltError(error_oauth_settings_invalid_type_async())
+
             installation_store = select_consistent_installation_store(
                 client_id=oauth_settings.client_id,
                 app_store=self._async_installation_store,
@@ -782,7 +786,22 @@ class AsyncApp:
     def _init_context(self, req: AsyncBoltRequest):
         req.context["logger"] = get_bolt_app_logger(self.name)
         req.context["token"] = self._token
-        req.context["client"] = self._async_client
+        if self._token is not None:
+            # This AsyncWebClient instance can be safely singleton
+            req.context["client"] = self._async_client
+        else:
+            # Set a new dedicated instance for this request
+            client_per_request: AsyncWebClient = AsyncWebClient(
+                token=None,  # the token will be set later
+                base_url=self._async_client.base_url,
+                timeout=self._async_client.timeout,
+                ssl=self._async_client.ssl,
+                proxy=self._async_client.proxy,
+                session=self._async_client.session,
+                trust_env_in_session=self._async_client.trust_env_in_session,
+                headers=self._async_client.headers,
+            )
+            req.context["client"] = client_per_request
 
     @staticmethod
     def _to_listener_functions(

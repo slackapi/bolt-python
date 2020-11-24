@@ -212,8 +212,6 @@ def action(
             return dialog_submission(constraints["callback_id"], asyncio)
         if action_type == "dialog_cancellation":
             return dialog_cancellation(constraints["callback_id"], asyncio)
-
-        # Still in beta
         # https://api.slack.com/workflows/steps
         if action_type == "workflow_step_edit":
             return workflow_step_edit(constraints["callback_id"], asyncio)
