@@ -93,7 +93,7 @@ Most of the app's functionality will be inside listener functions (the `fn` para
 
 | Argument  | Description  |
 | :---: | :--- |
-| `body` | Dictionary that contains the entire body of the request (superset of `payload`). Some accessory data is only available outside of the payload (such as `trigger_id` and `authed_users`).
+| `body` | Dictionary that contains the entire body of the request (superset of `payload`). Some accessory data is only available outside of the payload (such as `trigger_id` and `authorizations`).
 | `payload` | Contents of the incoming event. The payload structure depends on the listener. For example, for an Events API event, `payload` will be the [event type structure](https://api.slack.com/events-api#event_type_structure). For a block action, it will be the action from within the `actions` list. The `payload` dictionary is also accessible via the alias corresponding to the listener (`message`, `event`, `action`, `shortcut`, `view`, `command`, or `options`). For example, if you were building a `message()` listener, you could use the `payload` and `message` arguments interchangably. **An easy way to understand what's in a payload is to log it**. |
 | `context` | Event context. This dictionary contains data about the event and app, such as the `botId`. Middleware can add additional context before the event is passed to listeners.
 | `ack` | Function that **must** be called to acknowledge that your app received the incoming event. `ack` exists for all actions, shortcuts, view submissions, slash command and options requests. `ack` returns a promise that resolves when complete. Read more in [Acknowledging events](https://slack.dev/bolt-python/concepts#acknowledge).
