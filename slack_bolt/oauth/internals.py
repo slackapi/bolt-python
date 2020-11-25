@@ -36,7 +36,7 @@ class CallbackResponseBuilder:
             app_id=installation.app_id,
             team_id=installation.team_id,
             is_enterprise_install=installation.is_enterprise_install,
-            org_dashboard_grant_access=installation.org_dashboard_grant_access,
+            enterprise_url=installation.enterprise_url,
         )
         return BoltResponse(
             status=200,

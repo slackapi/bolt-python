@@ -288,6 +288,9 @@ class OAuthFlow:
             installed_enterprise: Dict[str, str] = oauth_response.get(
                 "enterprise"
             ) or {}
+            is_enterprise_install: bool = oauth_response.get(
+                "is_enterprise_install"
+            ) or False
             installed_team: Dict[str, str] = oauth_response.get("team") or {}
             installer: Dict[str, str] = oauth_response.get("authed_user") or {}
             incoming_webhook: Dict[str, str] = oauth_response.get(
@@ -297,22 +300,24 @@ class OAuthFlow:
             bot_token: Optional[str] = oauth_response.get("access_token")
             # NOTE: oauth.v2.access doesn't include bot_id in response
             bot_id: Optional[str] = None
-            org_dashboard_grant_access: Optional[str] = None
+            enterprise_url: Optional[str] = None
             if bot_token is not None:
                 auth_test = self.client.auth_test(token=bot_token)
                 bot_id = auth_test["bot_id"]
-                org_dashboard_grant_access = auth_test.get("url")
+                if is_enterprise_install is True:
+                    enterprise_url = auth_test.get("url")
 
             return Installation(
                 app_id=oauth_response.get("app_id"),
                 enterprise_id=installed_enterprise.get("id"),
                 enterprise_name=installed_enterprise.get("name"),
+                enterprise_url=enterprise_url,
                 team_id=installed_team.get("id"),
+                team_name=installed_team.get("name"),
                 bot_token=bot_token,
                 bot_id=bot_id,
                 bot_user_id=oauth_response.get("bot_user_id"),
                 bot_scopes=oauth_response.get("scope"),  # comma-separated string
-                org_dashboard_grant_access=org_dashboard_grant_access,
                 user_id=installer.get("id"),
                 user_token=installer.get("access_token"),
                 user_scopes=installer.get("scope"),  # comma-separated string
@@ -322,7 +327,7 @@ class OAuthFlow:
                 incoming_webhook_configuration_url=incoming_webhook.get(
                     "configuration_url", None
                 ),
-                is_enterprise_install=oauth_response.get("is_enterprise_install"),
+                is_enterprise_install=is_enterprise_install,
                 token_type=oauth_response.get("token_type"),
             )
 
