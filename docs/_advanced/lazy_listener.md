@@ -19,8 +19,8 @@ Lazy listeners can be a solution for this issue. Rather than acting as a decorat
 
 ```python
 def respond_to_slack_within_3_seconds(body, ack):
-    if "text" in body:
-        ack(":x: Usage: /start-process (description here)")
+    if body.get("text") is None:
+        ack(f":x: Usage: /start-process (description here)")
     else:
         ack(f"Accepted! (task: {body['text']})")
 
