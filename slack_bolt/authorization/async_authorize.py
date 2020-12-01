@@ -3,7 +3,7 @@ from logging import Logger
 from typing import Optional, Callable, Awaitable, Dict, Any
 
 from slack_sdk.errors import SlackApiError
-from slack_sdk.oauth.installation_store import Bot
+from slack_sdk.oauth.installation_store import Bot, Installation
 from slack_sdk.oauth.installation_store.async_installation_store import (
     AsyncInstallationStore,
 )
@@ -92,6 +92,7 @@ class AsyncCallableAuthorize(AsyncAuthorize):
 
 class AsyncInstallationStoreAuthorize(AsyncAuthorize):
     authorize_result_cache: Dict[str, AuthorizeResult] = {}
+    find_installation_available: Optional[bool]
 
     def __init__(
         self,
@@ -103,6 +104,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
         self.logger = logger
         self.installation_store = installation_store
         self.cache_enabled = cache_enabled
+        self.find_installation_available = None
 
     async def __call__(
         self,
@@ -112,27 +114,74 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
         team_id: str,
         user_id: Optional[str],
     ) -> Optional[AuthorizeResult]:
-        bot: Optional[Bot] = await self.installation_store.async_find_bot(
-            enterprise_id=enterprise_id, team_id=team_id,
-        )
-        if bot is None:
-            self.logger.debug(
-                f"No installation data found "
-                f"for enterprise_id: {enterprise_id} team_id: {team_id}"
+
+        if self.find_installation_available is None:
+            self.find_installation_available = hasattr(
+                self.installation_store, "async_find_installation"
             )
+
+        bot_token: Optional[str] = None
+        user_token: Optional[str] = None
+
+        if self.find_installation_available:
+            # since v1.1, this is the default way
+            try:
+                installation: Optional[
+                    Installation
+                ] = await self.installation_store.async_find_installation(
+                    enterprise_id=enterprise_id,
+                    team_id=team_id,
+                    is_enterprise_install=context.is_enterprise_install,
+                )
+                if installation is None:
+                    self._debug_log_for_not_found(enterprise_id, team_id)
+                    return None
+
+                if installation.user_id != user_id:
+                    # try to fetch the request user's installation
+                    # to reflect the user's access token if exists
+                    user_installation = await self.installation_store.async_find_installation(
+                        enterprise_id=enterprise_id,
+                        team_id=team_id,
+                        user_id=user_id,
+                        is_enterprise_install=context.is_enterprise_install,
+                    )
+                    if user_installation is not None:
+                        installation = user_installation
+
+                bot_token, user_token = installation.bot_token, installation.user_token
+            except NotImplementedError as _:
+                self.find_installation_available = False
+
+        if not self.find_installation_available:
+            # Use find_bot to get bot value (legacy)
+            bot: Optional[Bot] = await self.installation_store.async_find_bot(
+                enterprise_id=enterprise_id,
+                team_id=team_id,
+                is_enterprise_install=context.is_enterprise_install,
+            )
+            if bot is None:
+                self._debug_log_for_not_found(enterprise_id, team_id)
+                return None
+            bot_token, user_token = bot.bot_token, None
+
+        token: Optional[str] = bot_token or user_token
+        if token is None:
             return None
 
-        if self.cache_enabled and bot.bot_token in self.authorize_result_cache:
-            return self.authorize_result_cache[bot.bot_token]
+        # Check cache to see if the bot object already exists
+        if self.cache_enabled and token in self.authorize_result_cache:
+            return self.authorize_result_cache[token]
+
         try:
-            auth_result = await context.client.auth_test(token=bot.bot_token)
+            auth_test_api_response = await context.client.auth_test(token=token)
             authorize_result = AuthorizeResult.from_auth_test_response(
-                auth_test_response=auth_result,
-                bot_token=bot.bot_token,
-                user_token=None,  # Not yet supported
+                auth_test_response=auth_test_api_response,
+                bot_token=bot_token,
+                user_token=user_token,
             )
             if self.cache_enabled:
-                self.authorize_result_cache[bot.bot_token] = authorize_result
+                self.authorize_result_cache[token] = authorize_result
             return authorize_result
         except SlackApiError as err:
             self.logger.debug(
@@ -140,3 +189,13 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                 f"is no longer valid. (response: {err.response})"
             )
             return None
+
+    # ------------------------------------------------
+
+    def _debug_log_for_not_found(
+        self, enterprise_id: Optional[str], team_id: Optional[str]
+    ):
+        self.logger.debug(
+            "No installation data found "
+            f"for enterprise_id: {enterprise_id} team_id: {team_id}"
+        )

@@ -33,7 +33,10 @@ class CallbackResponseBuilder:
         self._logger.debug(debug_message)
 
         html = self._redirect_uri_page_renderer.render_success_page(
-            app_id=installation.app_id, team_id=installation.team_id,
+            app_id=installation.app_id,
+            team_id=installation.team_id,
+            is_enterprise_install=installation.is_enterprise_install,
+            enterprise_url=installation.enterprise_url,
         )
         return BoltResponse(
             status=200,

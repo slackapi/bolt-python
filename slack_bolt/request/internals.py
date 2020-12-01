@@ -46,6 +46,15 @@ def parse_body(body: str, content_type: Optional[str]) -> Dict[str, Any]:
             return dict(parse_qsl(body))
 
 
+def extract_is_enterprise_install(payload: Dict[str, Any]) -> Optional[bool]:
+    if "is_enterprise_install" in payload:
+        is_enterprise_install = payload.get("is_enterprise_install")
+        return is_enterprise_install is not None and (
+            is_enterprise_install is True or is_enterprise_install == "true"
+        )
+    return False
+
+
 def extract_enterprise_id(payload: Dict[str, Any]) -> Optional[str]:
     if "enterprise" in payload:
         org = payload.get("enterprise")
@@ -119,6 +128,7 @@ def extract_channel_id(payload: Dict[str, Any]) -> Optional[str]:
 
 
 def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
+    context["is_enterprise_install"] = extract_is_enterprise_install(body)
     enterprise_id = extract_enterprise_id(body)
     if enterprise_id:
         context["enterprise_id"] = enterprise_id
