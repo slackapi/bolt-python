@@ -1,14 +1,21 @@
 import asyncio
 import logging
+from typing import Union
 
 from slack_sdk.socket_mode.async_client import AsyncBaseSocketModeClient
 from slack_sdk.socket_mode.request import SocketModeRequest
 
+from slack_bolt import App
+from slack_bolt.app.async_app import AsyncApp
+
 
 class AsyncBaseSocketModeHandler:
+    app: Union[App, AsyncApp]  # type: ignore
     client: AsyncBaseSocketModeClient
 
-    async def handle(self, client: AsyncBaseSocketModeClient, req: SocketModeRequest) -> None:
+    async def handle(
+        self, client: AsyncBaseSocketModeClient, req: SocketModeRequest
+    ) -> None:
         raise NotImplementedError()
 
     async def connect_async(self):
