@@ -800,6 +800,7 @@ class AsyncApp:
                 session=self._async_client.session,
                 trust_env_in_session=self._async_client.trust_env_in_session,
                 headers=self._async_client.headers,
+                team_id=req.context.team_id,
             )
             req.context["client"] = client_per_request
 

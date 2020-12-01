@@ -18,8 +18,12 @@ class BaseContext(dict):
         return self.get("enterprise_id")
 
     @property
-    def team_id(self) -> str:
-        return self["team_id"]
+    def is_enterprise_install(self) -> Optional[bool]:
+        return self.get("is_enterprise_install")
+
+    @property
+    def team_id(self) -> Optional[str]:
+        return self.get("team_id")
 
     @property
     def user_id(self) -> Optional[str]:

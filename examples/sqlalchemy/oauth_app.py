@@ -32,7 +32,7 @@ oauth_state_store = SQLAlchemyOAuthStateStore(
 )
 
 try:
-    engine.execute("select count(*) from bots")
+    engine.execute("select count(*) from slack_bots")
 except Exception as e:
     installation_store.metadata.create_all(engine)
     oauth_state_store.metadata.create_all(engine)

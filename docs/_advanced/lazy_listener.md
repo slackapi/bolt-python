@@ -19,8 +19,9 @@ Lazy listeners can be a solution for this issue. Rather than acting as a decorat
 
 ```python
 def respond_to_slack_within_3_seconds(body, ack):
-    if "text" in body:
-        ack(":x: Usage: /start-process (description here)")
+    text = body.get("text")
+    if text is None or len(text) == 0:
+        ack(f":x: Usage: /start-process (description here)")
     else:
         ack(f"Accepted! (task: {body['text']})")
 
@@ -43,7 +44,7 @@ app.command("/start-process")(
 </summary>
 
 <div class="secondary-content" markdown="0">
-This example deploys the code to [AWS Lambda](https://aws.amazon.com/lambda/). There are more examples within the [`sample` folder](https://github.com/slackapi/bolt-python/tree/main/adapter).
+This example deploys the code to [AWS Lambda](https://aws.amazon.com/lambda/). There are more examples within the [`examples` folder](https://github.com/slackapi/bolt-python/tree/main/examples/aws_lambda).
 
 ```bash
 pip install slack_bolt
@@ -63,11 +64,14 @@ lambda deploy --config-file config.yaml --requirements requirements.txt
 
 ```python
 from slack_bolt import App
+from slack_bolt.adapter.aws_lambda import SlackRequestHandler
+
 # process_before_response must be True when running on FaaS
 app = App(process_before_response=True)
 
 def respond_to_slack_within_3_seconds(body, ack):
-    if "text" in body:
+    text = body.get("text")
+    if text is None or len(text) == 0:
         ack(":x: Usage: /start-process (description here)")
     else:
         ack(f"Accepted! (task: {body['text']})")
@@ -82,7 +86,6 @@ app.command("/start-process")(
     lazy=[run_long_process]  # unable to call `ack()` / can have multiple functions
 )
 
-from slack_bolt.adapter.aws_lambda import SlackRequestHandler
 def handler(event, context):
     slack_handler = SlackRequestHandler(app=app)
     return slack_handler.handle(event, context)

@@ -25,7 +25,7 @@ command = "/hello-bolt-python-lambda"
 
 
 def respond_to_slack_within_3_seconds(body, ack):
-    if body.get("text", None) is None:
+    if body.get("text") is None:
         ack(f":x: Usage: {command} (description here)")
     else:
         title = body["text"]
