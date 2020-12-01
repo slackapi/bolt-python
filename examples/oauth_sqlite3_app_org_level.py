@@ -9,8 +9,10 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG)
 
-from slack_bolt import App
+from slack_bolt import App, BoltContext
 from slack_bolt.oauth import OAuthFlow
+from slack_sdk import WebClient
+
 
 app = App(oauth_flow=OAuthFlow.sqlite3(database="./slackapp.db"))
 
@@ -18,6 +20,13 @@ app = App(oauth_flow=OAuthFlow.sqlite3(database="./slackapp.db"))
 @app.use
 def dump(context, next, logger):
     logger.info(context)
+    next()
+
+
+@app.use
+def call_apis_with_team_id(context: BoltContext, client: WebClient, next):
+    # client.users_list()
+    client.bots_info(bot=context.bot_id)
     next()
 
 

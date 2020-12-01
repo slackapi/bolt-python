@@ -774,6 +774,7 @@ class App:
                 ssl=self._client.ssl,
                 proxy=self._client.proxy,
                 headers=self._client.headers,
+                team_id=req.context.team_id,
             )
             req.context["client"] = client_per_request
 
