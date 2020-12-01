@@ -15,6 +15,12 @@ from slack_bolt.oauth import OAuthFlow
 app = App(oauth_flow=OAuthFlow.sqlite3(database="./slackapp.db"))
 
 
+@app.use
+def dump(context, next, logger):
+    logger.info(context)
+    next()
+
+
 @app.event("app_mention")
 def handle_app_mentions(body, say, logger):
     logger.info(body)

@@ -132,6 +132,19 @@ class InstallationStoreAuthorize(Authorize):
                 if installation is None:
                     self._debug_log_for_not_found(enterprise_id, team_id)
                     return None
+
+                if installation.user_id != user_id:
+                    # try to fetch the request user's installation
+                    # to reflect the user's access token if exists
+                    user_installation = self.installation_store.find_installation(
+                        enterprise_id=enterprise_id,
+                        team_id=team_id,
+                        user_id=user_id,
+                        is_enterprise_install=context.is_enterprise_install,
+                    )
+                    if user_installation is not None:
+                        installation = user_installation
+
                 bot_token, user_token = installation.bot_token, installation.user_token
             except NotImplementedError as _:
                 self.find_installation_available = False
@@ -148,23 +161,23 @@ class InstallationStoreAuthorize(Authorize):
                 return None
             bot_token, user_token = bot.bot_token, None
 
+        token: Optional[str] = bot_token or user_token
+        if token is None:
+            return None
+
         # Check cache to see if the bot object already exists
-        if self.cache_enabled and bot_token in self.authorize_result_cache:
-            return self.authorize_result_cache[bot_token]
+        if self.cache_enabled and token in self.authorize_result_cache:
+            return self.authorize_result_cache[token]
 
         try:
-            token_to_test = bot_token or user_token
-            if token_to_test is None:
-                return None
-
-            auth_test_api_response = context.client.auth_test(token=token_to_test)
+            auth_test_api_response = context.client.auth_test(token=token)
             authorize_result = AuthorizeResult.from_auth_test_response(
                 auth_test_response=auth_test_api_response,
                 bot_token=bot_token,
                 user_token=user_token,
             )
             if self.cache_enabled:
-                self.authorize_result_cache[bot_token] = authorize_result
+                self.authorize_result_cache[token] = authorize_result
             return authorize_result
         except SlackApiError as err:
             self.logger.debug(
