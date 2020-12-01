@@ -103,8 +103,8 @@ class InstallationStoreAuthorize(Authorize):
         self.logger = logger
         self.installation_store = installation_store
         self.cache_enabled = cache_enabled
-        self.find_installation_available = self._verify_if_find_installation_is_available(
-            self.installation_store
+        self.find_installation_available = hasattr(
+            installation_store, "find_installation"
         )
 
     def __call__(
@@ -121,19 +121,27 @@ class InstallationStoreAuthorize(Authorize):
 
         if self.find_installation_available:
             # since v1.1, this is the default way
-            installation: Optional[
-                Installation
-            ] = self.installation_store.find_installation(
-                enterprise_id=enterprise_id, team_id=team_id,
-            )
-            if installation is None:
-                self._debug_log_for_not_found(enterprise_id, team_id)
-                return None
-            bot_token, user_token = installation.bot_token, installation.user_token
-        else:
+            try:
+                installation: Optional[
+                    Installation
+                ] = self.installation_store.find_installation(
+                    enterprise_id=enterprise_id,
+                    team_id=team_id,
+                    is_enterprise_install=context.is_enterprise_install,
+                )
+                if installation is None:
+                    self._debug_log_for_not_found(enterprise_id, team_id)
+                    return None
+                bot_token, user_token = installation.bot_token, installation.user_token
+            except NotImplementedError as _:
+                self.find_installation_available = False
+
+        if not self.find_installation_available:
             # Use find_bot to get bot value (legacy)
             bot: Optional[Bot] = self.installation_store.find_bot(
-                enterprise_id=enterprise_id, team_id=team_id,
+                enterprise_id=enterprise_id,
+                team_id=team_id,
+                is_enterprise_install=context.is_enterprise_install,
             )
             if bot is None:
                 self._debug_log_for_not_found(enterprise_id, team_id)
@@ -174,20 +182,3 @@ class InstallationStoreAuthorize(Authorize):
             "No installation data found "
             f"for enterprise_id: {enterprise_id} team_id: {team_id}"
         )
-
-    @staticmethod
-    def _verify_if_find_installation_is_available(
-        installation_store: InstallationStore,
-    ) -> bool:
-        # For ensuring backward compatibility,
-        # we check if the method exists and is implemented.
-        available = hasattr(installation_store, "find_installation")
-        if available:
-            try:
-                # try the find_installation() method
-                installation_store.find_installation(enterprise_id=None, team_id=None)
-            except NotImplementedError as _:
-                available = False
-            except Exception as _:
-                pass
-        return available

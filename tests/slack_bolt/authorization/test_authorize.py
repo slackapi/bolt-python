@@ -29,12 +29,13 @@ class TestAuthorize:
         authorize = InstallationStoreAuthorize(
             logger=installation_store.logger, installation_store=installation_store
         )
-        assert authorize.find_installation_available is False
+        assert authorize.find_installation_available is True
         context = BoltContext()
         context["client"] = WebClient(base_url=self.mock_api_server_base_url)
         result = authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
         )
+        assert authorize.find_installation_available is False
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
@@ -55,12 +56,13 @@ class TestAuthorize:
             installation_store=installation_store,
             cache_enabled=True,
         )
-        assert authorize.find_installation_available is False
+        assert authorize.find_installation_available is True
         context = BoltContext()
         context["client"] = WebClient(base_url=self.mock_api_server_base_url)
         result = authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
         )
+        assert authorize.find_installation_available is False
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
@@ -134,7 +136,11 @@ class LegacyMemoryInstallationStore(InstallationStore):
         pass
 
     def find_bot(
-        self, *, enterprise_id: Optional[str], team_id: Optional[str]
+        self,
+        *,
+        enterprise_id: Optional[str],
+        team_id: Optional[str],
+        is_enterprise_install: Optional[bool] = False,
     ) -> Optional[Bot]:
         return Bot(
             app_id="A111",
@@ -155,7 +161,7 @@ class MemoryInstallationStore(LegacyMemoryInstallationStore):
         enterprise_id: Optional[str],
         team_id: Optional[str],
         user_id: Optional[str] = None,
-        is_enterprise_install: Optional[bool] = False
+        is_enterprise_install: Optional[bool] = False,
     ) -> Optional[Installation]:
         return Installation(
             app_id="A111",

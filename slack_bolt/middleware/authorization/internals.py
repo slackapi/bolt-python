@@ -29,21 +29,15 @@ def _is_ssl_check(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type:
     )
 
 
-def _is_uninstallation_event(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore
+no_auth_test_events = ["app_uninstalled", "tokens_revoked", "team_access_revoked"]
+
+
+def _is_no_auth_test_events(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore
     return (
         req is not None
         and req.body is not None
         and req.body.get("type") == "event_callback"
-        and req.body.get("event", {}).get("type") == "app_uninstalled"
-    )
-
-
-def _is_tokens_revoked_event(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore
-    return (
-        req is not None
-        and req.body is not None
-        and req.body.get("type") == "event_callback"
-        and req.body.get("event", {}).get("type") == "tokens_revoked"
+        and req.body.get("event", {}).get("type") in no_auth_test_events
     )
 
 
@@ -52,7 +46,7 @@ def _is_no_auth_required(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  
 
 
 def _is_no_auth_test_call_required(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore
-    return _is_uninstallation_event(req) or _is_tokens_revoked_event(req)
+    return _is_no_auth_test_events(req)
 
 
 def _build_error_response() -> BoltResponse:

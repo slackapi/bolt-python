@@ -6,6 +6,7 @@ from slack_bolt.request.internals import (
     extract_team_id,
     extract_enterprise_id,
     parse_query,
+    extract_is_enterprise_install,
 )
 
 
@@ -68,6 +69,17 @@ class TestRequestInternals:
         for req in self.requests:
             team_id = extract_enterprise_id(req)
             assert team_id == "E111"
+
+    def test_is_enterprise_install_extraction(self):
+        for req in self.requests:
+            should_be_false = extract_is_enterprise_install(req)
+            assert should_be_false is False
+        assert extract_is_enterprise_install({"is_enterprise_install": True}) is True
+        assert extract_is_enterprise_install({"is_enterprise_install": False}) is False
+        assert extract_is_enterprise_install({"is_enterprise_install": "true"}) is True
+        assert (
+            extract_is_enterprise_install({"is_enterprise_install": "false"}) is False
+        )
 
     def test_parse_query(self):
         expected = {"foo": ["bar"], "baz": ["123"]}

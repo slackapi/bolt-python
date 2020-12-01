@@ -116,8 +116,8 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
     ) -> Optional[AuthorizeResult]:
 
         if self.find_installation_available is None:
-            self.find_installation_available = await self._verify_if_find_installation_is_available(
-                self.installation_store
+            self.find_installation_available = hasattr(
+                self.installation_store, "async_find_installation"
             )
 
         bot_token: Optional[str] = None
@@ -125,19 +125,27 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
 
         if self.find_installation_available:
             # since v1.1, this is the default way
-            installation: Optional[
-                Installation
-            ] = await self.installation_store.async_find_installation(
-                enterprise_id=enterprise_id, team_id=team_id,
-            )
-            if installation is None:
-                self._debug_log_for_not_found(enterprise_id, team_id)
-                return None
-            bot_token, user_token = installation.bot_token, installation.user_token
-        else:
+            try:
+                installation: Optional[
+                    Installation
+                ] = await self.installation_store.async_find_installation(
+                    enterprise_id=enterprise_id,
+                    team_id=team_id,
+                    is_enterprise_install=context.is_enterprise_install,
+                )
+                if installation is None:
+                    self._debug_log_for_not_found(enterprise_id, team_id)
+                    return None
+                bot_token, user_token = installation.bot_token, installation.user_token
+            except NotImplementedError as _:
+                self.find_installation_available = False
+
+        if not self.find_installation_available:
             # Use find_bot to get bot value (legacy)
             bot: Optional[Bot] = await self.installation_store.async_find_bot(
-                enterprise_id=enterprise_id, team_id=team_id,
+                enterprise_id=enterprise_id,
+                team_id=team_id,
+                is_enterprise_install=context.is_enterprise_install,
             )
             if bot is None:
                 self._debug_log_for_not_found(enterprise_id, team_id)
@@ -178,22 +186,3 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
             "No installation data found "
             f"for enterprise_id: {enterprise_id} team_id: {team_id}"
         )
-
-    @staticmethod
-    async def _verify_if_find_installation_is_available(
-        installation_store: AsyncInstallationStore,
-    ) -> bool:
-        # For ensuring backward compatibility,
-        # we check if the method exists and is implemented.
-        available = hasattr(installation_store, "async_find_installation")
-        if available:
-            try:
-                # try the async_find_installation() method
-                await installation_store.async_find_installation(
-                    enterprise_id=None, team_id=None
-                )
-            except NotImplementedError as _:
-                available = False
-            except Exception as _:
-                pass
-        return available
