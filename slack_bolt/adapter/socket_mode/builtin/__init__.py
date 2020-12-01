@@ -3,7 +3,7 @@ from time import time
 from typing import Optional
 
 from slack_sdk.socket_mode.request import SocketModeRequest
-from slack_sdk.socket_mode.websocket_client import SocketModeClient
+from slack_sdk.socket_mode.builtin import SocketModeClient
 
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode.base_handler import BaseSocketModeHandler
