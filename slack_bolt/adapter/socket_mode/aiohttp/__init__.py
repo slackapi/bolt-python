@@ -17,12 +17,14 @@ from slack_bolt.response import BoltResponse
 
 
 class SocketModeHandler(AsyncBaseSocketModeHandler):
-    app: App
+    app: App  # type: ignore
     app_token: str
     client: SocketModeClient
 
-    def __init__(
-        self, app: App, app_token: Optional[str] = None,
+    def __init__(  # type: ignore
+        self,
+        app: App,  # type: ignore
+        app_token: Optional[str] = None,
     ):
         self.app = app
         self.app_token = app_token or os.environ["SLACK_APP_TOKEN"]
@@ -36,12 +38,14 @@ class SocketModeHandler(AsyncBaseSocketModeHandler):
 
 
 class AsyncSocketModeHandler(AsyncBaseSocketModeHandler):
-    app: AsyncApp
+    app: AsyncApp  # type: ignore
     app_token: str
     client: SocketModeClient
 
-    def __init__(
-        self, app: AsyncApp, app_token: Optional[str] = None,
+    def __init__(  # type: ignore
+        self,
+        app: AsyncApp,  # type: ignore
+        app_token: Optional[str] = None,
     ):
         self.app = app
         self.app_token = app_token or os.environ["SLACK_APP_TOKEN"]
