@@ -91,6 +91,7 @@ class CallableAuthorize(Authorize):
 
 class InstallationStoreAuthorize(Authorize):
     authorize_result_cache: Dict[str, AuthorizeResult] = {}
+    find_installation_available: bool
 
     def __init__(
         self,
@@ -102,6 +103,9 @@ class InstallationStoreAuthorize(Authorize):
         self.logger = logger
         self.installation_store = installation_store
         self.cache_enabled = cache_enabled
+        self.find_installation_available = self._verify_if_find_installation_is_available(
+            self.installation_store
+        )
 
     def __call__(
         self,
@@ -112,68 +116,47 @@ class InstallationStoreAuthorize(Authorize):
         user_id: Optional[str],
     ) -> Optional[AuthorizeResult]:
 
-        # couldn't get this to work
-        # installation_or_bot: Optional[Bot] | Optional[Installation]
+        bot_token: Optional[str] = None
+        user_token: Optional[str] = None
 
-
-        # TODO
-        # - handle Not ImplementedError
-        # - if installation doesn't work, cache that so we don't call it again
-        # - implement in async_authorize
-
-        if hasattr(self.installation_store, "find_installation"):
-            # Use find_bot to get bot value (legacy)
+        if self.find_installation_available:
+            # since v1.1, this is the default way
             installation: Optional[
                 Installation
             ] = self.installation_store.find_installation(
                 enterprise_id=enterprise_id, team_id=team_id,
             )
             if installation is None:
-                self.logger.debug(
-                    f"No installation data found "
-                    f"for enterprise_id: {enterprise_id} team_id: {team_id}"
-                )
+                self._debug_log_for_not_found(enterprise_id, team_id)
                 return None
-
-            # Check cache to see if the installation object already exists
-            if (
-                self.cache_enabled
-                and installation.bot_token in self.authorize_result_cache
-            ):
-                return self.authorize_result_cache[installation.bot_token]
-
-            installation_or_bot = installation
+            bot_token, user_token = installation.bot_token, installation.user_token
         else:
             # Use find_bot to get bot value (legacy)
             bot: Optional[Bot] = self.installation_store.find_bot(
                 enterprise_id=enterprise_id, team_id=team_id,
             )
             if bot is None:
-                self.logger.debug(
-                    f"No installation data found "
-                    f"for enterprise_id: {enterprise_id} team_id: {team_id}"
-                )
+                self._debug_log_for_not_found(enterprise_id, team_id)
                 return None
+            bot_token, user_token = bot.bot_token, None
 
-            # Check cache to see if the bot object already exists
-            if self.cache_enabled and bot.bot_token in self.authorize_result_cache:
-                return self.authorize_result_cache[bot.bot_token]
-
-            installation_or_bot = bot
+        # Check cache to see if the bot object already exists
+        if self.cache_enabled and bot_token in self.authorize_result_cache:
+            return self.authorize_result_cache[bot_token]
 
         try:
-            auth_result = context.client.auth_test(token=installation_or_bot.bot_token)
+            token_to_test = bot_token or user_token
+            if token_to_test is None:
+                return None
+
+            auth_test_api_response = context.client.auth_test(token=token_to_test)
             authorize_result = AuthorizeResult.from_auth_test_response(
-                auth_test_response=auth_result,
-                bot_token=installation_or_bot.bot_token,
-                user_token=installation_or_bot.user_token
-                if "user_token" in installation_or_bot  # check has attribute with python
-                else None,  # Not yet supported
+                auth_test_response=auth_test_api_response,
+                bot_token=bot_token,
+                user_token=user_token,
             )
             if self.cache_enabled:
-                self.authorize_result_cache[
-                    installation_or_bot.bot_token
-                ] = authorize_result
+                self.authorize_result_cache[bot_token] = authorize_result
             return authorize_result
         except SlackApiError as err:
             self.logger.debug(
@@ -181,3 +164,30 @@ class InstallationStoreAuthorize(Authorize):
                 f"is no longer valid. (response: {err.response})"
             )
             return None
+
+    # ------------------------------------------------
+
+    def _debug_log_for_not_found(
+        self, enterprise_id: Optional[str], team_id: Optional[str]
+    ):
+        self.logger.debug(
+            "No installation data found "
+            f"for enterprise_id: {enterprise_id} team_id: {team_id}"
+        )
+
+    @staticmethod
+    def _verify_if_find_installation_is_available(
+        installation_store: InstallationStore,
+    ) -> bool:
+        # For ensuring backward compatibility,
+        # we check if the method exists and is implemented.
+        available = hasattr(installation_store, "find_installation")
+        if available:
+            try:
+                # try the find_installation() method
+                installation_store.find_installation(enterprise_id=None, team_id=None)
+            except NotImplementedError as _:
+                available = False
+            except Exception as _:
+                pass
+        return available
