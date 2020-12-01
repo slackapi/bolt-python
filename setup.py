@@ -16,7 +16,7 @@ test_dependencies = [
     "pytest-cov>=2,<3",
     "pytest-asyncio<1",  # for async
     "aiohttp>=3,<4",  # for async
-    "black==19.10b0",
+    "black==19.10b0",  # TODO: upgrading the version
 ]
 
 setuptools.setup(
@@ -33,7 +33,7 @@ setuptools.setup(
         exclude=["examples", "integration_tests", "tests", "tests.*",]
     ),
     include_package_data=True,  # MANIFEST.in
-    install_requires=["slack_sdk==3.1.0b2",],
+    install_requires=["slack_sdk>=3.1.0rc1,<3.2",],
     setup_requires=["pytest-runner==5.2"],
     tests_require=test_dependencies,
     test_suite="tests",
