@@ -1,3 +1,4 @@
+import json
 import logging
 from time import time
 
@@ -10,7 +11,7 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
-def run_bolt_app(app: App, req: SocketModeRequest):
+def run_bolt_app(app: App, req: SocketModeRequest):  # type: ignore
     bolt_req: BoltRequest = BoltRequest(mode="socket_mode", body=req.payload)
     bolt_resp: BoltResponse = app.dispatch(bolt_req)
     return bolt_resp
@@ -20,16 +21,18 @@ def send_response(
     client: BaseSocketModeClient,
     req: SocketModeRequest,
     bolt_resp: BoltResponse,
-    start_time: int,
+    start_time: float,
 ):
     if bolt_resp.status == 200:
+        content_type = bolt_resp.headers.get("content-type", [""])[0]
         if bolt_resp.body is None or len(bolt_resp.body) == 0:
             client.send_socket_mode_response(
                 SocketModeResponse(envelope_id=req.envelope_id)
             )
-        elif bolt_resp.body.startswith("{"):
+        elif content_type.startswith("application/json"):
+            dict_body = json.loads(bolt_resp.body)
             client.send_socket_mode_response(
-                SocketModeResponse(envelope_id=req.envelope_id, payload=bolt_resp.body,)
+                SocketModeResponse(envelope_id=req.envelope_id, payload=dict_body)
             )
         else:
             client.send_socket_mode_response(
