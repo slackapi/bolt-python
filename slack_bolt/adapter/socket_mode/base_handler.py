@@ -4,8 +4,11 @@ from threading import Event
 from slack_sdk.socket_mode.client import BaseSocketModeClient
 from slack_sdk.socket_mode.request import SocketModeRequest
 
+from slack_bolt import App
+
 
 class BaseSocketModeHandler:
+    app: App  # type: ignore
     client: BaseSocketModeClient
 
     def handle(self, client: BaseSocketModeClient, req: SocketModeRequest) -> None:
