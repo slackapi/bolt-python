@@ -3,6 +3,9 @@ import logging
 import os
 from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable, Sequence
 
+from aiohttp import web
+
+from slack_bolt.app.async_server import AsyncSlackAppServer
 from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
 from slack_bolt.middleware.message_listener_matches.async_message_listener_matches import (
     AsyncMessageListenerMatches,
@@ -225,6 +228,8 @@ class AsyncApp:
         self._init_middleware_list_done = False
         self._init_async_middleware_list()
 
+        self._server: Optional[AsyncSlackAppServer] = None
+
     def _init_async_middleware_list(self):
         if self._init_middleware_list_done:
             return
@@ -282,6 +287,28 @@ class AsyncApp:
     # -------------------------
     # standalone server
 
+    from .async_server import AsyncSlackAppServer
+
+    def server(
+        self, port: int = 3000, path: str = "/slack/events"
+    ) -> AsyncSlackAppServer:
+        """Configure a web server using AIOHTTP.
+
+        :param port: The port to listen on (Default: 3000)
+        :param path: The path to handle request from Slack (Default: /slack/events)
+        :return: None
+        """
+        if (
+            self._server is None
+            or self._server.port != port
+            or self._server.path != path
+        ):
+            self._server = AsyncSlackAppServer(port=port, path=path, app=self,)
+        return self._server
+
+    def web_app(self, path: str = "/slack/events") -> web.Application:
+        return self.server(path=path).web_app
+
     def start(self, port: int = 3000, path: str = "/slack/events") -> None:
         """Start a web server using AIOHTTP.
 
@@ -289,10 +316,7 @@ class AsyncApp:
         :param path: The path to handle request from Slack (Default: /slack/events)
         :return: None
         """
-        from .async_server import AsyncSlackAppServer
-
-        self.server = AsyncSlackAppServer(port=port, path=path, app=self,)
-        self.server.start()
+        self.server(port=port, path=path).start()
 
     # -------------------------
     # main dispatcher
