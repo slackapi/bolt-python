@@ -1,0 +1,49 @@
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+name: CI Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', '3.9']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python setup.py install
+        pip install -U pip
+        pip install "pytest>=5,<6" "pytest-cov>=2,<3"
+    - name: Run tests without aiohttp
+      run: |
+        pytest tests/slack_bolt/
+        pytest tests/scenario_tests/
+    - name: Run tests for adapters
+      run: |
+        pip install -e ".[adapter]"
+        pytest tests/adapter_tests/
+    - name: Run async tests
+      run: |
+        pip install -e ".[async]"
+        pip install "pytest-asyncio<1"
+        pytest tests/slack_bolt_async/
+        pytest tests/scenario_tests_async/
+        pytest tests/adapter_tests_async/
+    - name: Run pytype verification & codecov
+      run: |
+        python_version=`python -V`
+        if [ ${python_version:7:3} == "3.8" ]; then
+          pip install "pytype" && pytype slack_bolt/
+          pytest --cov=slack_bolt/ && bash <(curl -s https://codecov.io/bash)
+        fi
