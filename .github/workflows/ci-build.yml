@@ -49,6 +49,8 @@ jobs:
       run: |
         python_version=`python -V`
         if [ ${python_version:7:3} == "3.8" ]; then
+          pip install -e ".[async]"
+          pip install -e ".[adapter]"
           pip install "pytype" && pytype slack_bolt/
           pytest --cov=slack_bolt/ && bash <(curl -s https://codecov.io/bash)
         fi
