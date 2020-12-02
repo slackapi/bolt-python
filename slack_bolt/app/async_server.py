@@ -9,11 +9,11 @@ from slack_bolt.response import BoltResponse
 class AsyncSlackAppServer:
     port: int
     path: str
-    bolt_app: "AsyncApp"
+    bolt_app: "AsyncApp"  # type:ignore
     web_app: web.Application
 
-    def __init__(
-        self, port: int, path: str, app: "AsyncApp",
+    def __init__(  # type:ignore
+        self, port: int, path: str, app: "AsyncApp",  # type:ignore
     ):
         """Standalone AIOHTTP Web Server
 
