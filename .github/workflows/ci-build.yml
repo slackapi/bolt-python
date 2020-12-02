@@ -38,7 +38,7 @@ jobs:
         # As the tests here are often slow on GitHub Actions,
         # we pick up only one Python version for it.
         python_version=`python -V`
-        if [ ${python_version:7:3} == "3.9" ]; then
+        if [ ${python_version:7:3} == "3.6" ]; then
           pip install -e ".[async]"
           pip install "pytest-asyncio<1"
           pytest tests/slack_bolt_async/
