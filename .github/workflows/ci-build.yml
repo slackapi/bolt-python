@@ -35,11 +35,16 @@ jobs:
         pytest tests/adapter_tests/
     - name: Run async tests
       run: |
-        pip install -e ".[async]"
-        pip install "pytest-asyncio<1"
-        pytest tests/slack_bolt_async/
-        pytest tests/scenario_tests_async/
-        pytest tests/adapter_tests_async/
+        # As the tests here are often slow on GitHub Actions,
+        # we pick up only one Python version for it.
+        python_version=`python -V`
+        if [ ${python_version:7:3} == "3.9" ]; then
+          pip install -e ".[async]"
+          pip install "pytest-asyncio<1"
+          pytest tests/slack_bolt_async/
+          pytest tests/scenario_tests_async/
+          pytest tests/adapter_tests_async/
+        fi
     - name: Run pytype verification & codecov
       run: |
         python_version=`python -V`
