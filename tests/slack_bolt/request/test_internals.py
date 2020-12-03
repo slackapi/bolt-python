@@ -50,6 +50,35 @@ class TestRequestInternals:
         },
     ]
 
+    enterprise_no_channel_requests = [
+        {
+            "type": "shortcut",
+            "token": "xxx",
+            "action_ts": "1606983924.521157",
+            "team": {"id": "T111", "domain": "ddd"},
+            "user": {"id": "U111", "username": "use", "team_id": "T111"},
+            "is_enterprise_install": False,
+            "enterprise": {"id": "E111", "domain": "eee"},
+            "callback_id": "run-socket-mode",
+            "trigger_id": "111.222.xxx",
+        },
+    ]
+
+    no_enterprise_no_channel_requests = [
+        {
+            "type": "shortcut",
+            "token": "xxx",
+            "action_ts": "1606983924.521157",
+            "team": {"id": "T111", "domain": "ddd"},
+            "user": {"id": "U111", "username": "use", "team_id": "T111"},
+            "is_enterprise_install": False,
+            # This may be "null" in Socket Mode
+            "enterprise": None,
+            "callback_id": "run-socket-mode",
+            "trigger_id": "111.222.xxx",
+        },
+    ]
+
     def test_channel_id_extraction(self):
         for req in self.requests:
             channel_id = extract_channel_id(req)
@@ -59,16 +88,34 @@ class TestRequestInternals:
         for req in self.requests:
             user_id = extract_user_id(req)
             assert user_id == "U111"
+        for req in self.enterprise_no_channel_requests:
+            user_id = extract_user_id(req)
+            assert user_id == "U111"
+        for req in self.no_enterprise_no_channel_requests:
+            user_id = extract_user_id(req)
+            assert user_id == "U111"
 
     def test_team_id_extraction(self):
         for req in self.requests:
             team_id = extract_team_id(req)
             assert team_id == "T111"
+        for req in self.enterprise_no_channel_requests:
+            team_id = extract_team_id(req)
+            assert team_id == "T111"
+        for req in self.no_enterprise_no_channel_requests:
+            team_id = extract_team_id(req)
+            assert team_id == "T111"
 
     def test_enterprise_id_extraction(self):
         for req in self.requests:
-            team_id = extract_enterprise_id(req)
-            assert team_id == "E111"
+            enterprise_id = extract_enterprise_id(req)
+            assert enterprise_id == "E111"
+        for req in self.enterprise_no_channel_requests:
+            enterprise_id = extract_enterprise_id(req)
+            assert enterprise_id == "E111"
+        for req in self.no_enterprise_no_channel_requests:
+            enterprise_id = extract_enterprise_id(req)
+            assert enterprise_id is None
 
     def test_is_enterprise_install_extraction(self):
         for req in self.requests:
