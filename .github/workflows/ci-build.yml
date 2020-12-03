@@ -45,7 +45,16 @@ jobs:
           pytest tests/scenario_tests_async/
           pytest tests/adapter_tests_async/
         fi
-    - name: Run pytype verification & codecov
+    - name: Run pytype verification
+      run: |
+        python_version=`python -V`
+        if [ ${python_version:7:3} == "3.8" ]; then
+          pip install -e ".[async]"
+          pip install -e ".[adapter]"
+          pip install "pytype" && pytype slack_bolt/
+        fi
+
+    - name: Run all tests for codecov
       run: |
         python_version=`python -V`
         # TODO: As Python 3.6 works the most stably on GitHub Actions,
@@ -53,6 +62,5 @@ jobs:
         if [ ${python_version:7:3} == "3.6" ]; then
           pip install -e ".[async]"
           pip install -e ".[adapter]"
-          pip install "pytype" && pytype slack_bolt/
           pytest --cov=slack_bolt/ && bash <(curl -s https://codecov.io/bash)
         fi
