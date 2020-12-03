@@ -35,9 +35,9 @@ jobs:
         pytest tests/adapter_tests/
     - name: Run async tests
       run: |
-        # As the tests here are often slow on GitHub Actions,
-        # we pick up only one Python version for it.
         python_version=`python -V`
+        # TODO: As Python 3.6 works the most stably on GitHub Actions,
+        # we use the version for code coverage and async tests
         if [ ${python_version:7:3} == "3.6" ]; then
           pip install -e ".[async]"
           pip install "pytest-asyncio<1"
@@ -48,7 +48,9 @@ jobs:
     - name: Run pytype verification & codecov
       run: |
         python_version=`python -V`
-        if [ ${python_version:7:3} == "3.8" ]; then
+        # TODO: As Python 3.6 works the most stably on GitHub Actions,
+        # we use the version for code coverage and async tests
+        if [ ${python_version:7:3} == "3.6" ]; then
           pip install -e ".[async]"
           pip install -e ".[adapter]"
           pip install "pytype" && pytype slack_bolt/
