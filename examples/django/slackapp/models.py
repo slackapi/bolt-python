@@ -8,11 +8,14 @@ class SlackBot(models.Model):
     client_id = models.TextField(null=False)
     app_id = models.TextField(null=False)
     enterprise_id = models.TextField(null=True)
+    enterprise_name = models.TextField(null=True)
     team_id = models.TextField(null=True)
+    team_name = models.TextField(null=True)
     bot_token = models.TextField(null=True)
     bot_id = models.TextField(null=True)
     bot_user_id = models.TextField(null=True)
     bot_scopes = models.TextField(null=True)
+    is_enterprise_install = models.BooleanField(null=True)
     installed_at = models.DateTimeField(null=False)
 
     class Meta:
@@ -27,7 +30,10 @@ class SlackInstallation(models.Model):
     client_id = models.TextField(null=False)
     app_id = models.TextField(null=False)
     enterprise_id = models.TextField(null=True)
+    enterprise_name = models.TextField(null=True)
+    enterprise_url = models.TextField(null=True)
     team_id = models.TextField(null=True)
+    team_name = models.TextField(null=True)
     bot_token = models.TextField(null=True)
     bot_id = models.TextField(null=True)
     bot_user_id = models.TextField(null=True)
@@ -36,8 +42,11 @@ class SlackInstallation(models.Model):
     user_token = models.TextField(null=True)
     user_scopes = models.TextField(null=True)
     incoming_webhook_url = models.TextField(null=True)
+    incoming_webhook_channel = models.TextField(null=True)
     incoming_webhook_channel_id = models.TextField(null=True)
     incoming_webhook_configuration_url = models.TextField(null=True)
+    is_enterprise_install = models.BooleanField(null=True)
+    token_type = models.TextField(null=True)
     installed_at = models.DateTimeField(null=False)
 
     class Meta:
@@ -95,11 +104,16 @@ class DjangoInstallationStore(InstallationStore):
         SlackBot(**b).save()
 
     def find_bot(
-        self, *, enterprise_id: Optional[str], team_id: Optional[str]
+        self, *, enterprise_id: Optional[str], team_id: Optional[str],
+        is_enterprise_install: Optional[bool] = False
     ) -> Optional[Bot]:
+        e_id = enterprise_id or None
+        t_id = team_id or None
+        if is_enterprise_install:
+            t_id = None
         rows = (
-            SlackBot.objects.filter(enterprise_id=enterprise_id)
-            .filter(team_id=team_id)
+            SlackBot.objects.filter(enterprise_id=e_id)
+            .filter(team_id=t_id)
             .order_by(F("installed_at").desc())[:1]
         )
         if len(rows) > 0:
@@ -113,6 +127,47 @@ class DjangoInstallationStore(InstallationStore):
                 bot_user_id=b.bot_user_id,
                 bot_scopes=b.bot_scopes,
                 installed_at=b.installed_at.timestamp(),
+            )
+        return None
+
+    def find_installation(
+        self,
+        *,
+        enterprise_id: Optional[str],
+        team_id: Optional[str],
+        user_id: Optional[str] = None,
+        is_enterprise_install: Optional[bool] = False,
+    ) -> Optional[Installation]:
+        e_id = enterprise_id or None
+        t_id = team_id or None
+        if is_enterprise_install:
+            t_id = None
+        if user_id is None:
+            rows = (SlackInstallation.objects.filter(
+                enterprise_id=e_id).filter(team_id=t_id).order_by(
+                    F("installed_at").desc())[:1])
+        else:
+            rows = (SlackInstallation.objects.filter(
+                enterprise_id=e_id).filter(team_id=t_id).filter(
+                    user_id=user_id).order_by(F("installed_at").desc())[:1])
+
+        if len(rows) > 0:
+            i = rows[0]
+            return Installation(
+                app_id=i.app_id,
+                enterprise_id=i.enterprise_id,
+                team_id=i.team_id,
+                bot_token=i.bot_token,
+                bot_id=i.bot_id,
+                bot_user_id=i.bot_user_id,
+                bot_scopes=i.bot_scopes,
+                user_id=i.user_id,
+                user_token=i.user_token,
+                user_scopes=i.user_scopes,
+                incoming_webhook_url=i.incoming_webhook_url,
+                incoming_webhook_channel_id=i.incoming_webhook_channel_id,
+                incoming_webhook_configuration_url=i.incoming_webhook_configuration_url,
+                installed_at=i.installed_at.timestamp(),
             )
         return None
 
