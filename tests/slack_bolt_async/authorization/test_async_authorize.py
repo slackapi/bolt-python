@@ -91,6 +91,65 @@ class TestAsyncAuthorize:
         assert self.mock_received_requests["/auth.test"] == 1  # cached
 
     @pytest.mark.asyncio
+    async def test_installation_store_bot_only(self):
+        installation_store = MemoryInstallationStore()
+        authorize = AsyncInstallationStoreAuthorize(
+            logger=installation_store.logger,
+            installation_store=installation_store,
+            bot_only=True,
+        )
+        assert authorize.find_installation_available is None
+        assert authorize.bot_only is True
+        context = AsyncBoltContext()
+        context["client"] = self.client
+        result = await authorize(
+            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
+        )
+        assert authorize.find_installation_available is True
+        assert result.bot_id == "BZYBOTHED"
+        assert result.bot_user_id == "W23456789"
+        assert result.user_token is None
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        result = await authorize(
+            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
+        )
+        assert result.bot_id == "BZYBOTHED"
+        assert result.bot_user_id == "W23456789"
+        assert result.user_token is None
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    @pytest.mark.asyncio
+    async def test_installation_store_cached_bot_only(self):
+        installation_store = MemoryInstallationStore()
+        authorize = AsyncInstallationStoreAuthorize(
+            logger=installation_store.logger,
+            installation_store=installation_store,
+            cache_enabled=True,
+            bot_only=True,
+        )
+        assert authorize.find_installation_available is None
+        assert authorize.bot_only is True
+        context = AsyncBoltContext()
+        context["client"] = self.client
+        result = await authorize(
+            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
+        )
+        assert authorize.find_installation_available is True
+        assert result.bot_id == "BZYBOTHED"
+        assert result.bot_user_id == "W23456789"
+        assert result.user_token is None
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        result = await authorize(
+            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
+        )
+        assert result.bot_id == "BZYBOTHED"
+        assert result.bot_user_id == "W23456789"
+        assert result.user_token is None
+        assert self.mock_received_requests["/auth.test"] == 1  # cached
+
+    @pytest.mark.asyncio
     async def test_installation_store(self):
         installation_store = MemoryInstallationStore()
         authorize = AsyncInstallationStoreAuthorize(

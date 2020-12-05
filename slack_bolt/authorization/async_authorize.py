@@ -91,7 +91,7 @@ class AsyncCallableAuthorize(AsyncAuthorize):
 
 
 class AsyncInstallationStoreAuthorize(AsyncAuthorize):
-    authorize_result_cache: Dict[str, AuthorizeResult] = {}
+    authorize_result_cache: Dict[str, AuthorizeResult]
     find_installation_available: Optional[bool]
 
     def __init__(
@@ -99,11 +99,16 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
         *,
         logger: Logger,
         installation_store: AsyncInstallationStore,
+        # For v1.0.x compatibility and people who still want its simplicity
+        # use only InstallationStore#find_bot(enterprise_id, team_id)
+        bot_only: bool = False,
         cache_enabled: bool = False,
     ):
         self.logger = logger
         self.installation_store = installation_store
+        self.bot_only = bot_only
         self.cache_enabled = cache_enabled
+        self.authorize_result_cache = {}
         self.find_installation_available = None
 
     async def __call__(
@@ -123,7 +128,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
         bot_token: Optional[str] = None
         user_token: Optional[str] = None
 
-        if self.find_installation_available:
+        if not self.bot_only and self.find_installation_available:
             # since v1.1, this is the default way
             try:
                 installation: Optional[
@@ -153,7 +158,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
             except NotImplementedError as _:
                 self.find_installation_available = False
 
-        if not self.find_installation_available:
+        if self.bot_only or not self.find_installation_available:
             # Use find_bot to get bot value (legacy)
             bot: Optional[Bot] = await self.installation_store.async_find_bot(
                 enterprise_id=enterprise_id,

@@ -76,6 +76,63 @@ class TestAuthorize:
         assert result.user_token is None
         assert self.mock_received_requests["/auth.test"] == 1  # cached
 
+    def test_installation_store_bot_only(self):
+        installation_store = MemoryInstallationStore()
+        authorize = InstallationStoreAuthorize(
+            logger=installation_store.logger,
+            installation_store=installation_store,
+            bot_only=True,
+        )
+        assert authorize.find_installation_available is True
+        assert authorize.bot_only is True
+        context = BoltContext()
+        context["client"] = WebClient(base_url=self.mock_api_server_base_url)
+        result = authorize(
+            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
+        )
+        assert authorize.find_installation_available is True
+        assert result.bot_id == "BZYBOTHED"
+        assert result.bot_user_id == "W23456789"
+        assert result.user_token is None
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        result = authorize(
+            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
+        )
+        assert result.bot_id == "BZYBOTHED"
+        assert result.bot_user_id == "W23456789"
+        assert result.user_token is None
+        assert self.mock_received_requests["/auth.test"] == 2
+
+    def test_installation_store_cached_bot_only(self):
+        installation_store = MemoryInstallationStore()
+        authorize = InstallationStoreAuthorize(
+            logger=installation_store.logger,
+            installation_store=installation_store,
+            cache_enabled=True,
+            bot_only=True,
+        )
+        assert authorize.find_installation_available is True
+        assert authorize.bot_only is True
+        context = BoltContext()
+        context["client"] = WebClient(base_url=self.mock_api_server_base_url)
+        result = authorize(
+            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
+        )
+        assert authorize.find_installation_available is True
+        assert result.bot_id == "BZYBOTHED"
+        assert result.bot_user_id == "W23456789"
+        assert result.user_token is None
+        assert self.mock_received_requests["/auth.test"] == 1
+
+        result = authorize(
+            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
+        )
+        assert result.bot_id == "BZYBOTHED"
+        assert result.bot_user_id == "W23456789"
+        assert result.user_token is None
+        assert self.mock_received_requests["/auth.test"] == 1  # cached
+
     def test_installation_store(self):
         installation_store = MemoryInstallationStore()
         authorize = InstallationStoreAuthorize(

@@ -39,6 +39,7 @@ class AsyncOAuthSettings:
     authorization_url: str  # default: https://slack.com/oauth/v2/authorize
     # Installation Management
     installation_store: AsyncInstallationStore
+    installation_store_bot_only: bool
     authorize: AsyncAuthorize
     # state parameter related configurations
     state_store: AsyncOAuthStateStore
@@ -69,6 +70,7 @@ class AsyncOAuthSettings:
         authorization_url: Optional[str] = None,
         # Installation Management
         installation_store: Optional[AsyncInstallationStore] = None,
+        installation_store_bot_only: bool = False,
         # state parameter related configurations
         state_store: Optional[AsyncOAuthStateStore] = None,
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
@@ -90,6 +92,7 @@ class AsyncOAuthSettings:
         :param failure_url: Set a complete URL if you want to redirect end-users when an installation fails.
         :param authorization_url: Set a URL if you want to customize the URL https://slack.com/oauth/v2/authorize
         :param installation_store: Specify the instance of InstallationStore (Default: FileInstallationStore)
+        :param installation_store_bot_only: Use AsyncInstallationStore#find_bot if True (Default: False)
         :param state_store: Specify the instance of InstallationStore (Default: FileOAuthStateStore)
         :param state_cookie_name: The cookie name that is set for installers' browser. (Default: slack-app-oauth-state)
         :param state_expiration_seconds: The seconds that the state value is alive (Default: 600 seconds)
@@ -129,8 +132,11 @@ class AsyncOAuthSettings:
         self.installation_store = (
             installation_store or get_or_create_default_installation_store(client_id)
         )
+        self.installation_store_bot_only = installation_store_bot_only
         self.authorize = AsyncInstallationStoreAuthorize(
-            logger=logger, installation_store=self.installation_store,
+            logger=logger,
+            installation_store=self.installation_store,
+            bot_only=self.installation_store_bot_only,
         )
         # state parameter related configurations
         self.state_store = state_store or FileOAuthStateStore(

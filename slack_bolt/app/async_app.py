@@ -90,6 +90,7 @@ class AsyncApp:
         client: Optional[AsyncWebClient] = None,
         # for multi-workspace apps
         installation_store: Optional[AsyncInstallationStore] = None,
+        installation_store_bot_only: bool = False,
         authorize: Optional[Callable[..., Awaitable[AuthorizeResult]]] = None,
         # for the OAuth flow
         oauth_settings: Optional[AsyncOAuthSettings] = None,
@@ -106,6 +107,7 @@ class AsyncApp:
         :param token: The bot access token required only for single-workspace app.
         :param client: The singleton slack_sdk.web.async_client.AsyncWebClient instance for this app.
         :param installation_store: The module offering save/find operations of installation data
+        :param installation_store_bot_only: Use InstallationStore#find_bot if True (Default: False)
         :param authorize: The function to authorize an incoming request from Slack
             by checking if there is a team/user in the installation data.
         :param oauth_settings: The settings related to Slack app installation flow (OAuth flow)
@@ -155,6 +157,7 @@ class AsyncApp:
             self._async_authorize = AsyncInstallationStoreAuthorize(
                 installation_store=self._async_installation_store,
                 logger=self._framework_logger,
+                bot_only=installation_store_bot_only,
             )
 
         self._async_oauth_flow: Optional[AsyncOAuthFlow] = None
