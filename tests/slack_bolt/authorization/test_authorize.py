@@ -77,7 +77,7 @@ class TestAuthorize:
         assert self.mock_received_requests["/auth.test"] == 1  # cached
 
     def test_installation_store_bot_only(self):
-        installation_store = MemoryInstallationStore()
+        installation_store = BotOnlyMemoryInstallationStore()
         authorize = InstallationStoreAuthorize(
             logger=installation_store.logger,
             installation_store=installation_store,
@@ -105,7 +105,7 @@ class TestAuthorize:
         assert self.mock_received_requests["/auth.test"] == 2
 
     def test_installation_store_cached_bot_only(self):
-        installation_store = MemoryInstallationStore()
+        installation_store = BotOnlyMemoryInstallationStore()
         authorize = InstallationStoreAuthorize(
             logger=installation_store.logger,
             installation_store=installation_store,
@@ -233,3 +233,15 @@ class MemoryInstallationStore(LegacyMemoryInstallationStore):
             user_scopes=["search:read"],
             installed_at=datetime.datetime.now().timestamp(),
         )
+
+
+class BotOnlyMemoryInstallationStore(LegacyMemoryInstallationStore):
+    def find_installation(
+        self,
+        *,
+        enterprise_id: Optional[str],
+        team_id: Optional[str],
+        user_id: Optional[str] = None,
+        is_enterprise_install: Optional[bool] = False,
+    ) -> Optional[Installation]:
+        raise ValueError
