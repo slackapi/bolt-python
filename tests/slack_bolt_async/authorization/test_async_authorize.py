@@ -92,7 +92,7 @@ class TestAsyncAuthorize:
 
     @pytest.mark.asyncio
     async def test_installation_store_bot_only(self):
-        installation_store = MemoryInstallationStore()
+        installation_store = BotOnlyMemoryInstallationStore()
         authorize = AsyncInstallationStoreAuthorize(
             logger=installation_store.logger,
             installation_store=installation_store,
@@ -121,7 +121,7 @@ class TestAsyncAuthorize:
 
     @pytest.mark.asyncio
     async def test_installation_store_cached_bot_only(self):
-        installation_store = MemoryInstallationStore()
+        installation_store = BotOnlyMemoryInstallationStore()
         authorize = AsyncInstallationStoreAuthorize(
             logger=installation_store.logger,
             installation_store=installation_store,
@@ -253,3 +253,15 @@ class MemoryInstallationStore(LegacyMemoryInstallationStore):
             user_scopes=["search:read"],
             installed_at=datetime.datetime.now().timestamp(),
         )
+
+
+class BotOnlyMemoryInstallationStore(LegacyMemoryInstallationStore):
+    async def async_find_installation(
+        self,
+        *,
+        enterprise_id: Optional[str],
+        team_id: Optional[str],
+        user_id: Optional[str] = None,
+        is_enterprise_install: Optional[bool] = False,
+    ) -> Optional[Installation]:
+        raise ValueError
