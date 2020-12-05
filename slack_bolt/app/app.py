@@ -79,6 +79,8 @@ class App:
         # for multi-workspace apps
         authorize: Optional[Callable[..., AuthorizeResult]] = None,
         installation_store: Optional[InstallationStore] = None,
+        # for v1.0.x compatibility
+        installation_store_bot_only: bool = False,
         # for the OAuth flow
         oauth_settings: Optional[OAuthSettings] = None,
         oauth_flow: Optional[OAuthFlow] = None,
@@ -96,6 +98,7 @@ class App:
         :param authorize: The function to authorize an incoming request from Slack
             by checking if there is a team/user in the installation data.
         :param installation_store: The module offering save/find operations of installation data
+        :param installation_store_bot_only: Use InstallationStore#find_bot if True (Default: False)
         :param oauth_settings: The settings related to Slack app installation flow (OAuth flow)
         :param oauth_flow: Manually instantiated slack_bolt.oauth.OAuthFlow.
             This is always prioritized over oauth_settings.
@@ -140,6 +143,7 @@ class App:
             self._authorize = InstallationStoreAuthorize(
                 installation_store=self._installation_store,
                 logger=self._framework_logger,
+                bot_only=installation_store_bot_only,
             )
 
         self._oauth_flow: Optional[OAuthFlow] = None

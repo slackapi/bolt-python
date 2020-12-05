@@ -110,6 +110,7 @@ class AsyncOAuthFlow:
         # state parameter related configurations
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
+        installation_store_bot_only: bool = False,
         client: Optional[AsyncWebClient] = None,
         logger: Optional[Logger] = None,
     ) -> "AsyncOAuthFlow":
@@ -140,6 +141,7 @@ class AsyncOAuthFlow:
                 installation_store=SQLite3InstallationStore(
                     database=database, client_id=client_id, logger=logger,
                 ),
+                installation_store_bot_only=installation_store_bot_only,
                 # state parameter related configurations
                 state_store=SQLite3OAuthStateStore(
                     database=database,
