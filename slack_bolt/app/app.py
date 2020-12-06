@@ -130,6 +130,10 @@ class App:
         else:
             self._client = create_web_client(token)  # NOTE: the token here can be None
 
+        # --------------------------------------
+        # Authorize & OAuthFlow initialization
+        # --------------------------------------
+
         self._authorize: Optional[Authorize] = None
         if authorize is not None:
             if oauth_settings is not None or oauth_flow is not None:
@@ -191,6 +195,13 @@ class App:
         ) and self._token is not None:
             self._token = None
             self._framework_logger.warning(warning_token_skipped())
+
+        # after setting bot_only here, __init__ cannot replace authorize function
+        self._authorize.bot_only = installation_store_bot_only
+
+        # --------------------------------------
+        # Middleware Initialization
+        # --------------------------------------
 
         self._middleware_list: List[Union[Callable, Middleware]] = []
         self._listeners: List[Listener] = []
