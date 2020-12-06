@@ -4,6 +4,7 @@ from aiohttp import web
 
 from slack_bolt.adapter.aiohttp import to_bolt_request, to_aiohttp_response
 from slack_bolt.response import BoltResponse
+from slack_bolt.util.utils import get_boot_message
 
 
 class AsyncSlackAppServer:
@@ -71,8 +72,8 @@ class AsyncSlackAppServer:
         :return: None
         """
         if self.bolt_app.logger.level > logging.INFO:
-            print("⚡️ Bolt app is running!")
+            print(get_boot_message())
         else:
-            self.bolt_app.logger.info("⚡️ Bolt app is running!")
+            self.bolt_app.logger.info(get_boot_message())
 
         web.run_app(self.web_app, host="0.0.0.0", port=self.port)
