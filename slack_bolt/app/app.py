@@ -58,7 +58,7 @@ from slack_bolt.oauth.internals import select_consistent_installation_store
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
-from slack_bolt.util.utils import create_web_client
+from slack_bolt.util.utils import create_web_client, get_boot_message
 from slack_bolt.workflows.step import WorkflowStep, WorkflowStepMiddleware
 
 
@@ -926,9 +926,9 @@ class SlackAppDevelopmentServer:
         :return: None
         """
         if self._bolt_app.logger.level > logging.INFO:
-            print("⚡️ Bolt app is running! (development server)")
+            print(get_boot_message(development_server=True))
         else:
-            self._bolt_app.logger.info("⚡️ Bolt app is running! (development server)")
+            self._bolt_app.logger.info(get_boot_message(development_server=True))
 
         try:
             self._server.serve_forever(0.05)

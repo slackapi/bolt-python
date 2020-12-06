@@ -39,3 +39,18 @@ def create_copy(original: Any) -> Any:
         return copy.copy(original)
     else:
         return copy.deepcopy(original)
+
+
+def get_boot_message(development_server: bool = False) -> str:
+    if sys.platform == "win32":
+        # Some Windows environments may fail to parse this str value
+        # and result in UnicodeEncodeError
+        if development_server:
+            return "Bolt app is running! (development server)"
+        else:
+            return "Bolt app is running!"
+
+    if development_server:
+        return "⚡️ Bolt app is running! (development server)"
+    else:
+        return "⚡️ Bolt app is running!"
