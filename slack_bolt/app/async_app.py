@@ -219,7 +219,8 @@ class AsyncApp:
             self._framework_logger.warning(warning_token_skipped())
 
         # after setting bot_only here, __init__ cannot replace authorize function
-        self._async_authorize.bot_only = installation_store_bot_only
+        if self._async_authorize is not None:
+            self._async_authorize.bot_only = installation_store_bot_only
 
         # --------------------------------------
         # Middleware Initialization

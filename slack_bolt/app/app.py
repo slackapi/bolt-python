@@ -197,7 +197,8 @@ class App:
             self._framework_logger.warning(warning_token_skipped())
 
         # after setting bot_only here, __init__ cannot replace authorize function
-        self._authorize.bot_only = installation_store_bot_only
+        if self._authorize is not None:
+            self._authorize.bot_only = installation_store_bot_only
 
         # --------------------------------------
         # Middleware Initialization
