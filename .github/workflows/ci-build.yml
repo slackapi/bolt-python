@@ -33,19 +33,7 @@ jobs:
       run: |
         pip install -e ".[adapter]"
         pytest tests/adapter_tests/
-    - name: Run async tests
-      run: |
-        python_version=`python -V`
-        # TODO: As Python 3.6 works the most stably on GitHub Actions,
-        # we use the version for code coverage and async tests
-        if [ ${python_version:7:3} == "3.6" ]; then
-          pip install -e ".[async]"
-          pip install "pytest-asyncio<1"
-          pytest tests/slack_bolt_async/
-          pytest tests/scenario_tests_async/
-          pytest tests/adapter_tests_async/
-        fi
-    - name: Run pytype verification
+    - name: Run pytype verification (3.8 only)
       run: |
         python_version=`python -V`
         if [ ${python_version:7:3} == "3.8" ]; then
@@ -53,8 +41,7 @@ jobs:
           pip install -e ".[adapter]"
           pip install "pytype" && pytype slack_bolt/
         fi
-
-    - name: Run all tests for codecov
+    - name: Run all tests for codecov (3.6 only)
       run: |
         python_version=`python -V`
         # TODO: As Python 3.6 works the most stably on GitHub Actions,
