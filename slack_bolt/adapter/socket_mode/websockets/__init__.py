@@ -1,9 +1,11 @@
 import os
+from logging import Logger
 from time import time
 from typing import Optional
 
 from slack_sdk.socket_mode.websockets import SocketModeClient
 from slack_sdk.socket_mode.request import SocketModeRequest
+from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode.async_base_handler import AsyncBaseSocketModeHandler
@@ -25,10 +27,18 @@ class SocketModeHandler(AsyncBaseSocketModeHandler):
         self,
         app: App,  # type: ignore
         app_token: Optional[str] = None,
+        logger: Optional[Logger] = None,
+        web_client: Optional[AsyncWebClient] = None,
+        ping_interval: float = 10,
     ):
         self.app = app
         self.app_token = app_token or os.environ["SLACK_APP_TOKEN"]
-        self.client = SocketModeClient(app_token=self.app_token)
+        self.client = SocketModeClient(
+            app_token=self.app_token,
+            logger=logger,
+            web_client=web_client,
+            ping_interval=ping_interval,
+        )
         self.client.socket_mode_request_listeners.append(self.handle)
 
     async def handle(self, client: SocketModeClient, req: SocketModeRequest) -> None:
