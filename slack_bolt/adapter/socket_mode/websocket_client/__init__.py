@@ -1,7 +1,9 @@
 import os
+from logging import Logger
 from time import time
-from typing import Optional
+from typing import Optional, Tuple
 
+from slack_sdk import WebClient
 from slack_sdk.socket_mode.request import SocketModeRequest
 from slack_sdk.socket_mode.websocket_client import SocketModeClient
 
@@ -20,12 +22,29 @@ class SocketModeHandler(BaseSocketModeHandler):
         self,
         app: App,  # type: ignore
         app_token: Optional[str] = None,
+        logger: Optional[Logger] = None,
+        web_client: Optional[WebClient] = None,
+        ping_interval: float = 10,
+        concurrency: int = 10,
+        http_proxy_host: Optional[str] = None,
+        http_proxy_port: Optional[int] = None,
+        http_proxy_auth: Optional[Tuple[str, str]] = None,
+        proxy_type: Optional[str] = None,
         trace_enabled: bool = False,
     ):
         self.app = app
         self.app_token = app_token or os.environ["SLACK_APP_TOKEN"]
         self.client = SocketModeClient(
-            app_token=self.app_token, trace_enabled=trace_enabled
+            app_token=self.app_token,
+            logger=logger,
+            web_client=web_client,
+            ping_interval=ping_interval,
+            concurrency=concurrency,
+            http_proxy_host=http_proxy_host,
+            http_proxy_port=http_proxy_port,
+            http_proxy_auth=http_proxy_auth,
+            proxy_type=proxy_type,
+            trace_enabled=trace_enabled,
         )
         self.client.socket_mode_request_listeners.append(self.handle)
 
