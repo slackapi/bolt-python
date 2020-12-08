@@ -48,6 +48,6 @@ jobs:
         # we use the version for code coverage and async tests
         if [ ${python_version:7:3} == "3.6" ]; then
           pip install -e ".[async]"
-          pip install -e ".[adapter]"
+          pip install -e ".[testing]"
           pytest --cov=slack_bolt/ && bash <(curl -s https://codecov.io/bash)
         fi
