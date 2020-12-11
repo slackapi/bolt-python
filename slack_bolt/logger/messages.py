@@ -76,6 +76,13 @@ def warning_did_not_call_ack(listener_name: str) -> str:
     return f"{listener_name} didn't call ack()"
 
 
+def warning_bot_only_conflicts() -> str:
+    return (
+        "installation_store_bot_only exists in both App and OAuthFlow.settings. "
+        "The one passed in App constructor is used."
+    )
+
+
 # -------------------------------
 # Info
 # -------------------------------

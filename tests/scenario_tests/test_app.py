@@ -3,7 +3,7 @@ from slack_sdk import WebClient
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 
-from slack_bolt import App
+from slack_bolt import App, Say
 from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.error import BoltError
 from slack_bolt.oauth import OAuthFlow
@@ -28,6 +28,16 @@ class TestApp:
     def teardown_method(self):
         cleanup_mock_web_api_server(self)
         restore_os_env(self.old_os_env)
+
+    @staticmethod
+    def handle_app_mention(body, say: Say, payload, event):
+        assert body["event"] == payload
+        assert payload == event
+        say("What's up?")
+
+    # --------------------------
+    # basic tests
+    # --------------------------
 
     def test_signing_secret_absence(self):
         with pytest.raises(BoltError):

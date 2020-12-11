@@ -41,6 +41,7 @@ from slack_bolt.logger.messages import (
     error_unexpected_listener_middleware,
     error_client_invalid_type,
     error_authorize_conflicts,
+    warning_bot_only_conflicts,
 )
 from slack_bolt.middleware import (
     Middleware,
@@ -80,7 +81,7 @@ class App:
         authorize: Optional[Callable[..., AuthorizeResult]] = None,
         installation_store: Optional[InstallationStore] = None,
         # for v1.0.x compatibility
-        installation_store_bot_only: bool = False,
+        installation_store_bot_only: Optional[bool] = None,
         # for the OAuth flow
         oauth_settings: Optional[OAuthSettings] = None,
         oauth_flow: Optional[OAuthFlow] = None,
@@ -197,8 +198,13 @@ class App:
             self._framework_logger.warning(warning_token_skipped())
 
         # after setting bot_only here, __init__ cannot replace authorize function
-        if self._authorize is not None:
-            self._authorize.bot_only = installation_store_bot_only
+        if installation_store_bot_only is not None and self._oauth_flow is not None:
+            app_bot_only = installation_store_bot_only or False
+            oauth_flow_bot_only = self._oauth_flow.settings.installation_store_bot_only
+            if app_bot_only != oauth_flow_bot_only:
+                self.logger.warning(warning_bot_only_conflicts())
+                self._oauth_flow.settings.installation_store_bot_only = app_bot_only
+                self._authorize.bot_only = app_bot_only
 
         # --------------------------------------
         # Middleware Initialization
