@@ -38,6 +38,7 @@ from slack_bolt.logger.messages import (
     error_authorize_conflicts,
     error_oauth_settings_invalid_type_async,
     error_oauth_flow_invalid_type_async,
+    warning_bot_only_conflicts,
 )
 from slack_bolt.lazy_listener.asyncio_runner import AsyncioLazyListenerRunner
 from slack_bolt.listener.async_listener import AsyncListener, AsyncCustomListener
@@ -90,7 +91,7 @@ class AsyncApp:
         client: Optional[AsyncWebClient] = None,
         # for multi-workspace apps
         installation_store: Optional[AsyncInstallationStore] = None,
-        installation_store_bot_only: bool = False,
+        installation_store_bot_only: Optional[bool] = None,
         authorize: Optional[Callable[..., Awaitable[AuthorizeResult]]] = None,
         # for the OAuth flow
         oauth_settings: Optional[AsyncOAuthSettings] = None,
@@ -219,8 +220,20 @@ class AsyncApp:
             self._framework_logger.warning(warning_token_skipped())
 
         # after setting bot_only here, __init__ cannot replace authorize function
-        if self._async_authorize is not None:
-            self._async_authorize.bot_only = installation_store_bot_only
+        if (
+            installation_store_bot_only is not None
+            and self._async_oauth_flow is not None
+        ):
+            app_bot_only = installation_store_bot_only or False
+            oauth_flow_bot_only = (
+                self._async_oauth_flow.settings.installation_store_bot_only
+            )
+            if app_bot_only != oauth_flow_bot_only:
+                self.logger.warning(warning_bot_only_conflicts())
+                self._async_oauth_flow.settings.installation_store_bot_only = (
+                    app_bot_only
+                )
+                self._async_authorize.bot_only = app_bot_only
 
         # --------------------------------------
         # Middleware Initialization
