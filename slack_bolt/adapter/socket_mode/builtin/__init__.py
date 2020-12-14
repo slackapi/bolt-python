@@ -33,9 +33,9 @@ class SocketModeHandler(BaseSocketModeHandler):
         self.app_token = app_token or os.environ["SLACK_APP_TOKEN"]
         self.client = SocketModeClient(
             app_token=self.app_token,
-            logger=logger,
-            web_client=web_client,
-            proxy=proxy,
+            logger=logger if logger is not None else app.logger,
+            web_client=web_client if web_client is not None else app.client,
+            proxy=proxy if proxy is not None else app.client.proxy,
             ping_interval=ping_interval,
             concurrency=concurrency,
             trace_enabled=trace_enabled,
