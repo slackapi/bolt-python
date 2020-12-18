@@ -76,6 +76,7 @@ class App:
         signing_secret: Optional[str] = None,
         # for single-workspace apps
         token: Optional[str] = None,
+        token_verification_enabled: bool = True,
         client: Optional[WebClient] = None,
         # for multi-workspace apps
         authorize: Optional[Callable[..., AuthorizeResult]] = None,
@@ -95,6 +96,7 @@ class App:
         :param process_before_response: True if this app runs on Function as a Service. (Default: False)
         :param signing_secret: The Signing Secret value used for verifying requests from Slack.
         :param token: The bot access token required only for single-workspace app.
+        :param token_verification_enabled: Verifies the validity of the given token if True.
         :param client: The singleton slack_sdk.WebClient instance for this app.
         :param authorize: The function to authorize an incoming request from Slack
             by checking if there is a team/user in the installation data.
@@ -227,9 +229,11 @@ class App:
         )
 
         self._init_middleware_list_done = False
-        self._init_middleware_list()
+        self._init_middleware_list(
+            token_verification_enabled=token_verification_enabled
+        )
 
-    def _init_middleware_list(self):
+    def _init_middleware_list(self, token_verification_enabled: bool):
         if self._init_middleware_list_done:
             return
         self._middleware_list.append(
@@ -240,7 +244,9 @@ class App:
         if self._oauth_flow is None:
             if self._token is not None:
                 try:
-                    auth_test_result = self._client.auth_test(token=self._token)
+                    auth_test_result = None
+                    if token_verification_enabled:
+                        auth_test_result = self._client.auth_test(token=self._token)
                     self._middleware_list.append(
                         SingleTeamAuthorization(auth_test_result=auth_test_result)
                     )
