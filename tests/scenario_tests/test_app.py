@@ -67,6 +67,20 @@ class TestApp:
         with pytest.raises(BoltError):
             App(signing_secret="valid", token="")
 
+    def test_token_verification_enabled_False(self):
+        App(
+            signing_secret="valid",
+            client=self.web_client,
+            token_verification_enabled=False,
+        )
+        App(
+            signing_secret="valid",
+            token="xoxb-invalid",
+            token_verification_enabled=False,
+        )
+
+        assert self.mock_received_requests.get("/auth.test") is None
+
     # --------------------------
     # multi teams auth
     # --------------------------
