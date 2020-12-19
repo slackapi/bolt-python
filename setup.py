@@ -16,7 +16,7 @@ test_dependencies = [
     "pytest-cov>=2,<3",
     "pytest-asyncio<1",  # for async
     "aiohttp>=3,<4",  # for async
-    "black==19.10b0",  # TODO: upgrading the version
+    "black==20.8b1",
 ]
 
 setuptools.setup(
