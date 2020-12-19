@@ -12,7 +12,11 @@ class MessageListenerMatches(Middleware):  # type: ignore
         self.keyword = keyword
 
     def process(
-        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
+        self,
+        *,
+        req: BoltRequest,
+        resp: BoltResponse,
+        next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         text = req.body.get("event", {}).get("text", "")
         if text:

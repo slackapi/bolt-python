@@ -12,7 +12,9 @@ class AsyncSay:
     channel: Optional[str]
 
     def __init__(
-        self, client: Optional[AsyncWebClient], channel: Optional[str],
+        self,
+        client: Optional[AsyncWebClient],
+        channel: Optional[str],
     ):
         self.client = client
         self.channel = channel

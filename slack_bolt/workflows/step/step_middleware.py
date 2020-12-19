@@ -14,7 +14,11 @@ class WorkflowStepMiddleware(Middleware):  # type:ignore
         self.listener_runner = listener_runner
 
     def process(
-        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
+        self,
+        *,
+        req: BoltRequest,
+        resp: BoltResponse,
+        next: Callable[[], BoltResponse],
     ) -> BoltResponse:
 
         if self.step.edit.matches(req=req, resp=resp):
@@ -33,7 +37,10 @@ class WorkflowStepMiddleware(Middleware):  # type:ignore
         return next()
 
     def _run(
-        self, listener: Listener, req: BoltRequest, resp: BoltResponse,
+        self,
+        listener: Listener,
+        req: BoltRequest,
+        resp: BoltResponse,
     ) -> Optional[BoltResponse]:
         resp, next_was_not_called = listener.run_middleware(req=req, resp=resp)
         if next_was_not_called:

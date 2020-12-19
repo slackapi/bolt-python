@@ -139,7 +139,9 @@ class AsyncOAuthFlow:
                 failure_url=failure_url,
                 # Installation Management
                 installation_store=SQLite3InstallationStore(
-                    database=database, client_id=client_id, logger=logger,
+                    database=database,
+                    client_id=client_id,
+                    logger=logger,
                 ),
                 installation_store_bot_only=installation_store_bot_only,
                 # state parameter related configurations
@@ -292,14 +294,14 @@ class AsyncOAuthFlow:
                 client_secret=self.settings.client_secret,
                 redirect_uri=self.settings.redirect_uri,  # can be None
             )
-            installed_enterprise: Dict[str, str] = oauth_response.get(
-                "enterprise"
-            ) or {}
+            installed_enterprise: Dict[str, str] = (
+                oauth_response.get("enterprise") or {}
+            )
             installed_team: Dict[str, str] = oauth_response.get("team") or {}
             installer: Dict[str, str] = oauth_response.get("authed_user") or {}
-            incoming_webhook: Dict[str, str] = oauth_response.get(
-                "incoming_webhook"
-            ) or {}
+            incoming_webhook: Dict[str, str] = (
+                oauth_response.get("incoming_webhook") or {}
+            )
 
             bot_token: Optional[str] = oauth_response.get("access_token")
             # NOTE: oauth.v2.access doesn't include bot_id in response

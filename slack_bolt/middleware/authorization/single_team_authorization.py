@@ -25,7 +25,11 @@ class SingleTeamAuthorization(Authorization):
         self.logger = get_bolt_logger(SingleTeamAuthorization)
 
     def process(
-        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
+        self,
+        *,
+        req: BoltRequest,
+        resp: BoltResponse,
+        next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         if _is_no_auth_required(req):
             return next()

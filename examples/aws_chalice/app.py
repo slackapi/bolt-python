@@ -19,13 +19,14 @@ def handle_app_mentions(body, say, logger):
 def respond_to_slack_within_3_seconds(ack):
     ack("Accepted!")
 
+
 def say_it(say):
     time.sleep(5)
     say("Done!")
 
+
 bolt_app.command("/hello-bolt-python-chalice")(
-    ack=respond_to_slack_within_3_seconds,
-    lazy=[say_it]
+    ack=respond_to_slack_within_3_seconds, lazy=[say_it]
 )
 
 ChaliceSlackRequestHandler.clear_all_log_handlers()

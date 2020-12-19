@@ -224,7 +224,8 @@ class App:
             ),
             listener_executor=listener_executor,
             lazy_listener_runner=ThreadLazyListenerRunner(
-                logger=self._framework_logger, executor=listener_executor,
+                logger=self._framework_logger,
+                executor=listener_executor,
             ),
         )
 
@@ -306,7 +307,10 @@ class App:
         :return: None
         """
         self._development_server = SlackAppDevelopmentServer(
-            port=port, path=path, app=self, oauth_flow=self.oauth_flow,
+            port=port,
+            path=path,
+            app=self,
+            oauth_flow=self.oauth_flow,
         )
         self._development_server.start()
 
@@ -411,7 +415,10 @@ class App:
         step = callback_id
         if isinstance(callback_id, (str, Pattern)):
             step = WorkflowStep(
-                callback_id=callback_id, edit=edit, save=save, execute=execute,
+                callback_id=callback_id,
+                edit=edit,
+                save=save,
+                execute=execute,
             )
         elif not isinstance(step, WorkflowStep):
             raise BoltError("Invalid step object")
@@ -431,7 +438,8 @@ class App:
         :return: None
         """
         self._listener_runner.listener_error_handler = CustomListenerErrorHandler(
-            logger=self._framework_logger, func=func,
+            logger=self._framework_logger,
+            func=func,
         )
         return func
 
@@ -864,7 +872,11 @@ class App:
 
 class SlackAppDevelopmentServer:
     def __init__(
-        self, port: int, path: str, app: App, oauth_flow: Optional[OAuthFlow] = None,
+        self,
+        port: int,
+        path: str,
+        app: App,
+        oauth_flow: Optional[OAuthFlow] = None,
     ):
         """Slack App Development Server
 

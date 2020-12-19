@@ -21,7 +21,10 @@ class TestAsyncShortcut:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = AsyncWebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     @pytest.fixture
     def event_loop(self):
@@ -37,7 +40,8 @@ class TestAsyncShortcut:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):
@@ -59,7 +63,10 @@ class TestAsyncShortcut:
     # NOTE: This is a compatible behavior with Bolt for JS
     @pytest.mark.asyncio
     async def test_success_both_global_and_message(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.shortcut("test-shortcut")(simple_listener)
 
         request = self.build_valid_request(global_shortcut_raw_body)
@@ -74,7 +81,10 @@ class TestAsyncShortcut:
 
     @pytest.mark.asyncio
     async def test_success_global(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.shortcut("test-shortcut")(simple_listener)
 
         request = self.build_valid_request(global_shortcut_raw_body)
@@ -84,7 +94,10 @@ class TestAsyncShortcut:
 
     @pytest.mark.asyncio
     async def test_success_global_2(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.global_shortcut("test-shortcut")(simple_listener)
 
         request = self.build_valid_request(global_shortcut_raw_body)
@@ -99,7 +112,10 @@ class TestAsyncShortcut:
 
     @pytest.mark.asyncio
     async def test_success_message(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.shortcut({"type": "message_action", "callback_id": "test-shortcut"})(
             simple_listener
         )
@@ -116,7 +132,10 @@ class TestAsyncShortcut:
 
     @pytest.mark.asyncio
     async def test_success_message_2(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.message_shortcut("test-shortcut")(simple_listener)
 
         request = self.build_valid_request(message_shortcut_raw_body)
@@ -145,7 +164,10 @@ class TestAsyncShortcut:
 
     @pytest.mark.asyncio
     async def test_failure(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(global_shortcut_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404
@@ -158,7 +180,10 @@ class TestAsyncShortcut:
 
     @pytest.mark.asyncio
     async def test_failure_2(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(global_shortcut_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404

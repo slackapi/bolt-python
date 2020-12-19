@@ -103,10 +103,13 @@ class DefaultCallbackOptions(CallbackOptions):
 
     def _success_handler(self, args: SuccessArgs) -> BoltResponse:
         return self._response_builder._build_callback_success_response(
-            request=args.request, installation=args.installation,
+            request=args.request,
+            installation=args.installation,
         )
 
     def _failure_handler(self, args: FailureArgs) -> BoltResponse:
         return self._response_builder._build_callback_failure_response(
-            request=args.request, reason=args.reason, status=args.suggested_status_code,
+            request=args.request,
+            reason=args.reason,
+            status=args.suggested_status_code,
         )

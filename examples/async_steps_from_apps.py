@@ -9,7 +9,12 @@ import logging
 
 from slack_sdk.web.async_client import AsyncSlackResponse, AsyncWebClient
 from slack_bolt.async_app import AsyncApp, AsyncAck
-from slack_bolt.workflows.step.async_step import AsyncConfigure, AsyncUpdate, AsyncComplete, AsyncFail
+from slack_bolt.workflows.step.async_step import (
+    AsyncConfigure,
+    AsyncUpdate,
+    AsyncComplete,
+    AsyncFail,
+)
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -93,7 +98,11 @@ async def save(ack: AsyncAck, view: dict, update: AsyncUpdate):
             },
         },
         outputs=[
-            {"name": "taskName", "type": "text", "label": "Task Name", },
+            {
+                "name": "taskName",
+                "type": "text",
+                "label": "Task Name",
+            },
             {
                 "name": "taskDescription",
                 "type": "text",
@@ -104,7 +113,7 @@ async def save(ack: AsyncAck, view: dict, update: AsyncUpdate):
                 "type": "text",
                 "label": "Task Author Email",
             },
-        ]
+        ],
     )
     await ack()
 
@@ -112,7 +121,9 @@ async def save(ack: AsyncAck, view: dict, update: AsyncUpdate):
 pseudo_database = {}
 
 
-async def execute(step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail):
+async def execute(
+    step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail
+):
     try:
         await complete(
             outputs={
@@ -152,9 +163,7 @@ async def execute(step: dict, client: AsyncWebClient, complete: AsyncComplete, f
             },
         )
     except:
-        await fail(error={
-            "message": "Something wrong!"
-        })
+        await fail(error={"message": "Something wrong!"})
 
 
 app.step(

@@ -21,7 +21,10 @@ from slack_bolt.request.payload_utils import (
 class ListenerErrorHandler(metaclass=ABCMeta):
     @abstractmethod
     def handle(
-        self, error: Exception, request: BoltRequest, response: Optional[BoltResponse],
+        self,
+        error: Exception,
+        request: BoltRequest,
+        response: Optional[BoltResponse],
     ) -> None:
         """Handles an unhandled exception.
 
@@ -40,7 +43,10 @@ class CustomListenerErrorHandler(ListenerErrorHandler):
         self.arg_names = inspect.getfullargspec(func).args
 
     def handle(
-        self, error: Exception, request: BoltRequest, response: Optional[BoltResponse],
+        self,
+        error: Exception,
+        request: BoltRequest,
+        response: Optional[BoltResponse],
     ):
         all_available_args = {
             "logger": self.logger,
@@ -95,7 +101,10 @@ class DefaultListenerErrorHandler(ListenerErrorHandler):
         self.logger = logger
 
     def handle(
-        self, error: Exception, request: BoltRequest, response: Optional[BoltResponse],
+        self,
+        error: Exception,
+        request: BoltRequest,
+        response: Optional[BoltResponse],
     ):
         message = f"Failed to run listener function (error: {error})"
         self.logger.exception(message)

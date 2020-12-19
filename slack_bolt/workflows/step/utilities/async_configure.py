@@ -11,7 +11,9 @@ class AsyncConfigure:
         self.body = body
 
     async def __call__(
-        self, *, blocks: Optional[Sequence[Union[dict, Block]]] = None,
+        self,
+        *,
+        blocks: Optional[Sequence[Union[dict, Block]]] = None,
     ) -> None:
         await self.client.views_open(
             trigger_id=self.body["trigger_id"],

@@ -20,7 +20,10 @@ class TestAsyncMiddleware:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = AsyncWebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     @pytest.fixture
     def event_loop(self):
@@ -56,7 +59,8 @@ class TestAsyncMiddleware:
                 "content-type": ["application/json"],
                 "x-slack-signature": [
                     self.signature_verifier.generate_signature(
-                        body=body, timestamp=timestamp,
+                        body=body,
+                        timestamp=timestamp,
                     )
                 ],
                 "x-slack-request-timestamp": [timestamp],
@@ -65,7 +69,10 @@ class TestAsyncMiddleware:
 
     @pytest.mark.asyncio
     async def test_no_next_call(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.use(no_next)
         app.shortcut("test-shortcut")(just_ack)
 
@@ -75,7 +82,10 @@ class TestAsyncMiddleware:
 
     @pytest.mark.asyncio
     async def test_next_call(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.use(just_next)
         app.shortcut("test-shortcut")(just_ack)
 

@@ -27,7 +27,10 @@ class TestAsyncWorkflowSteps:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = AsyncWebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     @pytest.fixture
     def event_loop(self):
@@ -43,7 +46,8 @@ class TestAsyncWorkflowSteps:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_app(self, callback_id: str):
@@ -381,7 +385,10 @@ async def edit(ack: AsyncAck, step, configure: AsyncConfigure):
                 "element": {
                     "type": "plain_text_input",
                     "action_id": "task_name",
-                    "placeholder": {"type": "plain_text", "text": "Write a task name",},
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "Write a task name",
+                    },
                 },
                 "label": {"type": "plain_text", "text": "Task name"},
             },
@@ -404,7 +411,10 @@ async def edit(ack: AsyncAck, step, configure: AsyncConfigure):
                 "element": {
                     "type": "plain_text_input",
                     "action_id": "task_author",
-                    "placeholder": {"type": "plain_text", "text": "Write a task name",},
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "Write a task name",
+                    },
                 },
                 "label": {"type": "plain_text", "text": "Task author"},
             },
@@ -431,9 +441,21 @@ async def save(ack: AsyncAck, step: dict, view: dict, update: AsyncUpdate):
             },
         },
         outputs=[
-            {"name": "taskName", "type": "text", "label": "Task Name",},
-            {"name": "taskDescription", "type": "text", "label": "Task Description",},
-            {"name": "taskAuthorEmail", "type": "text", "label": "Task Author Email",},
+            {
+                "name": "taskName",
+                "type": "text",
+                "label": "Task Name",
+            },
+            {
+                "name": "taskDescription",
+                "type": "text",
+                "label": "Task Description",
+            },
+            {
+                "name": "taskAuthorEmail",
+                "type": "text",
+                "label": "Task Author Email",
+            },
         ],
     )
     await ack()
@@ -506,7 +528,8 @@ async def save_lazy(step: dict, view: dict, update: AsyncUpdate):
     assert step is not None
     assert view is not None
     await update(
-        inputs={}, outputs=[],
+        inputs={},
+        outputs=[],
     )
 
 

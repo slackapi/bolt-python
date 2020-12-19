@@ -15,7 +15,9 @@ def to_bolt_request(request: Request) -> BoltRequest:
         else:
             body = request.body
     bolt_req = BoltRequest(
-        body=body, query=request.query_string, headers=request.headers,
+        body=body,
+        query=request.query_string,
+        headers=request.headers,
     )
     return bolt_req
 

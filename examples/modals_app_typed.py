@@ -123,7 +123,9 @@ def show_multi_options(ack: Ack) -> None:
             ),
             OptionGroup(
                 label=PlainTextObject(text="Group 2"),
-                options=[Option(text=PlainTextObject(text="Option 1"), value="2-1"),],
+                options=[
+                    Option(text=PlainTextObject(text="Option 1"), value="2-1"),
+                ],
             ),
         ]
     )
@@ -148,7 +150,8 @@ def button_click(ack: Ack, body: dict, respond: Respond) -> None:
     )
     # ephemeral / kwargs
     respond(
-        replace_original=False, text=":white_check_mark: Done!",
+        replace_original=False,
+        text=":white_check_mark: Done!",
     )
 
 

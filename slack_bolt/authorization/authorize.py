@@ -29,7 +29,10 @@ class Authorize:
 
 class CallableAuthorize(Authorize):
     def __init__(
-        self, *, logger: Logger, func: Callable[..., AuthorizeResult],
+        self,
+        *,
+        logger: Logger,
+        func: Callable[..., AuthorizeResult],
     ):
         self.logger = logger
         self.func = func

@@ -22,7 +22,11 @@ class CustomMiddleware(Middleware):
         self.logger = get_bolt_app_logger(self.app_name, self.func)
 
     def process(
-        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
+        self,
+        *,
+        req: BoltRequest,
+        resp: BoltResponse,
+        next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         return self.func(
             **build_required_kwargs(

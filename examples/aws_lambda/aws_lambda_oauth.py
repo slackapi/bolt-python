@@ -12,7 +12,10 @@ from slack_bolt.adapter.aws_lambda import SlackRequestHandler
 from slack_bolt.adapter.aws_lambda.lambda_s3_oauth_flow import LambdaS3OAuthFlow
 
 # process_before_response must be True when running on FaaS
-app = App(process_before_response=True, oauth_flow=LambdaS3OAuthFlow(),)
+app = App(
+    process_before_response=True,
+    oauth_flow=LambdaS3OAuthFlow(),
+)
 
 
 @app.event("app_mention")

@@ -6,7 +6,11 @@ class Fail:
         self.client = client
         self.body = body
 
-    def __call__(self, *, error: dict,) -> None:
+    def __call__(
+        self,
+        *,
+        error: dict,
+    ) -> None:
         self.client.workflows_stepFailed(
             workflow_step_execute_id=self.body["event"]["workflow_step"][
                 "workflow_step_execute_id"

@@ -29,7 +29,10 @@ def handle_command(body, ack, respond, client, logger):
             {
                 "type": "section",
                 "block_id": "b",
-                "text": {"type": "mrkdwn", "text": ":white_check_mark: Accepted!",},
+                "text": {
+                    "type": "mrkdwn",
+                    "text": ":white_check_mark: Accepted!",
+                },
             }
         ],
     )
@@ -58,14 +61,26 @@ def handle_command(body, ack, respond, client, logger):
         view={
             "type": "modal",
             "callback_id": "view-id",
-            "title": {"type": "plain_text", "text": "My App",},
-            "submit": {"type": "plain_text", "text": "Submit",},
-            "close": {"type": "plain_text", "text": "Cancel",},
+            "title": {
+                "type": "plain_text",
+                "text": "My App",
+            },
+            "submit": {
+                "type": "plain_text",
+                "text": "Submit",
+            },
+            "close": {
+                "type": "plain_text",
+                "text": "Cancel",
+            },
             "blocks": [
                 {
                     "type": "input",
                     "element": {"type": "plain_text_input"},
-                    "label": {"type": "plain_text", "text": "Label",},
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Label",
+                    },
                 },
                 {
                     "type": "input",
@@ -155,7 +170,8 @@ def button_click(ack, body, respond):
     )
     # ephemeral / kwargs
     respond(
-        replace_original=False, text=":white_check_mark: Done!",
+        replace_original=False,
+        text=":white_check_mark: Done!",
     )
 
 

@@ -11,7 +11,8 @@ class AsyncioLazyListenerRunner(AsyncLazyListenerRunner):
     logger: Logger
 
     def __init__(
-        self, logger: Logger,
+        self,
+        logger: Logger,
     ):
         self.logger = logger
 
@@ -20,6 +21,8 @@ class AsyncioLazyListenerRunner(AsyncLazyListenerRunner):
     ) -> None:
         asyncio.ensure_future(
             to_runnable_function(
-                internal_func=function, logger=self.logger, request=request,
+                internal_func=function,
+                logger=self.logger,
+                request=request,
             )
         )

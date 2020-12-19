@@ -68,7 +68,8 @@ class TestAsyncOrgApps:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):

@@ -19,7 +19,10 @@ class TestErrorHandler:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = WebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()
@@ -35,7 +38,8 @@ class TestErrorHandler:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):
@@ -48,11 +52,15 @@ class TestErrorHandler:
     def build_valid_request(self) -> BoltRequest:
         body = {
             "type": "block_actions",
-            "user": {"id": "W111",},
+            "user": {
+                "id": "W111",
+            },
             "api_app_id": "A111",
             "token": "verification_token",
             "trigger_id": "111.222.valid",
-            "team": {"id": "T111",},
+            "team": {
+                "id": "T111",
+            },
             "channel": {"id": "C111", "name": "test-channel"},
             "response_url": "https://hooks.slack.com/actions/T111/111/random-value",
             "actions": [
@@ -80,7 +88,10 @@ class TestErrorHandler:
         def failing_listener():
             raise Exception("Something wrong!")
 
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.action("a")(failing_listener)
 
         request = self.build_valid_request()
@@ -95,7 +106,10 @@ class TestErrorHandler:
         def failing_listener():
             raise Exception("Something wrong!")
 
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.error(error_handler)
         app.action("a")(failing_listener)
 

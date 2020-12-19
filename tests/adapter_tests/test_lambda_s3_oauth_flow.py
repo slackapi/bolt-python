@@ -16,7 +16,9 @@ class TestLambdaS3OAuthFlow:
     def test_instantiation(self):
         oauth_flow = LambdaS3OAuthFlow(
             settings=OAuthSettings(
-                client_id="111.222", client_secret="xxx", scopes=["chat:write"],
+                client_id="111.222",
+                client_secret="xxx",
+                scopes=["chat:write"],
             ),
             installation_bucket_name="dummy-installation",
             oauth_state_bucket_name="dummy-state",

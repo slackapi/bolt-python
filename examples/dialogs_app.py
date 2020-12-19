@@ -64,7 +64,7 @@ def dialog_submission_or_cancellation(ack: Ack, body: dict):
         errors = [
             {
                 "name": "loc_origin",
-                "error": "Pickup Location must be longer than 3 characters"
+                "error": "Pickup Location must be longer than 3 characters",
             }
         ]
     if len(errors) > 0:
@@ -114,7 +114,6 @@ def dialog_suggestion(ack):
             ]
         }
     )
-
 
 
 if __name__ == "__main__":

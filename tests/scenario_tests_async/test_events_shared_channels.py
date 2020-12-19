@@ -25,7 +25,8 @@ async def authorize(enterprise_id, team_id, client: AsyncWebClient):
     assert team_id == "T_INSTALLED"
     auth_test = await client.auth_test(token=valid_token)
     return AuthorizeResult.from_auth_test_response(
-        auth_test_response=auth_test, bot_token=valid_token,
+        auth_test_response=auth_test,
+        bot_token=valid_token,
     )
 
 
@@ -50,7 +51,8 @@ class TestAsyncEventsSharedChannels:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):

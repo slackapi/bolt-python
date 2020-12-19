@@ -15,7 +15,10 @@ from tests.utils import remove_os_env_temporarily, restore_os_env
 class TestEventsSocketMode:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
-    web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = WebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()

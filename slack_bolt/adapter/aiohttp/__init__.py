@@ -8,7 +8,9 @@ from slack_bolt.response import BoltResponse
 
 async def to_bolt_request(request: web.Request) -> AsyncBoltRequest:
     return AsyncBoltRequest(
-        body=await request.text(), query=request.query_string, headers=request.headers,
+        body=await request.text(),
+        query=request.query_string,
+        headers=request.headers,
     )
 
 

@@ -16,7 +16,10 @@ class AsyncListener(metaclass=ABCMeta):
     auto_acknowledgement: bool
 
     async def async_matches(
-        self, *, req: AsyncBoltRequest, resp: BoltResponse,
+        self,
+        *,
+        req: AsyncBoltRequest,
+        resp: BoltResponse,
     ) -> bool:
         is_matched: bool = False
         for matcher in self.matchers:
@@ -26,7 +29,10 @@ class AsyncListener(metaclass=ABCMeta):
         return is_matched
 
     async def run_async_middleware(
-        self, *, req: AsyncBoltRequest, resp: BoltResponse,
+        self,
+        *,
+        req: AsyncBoltRequest,
+        resp: BoltResponse,
     ) -> Tuple[BoltResponse, bool]:
         """Runs an async middleware.
 
@@ -100,7 +106,10 @@ class AsyncCustomListener(AsyncListener):
         self.logger = get_bolt_app_logger(app_name, self.ack_function)
 
     async def run_ack_function(
-        self, *, request: AsyncBoltRequest, response: BoltResponse,
+        self,
+        *,
+        request: AsyncBoltRequest,
+        response: BoltResponse,
     ) -> Optional[BoltResponse]:
         return await self.ack_function(
             **build_async_required_kwargs(

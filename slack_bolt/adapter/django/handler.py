@@ -11,12 +11,17 @@ from slack_bolt.response import BoltResponse
 def to_bolt_request(req: HttpRequest) -> BoltRequest:
     raw_body: bytes = req.body
     body: str = raw_body.decode("utf-8") if raw_body else ""
-    return BoltRequest(body=body, query=req.META["QUERY_STRING"], headers=req.headers,)
+    return BoltRequest(
+        body=body,
+        query=req.META["QUERY_STRING"],
+        headers=req.headers,
+    )
 
 
 def to_django_response(bolt_resp: BoltResponse) -> HttpResponse:
     resp: HttpResponse = HttpResponse(
-        status=bolt_resp.status, content=bolt_resp.body.encode("utf-8"),
+        status=bolt_resp.status,
+        content=bolt_resp.body.encode("utf-8"),
     )
     for k, v in bolt_resp.first_headers_without_set_cookie().items():
         resp[k] = v
