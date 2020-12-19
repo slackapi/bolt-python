@@ -48,8 +48,14 @@ class TestBottle:
         self.old_os_env = remove_os_env_temporarily()
         setup_mock_web_api_server(self)
 
-        web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
-        app = App(client=web_client, signing_secret=signing_secret,)
+        web_client = WebClient(
+            token=valid_token,
+            base_url=mock_api_server_base_url,
+        )
+        app = App(
+            client=web_client,
+            signing_secret=signing_secret,
+        )
         TestBottle.handler = SlackRequestHandler(app)
         app.event("app_mention")(event_handler)
         app.shortcut("test-shortcut")(shortcut_handler)
@@ -61,7 +67,8 @@ class TestBottle:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):

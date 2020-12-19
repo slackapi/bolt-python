@@ -102,7 +102,11 @@ async def save(ack: AsyncAck, client: AsyncWebClient, body: dict):
                 },
             },
             "outputs": [
-                {"name": "taskName", "type": "text", "label": "Task Name",},
+                {
+                    "name": "taskName",
+                    "type": "text",
+                    "label": "Task Name",
+                },
                 {
                     "name": "taskDescription",
                     "type": "text",

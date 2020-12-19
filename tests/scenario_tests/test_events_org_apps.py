@@ -47,7 +47,8 @@ class TestEventsOrgApps:
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
     web_client: WebClient = WebClient(
-        token=None, base_url=mock_api_server_base_url,
+        token=None,
+        base_url=mock_api_server_base_url,
     )
 
     def setup_method(self):
@@ -60,7 +61,8 @@ class TestEventsOrgApps:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):

@@ -10,7 +10,8 @@ from slack_bolt.request.internals import (
 
 
 def build_async_context(
-    context: AsyncBoltContext, payload: Dict[str, Any],
+    context: AsyncBoltContext,
+    payload: Dict[str, Any],
 ) -> AsyncBoltContext:
     enterprise_id = extract_enterprise_id(payload)
     if enterprise_id:

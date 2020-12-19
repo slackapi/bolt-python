@@ -18,7 +18,10 @@ class TestMiddleware:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = WebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()
@@ -50,7 +53,8 @@ class TestMiddleware:
                 "content-type": ["application/json"],
                 "x-slack-signature": [
                     self.signature_verifier.generate_signature(
-                        body=body, timestamp=timestamp,
+                        body=body,
+                        timestamp=timestamp,
                     )
                 ],
                 "x-slack-request-timestamp": [timestamp],
@@ -58,7 +62,10 @@ class TestMiddleware:
         )
 
     def test_no_next_call(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.use(no_next)
         app.shortcut("test-shortcut")(just_ack)
 
@@ -67,7 +74,10 @@ class TestMiddleware:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_next_call(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.use(just_next)
         app.shortcut("test-shortcut")(just_ack)
 

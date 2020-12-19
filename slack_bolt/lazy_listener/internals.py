@@ -8,7 +8,9 @@ from slack_bolt.request import BoltRequest
 
 
 def build_runnable_function(
-    func: Callable[..., None], logger: Logger, request: BoltRequest,
+    func: Callable[..., None],
+    logger: Logger,
+    request: BoltRequest,
 ) -> Callable[[], None]:
     arg_names = inspect.getfullargspec(func).args
 

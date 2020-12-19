@@ -25,10 +25,14 @@ client_id, client_secret, signing_secret = (
 
 engine: Engine = sqlalchemy.create_engine(database_url)
 installation_store = SQLAlchemyInstallationStore(
-    client_id=client_id, engine=engine, logger=logger,
+    client_id=client_id,
+    engine=engine,
+    logger=logger,
 )
 oauth_state_store = SQLAlchemyOAuthStateStore(
-    expiration_seconds=120, engine=engine, logger=logger,
+    expiration_seconds=120,
+    engine=engine,
+    logger=logger,
 )
 
 try:

@@ -34,14 +34,23 @@ def open_modal(ack, client, logger, body):
         view={
             "type": "modal",
             "callback_id": "view-id",
-            "title": {"type": "plain_text", "text": "My App",},
-            "submit": {"type": "plain_text", "text": "Submit",},
+            "title": {
+                "type": "plain_text",
+                "text": "My App",
+            },
+            "submit": {
+                "type": "plain_text",
+                "text": "Submit",
+            },
             "blocks": [
                 {
                     "type": "input",
                     "block_id": "b",
                     "element": {"type": "plain_text_input", "action_id": "a"},
-                    "label": {"type": "plain_text", "text": "Label",},
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Label",
+                    },
                 }
             ],
         },

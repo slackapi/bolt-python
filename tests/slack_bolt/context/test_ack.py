@@ -138,8 +138,14 @@ class TestAck:
             view={
                 "type": "modal",
                 "callback_id": "view-id",
-                "title": {"type": "plain_text", "text": "My App",},
-                "close": {"type": "plain_text", "text": "Cancel",},
+                "title": {
+                    "type": "plain_text",
+                    "text": "My App",
+                },
+                "close": {
+                    "type": "plain_text",
+                    "text": "Cancel",
+                },
                 "blocks": [{"type": "divider", "block_id": "b"}],
             },
         )

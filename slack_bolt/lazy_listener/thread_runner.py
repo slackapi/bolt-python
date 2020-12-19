@@ -11,12 +11,18 @@ class ThreadLazyListenerRunner(LazyListenerRunner):
     logger: Logger
 
     def __init__(
-        self, logger: Logger, executor: ThreadPoolExecutor,
+        self,
+        logger: Logger,
+        executor: ThreadPoolExecutor,
     ):
         self.logger = logger
         self.executor = executor
 
     def start(self, function: Callable[..., None], request: BoltRequest) -> None:
         self.executor.submit(
-            build_runnable_function(func=function, logger=self.logger, request=request,)
+            build_runnable_function(
+                func=function,
+                logger=self.logger,
+                request=request,
+            )
         )

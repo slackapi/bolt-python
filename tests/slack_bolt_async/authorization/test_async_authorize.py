@@ -22,7 +22,9 @@ from tests.utils import remove_os_env_temporarily, restore_os_env
 
 class TestAsyncAuthorize:
     mock_api_server_base_url = "http://localhost:8888"
-    client = AsyncWebClient(base_url=mock_api_server_base_url,)
+    client = AsyncWebClient(
+        base_url=mock_api_server_base_url,
+    )
 
     @pytest.fixture
     def event_loop(self):

@@ -48,14 +48,26 @@ def test_command(body, respond, client, ack, logger):
         view={
             "type": "modal",
             "callback_id": "view-id",
-            "title": {"type": "plain_text", "text": "My App",},
-            "submit": {"type": "plain_text", "text": "Submit",},
-            "close": {"type": "plain_text", "text": "Cancel",},
+            "title": {
+                "type": "plain_text",
+                "text": "My App",
+            },
+            "submit": {
+                "type": "plain_text",
+                "text": "Submit",
+            },
+            "close": {
+                "type": "plain_text",
+                "text": "Cancel",
+            },
             "blocks": [
                 {
                     "type": "input",
                     "element": {"type": "plain_text_input"},
-                    "label": {"type": "plain_text", "text": "Label",},
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Label",
+                    },
                 }
             ],
         },

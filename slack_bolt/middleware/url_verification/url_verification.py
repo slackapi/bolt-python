@@ -15,7 +15,11 @@ class UrlVerification(Middleware):  # type: ignore
         self.logger = get_bolt_logger(UrlVerification)
 
     def process(
-        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
+        self,
+        *,
+        req: BoltRequest,
+        resp: BoltResponse,
+        next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         if self._is_url_verification_request(req.body):
             return self._build_success_response(req.body)

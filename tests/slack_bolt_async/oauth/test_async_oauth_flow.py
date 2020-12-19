@@ -203,7 +203,8 @@ class TestAsyncOAuthFlow:
                 installation_store=FileInstallationStore(),
                 state_store=FileOAuthStateStore(expiration_seconds=120),
                 callback_options=AsyncCallbackOptions(
-                    success=success, failure=failure,
+                    success=success,
+                    failure=failure,
                 ),
             ),
         )

@@ -115,7 +115,9 @@ def _build_edit_listener_middleware(callback_id: str) -> Middleware:
         next: Callable[[], BoltResponse],
     ):
         context["configure"] = Configure(
-            callback_id=callback_id, client=client, body=body,
+            callback_id=callback_id,
+            client=client,
+            body=body,
         )
         return next()
 
@@ -134,7 +136,10 @@ def _build_save_listener_middleware() -> Middleware:
         body: dict,
         next: Callable[[], BoltResponse],
     ):
-        context["update"] = Update(client=client, body=body,)
+        context["update"] = Update(
+            client=client,
+            body=body,
+        )
         return next()
 
     return CustomMiddleware(app_name=__name__, func=save_listener_middleware)
@@ -152,8 +157,14 @@ def _build_execute_listener_middleware() -> Middleware:
         body: dict,
         next: Callable[[], BoltResponse],
     ):
-        context["complete"] = Complete(client=client, body=body,)
-        context["fail"] = Fail(client=client, body=body,)
+        context["complete"] = Complete(
+            client=client,
+            body=body,
+        )
+        context["fail"] = Fail(
+            client=client,
+            body=body,
+        )
         return next()
 
     return CustomMiddleware(app_name=__name__, func=execute_listener_middleware)

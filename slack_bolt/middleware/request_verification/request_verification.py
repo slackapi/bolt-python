@@ -19,7 +19,11 @@ class RequestVerification(Middleware):  # type: ignore
         self.logger = get_bolt_logger(RequestVerification)
 
     def process(
-        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
+        self,
+        *,
+        req: BoltRequest,
+        resp: BoltResponse,
+        next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         if self._can_skip(req.mode, req.body):
             return next()

@@ -21,7 +21,10 @@ class TestAsyncViewClosed:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = AsyncWebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     @pytest.fixture
     def event_loop(self):
@@ -37,7 +40,8 @@ class TestAsyncViewClosed:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):
@@ -60,7 +64,10 @@ class TestAsyncViewClosed:
 
     @pytest.mark.asyncio
     async def test_success(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.view({"type": "view_closed", "callback_id": "view-id"})(simple_listener)
 
         request = self.build_valid_request()
@@ -70,7 +77,10 @@ class TestAsyncViewClosed:
 
     @pytest.mark.asyncio
     async def test_success_2(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.view_closed("view-id")(simple_listener)
 
         request = self.build_valid_request()
@@ -94,7 +104,10 @@ class TestAsyncViewClosed:
 
     @pytest.mark.asyncio
     async def test_failure(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 404
@@ -107,7 +120,10 @@ class TestAsyncViewClosed:
 
     @pytest.mark.asyncio
     async def test_failure(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 404
@@ -120,7 +136,10 @@ class TestAsyncViewClosed:
 
     @pytest.mark.asyncio
     async def test_failure_2(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 404
@@ -156,7 +175,10 @@ body = {
             {
                 "type": "input",
                 "block_id": "hspI",
-                "label": {"type": "plain_text", "text": "Label",},
+                "label": {
+                    "type": "plain_text",
+                    "text": "Label",
+                },
                 "optional": False,
                 "element": {"type": "plain_text_input", "action_id": "maBWU"},
             }
@@ -165,11 +187,20 @@ body = {
         "callback_id": "view-id",
         "state": {"values": {}},
         "hash": "1596530361.3wRYuk3R",
-        "title": {"type": "plain_text", "text": "My App",},
+        "title": {
+            "type": "plain_text",
+            "text": "My App",
+        },
         "clear_on_close": False,
         "notify_on_close": False,
-        "close": {"type": "plain_text", "text": "Cancel",},
-        "submit": {"type": "plain_text", "text": "Submit",},
+        "close": {
+            "type": "plain_text",
+            "text": "Cancel",
+        },
+        "submit": {
+            "type": "plain_text",
+            "text": "Submit",
+        },
         "previous_view_id": None,
         "root_view_id": "V111",
         "app_id": "A111",

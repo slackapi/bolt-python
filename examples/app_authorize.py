@@ -7,12 +7,14 @@ sys.path.insert(1, "..")
 # ------------------------------------------------
 
 import logging
+
 logging.basicConfig(level=logging.DEBUG)
 
 import os
 from slack_bolt import App
 from slack_bolt.authorization import AuthorizeResult
 from slack_sdk import WebClient
+
 
 def authorize(enterprise_id, team_id, user_id, client: WebClient, logger):
     logger.info(f"{enterprise_id},{team_id},{user_id}")
@@ -23,10 +25,9 @@ def authorize(enterprise_id, team_id, user_id, client: WebClient, logger):
         bot_token=token,
     )
 
-app = App(
-    signing_secret=os.environ["SLACK_SIGNING_SECRET"],
-    authorize=authorize
-)
+
+app = App(signing_secret=os.environ["SLACK_SIGNING_SECRET"], authorize=authorize)
+
 
 @app.command("/hello-bolt-python")
 def hello_command(ack, body):

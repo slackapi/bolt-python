@@ -17,7 +17,10 @@ from tests.utils import remove_os_env_temporarily, restore_os_env
 class TestAsyncEvents:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
-    web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = AsyncWebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     @pytest.fixture
     def event_loop(self):
@@ -53,7 +56,10 @@ class TestAsyncEvents:
 
     @pytest.mark.asyncio
     async def test_process_before_response(self):
-        app = AsyncApp(client=self.web_client, process_before_response=True,)
+        app = AsyncApp(
+            client=self.web_client,
+            process_before_response=True,
+        )
         app.event("app_mention")(whats_up)
 
         request = self.build_valid_app_mention_request()

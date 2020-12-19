@@ -19,7 +19,10 @@ class TestApp:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
-    web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = WebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()
@@ -152,7 +155,9 @@ class TestApp:
         app = App(
             signing_secret="valid",
             oauth_settings=OAuthSettings(
-                client_id="111.222", client_secret="valid", installation_store=store1,
+                client_id="111.222",
+                client_secret="valid",
+                installation_store=store1,
             ),
             installation_store=store2,
         )
@@ -174,7 +179,10 @@ class TestApp:
         app = App(
             signing_secret="valid",
             oauth_flow=OAuthFlow(
-                settings=OAuthSettings(client_id="111.222", client_secret="valid",)
+                settings=OAuthSettings(
+                    client_id="111.222",
+                    client_secret="valid",
+                )
             ),
             installation_store=store1,
         )

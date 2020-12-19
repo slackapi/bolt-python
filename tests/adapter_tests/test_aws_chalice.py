@@ -40,7 +40,8 @@ class TestAwsChalice:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):
@@ -60,7 +61,10 @@ class TestAwsChalice:
         assert response.status_code == 404
 
     def test_events(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
 
         @app.event("app_mention")
         def event_handler():
@@ -109,7 +113,10 @@ class TestAwsChalice:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_shortcuts(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
 
         @app.shortcut("test-shortcut")
         def shortcut_handler(ack):
@@ -153,7 +160,10 @@ class TestAwsChalice:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_commands(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
 
         @app.command("/hello-world")
         def command_handler(ack):
@@ -197,7 +207,10 @@ class TestAwsChalice:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_lazy_listeners(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
 
         def command_handler(ack):
             ack()

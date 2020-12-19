@@ -31,6 +31,8 @@ class AsyncLazyListenerRunner(metaclass=ABCMeta):
         :return: None
         """
         func = to_runnable_function(
-            internal_func=function, logger=self.logger, request=request,
+            internal_func=function,
+            logger=self.logger,
+            request=request,
         )
         return await func()  # type: ignore

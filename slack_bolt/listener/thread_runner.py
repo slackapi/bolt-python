@@ -63,7 +63,9 @@ class ThreadListenerRunner:
                         response = BoltResponse(status=500)
                     response.status = 500
                     self.listener_error_handler.handle(
-                        error=e, request=request, response=response,
+                        error=e,
+                        request=request,
+                        response=response,
                     )
                     ack.response = response
 
@@ -103,7 +105,9 @@ class ThreadListenerRunner:
                         # You can customize this by passing your own error handler.
                         if listener.auto_acknowledgement:
                             self.listener_error_handler.handle(
-                                error=e, request=request, response=response,
+                                error=e,
+                                request=request,
+                                response=response,
                             )
                         else:
                             if response is None:
@@ -112,7 +116,9 @@ class ThreadListenerRunner:
                             if ack.response is not None:  # already acknowledged
                                 response = None
                             self.listener_error_handler.handle(
-                                error=e, request=request, response=response,
+                                error=e,
+                                request=request,
+                                response=response,
                             )
                             ack.response = response
 

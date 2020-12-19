@@ -8,7 +8,11 @@ from slack_bolt.response import BoltResponse
 class Middleware(metaclass=ABCMeta):
     @abstractmethod
     def process(
-        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
+        self,
+        *,
+        req: BoltRequest,
+        resp: BoltResponse,
+        next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         raise NotImplementedError()
 

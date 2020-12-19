@@ -157,10 +157,14 @@ client_id, client_secret, signing_secret = (
 )
 
 installation_store = AsyncSQLAlchemyInstallationStore(
-    client_id=client_id, database_url=database_url, logger=logger,
+    client_id=client_id,
+    database_url=database_url,
+    logger=logger,
 )
 oauth_state_store = AsyncSQLAlchemyOAuthStateStore(
-    expiration_seconds=120, database_url=database_url, logger=logger,
+    expiration_seconds=120,
+    database_url=database_url,
+    logger=logger,
 )
 
 app = AsyncApp(
@@ -168,7 +172,9 @@ app = AsyncApp(
     signing_secret=signing_secret,
     installation_store=installation_store,
     oauth_settings=AsyncOAuthSettings(
-        client_id=client_id, client_secret=client_secret, state_store=oauth_state_store,
+        client_id=client_id,
+        client_secret=client_secret,
+        state_store=oauth_state_store,
     ),
 )
 app_handler = AsyncSlackRequestHandler(app)

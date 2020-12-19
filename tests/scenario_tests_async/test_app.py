@@ -131,7 +131,9 @@ class TestAsyncApp:
         app = AsyncApp(
             signing_secret="valid",
             oauth_settings=AsyncOAuthSettings(
-                client_id="111.222", client_secret="valid", installation_store=store1,
+                client_id="111.222",
+                client_secret="valid",
+                installation_store=store1,
             ),
             installation_store=store2,
         )
@@ -153,7 +155,10 @@ class TestAsyncApp:
         app = AsyncApp(
             signing_secret="valid",
             oauth_flow=AsyncOAuthFlow(
-                settings=AsyncOAuthSettings(client_id="111.222", client_secret="valid",)
+                settings=AsyncOAuthSettings(
+                    client_id="111.222",
+                    client_secret="valid",
+                )
             ),
             installation_store=store1,
         )

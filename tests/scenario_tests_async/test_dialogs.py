@@ -21,7 +21,10 @@ class TestAsyncAttachmentActions:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = AsyncWebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     @pytest.fixture
     def event_loop(self):
@@ -37,7 +40,8 @@ class TestAsyncAttachmentActions:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):
@@ -58,7 +62,10 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_success_without_type(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.options("dialog-callback-id")(handle_suggestion)
         app.action("dialog-callback-id")(handle_submission_or_cancellation)
 
@@ -83,7 +90,10 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_success(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-id"})(
             handle_suggestion
         )
@@ -115,7 +125,10 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_success_2(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.dialog_suggestion("dialog-callback-id")(handle_suggestion)
         app.dialog_submission("dialog-callback-id")(handle_submission)
         app.dialog_cancellation("dialog-callback-id")(handle_cancellation)
@@ -207,7 +220,10 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_suggestion_failure_without_type(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404
@@ -220,7 +236,10 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_suggestion_failure(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404
@@ -233,7 +252,10 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_suggestion_failure_2(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404
@@ -248,7 +270,10 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_submission_failure_without_type(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404
@@ -261,7 +286,10 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_submission_failure(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404
@@ -274,7 +302,10 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_submission_failure_2(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404
@@ -289,7 +320,10 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_cancellation_failure_without_type(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404
@@ -302,7 +336,10 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_cancellation_failure(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404
@@ -315,7 +352,10 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_cancellation_failure_2(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = await app.async_dispatch(request)
         assert response.status == 404
@@ -402,7 +442,10 @@ options_response = {
             "value": "UXD-342",
         },
         {"label": "[FE-459] Remove the marquee tag", "value": "FE-459"},
-        {"label": "[FE-238] Too many shades of gray in master CSS", "value": "FE-238",},
+        {
+            "label": "[FE-238] Too many shades of gray in master CSS",
+            "value": "FE-238",
+        },
     ]
 }
 

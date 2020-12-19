@@ -10,7 +10,11 @@ def to_bolt_request(req: Request) -> BoltRequest:
     body = req.body.read()
     if isinstance(body, bytes):
         body = body.decode("utf-8")
-    return BoltRequest(body=body, query=req.query_string, headers=req.headers,)
+    return BoltRequest(
+        body=body,
+        query=req.query_string,
+        headers=req.headers,
+    )
 
 
 def set_response(bolt_resp: BoltResponse, resp: Response) -> None:

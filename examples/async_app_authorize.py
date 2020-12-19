@@ -14,6 +14,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.async_app import AsyncApp
 
+
 async def authorize(enterprise_id, team_id, user_id, client: AsyncWebClient, logger):
     logger.info(f"{enterprise_id},{team_id},{user_id}")
     # You can implement your own logic here
@@ -24,10 +25,8 @@ async def authorize(enterprise_id, team_id, user_id, client: AsyncWebClient, log
     )
 
 
-app = AsyncApp(
-    signing_secret=os.environ["SLACK_SIGNING_SECRET"],
-    authorize=authorize
-)
+app = AsyncApp(signing_secret=os.environ["SLACK_SIGNING_SECRET"], authorize=authorize)
+
 
 @app.event("app_mention")
 async def event_test(body, say, logger):

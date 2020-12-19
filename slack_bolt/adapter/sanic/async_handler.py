@@ -10,7 +10,9 @@ from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
 
 def to_async_bolt_request(req: Request) -> AsyncBoltRequest:
     return AsyncBoltRequest(
-        body=req.body.decode("utf-8"), query=req.query_string, headers=req.headers,
+        body=req.body.decode("utf-8"),
+        query=req.query_string,
+        headers=req.headers,
     )
 
 
@@ -58,4 +60,7 @@ class AsyncSlackRequestHandler:
             bolt_resp = await self.app.async_dispatch(to_async_bolt_request(req))
             return to_sanic_response(bolt_resp)
 
-        return HTTPResponse(status=404, body="Not found",)
+        return HTTPResponse(
+            status=404,
+            body="Not found",
+        )

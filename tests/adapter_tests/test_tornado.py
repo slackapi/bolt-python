@@ -41,8 +41,14 @@ class TestTornado(AsyncHTTPTestCase):
         self.old_os_env = remove_os_env_temporarily()
         setup_mock_web_api_server(self)
 
-        web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
-        self.app = App(client=web_client, signing_secret=signing_secret,)
+        web_client = WebClient(
+            token=valid_token,
+            base_url=mock_api_server_base_url,
+        )
+        self.app = App(
+            client=web_client,
+            signing_secret=signing_secret,
+        )
         self.app.event("app_mention")(event_handler)
         self.app.shortcut("test-shortcut")(shortcut_handler)
         self.app.command("/hello-world")(command_handler)
@@ -59,7 +65,8 @@ class TestTornado(AsyncHTTPTestCase):
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):

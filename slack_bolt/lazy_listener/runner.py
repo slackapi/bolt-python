@@ -26,4 +26,8 @@ class LazyListenerRunner(metaclass=ABCMeta):
         :param request: The request to pass to the function. The object must be thread-safe.
         :return: None
         """
-        build_runnable_function(func=function, logger=self.logger, request=request,)()
+        build_runnable_function(
+            func=function,
+            logger=self.logger,
+            request=request,
+        )()

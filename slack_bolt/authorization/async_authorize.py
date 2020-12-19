@@ -145,11 +145,13 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                 if installation.user_id != user_id:
                     # try to fetch the request user's installation
                     # to reflect the user's access token if exists
-                    user_installation = await self.installation_store.async_find_installation(
-                        enterprise_id=enterprise_id,
-                        team_id=team_id,
-                        user_id=user_id,
-                        is_enterprise_install=context.is_enterprise_install,
+                    user_installation = (
+                        await self.installation_store.async_find_installation(
+                            enterprise_id=enterprise_id,
+                            team_id=team_id,
+                            user_id=user_id,
+                            is_enterprise_install=context.is_enterprise_install,
+                        )
                     )
                     if user_installation is not None:
                         installation = user_installation

@@ -21,7 +21,10 @@ class TestAsyncErrorHandler:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = AsyncWebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     @pytest.fixture
     def event_loop(self):
@@ -41,7 +44,8 @@ class TestAsyncErrorHandler:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):
@@ -54,11 +58,15 @@ class TestAsyncErrorHandler:
     def build_valid_request(self) -> AsyncBoltRequest:
         body = {
             "type": "block_actions",
-            "user": {"id": "W111",},
+            "user": {
+                "id": "W111",
+            },
             "api_app_id": "A111",
             "token": "verification_token",
             "trigger_id": "111.222.valid",
-            "team": {"id": "T111",},
+            "team": {
+                "id": "T111",
+            },
             "channel": {"id": "C111", "name": "test-channel"},
             "response_url": "https://hooks.slack.com/actions/T111/111/random-value",
             "actions": [
@@ -87,7 +95,10 @@ class TestAsyncErrorHandler:
         async def failing_listener():
             raise Exception("Something wrong!")
 
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.action("a")(failing_listener)
 
         request = self.build_valid_request()
@@ -103,7 +114,10 @@ class TestAsyncErrorHandler:
         async def failing_listener():
             raise Exception("Something wrong!")
 
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.error(error_handler)
         app.action("a")(failing_listener)
 

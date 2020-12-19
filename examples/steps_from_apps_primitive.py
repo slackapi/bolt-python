@@ -104,7 +104,11 @@ def save(ack: Ack, client: WebClient, body: dict):
                 },
             },
             "outputs": [
-                {"name": "taskName", "type": "text", "label": "Task Name",},
+                {
+                    "name": "taskName",
+                    "type": "text",
+                    "label": "Task Name",
+                },
                 {
                     "name": "taskDescription",
                     "type": "text",

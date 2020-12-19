@@ -24,7 +24,10 @@ class TestAsyncStarlette:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = AsyncWebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()
@@ -36,7 +39,8 @@ class TestAsyncStarlette:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):
@@ -52,7 +56,10 @@ class TestAsyncStarlette:
         }
 
     def test_events(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
 
         async def event_handler():
             pass
@@ -92,13 +99,18 @@ class TestAsyncStarlette:
 
         client = TestClient(api)
         response = client.post(
-            "/slack/events", data=body, headers=self.build_headers(timestamp, body),
+            "/slack/events",
+            data=body,
+            headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_shortcuts(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
 
         async def shortcut_handler(ack):
             await ack()
@@ -133,13 +145,18 @@ class TestAsyncStarlette:
 
         client = TestClient(api)
         response = client.post(
-            "/slack/events", data=body, headers=self.build_headers(timestamp, body),
+            "/slack/events",
+            data=body,
+            headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_commands(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
 
         async def command_handler(ack):
             await ack()
@@ -174,7 +191,9 @@ class TestAsyncStarlette:
 
         client = TestClient(api)
         response = client.post(
-            "/slack/events", data=body, headers=self.build_headers(timestamp, body),
+            "/slack/events",
+            data=body,
+            headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
         assert self.mock_received_requests["/auth.test"] == 1

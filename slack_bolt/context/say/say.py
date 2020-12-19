@@ -13,7 +13,9 @@ class Say:
     channel: Optional[str]
 
     def __init__(
-        self, client: Optional[WebClient], channel: Optional[str],
+        self,
+        client: Optional[WebClient],
+        channel: Optional[str],
     ):
         self.client = client
         self.channel = channel

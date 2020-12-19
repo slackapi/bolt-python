@@ -76,14 +76,24 @@ class ChaliceSlackRequestHandler:
 
 
 def to_bolt_request(request: Request, body: str) -> BoltRequest:
-    return BoltRequest(body=body, query=request.query_params, headers=request.headers,)
+    return BoltRequest(
+        body=body,
+        query=request.query_params,
+        headers=request.headers,
+    )
 
 
 def to_chalice_response(resp: BoltResponse) -> Response:
     return Response(
-        status_code=resp.status, body=resp.body, headers=resp.first_headers(),
+        status_code=resp.status,
+        body=resp.body,
+        headers=resp.first_headers(),
     )
 
 
 def not_found() -> Response:
-    return Response(status_code=404, body="Not Found", headers={},)
+    return Response(
+        status_code=404,
+        body="Not Found",
+        headers={},
+    )

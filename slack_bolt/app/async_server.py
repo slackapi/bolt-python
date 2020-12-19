@@ -14,7 +14,10 @@ class AsyncSlackAppServer:
     web_app: web.Application
 
     def __init__(  # type:ignore
-        self, port: int, path: str, app: "AsyncApp",  # type:ignore
+        self,
+        port: int,
+        path: str,
+        app: "AsyncApp",  # type:ignore
     ):
         """Standalone AIOHTTP Web Server
 
@@ -67,7 +70,7 @@ class AsyncSlackAppServer:
         return await to_aiohttp_response(bolt_resp)
 
     def start(self) -> None:
-        """ Starts a new web server process.
+        """Starts a new web server process.
 
         :return: None
         """

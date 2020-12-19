@@ -20,7 +20,8 @@ class TestAsyncCustomListenerMatcher:
     @pytest.mark.asyncio
     async def test_instantiation(self):
         matcher: AsyncListenerMatcher = AsyncCustomListenerMatcher(
-            app_name="foo", func=func,
+            app_name="foo",
+            func=func,
         )
         resp = BoltResponse(status=201)
 

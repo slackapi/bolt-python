@@ -37,7 +37,10 @@ class AsyncWorkflowStepMiddleware(AsyncMiddleware):  # type:ignore
         return await next()
 
     async def _run(
-        self, listener: AsyncListener, req: AsyncBoltRequest, resp: BoltResponse,
+        self,
+        listener: AsyncListener,
+        req: AsyncBoltRequest,
+        resp: BoltResponse,
     ) -> Optional[BoltResponse]:
         resp, next_was_not_called = await listener.run_async_middleware(
             req=req, resp=resp

@@ -19,7 +19,9 @@ class MultiTeamsAuthorization(Authorization):
     authorize: Authorize
 
     def __init__(
-        self, *, authorize: Authorize,
+        self,
+        *,
+        authorize: Authorize,
     ):
         """Multi-workspace authorization.
 
@@ -29,7 +31,11 @@ class MultiTeamsAuthorization(Authorization):
         self.logger = get_bolt_logger(MultiTeamsAuthorization)
 
     def process(
-        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
+        self,
+        *,
+        req: BoltRequest,
+        resp: BoltResponse,
+        next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         if _is_no_auth_required(req):
             return next()
