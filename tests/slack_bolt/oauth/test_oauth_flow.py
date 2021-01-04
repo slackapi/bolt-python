@@ -40,7 +40,7 @@ class TestOAuthFlow:
         assert oauth_flow.logger is not None
         assert oauth_flow.client is not None
 
-    def test_handle_installation(self):
+    def test_handle_installation_default(self):
         oauth_flow = OAuthFlow(
             settings=OAuthSettings(
                 client_id="111.222",
@@ -57,6 +57,26 @@ class TestOAuthFlow:
         assert resp.headers.get("content-type") == ["text/html; charset=utf-8"]
         assert resp.headers.get("content-length") == ["576"]
         assert "https://slack.com/oauth/v2/authorize?state=" in resp.body
+
+    # https://github.com/slackapi/bolt-python/issues/183
+    # For direct install URL suppport
+    def test_handle_installation_no_rendering(self):
+        oauth_flow = OAuthFlow(
+            settings=OAuthSettings(
+                client_id="111.222",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+                user_scopes=["search:read"],
+                installation_store=FileInstallationStore(),
+                install_page_rendering_enabled=False,  # disabled
+                state_store=FileOAuthStateStore(expiration_seconds=120),
+            )
+        )
+        req = BoltRequest(body="")
+        resp = oauth_flow.handle_installation(req)
+        assert resp.status == 302
+        location_header = resp.headers.get("location")[0]
+        assert "https://slack.com/oauth/v2/authorize?state=" in location_header
 
     def test_scopes_as_str(self):
         settings = OAuthSettings(

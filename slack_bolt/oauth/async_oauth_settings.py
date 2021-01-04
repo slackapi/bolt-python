@@ -32,6 +32,7 @@ class AsyncOAuthSettings:
     redirect_uri: Optional[str]
     # Handler configuration
     install_path: str
+    install_page_rendering_enabled: bool
     redirect_uri_path: str
     callback_options: Optional[CallbackOptions] = None
     success_url: Optional[str]
@@ -63,6 +64,7 @@ class AsyncOAuthSettings:
         redirect_uri: Optional[str] = None,
         # Handler configuration
         install_path: str = "/slack/install",
+        install_page_rendering_enabled: bool = True,
         redirect_uri_path: str = "/slack/oauth_redirect",
         callback_options: Optional[CallbackOptions] = None,
         success_url: Optional[str] = None,
@@ -86,6 +88,7 @@ class AsyncOAuthSettings:
         :param user_scopes: Check the value in Settings > Manage Distribution
         :param redirect_uri: Check the value in Features > OAuth & Permissions > Redirect URLs
         :param install_path: The endpoint to start an OAuth flow (Default: /slack/install)
+        :param install_page_rendering_enabled: Renders a web page for install_path access if True
         :param redirect_uri_path: The path of Redirect URL (Default: /slack/oauth_redirect)
         :param callback_options: Give success/failure functions f you want to customize callback functions.
         :param success_url: Set a complete URL if you want to redirect end-users when an installation completes.
@@ -119,6 +122,7 @@ class AsyncOAuthSettings:
         self.install_path = install_path or os.environ.get(
             "SLACK_INSTALL_PATH", "/slack/install"
         )
+        self.install_page_rendering_enabled = install_page_rendering_enabled
         self.redirect_uri_path = redirect_uri_path or os.environ.get(
             "SLACK_REDIRECT_URI_PATH", "/slack/oauth_redirect"
         )
