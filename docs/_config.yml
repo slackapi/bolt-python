@@ -15,6 +15,8 @@ collections:
     output: false
   advanced:
     output: false
+  deployments:
+    output: true
   tutorials:
     output: true
     permalink: /tutorials/:slug
@@ -34,6 +36,7 @@ t:
     steps: Workflow steps
     advanced: Advanced concepts
     start: Getting started
+    deployments: Deployments
     contribute: Contributing
   ja-jp:
     basic: 基本的な概念
@@ -41,6 +44,8 @@ t:
     steps: Workflow steps
     advanced: 応用コンセプト
     start: Bolt 入門ガイド
+    # TODO: translate this title
+    deployments: Deployments
     contribute: 貢献
 
 # Metadata
