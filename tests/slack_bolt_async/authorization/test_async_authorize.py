@@ -11,7 +11,10 @@ from slack_sdk.oauth.installation_store.async_installation_store import (
 )
 from slack_sdk.web.async_client import AsyncWebClient
 
-from slack_bolt.authorization.async_authorize import AsyncInstallationStoreAuthorize
+from slack_bolt.authorization.async_authorize import (
+    AsyncInstallationStoreAuthorize,
+    AsyncAuthorize,
+)
 from slack_bolt.context.async_context import AsyncBoltContext
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
@@ -37,6 +40,17 @@ class TestAsyncAuthorize:
             cleanup_mock_web_api_server(self)
         finally:
             restore_os_env(old_os_env)
+
+    @pytest.mark.asyncio
+    async def test_root_class(self):
+        authorize = AsyncAuthorize()
+        with pytest.raises(NotImplementedError):
+            await authorize(
+                context=AsyncBoltContext(),
+                enterprise_id="T111",
+                team_id="T111",
+                user_id="U111",
+            )
 
     @pytest.mark.asyncio
     async def test_installation_store_legacy(self):
