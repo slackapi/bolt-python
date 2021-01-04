@@ -3,12 +3,13 @@ import logging
 from logging import Logger
 from typing import Optional
 
+import pytest
 from slack_sdk import WebClient
 from slack_sdk.oauth import InstallationStore
 from slack_sdk.oauth.installation_store import Bot, Installation
 
 from slack_bolt import BoltContext
-from slack_bolt.authorization.authorize import InstallationStoreAuthorize
+from slack_bolt.authorization.authorize import InstallationStoreAuthorize, Authorize
 from tests.mock_web_api_server import (
     cleanup_mock_web_api_server,
     setup_mock_web_api_server,
@@ -23,6 +24,16 @@ class TestAuthorize:
 
     def teardown_method(self):
         cleanup_mock_web_api_server(self)
+
+    def test_root_class(self):
+        authorize = Authorize()
+        with pytest.raises(NotImplementedError):
+            authorize(
+                context=BoltContext(),
+                enterprise_id="E111",
+                team_id="T111",
+                user_id="U111",
+            )
 
     def test_installation_store_legacy(self):
         installation_store = LegacyMemoryInstallationStore()
