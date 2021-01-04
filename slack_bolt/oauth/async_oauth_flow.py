@@ -162,19 +162,30 @@ class AsyncOAuthFlow:
     async def handle_installation(self, request: AsyncBoltRequest) -> BoltResponse:
         state = await self.issue_new_state(request)
         url = await self.build_authorize_url(state, request)
-        html = await self.build_install_page_html(url, request)
         set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(
             state
         )
-        return BoltResponse(
-            status=200,
-            body=html,
-            headers={
-                "Content-Type": "text/html; charset=utf-8",
-                "Content-Length": len(bytes(html, "utf-8")),
-                "Set-Cookie": [set_cookie_value],
-            },
-        )
+        if self.settings.install_page_rendering_enabled:
+            html = await self.build_install_page_html(url, request)
+            return BoltResponse(
+                status=200,
+                body=html,
+                headers={
+                    "Content-Type": "text/html; charset=utf-8",
+                    "Content-Length": len(bytes(html, "utf-8")),
+                    "Set-Cookie": [set_cookie_value],
+                },
+            )
+        else:
+            return BoltResponse(
+                status=302,
+                body="",
+                headers={
+                    "Content-Type": "text/html; charset=utf-8",
+                    "Location": url,
+                    "Set-Cookie": [set_cookie_value],
+                },
+            )
 
     # ----------------------
     # Internal methods for Installation

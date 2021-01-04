@@ -92,7 +92,7 @@ class TestAsyncOAuthFlow:
             )
 
     @pytest.mark.asyncio
-    async def test_handle_installation(self):
+    async def test_handle_installation_default(self):
         oauth_flow = AsyncOAuthFlow(
             settings=AsyncOAuthSettings(
                 client_id="111.222",
@@ -108,6 +108,24 @@ class TestAsyncOAuthFlow:
         assert resp.headers.get("content-type") == ["text/html; charset=utf-8"]
         assert resp.headers.get("content-length") == ["565"]
         assert "https://slack.com/oauth/v2/authorize?state=" in resp.body
+
+    @pytest.mark.asyncio
+    async def test_handle_installation_no_rendering(self):
+        oauth_flow = AsyncOAuthFlow(
+            settings=AsyncOAuthSettings(
+                client_id="111.222",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+                installation_store=FileInstallationStore(),
+                install_page_rendering_enabled=False,  # disabled
+                state_store=FileOAuthStateStore(expiration_seconds=120),
+            )
+        )
+        req = AsyncBoltRequest(body="")
+        resp = await oauth_flow.handle_installation(req)
+        assert resp.status == 302
+        location_header = resp.headers.get("location")[0]
+        assert "https://slack.com/oauth/v2/authorize?state=" in location_header
 
     @pytest.mark.asyncio
     async def test_handle_callback(self):
