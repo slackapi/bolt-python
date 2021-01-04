@@ -62,7 +62,9 @@ class AsyncioListenerRunner:
                         response = BoltResponse(status=500)
                     response.status = 500
                     await self.listener_error_handler.handle(
-                        error=e, request=request, response=response,
+                        error=e,
+                        request=request,
+                        response=response,
                     )
                     ack.response = response
 
@@ -95,7 +97,9 @@ class AsyncioListenerRunner:
                 # start the listener function asynchronously
                 # NOTE: intentionally
                 async def run_ack_function_asynchronously(
-                    ack: AsyncAck, request: AsyncBoltRequest, response: BoltResponse,
+                    ack: AsyncAck,
+                    request: AsyncBoltRequest,
+                    response: BoltResponse,
                 ):
                     try:
                         await listener.run_ack_function(
@@ -111,7 +115,9 @@ class AsyncioListenerRunner:
                             response = None
 
                         await self.listener_error_handler.handle(
-                            error=e, request=request, response=response,
+                            error=e,
+                            request=request,
+                            response=response,
                         )
                         ack.response = response
 

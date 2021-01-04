@@ -21,7 +21,10 @@ class TestAsyncAttachmentActions:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = AsyncWebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     @pytest.fixture
     def event_loop(self):
@@ -37,7 +40,8 @@ class TestAsyncAttachmentActions:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):
@@ -60,7 +64,10 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_success_without_type(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.action("pick_channel_for_fun")(simple_listener)
 
         request = self.build_valid_request()
@@ -70,9 +77,15 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_success(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.action(
-            {"callback_id": "pick_channel_for_fun", "type": "interactive_message",}
+            {
+                "callback_id": "pick_channel_for_fun",
+                "type": "interactive_message",
+            }
         )(simple_listener)
 
         request = self.build_valid_request()
@@ -82,7 +95,10 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_success_2(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.attachment_action("pick_channel_for_fun")(simple_listener)
 
         request = self.build_valid_request()
@@ -98,7 +114,10 @@ class TestAsyncAttachmentActions:
             process_before_response=True,
         )
         app.action(
-            {"callback_id": "pick_channel_for_fun", "type": "interactive_message",}
+            {
+                "callback_id": "pick_channel_for_fun",
+                "type": "interactive_message",
+            }
         )(simple_listener)
 
         request = self.build_valid_request()
@@ -122,7 +141,10 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_failure_without_type(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 404
@@ -135,22 +157,31 @@ class TestAsyncAttachmentActions:
 
     @pytest.mark.asyncio
     async def test_failure(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 1
 
-        app.action({"callback_id": "unknown", "type": "interactive_message",})(
-            simple_listener
-        )
+        app.action(
+            {
+                "callback_id": "unknown",
+                "type": "interactive_message",
+            }
+        )(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
         assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
     async def test_failure_2(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 404

@@ -47,7 +47,11 @@ class AsyncWorkflowStep:
 
     @classmethod
     def _build_listener(
-        cls, callback_id: str, app_name: str, listener: AsyncListener, name: str,
+        cls,
+        callback_id: str,
+        app_name: str,
+        listener: AsyncListener,
+        name: str,
     ) -> AsyncListener:
         if isinstance(listener, AsyncListener):
             return listener
@@ -114,7 +118,9 @@ def _build_edit_listener_middleware(callback_id: str) -> AsyncMiddleware:
         next: Callable[[], Awaitable[BoltResponse]],
     ):
         context["configure"] = AsyncConfigure(
-            callback_id=callback_id, client=client, body=body,
+            callback_id=callback_id,
+            client=client,
+            body=body,
         )
         return await next()
 
@@ -133,7 +139,10 @@ def _build_save_listener_middleware() -> AsyncMiddleware:
         body: dict,
         next: Callable[[], Awaitable[BoltResponse]],
     ):
-        context["update"] = AsyncUpdate(client=client, body=body,)
+        context["update"] = AsyncUpdate(
+            client=client,
+            body=body,
+        )
         return await next()
 
     return AsyncCustomMiddleware(app_name=__name__, func=save_listener_middleware)
@@ -151,8 +160,14 @@ def _build_execute_listener_middleware() -> AsyncMiddleware:
         body: dict,
         next: Callable[[], Awaitable[BoltResponse]],
     ):
-        context["complete"] = AsyncComplete(client=client, body=body,)
-        context["fail"] = AsyncFail(client=client, body=body,)
+        context["complete"] = AsyncComplete(
+            client=client,
+            body=body,
+        )
+        context["fail"] = AsyncFail(
+            client=client,
+            body=body,
+        )
         return await next()
 
     return AsyncCustomMiddleware(app_name=__name__, func=execute_listener_middleware)

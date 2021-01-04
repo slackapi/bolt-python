@@ -29,7 +29,10 @@ class TestAppBotOnly:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = AsyncWebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     @pytest.fixture
     def event_loop(self):
@@ -45,7 +48,8 @@ class TestAppBotOnly:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):

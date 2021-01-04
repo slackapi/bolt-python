@@ -11,7 +11,11 @@ from slack_bolt.response import BoltResponse
 def build_bolt_request() -> BoltRequest:
     req = cherrypy.request
     body = req.raw_body if hasattr(req, "raw_body") else ""
-    return BoltRequest(body=body, query=req.query_string, headers=req.headers,)
+    return BoltRequest(
+        body=body,
+        query=req.query_string,
+        headers=req.headers,
+    )
 
 
 def set_response_status_and_headers(bolt_resp: BoltResponse) -> None:

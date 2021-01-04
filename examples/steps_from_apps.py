@@ -101,7 +101,11 @@ def save(ack: Ack, view: dict, update: Update):
             },
         },
         outputs=[
-            {"name": "taskName", "type": "text", "label": "Task Name", },
+            {
+                "name": "taskName",
+                "type": "text",
+                "label": "Task Name",
+            },
             {
                 "name": "taskDescription",
                 "type": "text",
@@ -112,7 +116,7 @@ def save(ack: Ack, view: dict, update: Update):
                 "type": "text",
                 "label": "Task Author Email",
             },
-        ]
+        ],
     )
     ack()
 
@@ -161,9 +165,7 @@ def execute(step: dict, client: WebClient, complete: Complete, fail: Fail):
             },
         )
     except Exception as err:
-        fail(error={
-            "message": "Something wrong!"
-        })
+        fail(error={"message": "Something wrong!"})
 
 
 app.step(

@@ -82,7 +82,9 @@ def to_bolt_request(event) -> BoltRequest:
     headers = event.get("headers", {})
     headers["cookie"] = cookies
     return BoltRequest(
-        body=body, query=event.get("queryStringParameters", {}), headers=headers,
+        body=body,
+        query=event.get("queryStringParameters", {}),
+        headers=headers,
     )
 
 

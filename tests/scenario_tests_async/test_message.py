@@ -21,7 +21,10 @@ class TestAsyncMessage:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = AsyncWebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     @pytest.fixture
     def event_loop(self):
@@ -37,7 +40,8 @@ class TestAsyncMessage:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):
@@ -57,7 +61,10 @@ class TestAsyncMessage:
 
     @pytest.mark.asyncio
     async def test_string_keyword(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.message("Hello")(whats_up)
 
         request = self.build_request()
@@ -69,7 +76,10 @@ class TestAsyncMessage:
 
     @pytest.mark.asyncio
     async def test_string_keyword_capturing(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.message("We've received ([0-9]+) messages from (.+)!")(verify_matches)
 
         request = self.build_request2()
@@ -81,7 +91,10 @@ class TestAsyncMessage:
 
     @pytest.mark.asyncio
     async def test_string_keyword_capturing2(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.message(re.compile("We've received ([0-9]+) messages from (.+)!"))(
             verify_matches
         )
@@ -95,7 +108,10 @@ class TestAsyncMessage:
 
     @pytest.mark.asyncio
     async def test_string_keyword_unmatched(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.message("HELLO")(whats_up)
 
         request = self.build_request()
@@ -105,7 +121,10 @@ class TestAsyncMessage:
 
     @pytest.mark.asyncio
     async def test_regexp_keyword(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.message(re.compile("He.lo"))(whats_up)
 
         request = self.build_request()
@@ -117,7 +136,10 @@ class TestAsyncMessage:
 
     @pytest.mark.asyncio
     async def test_regexp_keyword_unmatched(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.message(re.compile("HELLO"))(whats_up)
 
         request = self.build_request()

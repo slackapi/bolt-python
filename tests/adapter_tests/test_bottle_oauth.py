@@ -6,7 +6,9 @@ signing_secret = "secret"
 app = App(
     signing_secret=signing_secret,
     oauth_settings=OAuthSettings(
-        client_id="111.111", client_secret="xxx", scopes=["chat:write", "commands"],
+        client_id="111.111",
+        client_secret="xxx",
+        scopes=["chat:write", "commands"],
     ),
 )
 handler = SlackRequestHandler(app)

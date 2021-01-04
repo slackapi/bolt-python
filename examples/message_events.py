@@ -75,7 +75,9 @@ def add_reaction(
     logger.info(f"subtype: {subtype}")
     message_ts = body["event"]["ts"]
     api_response = client.reactions_add(
-        channel=context.channel_id, timestamp=message_ts, name="eyes",
+        channel=context.channel_id,
+        timestamp=message_ts,
+        name="eyes",
     )
     logger.info(f"api_response: {api_response}")
 

@@ -8,7 +8,9 @@ from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
 
 def to_async_bolt_request(req: Request, body: bytes) -> AsyncBoltRequest:
     return AsyncBoltRequest(
-        body=body.decode("utf-8"), query=req.query_params, headers=req.headers,
+        body=body.decode("utf-8"),
+        query=req.query_params,
+        headers=req.headers,
     )
 
 
@@ -56,4 +58,7 @@ class AsyncSlackRequestHandler:
             bolt_resp = await self.app.async_dispatch(to_async_bolt_request(req, body))
             return to_starlette_response(bolt_resp)
 
-        return Response(status_code=404, content="Not found",)
+        return Response(
+            status_code=404,
+            content="Not found",
+        )

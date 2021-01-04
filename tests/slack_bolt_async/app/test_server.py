@@ -13,6 +13,9 @@ class TestServer:
         server = AsyncSlackAppServer(
             port=3001,
             path="/slack/events",
-            app=AsyncApp(signing_secret="valid", token="xoxb-valid",),
+            app=AsyncApp(
+                signing_secret="valid",
+                token="xoxb-valid",
+            ),
         )
         assert server is not None

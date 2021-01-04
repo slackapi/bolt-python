@@ -6,7 +6,11 @@ class AsyncFail:
         self.client = client
         self.body = body
 
-    async def __call__(self, *, error: dict,) -> None:
+    async def __call__(
+        self,
+        *,
+        error: dict,
+    ) -> None:
         await self.client.workflows_stepFailed(
             workflow_step_execute_id=self.body["event"]["workflow_step"][
                 "workflow_step_execute_id"

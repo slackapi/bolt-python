@@ -20,7 +20,10 @@ class TestBlockSuggestion:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = WebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()
@@ -32,7 +35,8 @@ class TestBlockSuggestion:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):
@@ -59,7 +63,10 @@ class TestBlockSuggestion:
         assert resp != None
 
     def test_success(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.options("es_a")(show_options)
 
         request = self.build_valid_request()
@@ -70,7 +77,10 @@ class TestBlockSuggestion:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_success_2(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.block_suggestion("es_a")(show_options)
 
         request = self.build_valid_request()
@@ -81,7 +91,10 @@ class TestBlockSuggestion:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_success_multi(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.options("mes_a")(show_multi_options)
 
         request = self.build_valid_multi_request()
@@ -122,7 +135,10 @@ class TestBlockSuggestion:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_failure(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 404
@@ -134,7 +150,10 @@ class TestBlockSuggestion:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_failure_2(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 404
@@ -146,7 +165,10 @@ class TestBlockSuggestion:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_failure_multi(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_multi_request()
         response = app.dispatch(request)
         assert response.status == 404

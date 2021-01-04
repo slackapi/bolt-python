@@ -10,7 +10,10 @@ from slack_bolt.version import __version__ as bolt_version
 
 
 def create_web_client(token: Optional[str] = None) -> WebClient:
-    return WebClient(token=token, user_agent_prefix=f"Bolt/{bolt_version}",)
+    return WebClient(
+        token=token,
+        user_agent_prefix=f"Bolt/{bolt_version}",
+    )
 
 
 def convert_to_dict_list(objects: Sequence[Union[Dict, JsonObject]]) -> Sequence[Dict]:

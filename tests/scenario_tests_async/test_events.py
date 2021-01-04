@@ -22,7 +22,10 @@ class TestAsyncEvents:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = AsyncWebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     @pytest.fixture
     def event_loop(self):
@@ -38,7 +41,8 @@ class TestAsyncEvents:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):
@@ -59,7 +63,10 @@ class TestAsyncEvents:
 
     @pytest.mark.asyncio
     async def test_app_mention(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.event("app_mention")(whats_up)
 
         request = self.build_valid_app_mention_request()
@@ -97,7 +104,10 @@ class TestAsyncEvents:
 
     @pytest.mark.asyncio
     async def test_simultaneous_requests(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.event("app_mention")(random_sleeper)
 
         request = self.build_valid_app_mention_request()
@@ -120,7 +130,10 @@ class TestAsyncEvents:
 
     @pytest.mark.asyncio
     async def test_reaction_added(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.event("reaction_added")(whats_up)
 
         request = self.build_valid_reaction_added_request()
@@ -132,7 +145,10 @@ class TestAsyncEvents:
 
     @pytest.mark.asyncio
     async def test_stable_auto_ack(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.event("reaction_added")(always_failing)
 
         for _ in range(10):
@@ -142,7 +158,10 @@ class TestAsyncEvents:
 
     @pytest.mark.asyncio
     async def test_self_events(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.event("reaction_added")(whats_up)
 
         self_event = {
@@ -180,7 +199,10 @@ class TestAsyncEvents:
 
     @pytest.mark.asyncio
     async def test_self_joined_left_events(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.event("reaction_added")(whats_up)
 
         join_event_body = {
@@ -249,7 +271,10 @@ class TestAsyncEvents:
 
     @pytest.mark.asyncio
     async def test_joined_left_events(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.event("reaction_added")(whats_up)
 
         join_event_body = {

@@ -14,7 +14,11 @@ class IgnoringSelfEvents(Middleware):
         self.logger = get_bolt_logger(IgnoringSelfEvents)
 
     def process(
-        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
+        self,
+        *,
+        req: BoltRequest,
+        resp: BoltResponse,
+        next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         auth_result = req.context.authorize_result
         if self._is_self_event(auth_result, req.context.user_id, req.body):

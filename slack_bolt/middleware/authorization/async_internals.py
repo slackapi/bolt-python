@@ -23,5 +23,6 @@ def _is_no_auth_required(req: AsyncBoltRequest) -> bool:
 def _build_error_response() -> BoltResponse:
     # show an ephemeral message to the end-user
     return BoltResponse(
-        status=200, body=":x: Please install this app into the workspace :bow:",
+        status=200,
+        body=":x: Please install this app into the workspace :bow:",
     )

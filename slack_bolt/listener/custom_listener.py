@@ -41,7 +41,10 @@ class CustomListener(Listener):
         self.logger = get_bolt_app_logger(app_name, self.ack_function)
 
     def run_ack_function(
-        self, *, request: BoltRequest, response: BoltResponse,
+        self,
+        *,
+        request: BoltRequest,
+        response: BoltResponse,
     ) -> Optional[BoltResponse]:
         return self.ack_function(
             **build_required_kwargs(

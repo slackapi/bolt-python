@@ -19,7 +19,10 @@ class TestAttachmentActions:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = WebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()
@@ -31,7 +34,8 @@ class TestAttachmentActions:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):
@@ -50,7 +54,10 @@ class TestAttachmentActions:
         assert resp != None
 
     def test_success_without_type(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.options("dialog-callback-id")(handle_suggestion)
         app.action("dialog-callback-id")(handle_submission_cancellation)
 
@@ -74,7 +81,10 @@ class TestAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_success(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-id"})(
             handle_suggestion
         )
@@ -105,7 +115,10 @@ class TestAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_success_2(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         app.dialog_suggestion("dialog-callback-id")(handle_suggestion)
         app.dialog_submission("dialog-callback-id")(handle_submission)
         app.dialog_cancellation("dialog-callback-id")(handle_cancellation)
@@ -194,7 +207,10 @@ class TestAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_suggestion_failure_without_type(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = app.dispatch(request)
         assert response.status == 404
@@ -206,7 +222,10 @@ class TestAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_suggestion_failure(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = app.dispatch(request)
         assert response.status == 404
@@ -218,7 +237,10 @@ class TestAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_suggestion_failure_2(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = app.dispatch(request)
         assert response.status == 404
@@ -232,7 +254,10 @@ class TestAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_submission_failure_without_type(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = app.dispatch(request)
         assert response.status == 404
@@ -244,7 +269,10 @@ class TestAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_submission_failure(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = app.dispatch(request)
         assert response.status == 404
@@ -256,7 +284,10 @@ class TestAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_submission_failure_2(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = app.dispatch(request)
         assert response.status == 404
@@ -270,7 +301,10 @@ class TestAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_cancellation_failure_without_type(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = app.dispatch(request)
         assert response.status == 404
@@ -282,7 +316,10 @@ class TestAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_cancellation_failure(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = app.dispatch(request)
         assert response.status == 404
@@ -294,7 +331,10 @@ class TestAttachmentActions:
         assert self.mock_received_requests["/auth.test"] == 1
 
     def test_cancellation_failure_2(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret,)
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
         request = self.build_valid_request(suggestion_raw_body)
         response = app.dispatch(request)
         assert response.status == 404
@@ -381,7 +421,10 @@ options_response = {
             "value": "UXD-342",
         },
         {"label": "[FE-459] Remove the marquee tag", "value": "FE-459"},
-        {"label": "[FE-238] Too many shades of gray in master CSS", "value": "FE-238",},
+        {
+            "label": "[FE-238] Too many shades of gray in master CSS",
+            "value": "FE-238",
+        },
     ]
 }
 

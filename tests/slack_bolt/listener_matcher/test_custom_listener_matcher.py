@@ -19,7 +19,8 @@ class TestCustomListenerMatcher:
 
     def test_instantiation(self):
         matcher: ListenerMatcher = CustomListenerMatcher(
-            app_name="foo", func=func,
+            app_name="foo",
+            func=func,
         )
         resp = BoltResponse(status=201)
 

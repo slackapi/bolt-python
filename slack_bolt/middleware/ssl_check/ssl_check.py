@@ -18,7 +18,11 @@ class SslCheck(Middleware):  # type: ignore
         self.logger = get_bolt_logger(SslCheck)
 
     def process(
-        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse],
+        self,
+        *,
+        req: BoltRequest,
+        resp: BoltResponse,
+        next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         if self._is_ssl_check_request(req.body):
             if self._verify_token_if_needed(req.body):

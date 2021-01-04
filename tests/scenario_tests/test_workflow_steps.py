@@ -32,7 +32,8 @@ class TestWorkflowSteps:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_app(self, callback_id: str):
@@ -364,7 +365,10 @@ def edit(ack: Ack, step, configure: Configure):
                 "element": {
                     "type": "plain_text_input",
                     "action_id": "task_name",
-                    "placeholder": {"type": "plain_text", "text": "Write a task name",},
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "Write a task name",
+                    },
                 },
                 "label": {"type": "plain_text", "text": "Task name"},
             },
@@ -387,7 +391,10 @@ def edit(ack: Ack, step, configure: Configure):
                 "element": {
                     "type": "plain_text_input",
                     "action_id": "task_author",
-                    "placeholder": {"type": "plain_text", "text": "Write a task name",},
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "Write a task name",
+                    },
                 },
                 "label": {"type": "plain_text", "text": "Task author"},
             },
@@ -414,9 +421,21 @@ def save(ack: Ack, step: dict, view: dict, update: Update):
             },
         },
         outputs=[
-            {"name": "taskName", "type": "text", "label": "Task Name",},
-            {"name": "taskDescription", "type": "text", "label": "Task Description",},
-            {"name": "taskAuthorEmail", "type": "text", "label": "Task Author Email",},
+            {
+                "name": "taskName",
+                "type": "text",
+                "label": "Task Name",
+            },
+            {
+                "name": "taskDescription",
+                "type": "text",
+                "label": "Task Description",
+            },
+            {
+                "name": "taskAuthorEmail",
+                "type": "text",
+                "label": "Task Author Email",
+            },
         ],
     )
     ack()
@@ -487,7 +506,8 @@ def save_lazy(step: dict, view: dict, update: Update):
     assert step is not None
     assert view is not None
     update(
-        inputs={}, outputs=[],
+        inputs={},
+        outputs=[],
     )
 
 

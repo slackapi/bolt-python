@@ -113,7 +113,10 @@ class TestAsyncOAuthFlowSQLite3:
             client_id="111.222",
             client_secret="xxx",
             scopes=["chat:write", "commands"],
-            callback_options=AsyncCallbackOptions(success=success, failure=failure,),
+            callback_options=AsyncCallbackOptions(
+                success=success,
+                failure=failure,
+            ),
         )
         state = await oauth_flow.issue_new_state(None)
         req = AsyncBoltRequest(

@@ -331,7 +331,11 @@ class AsyncApp:
             or self._server.port != port
             or self._server.path != path
         ):
-            self._server = AsyncSlackAppServer(port=port, path=path, app=self,)
+            self._server = AsyncSlackAppServer(
+                port=port,
+                path=path,
+                app=self,
+            )
         return self._server
 
     def web_app(self, path: str = "/slack/events") -> web.Application:
@@ -461,7 +465,10 @@ class AsyncApp:
         step = callback_id
         if isinstance(callback_id, (str, Pattern)):
             step = AsyncWorkflowStep(
-                callback_id=callback_id, edit=edit, save=save, execute=execute,
+                callback_id=callback_id,
+                edit=edit,
+                save=save,
+                execute=execute,
             )
         elif not isinstance(step, AsyncWorkflowStep):
             raise BoltError("Invalid step object")
@@ -480,8 +487,11 @@ class AsyncApp:
             when getting an unhandled error in Bolt app.
         :return: None
         """
-        self._async_listener_runner.listener_error_handler = AsyncCustomListenerErrorHandler(
-            logger=self._framework_logger, func=func,
+        self._async_listener_runner.listener_error_handler = (
+            AsyncCustomListenerErrorHandler(
+                logger=self._framework_logger,
+                func=func,
+            )
         )
         return func
 

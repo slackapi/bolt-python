@@ -24,7 +24,14 @@ class TestSanic:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = AsyncWebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
+
+    @staticmethod
+    def unique_sanic_app_name() -> str:
+        return f"awesome-slack-app-{time()}"
 
     @pytest.fixture
     def event_loop(self):
@@ -40,7 +47,8 @@ class TestSanic:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):
@@ -57,7 +65,10 @@ class TestSanic:
 
     @pytest.mark.asyncio
     async def test_events(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
 
         async def event_handler():
             pass
@@ -86,7 +97,7 @@ class TestSanic:
         }
         timestamp, body = str(int(time())), json.dumps(input)
 
-        api = Sanic(name="awesome-slack-app")
+        api = Sanic(name=self.unique_sanic_app_name())
         app_handler = AsyncSlackRequestHandler(app)
 
         @api.post("/slack/events")
@@ -94,14 +105,19 @@ class TestSanic:
             return await app_handler.handle(req)
 
         _, response = await api.asgi_client.post(
-            url="/slack/events", data=body, headers=self.build_headers(timestamp, body),
+            url="/slack/events",
+            data=body,
+            headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
     async def test_shortcuts(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
 
         async def shortcut_handler(ack):
             await ack()
@@ -125,7 +141,7 @@ class TestSanic:
 
         timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
 
-        api = Sanic(name="awesome-slack-app")
+        api = Sanic(name=self.unique_sanic_app_name())
         app_handler = AsyncSlackRequestHandler(app)
 
         @api.post("/slack/events")
@@ -133,14 +149,19 @@ class TestSanic:
             return await app_handler.handle(req)
 
         _, response = await api.asgi_client.post(
-            url="/slack/events", data=body, headers=self.build_headers(timestamp, body),
+            url="/slack/events",
+            data=body,
+            headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
         assert self.mock_received_requests["/auth.test"] == 1
 
     @pytest.mark.asyncio
     async def test_commands(self):
-        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret,)
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
 
         async def command_handler(ack):
             await ack()
@@ -164,7 +185,7 @@ class TestSanic:
         )
         timestamp, body = str(int(time())), input
 
-        api = Sanic(name="awesome-slack-app")
+        api = Sanic(name=self.unique_sanic_app_name())
         app_handler = AsyncSlackRequestHandler(app)
 
         @api.post("/slack/events")
@@ -172,7 +193,9 @@ class TestSanic:
             return await app_handler.handle(req)
 
         _, response = await api.asgi_client.post(
-            url="/slack/events", data=body, headers=self.build_headers(timestamp, body),
+            url="/slack/events",
+            data=body,
+            headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
         assert self.mock_received_requests["/auth.test"] == 1
@@ -188,7 +211,7 @@ class TestSanic:
                 scopes=["chat:write", "commands"],
             ),
         )
-        api = Sanic(name="awesome-slack-app")
+        api = Sanic(name=self.unique_sanic_app_name())
         app_handler = AsyncSlackRequestHandler(app)
 
         @api.get("/slack/install")

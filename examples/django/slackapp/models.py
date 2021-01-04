@@ -4,6 +4,7 @@
 
 from django.db import models
 
+
 class SlackBot(models.Model):
     client_id = models.TextField(null=False)
     app_id = models.TextField(null=False)
@@ -86,7 +87,9 @@ class DjangoInstallationStore(InstallationStore):
     client_id: str
 
     def __init__(
-        self, client_id: str, logger: Logger,
+        self,
+        client_id: str,
+        logger: Logger,
     ):
         self.client_id = client_id
         self._logger = logger
@@ -104,8 +107,11 @@ class DjangoInstallationStore(InstallationStore):
         SlackBot(**b).save()
 
     def find_bot(
-        self, *, enterprise_id: Optional[str], team_id: Optional[str],
-        is_enterprise_install: Optional[bool] = False
+        self,
+        *,
+        enterprise_id: Optional[str],
+        team_id: Optional[str],
+        is_enterprise_install: Optional[bool] = False,
     ) -> Optional[Bot]:
         e_id = enterprise_id or None
         t_id = team_id or None
@@ -143,13 +149,18 @@ class DjangoInstallationStore(InstallationStore):
         if is_enterprise_install:
             t_id = None
         if user_id is None:
-            rows = (SlackInstallation.objects.filter(
-                enterprise_id=e_id).filter(team_id=t_id).order_by(
-                    F("installed_at").desc())[:1])
+            rows = (
+                SlackInstallation.objects.filter(enterprise_id=e_id)
+                .filter(team_id=t_id)
+                .order_by(F("installed_at").desc())[:1]
+            )
         else:
-            rows = (SlackInstallation.objects.filter(
-                enterprise_id=e_id).filter(team_id=t_id).filter(
-                    user_id=user_id).order_by(F("installed_at").desc())[:1])
+            rows = (
+                SlackInstallation.objects.filter(enterprise_id=e_id)
+                .filter(team_id=t_id)
+                .filter(user_id=user_id)
+                .order_by(F("installed_at").desc())[:1]
+            )
 
         if len(rows) > 0:
             i = rows[0]
@@ -176,7 +187,9 @@ class DjangoOAuthStateStore(OAuthStateStore):
     expiration_seconds: int
 
     def __init__(
-        self, expiration_seconds: int, logger: Logger,
+        self,
+        expiration_seconds: int,
+        logger: Logger,
     ):
         self.expiration_seconds = expiration_seconds
         self._logger = logger
@@ -202,6 +215,7 @@ class DjangoOAuthStateStore(OAuthStateStore):
             return True
         return False
 
+
 # ----------------------
 # Slack App
 # ----------------------
@@ -220,11 +234,17 @@ client_id, client_secret, signing_secret = (
 
 app = App(
     signing_secret=signing_secret,
-    installation_store=DjangoInstallationStore(client_id=client_id, logger=logger,),
+    installation_store=DjangoInstallationStore(
+        client_id=client_id,
+        logger=logger,
+    ),
     oauth_settings=OAuthSettings(
         client_id=client_id,
         client_secret=client_secret,
-        state_store=DjangoOAuthStateStore(expiration_seconds=120, logger=logger,),
+        state_store=DjangoOAuthStateStore(
+            expiration_seconds=120,
+            logger=logger,
+        ),
     ),
 )
 
@@ -233,6 +253,7 @@ app = App(
 def event_test(body, say, logger):
     logger.info(body)
     say("What's up?")
+
 
 @app.command("/hello-bolt-python")
 def command(ack):

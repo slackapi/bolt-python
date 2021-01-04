@@ -140,7 +140,8 @@ class AsyncOAuthSettings:
         )
         # state parameter related configurations
         self.state_store = state_store or FileOAuthStateStore(
-            expiration_seconds=state_expiration_seconds, client_id=client_id,
+            expiration_seconds=state_expiration_seconds,
+            client_id=client_id,
         )
         self.state_cookie_name = state_cookie_name
         self.state_expiration_seconds = state_expiration_seconds

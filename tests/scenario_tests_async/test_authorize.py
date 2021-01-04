@@ -26,7 +26,8 @@ async def authorize(enterprise_id, team_id, user_id, client: AsyncWebClient):
     assert user_id == "W99999"
     auth_test = await client.auth_test(token=valid_token)
     return AuthorizeResult.from_auth_test_response(
-        auth_test_response=auth_test, bot_token=valid_token,
+        auth_test_response=auth_test,
+        bot_token=valid_token,
     )
 
 
@@ -36,7 +37,8 @@ async def user_authorize(enterprise_id, team_id, user_id, client: AsyncWebClient
     assert user_id == "W99999"
     auth_test = await client.auth_test(token=valid_user_token)
     return AuthorizeResult.from_auth_test_response(
-        auth_test_response=auth_test, user_token=valid_user_token,
+        auth_test_response=auth_test,
+        user_token=valid_user_token,
     )
 
 
@@ -51,7 +53,10 @@ class TestAsyncAuthorize:
     signing_secret = "secret"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url,)
+    web_client = AsyncWebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     @pytest.fixture
     def event_loop(self):
@@ -67,7 +72,8 @@ class TestAsyncAuthorize:
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
-            body=body, timestamp=timestamp,
+            body=body,
+            timestamp=timestamp,
         )
 
     def build_headers(self, timestamp: str, body: str):
