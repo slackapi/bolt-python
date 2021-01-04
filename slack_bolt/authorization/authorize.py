@@ -21,7 +21,7 @@ class Authorize:
         *,
         context: BoltContext,
         enterprise_id: Optional[str],
-        team_id: str,
+        team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
     ) -> Optional[AuthorizeResult]:
         raise NotImplementedError()
@@ -43,7 +43,7 @@ class CallableAuthorize(Authorize):
         *,
         context: BoltContext,
         enterprise_id: Optional[str],
-        team_id: str,
+        team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
     ) -> Optional[AuthorizeResult]:
         try:
@@ -121,7 +121,7 @@ class InstallationStoreAuthorize(Authorize):
         *,
         context: BoltContext,
         enterprise_id: Optional[str],
-        team_id: str,
+        team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
     ) -> Optional[AuthorizeResult]:
 

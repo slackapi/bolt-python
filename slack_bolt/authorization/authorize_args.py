@@ -11,7 +11,7 @@ class AuthorizeArgs:
     logger: Logger
     client: WebClient
     enterprise_id: Optional[str]
-    team_id: str
+    team_id: Optional[str]
     user_id: Optional[str]
 
     def __init__(
@@ -19,7 +19,7 @@ class AuthorizeArgs:
         *,
         context: BoltContext,
         enterprise_id: Optional[str],
-        team_id: str,
+        team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
     ):
         """The whole arguments that are passed to Authorize functions.

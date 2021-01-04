@@ -22,7 +22,7 @@ class AsyncAuthorize:
         *,
         context: AsyncBoltContext,
         enterprise_id: Optional[str],
-        team_id: str,
+        team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
     ) -> Optional[AuthorizeResult]:
         raise NotImplementedError()
@@ -41,7 +41,7 @@ class AsyncCallableAuthorize(AsyncAuthorize):
         *,
         context: AsyncBoltContext,
         enterprise_id: Optional[str],
-        team_id: str,
+        team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
     ) -> Optional[AuthorizeResult]:
         try:
@@ -116,7 +116,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
         *,
         context: AsyncBoltContext,
         enterprise_id: Optional[str],
-        team_id: str,
+        team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
     ) -> Optional[AuthorizeResult]:
 
