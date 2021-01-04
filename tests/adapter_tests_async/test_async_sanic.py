@@ -29,6 +29,10 @@ class TestSanic:
         base_url=mock_api_server_base_url,
     )
 
+    @staticmethod
+    def unique_sanic_app_name() -> str:
+        return f"awesome-slack-app-{time()}"
+
     @pytest.fixture
     def event_loop(self):
         old_os_env = remove_os_env_temporarily()
@@ -93,7 +97,7 @@ class TestSanic:
         }
         timestamp, body = str(int(time())), json.dumps(input)
 
-        api = Sanic(name="awesome-slack-app")
+        api = Sanic(name=self.unique_sanic_app_name())
         app_handler = AsyncSlackRequestHandler(app)
 
         @api.post("/slack/events")
@@ -137,7 +141,7 @@ class TestSanic:
 
         timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
 
-        api = Sanic(name="awesome-slack-app")
+        api = Sanic(name=self.unique_sanic_app_name())
         app_handler = AsyncSlackRequestHandler(app)
 
         @api.post("/slack/events")
@@ -181,7 +185,7 @@ class TestSanic:
         )
         timestamp, body = str(int(time())), input
 
-        api = Sanic(name="awesome-slack-app")
+        api = Sanic(name=self.unique_sanic_app_name())
         app_handler = AsyncSlackRequestHandler(app)
 
         @api.post("/slack/events")
@@ -207,7 +211,7 @@ class TestSanic:
                 scopes=["chat:write", "commands"],
             ),
         )
-        api = Sanic(name="awesome-slack-app")
+        api = Sanic(name=self.unique_sanic_app_name())
         app_handler = AsyncSlackRequestHandler(app)
 
         @api.get("/slack/install")
