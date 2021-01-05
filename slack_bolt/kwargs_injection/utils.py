@@ -15,6 +15,7 @@ from slack_bolt.request.payload_utils import (
     to_message,
     to_step,
 )
+from ..logger.messages import warning_skip_uncommon_arg_name
 
 
 def build_required_kwargs(
@@ -64,6 +65,16 @@ def build_required_kwargs(
     for k, v in request.context.items():
         if k not in all_available_args:
             all_available_args[k] = v
+
+    if len(required_arg_names) > 0:
+        # To support instance/class methods in a class for listeners/middleware,
+        # check if the first argument is either self or cls
+        first_arg_name = required_arg_names[0]
+        if first_arg_name in {"self", "cls"}:
+            required_arg_names.pop(0)
+        elif first_arg_name not in all_available_args.keys():
+            logger.warning(warning_skip_uncommon_arg_name(first_arg_name))
+            required_arg_names.pop(0)
 
     kwargs: Dict[str, Any] = {
         k: v for k, v in all_available_args.items() if k in required_arg_names
