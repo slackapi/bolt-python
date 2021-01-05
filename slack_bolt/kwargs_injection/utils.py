@@ -78,7 +78,7 @@ def build_required_kwargs(
                     f"Unknown Request object type detected ({type(request)})"
                 )
 
-        if name not in found_arg_names:
+        if name not in found_arg_names and name != 'self':
             logger.warning(f"{name} is not a valid argument")
             kwargs[name] = None
     return kwargs
