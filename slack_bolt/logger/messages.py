@@ -84,6 +84,13 @@ def warning_bot_only_conflicts() -> str:
     )
 
 
+def warning_skip_uncommon_arg_name(arg_name: str) -> str:
+    return (
+        f"Bolt skips injecting a value to the first keyword argument ({arg_name}). "
+        "If it is self/cls of a method, we recommend using the common names."
+    )
+
+
 # -------------------------------
 # Info
 # -------------------------------
