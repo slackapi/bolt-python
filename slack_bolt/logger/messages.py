@@ -1,3 +1,4 @@
+import time
 from typing import Union
 
 from slack_sdk.web import SlackResponse
@@ -111,3 +112,10 @@ def debug_running_lazy_listener(func_name: str) -> str:
 
 def debug_responding(status: int, body: str, millis: int) -> str:
     return f'Responding with status: {status} body: "{body}" ({millis} millis)'
+
+
+def debug_return_listener_middleware_response(
+    listener_name: str, status: int, body: str, starting_time: float
+) -> str:
+    millis = int((time.time() - starting_time) * 1000)
+    return f"Responding with listener middleware's response - listener: {listener_name}, status: {status}, body: {body} ({millis} millis)"
