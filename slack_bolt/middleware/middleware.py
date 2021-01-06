@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Callable
+from typing import Callable, Optional
 
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
@@ -13,7 +13,7 @@ class Middleware(metaclass=ABCMeta):
         req: BoltRequest,
         resp: BoltResponse,
         next: Callable[[], BoltResponse],
-    ) -> BoltResponse:
+    ) -> Optional[BoltResponse]:
         raise NotImplementedError()
 
     @property

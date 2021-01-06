@@ -42,9 +42,10 @@ class AsyncioListenerRunner:
         response: BoltResponse,
         listener_name: str,
         listener: AsyncListener,
+        starting_time: Optional[float] = None,
     ) -> Optional[BoltResponse]:
         ack = request.context.ack
-        starting_time = time.time()
+        starting_time = starting_time if starting_time is not None else time.time()
         if self.process_before_response:
             if not request.lazy_only:
                 try:

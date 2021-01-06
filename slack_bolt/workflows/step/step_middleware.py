@@ -19,7 +19,7 @@ class WorkflowStepMiddleware(Middleware):  # type:ignore
         req: BoltRequest,
         resp: BoltResponse,
         next: Callable[[], BoltResponse],
-    ) -> BoltResponse:
+    ) -> Optional[BoltResponse]:
 
         if self.step.edit.matches(req=req, resp=resp):
             resp = self._run(self.step.edit, req, resp)
