@@ -33,7 +33,7 @@ class AsyncListener(metaclass=ABCMeta):
         *,
         req: AsyncBoltRequest,
         resp: BoltResponse,
-    ) -> Tuple[BoltResponse, bool]:
+    ) -> Tuple[Optional[BoltResponse], bool]:
         """Runs an async middleware.
 
         :param req: The incoming request
