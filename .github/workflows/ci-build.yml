@@ -25,7 +25,7 @@ jobs:
       run: |
         python setup.py install
         pip install -U pip
-        pip install "pytest>=5,<6" "pytest-cov>=2,<3"
+        pip install "pytest>=5,<6" "pytest-cov>=2,<3" "flask_sockets>0.2,<1"
     - name: Run tests without aiohttp
       run: |
         pytest tests/slack_bolt/
