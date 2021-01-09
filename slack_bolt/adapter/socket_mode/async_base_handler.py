@@ -7,6 +7,7 @@ from slack_sdk.socket_mode.request import SocketModeRequest
 
 from slack_bolt import App
 from slack_bolt.app.async_app import AsyncApp
+from slack_bolt.util.utils import get_boot_message
 
 
 class AsyncBaseSocketModeHandler:
@@ -30,7 +31,7 @@ class AsyncBaseSocketModeHandler:
     async def start_async(self):
         await self.connect_async()
         if self.app.logger.level > logging.INFO:
-            print("⚡️ Bolt app is running!")
+            print(get_boot_message())
         else:
-            self.app.logger.info("⚡️ Bolt app is running!")
+            self.app.logger.info(get_boot_message())
         await asyncio.sleep(float("inf"))
