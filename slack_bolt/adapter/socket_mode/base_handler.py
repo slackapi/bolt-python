@@ -5,6 +5,7 @@ from slack_sdk.socket_mode.client import BaseSocketModeClient
 from slack_sdk.socket_mode.request import SocketModeRequest
 
 from slack_bolt import App
+from slack_bolt.util.utils import get_boot_message
 
 
 class BaseSocketModeHandler:
@@ -26,7 +27,7 @@ class BaseSocketModeHandler:
     def start(self):
         self.connect()
         if self.app.logger.level > logging.INFO:
-            print("⚡️ Bolt app is running!")
+            print(get_boot_message())
         else:
-            self.app.logger.info("⚡️ Bolt app is running!")
+            self.app.logger.info(get_boot_message())
         Event().wait()
