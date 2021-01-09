@@ -16,6 +16,7 @@ test_dependencies = [
     "pytest-cov>=2,<3",
     "pytest-asyncio<1",  # for async
     "aiohttp>=3,<4",  # for async
+    "Flask-Sockets>=0.2,<1",
     "black==20.8b1",
 ]
 
@@ -33,7 +34,7 @@ setuptools.setup(
         exclude=["examples", "integration_tests", "tests", "tests.*",]
     ),
     include_package_data=True,  # MANIFEST.in
-    install_requires=["slack_sdk>=3.2.0b6,<3.3",],
+    install_requires=["slack_sdk>=3.2.0b7,<3.3",],
     setup_requires=["pytest-runner==5.2"],
     tests_require=test_dependencies,
     test_suite="tests",
