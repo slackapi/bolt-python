@@ -1,3 +1,4 @@
 #!/bin/bash
 
-pip freeze | grep -v "^-e" | xargs pip uninstall -y
+pip uninstall -y slack-bolt && \
+  pip freeze | grep -v "^-e" | xargs pip uninstall -y
