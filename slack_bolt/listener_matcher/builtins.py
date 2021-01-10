@@ -26,7 +26,7 @@ if sys.version_info.major == 3 and sys.version_info.minor <= 6:
     from re import _pattern_type as Pattern
 else:
     from re import Pattern
-from typing import Callable, Awaitable, Any
+from typing import Callable, Awaitable, Any, Sequence, Optional, Union
 from typing import Union, Optional, Dict
 
 from slack_bolt.kwargs_injection import build_required_kwargs
@@ -74,7 +74,9 @@ def build_listener_matcher(
 
 
 def event(
-    constraints: Union[str, Pattern, Dict[str, str]],
+    constraints: Union[
+        str, Pattern, Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]]
+    ],
     asyncio: bool = False,
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     if isinstance(constraints, (str, Pattern)):
@@ -93,10 +95,24 @@ def event(
                 if not _matches(constraints["type"], event["type"]):
                     return False
                 if "subtype" in constraints:
-                    expected_subtype = constraints["subtype"]
+                    expected_subtype: Union[
+                        str, Sequence[Optional[Union[str, Pattern]]]
+                    ] = constraints["subtype"]
                     if expected_subtype is None:
                         # "subtype" in constraints is intentionally None for this pattern
                         return "subtype" not in event
+                    elif isinstance(expected_subtype, Sequence):
+                        subtypes: Sequence[
+                            Optional[Union[str, Pattern]]
+                        ] = expected_subtype
+                        for expected in subtypes:
+                            actual: Optional[str] = event.get("subtype")
+                            if expected is None:
+                                if actual is None:
+                                    return True
+                            elif actual is not None and _matches(expected, actual):
+                                return True
+                        return False
                     else:
                         return "subtype" in event and _matches(
                             expected_subtype, event["subtype"]
