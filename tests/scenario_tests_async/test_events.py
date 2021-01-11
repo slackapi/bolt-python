@@ -561,6 +561,37 @@ class TestAsyncEvents:
         response = await app.async_dispatch(request)
         assert response.status == 200
 
+    # https://github.com/slackapi/bolt-python/issues/199
+    @pytest.mark.asyncio
+    async def test_invalid_message_events(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        async def handle():
+            pass
+
+        # valid
+        app.event("message")(handle)
+
+        with pytest.raises(ValueError):
+            app.event("message.channels")(handle)
+        with pytest.raises(ValueError):
+            app.event("message.groups")(handle)
+        with pytest.raises(ValueError):
+            app.event("message.im")(handle)
+        with pytest.raises(ValueError):
+            app.event("message.mpim")(handle)
+
+        with pytest.raises(ValueError):
+            app.event(re.compile("message\\..*"))(handle)
+
+        with pytest.raises(ValueError):
+            app.event({"type": "message.channels"})(handle)
+        with pytest.raises(ValueError):
+            app.event({"type": re.compile("message\\..*")})(handle)
+
 
 app_mention_body = {
     "token": "verification_token",
