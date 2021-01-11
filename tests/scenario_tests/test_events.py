@@ -2,6 +2,7 @@ import json
 import re
 from time import time, sleep
 
+import pytest
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 
@@ -553,3 +554,30 @@ class TestEvents:
         )
         response = app.dispatch(request)
         assert response.status == 200
+
+    # https://github.com/slackapi/bolt-python/issues/199
+    def test_invalid_message_events(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+
+        def handle():
+            pass
+
+        # valid
+        app.event("message")(handle)
+
+        with pytest.raises(ValueError):
+            app.event("message.channels")(handle)
+        with pytest.raises(ValueError):
+            app.event("message.groups")(handle)
+        with pytest.raises(ValueError):
+            app.event("message.im")(handle)
+        with pytest.raises(ValueError):
+            app.event("message.mpim")(handle)
+
+        with pytest.raises(ValueError):
+            app.event(re.compile("message\\..*"))(handle)
+
+        with pytest.raises(ValueError):
+            app.event({"type": "message.channels"})(handle)
+        with pytest.raises(ValueError):
+            app.event({"type": re.compile("message\\..*")})(handle)

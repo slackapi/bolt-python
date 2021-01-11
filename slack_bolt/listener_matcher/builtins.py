@@ -21,6 +21,7 @@ from slack_bolt.request.payload_utils import (
     to_action,
     is_workflow_step_save,
 )
+from ..logger.messages import error_message_event_type
 
 if sys.version_info.major == 3 and sys.version_info.minor <= 6:
     from re import _pattern_type as Pattern
@@ -82,6 +83,7 @@ def event(
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     if isinstance(constraints, (str, Pattern)):
         event_type: Union[str, Pattern] = constraints
+        _verify_message_event_type(event_type)
 
         def func(body: Dict[str, Any]) -> bool:
             return is_event(body) and _matches(event_type, body["event"]["type"])
@@ -89,6 +91,7 @@ def event(
         return build_listener_matcher(func, asyncio)
 
     elif "type" in constraints:
+        _verify_message_event_type(constraints["type"])
 
         def func(body: Dict[str, Any]) -> bool:
             if is_event(body):
@@ -130,6 +133,13 @@ def event(
     raise BoltError(
         f"event ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
     )
+
+
+def _verify_message_event_type(event_type: str) -> None:
+    if isinstance(event_type, str) and event_type.startswith("message."):
+        raise ValueError(error_message_event_type(event_type))
+    if isinstance(event_type, Pattern) and "message\\." in event_type.pattern:
+        raise ValueError(error_message_event_type(event_type))
 
 
 def workflow_step_execute(
