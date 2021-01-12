@@ -28,5 +28,6 @@ class CustomListenerMatcher(ListenerMatcher):
                 required_arg_names=self.arg_names,
                 request=req,
                 response=resp,
+                this_func=self.func,
             )
         )

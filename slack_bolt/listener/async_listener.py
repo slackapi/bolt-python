@@ -117,6 +117,7 @@ class AsyncCustomListener(AsyncListener):
                 required_arg_names=self.arg_names,
                 request=request,
                 response=response,
+                this_func=self.ack_function,
             )
         )
 

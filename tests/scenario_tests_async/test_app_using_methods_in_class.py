@@ -1,4 +1,5 @@
 import asyncio
+import inspect
 import json
 from time import time
 from typing import Callable
@@ -40,6 +41,29 @@ class TestAppUsingMethodsInClass:
             cleanup_mock_web_api_server(self)
         finally:
             restore_os_env(old_os_env)
+
+    def test_inspect_behaviors(self):
+        async def f():
+            pass
+
+        assert inspect.ismethod(f) is False
+
+        class A:
+            async def b(self):
+                pass
+
+            @classmethod
+            async def c(cls):
+                pass
+
+            @staticmethod
+            async def d():
+                pass
+
+        a = A()
+        assert inspect.ismethod(a.b) is True
+        assert inspect.ismethod(A.c) is True
+        assert inspect.ismethod(A.d) is False
 
     async def run_app_and_verify(self, app: AsyncApp):
         payload = {
@@ -126,7 +150,7 @@ class TestAppUsingMethodsInClass:
         await self.run_app_and_verify(app)
 
     @pytest.mark.asyncio
-    async def test_instance_methods_uncommon_name(self):
+    async def test_instance_methods_uncommon_name_1(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
         awesome = AwesomeClass("Slackbot")
         app.use(awesome.instance_middleware)
@@ -134,10 +158,24 @@ class TestAppUsingMethodsInClass:
         await self.run_app_and_verify(app)
 
     @pytest.mark.asyncio
+    async def test_instance_methods_uncommon_name_2(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
+        awesome = AwesomeClass("Slackbot")
+        app.use(awesome.instance_middleware)
+        app.shortcut("test-shortcut")(awesome.instance_method3)
+        await self.run_app_and_verify(app)
+
+    @pytest.mark.asyncio
     async def test_static_methods(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
         app.use(AwesomeClass.static_middleware)
         app.shortcut("test-shortcut")(AwesomeClass.static_method)
+        await self.run_app_and_verify(app)
+
+    @pytest.mark.asyncio
+    async def test_invalid_arg_in_func(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
+        app.shortcut("test-shortcut")(top_level_function)
         await self.run_app_and_verify(app)
 
 
@@ -182,7 +220,20 @@ class AwesomeClass:
         await ack()
         await say(f"Hello <@{context.user_id}>! My name is {whatever.name}")
 
+    text = "hello world"
+
+    async def instance_method3(this, ack, logger, say):
+        await ack()
+        logger.debug(this.text)
+        await say(f"Hi there!")
+
     @staticmethod
     async def static_method(context: AsyncBoltContext, say: AsyncSay, ack: AsyncAck):
         await ack()
         await say(f"Hello <@{context.user_id}>!")
+
+
+async def top_level_function(invalid_arg, ack, say):
+    assert invalid_arg is None
+    await ack()
+    await say("Hi")

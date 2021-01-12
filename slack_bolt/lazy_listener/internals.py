@@ -23,6 +23,7 @@ def build_runnable_function(
                     required_arg_names=arg_names,
                     request=request,
                     response=None,
+                    this_func=func,
                 )
             )
         except Exception as e:
