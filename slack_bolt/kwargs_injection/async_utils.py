@@ -1,4 +1,5 @@
 # pytype: skip-file
+import inspect
 import logging
 from typing import Callable, Dict, Optional, Any, Sequence
 
@@ -25,6 +26,7 @@ def build_async_required_kwargs(
     request: AsyncBoltRequest,
     response: Optional[BoltResponse],
     next_func: Callable[[], None] = None,
+    this_func: Optional[Callable] = None,
 ) -> Dict[str, Any]:
     all_available_args = {
         "logger": logger,
@@ -73,8 +75,12 @@ def build_async_required_kwargs(
         if first_arg_name in {"self", "cls"}:
             required_arg_names.pop(0)
         elif first_arg_name not in all_available_args.keys():
-            logger.warning(warning_skip_uncommon_arg_name(first_arg_name))
-            required_arg_names.pop(0)
+            if this_func is None:
+                logger.warning(warning_skip_uncommon_arg_name(first_arg_name))
+                required_arg_names.pop(0)
+            elif inspect.ismethod(this_func):
+                # We are sure that we should skip manipulating this arg
+                required_arg_names.pop(0)
 
     kwargs: Dict[str, Any] = {
         k: v for k, v in all_available_args.items() if k in required_arg_names

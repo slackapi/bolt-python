@@ -35,6 +35,7 @@ class CustomMiddleware(Middleware):
                 request=req,
                 response=resp,
                 next_func=next,
+                this_func=self.func,
             )
         )
 
