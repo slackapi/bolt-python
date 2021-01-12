@@ -1,4 +1,5 @@
 import json
+import re
 from time import time, sleep
 
 from slack_sdk.signature import SignatureVerifier
@@ -396,3 +397,159 @@ class TestEvents:
         assert self.mock_received_requests["/auth.test"] == 1
         sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 2
+
+    message_file_share_body = {
+        "token": "verification-token",
+        "team_id": "T111",
+        "api_app_id": "A111",
+        "event": {
+            "type": "message",
+            "text": "Here is your file!",
+            "files": [
+                {
+                    "id": "F111",
+                    "created": 1610493713,
+                    "timestamp": 1610493713,
+                    "name": "test.png",
+                    "title": "test.png",
+                    "mimetype": "image/png",
+                    "filetype": "png",
+                    "pretty_type": "PNG",
+                    "user": "U111",
+                    "editable": False,
+                    "size": 42706,
+                    "mode": "hosted",
+                    "is_external": False,
+                    "external_type": "",
+                    "is_public": False,
+                    "public_url_shared": False,
+                    "display_as_bot": False,
+                    "username": "",
+                    "url_private": "https://files.slack.com/files-pri/T111-F111/test.png",
+                    "url_private_download": "https://files.slack.com/files-pri/T111-F111/download/test.png",
+                    "thumb_64": "https://files.slack.com/files-tmb/T111-F111-8d3f9a6d4b/test_64.png",
+                    "thumb_80": "https://files.slack.com/files-tmb/T111-F111-8d3f9a6d4b/test_80.png",
+                    "thumb_360": "https://files.slack.com/files-tmb/T111-F111-8d3f9a6d4b/test_360.png",
+                    "thumb_360_w": 358,
+                    "thumb_360_h": 360,
+                    "thumb_480": "https://files.slack.com/files-tmb/T111-F111-8d3f9a6d4b/test_480.png",
+                    "thumb_480_w": 477,
+                    "thumb_480_h": 480,
+                    "thumb_160": "https://files.slack.com/files-tmb/T111-F111-8d3f9a6d4b/test_160.png",
+                    "thumb_720": "https://files.slack.com/files-tmb/T111-F111-8d3f9a6d4b/test_720.png",
+                    "thumb_720_w": 716,
+                    "thumb_720_h": 720,
+                    "original_w": 736,
+                    "original_h": 740,
+                    "thumb_tiny": "xxx",
+                    "permalink": "https://xxx.slack.com/files/U111/F111/test.png",
+                    "permalink_public": "https://slack-files.com/T111-F111-3e534ef8ca",
+                    "has_rich_preview": False,
+                }
+            ],
+            "upload": False,
+            "blocks": [
+                {
+                    "type": "rich_text",
+                    "block_id": "gvM",
+                    "elements": [
+                        {
+                            "type": "rich_text_section",
+                            "elements": [
+                                {"type": "text", "text": "Here is your file!"}
+                            ],
+                        }
+                    ],
+                }
+            ],
+            "user": "U111",
+            "display_as_bot": False,
+            "ts": "1610493715.001000",
+            "channel": "G111",
+            "subtype": "file_share",
+            "event_ts": "1610493715.001000",
+            "channel_type": "group",
+        },
+        "type": "event_callback",
+        "event_id": "Ev111",
+        "event_time": 1610493715,
+        "authorizations": [
+            {
+                "enterprise_id": None,
+                "team_id": "T111",
+                "user_id": "U111",
+                "is_bot": True,
+                "is_enterprise_install": False,
+            }
+        ],
+        "is_ext_shared_channel": False,
+        "event_context": "1-message-T111-G111",
+    }
+
+    def test_message_subtypes_0(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        app._client = WebClient(
+            token="uninstalled-revoked", base_url=self.mock_api_server_base_url
+        )
+
+        @app.event({"type": "message", "subtype": "file_share"})
+        def handler1(event):
+            assert event["subtype"] == "file_share"
+
+        timestamp, body = str(int(time())), json.dumps(self.message_file_share_body)
+        request: BoltRequest = BoltRequest(
+            body=body, headers=self.build_headers(timestamp, body)
+        )
+        response = app.dispatch(request)
+        assert response.status == 200
+
+    def test_message_subtypes_1(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        app._client = WebClient(
+            token="uninstalled-revoked", base_url=self.mock_api_server_base_url
+        )
+
+        @app.event({"type": "message", "subtype": re.compile("file_.+")})
+        def handler1(event):
+            assert event["subtype"] == "file_share"
+
+        timestamp, body = str(int(time())), json.dumps(self.message_file_share_body)
+        request: BoltRequest = BoltRequest(
+            body=body, headers=self.build_headers(timestamp, body)
+        )
+        response = app.dispatch(request)
+        assert response.status == 200
+
+    def test_message_subtypes_2(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        app._client = WebClient(
+            token="uninstalled-revoked", base_url=self.mock_api_server_base_url
+        )
+
+        @app.event({"type": "message", "subtype": ["file_share"]})
+        def handler1(event):
+            assert event["subtype"] == "file_share"
+
+        timestamp, body = str(int(time())), json.dumps(self.message_file_share_body)
+        request: BoltRequest = BoltRequest(
+            body=body, headers=self.build_headers(timestamp, body)
+        )
+        response = app.dispatch(request)
+        assert response.status == 200
+
+    def test_message_subtypes_3(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        app._client = WebClient(
+            token="uninstalled-revoked", base_url=self.mock_api_server_base_url
+        )
+
+        @app.event("message")
+        def handler1(event):
+            assert event["subtype"] == "file_share"
+
+        timestamp, body = str(int(time())), json.dumps(self.message_file_share_body)
+        request: BoltRequest = BoltRequest(
+            body=body, headers=self.build_headers(timestamp, body)
+        )
+        response = app.dispatch(request)
+        assert response.status == 200

@@ -102,6 +102,10 @@ def event(
                     if expected_subtype is None:
                         # "subtype" in constraints is intentionally None for this pattern
                         return "subtype" not in event
+                    elif isinstance(expected_subtype, (str, Pattern)):
+                        return "subtype" in event and _matches(
+                            expected_subtype, event["subtype"]
+                        )
                     elif isinstance(expected_subtype, Sequence):
                         subtypes: Sequence[
                             Optional[Union[str, Pattern]]
