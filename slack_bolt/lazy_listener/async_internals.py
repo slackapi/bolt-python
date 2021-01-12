@@ -23,6 +23,7 @@ async def to_runnable_function(
                     required_arg_names=arg_names,
                     request=request,
                     response=None,
+                    this_func=internal_func,
                 )
             )
         except Exception as e:

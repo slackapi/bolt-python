@@ -1,3 +1,4 @@
+import inspect
 import json
 from time import time, sleep
 from typing import Callable
@@ -30,6 +31,29 @@ class TestAppUsingMethodsInClass:
     def teardown_method(self):
         cleanup_mock_web_api_server(self)
         restore_os_env(self.old_os_env)
+
+    def test_inspect_behaviors(self):
+        def f():
+            pass
+
+        assert inspect.ismethod(f) is False
+
+        class A:
+            def b(self):
+                pass
+
+            @classmethod
+            def c(cls):
+                pass
+
+            @staticmethod
+            def d():
+                pass
+
+        a = A()
+        assert inspect.ismethod(a.b) is True
+        assert inspect.ismethod(A.c) is True
+        assert inspect.ismethod(A.d) is False
 
     def run_app_and_verify(self, app: App):
         payload = {
@@ -119,10 +143,22 @@ class TestAppUsingMethodsInClass:
         app.shortcut("test-shortcut")(awesome.instance_method2)
         self.run_app_and_verify(app)
 
+    def test_instance_methods_uncommon_name_3(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        awesome = AwesomeClass("Slackbot")
+        app.use(awesome.instance_middleware)
+        app.shortcut("test-shortcut")(awesome.instance_method3)
+        self.run_app_and_verify(app)
+
     def test_static_methods(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
         app.use(AwesomeClass.static_middleware)
         app.shortcut("test-shortcut")(AwesomeClass.static_method)
+        self.run_app_and_verify(app)
+
+    def test_invalid_arg_in_func(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        app.shortcut("test-shortcut")(top_level_function)
         self.run_app_and_verify(app)
 
 
@@ -159,7 +195,20 @@ class AwesomeClass:
         ack()
         say(f"Hello <@{context.user_id}>! My name is {whatever.name}")
 
+    text = "hello world"
+
+    def instance_method3(this, ack, logger, say):
+        ack()
+        logger.debug(this.text)
+        say(f"Hi there!")
+
     @staticmethod
     def static_method(context: BoltContext, say: Say, ack: Ack):
         ack()
         say(f"Hello <@{context.user_id}>!")
+
+
+def top_level_function(invalid_arg, ack, say):
+    assert invalid_arg is None
+    ack()
+    say("Hi")
