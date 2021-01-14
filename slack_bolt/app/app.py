@@ -63,6 +63,7 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_bolt.util.utils import create_web_client, get_boot_message
 from slack_bolt.workflows.step import WorkflowStep, WorkflowStepMiddleware
+from slack_bolt.app.current import set_app
 
 
 class App:
@@ -235,6 +236,7 @@ class App:
         self._init_middleware_list(
             token_verification_enabled=token_verification_enabled
         )
+        set_app(self)
 
     def _init_middleware_list(self, token_verification_enabled: bool):
         if self._init_middleware_list_done:
