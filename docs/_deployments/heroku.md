@@ -32,6 +32,14 @@ After you have a Bolt app, navigate to its directory:
 cd bolt-python-getting-started-app/
 ```
 
+Once in the app directory, initialize your Python virtual environment and install its dependencies:
+
+```shell
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
 Now that you have an app, let's prepare it for Heroku.
 
 ---
@@ -53,7 +61,7 @@ Every Heroku app uses a special file called `Procfile` that tells Heroku how to 
 Create a new file called `Procfile` (without any extension) in your app's root directory anad paste the following:
 
 ```yaml
-web: gunicorn --bind :$PORT --workers 1 --threads 2 --timeout 0 main:flask_app
+web: gunicorn --bind :$PORT --workers 1 --threads 2 --timeout 0 app:flask_app
 ```
 
 Once you've saved the file, let's commit it to your Git repository:
@@ -63,7 +71,78 @@ git add Procfile
 git commit -m "Add Procfile"
 ```
 
-> 💡 Are you following this guide with an existing Bolt app? If so, please review the guide on [preparing a codebase for Heroku][heroku-prepare-codebase] to listen on the correct port.
+**3. Update app dependencies**
+
+It's a good idea to replace Bolt's default development adapter with a production-ready WSGI server and web framework.
+
+In this guide, we'll use the [Gunicorn server][gunicorn] and [Flask framework][flask], but Bolt also [supports adapters for many other popular frameworks][docs-concepts-adapters].
+
+First, add the following packages to your `requirements.txt`:
+
+```
+Flask>=1.1
+gunicorn>=20
+```
+
+Next, install the dependencies to your virtual environment:
+
+```zsh
+pip install -r requirements.txt
+```
+
+After the install, let's commit your updated `requirements.txt` file:
+
+```shell
+git add requirements.txt
+git commit -m "Add Flask and Gunicorn dependencies"
+```
+
+**4. Update app code**
+
+Now that we've installed the dependencies for the [Gunicorn server][gunicorn] and [Flask framework][flask], we can now update your app code in `app.py`.
+
+Import Flask and the Bolt adapter by updating the [source code that imports your modules][getting-started-app/app.py#imports]:
+
+```python
+import os
+from slack_bolt import App
+from flask import Flask, request
+from slack_bolt.adapter.flask import SlackRequestHandler
+```
+
+Initialize Flask to handle your Slack requests after the [source code that initializes Bolt][getting-started-app/app.py#init]:
+
+```python
+# Initializes your app with your bot token and signing secret
+app = App(
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
+)
+
+# Initialize Flask to handle the Slack requests
+flask_app = Flask(__name__)
+slack_request_handler = SlackRequestHandler(app)
+```
+
+Handle Slack requests with Flask by replacing the [source code that starts your app][getting-started-app/app.py#start-app]:
+
+```python
+# Handle Slack event requests
+@flask_app.route("/slack/events", methods=["POST"])
+def slack_events():
+    return slack_request_handler.handle(request)
+```
+
+After updating the app, let's commit your updated `app.py` file:
+
+```shell
+git add app.py
+git commit -m "Update Bolt app to use Flask"
+```
+
+> 💡 Are you following this guide with an existing Bolt app? If so, please review the guide on [preparing a codebase for Heroku][heroku-prepare-codebase] to learn about other required updates.
+
+Your app is now prepared for Heroku! We can now move on to setting up the Heroku deployment tools.
 
 ---
 
@@ -103,6 +182,16 @@ Check that you're logged in by displaying the account currently connected to you
 ```shell
 heroku auth:whoami
 ```
+
+**4. Confirm the app runs locally**
+
+Finally, confirm that your app starts by running it locally:
+
+```zsh
+PORT=3000 heroku local
+```
+
+> 💡 Did you run into an error? Try comparing your `app.py` to our [Heroku example app source code][deploy-heroku-app/app.py] to track down the culprit.
 
 You should now be set up with the Heroku tools! Let's move on to the exciting step of creating an app on Heroku.
 
@@ -223,14 +312,14 @@ Open a Slack channel that your app has joined and say "hello" (lower-case). Just
 
 As you continue building your Slack app, you'll need to deploy updates. A common flow is to make a change, commit it, and then push it to Heroku.
 
-Let's get a feel for this by updating your app to respond to a "goodbye" message. Add the following code to `app.py` ([source code on GitHub][deploy-heroku-app/app.js]):
+Let's get a feel for this by updating your app to respond to a "goodbye" message. Add the following code to `app.py` ([source code on GitHub][deploy-heroku-app/app.py]):
 
 ```python
 # Listens to incoming messages that contain "goodbye"
 @app.message("goodbye")
 def message_hello(message, say):
     # say() sends a message to the channel where the event was triggered
-    say("See ya later, <@{message['user']}> :wave:")
+    say(f"See ya later, <@{message['user']}> :wave:")
 ```
 
 Commit the changes to your local Git respository:
@@ -262,14 +351,20 @@ Now that you've deployed a basic app, you can start exploring how to customize a
 
 [bolt-python]: /bolt-python
 [deploy-heroku-app]: https://github.com/slackapi/bolt-python/tree/main/examples/deploy-heroku
-[deploy-heroku-app/app.js]: https://github.com/slackapi/bolt-python/blob/main/examples/deploy-heroku/app.py
+[deploy-heroku-app/app.py]: https://github.com/slackapi/bolt-python/blob/main/examples/deploy-heroku/app.py
+[docs-concepts-adapters]: /bolt-python/concepts#adapters
 [docs-concepts-basic]: /bolt-python/concepts#basic
 [docs-concepts-logging]: /bolt-python/concepts#logging
 [docs-getting-started-actions]: /bolt-python/tutorial/getting-started#sending-and-responding-to-actions
 [docs-getting-started-tokens]: /bolt-python/tutorial/getting-started#tokens-and-installing-apps
+[flask]: https://flask.palletsprojects.com/
+[getting-started-app/app.py#imports]: https://github.com/slackapi/bolt-python-getting-started-app/blob/main/app.py#L1-L2
+[getting-started-app/app.py#init]: https://github.com/slackapi/bolt-python-getting-started-app/blob/main/app.py#L4-L8
+[getting-started-app/app.py#start-app]: https://github.com/slackapi/bolt-python-getting-started-app/blob/main/app.py#L38-L40
 [getting-started-guide]: /bolt-python/tutorial/getting-started
 [git-install]: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 [git-repo]: https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository
+[gunicorn]: https://gunicorn.org/
 [heroku]: https://heroku.com/
 [heroku-addons]: https://elements.heroku.com/addons
 [heroku-cli-http-proxy]: https://devcenter.heroku.com/articles/using-the-cli#using-an-http-proxy
