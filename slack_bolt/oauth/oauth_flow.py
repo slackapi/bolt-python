@@ -340,7 +340,7 @@ class OAuthFlow:
                 incoming_webhook_channel=incoming_webhook.get("channel"),
                 incoming_webhook_channel_id=incoming_webhook.get("channel_id"),
                 incoming_webhook_configuration_url=incoming_webhook.get(
-                    "configuration_url", None
+                    "configuration_url"
                 ),
                 is_enterprise_install=is_enterprise_install,
                 token_type=oauth_response.get("token_type"),
