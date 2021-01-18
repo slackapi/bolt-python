@@ -19,8 +19,8 @@ from slack_bolt.authorization.async_authorize import (
     AsyncAuthorize,
 )
 from slack_bolt.error import BoltError
+from slack_bolt.oauth.async_callback_options import AsyncCallbackOptions
 from slack_bolt.oauth.async_internals import get_or_create_default_installation_store
-from slack_bolt.oauth.callback_options import CallbackOptions
 
 
 class AsyncOAuthSettings:
@@ -34,7 +34,7 @@ class AsyncOAuthSettings:
     install_path: str
     install_page_rendering_enabled: bool
     redirect_uri_path: str
-    callback_options: Optional[CallbackOptions] = None
+    callback_options: Optional[AsyncCallbackOptions] = None
     success_url: Optional[str]
     failure_url: Optional[str]
     authorization_url: str  # default: https://slack.com/oauth/v2/authorize
@@ -66,7 +66,7 @@ class AsyncOAuthSettings:
         install_path: str = "/slack/install",
         install_page_rendering_enabled: bool = True,
         redirect_uri_path: str = "/slack/oauth_redirect",
-        callback_options: Optional[CallbackOptions] = None,
+        callback_options: Optional[AsyncCallbackOptions] = None,
         success_url: Optional[str] = None,
         failure_url: Optional[str] = None,
         authorization_url: Optional[str] = None,
