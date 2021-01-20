@@ -1,6 +1,6 @@
 import copy
 import sys
-from typing import Optional, Union, Dict, Any, Sequence
+from typing import Optional, Union, Dict, Any, Sequence, Callable
 
 from slack_sdk import WebClient
 from slack_sdk.models import JsonObject
@@ -59,8 +59,9 @@ def get_boot_message(development_server: bool = False) -> str:
         return "⚡️ Bolt app is running!"
 
 
-def name_for_callable(func):
+def name_for_callable(func: Callable) -> str:
     if hasattr(func, "__name__"):
         func_name = func.__name__
     else:
         func_name = f"{func.__class__.__module__}.{func.__class__.__name__}"
+    return func_name
