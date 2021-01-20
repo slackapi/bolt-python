@@ -93,6 +93,23 @@ class TestListenerMiddleware:
         response = app.dispatch(self.build_request())
         assert response.status == 200
 
+    def test_class_next(self):
+        class NextClass:
+            def __call__(self, next):
+                next()
+
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        @app.shortcut(constraints="test-shortcut", middleware=[NextClass()])
+        def handle(ack):
+            ack()
+
+        response = app.dispatch(self.build_request())
+        assert response.status == 200
+
 
 def listener_middleware_returning_response():
     return BoltResponse(status=200, body="listener middleware")
