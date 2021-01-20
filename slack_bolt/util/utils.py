@@ -57,3 +57,10 @@ def get_boot_message(development_server: bool = False) -> str:
         return "⚡️ Bolt app is running! (development server)"
     else:
         return "⚡️ Bolt app is running!"
+
+
+def name_for_callable(func):
+    if hasattr(func, "__name__"):
+        func_name = func.__name__
+    else:
+        func_name = f"{func.__class__.__module__}.{func.__class__.__name__}"

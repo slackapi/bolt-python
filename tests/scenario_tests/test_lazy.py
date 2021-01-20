@@ -110,3 +110,31 @@ class TestErrorHandler:
         assert response.status == 200
         time.sleep(1)  # wait a bit
         assert self.mock_received_requests["/chat.postMessage"] == 2
+
+    def test_lazy_class(self):
+        def just_ack(ack):
+            ack()
+
+        class LazyClass:
+            def __call__(self, say):
+                time.sleep(0.3)
+                say(text="lazy function 1")
+
+        def async2(say):
+            time.sleep(0.5)
+            say(text="lazy function 2")
+
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.action("a")(
+            ack=just_ack,
+            lazy=[LazyClass(), async2],
+        )
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        time.sleep(1)  # wait a bit
+        assert self.mock_received_requests["/chat.postMessage"] == 2

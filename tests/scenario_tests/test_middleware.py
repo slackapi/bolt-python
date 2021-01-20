@@ -86,6 +86,23 @@ class TestMiddleware:
         assert response.body == "acknowledged!"
         assert self.mock_received_requests["/auth.test"] == 1
 
+    def test_class_call(self):
+        class NextClass:
+            def __call__(self, next):
+                next()
+
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.use(NextClass())
+        app.shortcut("test-shortcut")(just_ack)
+
+        response = app.dispatch(self.build_request())
+        assert response.status == 200
+        assert response.body == "acknowledged!"
+        assert self.mock_received_requests["/auth.test"] == 1
+
 
 def just_ack(ack):
     ack("acknowledged!")
