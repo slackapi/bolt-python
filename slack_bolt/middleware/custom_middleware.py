@@ -9,6 +9,7 @@ from slack_bolt.response import BoltResponse
 from .middleware import Middleware
 from slack_bolt.util.utils import name_for_callable
 
+
 class CustomMiddleware(Middleware):
     app_name: str
     func: Callable[..., Any]
