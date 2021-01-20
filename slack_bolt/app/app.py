@@ -61,7 +61,11 @@ from slack_bolt.oauth.internals import select_consistent_installation_store
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
-from slack_bolt.util.utils import create_web_client, get_boot_message
+from slack_bolt.util.utils import (
+    create_web_client,
+    get_boot_message,
+    get_name_for_callable,
+)
 from slack_bolt.workflows.step import WorkflowStep, WorkflowStepMiddleware
 
 
@@ -347,7 +351,7 @@ class App:
                 return resp
 
         for listener in self._listeners:
-            listener_name = listener.ack_function.__name__
+            listener_name = get_name_for_callable(listener.ack_function)
             self._framework_logger.debug(debug_checking_listener(listener_name))
             if listener.matches(req=req, resp=resp):
                 # run all the middleware attached to this listener first

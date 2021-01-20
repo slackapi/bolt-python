@@ -59,9 +59,13 @@ def get_boot_message(development_server: bool = False) -> str:
         return "⚡️ Bolt app is running!"
 
 
-def name_for_callable(func: Callable) -> str:
+def get_name_for_callable(func: Callable) -> str:
+    """Returns the name for the given Callable function object.
+
+    :param func: either a Callable instance or a function, which as __name__
+    :return: name of the given Callable object
+    """
     if hasattr(func, "__name__"):
-        func_name = func.__name__
+        return func.__name__
     else:
-        func_name = f"{func.__class__.__module__}.{func.__class__.__name__}"
-    return func_name
+        return f"{func.__class__.__module__}.{func.__class__.__name__}"

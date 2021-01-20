@@ -5,6 +5,7 @@ from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
 from slack_bolt.middleware.async_middleware import AsyncMiddleware
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
+from slack_bolt.util.utils import get_name_for_callable
 from slack_bolt.workflows.step.async_step import AsyncWorkflowStep
 
 
@@ -51,6 +52,6 @@ class AsyncWorkflowStepMiddleware(AsyncMiddleware):  # type:ignore
         return await self.listener_runner.run(
             request=req,
             response=resp,
-            listener_name=listener.ack_function.__name__,
+            listener_name=get_name_for_callable(listener.ack_function),
             listener=listener,
         )

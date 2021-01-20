@@ -7,7 +7,7 @@ from slack_bolt.logger import get_bolt_app_logger
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from .middleware import Middleware
-from slack_bolt.util.utils import name_for_callable
+from slack_bolt.util.utils import get_name_for_callable
 
 
 class CustomMiddleware(Middleware):
@@ -42,4 +42,4 @@ class CustomMiddleware(Middleware):
 
     @property
     def name(self) -> str:
-        return f"CustomMiddleware(func={name_for_callable(self.func)})"
+        return f"CustomMiddleware(func={get_name_for_callable(self.func)})"

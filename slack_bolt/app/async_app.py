@@ -12,6 +12,7 @@ from slack_bolt.middleware.message_listener_matches.async_message_listener_match
     AsyncMessageListenerMatches,
 )
 from slack_bolt.oauth.async_internals import select_consistent_installation_store
+from slack_bolt.util.utils import get_name_for_callable
 from slack_bolt.workflows.step.async_step import AsyncWorkflowStep
 from slack_bolt.workflows.step.async_step_middleware import AsyncWorkflowStepMiddleware
 from slack_sdk.oauth.installation_store.async_installation_store import (
@@ -385,7 +386,7 @@ class AsyncApp:
                 return resp
 
         for listener in self._async_listeners:
-            listener_name = listener.ack_function.__name__
+            listener_name = get_name_for_callable(listener.ack_function)
             self._framework_logger.debug(debug_checking_listener(listener_name))
             if await listener.async_matches(req=req, resp=resp):
                 # run all the middleware attached to this listener first
@@ -917,7 +918,7 @@ class AsyncApp:
 
         for func in functions:
             if not inspect.iscoroutinefunction(func):
-                name = func.__name__
+                name = get_name_for_callable(func)
                 raise BoltError(error_listener_function_must_be_coro_func(name))
 
         listener_matchers = [
