@@ -7,7 +7,7 @@ from slack_bolt.logger import get_bolt_app_logger
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from .async_middleware import AsyncMiddleware
-from slack_bolt.util.utils import name_for_callable
+from slack_bolt.util.utils import get_name_for_callable
 
 
 class AsyncCustomMiddleware(AsyncMiddleware):
@@ -46,4 +46,4 @@ class AsyncCustomMiddleware(AsyncMiddleware):
 
     @property
     def name(self) -> str:
-        return f"AsyncCustomMiddleware(func={name_for_callable(self.func)})"
+        return f"AsyncCustomMiddleware(func={get_name_for_callable(self.func)})"

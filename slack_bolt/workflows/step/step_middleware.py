@@ -5,6 +5,7 @@ from slack_bolt.listener.thread_runner import ThreadListenerRunner
 from slack_bolt.middleware import Middleware
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
+from slack_bolt.util.utils import get_name_for_callable
 from slack_bolt.workflows.step.step import WorkflowStep
 
 
@@ -49,6 +50,6 @@ class WorkflowStepMiddleware(Middleware):  # type:ignore
         return self.listener_runner.run(
             request=req,
             response=resp,
-            listener_name=listener.ack_function.__name__,
+            listener_name=get_name_for_callable(listener.ack_function),
             listener=listener,
         )

@@ -15,7 +15,7 @@ from slack_bolt.logger.messages import (
 )
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
-from slack_bolt.util.utils import create_copy, name_for_callable
+from slack_bolt.util.utils import create_copy, get_name_for_callable
 
 
 class AsyncioListenerRunner:
@@ -71,7 +71,7 @@ class AsyncioListenerRunner:
 
             for lazy_func in listener.lazy_functions:
                 if request.lazy_function_name:
-                    func_name = name_for_callable(lazy_func)
+                    func_name = get_name_for_callable(lazy_func)
                     if func_name == request.lazy_function_name:
                         await self.lazy_listener_runner.run(
                             function=lazy_func, request=request
@@ -128,7 +128,7 @@ class AsyncioListenerRunner:
 
             for lazy_func in listener.lazy_functions:
                 if request.lazy_function_name:
-                    func_name = name_for_callable(lazy_func)
+                    func_name = get_name_for_callable(lazy_func)
                     if func_name == request.lazy_function_name:
                         await self.lazy_listener_runner.run(
                             function=lazy_func, request=request
@@ -163,7 +163,7 @@ class AsyncioListenerRunner:
         self, lazy_func: Callable[..., Awaitable[None]], request: AsyncBoltRequest
     ) -> None:
         # Start a lazy function asynchronously
-        func_name: str = name_for_callable(lazy_func)
+        func_name: str = get_name_for_callable(lazy_func)
         self.logger.debug(debug_running_lazy_listener(func_name))
         copied_request = self._build_lazy_request(request, func_name)
         self.lazy_listener_runner.start(function=lazy_func, request=copied_request)
