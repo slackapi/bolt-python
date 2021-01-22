@@ -46,4 +46,4 @@ def log_message_change(logger, event):
     user, text = event["user"], event["text"]
     logger.info(f"The user {user} changed the message to {text}")
 ```
-
+</details>
