@@ -17,8 +17,8 @@ The `event()` method requires an `eventType` of type `str`.
 # When a user joins the team, send a message in a predefined channel asking them to introduce themselves
 @app.event("team_join")
 def ask_for_introduction(event, say):
-    welcome_channel_id = "C12345";
-    user_id = event["user"]["id"]
+    welcome_channel_id = "C12345"
+    user_id = event["user"]
     text = f"Welcome to the team, <@{user_id}>! 🎉 You can introduce yourself in this channel."
     say(text=text, channel=welcome_channel_id)
 ```
@@ -46,5 +46,4 @@ def log_message_change(logger, event):
     user, text = event["user"], event["text"]
     logger.info(f"The user {user} changed the message to {text}")
 ```
-
 </details>
