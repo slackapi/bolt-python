@@ -67,6 +67,7 @@ from slack_bolt.util.utils import (
     get_name_for_callable,
 )
 from slack_bolt.workflows.step import WorkflowStep, WorkflowStepMiddleware
+from slack_bolt.workflows.step.step import WorkflowStepBuilder
 
 
 class App:
@@ -422,7 +423,7 @@ class App:
 
     def step(
         self,
-        callback_id: Union[str, Pattern, WorkflowStep],
+        callback_id: Union[str, Pattern, WorkflowStep, WorkflowStepBuilder],
         edit: Optional[
             Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]
         ] = None,
@@ -433,7 +434,10 @@ class App:
             Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]
         ] = None,
     ):
-        """Registers a new Workflow Step listener"""
+        """Registers a new Workflow Step listener
+        Unlike others, this method doesn't behave as a decorator. If you want to register a workflow step
+        by a decorator, use WorkflowStepBuilder's methods.
+        """
         step = callback_id
         if isinstance(callback_id, (str, Pattern)):
             step = WorkflowStep(
@@ -442,8 +446,10 @@ class App:
                 save=save,
                 execute=execute,
             )
+        elif isinstance(step, WorkflowStepBuilder):
+            step = step.build()
         elif not isinstance(step, WorkflowStep):
-            raise BoltError("Invalid step object")
+            raise BoltError(f"Invalid step object ({type(step)})")
 
         self.use(WorkflowStepMiddleware(step, self.listener_runner))
 

@@ -2,30 +2,28 @@
 # instead of slack_bolt in requirements.txt
 import sys
 
-sys.path.insert(1, "..")
+sys.path.insert(1, "../..")
 # ------------------------------------------------
 
 import logging
 
-from slack_sdk import WebClient
-from slack_sdk.web import SlackResponse
-
-from slack_bolt import App, Ack
+from slack_sdk.web.async_client import AsyncSlackResponse, AsyncWebClient
+from slack_bolt.async_app import AsyncApp, AsyncAck
 
 logging.basicConfig(level=logging.DEBUG)
 
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
-app = App()
+app = AsyncApp()
 
 
 # https://api.slack.com/tutorials/workflow-builder-steps
 
 
 @app.action({"type": "workflow_step_edit", "callback_id": "copy_review"})
-def edit(body: dict, ack: Ack, client: WebClient):
-    ack()
-    new_modal: SlackResponse = client.views_open(
+async def edit(body: dict, ack: AsyncAck, client: AsyncWebClient):
+    await ack()
+    new_modal: AsyncSlackResponse = await client.views_open(
         trigger_id=body["trigger_id"],
         view={
             "type": "workflow_step",
@@ -84,9 +82,9 @@ def edit(body: dict, ack: Ack, client: WebClient):
 
 
 @app.view("copy_review_view")
-def save(ack: Ack, client: WebClient, body: dict):
+async def save(ack: AsyncAck, client: AsyncWebClient, body: dict):
     state_values = body["view"]["state"]["values"]
-    response: SlackResponse = client.api_call(
+    response: AsyncSlackResponse = await client.api_call(
         api_method="workflows.updateStep",
         json={
             "workflow_step_edit_id": body["workflow_step"]["workflow_step_edit_id"],
@@ -122,16 +120,16 @@ def save(ack: Ack, client: WebClient, body: dict):
             ],
         },
     )
-    ack()
+    await ack()
 
 
 pseudo_database = {}
 
 
 @app.event("workflow_step_execute")
-def execute(body: dict, client: WebClient):
+async def execute(body: dict, client: AsyncWebClient):
     step = body["event"]["workflow_step"]
-    completion: SlackResponse = client.api_call(
+    completion: AsyncSlackResponse = await client.api_call(
         api_method="workflows.stepCompleted",
         json={
             "workflow_step_execute_id": step["workflow_step_execute_id"],
@@ -142,7 +140,7 @@ def execute(body: dict, client: WebClient):
             },
         },
     )
-    user: SlackResponse = client.users_lookupByEmail(
+    user: AsyncSlackResponse = await client.users_lookupByEmail(
         email=step["inputs"]["taskAuthorEmail"]["value"]
     )
     user_id = user["user"]["id"]
@@ -164,7 +162,7 @@ def execute(body: dict, client: WebClient):
         )
         blocks.append({"type": "divider"})
 
-    home_tab_update: SlackResponse = client.views_publish(
+    home_tab_update: AsyncSlackResponse = await client.views_publish(
         user_id=user_id,
         view={
             "type": "home",
