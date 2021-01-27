@@ -15,6 +15,7 @@ from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -110,7 +111,7 @@ class TestSanic:
             headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     @pytest.mark.asyncio
     async def test_shortcuts(self):
@@ -154,7 +155,7 @@ class TestSanic:
             headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     @pytest.mark.asyncio
     async def test_commands(self):
@@ -198,7 +199,7 @@ class TestSanic:
             headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     @pytest.mark.asyncio
     async def test_oauth(self):

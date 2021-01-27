@@ -10,6 +10,7 @@ from slack_bolt.app import App
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -65,7 +66,7 @@ class TestBlockActions:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_success_2(self):
         app = App(
@@ -77,7 +78,7 @@ class TestBlockActions:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_process_before_response(self):
         app = App(
@@ -90,7 +91,7 @@ class TestBlockActions:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_default_type(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
@@ -99,7 +100,7 @@ class TestBlockActions:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_default_type_no_block_id(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
@@ -108,7 +109,7 @@ class TestBlockActions:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_default_type_and_unmatched_block_id(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
@@ -117,7 +118,7 @@ class TestBlockActions:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_failure(self):
         app = App(
@@ -127,12 +128,12 @@ class TestBlockActions:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         app.action("aaa")(simple_listener)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_failure_2(self):
         app = App(
@@ -142,12 +143,12 @@ class TestBlockActions:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         app.block_action("aaa")(simple_listener)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
 
 body = {

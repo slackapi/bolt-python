@@ -13,6 +13,7 @@ from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -82,7 +83,7 @@ class TestAsyncBlockSuggestion:
         assert response.status == 200
         assert response.body == expected_response_body
         assert response.headers["content-type"][0] == "application/json;charset=utf-8"
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
     async def test_success_2(self):
@@ -97,7 +98,7 @@ class TestAsyncBlockSuggestion:
         assert response.status == 200
         assert response.body == expected_response_body
         assert response.headers["content-type"][0] == "application/json;charset=utf-8"
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
     async def test_success_multi(self):
@@ -112,7 +113,7 @@ class TestAsyncBlockSuggestion:
         assert response.status == 200
         assert response.body == expected_multi_response_body
         assert response.headers["content-type"][0] == "application/json;charset=utf-8"
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
     async def test_process_before_response(self):
@@ -128,7 +129,7 @@ class TestAsyncBlockSuggestion:
         assert response.status == 200
         assert response.body == expected_response_body
         assert response.headers["content-type"][0] == "application/json;charset=utf-8"
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
     async def test_process_before_response_multi(self):
@@ -144,7 +145,7 @@ class TestAsyncBlockSuggestion:
         assert response.status == 200
         assert response.body == expected_multi_response_body
         assert response.headers["content-type"][0] == "application/json;charset=utf-8"
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
     async def test_failure(self):
@@ -155,12 +156,12 @@ class TestAsyncBlockSuggestion:
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         app.options("mes_a")(show_multi_options)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
     async def test_failure_2(self):
@@ -171,12 +172,12 @@ class TestAsyncBlockSuggestion:
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         app.block_suggestion("mes_a")(show_multi_options)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
     async def test_failure_multi(self):
@@ -187,12 +188,12 @@ class TestAsyncBlockSuggestion:
         request = self.build_valid_multi_request()
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         app.options("es_a")(show_options)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
 
 body = {

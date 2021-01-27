@@ -10,6 +10,7 @@ from slack_bolt.request import BoltRequest
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -74,7 +75,7 @@ class TestBotMessage:
         response = app.dispatch(request)
         assert response.status == 200
 
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         time.sleep(1)  # wait a bit after auto ack()
         assert result["call_count"] == 3
 

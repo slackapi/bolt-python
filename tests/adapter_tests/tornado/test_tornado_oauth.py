@@ -1,6 +1,5 @@
-import tornado
-from tornado.httpclient import HTTPRequest, HTTPResponse
-from tornado.testing import AsyncHTTPTestCase
+from tornado.httpclient import HTTPRequest, HTTPResponse, HTTPClientError
+from tornado.testing import AsyncHTTPTestCase, gen_test
 from tornado.web import Application
 
 from slack_bolt.adapter.tornado import SlackOAuthHandler
@@ -32,7 +31,7 @@ class TestTornado(AsyncHTTPTestCase):
         AsyncHTTPTestCase.tearDown(self)
         restore_os_env(self.old_os_env)
 
-    @tornado.testing.gen_test
+    @gen_test
     async def test_oauth(self):
         request = HTTPRequest(
             url=self.get_url("/slack/install"), method="GET", follow_redirects=False
@@ -40,5 +39,5 @@ class TestTornado(AsyncHTTPTestCase):
         try:
             response: HTTPResponse = await self.http_client.fetch(request)
             assert response.code == 200
-        except tornado.httpclient.HTTPClientError as e:
+        except HTTPClientError as e:
             assert e.code == 200

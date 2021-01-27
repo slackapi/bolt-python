@@ -1,5 +1,12 @@
 import logging
-from typing import List
+import sys
+import threading
+import time
+from multiprocessing.context import Process
+from typing import List, Optional
+from unittest import TestCase
+
+from tests.utils import get_mock_server_mode
 
 socket_mode_envelopes = [
     """{"envelope_id":"57d6a792-4d35-4d0b-b6aa-3361493e1caf","payload":{"type":"shortcut","token":"xxx","action_ts":"1610198080.300836","team":{"id":"T111","domain":"seratch"},"user":{"id":"U111","username":"seratch","team_id":"T111"},"is_enterprise_install":false,"enterprise":null,"callback_id":"do-something","trigger_id":"111.222.xxx"},"type":"interactive","accepts_response_payload":false}""",
@@ -11,8 +18,8 @@ from flask import Flask
 from flask_sockets import Sockets
 
 
-def start_socket_mode_server(self, port: int):
-    def _start_socket_mode_server():
+def start_thread_socket_mode_server(test: TestCase, port: int):
+    def _start_thread_socket_mode_server():
         logger = logging.getLogger(__name__)
         app: Flask = Flask(__name__)
         sockets: Sockets = Sockets(app)
@@ -36,7 +43,85 @@ def start_socket_mode_server(self, port: int):
         from geventwebsocket.handler import WebSocketHandler
 
         server = pywsgi.WSGIServer(("", port), app, handler_class=WebSocketHandler)
-        self.server = server
+        test.server = server
         server.serve_forever(stop_timeout=1)
 
-    return _start_socket_mode_server
+    return _start_thread_socket_mode_server
+
+
+def start_process_socket_mode_server(port: int):
+    logger = logging.getLogger(__name__)
+    app: Flask = Flask(__name__)
+    sockets: Sockets = Sockets(app)
+
+    envelopes_to_consume: List[str] = list(socket_mode_envelopes)
+
+    @sockets.route("/link")
+    def link(ws):
+        while not ws.closed:
+            message = ws.read_message()
+            if message is not None:
+                if len(envelopes_to_consume) > 0:
+                    e = envelopes_to_consume.pop(0)
+                    logger.debug(f"Send an envelope: {e}")
+                    ws.send(e)
+
+                logger.debug(f"Server received a message: {message}")
+                ws.send(message)
+
+    from gevent import pywsgi
+    from geventwebsocket.handler import WebSocketHandler
+
+    server = pywsgi.WSGIServer(("", port), app, handler_class=WebSocketHandler)
+    server.serve_forever(stop_timeout=1)
+
+
+def start_socket_mode_server(test, port: int):
+    if get_mock_server_mode() == "threading":
+        test.sm_thread = threading.Thread(
+            target=start_thread_socket_mode_server(test, port)
+        )
+        test.sm_thread.daemon = True
+        test.sm_thread.start()
+        time.sleep(2)  # wait for the server
+    else:
+        test.sm_process = Process(
+            target=start_process_socket_mode_server, kwargs={"port": port}
+        )
+        test.sm_process.start()
+
+
+def stop_socket_mode_server(test):
+    if get_mock_server_mode() == "threading":
+        print(test)
+        test.server.stop()
+        test.server.close()
+    else:
+        # terminate the process
+        test.sm_process.terminate()
+        test.sm_process.join()
+        # Python 3.6 does not have these methods
+        if sys.version_info.major == 3 and sys.version_info.minor > 6:
+            # cleanup the process's resources
+            test.sm_process.kill()
+            test.sm_process.close()
+
+        test.sm_process = None
+
+
+async def stop_socket_mode_server_async(test: TestCase):
+    if get_mock_server_mode() == "threading":
+        test.server.stop()
+        test.server.close()
+    else:
+        # terminate the process
+        test.sm_process.terminate()
+        test.sm_process.join()
+
+        # Python 3.6 does not have these methods
+        if sys.version_info.major == 3 and sys.version_info.minor > 6:
+            # cleanup the process's resources
+            test.sm_process.kill()
+            test.sm_process.close()
+
+        test.sm_process = None
