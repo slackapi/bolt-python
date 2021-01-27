@@ -14,6 +14,7 @@ from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
     cleanup_mock_web_api_server,
     setup_mock_web_api_server,
+    assert_auth_test_count,
 )
 
 
@@ -139,7 +140,7 @@ class TestOAuthFlow:
         request = BoltRequest(body=body, headers=headers)
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_handle_callback_invalid_state(self):
         oauth_flow = OAuthFlow(

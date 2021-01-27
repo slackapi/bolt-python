@@ -2,22 +2,25 @@ import json
 from time import time
 from urllib.parse import quote
 
-import falcon
-from falcon import testing
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
+from starlette.applications import Starlette
+from starlette.requests import Request
+from starlette.routing import Route
+from starlette.testclient import TestClient
 
-from slack_bolt.adapter.falcon import SlackAppResource
+from slack_bolt.adapter.starlette import SlackRequestHandler
 from slack_bolt.app import App
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-class TestFalcon:
+class TestStarlette:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -64,6 +67,8 @@ class TestFalcon:
 
         app.event("app_mention")(event_handler)
 
+        app_handler = SlackRequestHandler(app)
+
         input = {
             "token": "verification_token",
             "team_id": "T111",
@@ -86,18 +91,21 @@ class TestFalcon:
         }
         timestamp, body = str(int(time())), json.dumps(input)
 
-        api = falcon.API()
-        resource = SlackAppResource(app)
-        api.add_route("/slack/events", resource)
+        async def endpoint(req: Request):
+            return await app_handler.handle(req)
 
-        client = testing.TestClient(api)
-        response = client.simulate_post(
+        api = Starlette(
+            debug=True,
+            routes=[Route("/slack/events", endpoint=endpoint, methods=["POST"])],
+        )
+        client = TestClient(api)
+        response = client.post(
             "/slack/events",
-            body=body,
+            data=body,
             headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_shortcuts(self):
         app = App(
@@ -109,6 +117,8 @@ class TestFalcon:
             ack()
 
         app.shortcut("test-shortcut")(shortcut_handler)
+
+        app_handler = SlackRequestHandler(app)
 
         input = {
             "type": "shortcut",
@@ -127,18 +137,21 @@ class TestFalcon:
 
         timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
 
-        api = falcon.API()
-        resource = SlackAppResource(app)
-        api.add_route("/slack/events", resource)
+        async def endpoint(req: Request):
+            return await app_handler.handle(req)
 
-        client = testing.TestClient(api)
-        response = client.simulate_post(
+        api = Starlette(
+            debug=True,
+            routes=[Route("/slack/events", endpoint=endpoint, methods=["POST"])],
+        )
+        client = TestClient(api)
+        response = client.post(
             "/slack/events",
-            body=body,
+            data=body,
             headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_commands(self):
         app = App(
@@ -150,6 +163,8 @@ class TestFalcon:
             ack()
 
         app.command("/hello-world")(command_handler)
+
+        app_handler = SlackRequestHandler(app)
 
         input = (
             "token=verification_token"
@@ -168,18 +183,21 @@ class TestFalcon:
         )
         timestamp, body = str(int(time())), input
 
-        api = falcon.API()
-        resource = SlackAppResource(app)
-        api.add_route("/slack/events", resource)
+        async def endpoint(req: Request):
+            return await app_handler.handle(req)
 
-        client = testing.TestClient(api)
-        response = client.simulate_post(
+        api = Starlette(
+            debug=True,
+            routes=[Route("/slack/events", endpoint=endpoint, methods=["POST"])],
+        )
+        client = TestClient(api)
+        response = client.post(
             "/slack/events",
-            body=body,
+            data=body,
             headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_oauth(self):
         app = App(
@@ -191,11 +209,18 @@ class TestFalcon:
                 scopes=["chat:write", "commands"],
             ),
         )
-        api = falcon.API()
-        resource = SlackAppResource(app)
-        api.add_route("/slack/install", resource)
+        app_handler = SlackRequestHandler(app)
 
-        client = testing.TestClient(api)
-        response = client.simulate_get("/slack/install")
+        async def endpoint(req: Request):
+            return await app_handler.handle(req)
+
+        api = Starlette(
+            debug=True,
+            routes=[Route("/slack/install", endpoint=endpoint, methods=["GET"])],
+        )
+        client = TestClient(api)
+        response = client.get("/slack/install", allow_redirects=False)
         assert response.status_code == 200
+        assert response.headers.get("content-type") == "text/html; charset=utf-8"
+        assert response.headers.get("content-length") == "565"
         assert "https://slack.com/oauth/v2/authorize?state=" in response.text

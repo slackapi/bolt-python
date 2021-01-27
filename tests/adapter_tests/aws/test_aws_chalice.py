@@ -19,6 +19,7 @@ from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -110,7 +111,7 @@ class TestAwsChalice:
             headers=self.build_headers(timestamp, body),
         )
         assert response["statusCode"] == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_shortcuts(self):
         app = App(
@@ -157,7 +158,7 @@ class TestAwsChalice:
             headers=self.build_headers(timestamp, body),
         )
         assert response["statusCode"] == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_commands(self):
         app = App(
@@ -204,7 +205,7 @@ class TestAwsChalice:
             headers=self.build_headers(timestamp, body),
         )
         assert response["statusCode"] == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_lazy_listeners(self):
         app = App(
@@ -261,7 +262,7 @@ class TestAwsChalice:
         )
         response: Response = slack_handler.handle(request)
         assert response.status_code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     def test_oauth(self):

@@ -8,6 +8,7 @@ from slack_bolt.error import BoltError
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -72,7 +73,7 @@ class TestEventsSocketMode:
         )
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
@@ -94,7 +95,7 @@ class TestEventsSocketMode:
         )
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     valid_reaction_added_body = {
         "token": "verification_token",
@@ -130,7 +131,7 @@ class TestEventsSocketMode:
         )
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
@@ -181,7 +182,7 @@ class TestEventsSocketMode:
         request: BoltRequest = BoltRequest(body=event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         sleep(1)  # wait a bit after auto ack()
         # The listener should not be executed
         assert self.mock_received_requests.get("/chat.postMessage") is None
@@ -237,7 +238,7 @@ class TestEventsSocketMode:
         request: BoltRequest = BoltRequest(body=join_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         request: BoltRequest = BoltRequest(body=left_event_body, mode="socket_mode")
         response = app.dispatch(request)
@@ -297,7 +298,7 @@ class TestEventsSocketMode:
         request: BoltRequest = BoltRequest(body=join_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         request: BoltRequest = BoltRequest(body=left_event_body, mode="socket_mode")
         response = app.dispatch(request)
@@ -356,6 +357,6 @@ class TestEventsSocketMode:
         response = app.dispatch(request)
         assert response.status == 200
 
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 2

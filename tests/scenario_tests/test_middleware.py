@@ -9,6 +9,7 @@ from slack_bolt.request import BoltRequest
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -71,7 +72,7 @@ class TestMiddleware:
 
         response = app.dispatch(self.build_request())
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_next_call(self):
         app = App(
@@ -84,7 +85,7 @@ class TestMiddleware:
         response = app.dispatch(self.build_request())
         assert response.status == 200
         assert response.body == "acknowledged!"
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_class_call(self):
         class NextClass:
@@ -101,7 +102,7 @@ class TestMiddleware:
         response = app.dispatch(self.build_request())
         assert response.status == 200
         assert response.body == "acknowledged!"
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
 
 def just_ack(ack):

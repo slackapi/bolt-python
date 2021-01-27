@@ -9,6 +9,7 @@ from slack_bolt.request import BoltRequest
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -62,7 +63,7 @@ class TestSlashCommand:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_process_before_response(self):
         app = App(
@@ -75,7 +76,7 @@ class TestSlashCommand:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_failure(self):
         app = App(
@@ -85,12 +86,12 @@ class TestSlashCommand:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         app.command("/another-one")(commander)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
 
 slash_command_body = (

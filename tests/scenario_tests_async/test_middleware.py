@@ -11,6 +11,7 @@ from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -78,7 +79,7 @@ class TestAsyncMiddleware:
 
         response = await app.async_dispatch(self.build_request())
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
     async def test_next_call(self):
@@ -92,7 +93,7 @@ class TestAsyncMiddleware:
         response = await app.async_dispatch(self.build_request())
         assert response.status == 200
         assert response.body == "acknowledged!"
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
 
 async def just_ack(ack):

@@ -1,6 +1,5 @@
 import logging
 import time
-from threading import Thread
 
 from slack_sdk import WebClient
 
@@ -8,6 +7,7 @@ from slack_bolt import App
 from slack_bolt.adapter.socket_mode.websocket_client import SocketModeHandler
 from .mock_socket_mode_server import (
     start_socket_mode_server,
+    stop_socket_mode_server,
 )
 from .mock_web_api_server import (
     setup_mock_web_api_server,
@@ -26,16 +26,15 @@ class TestSocketModeWebsocketClient:
             token="xoxb-api_test",
             base_url="http://localhost:8888",
         )
+        start_socket_mode_server(self, 3012)
+        time.sleep(2)  # wait for the server
 
     def teardown_method(self):
         cleanup_mock_web_api_server(self)
         restore_os_env(self.old_os_env)
+        stop_socket_mode_server(self)
 
     def test_interactions(self):
-        t = Thread(target=start_socket_mode_server(self, 3012))
-        t.daemon = True
-        t.start()
-        time.sleep(1)  # wait for the server
 
         app = App(client=self.web_client)
 
@@ -70,5 +69,3 @@ class TestSocketModeWebsocketClient:
             assert result["command"] is True
         finally:
             handler.client.close()
-            self.server.stop()
-            self.server.close()

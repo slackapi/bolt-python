@@ -10,6 +10,7 @@ from slack_bolt.request import BoltRequest
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -63,7 +64,7 @@ class TestMessage:
         request = self.build_request()
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         time.sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
@@ -77,7 +78,7 @@ class TestMessage:
         request = self.build_request2()
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         time.sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
@@ -93,7 +94,7 @@ class TestMessage:
         request = self.build_request2()
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         time.sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
@@ -107,7 +108,7 @@ class TestMessage:
         request = self.build_request()
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_regexp_keyword(self):
         app = App(
@@ -119,7 +120,7 @@ class TestMessage:
         request = self.build_request()
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         time.sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
@@ -133,7 +134,7 @@ class TestMessage:
         request = self.build_request()
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
 
 message_body = {

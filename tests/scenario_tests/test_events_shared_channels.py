@@ -9,6 +9,7 @@ from slack_bolt.authorization import AuthorizeResult
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -108,7 +109,7 @@ class TestEventsSharedChannels:
         )
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
@@ -135,7 +136,7 @@ class TestEventsSharedChannels:
         )
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     valid_reaction_added_body = {
         "token": "verification_token",
@@ -184,7 +185,7 @@ class TestEventsSharedChannels:
         )
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
@@ -258,7 +259,7 @@ class TestEventsSharedChannels:
         )
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         sleep(1)  # wait a bit after auto ack()
         # The listener should not be executed
         assert self.mock_received_requests.get("/chat.postMessage") is None
@@ -337,7 +338,7 @@ class TestEventsSharedChannels:
         )
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         timestamp, body = str(int(time())), json.dumps(left_event_body)
         request: BoltRequest = BoltRequest(
@@ -423,7 +424,7 @@ class TestEventsSharedChannels:
         )
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         timestamp, body = str(int(time())), json.dumps(left_event_body)
         request: BoltRequest = BoltRequest(
