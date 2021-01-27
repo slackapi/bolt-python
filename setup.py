@@ -52,7 +52,8 @@ setuptools.setup(
             "moto<=2", # For AWS tests
             "bottle>=0.12,<1",
             "boddle>=0.2,<0.3",  # For Bottle app tests
-            "chalice>=1,<2",
+            # TODO: https://github.com/aws/chalice/issues/1627
+            "chalice>=1.22,<2",
             "click>=7,<8",  # for chalice
             "CherryPy>=18,<19",
             "Django>=3,<4",
