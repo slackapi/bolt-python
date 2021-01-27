@@ -18,6 +18,7 @@ from slack_bolt.workflows.step.utilities.async_update import AsyncUpdate
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -82,7 +83,7 @@ class TestAsyncWorkflowSteps:
         request = AsyncBoltRequest(body=body, headers=headers)
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         app = self.build_app("copy_review___")
         response = await app.async_dispatch(request)
@@ -101,7 +102,7 @@ class TestAsyncWorkflowSteps:
         request = AsyncBoltRequest(body=body, headers=headers)
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         app = self.build_process_before_response_app("copy_review___")
         response = await app.async_dispatch(request)
@@ -120,7 +121,7 @@ class TestAsyncWorkflowSteps:
         request = AsyncBoltRequest(body=body, headers=headers)
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         app = self.build_app("copy_review___")
         response = await app.async_dispatch(request)
@@ -139,7 +140,7 @@ class TestAsyncWorkflowSteps:
         request = AsyncBoltRequest(body=body, headers=headers)
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         app = self.build_process_before_response_app("copy_review___")
         response = await app.async_dispatch(request)
@@ -158,7 +159,7 @@ class TestAsyncWorkflowSteps:
         request = AsyncBoltRequest(body=body, headers=headers)
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
         await asyncio.sleep(0.5)
         assert self.mock_received_requests["/workflows.stepCompleted"] == 1
 
@@ -179,7 +180,7 @@ class TestAsyncWorkflowSteps:
         request = AsyncBoltRequest(body=body, headers=headers)
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
         await asyncio.sleep(0.5)
         assert self.mock_received_requests["/workflows.stepCompleted"] == 1
 

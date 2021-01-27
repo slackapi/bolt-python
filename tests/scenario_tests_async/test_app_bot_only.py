@@ -20,6 +20,7 @@ from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -89,7 +90,7 @@ class TestAppBotOnly:
         request = self.build_valid_app_mention_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
         await asyncio.sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
@@ -106,7 +107,7 @@ class TestAppBotOnly:
         request = self.build_valid_app_mention_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
         await asyncio.sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
@@ -122,7 +123,7 @@ class TestAppBotOnly:
         request = self.build_valid_app_mention_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
         await asyncio.sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
@@ -139,7 +140,7 @@ class TestAppBotOnly:
         request = self.build_valid_app_mention_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
         await asyncio.sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
@@ -155,7 +156,7 @@ class TestAppBotOnly:
         request = self.build_valid_app_mention_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
         await asyncio.sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 

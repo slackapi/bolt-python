@@ -1,19 +1,17 @@
 import json
 from time import time
+from typing import Optional
 from urllib.parse import quote
 
-import tornado
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
-from tornado.httpclient import HTTPRequest, HTTPResponse
-from tornado.testing import AsyncHTTPTestCase
-from tornado.web import Application
 
-from slack_bolt.adapter.tornado import SlackEventsHandler
+from slack_bolt.adapter.bottle import SlackRequestHandler
 from slack_bolt.app import App
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -34,10 +32,20 @@ def command_handler(ack):
     ack()
 
 
-class TestTornado(AsyncHTTPTestCase):
-    signature_verifier = SignatureVerifier(signing_secret)
+from bottle import post, request, response
+from boddle import boddle
 
-    def setUp(self):
+
+@post("/slack/events")
+def slack_events():
+    return TestBottle.handler.handle(request, response)
+
+
+class TestBottle:
+    signature_verifier = SignatureVerifier(signing_secret)
+    handler: Optional[SlackRequestHandler] = None
+
+    def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()
         setup_mock_web_api_server(self)
 
@@ -45,23 +53,18 @@ class TestTornado(AsyncHTTPTestCase):
             token=valid_token,
             base_url=mock_api_server_base_url,
         )
-        self.app = App(
+        app = App(
             client=web_client,
             signing_secret=signing_secret,
         )
-        self.app.event("app_mention")(event_handler)
-        self.app.shortcut("test-shortcut")(shortcut_handler)
-        self.app.command("/hello-world")(command_handler)
+        TestBottle.handler = SlackRequestHandler(app)
+        app.event("app_mention")(event_handler)
+        app.shortcut("test-shortcut")(shortcut_handler)
+        app.command("/hello-world")(command_handler)
 
-        AsyncHTTPTestCase.setUp(self)
-
-    def tearDown(self):
-        AsyncHTTPTestCase.tearDown(self)
+    def teardown_method(self):
         cleanup_mock_web_api_server(self)
         restore_os_env(self.old_os_env)
-
-    def get_app(self):
-        return Application([("/slack/events", SlackEventsHandler, dict(app=self.app))])
 
     def generate_signature(self, body: str, timestamp: str):
         return self.signature_verifier.generate_signature(
@@ -70,19 +73,12 @@ class TestTornado(AsyncHTTPTestCase):
         )
 
     def build_headers(self, timestamp: str, body: str):
-        content_type = (
-            "application/json"
-            if body.startswith("{")
-            else "application/x-www-form-urlencoded"
-        )
         return {
-            "content-type": content_type,
             "x-slack-signature": self.generate_signature(body, timestamp),
             "x-slack-request-timestamp": timestamp,
         }
 
-    @tornado.testing.gen_test
-    async def test_events(self):
+    def test_events(self):
         input = {
             "token": "verification_token",
             "team_id": "T111",
@@ -105,18 +101,18 @@ class TestTornado(AsyncHTTPTestCase):
         }
         timestamp, body = str(int(time())), json.dumps(input)
 
-        request = HTTPRequest(
-            url=self.get_url("/slack/events"),
+        with boddle(
             method="POST",
+            path="/slack/events",
             body=body,
             headers=self.build_headers(timestamp, body),
-        )
-        response: HTTPResponse = await self.http_client.fetch(request)
-        assert response.code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        ):
+            response_body = slack_events()
+            assert response.status_code == 200
+            assert response_body == ""
+            assert_auth_test_count(self, 1)
 
-    @tornado.testing.gen_test
-    async def test_shortcuts(self):
+    def test_shortcuts(self):
         input = {
             "type": "shortcut",
             "token": "verification_token",
@@ -134,18 +130,18 @@ class TestTornado(AsyncHTTPTestCase):
 
         timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
 
-        request = HTTPRequest(
-            url=self.get_url("/slack/events"),
+        with boddle(
             method="POST",
+            path="/slack/events",
             body=body,
             headers=self.build_headers(timestamp, body),
-        )
-        response: HTTPResponse = await self.http_client.fetch(request)
-        assert response.code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        ):
+            response_body = slack_events()
+            assert response.status_code == 200
+            assert response_body == ""
+            assert_auth_test_count(self, 1)
 
-    @tornado.testing.gen_test
-    async def test_commands(self):
+    def test_commands(self):
         input = (
             "token=verification_token"
             "&team_id=T111"
@@ -163,12 +159,13 @@ class TestTornado(AsyncHTTPTestCase):
         )
         timestamp, body = str(int(time())), input
 
-        request = HTTPRequest(
-            url=self.get_url("/slack/events"),
+        with boddle(
             method="POST",
+            path="/slack/events",
             body=body,
             headers=self.build_headers(timestamp, body),
-        )
-        response: HTTPResponse = await self.http_client.fetch(request)
-        assert response.code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        ):
+            response_body = slack_events()
+            assert response.status_code == 200
+            assert response_body == ""
+            assert_auth_test_count(self, 1)

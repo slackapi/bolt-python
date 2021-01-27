@@ -1,25 +1,23 @@
 import json
 from time import time
-from unittest import TestCase
 from urllib.parse import quote
 
-from pyramid import testing
-from pyramid.request import Request
-from pyramid.response import Response
+from flask import Flask, request
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 
-from slack_bolt.adapter.pyramid import SlackRequestHandler
+from slack_bolt.adapter.flask import SlackRequestHandler
 from slack_bolt.app import App
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-class TestPyramid(TestCase):
+class TestFlask:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -29,13 +27,11 @@ class TestPyramid(TestCase):
         base_url=mock_api_server_base_url,
     )
 
-    def setUp(self):
-        self.config = testing.setUp()
+    def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()
         setup_mock_web_api_server(self)
 
-    def tearDown(self):
-        testing.tearDown()
+    def teardown_method(self):
         cleanup_mock_web_api_server(self)
         restore_os_env(self.old_os_env)
 
@@ -90,14 +86,20 @@ class TestPyramid(TestCase):
         }
         timestamp, body = str(int(time())), json.dumps(input)
 
-        request: Request = testing.DummyRequest()
-        request.path = "/slack/events"
-        request.method = "POST"
-        request.body = body.encode("utf-8")
-        request.headers = self.build_headers(timestamp, body)
-        response: Response = SlackRequestHandler(app).handle(request)
-        assert response.status_code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        flask_app = Flask(__name__)
+
+        @flask_app.route("/slack/events", methods=["POST"])
+        def endpoint():
+            return SlackRequestHandler(app).handle(request)
+
+        with flask_app.test_client() as client:
+            rv = client.post(
+                "/slack/events",
+                data=body,
+                headers=self.build_headers(timestamp, body),
+            )
+            assert rv.status_code == 200
+            assert_auth_test_count(self, 1)
 
     def test_shortcuts(self):
         app = App(
@@ -127,14 +129,20 @@ class TestPyramid(TestCase):
 
         timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
 
-        request: Request = testing.DummyRequest()
-        request.path = "/slack/events"
-        request.method = "POST"
-        request.body = body.encode("utf-8")
-        request.headers = self.build_headers(timestamp, body)
-        response: Response = SlackRequestHandler(app).handle(request)
-        assert response.status_code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        flask_app = Flask(__name__)
+
+        @flask_app.route("/slack/events", methods=["POST"])
+        def endpoint():
+            return SlackRequestHandler(app).handle(request)
+
+        with flask_app.test_client() as client:
+            rv = client.post(
+                "/slack/events",
+                data=body,
+                headers=self.build_headers(timestamp, body),
+            )
+            assert rv.status_code == 200
+            assert_auth_test_count(self, 1)
 
     def test_commands(self):
         app = App(
@@ -164,14 +172,20 @@ class TestPyramid(TestCase):
         )
         timestamp, body = str(int(time())), input
 
-        request: Request = testing.DummyRequest()
-        request.path = "/slack/events"
-        request.method = "POST"
-        request.body = body.encode("utf-8")
-        request.headers = self.build_headers(timestamp, body)
-        response: Response = SlackRequestHandler(app).handle(request)
-        assert response.status_code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        flask_app = Flask(__name__)
+
+        @flask_app.route("/slack/events", methods=["POST"])
+        def endpoint():
+            return SlackRequestHandler(app).handle(request)
+
+        with flask_app.test_client() as client:
+            rv = client.post(
+                "/slack/events",
+                data=body,
+                headers=self.build_headers(timestamp, body),
+            )
+            assert rv.status_code == 200
+            assert_auth_test_count(self, 1)
 
     def test_oauth(self):
         app = App(
@@ -183,12 +197,12 @@ class TestPyramid(TestCase):
                 scopes=["chat:write", "commands"],
             ),
         )
+        flask_app = Flask(__name__)
 
-        request: Request = testing.DummyRequest()
-        request.path = "/slack/install"
-        request.method = "GET"
-        response: Response = SlackRequestHandler(app).handle(request)
-        assert response.status_code == 200
-        assert "https://slack.com/oauth/v2/authorize?state=" in response.body.decode(
-            "utf-8"
-        )
+        @flask_app.route("/slack/install", methods=["GET"])
+        def endpoint():
+            return SlackRequestHandler(app).handle(request)
+
+        with flask_app.test_client() as client:
+            rv = client.get("/slack/install")
+            assert rv.status_code == 200

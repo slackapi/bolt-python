@@ -11,6 +11,7 @@ from slack_bolt.workflows.step import Complete, Fail, Update, Configure
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -67,7 +68,7 @@ class TestWorkflowSteps:
         request: BoltRequest = BoltRequest(body=body, headers=headers)
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         app = self.build_app("copy_review___")
         response = app.dispatch(request)
@@ -85,7 +86,7 @@ class TestWorkflowSteps:
         request: BoltRequest = BoltRequest(body=body, headers=headers)
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         app = self.build_process_before_response_app("copy_review___")
         response = app.dispatch(request)
@@ -103,7 +104,7 @@ class TestWorkflowSteps:
         request: BoltRequest = BoltRequest(body=body, headers=headers)
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         app = self.build_app("copy_review___")
         response = app.dispatch(request)
@@ -121,7 +122,7 @@ class TestWorkflowSteps:
         request: BoltRequest = BoltRequest(body=body, headers=headers)
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         app = self.build_process_before_response_app("copy_review___")
         response = app.dispatch(request)
@@ -139,7 +140,7 @@ class TestWorkflowSteps:
         request: BoltRequest = BoltRequest(body=body, headers=headers)
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         time_module.sleep(0.5)
         assert self.mock_received_requests["/workflows.stepCompleted"] == 1
 
@@ -159,7 +160,7 @@ class TestWorkflowSteps:
         request: BoltRequest = BoltRequest(body=body, headers=headers)
         response = app.dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         time_module.sleep(0.5)
         assert self.mock_received_requests["/workflows.stepCompleted"] == 1
 

@@ -19,6 +19,7 @@ from slack_bolt.context.async_context import AsyncBoltContext
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -68,7 +69,7 @@ class TestAsyncAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         result = await authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
@@ -76,7 +77,7 @@ class TestAsyncAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 2
+        await assert_auth_test_count_async(self, 2)
 
     @pytest.mark.asyncio
     async def test_installation_store_cached_legacy(self):
@@ -96,7 +97,7 @@ class TestAsyncAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         result = await authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
@@ -104,7 +105,7 @@ class TestAsyncAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 1  # cached
+        await assert_auth_test_count_async(self, 1)  # cached
 
     @pytest.mark.asyncio
     async def test_installation_store_bot_only(self):
@@ -125,7 +126,7 @@ class TestAsyncAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         result = await authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
@@ -133,7 +134,7 @@ class TestAsyncAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 2
+        await assert_auth_test_count_async(self, 2)
 
     @pytest.mark.asyncio
     async def test_installation_store_cached_bot_only(self):
@@ -155,7 +156,7 @@ class TestAsyncAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         result = await authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
@@ -163,7 +164,7 @@ class TestAsyncAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 1  # cached
+        await assert_auth_test_count_async(self, 1)  # cached
 
     @pytest.mark.asyncio
     async def test_installation_store(self):
@@ -181,7 +182,7 @@ class TestAsyncAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         result = await authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
@@ -189,7 +190,7 @@ class TestAsyncAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
-        assert self.mock_received_requests["/auth.test"] == 2
+        await assert_auth_test_count_async(self, 2)
 
     @pytest.mark.asyncio
     async def test_installation_store_cached(self):
@@ -209,7 +210,7 @@ class TestAsyncAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         result = await authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
@@ -217,7 +218,7 @@ class TestAsyncAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
-        assert self.mock_received_requests["/auth.test"] == 1  # cached
+        await assert_auth_test_count_async(self, 1)  # cached
 
 
 class LegacyMemoryInstallationStore(AsyncInstallationStore):

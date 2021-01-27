@@ -9,12 +9,15 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     timeout-minutes: 10
     strategy:
       matrix:
         python-version: ['3.6', '3.7', '3.8', '3.9']
-
+    env:
+      # default: multiprocessing
+      # threading is more stable on GitHub Actions
+      BOLT_PYTHON_MOCK_SERVER_MODE: threading
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -30,10 +33,41 @@ jobs:
       run: |
         pytest tests/slack_bolt/
         pytest tests/scenario_tests/
-    - name: Run tests for adapters
+    - name: Run tests for Socket Mode adapters
       run: |
         pip install -e ".[adapter]"
-        pytest tests/adapter_tests/
+        pytest tests/adapter_tests/socket_mode/
+    - name: Run tests for HTTP Mode adapters (AWS)
+      run: |
+        pytest tests/adapter_tests/aws/
+    - name: Run tests for HTTP Mode adapters (Bottle)
+      run: |
+        pytest tests/adapter_tests/bottle/
+    - name: Run tests for HTTP Mode adapters (CherryPy)
+      run: |
+        pytest tests/adapter_tests/cherrypy/
+    - name: Run tests for HTTP Mode adapters (Django)
+      run: |
+        pytest tests/adapter_tests/django/
+    - name: Run tests for HTTP Mode adapters (Falcon)
+      run: |
+        pytest tests/adapter_tests/falcon/
+    - name: Run tests for HTTP Mode adapters (Flask)
+      run: |
+        pytest tests/adapter_tests/flask/
+    - name: Run tests for HTTP Mode adapters (Pyramid)
+      run: |
+        pytest tests/adapter_tests/pyramid/
+    - name: Run tests for HTTP Mode adapters (Starlette)
+      run: |
+        pytest tests/adapter_tests/starlette/
+    - name: Run tests for HTTP Mode adapters (Tornado)
+      run: |
+        pytest tests/adapter_tests/tornado/
+    - name: Run tests for HTTP Mode adapters (asyncio-based libraries)
+      run: |
+        pip install -e ".[async]"
+        pytest tests/adapter_tests_async/
     - name: Run pytype verification (3.8 only)
       run: |
         python_version=`python -V`
@@ -42,12 +76,10 @@ jobs:
           pip install -e ".[adapter]"
           pip install "pytype" && pytype slack_bolt/
         fi
-    - name: Run all tests for codecov (3.6 only)
+    - name: Run all tests for codecov (3.9 only)
       run: |
         python_version=`python -V`
-        # TODO: As Python 3.6 works the most stably on GitHub Actions,
-        # we use the version for code coverage and async tests
-        if [ ${python_version:7:3} == "3.6" ]; then
+        if [ ${python_version:7:3} == "3.9" ]; then
           pip install -e ".[async]"
           pip install -e ".[testing]"
           pytest --cov=slack_bolt/ && bash <(curl -s https://codecov.io/bash)

@@ -14,6 +14,7 @@ from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -123,7 +124,7 @@ class TestAWSLambda:
         }
         response = SlackRequestHandler(app).handle(event, self.context)
         assert response["statusCode"] == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         event = {
             "body": body,
@@ -134,7 +135,7 @@ class TestAWSLambda:
         }
         response = SlackRequestHandler(app).handle(event, self.context)
         assert response["statusCode"] == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     @mock_lambda
     def test_shortcuts(self):
@@ -173,7 +174,7 @@ class TestAWSLambda:
         }
         response = SlackRequestHandler(app).handle(event, self.context)
         assert response["statusCode"] == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         event = {
             "body": body,
@@ -184,7 +185,7 @@ class TestAWSLambda:
         }
         response = SlackRequestHandler(app).handle(event, self.context)
         assert response["statusCode"] == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     @mock_lambda
     def test_commands(self):
@@ -223,7 +224,7 @@ class TestAWSLambda:
         }
         response = SlackRequestHandler(app).handle(event, self.context)
         assert response["statusCode"] == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         event = {
             "body": body,
@@ -234,7 +235,7 @@ class TestAWSLambda:
         }
         response = SlackRequestHandler(app).handle(event, self.context)
         assert response["statusCode"] == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     @mock_lambda
     def test_lazy_listeners(self):
@@ -279,7 +280,7 @@ class TestAWSLambda:
         }
         response = SlackRequestHandler(app).handle(event, self.context)
         assert response["statusCode"] == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     @mock_lambda

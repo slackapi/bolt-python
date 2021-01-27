@@ -11,6 +11,7 @@ from slack_bolt.app import App
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -74,7 +75,7 @@ class TestBlockSuggestion:
         assert response.status == 200
         assert response.body == expected_response_body
         assert response.headers["content-type"][0] == "application/json;charset=utf-8"
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_success_2(self):
         app = App(
@@ -88,7 +89,7 @@ class TestBlockSuggestion:
         assert response.status == 200
         assert response.body == expected_response_body
         assert response.headers["content-type"][0] == "application/json;charset=utf-8"
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_success_multi(self):
         app = App(
@@ -102,7 +103,7 @@ class TestBlockSuggestion:
         assert response.status == 200
         assert response.body == expected_multi_response_body
         assert response.headers["content-type"][0] == "application/json;charset=utf-8"
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_process_before_response(self):
         app = App(
@@ -117,7 +118,7 @@ class TestBlockSuggestion:
         assert response.status == 200
         assert response.body == expected_response_body
         assert response.headers["content-type"][0] == "application/json;charset=utf-8"
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_process_before_response_multi(self):
         app = App(
@@ -132,7 +133,7 @@ class TestBlockSuggestion:
         assert response.status == 200
         assert response.body == expected_multi_response_body
         assert response.headers["content-type"][0] == "application/json;charset=utf-8"
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_failure(self):
         app = App(
@@ -142,12 +143,12 @@ class TestBlockSuggestion:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         app.options("mes_a")(show_multi_options)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_failure_2(self):
         app = App(
@@ -157,12 +158,12 @@ class TestBlockSuggestion:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         app.block_suggestion("mes_a")(show_multi_options)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_failure_multi(self):
         app = App(
@@ -172,12 +173,12 @@ class TestBlockSuggestion:
         request = self.build_valid_multi_request()
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         app.options("es_a")(show_options)
         response = app.dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
 
 body = {

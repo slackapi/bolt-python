@@ -13,6 +13,7 @@ from slack_bolt.authorization.authorize import InstallationStoreAuthorize, Autho
 from tests.mock_web_api_server import (
     cleanup_mock_web_api_server,
     setup_mock_web_api_server,
+    assert_auth_test_count,
 )
 
 
@@ -50,7 +51,7 @@ class TestAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         result = authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
@@ -58,7 +59,7 @@ class TestAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert_auth_test_count(self, 2)
 
     def test_installation_store_cached_legacy(self):
         installation_store = LegacyMemoryInstallationStore()
@@ -77,7 +78,7 @@ class TestAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         result = authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
@@ -85,7 +86,7 @@ class TestAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 1  # cached
+        assert_auth_test_count(self, 1)  # cached
 
     def test_installation_store_bot_only(self):
         installation_store = BotOnlyMemoryInstallationStore()
@@ -105,7 +106,7 @@ class TestAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         result = authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
@@ -113,7 +114,7 @@ class TestAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert_auth_test_count(self, 2)
 
     def test_installation_store_cached_bot_only(self):
         installation_store = BotOnlyMemoryInstallationStore()
@@ -134,7 +135,7 @@ class TestAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         result = authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
@@ -142,7 +143,7 @@ class TestAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
-        assert self.mock_received_requests["/auth.test"] == 1  # cached
+        assert_auth_test_count(self, 1)  # cached
 
     def test_installation_store(self):
         installation_store = MemoryInstallationStore()
@@ -158,7 +159,7 @@ class TestAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         result = authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
@@ -166,7 +167,7 @@ class TestAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
-        assert self.mock_received_requests["/auth.test"] == 2
+        assert_auth_test_count(self, 2)
 
     def test_installation_store_cached(self):
         installation_store = MemoryInstallationStore()
@@ -184,7 +185,7 @@ class TestAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
         result = authorize(
             context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
@@ -192,7 +193,7 @@ class TestAuthorize:
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
-        assert self.mock_received_requests["/auth.test"] == 1  # cached
+        assert_auth_test_count(self, 1)  # cached
 
 
 class LegacyMemoryInstallationStore(InstallationStore):

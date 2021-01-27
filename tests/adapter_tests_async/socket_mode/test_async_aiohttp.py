@@ -1,5 +1,4 @@
 import asyncio
-from threading import Thread
 
 import pytest
 from slack_sdk.web.async_client import AsyncWebClient
@@ -13,6 +12,7 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 from ...adapter_tests.socket_mode.mock_socket_mode_server import (
     start_socket_mode_server,
+    stop_socket_mode_server_async,
 )
 
 
@@ -38,9 +38,7 @@ class TestSocketModeAiohttp:
 
     @pytest.mark.asyncio
     async def test_events(self):
-        t = Thread(target=start_socket_mode_server(self, 3021))
-        t.daemon = True
-        t.start()
+        start_socket_mode_server(self, 3021)
         await asyncio.sleep(1)  # wait for the server
 
         app = AsyncApp(client=self.web_client)
@@ -74,5 +72,4 @@ class TestSocketModeAiohttp:
             assert result["command"] is True
         finally:
             await handler.client.close()
-            self.server.stop()
-            self.server.close()
+            await stop_socket_mode_server_async(self)

@@ -1,25 +1,26 @@
 import json
 from time import time
+from unittest import TestCase
 from urllib.parse import quote
 
+from pyramid import testing
+from pyramid.request import Request
+from pyramid.response import Response
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
-from starlette.applications import Starlette
-from starlette.requests import Request
-from starlette.routing import Route
-from starlette.testclient import TestClient
 
-from slack_bolt.adapter.starlette import SlackRequestHandler
+from slack_bolt.adapter.pyramid import SlackRequestHandler
 from slack_bolt.app import App
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-class TestStarlette:
+class TestPyramid(TestCase):
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -29,11 +30,13 @@ class TestStarlette:
         base_url=mock_api_server_base_url,
     )
 
-    def setup_method(self):
+    def setUp(self):
+        self.config = testing.setUp()
         self.old_os_env = remove_os_env_temporarily()
         setup_mock_web_api_server(self)
 
-    def teardown_method(self):
+    def tearDown(self):
+        testing.tearDown()
         cleanup_mock_web_api_server(self)
         restore_os_env(self.old_os_env)
 
@@ -50,9 +53,9 @@ class TestStarlette:
             else "application/x-www-form-urlencoded"
         )
         return {
-            "content-type": content_type,
-            "x-slack-signature": self.generate_signature(body, timestamp),
-            "x-slack-request-timestamp": timestamp,
+            "content-type": [content_type],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
         }
 
     def test_events(self):
@@ -65,8 +68,6 @@ class TestStarlette:
             pass
 
         app.event("app_mention")(event_handler)
-
-        app_handler = SlackRequestHandler(app)
 
         input = {
             "token": "verification_token",
@@ -90,21 +91,14 @@ class TestStarlette:
         }
         timestamp, body = str(int(time())), json.dumps(input)
 
-        async def endpoint(req: Request):
-            return await app_handler.handle(req)
-
-        api = Starlette(
-            debug=True,
-            routes=[Route("/slack/events", endpoint=endpoint, methods=["POST"])],
-        )
-        client = TestClient(api)
-        response = client.post(
-            "/slack/events",
-            data=body,
-            headers=self.build_headers(timestamp, body),
-        )
+        request: Request = testing.DummyRequest()
+        request.path = "/slack/events"
+        request.method = "POST"
+        request.body = body.encode("utf-8")
+        request.headers = self.build_headers(timestamp, body)
+        response: Response = SlackRequestHandler(app).handle(request)
         assert response.status_code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_shortcuts(self):
         app = App(
@@ -116,8 +110,6 @@ class TestStarlette:
             ack()
 
         app.shortcut("test-shortcut")(shortcut_handler)
-
-        app_handler = SlackRequestHandler(app)
 
         input = {
             "type": "shortcut",
@@ -136,21 +128,14 @@ class TestStarlette:
 
         timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
 
-        async def endpoint(req: Request):
-            return await app_handler.handle(req)
-
-        api = Starlette(
-            debug=True,
-            routes=[Route("/slack/events", endpoint=endpoint, methods=["POST"])],
-        )
-        client = TestClient(api)
-        response = client.post(
-            "/slack/events",
-            data=body,
-            headers=self.build_headers(timestamp, body),
-        )
+        request: Request = testing.DummyRequest()
+        request.path = "/slack/events"
+        request.method = "POST"
+        request.body = body.encode("utf-8")
+        request.headers = self.build_headers(timestamp, body)
+        response: Response = SlackRequestHandler(app).handle(request)
         assert response.status_code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_commands(self):
         app = App(
@@ -162,8 +147,6 @@ class TestStarlette:
             ack()
 
         app.command("/hello-world")(command_handler)
-
-        app_handler = SlackRequestHandler(app)
 
         input = (
             "token=verification_token"
@@ -182,21 +165,14 @@ class TestStarlette:
         )
         timestamp, body = str(int(time())), input
 
-        async def endpoint(req: Request):
-            return await app_handler.handle(req)
-
-        api = Starlette(
-            debug=True,
-            routes=[Route("/slack/events", endpoint=endpoint, methods=["POST"])],
-        )
-        client = TestClient(api)
-        response = client.post(
-            "/slack/events",
-            data=body,
-            headers=self.build_headers(timestamp, body),
-        )
+        request: Request = testing.DummyRequest()
+        request.path = "/slack/events"
+        request.method = "POST"
+        request.body = body.encode("utf-8")
+        request.headers = self.build_headers(timestamp, body)
+        response: Response = SlackRequestHandler(app).handle(request)
         assert response.status_code == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        assert_auth_test_count(self, 1)
 
     def test_oauth(self):
         app = App(
@@ -208,18 +184,12 @@ class TestStarlette:
                 scopes=["chat:write", "commands"],
             ),
         )
-        app_handler = SlackRequestHandler(app)
 
-        async def endpoint(req: Request):
-            return await app_handler.handle(req)
-
-        api = Starlette(
-            debug=True,
-            routes=[Route("/slack/install", endpoint=endpoint, methods=["GET"])],
-        )
-        client = TestClient(api)
-        response = client.get("/slack/install", allow_redirects=False)
+        request: Request = testing.DummyRequest()
+        request.path = "/slack/install"
+        request.method = "GET"
+        response: Response = SlackRequestHandler(app).handle(request)
         assert response.status_code == 200
-        assert response.headers.get("content-type") == "text/html; charset=utf-8"
-        assert response.headers.get("content-length") == "565"
-        assert "https://slack.com/oauth/v2/authorize?state=" in response.text
+        assert "https://slack.com/oauth/v2/authorize?state=" in response.body.decode(
+            "utf-8"
+        )

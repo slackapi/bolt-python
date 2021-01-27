@@ -12,6 +12,7 @@ from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -73,7 +74,7 @@ class TestAsyncAttachmentActions:
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
     async def test_success(self):
@@ -91,7 +92,7 @@ class TestAsyncAttachmentActions:
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
     async def test_success_2(self):
@@ -104,7 +105,7 @@ class TestAsyncAttachmentActions:
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
     async def test_process_before_response(self):
@@ -123,7 +124,7 @@ class TestAsyncAttachmentActions:
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
     async def test_process_before_response_2(self):
@@ -137,7 +138,7 @@ class TestAsyncAttachmentActions:
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
     async def test_failure_without_type(self):
@@ -148,12 +149,12 @@ class TestAsyncAttachmentActions:
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         app.action("unknown")(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
     async def test_failure(self):
@@ -164,7 +165,7 @@ class TestAsyncAttachmentActions:
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         app.action(
             {
@@ -174,7 +175,7 @@ class TestAsyncAttachmentActions:
         )(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
     async def test_failure_2(self):
@@ -185,12 +186,12 @@ class TestAsyncAttachmentActions:
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         app.attachment_action("unknown")(simple_listener)
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
 
 # https://api.slack.com/legacy/interactive-messages
