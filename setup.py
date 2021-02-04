@@ -34,7 +34,7 @@ setuptools.setup(
         exclude=["examples", "integration_tests", "tests", "tests.*",]
     ),
     include_package_data=True,  # MANIFEST.in
-    install_requires=["slack_sdk>=3.2.1,<3.3",],
+    install_requires=["slack_sdk>=3.3.0rc1,<3.4",],
     setup_requires=["pytest-runner==5.2"],
     tests_require=test_dependencies,
     test_suite="tests",
