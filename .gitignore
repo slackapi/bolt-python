@@ -14,6 +14,8 @@ __pycache__/
 # virtualenv
 env*/
 venv/
+.venv/
+.env/
 
 # codecov / coverage
 .coverage
