@@ -517,7 +517,7 @@ class App:
             # By contrast, messages posted using class app's bot token still have the subtype.
             constraints = {"type": "message", "subtype": (None, "bot_message")}
             primary_matcher = builtin_matchers.event(constraints=constraints)
-            middleware.append(MessageListenerMatches(keyword))
+            middleware.insert(0, MessageListenerMatches(keyword))
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware, True
             )

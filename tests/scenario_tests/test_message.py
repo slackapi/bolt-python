@@ -5,6 +5,7 @@ import time
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 
+from slack_bolt import BoltResponse
 from slack_bolt.app import App
 from slack_bolt.request import BoltRequest
 from tests.mock_web_api_server import (
@@ -46,13 +47,15 @@ class TestMessage:
             "x-slack-request-timestamp": [timestamp],
         }
 
-    def build_request(self) -> BoltRequest:
+    def build_request_from_body(self, message_body: dict) -> BoltRequest:
         timestamp, body = str(int(time.time())), json.dumps(message_body)
         return BoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
+    def build_request(self) -> BoltRequest:
+        return self.build_request_from_body(message_body)
+
     def build_request2(self) -> BoltRequest:
-        timestamp, body = str(int(time.time())), json.dumps(message_body2)
-        return BoltRequest(body=body, headers=self.build_headers(timestamp, body))
+        return self.build_request_from_body(message_body2)
 
     def test_string_keyword(self):
         app = App(
@@ -135,6 +138,55 @@ class TestMessage:
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
+
+    # https://github.com/slackapi/bolt-python/issues/232
+    def test_issue_232_message_listener_middleware(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        called = {
+            "first": False,
+            "second": False,
+        }
+
+        def this_should_be_skipped():
+            return BoltResponse(status=500, body="failed")
+
+        @app.message("first", middleware=[this_should_be_skipped])
+        def first():
+            called["first"] = True
+
+        @app.message("second", middleware=[])
+        def second():
+            called["second"] = True
+
+        request = self.build_request_from_body(
+            {
+                "token": "verification_token",
+                "team_id": "T111",
+                "enterprise_id": "E111",
+                "api_app_id": "A111",
+                "event": {
+                    "client_msg_id": "a8744611-0210-4f85-9f15-5faf7fb225c8",
+                    "type": "message",
+                    "text": "This message should match the second listener only",
+                    "user": "W111",
+                    "ts": "1596183880.004200",
+                    "team": "T111",
+                    "channel": "C111",
+                    "event_ts": "1596183880.004200",
+                    "channel_type": "channel",
+                },
+                "type": "event_callback",
+                "event_id": "Ev111",
+                "event_time": 1596183880,
+            }
+        )
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert called["first"] == False
+        assert called["second"] == True
 
 
 message_body = {
