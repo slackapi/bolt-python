@@ -567,7 +567,7 @@ class AsyncApp:
             primary_matcher = builtin_matchers.event(
                 constraints=constraints, asyncio=True
             )
-            middleware.append(AsyncMessageListenerMatches(keyword))
+            middleware.insert(0, AsyncMessageListenerMatches(keyword))
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware, True
             )
