@@ -1,7 +1,7 @@
 import os
 from logging import Logger
 from time import time
-from typing import Optional
+from typing import Optional, Dict
 
 from slack_sdk import WebClient
 from slack_sdk.socket_mode.request import SocketModeRequest
@@ -25,6 +25,7 @@ class SocketModeHandler(BaseSocketModeHandler):
         logger: Optional[Logger] = None,
         web_client: Optional[WebClient] = None,
         proxy: Optional[str] = None,
+        proxy_headers: Optional[Dict[str, str]] = None,
         auto_reconnect_enabled: bool = True,
         trace_enabled: bool = False,
         all_message_trace_enabled: bool = False,
@@ -40,6 +41,7 @@ class SocketModeHandler(BaseSocketModeHandler):
             logger=logger if logger is not None else app.logger,
             web_client=web_client if web_client is not None else app.client,
             proxy=proxy if proxy is not None else app.client.proxy,
+            proxy_headers=proxy_headers,
             auto_reconnect_enabled=auto_reconnect_enabled,
             trace_enabled=trace_enabled,
             all_message_trace_enabled=all_message_trace_enabled,
