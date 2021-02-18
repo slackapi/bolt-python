@@ -1,10 +1,3 @@
-# ------------------------------------------------
-# instead of slack_bolt in requirements.txt
-import sys
-
-sys.path.insert(1, "..")
-# ------------------------------------------------
-
 import logging
 import re
 from typing import Callable

@@ -1,11 +1,3 @@
-# ------------------------------------------------
-# instead of slack_bolt in requirements.txt
-import sys
-import time
-
-sys.path.insert(1, "vendor")
-# ------------------------------------------------
-
 import logging
 
 from slack_bolt import App

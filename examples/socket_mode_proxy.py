@@ -1,10 +1,3 @@
-# ------------------------------------------------
-# instead of slack_bolt in requirements.txt
-import sys
-
-sys.path.insert(1, "..")
-# ------------------------------------------------
-
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -20,9 +13,7 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 proxy_url = "http://localhost:9000"
 
 # Install the Slack app and get xoxb- token in advance
-app = App(
-    client=WebClient(token=os.environ["SLACK_BOT_TOKEN"], proxy=proxy_url)
-)
+app = App(client=WebClient(token=os.environ["SLACK_BOT_TOKEN"], proxy=proxy_url))
 
 
 @app.event("app_mention")

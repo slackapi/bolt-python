@@ -1,10 +1,3 @@
-# ------------------------------------------------
-# instead of slack_bolt in requirements.txt
-import sys
-
-sys.path.insert(1, "..")
-# ------------------------------------------------
-
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -45,15 +38,30 @@ def open_modal(body, client):
         view={
             "type": "modal",
             "callback_id": "socket_modal_submission",
-            "submit": {"type": "plain_text", "text": "Submit",},
-            "close": {"type": "plain_text", "text": "Cancel",},
-            "title": {"type": "plain_text", "text": "Socket Modal",},
+            "submit": {
+                "type": "plain_text",
+                "text": "Submit",
+            },
+            "close": {
+                "type": "plain_text",
+                "text": "Cancel",
+            },
+            "title": {
+                "type": "plain_text",
+                "text": "Socket Modal",
+            },
             "blocks": [
                 {
                     "type": "input",
                     "block_id": "q1",
-                    "label": {"type": "plain_text", "text": "Write anything here!",},
-                    "element": {"action_id": "feedback", "type": "plain_text_input",},
+                    "label": {
+                        "type": "plain_text",
+                        "text": "Write anything here!",
+                    },
+                    "element": {
+                        "action_id": "feedback",
+                        "type": "plain_text_input",
+                    },
                 },
                 {
                     "type": "input",
@@ -81,9 +89,18 @@ app.shortcut("socket-mode")(ack=ack_shortcut, lazy=[open_modal])
 
 
 all_options = [
-    {"text": {"type": "plain_text", "text": ":cat: Cat"}, "value": "cat",},
-    {"text": {"type": "plain_text", "text": ":dog: Dog"}, "value": "dog",},
-    {"text": {"type": "plain_text", "text": ":bear: Bear"}, "value": "bear",},
+    {
+        "text": {"type": "plain_text", "text": ":cat: Cat"},
+        "value": "cat",
+    },
+    {
+        "text": {"type": "plain_text", "text": ":dog: Dog"},
+        "value": "dog",
+    },
+    {
+        "text": {"type": "plain_text", "text": ":bear: Bear"},
+        "value": "bear",
+    },
 ]
 
 

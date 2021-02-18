@@ -2,16 +2,6 @@
 """Django's command-line utility for administrative tasks."""
 import os
 
-# ------------------------------------------------
-# instead of slack_bolt in requirements.txt
-
-import sys
-
-sys.path.insert(1, "../../..")
-
-
-# ------------------------------------------------
-
 
 def main():
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "slackapp.settings")
