@@ -49,7 +49,39 @@ python app.py
 ngrok http 3000
 ```
 
+## Running a Socket Mode app
+
+If you use [Socket Mode](https://api.slack.com/socket-mode) for running your app, `SocketModeHandler` is available for it.
+
+```python
+import os
+from slack_bolt import App
+from slack_bolt.adapter.socket_mode import SocketModeHandler
+
+# Install the Slack app and get xoxb- token in advance
+app = App(token=os.environ["SLACK_BOT_TOKEN"])
+
+# Add functionality here
+
+if __name__ == "__main__":
+    # Create an app-level token with connections:write scope
+    handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"])
+    handler.start()
+```
+
+Run the app this way:
+
+```bash
+export SLACK_APP_TOKEN=xapp-***
+export SLACK_BOT_TOKEN=xoxb-***
+python app.py
+
+# SLACK_SIGNING_SECRET is not required
+# Running ngrok is not required
+```
+
 ## Listening for events
+
 Apps typically react to a collection of incoming events, which can correspond to [Events API events](https://api.slack.com/events-api), [actions](https://api.slack.com/interactivity/components), [shortcuts](https://api.slack.com/interactivity/shortcuts), [slash commands](https://api.slack.com/interactivity/slash-commands) or [options requests](https://api.slack.com/reference/block-kit/block-elements#external_select). For each type of
 request, there's a method to build a listener function.
 
