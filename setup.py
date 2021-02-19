@@ -34,7 +34,7 @@ setuptools.setup(
         exclude=["examples", "integration_tests", "tests", "tests.*",]
     ),
     include_package_data=True,  # MANIFEST.in
-    install_requires=["slack_sdk>=3.3.2,<3.4",],
+    install_requires=["slack_sdk>=3.4,<4",],
     setup_requires=["pytest-runner==5.2"],
     tests_require=test_dependencies,
     test_suite="tests",
@@ -52,8 +52,7 @@ setuptools.setup(
             "moto<=2", # For AWS tests
             "bottle>=0.12,<1",
             "boddle>=0.2,<0.3",  # For Bottle app tests
-            # TODO: https://github.com/aws/chalice/issues/1627
-            "chalice>=1.22,<2",
+            "chalice>=1.22.1,<2",
             "click>=7,<8",  # for chalice
             "CherryPy>=18,<19",
             "Django>=3,<4",
