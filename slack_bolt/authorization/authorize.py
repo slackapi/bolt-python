@@ -131,6 +131,8 @@ class InstallationStoreAuthorize(Authorize):
         if not self.bot_only and self.find_installation_available:
             # since v1.1, this is the default way
             try:
+                # Note that this is the latest information for the org/workspace.
+                # The installer may not be the user associated with this incoming request.
                 installation: Optional[
                     Installation
                 ] = self.installation_store.find_installation(
@@ -143,6 +145,10 @@ class InstallationStoreAuthorize(Authorize):
                     return None
 
                 if installation.user_id != user_id:
+                    # First off, remove the user token as the installer is a different user
+                    installation.user_token = None
+                    installation.user_scopes = []
+
                     # try to fetch the request user's installation
                     # to reflect the user's access token if exists
                     user_installation = self.installation_store.find_installation(
@@ -152,6 +158,7 @@ class InstallationStoreAuthorize(Authorize):
                         is_enterprise_install=context.is_enterprise_install,
                     )
                     if user_installation is not None:
+                        # Overwrite the installation with the one for this user
                         installation = user_installation
 
                 bot_token, user_token = installation.bot_token, installation.user_token
