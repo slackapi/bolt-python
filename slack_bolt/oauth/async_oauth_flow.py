@@ -39,7 +39,7 @@ class AsyncOAuthFlow:
     @property
     def client(self) -> AsyncWebClient:
         if self._async_client is None:
-            self._async_client = create_async_web_client()
+            self._async_client = create_async_web_client(logger=self.logger)
         return self._async_client
 
     @property
