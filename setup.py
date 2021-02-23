@@ -43,6 +43,8 @@ setuptools.setup(
         "async": [
             # async features heavily depends on aiohttp
             "aiohttp>=3,<4",
+            # Socket Mode 3rd party implementation
+            "websockets>=8,<9",
         ],
         # pip install -e ".[adapter]"
         # NOTE: any of async ones requires pip install -e ".[async]" too
@@ -67,6 +69,8 @@ setuptools.setup(
             # server
             "uvicorn<1",
             "gunicorn>=20,<21",
+            # Socket Mode 3rd party implementation
+            "websocket_client>=0.57,<1"
         ],
         # pip install -e ".[testing]"
         "testing": test_dependencies,
