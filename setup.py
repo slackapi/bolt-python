@@ -51,7 +51,8 @@ setuptools.setup(
         "adapter": [
             # used only under src/slack_bolt/adapter
             "boto3<=2",
-            "moto<=2", # For AWS tests
+            # TODO: Upgrade to v2
+            "moto<2", # For AWS tests
             "bottle>=0.12,<1",
             "boddle>=0.2,<0.3",  # For Bottle app tests
             "chalice>=1.22.1,<2",
