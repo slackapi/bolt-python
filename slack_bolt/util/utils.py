@@ -1,5 +1,6 @@
 import copy
 import sys
+from logging import Logger
 from typing import Optional, Union, Dict, Any, Sequence, Callable
 
 from slack_sdk import WebClient
@@ -9,9 +10,12 @@ from slack_bolt.error import BoltError
 from slack_bolt.version import __version__ as bolt_version
 
 
-def create_web_client(token: Optional[str] = None) -> WebClient:
+def create_web_client(
+    token: Optional[str] = None, logger: Optional[Logger] = None
+) -> WebClient:
     return WebClient(
         token=token,
+        logger=logger,
         user_agent_prefix=f"Bolt/{bolt_version}",
     )
 

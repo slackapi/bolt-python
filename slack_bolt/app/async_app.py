@@ -145,8 +145,11 @@ class AsyncApp:
                     warning_client_prioritized_and_token_skipped()
                 )
         else:
-            # NOTE: the token here can be None
-            self._async_client = create_async_web_client(token)
+            self._async_client = create_async_web_client(
+                # NOTE: the token here can be None
+                token=token,
+                logger=self._framework_logger,
+            )
 
         # --------------------------------------
         # Authorize & OAuthFlow initialization

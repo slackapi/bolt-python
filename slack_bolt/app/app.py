@@ -138,7 +138,11 @@ class App:
                     warning_client_prioritized_and_token_skipped()
                 )
         else:
-            self._client = create_web_client(token)  # NOTE: the token here can be None
+            self._client = create_web_client(
+                # NOTE: the token here can be None
+                token=token,
+                logger=self._framework_logger,
+            )
 
         # --------------------------------------
         # Authorize & OAuthFlow initialization

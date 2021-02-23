@@ -72,7 +72,7 @@ class LambdaS3OAuthFlow(OAuthFlow):
     @property
     def client(self) -> WebClient:
         if self._client is None:
-            self._client = create_web_client()
+            self._client = create_web_client(logger=self.logger)
         return self._client
 
     @property
