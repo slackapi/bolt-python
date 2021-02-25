@@ -18,8 +18,8 @@ The second way to respond to actions is using `respond()`, which is a utility to
 @app.action("approve_button")
 def approve_request(ack, say):
     # Acknowledge action request
-    ack();
-    say("Request approved 👍");
+    ack()
+    say("Request approved 👍")
 ```
 
 <details class="secondary-wrapper">
@@ -37,7 +37,7 @@ Since `respond()` is a utility for calling the `response_url`, it behaves in the
 # Listens to actions triggered with action_id of “user_select”
 @app.action("user_select")
 def select_user(ack, action, respond):
-    ack();
+    ack()
     respond(f"You selected <@{action['selected_user']}>")
 ```
 
