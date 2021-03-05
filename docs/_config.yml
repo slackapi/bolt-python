@@ -36,12 +36,11 @@ t:
     start: Getting started
     contribute: Contributing
   ja-jp:
-    basic: 基本的な概念
-    # TODO: translate this title
-    steps: Workflow steps
-    advanced: 応用コンセプト
+#    basic: 基本的な概念
+#    steps: ワークフローステップ
+#    advanced: 応用コンセプト
     start: Bolt 入門ガイド
-    contribute: 貢献
+#    contribute: 貢献
 
 # Metadata
 repo_name: bolt-python

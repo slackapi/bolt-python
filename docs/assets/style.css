@@ -133,7 +133,7 @@ span.beta {
   color: var(--grey);
   font-weight: 700;
   padding: 6px 14px 9px;
-  font-size 0.9em;
+  font-size: 0.9em;
 }
 
 .header a.language-switcher:hover {
@@ -173,7 +173,7 @@ span.beta {
   border-image: linear-gradient(
     to bottom, 
     #FFFFFF 0%, 
-    #F2F2F2 6% 92%,
+    #F2F2F2 6%,
     #FFFFFF 100%
   ) 1 100%;
   list-style: none;
