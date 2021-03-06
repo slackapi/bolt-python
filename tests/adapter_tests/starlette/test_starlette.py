@@ -222,5 +222,4 @@ class TestStarlette:
         response = client.get("/slack/install", allow_redirects=False)
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
-        assert response.headers.get("content-length") == "565"
         assert "https://slack.com/oauth/v2/authorize?state=" in response.text

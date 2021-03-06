@@ -42,7 +42,6 @@ class CallbackResponseBuilder:
             status=200,
             headers={
                 "Content-Type": "text/html; charset=utf-8",
-                "Content-Length": len(bytes(html, "utf-8")),
                 "Set-Cookie": self._state_utils.build_set_cookie_for_deletion(),
             },
             body=html,
@@ -66,7 +65,6 @@ class CallbackResponseBuilder:
             status=status,
             headers={
                 "Content-Type": "text/html; charset=utf-8",
-                "Content-Length": len(bytes(html, "utf-8")),
                 "Set-Cookie": self._state_utils.build_set_cookie_for_deletion(),
             },
             body=html,

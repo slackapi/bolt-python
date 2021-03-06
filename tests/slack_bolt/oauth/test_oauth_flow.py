@@ -56,7 +56,6 @@ class TestOAuthFlow:
         resp = oauth_flow.handle_installation(req)
         assert resp.status == 200
         assert resp.headers.get("content-type") == ["text/html; charset=utf-8"]
-        assert resp.headers.get("content-length") == ["576"]
         assert "https://slack.com/oauth/v2/authorize?state=" in resp.body
 
     # https://github.com/slackapi/bolt-python/issues/183
