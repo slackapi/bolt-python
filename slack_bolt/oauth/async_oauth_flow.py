@@ -172,7 +172,6 @@ class AsyncOAuthFlow:
                 body=html,
                 headers={
                     "Content-Type": "text/html; charset=utf-8",
-                    "Content-Length": len(bytes(html, "utf-8")),
                     "Set-Cookie": [set_cookie_value],
                 },
             )

@@ -107,7 +107,6 @@ class TestAsyncOAuthFlow:
         resp = await oauth_flow.handle_installation(req)
         assert resp.status == 200
         assert resp.headers.get("content-type") == ["text/html; charset=utf-8"]
-        assert resp.headers.get("content-length") == ["565"]
         assert "https://slack.com/oauth/v2/authorize?state=" in resp.body
 
     @pytest.mark.asyncio

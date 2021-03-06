@@ -188,7 +188,6 @@ class TestDjango(TestCase):
         response = SlackRequestHandler(app).handle(request)
         assert response.status_code == 200
         assert response.get("content-type") == "text/html; charset=utf-8"
-        assert response.get("content-length") == "565"
         assert "https://slack.com/oauth/v2/authorize?state=" in response.content.decode(
             "utf-8"
         )
