@@ -69,7 +69,8 @@ def warning_client_prioritized_and_token_skipped() -> str:
 
 def warning_token_skipped() -> str:
     return (
-        "As you gave `installation_store`/`authorize` as well, `token` will be unused."
+        "As either `installation_store` or `authorize` is enabled, "
+        "`token` (or SLACK_BOT_TOKEN env variable) will be unused."
     )
 
 
@@ -102,6 +103,16 @@ def warning_skip_uncommon_arg_name(arg_name: str) -> str:
 # -------------------------------
 # Info
 # -------------------------------
+
+
+def info_default_oauth_settings_loaded() -> str:
+    return (
+        "As you've set SLACK_CLIENT_ID and SLACK_CLIENT_SECRET env variables, "
+        "Bolt enabled file-based InstallationStore/OAuthStateStore for you. "
+        "Note that the file based ones are for local development. "
+        "If you want to use a different datastore, set oauth_settings argument in App constructor. "
+        "Refer to https://slack.dev/bolt-python/concepts#authenticating-oauth for more details."
+    )
 
 
 # -------------------------------
