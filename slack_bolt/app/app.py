@@ -44,6 +44,7 @@ from slack_bolt.logger.messages import (
     error_authorize_conflicts,
     warning_bot_only_conflicts,
     debug_return_listener_middleware_response,
+    info_default_oauth_settings_loaded,
 )
 from slack_bolt.middleware import (
     Middleware,
@@ -174,7 +175,11 @@ class App:
             # initialize with the default settings
             oauth_settings = OAuthSettings()
 
-        if oauth_flow:
+            if oauth_flow is None and installation_store is None:
+                # show info-level log for avoiding confusions
+                self._framework_logger.info(info_default_oauth_settings_loaded())
+
+        if oauth_flow is not None:
             self._oauth_flow = oauth_flow
             installation_store = select_consistent_installation_store(
                 client_id=self._oauth_flow.client_id,
