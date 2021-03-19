@@ -1,4 +1,6 @@
 import logging
+import signal
+import sys
 from threading import Event
 
 from slack_sdk.socket_mode.client import BaseSocketModeClient
@@ -30,4 +32,10 @@ class BaseSocketModeHandler:
             print(get_boot_message())
         else:
             self.app.logger.info(get_boot_message())
+
+        if sys.platform == "win32":
+            # Ctrl+C etc does not work on Windows OS
+            # see https://bugs.python.org/issue35935 for details
+            signal.signal(signal.SIGINT, signal.SIG_DFL)
+
         Event().wait()
