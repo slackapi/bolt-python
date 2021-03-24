@@ -35,11 +35,12 @@ class AsyncBoltRequest:
     ):
         """Request to a Bolt app.
 
-        :param body: The raw request body (only plain text is supported for "http" mode)
-        :param query: The query string data in any data format.
-        :param headers: The request headers.
-        :param context: The context in this request.
-        :param mode: The mode used for this request. (either "http" or "socket_mode")
+        Args:
+            body: The raw request body (only plain text is supported for "http" mode)
+            query: The query string data in any data format.
+            headers: The request headers.
+            context: The context in this request.
+            mode: The mode used for this request. (either "http" or "socket_mode")
         """
         if mode == "http" and not isinstance(body, str):
             raise BoltError(error_message_raw_body_required_in_http_mode())

@@ -1,3 +1,10 @@
+"""A middleware processes request data and calls `next()` method
+if the execution chain should continue running the following middleware.
+
+Middleware can be used globally before all listener executions.
+It's also possible to run a middleware only for a particular listener.
+"""
+
 # Don't add async module imports here
 from .authorization import SingleTeamAuthorization, MultiTeamsAuthorization
 from .custom_middleware import CustomMiddleware

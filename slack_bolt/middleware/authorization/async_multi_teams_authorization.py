@@ -17,7 +17,8 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
     def __init__(self, authorize: AsyncAuthorize):
         """Multi-workspace authorization.
 
-        :param authorize: The function to authorize incoming requests from Slack.
+        Args:
+            authorize: The function to authorize incoming requests from Slack.
         """
         self.authorize = authorize
         self.logger = get_bolt_logger(AsyncMultiTeamsAuthorization)

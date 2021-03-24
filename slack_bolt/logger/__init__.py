@@ -1,3 +1,5 @@
+"""Bolt for Python relies on the standard `logging` module."""
+
 import logging
 from logging import Logger
 from typing import Any

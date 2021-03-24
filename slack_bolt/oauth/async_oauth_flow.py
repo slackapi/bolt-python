@@ -57,9 +57,10 @@ class AsyncOAuthFlow:
     ):
         """The module to run the Slack app installation flow (OAuth flow).
 
-        :param client: The AsyncWebClient.
-        :param logger: The logger.
-        :param settings: OAuth settings to configure this module.
+        Args:
+            client: The `slack_sdk.web.async_client.AsyncWebClient` instance.
+            logger: The logger.
+            settings: OAuth settings to configure this module.
         """
         self._async_client = client
         self._logger = logger

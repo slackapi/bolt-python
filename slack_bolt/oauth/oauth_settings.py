@@ -77,24 +77,25 @@ class OAuthSettings:
     ):
         """The settings for Slack App installation (OAuth flow).
 
-        :param client_id: Check the value in Settings > Basic Information > App Credentials
-        :param client_secret: Check the value in Settings > Basic Information > App Credentials
-        :param scopes: Check the value in Settings > Manage Distribution
-        :param user_scopes: Check the value in Settings > Manage Distribution
-        :param redirect_uri: Check the value in Features > OAuth & Permissions > Redirect URLs
-        :param install_path: The endpoint to start an OAuth flow (Default: /slack/install)
-        :param install_page_rendering_enabled: Renders a web page for install_path access if True
-        :param redirect_uri_path: The path of Redirect URL (Default: /slack/oauth_redirect)
-        :param callback_options: Give success/failure functions f you want to customize callback functions.
-        :param success_url: Set a complete URL if you want to redirect end-users when an installation completes.
-        :param failure_url: Set a complete URL if you want to redirect end-users when an installation fails.
-        :param authorization_url: Set a URL if you want to customize the URL https://slack.com/oauth/v2/authorize
-        :param installation_store: Specify the instance of InstallationStore (Default: FileInstallationStore)
-        :param installation_store_bot_only: Use InstallationStore#find_bot if True (Default: False)
-        :param state_store: Specify the instance of InstallationStore (Default: FileOAuthStateStore)
-        :param state_cookie_name: The cookie name that is set for installers' browser. (Default: slack-app-oauth-state)
-        :param state_expiration_seconds: The seconds that the state value is alive (Default: 600 seconds)
-        :param logger: The logger that will be used internally
+        Args:
+            client_id: Check the value in Settings > Basic Information > App Credentials
+            client_secret: Check the value in Settings > Basic Information > App Credentials
+            scopes: Check the value in Settings > Manage Distribution
+            user_scopes: Check the value in Settings > Manage Distribution
+            redirect_uri: Check the value in Features > OAuth & Permissions > Redirect URLs
+            install_path: The endpoint to start an OAuth flow (Default: `/slack/install`)
+            install_page_rendering_enabled: Renders a web page for install_path access if True
+            redirect_uri_path: The path of Redirect URL (Default: `/slack/oauth_redirect`)
+            callback_options: Give success/failure functions f you want to customize callback functions.
+            success_url: Set a complete URL if you want to redirect end-users when an installation completes.
+            failure_url: Set a complete URL if you want to redirect end-users when an installation fails.
+            authorization_url: Set a URL if you want to customize the URL `https://slack.com/oauth/v2/authorize`
+            installation_store: Specify the instance of `InstallationStore` (Default: `FileInstallationStore`)
+            installation_store_bot_only: Use `InstallationStore#find_bot()` if True (Default: False)
+            state_store: Specify the instance of `InstallationStore` (Default: `FileOAuthStateStore`)
+            state_cookie_name: The cookie name that is set for installers' browser. (Default: "slack-app-oauth-state")
+            state_expiration_seconds: The seconds that the state value is alive (Default: 600 seconds)
+            logger: The logger that will be used internally
         """
         self.client_id = client_id or os.environ.get("SLACK_CLIENT_ID")
         self.client_secret = client_secret or os.environ.get(

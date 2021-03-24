@@ -10,6 +10,7 @@ from slack_bolt.workflows.step.async_step import AsyncWorkflowStep
 
 
 class AsyncWorkflowStepMiddleware(AsyncMiddleware):  # type:ignore
+    """Base middleware for workflow step specific ones"""
     def __init__(self, step: AsyncWorkflowStep, listener_runner: AsyncioListenerRunner):
         self.step = step
         self.listener_runner = listener_runner

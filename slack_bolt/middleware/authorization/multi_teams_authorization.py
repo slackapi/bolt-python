@@ -25,7 +25,8 @@ class MultiTeamsAuthorization(Authorization):
     ):
         """Multi-workspace authorization.
 
-        :param authorize: The function to authorize incoming requests from Slack.
+        Args:
+            authorize: The function to authorize incoming requests from Slack.
         """
         self.authorize = authorize
         self.logger = get_bolt_logger(MultiTeamsAuthorization)
