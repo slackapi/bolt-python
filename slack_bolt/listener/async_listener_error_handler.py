@@ -28,10 +28,10 @@ class AsyncListenerErrorHandler(metaclass=ABCMeta):
     ) -> None:
         """Handles an unhandled exception.
 
-        :param error: The raised exception.
-        :param request: The request.
-        :param response: The response.
-        :return: None
+        Args:
+            error: The raised exception.
+            request: The request.
+            response: The response.
         """
         raise NotImplementedError()
 

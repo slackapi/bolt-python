@@ -109,6 +109,12 @@ $ ngrok http 3000 --subdomain {your-domain}
 
 ### Releasing
 
+#### Generate API documents
+
+```bash
+./scripts/generate_api_docs.sh
+```
+
 #### test.pypi.org deployment
 
 ##### $HOME/.pypirc

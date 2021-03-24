@@ -21,10 +21,11 @@ class AsyncSuccessArgs:
     ):
         """The arguments for a success function.
 
-        :param request: The request.
-        :param installation: The installation data.
-        :param settings: The settings for OAuth flow.
-        :param default: The default AsyncCallbackOptions.
+        Args:
+            request: The request.
+            installation: The installation data.
+            settings: The settings for Slack OAuth flow.
+            default: The default `AsyncCallbackOptions`.
         """
         self.request = request
         self.installation = installation
@@ -45,12 +46,13 @@ class AsyncFailureArgs:
     ):
         """The arguments for a failure function.
 
-        :param request: The request.
-        :param reason: The response.
-        :param error: An exception if exists.
-        :param suggested_status_code: The recommended HTTP status code for the failure.
-        :param settings: The settings for OAuth flow.
-        :param default: The default AsyncCallbackOptions.
+        Args:
+            request: The request.
+            reason: The response.
+            error: An exception if exists.
+            suggested_status_code: The recommended HTTP status code for the failure.
+            settings: The settings for Slack OAuth flow.
+            default: The default `AsyncCallbackOptions`.
         """
         self.request = request
         self.reason = reason

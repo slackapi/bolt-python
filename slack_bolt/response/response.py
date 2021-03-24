@@ -17,9 +17,10 @@ class BoltResponse:
     ):
         """The response from a Bolt app.
 
-        :param status: HTTP status code
-        :param body: The response body  (plain text response is supported)
-        :param headers: The response headers.
+        Args:
+            status: HTTP status code
+            body: The response body (dict and str are supported)
+            headers: The response headers.
         """
         self.status: int = status
         self.body: str = json.dumps(body) if isinstance(body, dict) else body

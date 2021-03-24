@@ -4,6 +4,8 @@ from slack_sdk.web import SlackResponse
 
 
 class AuthorizeResult(dict):
+    """Authorize function call result"""
+
     enterprise_id: Optional[str]
     team_id: Optional[str]
     bot_id: Optional[str]
@@ -25,15 +27,15 @@ class AuthorizeResult(dict):
         user_id: Optional[str] = None,
         user_token: Optional[str] = None,
     ):
-        """The `auth.test` API result for an incoming request.
-
-        :param enterprise_id: Organization ID (Enterprise Grid)
-        :param team_id: Workspace ID
-        :param bot_user_id: Bot user's User ID
-        :param bot_id: Bot ID
-        :param bot_token: Bot user access token starting with xoxb-
-        :param user_id: The request user ID
-        :param user_token: User access token starting with xoxp-
+        """
+        Args:
+            enterprise_id: Organization ID (Enterprise Grid) starting with `E`
+            team_id: Workspace ID starting with `T`
+            bot_user_id: Bot user's User ID starting with either `U` or `W`
+            bot_id: Bot ID starting with `B`
+            bot_token: Bot user access token starting with `xoxb-`
+            user_id: The request user ID
+            user_token: User access token starting with `xoxp-`
         """
         self["enterprise_id"] = self.enterprise_id = enterprise_id
         self["team_id"] = self.team_id = team_id

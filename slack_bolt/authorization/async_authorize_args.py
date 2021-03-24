@@ -22,12 +22,13 @@ class AsyncAuthorizeArgs:
         team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
     ):
-        """The whole arguments that are passed to Authorize functions.
+        """The full list of the arguments passed to `authorize` function.
 
-        :param context: The request context
-        :param enterprise_id: The Organization ID (Enterprise Grid)
-        :param team_id: The workspace ID
-        :param user_id: The request user ID
+        Args:
+            context: The request context
+            enterprise_id: The Organization ID (Enterprise Grid)
+            team_id: The workspace ID
+            user_id: The request user ID
         """
         self.context = context
         self.logger = context.logger

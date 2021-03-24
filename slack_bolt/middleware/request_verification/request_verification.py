@@ -11,9 +11,12 @@ from slack_bolt.response import BoltResponse
 class RequestVerification(Middleware):  # type: ignore
     def __init__(self, signing_secret: str):
         """Verifies an incoming request by checking the validity of
-        x-slack-signature, x-slack-request-timestamp, and its body data.
+        `x-slack-signature`, `x-slack-request-timestamp`, and its body data.
 
-        :param signing_secret: The signing secret.
+        Refer to https://api.slack.com/authentication/verifying-requests-from-slack for details.
+
+        Args:
+            signing_secret: The signing secret
         """
         self.verifier = SignatureVerifier(signing_secret=signing_secret)
         self.logger = get_bolt_logger(RequestVerification)

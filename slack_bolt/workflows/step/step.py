@@ -21,6 +21,9 @@ from slack_sdk.web import WebClient
 
 
 class WorkflowStepBuilder:
+    """Steps from Apps
+    Refer to https://api.slack.com/workflows/steps for details.
+    """
     callback_id: Union[str, Pattern]
     _edit: Optional[Listener]
     _save: Optional[Listener]
@@ -32,19 +35,26 @@ class WorkflowStepBuilder:
         app_name: Optional[str] = None,
     ):
         """This builder is supposed to be used as decorator.
-        my_step = WorkflowStep.builder("my_step")
-        @my_step.edit
-        def edit_my_step(ack, configure):
-            pass
-        @my_step.save
-        def save_my_step(ack, step, update):
-            pass
-        @my_step.execute
-        def execute_my_step(step, complete, fail):
-            pass
-        app.step(my_step)
-        :param callback_id: the callback_id for the workflow
-        :param app_name: the application name mainly for logging
+
+            my_step = WorkflowStep.builder("my_step")
+            @my_step.edit
+            def edit_my_step(ack, configure):
+                pass
+            @my_step.save
+            def save_my_step(ack, step, update):
+                pass
+            @my_step.execute
+            def execute_my_step(step, complete, fail):
+                pass
+            app.step(my_step)
+
+        For further information about WorkflowStep specific function arguments
+        such as `configure`, `update`, `complete`, and `fail`,
+        refer to `slack_bolt.workflows.step.utilities` API documents.
+
+        Args:
+            callback_id: The callback_id for the workflow
+            app_name: The application name mainly for logging
         """
         self.callback_id = callback_id
         self.app_name = app_name or __name__
@@ -59,15 +69,28 @@ class WorkflowStepBuilder:
         middleware: Optional[Union[Callable, Middleware]] = None,
         lazy: Optional[List[Callable[..., None]]] = None,
     ):
-        """Register a new edit listener with details.
+        """Registers a new edit listener with details.
         You can use this method as decorator as well.
-        @my_step.edit
-        def edit_my_step(ack, configure):
-            pass
+
+            @my_step.edit
+            def edit_my_step(ack, configure):
+                pass
+
         It's also possible to add additional listener matchers and/or middleware
-        @my_step.edit(matchers=[is_valid], middleware=[update_context])
-        def edit_my_step(ack, configure):
-            pass
+
+            @my_step.edit(matchers=[is_valid], middleware=[update_context])
+            def edit_my_step(ack, configure):
+                pass
+
+        For further information about WorkflowStep specific function arguments
+        such as `configure`, `update`, `complete`, and `fail`,
+        refer to `slack_bolt.workflows.step.utilities` API documents.
+
+        Args:
+            *args: This method can behave as either decorator or a method
+            matchers: Listener matchers
+            middleware: Listener middleware
+            lazy: Lazy listeners
         """
 
         if _is_used_without_argument(args):
@@ -94,17 +117,29 @@ class WorkflowStepBuilder:
         middleware: Optional[Union[Callable, Middleware]] = None,
         lazy: Optional[List[Callable[..., None]]] = None,
     ):
-        """Register a new save listener with details.
+        """Registers a new save listener with details.
         You can use this method as decorator as well.
-        @my_step.save
-        def save_my_step(ack, step, update):
-            pass
-        It's also possible to add additional listener matchers and/or middleware
-        @my_step.save(matchers=[is_valid], middleware=[update_context])
-        def save_my_step(ack, step, update):
-            pass
-        """
 
+            @my_step.save
+            def save_my_step(ack, step, update):
+                pass
+
+        It's also possible to add additional listener matchers and/or middleware
+
+            @my_step.save(matchers=[is_valid], middleware=[update_context])
+            def save_my_step(ack, step, update):
+                pass
+
+        For further information about WorkflowStep specific function arguments
+        such as `configure`, `update`, `complete`, and `fail`,
+        refer to `slack_bolt.workflows.step.utilities` API documents.
+
+        Args:
+            *args: This method can behave as either decorator or a method
+            matchers: Listener matchers
+            middleware: Listener middleware
+            lazy: Lazy listeners
+        """
         if _is_used_without_argument(args):
             func = args[0]
             self._save = self._to_listener("save", func, matchers, middleware)
@@ -129,17 +164,29 @@ class WorkflowStepBuilder:
         middleware: Optional[Union[Callable, Middleware]] = None,
         lazy: Optional[List[Callable[..., None]]] = None,
     ):
-        """Register a new execute listener with details.
+        """Registers a new execute listener with details.
         You can use this method as decorator as well.
-        @my_step.execute
-        def execute_my_step(step, complete, fail):
-            pass
-        It's also possible to add additional listener matchers and/or middleware
-        @my_step.save(matchers=[is_valid], middleware=[update_context])
-        def execute_my_step(step, complete, fail):
-            pass
-        """
 
+            @my_step.execute
+            def execute_my_step(step, complete, fail):
+                pass
+
+        It's also possible to add additional listener matchers and/or middleware
+
+            @my_step.save(matchers=[is_valid], middleware=[update_context])
+            def execute_my_step(step, complete, fail):
+                pass
+
+        For further information about WorkflowStep specific function arguments
+        such as `configure`, `update`, `complete`, and `fail`,
+        refer to `slack_bolt.workflows.step.utilities` API documents.
+
+        Args:
+            *args: This method can behave as either decorator or a method
+            matchers: Listener matchers
+            middleware: Listener middleware
+            lazy: Lazy listeners
+        """
         if _is_used_without_argument(args):
             func = args[0]
             self._execute = self._to_listener("execute", func, matchers, middleware)
@@ -162,7 +209,9 @@ class WorkflowStepBuilder:
     def build(self) -> "WorkflowStep":
         """Constructs a WorkflowStep object. This method may raise an exception
         if the builder doesn't have enough configurations to build the object.
-        :return: WorkflowStep object
+
+        Returns:
+            WorkflowStep object
         """
         if self._edit is None:
             raise BoltError(f"edit listener is not registered")
@@ -231,9 +280,13 @@ class WorkflowStepBuilder:
 
 class WorkflowStep:
     callback_id: Union[str, Pattern]
+    """The Callback ID of the workflow step"""
     edit: Listener
+    """`edit` listener, which displays a modal in Workflow Builder"""
     save: Listener
+    """`save` listener, which accepts workflow creator's data submission in Workflow Builder"""
     execute: Listener
+    """`execute` listener, which processes workflow step execution"""
 
     def __init__(
         self,

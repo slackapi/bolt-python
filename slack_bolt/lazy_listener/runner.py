@@ -13,18 +13,18 @@ class LazyListenerRunner(metaclass=ABCMeta):
     def start(self, function: Callable[..., None], request: BoltRequest) -> None:
         """Starts a new lazy listener execution.
 
-        :param function: The function to run.
-        :param request: The request to pass to the function. The object must be thread-safe.
-        :return: None
+        Args:
+            function: The function to run.
+            request: The request to pass to the function. The object must be thread-safe.
         """
         raise NotImplementedError()
 
     def run(self, function: Callable[..., None], request: BoltRequest) -> None:
-        """Synchronously run the function with a given request data.
+        """Synchronously runs the function with a given request data.
 
-        :param function: The function to run.
-        :param request: The request to pass to the function. The object must be thread-safe.
-        :return: None
+        Args:
+            function: The function to run.
+            request: The request to pass to the function. The object must be thread-safe.
         """
         build_runnable_function(
             func=function,

@@ -8,11 +8,12 @@ from slack_bolt.response import BoltResponse
 
 class SslCheck(Middleware):  # type: ignore
     def __init__(self, verification_token: str = None):
-        """Handles ssl_check requests.
-
+        """Handles `ssl_check` requests.
         Refer to https://api.slack.com/interactivity/slash-commands for details.
-        :param verification_token: The verification token to check
-            (optional as it's already deprecated - https://api.slack.com/authentication/verifying-requests-from-slack#verification_token_deprecation)
+
+        Args:
+            verification_token: The verification token to check
+                (optional as it's already deprecated - https://api.slack.com/authentication/verifying-requests-from-slack#verification_token_deprecation)
         """
         self.verification_token = verification_token
         self.logger = get_bolt_logger(SslCheck)

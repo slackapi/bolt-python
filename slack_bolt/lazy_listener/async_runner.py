@@ -15,9 +15,9 @@ class AsyncLazyListenerRunner(metaclass=ABCMeta):
     ) -> None:
         """Starts a new lazy listener execution.
 
-        :param function: The function to run.
-        :param request: The request to pass to the function. The object must be thread-safe.
-        :return: None
+        Args:
+            function: The function to run.
+            request: The request to pass to the function. The object must be thread-safe.
         """
         raise NotImplementedError()
 
@@ -26,9 +26,9 @@ class AsyncLazyListenerRunner(metaclass=ABCMeta):
     ) -> None:
         """Synchronously run the function with a given request data.
 
-        :param function: The function to run.
-        :param request: The request to pass to the function. The object must be thread-safe.
-        :return: None
+        Args:
+            function: The function to run.
+            request: The request to pass to the function. The object must be thread-safe.
         """
         func = to_runnable_function(
             internal_func=function,

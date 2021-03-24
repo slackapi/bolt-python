@@ -106,23 +106,46 @@ class AsyncApp:
         # No need to set (the value is used only in response to ssl_check requests)
         verification_token: Optional[str] = None,
     ):
-        """Bolt App that provides functionalities to register middleware/listeners
+        """Bolt App that provides functionalities to register middleware/listeners.
 
-        :param name: The application name that will be used in logging.
-            If absent, the source file name will be used instead.
-        :param process_before_response: True if this app runs on Function as a Service. (Default: False)
-        :param signing_secret: The Signing Secret value used for verifying requests from Slack.
-        :param token: The bot access token required only for single-workspace app.
-        :param client: The singleton slack_sdk.web.async_client.AsyncWebClient instance for this app.
-        :param installation_store: The module offering save/find operations of installation data
-        :param installation_store_bot_only: Use InstallationStore#find_bot if True (Default: False)
-        :param authorize: The function to authorize an incoming request from Slack
-            by checking if there is a team/user in the installation data.
-        :param oauth_settings: The settings related to Slack app installation flow (OAuth flow)
-        :param oauth_flow: Manually instantiated slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow.
-            This is always prioritized over oauth_settings.
-        :param verification_token: Deprecated verification mechanism.
-            This can used only for ssl_check requests.
+            import os
+            from slack_bolt.async_app import AsyncApp
+
+            # Initializes your app with your bot token and signing secret
+            app = AsyncApp(
+                token=os.environ.get("SLACK_BOT_TOKEN"),
+                signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+            )
+
+            # Listens to incoming messages that contain "hello"
+            @app.message("hello")
+            async def message_hello(message, say):  # async function
+                # say() sends a message to the channel where the event was triggered
+                await say(f"Hey there <@{message['user']}>!")
+
+            # Start your app
+            if __name__ == "__main__":
+                app.start(port=int(os.environ.get("PORT", 3000)))
+
+        Refer to https://slack.dev/bolt-python/concepts#async for details.
+
+        If yoy would like to build an OAuth app for enabling the app to run with multiple workspaces,
+        refer to https://slack.dev/bolt-python/concepts#authenticating-oauth to learn how to configure the app.
+
+        Args:
+            logger: The custom logger that can be used in this app.
+            name: The application name that will be used in logging. If absent, the source file name will be used.
+            process_before_response: True if this app runs on Function as a Service. (Default: False)
+            signing_secret: The Signing Secret value used for verifying requests from Slack.
+            token: The bot/user access token required only for single-workspace app.
+            client: The singleton `slack_sdk.web.async_client.AsyncWebClient` instance for this app.
+            authorize: The function to authorize an incoming request from Slack
+                by checking if there is a team/user in the installation data.
+            installation_store: The module offering save/find operations of installation data
+            installation_store_bot_only: Use `AsyncInstallationStore#async_find_bot()` if True (Default: False)
+            oauth_settings: The settings related to Slack app installation flow (OAuth flow)
+            oauth_flow: Instantiated `slack_bolt.oauth.AsyncOAuthFlow`. This is always prioritized over oauth_settings.
+            verification_token: Deprecated verification mechanism. This can used only for ssl_check requests.
         """
         signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET")
         token = token or os.environ.get("SLACK_BOT_TOKEN")
@@ -304,26 +327,32 @@ class AsyncApp:
 
     @property
     def name(self) -> str:
+        """The name of this app (default: the filename)"""
         return self._name
 
     @property
     def oauth_flow(self) -> Optional[AsyncOAuthFlow]:
+        """Configured `OAuthFlow` object if exists."""
         return self._async_oauth_flow
 
     @property
     def client(self) -> AsyncWebClient:
+        """The singleton `slack_sdk.web.async_client.AsyncWebClient` instance in this app."""
         return self._async_client
 
     @property
     def logger(self) -> logging.Logger:
+        """The logger this app uses."""
         return self._framework_logger
 
     @property
     def installation_store(self) -> Optional[AsyncInstallationStore]:
+        """The `slack_sdk.oauth.AsyncInstallationStore` that can be used in the `authorize` middleware."""
         return self._async_installation_store
 
     @property
     def listener_runner(self) -> AsyncioListenerRunner:
+        """The asyncio-based executor for asynchronously running listeners."""
         return self._async_listener_runner
 
     # -------------------------
@@ -335,10 +364,11 @@ class AsyncApp:
         self, port: int = 3000, path: str = "/slack/events"
     ) -> AsyncSlackAppServer:
         """Configure a web server using AIOHTTP.
+        Refer to https://docs.aiohttp.org/ for more details about AIOHTTP.
 
-        :param port: The port to listen on (Default: 3000)
-        :param path: The path to handle request from Slack (Default: /slack/events)
-        :return: None
+        Args:
+            port: The port to listen on (Default: 3000)
+            path:The path to handle request from Slack (Default: `/slack/events`)
         """
         if (
             self._server is None
@@ -353,14 +383,33 @@ class AsyncApp:
         return self._server
 
     def web_app(self, path: str = "/slack/events") -> web.Application:
+        """Returns a `web.Application` instance for aiohttp-devtools users.
+
+            from slack_bolt.async_app import AsyncApp
+            app = AsyncApp()
+
+            @app.event("app_mention")
+            async def event_test(body, say, logger):
+                logger.info(body)
+                await say("What's up?")
+
+            def app_factory():
+                return app.web_app()
+
+            # adev runserver --port 3000 --app-factory app_factory async_app.py
+
+        Args:
+            path: The path to receive incoming requests from Slack
+        """
         return self.server(path=path).web_app
 
     def start(self, port: int = 3000, path: str = "/slack/events") -> None:
         """Start a web server using AIOHTTP.
+        Refer to https://docs.aiohttp.org/ for more details about AIOHTTP.
 
-        :param port: The port to listen on (Default: 3000)
-        :param path: The path to handle request from Slack (Default: /slack/events)
-        :return: None
+        Args:
+            port: The port to listen on (Default: 3000)
+            path:The path to handle request from Slack (Default: `/slack/events`)
         """
         self.server(port=port, path=path).start()
 
@@ -370,8 +419,11 @@ class AsyncApp:
     async def async_dispatch(self, req: AsyncBoltRequest) -> BoltResponse:
         """Applies all middleware and dispatches an incoming request from Slack to the right code path.
 
-        :param req: An incoming request from Slack.
-        :return: The response generated by this Bolt app.
+        Args:
+            req: An incoming request from Slack.
+
+        Returns:
+            The response generated by this Bolt app.
         """
         starting_time = time.time()
         self._init_context(req)
@@ -442,14 +494,26 @@ class AsyncApp:
     # middleware
 
     def use(self, *args) -> Optional[Callable]:
-        """Refer to middleware method's docstring for details."""
+        """Refer to `AsyncApp#middleware()` method's docstring for details."""
         return self.middleware(*args)
 
     def middleware(self, *args) -> Optional[Callable]:
-        """Registers a new middleware to this Bolt app.
+        """Registers a new middleware to this app.
+        This method can be used as either a decorator or a method.
 
-        :param args: a list of middleware. Passing a single middleware is supported.
-        :return: None
+            # Use this method as a decorator
+            @app.middleware
+            async def middleware_func(logger, body, next):
+                logger.info(f"request body: {body}")
+                await next()
+
+            # Pass a function to this method
+            app.middleware(middleware_func)
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
+
+        Args:
+            *args: A function that works as a global middleware.
         """
         if len(args) > 0:
             middleware_or_callable = args[0]
@@ -490,9 +554,34 @@ class AsyncApp:
             ]
         ] = None,
     ):
-        """Registers a new Workflow Step listener
-        Unlike others, this method doesn't behave as a decorator. If you want to register a workflow step
-        by a decorator, use AsyncWorkflowStepBuilder's methods.
+        """
+        Registers a new Workflow Step listener.
+        Unlike others, this method doesn't behave as a decorator.
+        If you want to register a workflow step by a decorator, use `AsyncWorkflowStepBuilder`'s methods.
+
+            # Create a new WorkflowStep instance
+            from slack_bolt.workflows.async_step import AsyncWorkflowStep
+            ws = AsyncWorkflowStep(
+                callback_id="add_task",
+                edit=edit,
+                save=save,
+                execute=execute,
+            )
+            # Pass Step to set up listeners
+            app.step(ws)
+
+        Refer to https://api.slack.com/workflows/steps for details of Steps from Apps.
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
+        For further information about AsyncWorkflowStep specific function arguments
+        such as `configure`, `update`, `complete`, and `fail`,
+        refer to the `async` prefixed ones in `slack_bolt.workflows.step.utilities` API documents.
+
+        Args:
+            callback_id: The Callback ID for this workflow step
+            edit: The function for displaying a modal in the Workflow Builder
+            save: The function for handling configuration in the Workflow Builder
+            execute: The function for handling the step execution
         """
         step = callback_id
         if isinstance(callback_id, (str, Pattern)):
@@ -515,11 +604,22 @@ class AsyncApp:
     def error(
         self, func: Callable[..., Awaitable[None]]
     ) -> Callable[..., Awaitable[None]]:
-        """Updates the global error handler.
+        """Updates the global error handler. This method can be used as either a decorator or a method.
 
-        :param func: The function that is supposed to be executed
-            when getting an unhandled error in Bolt app.
-        :return: None
+            # Use this method as a decorator
+            @app.error
+            async def custom_error_handler(error, body, logger):
+                logger.exception(f"Error: {error}")
+                logger.info(f"Request body: {body}")
+
+            # Pass a function to this method
+            app.error(custom_error_handler)
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
+
+        Args:
+            func: The function that is supposed to be executed
+                when getting an unhandled error in Bolt app.
         """
         self._async_listener_runner.listener_error_handler = (
             AsyncCustomListenerErrorHandler(
@@ -540,12 +640,30 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
-        """Registers a new event listener.
+        """Registers a new event listener. This method can be used as either a decorator or a method.
 
-        :param event: The conditions to match against a request payload
-        :param matchers: A list of listener matcher functions.
-        :param middleware: A list of lister middleware functions.
-        :return: None
+            # Use this method as a decorator
+            @app.event("team_join")
+            async def ask_for_introduction(event, say):
+                welcome_channel_id = "C12345"
+                user_id = event["user"]
+                text = f"Welcome to the team, <@{user_id}>! :tada: You can introduce yourself in this channel."
+                await say(text=text, channel=welcome_channel_id)
+
+            # Pass a function to this method
+            app.event("team_join")(ask_for_introduction)
+
+        Refer to https://api.slack.com/apis/connections/events-api for details of Events API.
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
+
+        Args:
+            event: The conditions that match a request payload.
+                If you pass a dict for this, you can have type, subtype in the constraint.
+            matchers: A list of listener matcher functions.
+                Only when all the matchers return True, the listener function can be invoked.
+            middleware: A list of lister middleware functions.
+                Only when all the middleware call `next()` method, the listener function can be invoked.
         """
 
         def __call__(*args, **kwargs):
@@ -563,7 +681,29 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
-        """Register a new message event listener."""
+        """Registers a new message event listener. This method can be used as either a decorator or a method.
+        Check the `App#event` method's docstring for details.
+
+            # Use this method as a decorator
+            @app.message(":wave:")
+            async def say_hello(message, say):
+                user = message['user']
+                await say(f"Hi there, <@{user}>!")
+
+            # Pass a function to this method
+            app.message(":wave:")(say_hello)
+
+        Refer to https://api.slack.com/events/message for details of `message` events.
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
+
+        Args:
+            keyword: The keyword to match
+            matchers: A list of listener matcher functions.
+                Only when all the matchers return True, the listener function can be invoked.
+            middleware: A list of lister middleware functions.
+                Only when all the middleware call `next()` method, the listener function can be invoked.
+        """
         matchers = list(matchers) if matchers else []
         middleware = list(middleware) if middleware else []
 
@@ -592,11 +732,28 @@ class AsyncApp:
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new slash command listener.
+        This method can be used as either a decorator or a method.
 
-        :param command: The conditions to match against a request payload
-        :param matchers: A list of listener matcher functions.
-        :param middleware: A list of lister middleware functions.
-        :return: None
+            # Use this method as a decorator
+            @app.command("/echo")
+            async def repeat_text(ack, say, command):
+                # Acknowledge command request
+                await ack()
+                await say(f"{command['text']}")
+
+            # Pass a function to this method
+            app.command("/echo")(repeat_text)
+
+        Refer to https://api.slack.com/interactivity/slash-commands for details of Slash Commands.
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
+
+        Args:
+            command: The conditions that match a request payload
+            matchers: A list of listener matcher functions.
+                Only when all the matchers return True, the listener function can be invoked.
+            middleware: A list of lister middleware functions.
+                Only when all the middleware call `next()` method, the listener function can be invoked.
         """
 
         def __call__(*args, **kwargs):
@@ -618,11 +775,34 @@ class AsyncApp:
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new shortcut listener.
+        This method can be used as either a decorator or a method.
 
-        :param constraints: The conditions to match against a request payload
-        :param matchers: A list of listener matcher functions.
-        :param middleware: A list of lister middleware functions.
-        :return: None
+            # Use this method as a decorator
+            @app.shortcut("open_modal")
+            async def open_modal(ack, body, client):
+                # Acknowledge the command request
+                await ack()
+                # Call views_open with the built-in client
+                await client.views_open(
+                    # Pass a valid trigger_id within 3 seconds of receiving it
+                    trigger_id=body["trigger_id"],
+                    # View payload
+                    view={ ... }
+                )
+
+            # Pass a function to this method
+            app.shortcut("open_modal")(open_modal)
+
+        Refer to https://api.slack.com/interactivity/shortcuts for details about Shortcuts.
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
+
+        Args:
+            constraints: The conditions that match a request payload.
+            matchers: A list of listener matcher functions.
+                Only when all the matchers return True, the listener function can be invoked.
+            middleware: A list of lister middleware functions.
+                Only when all the middleware call `next()` method, the listener function can be invoked.
         """
 
         def __call__(*args, **kwargs):
@@ -677,12 +857,28 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
-        """Registers a new action listener.
+        """Registers a new action listener. This method can be used as either a decorator or a method.
 
-        :param constraints: The conditions to match against a request payload
-        :param matchers: A list of listener matcher functions.
-        :param middleware: A list of lister middleware functions.
-        :return: None
+            # Use this method as a decorator
+            @app.action("approve_button")
+            async def update_message(ack):
+                await ack()
+
+            # Pass a function to this method
+            app.action("approve_button")(update_message)
+
+        * Refer to https://api.slack.com/reference/interaction-payloads/block-actions for actions in `blocks`.
+        * Refer to https://api.slack.com/legacy/message-buttons for actions in `attachments`.
+        * Refer to https://api.slack.com/dialogs for actions in dialogs.
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
+
+        Args:
+            constraints: The conditions that match a request payload
+            matchers: A list of listener matcher functions.
+                Only when all the matchers return True, the listener function can be invoked.
+            middleware: A list of lister middleware functions.
+                Only when all the middleware call `next()` method, the listener function can be invoked.
         """
 
         def __call__(*args, **kwargs):
@@ -700,7 +896,9 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
-        """Registers a new block_actions listener."""
+        """Registers a new `block_actions` action listener.
+        Refer to https://api.slack.com/reference/interaction-payloads/block-actions for details.
+        """
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -717,7 +915,8 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
-        """Registers a new interactive_message listener."""
+        """Registers a new `interactive_message` action listener.
+        Refer to https://api.slack.com/legacy/message-buttons for details."""
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -734,7 +933,8 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
-        """Registers a new dialog_submission listener."""
+        """Registers a new `dialog_submission` listener.
+        Refer to https://api.slack.com/dialogs for details."""
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -751,7 +951,8 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
-        """Registers a new dialog_cancellation listener."""
+        """Registers a new `dialog_submission` listener.
+        Refer to https://api.slack.com/dialogs for details."""
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -771,12 +972,39 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
-        """Registers a new view submission/closed listener.
+        """Registers a new `view_submission`/`view_closed` event listener.
+        This method can be used as either a decorator or a method.
 
-        :param constraints: The conditions to match against a request payload
-        :param matchers: A list of listener matcher functions.
-        :param middleware: A list of lister middleware functions.
-        :return: None
+            # Use this method as a decorator
+            @app.view("view_1")
+            async def handle_submission(ack, body, client, view):
+                # Assume there's an input block with `block_c` as the block_id and `dreamy_input`
+                hopes_and_dreams = view["state"]["values"]["block_c"]["dreamy_input"]
+                user = body["user"]["id"]
+                # Validate the inputs
+                errors = {}
+                if hopes_and_dreams is not None and len(hopes_and_dreams) <= 5:
+                    errors["block_c"] = "The value must be longer than 5 characters"
+                if len(errors) > 0:
+                    await ack(response_action="errors", errors=errors)
+                    return
+                # Acknowledge the view_submission event and close the modal
+                await ack()
+                # Do whatever you want with the input data - here we're saving it to a DB
+
+            # Pass a function to this method
+            app.view("view_1")(handle_submission)
+
+        Refer to https://api.slack.com/reference/interaction-payloads/views for details of payloads.
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
+
+        Args:
+            constraints: The conditions that match a request payload
+            matchers: A list of listener matcher functions.
+                Only when all the matchers return True, the listener function can be invoked.
+            middleware: A list of lister middleware functions.
+                Only when all the middleware call `next()` method, the listener function can be invoked.
         """
 
         def __call__(*args, **kwargs):
@@ -794,7 +1022,8 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
-        """Registers a new view_submission listener."""
+        """Registers a new `view_submission` listener.
+        Refer to https://api.slack.com/reference/interaction-payloads/views#view_submission for details."""
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -811,7 +1040,8 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
-        """Registers a new view_closed listener."""
+        """Registers a new `view_closed` listener.
+        Refer to https://api.slack.com/reference/interaction-payloads/views#view_closed for details."""
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -832,11 +1062,38 @@ class AsyncApp:
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         """Registers a new options listener.
+        This method can be used as either a decorator or a method.
 
-        :param constraints: The conditions to match against a request payload
-        :param matchers: A list of listener matcher functions.
-        :param middleware: A list of lister middleware functions.
-        :return: None
+            # Use this method as a decorator
+            @app.options("menu_selection")
+            async def show_menu_options(ack):
+                options = [
+                    {
+                        "text": {"type": "plain_text", "text": "Option 1"},
+                        "value": "1-1",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Option 2"},
+                        "value": "1-2",
+                    },
+                ]
+                await ack(options=options)
+
+            # Pass a function to this method
+            app.options("menu_selection")(show_menu_options)
+
+        Refer to the following documents for details:
+
+        * https://api.slack.com/reference/block-kit/block-elements#external_select
+        * https://api.slack.com/reference/block-kit/block-elements#external_multi_select
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
+
+        Args:
+            matchers: A list of listener matcher functions.
+                Only when all the matchers return True, the listener function can be invoked.
+            middleware: A list of lister middleware functions.
+                Only when all the middleware call `next()` method, the listener function can be invoked.
         """
 
         def __call__(*args, **kwargs):
@@ -854,7 +1111,7 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
-        """Registers a new block_suggestion listener."""
+        """Registers a new `block_suggestion` listener."""
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -871,7 +1128,8 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
-        """Registers a new dialog_submission listener."""
+        """Registers a new `dialog_suggestion` listener.
+        Refer to https://api.slack.com/dialogs for details."""
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)

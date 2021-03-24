@@ -19,7 +19,8 @@ class SingleTeamAuthorization(Authorization):
     def __init__(self, *, auth_test_result: Optional[SlackResponse] = None):
         """Single-workspace authorization.
 
-        :param auth_test_result: The initial `auth.test` API call result.
+        Args:
+            auth_test_result: The initial `auth.test` API call result.
         """
         self.auth_test_result = auth_test_result
         self.logger = get_bolt_logger(SingleTeamAuthorization)

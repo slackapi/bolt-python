@@ -19,10 +19,13 @@ class AsyncSlackAppServer:
         path: str,
         app: "AsyncApp",  # type:ignore
     ):
-        """Standalone AIOHTTP Web Server
+        """Standalone AIOHTTP Web Server.
+        Refer to https://docs.aiohttp.org/en/stable/web.html for details of AIOHTTP.
 
-        Refer to AIOHTTP documents for details.
-        https://docs.aiohttp.org/en/stable/web.html
+        Args:
+            port: The port to listen on
+            path: The path to receive incoming requests from Slack
+            app: The `AsyncApp` instance that is used for processing requests
         """
         self.port = port
         self.path = path
@@ -70,10 +73,7 @@ class AsyncSlackAppServer:
         return await to_aiohttp_response(bolt_resp)
 
     def start(self) -> None:
-        """Starts a new web server process.
-
-        :return: None
-        """
+        """Starts a new web server process."""
         if self.bolt_app.logger.level > logging.INFO:
             print(get_boot_message())
         else:

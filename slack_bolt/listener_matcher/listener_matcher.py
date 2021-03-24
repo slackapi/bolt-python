@@ -9,8 +9,11 @@ class ListenerMatcher(metaclass=ABCMeta):
     def matches(self, req: BoltRequest, resp: BoltResponse) -> bool:
         """Matches against the request and returns True if matched.
 
-        :param req: The request
-        :param resp: The response
-        :return: True if matched.
+        Args:
+            req: The request
+            resp: The response
+
+        Returns:
+            True if matched.
         """
         raise NotImplementedError()
