@@ -1,6 +1,12 @@
 import logging
+import json
+from os import getenv
 
 from chalice.app import Request, Response, Chalice
+from chalice.config import Config
+from chalice.test import (
+    BaseClient, LambdaContext, InvokeResponse
+)
 
 from slack_bolt.adapter.aws_lambda.chalice_lazy_listener_runner import (
     ChaliceLazyListenerRunner,
@@ -13,14 +19,41 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
+class LocalLambdaClient(BaseClient):
+    """Lambda client implementing `invoke` for use when running with Chalice CLI"""
+    def __init__(self, app, config):
+        # type: (Chalice, Config) -> None
+        self._app = app
+        self._config = config
+
+    def invoke(self, FunctionName: str = None, InvocationType: str = "Event", Payload: str = None):
+        # type: (str, Any) -> InvokeResponse
+        if Payload is None:
+            Payload = '{}'
+        scoped = self._config.scope(self._config.chalice_stage, FunctionName)
+        lambda_context = LambdaContext(
+            FunctionName, memory_size=scoped.lambda_memory_size)
+
+        with self._patched_env_vars(scoped.environment_variables):
+            response = self._app(json.loads(Payload), lambda_context)
+        return InvokeResponse(payload=response)
+
+
 class ChaliceSlackRequestHandler:
     def __init__(self, app: App, chalice: Chalice):  # type: ignore
         self.app = app
         self.chalice = chalice
         self.logger = get_bolt_app_logger(app.name, ChaliceSlackRequestHandler)
+
+        lambda_client = None
+        if getenv('AWS_CHALICE_CLI_MODE') == 'true':
+            lambda_client = LocalLambdaClient(self.chalice, Config())
+
         self.app.listener_runner.lazy_listener_runner = ChaliceLazyListenerRunner(
-            logger=self.logger
+            logger=self.logger,
+            lambda_client=lambda_client
         )
+
         if self.app.oauth_flow is not None:
             self.app.oauth_flow.settings.redirect_uri_page_renderer.install_path = "?"
 
