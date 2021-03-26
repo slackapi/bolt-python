@@ -1,3 +1,4 @@
+"""Internal functions"""
 import json
 import logging
 from time import time

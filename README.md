@@ -5,7 +5,7 @@
 [![Build Status][build-image]][build-url]
 [![Codecov][codecov-image]][codecov-url]
 
-A Python framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://slack.dev/bolt-python/tutorial/getting-started) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt.
+A Python framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://slack.dev/bolt-python/tutorial/getting-started) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt. The Python module documents are available [here](https://slack.dev/bolt-python/api-docs/slack_bolt/).
 
 ## Setup
 
@@ -178,7 +178,7 @@ Apps can be run the same way as the syncronous example above. If you'd prefer an
 
 ## Getting Help
 
-[The documentation](https://slack.dev/bolt-python) has more information on basic and advanced concepts for Bolt for Python.
+[The documentation](https://slack.dev/bolt-python) has more information on basic and advanced concepts for Bolt for Python. Also, all the Python module documents of this library are available [here](https://slack.dev/bolt-python/api-docs/slack_bolt/).
 
 If you otherwise get stuck, we're here to help. The following are the best ways to get assistance working through your issue:
 
