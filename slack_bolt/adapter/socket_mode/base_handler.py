@@ -1,3 +1,6 @@
+"""The base class of Socket Mode client implementation.
+If you want to build asyncio-based ones, use `AsyncBaseSocketModeHandler` instead.
+"""
 import logging
 import signal
 import sys
@@ -15,18 +18,31 @@ class BaseSocketModeHandler:
     client: BaseSocketModeClient
 
     def handle(self, client: BaseSocketModeClient, req: SocketModeRequest) -> None:
+        """Handles Socket Mode envelope requests through a WebSocket connection.
+
+        Args:
+            client: this Socket Mode client instance
+            req: the request data
+        """
         raise NotImplementedError()
 
     def connect(self):
+        """Establishes a new connection with the Socket Mode server"""
         self.client.connect()
 
     def disconnect(self):
+        """Disconnects the current WebSocket connection with the Socket Mode server"""
         self.client.disconnect()
 
     def close(self):
+        """Disconnects from the Socket Mode server and cleans the resources this instance holds up"""
         self.client.close()
 
     def start(self):
+        """Establishes a new connection and then blocks the current thread
+        to prevent the termination of this process.
+        If you don't want to block the current thread, use `#connect()` method instead.
+        """
         self.connect()
         if self.app.logger.level > logging.INFO:
             print(get_boot_message())

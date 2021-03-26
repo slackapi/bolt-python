@@ -1,3 +1,4 @@
+"""[`aiohttp`](https://pypi.org/project/aiohttp/) based implementation / asyncio compatible"""
 import os
 from logging import Logger
 from time import time
@@ -32,6 +33,16 @@ class SocketModeHandler(AsyncBaseSocketModeHandler):
         proxy: Optional[str] = None,
         ping_interval: float = 10,
     ):
+        """Socket Mode adapter for Bolt apps
+
+        Args:
+            app: The Bolt app
+            app_token: App-level token starting with `xapp-`
+            logger: Custom logger
+            web_client: custom `slack_sdk.web.WebClient` instance
+            proxy: HTTP proxy URL
+            ping_interval: The ping-pong internal (seconds)
+        """
         self.app = app
         self.app_token = app_token or os.environ["SLACK_APP_TOKEN"]
         self.client = SocketModeClient(

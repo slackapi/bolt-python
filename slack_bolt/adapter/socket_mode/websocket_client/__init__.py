@@ -1,3 +1,4 @@
+"""[`websocket-client`](https://pypi.org/project/websocket-client/) based implementation"""
 import os
 from logging import Logger
 from time import time
@@ -32,6 +33,21 @@ class SocketModeHandler(BaseSocketModeHandler):
         proxy_type: Optional[str] = None,
         trace_enabled: bool = False,
     ):
+        """Socket Mode adapter for Bolt apps
+
+        Args:
+            app: The Bolt app
+            app_token: App-level token starting with `xapp-`
+            logger: Custom logger
+            web_client: custom `slack_sdk.web.WebClient` instance
+            ping_interval: The ping-pong internal (seconds)
+            concurrency: The size of the underlying thread pool
+            http_proxy_host: HTTP proxy host
+            http_proxy_port: HTTP proxy port
+            http_proxy_auth: HTTP proxy authentication (username, password)
+            proxy_type: Proxy type
+            trace_enabled: True if trace-level logging is enabled
+        """
         self.app = app
         self.app_token = app_token or os.environ["SLACK_APP_TOKEN"]
         self.client = SocketModeClient(
