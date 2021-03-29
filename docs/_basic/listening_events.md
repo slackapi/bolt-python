@@ -14,7 +14,7 @@ The `event()` method requires an `eventType` of type `str`.
 </div>
 
 ```python
-# When a user joins the team, send a message in a predefined channel asking them to introduce themselves
+# When a user joins the workspace, send a message in a predefined channel asking them to introduce themselves
 @app.event("team_join")
 def ask_for_introduction(event, say):
     welcome_channel_id = "C12345"
@@ -37,7 +37,7 @@ You can filter on subtypes of events by passing in the additional key `subtype`.
 </div>
 
 ```python
-# Matches all messages from bot users
+# Matches all modified messages
 @app.event({
     "type": "message",
     "subtype": "message_changed"
