@@ -15,7 +15,7 @@ You’ll notice in all `action()` examples, `ack()` is used. It is required to c
 </div>
 
 ```python
-# Your middleware will be called every time an interactive component with the action_id "approve_button" is triggered
+# Your listener will be called every time a block element with the action_id "approve_button" is triggered
 @app.action("approve_button")
 def update_message(ack):
     ack()

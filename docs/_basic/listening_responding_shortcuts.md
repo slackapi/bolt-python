@@ -22,13 +22,12 @@ When setting up shortcuts within your app configuration, as with other URLs, you
 </div>
 
 ```python
-
 # The open_modal shortcut listens to a shortcut with the callback_id "open_modal"
 @app.shortcut("open_modal")
 def open_modal(ack, shortcut, client):
     # Acknowledge the shortcut request
     ack()
-    # Call the views_open method using one of the built-in WebClients
+    # Call the views_open method using the built-in WebClient
     client.views_open(
         trigger_id=shortcut["trigger_id"],
         # A simple view payload for a modal
@@ -68,8 +67,7 @@ def open_modal(ack, shortcut, client):
   </div>
 
 ```python
-
-# Your middleware will only be called when the callback_id matches 'open_modal' AND the type matches 'message_action'
+# Your listener will only be called when the callback_id matches 'open_modal' AND the type matches 'message_action'
 @app.shortcut({"callback_id": "open_modal", "type": "message_action"})
 def open_modal(ack, shortcut, client):
     # Acknowledge the shortcut request
