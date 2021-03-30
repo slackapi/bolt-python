@@ -43,7 +43,7 @@ Slack アプリで使用できるトークンには、ユーザートークン�
 
 左サイドバーの「**OAuth & Permissions**」をクリックし、「**Bot Token Scopes**」セクションまで下にスクロールします。「**Add an OAuth Scope**」をクリックします。
 
-ここでは「[`chat:write`](https://api.slack.com/scopes/chat:write)」というスコープのみを追加します。このスコープは、アプリが参加しているチャンネルにメッセージを投稿することを許可します。
+ここでは [`chat:write`](https://api.slack.com/scopes/chat:write) というスコープのみを追加します。このスコープは、アプリが参加しているチャンネルにメッセージを投稿することを許可します。
 
 OAuth & Permissions ページの一番上までスクロールし、「**Install App to Workspace**」をクリックします。Slack の OAuth 確認画面 が表示されます。この画面で開発用ワークスペースへのアプリのインストールを承認します。
 
@@ -173,7 +173,7 @@ app = App(
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
 )
 
-# 「hello」を含むメッセージをリッスンします
+# 'hello' を含むメッセージをリッスンします
 @app.message("hello")
 def message_hello(message, say):
     # イベントがトリガーされたチャンネルへ say() でメッセージを送信します
@@ -214,7 +214,7 @@ app = App(
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
 )
 
-# 「hello」を含むメッセージをリッスンします
+# 'hello' を含むメッセージをリッスンします
 @app.message("hello")
 def message_hello(message, say):
     # イベントがトリガーされたチャンネルへ say() でメッセージを送信します
@@ -238,9 +238,9 @@ if __name__ == "__main__":
     app.start(port=int(os.environ.get("PORT", 3000)))
 ```
 
-`say()` の中の値を、「`blocks`」という配列のオブジェクトに変えました。ブロックは Slack メッセージを構成するコンポーネントであり、テキストや画像、日付ピッカーなど、さまざまなタイプのブロックがあります。この例では、「accessory」に「button」を持たせた「section」のブロックを、アプリからの応答に含めています。「`blocks`」を使用する場合、「`text`」は通知やアクセシビリティのためのフォールバックとなります。
+`say()` の中の値を `blocks` という配列のオブジェクトに変えました。ブロックは Slack メッセージを構成するコンポーネントであり、テキストや画像、日付ピッカーなど、さまざまなタイプのブロックがあります。この例では `accessory` に `button` を持たせた「section」のブロックを、アプリからの応答に含めています。`blocks` を使用する場合、`text` は通知やアクセシビリティのためのフォールバックとなります。
 
-ボタンを含む「`accessory`」オブジェクトでは、「`action_id`」を指定していることがわかります。これは、ボタンを一意に示す識別子として機能します。これを使って、アプリをどのアクションに応答させるかを指定できます。
+ボタンを含む `accessory` オブジェクトでは、`action_id` を指定していることがわかります。これは、ボタンを一意に示す識別子として機能します。これを使って、アプリをどのアクションに応答させるかを指定できます。
 
 > 💡 [Block Kit Builder](https://app.slack.com/block-kit-builder) を使用すると、インタラクティブなメッセージのプロトタイプを簡単に作成できます。自分自身やチームメンバーがメッセージのモックアップを作成し、生成される JSON をアプリに直接貼りつけることができます。
 
@@ -258,7 +258,7 @@ app = App(
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
 )
 
-# 「hello」を含むメッセージをリッスンします
+# 'hello' を含むメッセージをリッスンします
 @app.message("hello")
 def message_hello(message, say):
     # イベントがトリガーされたチャンネルへ say() でメッセージを送信します
@@ -289,7 +289,7 @@ if __name__ == "__main__":
     app.start(port=int(os.environ.get("PORT", 3000)))
 ```
 
-`app.action()` を使って、先ほど命名した「`button_click`」という `action_id` をリッスンしています。アプリを再起動し、ボタンをクリックすると、アプリからの「clicked the button」というメッセージが新たに表示されるでしょう。
+`app.action()` を使って、先ほど命名した `button_click` という `action_id` をリッスンしています。アプリを再起動し、ボタンをクリックすると、アプリからの「clicked the button」というメッセージが新たに表示されるでしょう。
 
 ---
 
