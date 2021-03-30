@@ -28,10 +28,8 @@ class LocalLambdaClient(BaseClient):
         self,
         FunctionName: str = None,
         InvocationType: str = "Event",
-        Payload: str = None,
+        Payload: str = "{}",
     ) -> InvokeResponse:
-        if Payload is None:
-            Payload = "{}"
         scoped = self._config.scope(self._config.chalice_stage, FunctionName)
         lambda_context = LambdaContext(
             FunctionName, memory_size=scoped.lambda_memory_size
