@@ -9,7 +9,7 @@ order: 1
 
 To listen to messages that [your app has access to receive](https://api.slack.com/messaging/retrieving#permissions), you can use the `message()` method which filters out events that aren't of type `message`.
 
-`message()` accepts an argument of type `str` or `re.Pattern` object that filters out any messages that don’t match the pattern.
+`message()` accepts an argument of type `str` or `re.Pattern` object that filters out any messages that don't match the pattern.
 
 </div>
 

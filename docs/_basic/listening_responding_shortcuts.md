@@ -9,7 +9,7 @@ order: 8
 
 The `shortcut()` method supports both [global shortcuts](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts) and [message shortcuts](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts).
 
-Shortcuts are invokable entry points to apps. Global shortcuts are available from within search in Slack. Message shortcuts are available in the context menus of messages. Your app can use the `shortcut()` method to listen to incoming shortcut events. The method requires a `callback_id` parameter of type `str` or `re.Pattern`.
+Shortcuts are invokable entry points to apps. Global shortcuts are available from within search and text composer area in Slack. Message shortcuts are available in the context menus of messages. Your app can use the `shortcut()` method to listen to incoming shortcut events. The method requires a `callback_id` parameter of type `str` or `re.Pattern`.
 
 Shortcuts must be acknowledged with `ack()` to inform Slack that your app has received the event.
 
@@ -22,13 +22,12 @@ When setting up shortcuts within your app configuration, as with other URLs, you
 </div>
 
 ```python
-
 # The open_modal shortcut listens to a shortcut with the callback_id "open_modal"
 @app.shortcut("open_modal")
 def open_modal(ack, shortcut, client):
     # Acknowledge the shortcut request
     ack()
-    # Call the views_open method using one of the built-in WebClients
+    # Call the views_open method using the built-in WebClient
     client.views_open(
         trigger_id=shortcut["trigger_id"],
         # A simple view payload for a modal
@@ -68,8 +67,7 @@ def open_modal(ack, shortcut, client):
   </div>
 
 ```python
-
-# Your middleware will only be called when the callback_id matches 'open_modal' AND the type matches 'message_action'
+# Your listener will only be called when the callback_id matches 'open_modal' AND the type matches 'message_action'
 @app.shortcut({"callback_id": "open_modal", "type": "message_action"})
 def open_modal(ack, shortcut, client):
     # Acknowledge the shortcut request

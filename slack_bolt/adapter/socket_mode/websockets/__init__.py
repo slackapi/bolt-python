@@ -1,3 +1,4 @@
+"""[`websockets`](https://pypi.org/project/websockets/) based implementation  / asyncio compatible"""
 import os
 from logging import Logger
 from time import time
@@ -31,6 +32,19 @@ class SocketModeHandler(AsyncBaseSocketModeHandler):
         web_client: Optional[AsyncWebClient] = None,
         ping_interval: float = 10,
     ):
+        """Socket Mode adapter for Bolt apps.
+
+        Please note that this adapter does not support proxy configuration
+        as the underlying websockets module does not support proxy-wired connections.
+        If you use proxy, consider using one of the other Socket Mode adapters.
+
+        Args:
+            app: The Bolt app
+            app_token: App-level token starting with `xapp-`
+            logger: Custom logger
+            web_client: custom `slack_sdk.web.WebClient` instance
+            ping_interval: The ping-pong internal (seconds)
+        """
         self.app = app
         self.app_token = app_token or os.environ["SLACK_APP_TOKEN"]
         self.client = SocketModeClient(

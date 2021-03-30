@@ -14,7 +14,7 @@ The second way to respond to actions is using `respond()`, which is a utility to
 </div>
 
 ```python
-# Your middleware will be called every time an interactive component with the action_id “approve_button” is triggered
+# Your listener will be called every time an interactive component with the action_id “approve_button” is triggered
 @app.action("approve_button")
 def approve_request(ack, say):
     # Acknowledge action request

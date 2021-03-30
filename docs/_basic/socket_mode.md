@@ -40,11 +40,11 @@ if __name__ == "__main__":
 
 <details class="secondary-wrapper">
 <summary markdown="0">
-<h4 class="secondary-header">Using Async</h4>
+<h4 class="secondary-header">Using Async (asyncio)</h4>
 </summary>
 
 <div class="secondary-content" markdown="0">
-To use the asyncio-based adapters such as aiohttp, your app needs to be compatible with asyncio's async/await programming model. `AsyncSocketModeHandler` is available for running `AsyncApp` and its async middleware and listeners. 
+To use the asyncio-based adapters such as aiohttp, your whole app needs to be compatible with asyncio's async/await programming model. `AsyncSocketModeHandler` is available for running `AsyncApp` and its async middleware and listeners. 
 
 To learn how to use `AsyncApp`, checkout the [Using Async](https://slack.dev/bolt-python/concepts#async) document and relevant [examples](https://github.com/slackapi/bolt-python/tree/main/examples).
 </div>
