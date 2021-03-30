@@ -36,7 +36,7 @@ t:
     start: Getting started
     contribute: Contributing
   ja-jp:
-#    basic: 基本的な概念
+    basic: 基本的な概念
 #    steps: ワークフローステップ
 #    advanced: 応用コンセプト
     start: Bolt 入門ガイド

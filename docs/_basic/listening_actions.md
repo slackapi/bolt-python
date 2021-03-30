@@ -10,7 +10,7 @@ Your app can listen to user actions, like button clicks, and menu selects, using
 
 Actions can be filtered on an `action_id` of type `str` or `re.Pattern`. `action_id`s act as unique identifiers for interactive components on the Slack platform.
 
-You’ll notice in all `action()` examples, `ack()` is used. It is required to call the `ack()` function within an action listener to acknowledge that the event was received from Slack. This is discussed in the [acknowledging events section](#acknowledge).
+You'll notice in all `action()` examples, `ack()` is used. It is required to call the `ack()` function within an action listener to acknowledge that the event was received from Slack. This is discussed in the [acknowledging events section](#acknowledge).
 
 </div>
 
