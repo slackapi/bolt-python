@@ -1,12 +1,16 @@
 import json
+import os
 from time import time
 from typing import Dict, Any
 from urllib.parse import quote
+from unittest import mock
+import logging
 
 from chalice import Chalice, Response
 from chalice.app import Request
 from chalice.config import Config
 from chalice.local import LocalGateway
+from chalice.test import Client
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 
@@ -264,6 +268,67 @@ class TestAwsChalice:
         assert response.status_code == 200
         assert_auth_test_count(self, 1)
         assert self.mock_received_requests["/chat.postMessage"] == 1
+
+    def test_lazy_listeners_cli(self):
+        with mock.patch.dict(os.environ, {"AWS_CHALICE_CLI_MODE": "true"}):
+            assert os.environ.get("AWS_CHALICE_CLI_MODE") == "true"
+            app = App(
+                client=self.web_client,
+                signing_secret=self.signing_secret,
+                process_before_response=True
+            )
+
+            def command_handler(ack):
+                ack()
+
+            def say_it(say):
+                say("Done!")
+
+            app.command("/hello-world")(ack=command_handler, lazy=[say_it])
+
+            input = (
+                "token=verification_token"
+                "&team_id=T111"
+                "&team_domain=test-domain"
+                "&channel_id=C111"
+                "&channel_name=random"
+                "&user_id=W111"
+                "&user_name=primary-owner"
+                "&command=%2Fhello-world"
+                "&text=Hi"
+                "&enterprise_id=E111"
+                "&enterprise_name=Org+Name"
+                "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
+                "&trigger_id=111.111.xxx"
+            )
+            timestamp, body = str(int(time())), input
+
+            chalice_app = Chalice(app_name="bolt-python-chalice")
+            slack_handler = ChaliceSlackRequestHandler(app=app, chalice=chalice_app)
+
+            @chalice_app.route(
+                "/slack/events",
+                methods=["POST"],
+                content_types=["application/x-www-form-urlencoded", "application/json"],
+            )
+            def events() -> Response:
+                return slack_handler.handle(chalice_app.current_request)
+
+            headers = self.build_headers(timestamp, body)
+            client = Client(chalice_app, Config())
+            response = client.http.post("/slack/events", headers=headers, body=body)
+            #
+            # response: Dict[str, Any] = LocalGateway(chalice_app, Config()).handle_request(
+            #     method="POST",
+            #     path="/slack/events",
+            #     body=body,
+            #     headers=self.build_headers(timestamp, body),
+            # )
+
+            # assert response["statusCode"] == 200, f"error: {response['body']}"
+            assert response.status_code == 200, f"Failed request: {response.body}"
+            assert_auth_test_count(self, 1)
+            assert self.mock_received_requests["/chat.postMessage"] == 1
 
     def test_oauth(self):
         app = App(
