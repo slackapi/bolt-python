@@ -317,15 +317,7 @@ class TestAwsChalice:
             headers = self.build_headers(timestamp, body)
             client = Client(chalice_app, Config())
             response = client.http.post("/slack/events", headers=headers, body=body)
-            #
-            # response: Dict[str, Any] = LocalGateway(chalice_app, Config()).handle_request(
-            #     method="POST",
-            #     path="/slack/events",
-            #     body=body,
-            #     headers=self.build_headers(timestamp, body),
-            # )
 
-            # assert response["statusCode"] == 200, f"error: {response['body']}"
             assert response.status_code == 200, f"Failed request: {response.body}"
             assert_auth_test_count(self, 1)
             assert self.mock_received_requests["/chat.postMessage"] == 1
