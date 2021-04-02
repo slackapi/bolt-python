@@ -22,7 +22,7 @@ LOGGING = {
     },
     "root": {
         "handlers": ["console"],
-        "level": "INFO",
+        "level": "DEBUG",
     },
     "loggers": {
         "django": {
@@ -30,7 +30,7 @@ LOGGING = {
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
             "propagate": False,
         },
-        "django.db.backends": {
+        "django.db": {
             "level": "DEBUG",
         },
         "slack_bolt": {
@@ -105,10 +105,25 @@ WSGI_APPLICATION = "slackapp.wsgi.application"
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
+    # python manage.py migrate
+    # python manage.py runserver 0.0.0.0:3000
+    # "default": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+    # },
+
+    # docker-compose -f mysql-docker-compose.yml up --build
+    # pip install mysqlclient
+    # python manage.py migrate
+    # python manage.py runserver 0.0.0.0:3000
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-    }
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "slackapp",
+        "USER": "app",
+        "PASSWORD": "password",
+        "HOST": "127.0.0.1",
+        "PORT": 33306,
+    },
 }
 
 # Password validation

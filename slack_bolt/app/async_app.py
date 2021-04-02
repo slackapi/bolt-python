@@ -7,6 +7,9 @@ from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable, Se
 from aiohttp import web
 
 from slack_bolt.app.async_server import AsyncSlackAppServer
+from slack_bolt.listener.async_listener_completion_handler import (
+    AsyncDefaultListenerCompletionHandler,
+)
 from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
 from slack_bolt.middleware.message_listener_matches.async_message_listener_matches import (
     AsyncMessageListenerMatches,
@@ -279,10 +282,14 @@ class AsyncApp:
         self._async_middleware_list: List[Union[Callable, AsyncMiddleware]] = []
         self._async_listeners: List[AsyncListener] = []
 
+        self._process_before_response = process_before_response
         self._async_listener_runner = AsyncioListenerRunner(
             logger=self._framework_logger,
             process_before_response=process_before_response,
             listener_error_handler=AsyncDefaultListenerErrorHandler(
+                logger=self._framework_logger
+            ),
+            listener_completion_handler=AsyncDefaultListenerCompletionHandler(
                 logger=self._framework_logger
             ),
             lazy_listener_runner=AsyncioLazyListenerRunner(
@@ -354,6 +361,10 @@ class AsyncApp:
     def listener_runner(self) -> AsyncioListenerRunner:
         """The asyncio-based executor for asynchronously running listeners."""
         return self._async_listener_runner
+
+    @property
+    def process_before_response(self) -> bool:
+        return self._process_before_response or False
 
     # -------------------------
     # standalone server

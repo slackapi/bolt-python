@@ -7,6 +7,9 @@ from typing import Optional, Callable, Awaitable
 from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.lazy_listener.async_runner import AsyncLazyListenerRunner
 from slack_bolt.listener.async_listener import AsyncListener
+from slack_bolt.listener.async_listener_completion_handler import (
+    AsyncListenerCompletionHandler,
+)
 from slack_bolt.listener.async_listener_error_handler import AsyncListenerErrorHandler
 from slack_bolt.logger.messages import (
     debug_responding,
@@ -22,6 +25,7 @@ class AsyncioListenerRunner:
     logger: Logger
     process_before_response: bool
     listener_error_handler: AsyncListenerErrorHandler
+    listener_completion_handler: AsyncListenerCompletionHandler
     lazy_listener_runner: AsyncLazyListenerRunner
 
     def __init__(
@@ -29,11 +33,13 @@ class AsyncioListenerRunner:
         logger: Logger,
         process_before_response: bool,
         listener_error_handler: AsyncListenerErrorHandler,
+        listener_completion_handler: AsyncListenerCompletionHandler,
         lazy_listener_runner: AsyncLazyListenerRunner,
     ):
         self.logger = logger
         self.process_before_response = process_before_response
         self.listener_error_handler = listener_error_handler
+        self.listener_completion_handler = listener_completion_handler
         self.lazy_listener_runner = lazy_listener_runner
 
     async def run(
@@ -68,6 +74,10 @@ class AsyncioListenerRunner:
                         response=response,
                     )
                     ack.response = response
+                finally:
+                    await self.listener_completion_handler.handle(
+                        request=request, response=response
+                    )
 
             for lazy_func in listener.lazy_functions:
                 if request.lazy_function_name:
@@ -121,6 +131,10 @@ class AsyncioListenerRunner:
                             response=response,
                         )
                         ack.response = response
+                    finally:
+                        await self.listener_completion_handler.handle(
+                            request=request, response=response
+                        )
 
                 _f: Future = asyncio.ensure_future(
                     run_ack_function_asynchronously(ack, request, response)

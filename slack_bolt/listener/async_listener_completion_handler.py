@@ -14,11 +14,10 @@ from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 
 
-class AsyncListenerErrorHandler(metaclass=ABCMeta):
+class AsyncListenerCompletionHandler(metaclass=ABCMeta):
     @abstractmethod
     async def handle(
         self,
-        error: Exception,
         request: AsyncBoltRequest,
         response: Optional[BoltResponse],
     ) -> None:
@@ -32,7 +31,7 @@ class AsyncListenerErrorHandler(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-class AsyncCustomListenerErrorHandler(AsyncListenerErrorHandler):
+class AsyncCustomListenerCompletionHandler(AsyncListenerCompletionHandler):
     def __init__(self, logger: Logger, func: Callable[..., Awaitable[None]]):
         self.func = func
         self.logger = logger
@@ -40,13 +39,11 @@ class AsyncCustomListenerErrorHandler(AsyncListenerErrorHandler):
 
     async def handle(
         self,
-        error: Exception,
         request: AsyncBoltRequest,
         response: Optional[BoltResponse],
     ) -> None:
         all_available_args = _build_all_available_args(
             logger=self.logger,
-            error=error,
             request=request,
             response=response,
         )
@@ -58,15 +55,13 @@ class AsyncCustomListenerErrorHandler(AsyncListenerErrorHandler):
         await self.func(**kwargs)
 
 
-class AsyncDefaultListenerErrorHandler(AsyncListenerErrorHandler):
+class AsyncDefaultListenerCompletionHandler(AsyncListenerCompletionHandler):
     def __init__(self, logger: Logger):
         self.logger = logger
 
     async def handle(
         self,
-        error: Exception,
         request: AsyncBoltRequest,
         response: Optional[BoltResponse],
     ):
-        message = f"Failed to run listener function (error: {error})"
-        self.logger.exception(message)
+        pass

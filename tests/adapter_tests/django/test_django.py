@@ -174,6 +174,88 @@ class TestDjango(TestCase):
         assert response.status_code == 200
         assert_auth_test_count(self, 1)
 
+    def test_commands_process_before_response(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            process_before_response=True,
+        )
+
+        def command_handler(ack):
+            ack()
+
+        app.command("/hello-world")(command_handler)
+
+        input = (
+            "token=verification_token"
+            "&team_id=T111"
+            "&team_domain=test-domain"
+            "&channel_id=C111"
+            "&channel_name=random"
+            "&user_id=W111"
+            "&user_name=primary-owner"
+            "&command=%2Fhello-world"
+            "&text=Hi"
+            "&enterprise_id=E111"
+            "&enterprise_name=Org+Name"
+            "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
+            "&trigger_id=111.111.xxx"
+        )
+        timestamp, body = str(int(time())), input
+
+        request = self.rf.post(
+            "/slack/events",
+            data=body,
+            content_type="application/x-www-form-urlencoded",
+        )
+        request.headers = self.build_headers(timestamp, body)
+
+        response = SlackRequestHandler(app).handle(request)
+        assert response.status_code == 200
+        assert_auth_test_count(self, 1)
+
+    def test_commands_lazy(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        def command_handler(ack):
+            ack()
+
+        def lazy_handler():
+            pass
+
+        app.command("/hello-world")(ack=command_handler, lazy=[lazy_handler])
+
+        input = (
+            "token=verification_token"
+            "&team_id=T111"
+            "&team_domain=test-domain"
+            "&channel_id=C111"
+            "&channel_name=random"
+            "&user_id=W111"
+            "&user_name=primary-owner"
+            "&command=%2Fhello-world"
+            "&text=Hi"
+            "&enterprise_id=E111"
+            "&enterprise_name=Org+Name"
+            "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
+            "&trigger_id=111.111.xxx"
+        )
+        timestamp, body = str(int(time())), input
+
+        request = self.rf.post(
+            "/slack/events",
+            data=body,
+            content_type="application/x-www-form-urlencoded",
+        )
+        request.headers = self.build_headers(timestamp, body)
+
+        response = SlackRequestHandler(app).handle(request)
+        assert response.status_code == 200
+        assert_auth_test_count(self, 1)
+
     def test_oauth(self):
         app = App(
             client=self.web_client,

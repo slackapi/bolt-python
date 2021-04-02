@@ -6,15 +6,15 @@ from django.db import models
 
 
 class SlackBot(models.Model):
-    client_id = models.TextField(null=False)
-    app_id = models.TextField(null=False)
-    enterprise_id = models.TextField(null=True)
+    client_id = models.CharField(null=False, max_length=32)
+    app_id = models.CharField(null=False, max_length=32)
+    enterprise_id = models.CharField(null=True, max_length=32)
     enterprise_name = models.TextField(null=True)
-    team_id = models.TextField(null=True)
+    team_id = models.CharField(null=True, max_length=32)
     team_name = models.TextField(null=True)
     bot_token = models.TextField(null=True)
-    bot_id = models.TextField(null=True)
-    bot_user_id = models.TextField(null=True)
+    bot_id = models.CharField(null=True, max_length=32)
+    bot_user_id = models.CharField(null=True, max_length=32)
     bot_scopes = models.TextField(null=True)
     is_enterprise_install = models.BooleanField(null=True)
     installed_at = models.DateTimeField(null=False)
@@ -28,18 +28,18 @@ class SlackBot(models.Model):
 
 
 class SlackInstallation(models.Model):
-    client_id = models.TextField(null=False)
-    app_id = models.TextField(null=False)
-    enterprise_id = models.TextField(null=True)
+    client_id = models.CharField(null=False, max_length=32)
+    app_id = models.CharField(null=False, max_length=32)
+    enterprise_id = models.CharField(null=True, max_length=32)
     enterprise_name = models.TextField(null=True)
     enterprise_url = models.TextField(null=True)
-    team_id = models.TextField(null=True)
+    team_id = models.CharField(null=True, max_length=32)
     team_name = models.TextField(null=True)
     bot_token = models.TextField(null=True)
-    bot_id = models.TextField(null=True)
+    bot_id = models.CharField(null=True, max_length=32)
     bot_user_id = models.TextField(null=True)
     bot_scopes = models.TextField(null=True)
-    user_id = models.TextField(null=False)
+    user_id = models.CharField(null=False, max_length=32)
     user_token = models.TextField(null=True)
     user_scopes = models.TextField(null=True)
     incoming_webhook_url = models.TextField(null=True)
@@ -47,7 +47,7 @@ class SlackInstallation(models.Model):
     incoming_webhook_channel_id = models.TextField(null=True)
     incoming_webhook_configuration_url = models.TextField(null=True)
     is_enterprise_install = models.BooleanField(null=True)
-    token_type = models.TextField(null=True)
+    token_type = models.CharField(null=True, max_length=32)
     installed_at = models.DateTimeField(null=False)
 
     class Meta:
@@ -65,7 +65,7 @@ class SlackInstallation(models.Model):
 
 
 class SlackOAuthState(models.Model):
-    state = models.TextField(null=False)
+    state = models.CharField(null=False, max_length=64)
     expire_at = models.DateTimeField(null=False)
 
 
@@ -81,6 +81,7 @@ from django.db.models import F
 from django.utils import timezone
 from slack_sdk.oauth import InstallationStore, OAuthStateStore
 from slack_sdk.oauth.installation_store import Bot, Installation
+from slack_sdk.webhook import WebhookClient
 
 
 class DjangoInstallationStore(InstallationStore):
@@ -100,9 +101,13 @@ class DjangoInstallationStore(InstallationStore):
 
     def save(self, installation: Installation):
         i = installation.to_dict()
+        if is_naive(i["installed_at"]):
+            i["installed_at"] = make_aware(i["installed_at"])
         i["client_id"] = self.client_id
         SlackInstallation(**i).save()
         b = installation.to_bot().to_dict()
+        if is_naive(b["installed_at"]):
+            b["installed_at"] = make_aware(b["installed_at"])
         b["client_id"] = self.client_id
         SlackBot(**b).save()
 
@@ -222,7 +227,7 @@ class DjangoOAuthStateStore(OAuthStateStore):
 
 import logging
 import os
-from slack_bolt import App
+from slack_bolt import App, BoltContext
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 
 logger = logging.getLogger(__name__)
@@ -249,12 +254,34 @@ app = App(
 )
 
 
-@app.event("app_mention")
-def event_test(body, say, logger):
+def event_test(body, say, context: BoltContext, logger):
     logger.info(body)
-    say("What's up?")
+    say(":wave: What's up?")
+
+    found_rows = list(
+        SlackInstallation.objects.filter(enterprise_id=context.enterprise_id)
+        .filter(team_id=context.team_id)
+        .filter(incoming_webhook_url__isnull=False)
+        .order_by(F("installed_at").desc())[:1]
+    )
+    if len(found_rows) > 0:
+        webhook_url = found_rows[0].incoming_webhook_url
+        logger.info(f"webhook_url: {webhook_url}")
+        client = WebhookClient(webhook_url)
+        client.send(text=":wave: This is a message posted using Incoming Webhook!")
 
 
-@app.command("/hello-bolt-python")
+# lazy listener example
+def noop():
+    pass
+
+
+app.event("app_mention")(
+    ack=event_test,
+    lazy=[noop],
+)
+
+
+@app.command("/hello-django-app")
 def command(ack):
-    ack("This is a Django app!")
+    ack(":wave: Hello from a Django app :smile:")
