@@ -34,6 +34,7 @@ class Configure:
 
     Refer to https://api.slack.com/workflows/steps for details.
     """
+
     def __init__(self, *, callback_id: str, client: WebClient, body: dict):
         self.callback_id = callback_id
         self.client = client

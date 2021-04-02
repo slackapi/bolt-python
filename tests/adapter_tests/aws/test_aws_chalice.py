@@ -275,7 +275,7 @@ class TestAwsChalice:
             app = App(
                 client=self.web_client,
                 signing_secret=self.signing_secret,
-                process_before_response=True
+                process_before_response=True,
             )
 
             def command_handler(ack):

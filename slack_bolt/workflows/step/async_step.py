@@ -29,6 +29,7 @@ class AsyncWorkflowStepBuilder:
     """Steps from Apps
     Refer to https://api.slack.com/workflows/steps for details.
     """
+
     callback_id: Union[str, Pattern]
     _edit: Optional[AsyncListener]
     _save: Optional[AsyncListener]

@@ -40,6 +40,7 @@ class Update:
     This utility is a thin wrapper of workflows.stepFailed API method.
     Refer to https://api.slack.com/methods/workflows.updateStep for details.
     """
+
     def __init__(self, *, client: WebClient, body: dict):
         self.client = client
         self.body = body
