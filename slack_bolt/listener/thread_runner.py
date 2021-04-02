@@ -5,6 +5,7 @@ from typing import Optional, Callable
 
 from slack_bolt.lazy_listener import LazyListenerRunner
 from slack_bolt.listener import Listener
+from slack_bolt.listener.listener_completion_handler import ListenerCompletionHandler
 from slack_bolt.listener.listener_error_handler import ListenerErrorHandler
 from slack_bolt.logger.messages import (
     debug_responding,
@@ -20,6 +21,7 @@ class ThreadListenerRunner:
     logger: Logger
     process_before_response: bool
     listener_error_handler: ListenerErrorHandler
+    listener_completion_handler: ListenerCompletionHandler
     listener_executor: ThreadPoolExecutor
     lazy_listener_runner: LazyListenerRunner
 
@@ -28,12 +30,14 @@ class ThreadListenerRunner:
         logger: Logger,
         process_before_response: bool,
         listener_error_handler: ListenerErrorHandler,
+        listener_completion_handler: ListenerCompletionHandler,
         listener_executor: ThreadPoolExecutor,
         lazy_listener_runner: LazyListenerRunner,
     ):
         self.logger = logger
         self.process_before_response = process_before_response
         self.listener_error_handler = listener_error_handler
+        self.listener_completion_handler = listener_completion_handler
         self.listener_executor = listener_executor
         self.lazy_listener_runner = lazy_listener_runner
 
@@ -69,6 +73,11 @@ class ThreadListenerRunner:
                         response=response,
                     )
                     ack.response = response
+                finally:
+                    self.listener_completion_handler.handle(
+                        request=request,
+                        response=response,
+                    )
 
             for lazy_func in listener.lazy_functions:
                 if request.lazy_function_name:
@@ -122,6 +131,11 @@ class ThreadListenerRunner:
                                 response=response,
                             )
                             ack.response = response
+                    finally:
+                        self.listener_completion_handler.handle(
+                            request=request,
+                            response=response,
+                        )
 
                 self.listener_executor.submit(run_ack_function_asynchronously)
 

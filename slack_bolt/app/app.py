@@ -21,6 +21,9 @@ from slack_bolt.error import BoltError
 from slack_bolt.lazy_listener.thread_runner import ThreadLazyListenerRunner
 from slack_bolt.listener.custom_listener import CustomListener
 from slack_bolt.listener.listener import Listener
+from slack_bolt.listener.listener_completion_handler import (
+    DefaultListenerCompletionHandler,
+)
 from slack_bolt.listener.listener_error_handler import (
     DefaultListenerErrorHandler,
     CustomListenerErrorHandler,
@@ -255,10 +258,14 @@ class App:
         self._listeners: List[Listener] = []
 
         listener_executor = ThreadPoolExecutor(max_workers=5)
+        self._process_before_response = process_before_response
         self._listener_runner = ThreadListenerRunner(
             logger=self._framework_logger,
             process_before_response=process_before_response,
             listener_error_handler=DefaultListenerErrorHandler(
+                logger=self._framework_logger
+            ),
+            listener_completion_handler=DefaultListenerCompletionHandler(
                 logger=self._framework_logger
             ),
             listener_executor=listener_executor,
@@ -338,6 +345,10 @@ class App:
     def listener_runner(self) -> ThreadListenerRunner:
         """The thread executor for asynchronously running listeners."""
         return self._listener_runner
+
+    @property
+    def process_before_response(self) -> bool:
+        return self._process_before_response or False
 
     # -------------------------
     # standalone server
