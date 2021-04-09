@@ -54,7 +54,8 @@ pip install slack_bolt
 # https://pypi.org/project/python-lambda/
 pip install python-lambda
 
-# Configure config.yml properly (AWSLambdaFullAccess required)
+# Configure config.yml properly
+# lambda:InvokeFunction & lambda:GetFunction are required for running lazy listeners
 export SLACK_SIGNING_SECRET=***
 export SLACK_BOT_TOKEN=xoxb-***
 echo 'slack_bolt' > requirements.txt
@@ -89,5 +90,24 @@ app.command("/start-process")(
 def handler(event, context):
     slack_handler = SlackRequestHandler(app=app)
     return slack_handler.handle(event, context)
+```
+
+Please note that the followig IAM permissions would be required for running this example app.
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "lambda:InvokeFunction",
+                "lambda:GetFunction"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
 ```
 </details>

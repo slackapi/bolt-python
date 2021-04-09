@@ -5,7 +5,8 @@ handler: lazy_aws_lambda.handler
 description: My first lambda function
 runtime: python3.8
 # role: lambda_basic_execution
-role: bolt_python_lambda_invocation #  AWSLambdaFullAccess
+# Have lambda:InvokeFunction & lambda:GetFunction in the allowed actions
+role: bolt_python_lambda_invocation 
 
 # S3 upload requires appropriate role with s3:PutObject permission
 # (ex. basic_s3_upload), a destination bucket, and the key prefix
