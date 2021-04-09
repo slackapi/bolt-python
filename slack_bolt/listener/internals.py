@@ -31,7 +31,6 @@ def _build_all_available_args(
         "resp": response,
         "response": response,
         "context": request.context,
-        "body": request.body,
         # payload
         "body": request.body,
         "options": to_options(request.body),
