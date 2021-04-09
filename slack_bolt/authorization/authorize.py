@@ -96,6 +96,7 @@ class InstallationStoreAuthorize(Authorize):
     authorize_result_cache: Dict[str, AuthorizeResult]
     bot_only: bool
     find_installation_available: bool
+    find_bot_available: bool
 
     def __init__(
         self,
@@ -115,6 +116,7 @@ class InstallationStoreAuthorize(Authorize):
         self.find_installation_available = hasattr(
             installation_store, "find_installation"
         )
+        self.find_bot_available = hasattr(installation_store, "find_bot")
 
     def __call__(
         self,
@@ -129,7 +131,8 @@ class InstallationStoreAuthorize(Authorize):
         user_token: Optional[str] = None
 
         if not self.bot_only and self.find_installation_available:
-            # since v1.1, this is the default way
+            # Since v1.1, this is the default way.
+            # If you want to use find_bot / delete_bot only, you can set bot_only as True.
             try:
                 # Note that this is the latest information for the org/workspace.
                 # The installer may not be the user associated with this incoming request.
@@ -140,45 +143,61 @@ class InstallationStoreAuthorize(Authorize):
                     team_id=team_id,
                     is_enterprise_install=context.is_enterprise_install,
                 )
-                if installation is None:
-                    self._debug_log_for_not_found(enterprise_id, team_id)
-                    return None
+                if installation is not None:
+                    if installation.user_id != user_id:
+                        # First off, remove the user token as the installer is a different user
+                        installation.user_token = None
+                        installation.user_scopes = []
 
-                if installation.user_id != user_id:
-                    # First off, remove the user token as the installer is a different user
-                    installation.user_token = None
-                    installation.user_scopes = []
+                        # try to fetch the request user's installation
+                        # to reflect the user's access token if exists
+                        user_installation = self.installation_store.find_installation(
+                            enterprise_id=enterprise_id,
+                            team_id=team_id,
+                            user_id=user_id,
+                            is_enterprise_install=context.is_enterprise_install,
+                        )
+                        if user_installation is not None:
+                            # Overwrite the installation with the one for this user
+                            installation = user_installation
 
-                    # try to fetch the request user's installation
-                    # to reflect the user's access token if exists
-                    user_installation = self.installation_store.find_installation(
-                        enterprise_id=enterprise_id,
-                        team_id=team_id,
-                        user_id=user_id,
-                        is_enterprise_install=context.is_enterprise_install,
+                    bot_token, user_token = (
+                        installation.bot_token,
+                        installation.user_token,
                     )
-                    if user_installation is not None:
-                        # Overwrite the installation with the one for this user
-                        installation = user_installation
 
-                bot_token, user_token = installation.bot_token, installation.user_token
             except NotImplementedError as _:
                 self.find_installation_available = False
 
-        if self.bot_only or not self.find_installation_available:
-            # Use find_bot to get bot value (legacy)
-            bot: Optional[Bot] = self.installation_store.find_bot(
-                enterprise_id=enterprise_id,
-                team_id=team_id,
-                is_enterprise_install=context.is_enterprise_install,
+        if (
+            # If you intentionally use only find_bot / delete_bot,
+            self.bot_only
+            # If find_installation method is not available,
+            or not self.find_installation_available
+            # If find_installation did not return data and find_bot method is available,
+            or (
+                self.find_bot_available is True
+                and bot_token is None
+                and user_token is None
             )
-            if bot is None:
-                self._debug_log_for_not_found(enterprise_id, team_id)
-                return None
-            bot_token, user_token = bot.bot_token, None
+        ):
+            try:
+                bot: Optional[Bot] = self.installation_store.find_bot(
+                    enterprise_id=enterprise_id,
+                    team_id=team_id,
+                    is_enterprise_install=context.is_enterprise_install,
+                )
+                if bot is not None:
+                    bot_token = bot.bot_token
+            except NotImplementedError as _:
+                self.find_bot_available = False
+            except Exception as e:
+                self.logger.info(f"Failed to call find_bot method: {e}")
 
         token: Optional[str] = bot_token or user_token
         if token is None:
+            # No valid token was found
+            self._debug_log_for_not_found(enterprise_id, team_id)
             return None
 
         # Check cache to see if the bot object already exists
