@@ -92,6 +92,12 @@ class MockHandler(SimpleHTTPRequestHandler):
     def _handle(self):
         self.received_requests[self.path] = self.received_requests.get(self.path, 0) + 1
         try:
+            if self.path == "/webhook":
+                self.send_response(200)
+                self.set_common_headers()
+                self.wfile.write("OK".encode("utf-8"))
+                return
+
             if self.path == "/received_requests.json":
                 self.send_response(200)
                 self.set_common_headers()

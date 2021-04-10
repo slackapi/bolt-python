@@ -143,6 +143,14 @@ def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
         context["channel_id"] = channel_id
     if "response_url" in body:
         context["response_url"] = body["response_url"]
+    elif "response_urls" in body:
+        # In the case where response_url_enabled: true in a modal exists
+        response_urls = body["response_urls"]
+        if len(response_urls) >= 1:
+            if len(response_urls) > 1:
+                context.logger.debug(debug_multiple_response_urls_detected())
+            response_url = response_urls[0].get("response_url")
+            context["response_url"] = response_url
     return context
 
 
@@ -177,3 +185,11 @@ def error_message_raw_body_required_in_http_mode() -> str:
 
 def error_message_unknown_request_body_type() -> str:
     return "`body` must be either str or dict"
+
+
+def debug_multiple_response_urls_detected() -> str:
+    return (
+        "`response_urls` in the body has multiple URLs in it. "
+        "If you would like to use non-primary one, "
+        "please manually extract the one from body['response_urls']."
+    )

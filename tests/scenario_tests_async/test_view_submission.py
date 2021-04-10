@@ -17,6 +17,133 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
+body = {
+    "type": "view_submission",
+    "team": {
+        "id": "T111",
+        "domain": "workspace-domain",
+        "enterprise_id": "E111",
+        "enterprise_name": "Sandbox Org",
+    },
+    "user": {
+        "id": "W111",
+        "username": "primary-owner",
+        "name": "primary-owner",
+        "team_id": "T111",
+    },
+    "api_app_id": "A111",
+    "token": "verification_token",
+    "trigger_id": "111.222.valid",
+    "view": {
+        "id": "V111",
+        "team_id": "T111",
+        "type": "modal",
+        "blocks": [
+            {
+                "type": "input",
+                "block_id": "hspI",
+                "label": {
+                    "type": "plain_text",
+                    "text": "Label",
+                },
+                "optional": False,
+                "element": {"type": "plain_text_input", "action_id": "maBWU"},
+            }
+        ],
+        "private_metadata": "This is for you!",
+        "callback_id": "view-id",
+        "state": {
+            "values": {"hspI": {"maBWU": {"type": "plain_text_input", "value": "test"}}}
+        },
+        "hash": "1596530361.3wRYuk3R",
+        "title": {
+            "type": "plain_text",
+            "text": "My App",
+        },
+        "clear_on_close": False,
+        "notify_on_close": False,
+        "close": {
+            "type": "plain_text",
+            "text": "Cancel",
+        },
+        "submit": {
+            "type": "plain_text",
+            "text": "Submit",
+        },
+        "previous_view_id": None,
+        "root_view_id": "V111",
+        "app_id": "A111",
+        "external_id": "",
+        "app_installed_team_id": "T111",
+        "bot_id": "B111",
+    },
+    "response_urls": [],
+}
+
+raw_body = f"payload={quote(json.dumps(body))}"
+
+
+def simple_listener(ack, body, payload, view):
+    assert body["trigger_id"] == "111.222.valid"
+    assert body["view"] == payload
+    assert payload == view
+    assert view["private_metadata"] == "This is for you!"
+    ack()
+
+
+response_url_payload_body = {
+    "type": "view_submission",
+    "team": {"id": "T111", "domain": "test-test-test"},
+    "user": {
+        "id": "U111",
+        "username": "test-test-test",
+        "name": "test-test-test",
+        "team_id": "T111",
+    },
+    "api_app_id": "A111",
+    "token": "verification-token",
+    "trigger_id": "111.222.xxx",
+    "view": {
+        "id": "V111",
+        "team_id": "T111",
+        "type": "modal",
+        "blocks": [],
+        "callback_id": "view-id",
+        "state": {},
+        "title": {
+            "type": "plain_text",
+            "text": "My App",
+        },
+        "close": {
+            "type": "plain_text",
+            "text": "Cancel",
+        },
+        "submit": {
+            "type": "plain_text",
+            "text": "Submit",
+        },
+        "previous_view_id": None,
+        "root_view_id": "V111",
+        "app_id": "A111",
+        "external_id": "",
+        "app_installed_team_id": "T111",
+        "bot_id": "B111",
+    },
+    "response_urls": [
+        {
+            "block_id": "b",
+            "action_id": "a",
+            "channel_id": "C111",
+            "response_url": "http://localhost:8888/webhook",
+        }
+    ],
+    "is_enterprise_install": False,
+}
+
+
+raw_response_url_body = f"payload={quote(json.dumps(response_url_payload_body))}"
+
+
 class TestAsyncViewSubmission:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
@@ -52,11 +179,9 @@ class TestAsyncViewSubmission:
             "x-slack-request-timestamp": [timestamp],
         }
 
-    def build_valid_request(self) -> AsyncBoltRequest:
+    def build_valid_request(self, body: str = raw_body) -> AsyncBoltRequest:
         timestamp = str(int(time()))
-        return AsyncBoltRequest(
-            body=raw_body, headers=self.build_headers(timestamp, raw_body)
-        )
+        return AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
     @pytest.mark.asyncio
     async def test_mock_server_is_running(self):
@@ -135,71 +260,22 @@ class TestAsyncViewSubmission:
         assert response.status == 404
         await assert_auth_test_count_async(self, 1)
 
+    @pytest.mark.asyncio
+    async def test_response_urls(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
 
-body = {
-    "type": "view_submission",
-    "team": {
-        "id": "T111",
-        "domain": "workspace-domain",
-        "enterprise_id": "E111",
-        "enterprise_name": "Sandbox Org",
-    },
-    "user": {
-        "id": "W111",
-        "username": "primary-owner",
-        "name": "primary-owner",
-        "team_id": "T111",
-    },
-    "api_app_id": "A111",
-    "token": "verification_token",
-    "trigger_id": "111.222.valid",
-    "view": {
-        "id": "V111",
-        "team_id": "T111",
-        "type": "modal",
-        "blocks": [
-            {
-                "type": "input",
-                "block_id": "hspI",
-                "label": {
-                    "type": "plain_text",
-                    "text": "Label",
-                },
-                "optional": False,
-                "element": {"type": "plain_text_input", "action_id": "maBWU"},
-            }
-        ],
-        "private_metadata": "This is for you!",
-        "callback_id": "view-id",
-        "state": {
-            "values": {"hspI": {"maBWU": {"type": "plain_text_input", "value": "test"}}}
-        },
-        "hash": "1596530361.3wRYuk3R",
-        "title": {
-            "type": "plain_text",
-            "text": "My App",
-        },
-        "clear_on_close": False,
-        "notify_on_close": False,
-        "close": {
-            "type": "plain_text",
-            "text": "Cancel",
-        },
-        "submit": {
-            "type": "plain_text",
-            "text": "Submit",
-        },
-        "previous_view_id": None,
-        "root_view_id": "V111",
-        "app_id": "A111",
-        "external_id": "",
-        "app_installed_team_id": "T111",
-        "bot_id": "B111",
-    },
-    "response_urls": [],
-}
+        @app.view("view-id")
+        async def check(ack, respond):
+            await respond("Hi")
+            await ack()
 
-raw_body = f"payload={quote(json.dumps(body))}"
+        request = self.build_valid_request(raw_response_url_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_auth_test_count_async(self, 1)
 
 
 async def simple_listener(ack, body, payload, view):
