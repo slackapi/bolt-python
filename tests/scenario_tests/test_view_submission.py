@@ -15,115 +15,6 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-class TestViewSubmission:
-    signing_secret = "secret"
-    valid_token = "xoxb-valid"
-    mock_api_server_base_url = "http://localhost:8888"
-    signature_verifier = SignatureVerifier(signing_secret)
-    web_client = WebClient(
-        token=valid_token,
-        base_url=mock_api_server_base_url,
-    )
-
-    def setup_method(self):
-        self.old_os_env = remove_os_env_temporarily()
-        setup_mock_web_api_server(self)
-
-    def teardown_method(self):
-        cleanup_mock_web_api_server(self)
-        restore_os_env(self.old_os_env)
-
-    def generate_signature(self, body: str, timestamp: str):
-        return self.signature_verifier.generate_signature(
-            body=body,
-            timestamp=timestamp,
-        )
-
-    def build_headers(self, timestamp: str, body: str):
-        return {
-            "content-type": ["application/x-www-form-urlencoded"],
-            "x-slack-signature": [self.generate_signature(body, timestamp)],
-            "x-slack-request-timestamp": [timestamp],
-        }
-
-    def build_valid_request(self) -> BoltRequest:
-        timestamp = str(int(time()))
-        return BoltRequest(
-            body=raw_body, headers=self.build_headers(timestamp, raw_body)
-        )
-
-    def test_mock_server_is_running(self):
-        resp = self.web_client.api_test()
-        assert resp != None
-
-    def test_success(self):
-        app = App(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
-        )
-        app.view("view-id")(simple_listener)
-
-        request = self.build_valid_request()
-        response = app.dispatch(request)
-        assert response.status == 200
-        assert_auth_test_count(self, 1)
-
-    def test_success_2(self):
-        app = App(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
-        )
-        app.view_submission("view-id")(simple_listener)
-
-        request = self.build_valid_request()
-        response = app.dispatch(request)
-        assert response.status == 200
-        assert_auth_test_count(self, 1)
-
-    def test_process_before_response(self):
-        app = App(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
-            process_before_response=True,
-        )
-        app.view("view-id")(simple_listener)
-
-        request = self.build_valid_request()
-        response = app.dispatch(request)
-        assert response.status == 200
-        assert_auth_test_count(self, 1)
-
-    def test_failure(self):
-        app = App(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
-        )
-        request = self.build_valid_request()
-        response = app.dispatch(request)
-        assert response.status == 404
-        assert_auth_test_count(self, 1)
-
-        app.view("view-idddd")(simple_listener)
-        response = app.dispatch(request)
-        assert response.status == 404
-        assert_auth_test_count(self, 1)
-
-    def test_failure_2(self):
-        app = App(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
-        )
-        request = self.build_valid_request()
-        response = app.dispatch(request)
-        assert response.status == 404
-        assert_auth_test_count(self, 1)
-
-        app.view_submission("view-idddd")(simple_listener)
-        response = app.dispatch(request)
-        assert response.status == 404
-        assert_auth_test_count(self, 1)
-
-
 body = {
     "type": "view_submission",
     "team": {
@@ -196,3 +87,179 @@ def simple_listener(ack, body, payload, view):
     assert payload == view
     assert view["private_metadata"] == "This is for you!"
     ack()
+
+
+response_url_payload_body = {
+    "type": "view_submission",
+    "team": {"id": "T111", "domain": "test-test-test"},
+    "user": {
+        "id": "U111",
+        "username": "test-test-test",
+        "name": "test-test-test",
+        "team_id": "T111",
+    },
+    "api_app_id": "A111",
+    "token": "verification-token",
+    "trigger_id": "111.222.xxx",
+    "view": {
+        "id": "V111",
+        "team_id": "T111",
+        "type": "modal",
+        "blocks": [],
+        "callback_id": "view-id",
+        "state": {},
+        "title": {
+            "type": "plain_text",
+            "text": "My App",
+        },
+        "close": {
+            "type": "plain_text",
+            "text": "Cancel",
+        },
+        "submit": {
+            "type": "plain_text",
+            "text": "Submit",
+        },
+        "previous_view_id": None,
+        "root_view_id": "V111",
+        "app_id": "A111",
+        "external_id": "",
+        "app_installed_team_id": "T111",
+        "bot_id": "B111",
+    },
+    "response_urls": [
+        {
+            "block_id": "b",
+            "action_id": "a",
+            "channel_id": "C111",
+            "response_url": "http://localhost:8888/webhook",
+        }
+    ],
+    "is_enterprise_install": False,
+}
+
+
+raw_response_url_body = f"payload={quote(json.dumps(response_url_payload_body))}"
+
+
+class TestViewSubmission:
+    signing_secret = "secret"
+    valid_token = "xoxb-valid"
+    mock_api_server_base_url = "http://localhost:8888"
+    signature_verifier = SignatureVerifier(signing_secret)
+    web_client = WebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
+
+    def setup_method(self):
+        self.old_os_env = remove_os_env_temporarily()
+        setup_mock_web_api_server(self)
+
+    def teardown_method(self):
+        cleanup_mock_web_api_server(self)
+        restore_os_env(self.old_os_env)
+
+    def generate_signature(self, body: str, timestamp: str):
+        return self.signature_verifier.generate_signature(
+            body=body,
+            timestamp=timestamp,
+        )
+
+    def build_headers(self, timestamp: str, body: str):
+        return {
+            "content-type": ["application/x-www-form-urlencoded"],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
+        }
+
+    def build_valid_request(self, body: str = raw_body) -> BoltRequest:
+        timestamp = str(int(time()))
+        return BoltRequest(body=body, headers=self.build_headers(timestamp, body))
+
+    def test_mock_server_is_running(self):
+        resp = self.web_client.api_test()
+        assert resp != None
+
+    def test_success(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.view("view-id")(simple_listener)
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+
+    def test_success_2(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.view_submission("view-id")(simple_listener)
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+
+    def test_process_before_response(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            process_before_response=True,
+        )
+        app.view("view-id")(simple_listener)
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+
+    def test_failure(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert_auth_test_count(self, 1)
+
+        app.view("view-idddd")(simple_listener)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert_auth_test_count(self, 1)
+
+    def test_failure_2(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert_auth_test_count(self, 1)
+
+        app.view_submission("view-idddd")(simple_listener)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert_auth_test_count(self, 1)
+
+    def test_response_urls(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        @app.view("view-id")
+        def check(ack, respond):
+            respond("Hi")
+            ack()
+
+        request = self.build_valid_request(raw_response_url_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
