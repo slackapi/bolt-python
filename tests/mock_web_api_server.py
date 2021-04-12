@@ -310,7 +310,7 @@ def assert_auth_test_count(test: TestCase, expected_count: int):
     error = None
     while retry_count < 3:
         try:
-            test.mock_received_requests["/auth.test"] == expected_count
+            test.mock_received_requests.get("/auth.test", 0) == expected_count
             break
         except Exception as e:
             error = e
@@ -328,7 +328,7 @@ async def assert_auth_test_count_async(test: TestCase, expected_count: int):
     error = None
     while retry_count < 3:
         try:
-            test.mock_received_requests["/auth.test"] == expected_count
+            test.mock_received_requests.get("/auth.test", 0) == expected_count
             break
         except Exception as e:
             error = e
