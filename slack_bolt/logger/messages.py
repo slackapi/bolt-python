@@ -58,6 +58,13 @@ def error_message_event_type(event_type: str) -> str:
     )
 
 
+def error_installation_store_required_for_builtin_listeners() -> str:
+    return (
+        "To use the event listeners for token revocation handling, "
+        "setting a valid `installation_store` to `App`/`AsyncApp` is required."
+    )
+
+
 # -------------------------------
 # Warning
 # -------------------------------

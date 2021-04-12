@@ -19,6 +19,7 @@ from slack_bolt.authorization.authorize import (
 )
 from slack_bolt.error import BoltError
 from slack_bolt.lazy_listener.thread_runner import ThreadLazyListenerRunner
+from slack_bolt.listener.builtins import TokenRevocationListeners
 from slack_bolt.listener.custom_listener import CustomListener
 from slack_bolt.listener.listener import Listener
 from slack_bolt.listener.listener_completion_handler import (
@@ -48,6 +49,7 @@ from slack_bolt.logger.messages import (
     warning_bot_only_conflicts,
     debug_return_listener_middleware_response,
     info_default_oauth_settings_loaded,
+    error_installation_store_required_for_builtin_listeners,
 )
 from slack_bolt.middleware import (
     Middleware,
@@ -249,6 +251,12 @@ class App:
                 self.logger.warning(warning_bot_only_conflicts())
                 self._oauth_flow.settings.installation_store_bot_only = app_bot_only
                 self._authorize.bot_only = app_bot_only
+
+        self._tokens_revocation_listeners: Optional[TokenRevocationListeners] = None
+        if self._installation_store is not None:
+            self._tokens_revocation_listeners = TokenRevocationListeners(
+                self._installation_store
+            )
 
         # --------------------------------------
         # Middleware Initialization
@@ -1088,6 +1096,27 @@ class App:
             )
 
         return __call__
+
+    # -------------------------
+    # built-in listener functions
+
+    def default_tokens_revoked_event_listener(
+        self,
+    ) -> Callable[..., Optional[BoltResponse]]:
+        if self._tokens_revocation_listeners is None:
+            raise BoltError(error_installation_store_required_for_builtin_listeners())
+        return self._tokens_revocation_listeners.handle_tokens_revoked_events
+
+    def default_app_uninstalled_event_listener(
+        self,
+    ) -> Callable[..., Optional[BoltResponse]]:
+        if self._tokens_revocation_listeners is None:
+            raise BoltError(error_installation_store_required_for_builtin_listeners())
+        return self._tokens_revocation_listeners.handle_app_uninstalled_events
+
+    def enable_token_revocation_listeners(self) -> None:
+        self.event("tokens_revoked")(self.default_tokens_revoked_event_listener())
+        self.event("app_uninstalled")(self.default_app_uninstalled_event_listener())
 
     # -------------------------
 
