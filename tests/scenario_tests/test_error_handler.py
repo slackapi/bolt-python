@@ -5,8 +5,9 @@ from urllib.parse import quote
 from slack_sdk import WebClient
 from slack_sdk.signature import SignatureVerifier
 
-from slack_bolt import BoltRequest
+from slack_bolt import BoltRequest, BoltResponse
 from slack_bolt.app import App
+from slack_bolt.error import BoltUnhandledRequestError
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -153,3 +154,91 @@ class TestErrorHandler:
         response = app.dispatch(request)
         assert response.status == 500
         assert response.headers["x-test-result"] == ["1"]
+
+    def test_unhandled_errors(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            raise_error_for_unhandled_request=True,
+        )
+        response = app.dispatch(self.build_valid_request())
+        assert response.status == 404
+        assert response.body == '{"error": "unhandled request"}'
+
+        @app.error
+        def handle_errors(error):
+            assert isinstance(error, BoltUnhandledRequestError)
+            return BoltResponse(status=404, body="TODO")
+
+        response = app.dispatch(self.build_valid_request())
+        assert response.status == 404
+        assert response.body == "TODO"
+
+    def test_unhandled_errors_process_before_response(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            raise_error_for_unhandled_request=True,
+            process_before_response=True,
+        )
+        response = app.dispatch(self.build_valid_request())
+        assert response.status == 404
+        assert response.body == '{"error": "unhandled request"}'
+
+        @app.error
+        def handle_errors(error):
+            assert isinstance(error, BoltUnhandledRequestError)
+            return BoltResponse(status=404, body="TODO")
+
+        response = app.dispatch(self.build_valid_request())
+        assert response.status == 404
+        assert response.body == "TODO"
+
+    def test_unhandled_errors_no_next(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            raise_error_for_unhandled_request=True,
+        )
+
+        @app.middleware
+        def broken_middleware():
+            pass
+
+        response = app.dispatch(self.build_valid_request())
+        assert response.status == 404
+        assert response.body == '{"error": "no next() calls in middleware"}'
+
+        @app.error
+        def handle_errors(error):
+            assert isinstance(error, BoltUnhandledRequestError)
+            return BoltResponse(status=404, body="TODO")
+
+        response = app.dispatch(self.build_valid_request())
+        assert response.status == 404
+        assert response.body == "TODO"
+
+    def test_unhandled_errors_process_before_response_no_next(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            raise_error_for_unhandled_request=True,
+            process_before_response=True,
+        )
+
+        @app.middleware
+        def broken_middleware():
+            pass
+
+        response = app.dispatch(self.build_valid_request())
+        assert response.status == 404
+        assert response.body == '{"error": "no next() calls in middleware"}'
+
+        @app.error
+        def handle_errors(error):
+            assert isinstance(error, BoltUnhandledRequestError)
+            return BoltResponse(status=404, body="TODO")
+
+        response = app.dispatch(self.build_valid_request())
+        assert response.status == 404
+        assert response.body == "TODO"

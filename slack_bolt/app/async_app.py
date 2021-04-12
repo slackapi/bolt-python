@@ -33,7 +33,7 @@ from slack_bolt.authorization.async_authorize import (
     AsyncCallableAuthorize,
     AsyncInstallationStoreAuthorize,
 )
-from slack_bolt.error import BoltError
+from slack_bolt.error import BoltError, BoltUnhandledRequestError
 from slack_bolt.logger.messages import (
     warning_client_prioritized_and_token_skipped,
     warning_token_skipped,
@@ -51,6 +51,7 @@ from slack_bolt.logger.messages import (
     debug_return_listener_middleware_response,
     info_default_oauth_settings_loaded,
     error_installation_store_required_for_builtin_listeners,
+    warning_unhandled_by_global_middleware,
 )
 from slack_bolt.lazy_listener.asyncio_runner import AsyncioLazyListenerRunner
 from slack_bolt.listener.async_listener import AsyncListener, AsyncCustomListener
@@ -96,6 +97,8 @@ class AsyncApp:
         name: Optional[str] = None,
         # Set True when you run this app on a FaaS platform
         process_before_response: bool = False,
+        # Set True if you want to handle an unhandled request as an exception
+        raise_error_for_unhandled_request: bool = False,
         # Basic Information > Credentials > Signing Secret
         signing_secret: Optional[str] = None,
         # for single-workspace apps
@@ -103,6 +106,7 @@ class AsyncApp:
         client: Optional[AsyncWebClient] = None,
         # for multi-workspace apps
         installation_store: Optional[AsyncInstallationStore] = None,
+        # for either only bot scope usage or v1.0.x compatibility
         installation_store_bot_only: Optional[bool] = None,
         authorize: Optional[Callable[..., Awaitable[AuthorizeResult]]] = None,
         # for the OAuth flow
@@ -141,6 +145,9 @@ class AsyncApp:
             logger: The custom logger that can be used in this app.
             name: The application name that will be used in logging. If absent, the source file name will be used.
             process_before_response: True if this app runs on Function as a Service. (Default: False)
+            raise_error_for_unhandled_request: True if you want to raise exceptions for unhandled requests
+                and use @app.error listeners instead of
+                the built-in handler, which pints warning logs and returns 404 to Slack (Default: False)
             signing_secret: The Signing Secret value used for verifying requests from Slack.
             token: The bot/user access token required only for single-workspace app.
             client: The singleton `slack_sdk.web.async_client.AsyncWebClient` instance for this app.
@@ -161,6 +168,7 @@ class AsyncApp:
             "SLACK_VERIFICATION_TOKEN", None
         )
         self._framework_logger = logger or get_bolt_logger(AsyncApp)
+        self._raise_error_for_unhandled_request = raise_error_for_unhandled_request
 
         self._token: Optional[str] = token
 
@@ -464,9 +472,26 @@ class AsyncApp:
             )
             if not middleware_state["next_called"]:
                 if resp is None:
-                    return BoltResponse(
+                    # next() method was not called without providing the response to return to Slack
+                    # This should not be an intentional handling in usual use cases.
+                    resp = BoltResponse(
                         status=404, body={"error": "no next() calls in middleware"}
                     )
+                    if self._raise_error_for_unhandled_request is True:
+                        await self._async_listener_runner.listener_error_handler.handle(
+                            error=BoltUnhandledRequestError(
+                                request=req,
+                                current_response=resp,
+                                last_global_middleware_name=middleware.name,
+                            ),
+                            request=req,
+                            response=resp,
+                        )
+                        return resp
+                    self._framework_logger.warning(
+                        warning_unhandled_by_global_middleware(middleware.name, req)
+                    )
+                    return resp
                 return resp
 
         for listener in self._async_listeners:
@@ -508,8 +533,27 @@ class AsyncApp:
                 if listener_response is not None:
                     return listener_response
 
+        if resp is None:
+            resp = BoltResponse(status=404, body={"error": "unhandled request"})
+        if self._raise_error_for_unhandled_request is True:
+            await self._async_listener_runner.listener_error_handler.handle(
+                error=BoltUnhandledRequestError(
+                    request=req,
+                    current_response=resp,
+                ),
+                request=req,
+                response=resp,
+            )
+            return resp
+        return self._handle_unmatched_requests(req, resp)
+
+    def _handle_unmatched_requests(
+        self, req: AsyncBoltRequest, resp: BoltResponse
+    ) -> BoltResponse:
+        # TODO: provide more info like suggestion of listeners
+        # e.g., You can handle this type of message with @app.event("app_mention")
         self._framework_logger.warning(warning_unhandled_request(req))
-        return BoltResponse(status=404, body={"error": "unhandled request"})
+        return resp
 
     # -------------------------
     # middleware
@@ -623,8 +667,8 @@ class AsyncApp:
     # global error handler
 
     def error(
-        self, func: Callable[..., Awaitable[None]]
-    ) -> Callable[..., Awaitable[None]]:
+        self, func: Callable[..., Awaitable[Optional[BoltResponse]]]
+    ) -> Callable[..., Awaitable[Optional[BoltResponse]]]:
         """Updates the global error handler. This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
@@ -642,6 +686,9 @@ class AsyncApp:
             func: The function that is supposed to be executed
                 when getting an unhandled error in Bolt app.
         """
+        if not inspect.iscoroutinefunction(func):
+            name = get_name_for_callable(func)
+            raise BoltError(error_listener_function_must_be_coro_func(name))
         self._async_listener_runner.listener_error_handler = (
             AsyncCustomListenerErrorHandler(
                 logger=self._framework_logger,

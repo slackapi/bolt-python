@@ -85,7 +85,18 @@ def warning_installation_store_conflicts() -> str:
     return "As you gave both `installation_store` and `oauth_settings`/`auth_flow`, the top level one is unused."
 
 
-def warning_unhandled_request(req: Union[BoltRequest, "AsyncBoltRequest"]) -> str:  # type: ignore
+def warning_unhandled_by_global_middleware(  # type: ignore
+    name: str, req: Union[BoltRequest, "AsyncBoltRequest"]  # type: ignore
+) -> str:  # type: ignore
+    return (
+        f"A global middleware ({name}) skipped calling `next()` "
+        f"without providing a response for the request ({req.body})"
+    )
+
+
+def warning_unhandled_request(  # type: ignore
+    req: Union[BoltRequest, "AsyncBoltRequest"],  # type: ignore
+) -> str:  # type: ignore
     return f"Unhandled request ({req.body})"
 
 
