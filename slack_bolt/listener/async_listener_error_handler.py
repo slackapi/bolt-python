@@ -33,7 +33,9 @@ class AsyncListenerErrorHandler(metaclass=ABCMeta):
 
 
 class AsyncCustomListenerErrorHandler(AsyncListenerErrorHandler):
-    def __init__(self, logger: Logger, func: Callable[..., Awaitable[None]]):
+    def __init__(
+        self, logger: Logger, func: Callable[..., Awaitable[Optional[BoltResponse]]]
+    ):
         self.func = func
         self.logger = logger
         self.arg_names = inspect.getfullargspec(func).args
@@ -55,7 +57,13 @@ class AsyncCustomListenerErrorHandler(AsyncListenerErrorHandler):
             arg_names=self.arg_names,
             logger=self.logger,
         )
-        await self.func(**kwargs)
+        returned_response = await self.func(**kwargs)
+        if returned_response is not None and isinstance(
+            returned_response, BoltResponse
+        ):
+            response.status = returned_response.status
+            response.headers = returned_response.headers
+            response.body = returned_response.body
 
 
 class AsyncDefaultListenerErrorHandler(AsyncListenerErrorHandler):

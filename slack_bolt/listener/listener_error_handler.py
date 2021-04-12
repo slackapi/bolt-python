@@ -31,7 +31,7 @@ class ListenerErrorHandler(metaclass=ABCMeta):
 
 
 class CustomListenerErrorHandler(ListenerErrorHandler):
-    def __init__(self, logger: Logger, func: Callable[..., None]):
+    def __init__(self, logger: Logger, func: Callable[..., Optional[BoltResponse]]):
         self.func = func
         self.logger = logger
         self.arg_names = inspect.getfullargspec(func).args
@@ -53,7 +53,13 @@ class CustomListenerErrorHandler(ListenerErrorHandler):
             arg_names=self.arg_names,
             logger=self.logger,
         )
-        self.func(**kwargs)
+        returned_response = self.func(**kwargs)
+        if returned_response is not None and isinstance(
+            returned_response, BoltResponse
+        ):
+            response.status = returned_response.status
+            response.headers = returned_response.headers
+            response.body = returned_response.body
 
 
 class DefaultListenerErrorHandler(ListenerErrorHandler):
