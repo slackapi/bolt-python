@@ -31,19 +31,13 @@ from abc import ABCMeta, abstractmethod
 from logging import Logger
 from typing import Callable, Dict, Any, Optional
 
+from slack_bolt.listener.internals import (
+    _build_all_available_args,
+    _convert_all_available_args_to_kwargs,
+)
+
 from slack_bolt.request.request import BoltRequest
 from slack_bolt.response.response import BoltResponse
-
-from slack_bolt.request.payload_utils import (
-    to_options,
-    to_shortcut,
-    to_action,
-    to_view,
-    to_command,
-    to_event,
-    to_message,
-    to_step,
-)
 
 
 class ListenerErrorHandler(metaclass=ABCMeta):
@@ -65,7 +59,7 @@ class ListenerErrorHandler(metaclass=ABCMeta):
 
 
 class CustomListenerErrorHandler(ListenerErrorHandler):
-    def __init__(self, logger: Logger, func: Callable[..., None]):
+    def __init__(self, logger: Logger, func: Callable[..., Optional[BoltResponse]]):
         self.func = func
         self.logger = logger
         self.arg_names = inspect.getfullargspec(func).args
@@ -76,52 +70,24 @@ class CustomListenerErrorHandler(ListenerErrorHandler):
         request: BoltRequest,
         response: Optional[BoltResponse],
     ):
-        all_available_args = {
-            &#34;logger&#34;: self.logger,
-            &#34;error&#34;: error,
-            &#34;client&#34;: request.context.client,
-            &#34;req&#34;: request,
-            &#34;request&#34;: request,
-            &#34;resp&#34;: response,
-            &#34;response&#34;: response,
-            &#34;context&#34;: request.context,
-            &#34;body&#34;: request.body,
-            # payload
-            &#34;body&#34;: request.body,
-            &#34;options&#34;: to_options(request.body),
-            &#34;shortcut&#34;: to_shortcut(request.body),
-            &#34;action&#34;: to_action(request.body),
-            &#34;view&#34;: to_view(request.body),
-            &#34;command&#34;: to_command(request.body),
-            &#34;event&#34;: to_event(request.body),
-            &#34;message&#34;: to_message(request.body),
-            &#34;step&#34;: to_step(request.body),
-            # utilities
-            &#34;say&#34;: request.context.say,
-            &#34;respond&#34;: request.context.respond,
-        }
-        all_available_args[&#34;payload&#34;] = (
-            all_available_args[&#34;options&#34;]
-            or all_available_args[&#34;shortcut&#34;]
-            or all_available_args[&#34;action&#34;]
-            or all_available_args[&#34;view&#34;]
-            or all_available_args[&#34;command&#34;]
-            or all_available_args[&#34;event&#34;]
-            or all_available_args[&#34;message&#34;]
-            or all_available_args[&#34;step&#34;]
-            or request.body
+        all_available_args = _build_all_available_args(
+            logger=self.logger,
+            error=error,
+            request=request,
+            response=response,
         )
-
-        kwargs: Dict[str, Any] = {  # type: ignore
-            k: v for k, v in all_available_args.items() if k in self.arg_names  # type: ignore
-        }
-        found_arg_names = kwargs.keys()
-        for name in self.arg_names:
-            if name not in found_arg_names:
-                self.logger.warning(f&#34;{name} is not a valid argument&#34;)
-                kwargs[name] = None
-
-        self.func(**kwargs)
+        kwargs: Dict[str, Any] = _convert_all_available_args_to_kwargs(
+            all_available_args=all_available_args,
+            arg_names=self.arg_names,
+            logger=self.logger,
+        )
+        returned_response = self.func(**kwargs)
+        if returned_response is not None and isinstance(
+            returned_response, BoltResponse
+        ):
+            response.status = returned_response.status
+            response.headers = returned_response.headers
+            response.body = returned_response.body
 
 
 class DefaultListenerErrorHandler(ListenerErrorHandler):
@@ -149,7 +115,7 @@ class DefaultListenerErrorHandler(ListenerErrorHandler):
 <dl>
 <dt id="slack_bolt.listener.listener_error_handler.CustomListenerErrorHandler"><code class="flex name class">
 <span>class <span class="ident">CustomListenerErrorHandler</span></span>
-<span>(</span><span>logger: logging.Logger, func: Callable[..., NoneType])</span>
+<span>(</span><span>logger: logging.Logger, func: Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]])</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -158,7 +124,7 @@ class DefaultListenerErrorHandler(ListenerErrorHandler):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class CustomListenerErrorHandler(ListenerErrorHandler):
-    def __init__(self, logger: Logger, func: Callable[..., None]):
+    def __init__(self, logger: Logger, func: Callable[..., Optional[BoltResponse]]):
         self.func = func
         self.logger = logger
         self.arg_names = inspect.getfullargspec(func).args
@@ -169,52 +135,24 @@ class DefaultListenerErrorHandler(ListenerErrorHandler):
         request: BoltRequest,
         response: Optional[BoltResponse],
     ):
-        all_available_args = {
-            &#34;logger&#34;: self.logger,
-            &#34;error&#34;: error,
-            &#34;client&#34;: request.context.client,
-            &#34;req&#34;: request,
-            &#34;request&#34;: request,
-            &#34;resp&#34;: response,
-            &#34;response&#34;: response,
-            &#34;context&#34;: request.context,
-            &#34;body&#34;: request.body,
-            # payload
-            &#34;body&#34;: request.body,
-            &#34;options&#34;: to_options(request.body),
-            &#34;shortcut&#34;: to_shortcut(request.body),
-            &#34;action&#34;: to_action(request.body),
-            &#34;view&#34;: to_view(request.body),
-            &#34;command&#34;: to_command(request.body),
-            &#34;event&#34;: to_event(request.body),
-            &#34;message&#34;: to_message(request.body),
-            &#34;step&#34;: to_step(request.body),
-            # utilities
-            &#34;say&#34;: request.context.say,
-            &#34;respond&#34;: request.context.respond,
-        }
-        all_available_args[&#34;payload&#34;] = (
-            all_available_args[&#34;options&#34;]
-            or all_available_args[&#34;shortcut&#34;]
-            or all_available_args[&#34;action&#34;]
-            or all_available_args[&#34;view&#34;]
-            or all_available_args[&#34;command&#34;]
-            or all_available_args[&#34;event&#34;]
-            or all_available_args[&#34;message&#34;]
-            or all_available_args[&#34;step&#34;]
-            or request.body
+        all_available_args = _build_all_available_args(
+            logger=self.logger,
+            error=error,
+            request=request,
+            response=response,
         )
-
-        kwargs: Dict[str, Any] = {  # type: ignore
-            k: v for k, v in all_available_args.items() if k in self.arg_names  # type: ignore
-        }
-        found_arg_names = kwargs.keys()
-        for name in self.arg_names:
-            if name not in found_arg_names:
-                self.logger.warning(f&#34;{name} is not a valid argument&#34;)
-                kwargs[name] = None
-
-        self.func(**kwargs)</code></pre>
+        kwargs: Dict[str, Any] = _convert_all_available_args_to_kwargs(
+            all_available_args=all_available_args,
+            arg_names=self.arg_names,
+            logger=self.logger,
+        )
+        returned_response = self.func(**kwargs)
+        if returned_response is not None and isinstance(
+            returned_response, BoltResponse
+        ):
+            response.status = returned_response.status
+            response.headers = returned_response.headers
+            response.body = returned_response.body</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">

@@ -34,27 +34,36 @@ from slack_bolt.request.internals import (
     extract_team_id,
     extract_user_id,
     extract_channel_id,
+    debug_multiple_response_urls_detected,
 )
 
 
 def build_async_context(
     context: AsyncBoltContext,
-    payload: Dict[str, Any],
+    body: Dict[str, Any],
 ) -&gt; AsyncBoltContext:
-    enterprise_id = extract_enterprise_id(payload)
+    enterprise_id = extract_enterprise_id(body)
     if enterprise_id:
         context[&#34;enterprise_id&#34;] = enterprise_id
-    team_id = extract_team_id(payload)
+    team_id = extract_team_id(body)
     if team_id:
         context[&#34;team_id&#34;] = team_id
-    user_id = extract_user_id(payload)
+    user_id = extract_user_id(body)
     if user_id:
         context[&#34;user_id&#34;] = user_id
-    channel_id = extract_channel_id(payload)
+    channel_id = extract_channel_id(body)
     if channel_id:
         context[&#34;channel_id&#34;] = channel_id
-    if &#34;response_url&#34; in payload:
-        context[&#34;response_url&#34;] = payload[&#34;response_url&#34;]
+    if &#34;response_url&#34; in body:
+        context[&#34;response_url&#34;] = body[&#34;response_url&#34;]
+    elif &#34;response_urls&#34; in body:
+        # In the case where response_url_enabled: true in a modal exists
+        response_urls = body[&#34;response_urls&#34;]
+        if len(response_urls) &gt;= 1:
+            if len(response_urls) &gt; 1:
+                context.logger.debug(debug_multiple_response_urls_detected())
+            response_url = response_urls[0].get(&#34;response_url&#34;)
+            context[&#34;response_url&#34;] = response_url
     return context</code></pre>
 </details>
 </section>
@@ -66,7 +75,7 @@ def build_async_context(
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="slack_bolt.request.async_internals.build_async_context"><code class="name flex">
-<span>def <span class="ident">build_async_context</span></span>(<span>context: <a title="slack_bolt.context.async_context.AsyncBoltContext" href="../context/async_context.html#slack_bolt.context.async_context.AsyncBoltContext">AsyncBoltContext</a>, payload: Dict[str, Any]) ‑> <a title="slack_bolt.context.async_context.AsyncBoltContext" href="../context/async_context.html#slack_bolt.context.async_context.AsyncBoltContext">AsyncBoltContext</a></span>
+<span>def <span class="ident">build_async_context</span></span>(<span>context: <a title="slack_bolt.context.async_context.AsyncBoltContext" href="../context/async_context.html#slack_bolt.context.async_context.AsyncBoltContext">AsyncBoltContext</a>, body: Dict[str, Any]) ‑> <a title="slack_bolt.context.async_context.AsyncBoltContext" href="../context/async_context.html#slack_bolt.context.async_context.AsyncBoltContext">AsyncBoltContext</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -76,22 +85,30 @@ def build_async_context(
 </summary>
 <pre><code class="python">def build_async_context(
     context: AsyncBoltContext,
-    payload: Dict[str, Any],
+    body: Dict[str, Any],
 ) -&gt; AsyncBoltContext:
-    enterprise_id = extract_enterprise_id(payload)
+    enterprise_id = extract_enterprise_id(body)
     if enterprise_id:
         context[&#34;enterprise_id&#34;] = enterprise_id
-    team_id = extract_team_id(payload)
+    team_id = extract_team_id(body)
     if team_id:
         context[&#34;team_id&#34;] = team_id
-    user_id = extract_user_id(payload)
+    user_id = extract_user_id(body)
     if user_id:
         context[&#34;user_id&#34;] = user_id
-    channel_id = extract_channel_id(payload)
+    channel_id = extract_channel_id(body)
     if channel_id:
         context[&#34;channel_id&#34;] = channel_id
-    if &#34;response_url&#34; in payload:
-        context[&#34;response_url&#34;] = payload[&#34;response_url&#34;]
+    if &#34;response_url&#34; in body:
+        context[&#34;response_url&#34;] = body[&#34;response_url&#34;]
+    elif &#34;response_urls&#34; in body:
+        # In the case where response_url_enabled: true in a modal exists
+        response_urls = body[&#34;response_urls&#34;]
+        if len(response_urls) &gt;= 1:
+            if len(response_urls) &gt; 1:
+                context.logger.debug(debug_multiple_response_urls_detected())
+            response_url = response_urls[0].get(&#34;response_url&#34;)
+            context[&#34;response_url&#34;] = response_url
     return context</code></pre>
 </details>
 </dd>

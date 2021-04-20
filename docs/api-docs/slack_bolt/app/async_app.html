@@ -35,6 +35,10 @@ from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable, Se
 from aiohttp import web
 
 from slack_bolt.app.async_server import AsyncSlackAppServer
+from slack_bolt.listener.async_builtins import AsyncTokenRevocationListeners
+from slack_bolt.listener.async_listener_completion_handler import (
+    AsyncDefaultListenerCompletionHandler,
+)
 from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
 from slack_bolt.middleware.message_listener_matches.async_message_listener_matches import (
     AsyncMessageListenerMatches,
@@ -57,7 +61,7 @@ from slack_bolt.authorization.async_authorize import (
     AsyncCallableAuthorize,
     AsyncInstallationStoreAuthorize,
 )
-from slack_bolt.error import BoltError
+from slack_bolt.error import BoltError, BoltUnhandledRequestError
 from slack_bolt.logger.messages import (
     warning_client_prioritized_and_token_skipped,
     warning_token_skipped,
@@ -74,6 +78,8 @@ from slack_bolt.logger.messages import (
     warning_bot_only_conflicts,
     debug_return_listener_middleware_response,
     info_default_oauth_settings_loaded,
+    error_installation_store_required_for_builtin_listeners,
+    warning_unhandled_by_global_middleware,
 )
 from slack_bolt.lazy_listener.asyncio_runner import AsyncioLazyListenerRunner
 from slack_bolt.listener.async_listener import AsyncListener, AsyncCustomListener
@@ -119,6 +125,8 @@ class AsyncApp:
         name: Optional[str] = None,
         # Set True when you run this app on a FaaS platform
         process_before_response: bool = False,
+        # Set True if you want to handle an unhandled request as an exception
+        raise_error_for_unhandled_request: bool = False,
         # Basic Information &gt; Credentials &gt; Signing Secret
         signing_secret: Optional[str] = None,
         # for single-workspace apps
@@ -126,6 +134,7 @@ class AsyncApp:
         client: Optional[AsyncWebClient] = None,
         # for multi-workspace apps
         installation_store: Optional[AsyncInstallationStore] = None,
+        # for either only bot scope usage or v1.0.x compatibility
         installation_store_bot_only: Optional[bool] = None,
         authorize: Optional[Callable[..., Awaitable[AuthorizeResult]]] = None,
         # for the OAuth flow
@@ -164,6 +173,9 @@ class AsyncApp:
             logger: The custom logger that can be used in this app.
             name: The application name that will be used in logging. If absent, the source file name will be used.
             process_before_response: True if this app runs on Function as a Service. (Default: False)
+            raise_error_for_unhandled_request: True if you want to raise exceptions for unhandled requests
+                and use @app.error listeners instead of
+                the built-in handler, which pints warning logs and returns 404 to Slack (Default: False)
             signing_secret: The Signing Secret value used for verifying requests from Slack.
             token: The bot/user access token required only for single-workspace app.
             client: The singleton `slack_sdk.web.async_client.AsyncWebClient` instance for this app.
@@ -184,6 +196,7 @@ class AsyncApp:
             &#34;SLACK_VERIFICATION_TOKEN&#34;, None
         )
         self._framework_logger = logger or get_bolt_logger(AsyncApp)
+        self._raise_error_for_unhandled_request = raise_error_for_unhandled_request
 
         self._token: Optional[str] = token
 
@@ -300,6 +313,14 @@ class AsyncApp:
                 )
                 self._async_authorize.bot_only = app_bot_only
 
+        self._async_tokens_revocation_listeners: Optional[
+            AsyncTokenRevocationListeners
+        ] = None
+        if self._async_installation_store is not None:
+            self._async_tokens_revocation_listeners = AsyncTokenRevocationListeners(
+                self._async_installation_store
+            )
+
         # --------------------------------------
         # Middleware Initialization
         # --------------------------------------
@@ -307,10 +328,14 @@ class AsyncApp:
         self._async_middleware_list: List[Union[Callable, AsyncMiddleware]] = []
         self._async_listeners: List[AsyncListener] = []
 
+        self._process_before_response = process_before_response
         self._async_listener_runner = AsyncioListenerRunner(
             logger=self._framework_logger,
             process_before_response=process_before_response,
             listener_error_handler=AsyncDefaultListenerErrorHandler(
+                logger=self._framework_logger
+            ),
+            listener_completion_handler=AsyncDefaultListenerCompletionHandler(
                 logger=self._framework_logger
             ),
             lazy_listener_runner=AsyncioLazyListenerRunner(
@@ -382,6 +407,10 @@ class AsyncApp:
     def listener_runner(self) -&gt; AsyncioListenerRunner:
         &#34;&#34;&#34;The asyncio-based executor for asynchronously running listeners.&#34;&#34;&#34;
         return self._async_listener_runner
+
+    @property
+    def process_before_response(self) -&gt; bool:
+        return self._process_before_response or False
 
     # -------------------------
     # standalone server
@@ -471,9 +500,26 @@ class AsyncApp:
             )
             if not middleware_state[&#34;next_called&#34;]:
                 if resp is None:
-                    return BoltResponse(
+                    # next() method was not called without providing the response to return to Slack
+                    # This should not be an intentional handling in usual use cases.
+                    resp = BoltResponse(
                         status=404, body={&#34;error&#34;: &#34;no next() calls in middleware&#34;}
                     )
+                    if self._raise_error_for_unhandled_request is True:
+                        await self._async_listener_runner.listener_error_handler.handle(
+                            error=BoltUnhandledRequestError(
+                                request=req,
+                                current_response=resp,
+                                last_global_middleware_name=middleware.name,
+                            ),
+                            request=req,
+                            response=resp,
+                        )
+                        return resp
+                    self._framework_logger.warning(
+                        warning_unhandled_by_global_middleware(middleware.name, req)
+                    )
+                    return resp
                 return resp
 
         for listener in self._async_listeners:
@@ -515,8 +561,27 @@ class AsyncApp:
                 if listener_response is not None:
                     return listener_response
 
+        if resp is None:
+            resp = BoltResponse(status=404, body={&#34;error&#34;: &#34;unhandled request&#34;})
+        if self._raise_error_for_unhandled_request is True:
+            await self._async_listener_runner.listener_error_handler.handle(
+                error=BoltUnhandledRequestError(
+                    request=req,
+                    current_response=resp,
+                ),
+                request=req,
+                response=resp,
+            )
+            return resp
+        return self._handle_unmatched_requests(req, resp)
+
+    def _handle_unmatched_requests(
+        self, req: AsyncBoltRequest, resp: BoltResponse
+    ) -&gt; BoltResponse:
+        # TODO: provide more info like suggestion of listeners
+        # e.g., You can handle this type of message with @app.event(&#34;app_mention&#34;)
         self._framework_logger.warning(warning_unhandled_request(req))
-        return BoltResponse(status=404, body={&#34;error&#34;: &#34;unhandled request&#34;})
+        return resp
 
     # -------------------------
     # middleware
@@ -630,8 +695,8 @@ class AsyncApp:
     # global error handler
 
     def error(
-        self, func: Callable[..., Awaitable[None]]
-    ) -&gt; Callable[..., Awaitable[None]]:
+        self, func: Callable[..., Awaitable[Optional[BoltResponse]]]
+    ) -&gt; Callable[..., Awaitable[Optional[BoltResponse]]]:
         &#34;&#34;&#34;Updates the global error handler. This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
@@ -649,6 +714,9 @@ class AsyncApp:
             func: The function that is supposed to be executed
                 when getting an unhandled error in Bolt app.
         &#34;&#34;&#34;
+        if not inspect.iscoroutinefunction(func):
+            name = get_name_for_callable(func)
+            raise BoltError(error_listener_function_must_be_coro_func(name))
         self._async_listener_runner.listener_error_handler = (
             AsyncCustomListenerErrorHandler(
                 logger=self._framework_logger,
@@ -1167,6 +1235,27 @@ class AsyncApp:
             )
 
         return __call__
+
+    # -------------------------
+    # built-in listener functions
+
+    def default_tokens_revoked_event_listener(
+        self,
+    ) -&gt; Callable[..., Awaitable[Optional[BoltResponse]]]:
+        if self._async_tokens_revocation_listeners is None:
+            raise BoltError(error_installation_store_required_for_builtin_listeners())
+        return self._async_tokens_revocation_listeners.handle_tokens_revoked_events
+
+    def default_app_uninstalled_event_listener(
+        self,
+    ) -&gt; Callable[..., Awaitable[Optional[BoltResponse]]]:
+        if self._async_tokens_revocation_listeners is None:
+            raise BoltError(error_installation_store_required_for_builtin_listeners())
+        return self._async_tokens_revocation_listeners.handle_app_uninstalled_events
+
+    def enable_token_revocation_listeners(self) -&gt; None:
+        self.event(&#34;tokens_revoked&#34;)(self.default_tokens_revoked_event_listener())
+        self.event(&#34;app_uninstalled&#34;)(self.default_app_uninstalled_event_listener())
 
     # -------------------------
 
@@ -1264,7 +1353,7 @@ class AsyncApp:
 <dl>
 <dt id="slack_bolt.app.async_app.AsyncApp"><code class="flex name class">
 <span>class <span class="ident">AsyncApp</span></span>
-<span>(</span><span>*, logger: Optional[logging.Logger] = None, name: Optional[str] = None, process_before_response: bool = False, signing_secret: Optional[str] = None, token: Optional[str] = None, client: Optional[slack_sdk.web.async_client.AsyncWebClient] = None, installation_store: Optional[slack_sdk.oauth.installation_store.async_installation_store.AsyncInstallationStore] = None, installation_store_bot_only: Optional[bool] = None, authorize: Optional[Callable[..., Awaitable[<a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="../authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]]] = None, oauth_settings: Optional[<a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings" href="../oauth/async_oauth_settings.html#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings">AsyncOAuthSettings</a>] = None, oauth_flow: Optional[<a title="slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow" href="../oauth/async_oauth_flow.html#slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow">AsyncOAuthFlow</a>] = None, verification_token: Optional[str] = None)</span>
+<span>(</span><span>*, logger: Optional[logging.Logger] = None, name: Optional[str] = None, process_before_response: bool = False, raise_error_for_unhandled_request: bool = False, signing_secret: Optional[str] = None, token: Optional[str] = None, client: Optional[slack_sdk.web.async_client.AsyncWebClient] = None, installation_store: Optional[slack_sdk.oauth.installation_store.async_installation_store.AsyncInstallationStore] = None, installation_store_bot_only: Optional[bool] = None, authorize: Optional[Callable[..., Awaitable[<a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="../authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]]] = None, oauth_settings: Optional[<a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings" href="../oauth/async_oauth_settings.html#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings">AsyncOAuthSettings</a>] = None, oauth_flow: Optional[<a title="slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow" href="../oauth/async_oauth_flow.html#slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow">AsyncOAuthFlow</a>] = None, verification_token: Optional[str] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Bolt App that provides functionalities to register middleware/listeners.</p>
@@ -1298,6 +1387,10 @@ refer to <a href="https://slack.dev/bolt-python/concepts#authenticating-oauth">h
 <dd>The application name that will be used in logging. If absent, the source file name will be used.</dd>
 <dt><strong><code>process_before_response</code></strong></dt>
 <dd>True if this app runs on Function as a Service. (Default: False)</dd>
+<dt><strong><code>raise_error_for_unhandled_request</code></strong></dt>
+<dd>True if you want to raise exceptions for unhandled requests
+and use @app.error listeners instead of
+the built-in handler, which pints warning logs and returns 404 to Slack (Default: False)</dd>
 <dt><strong><code>signing_secret</code></strong></dt>
 <dd>The Signing Secret value used for verifying requests from Slack.</dd>
 <dt><strong><code>token</code></strong></dt>
@@ -1331,6 +1424,8 @@ by checking if there is a team/user in the installation data.</dd>
         name: Optional[str] = None,
         # Set True when you run this app on a FaaS platform
         process_before_response: bool = False,
+        # Set True if you want to handle an unhandled request as an exception
+        raise_error_for_unhandled_request: bool = False,
         # Basic Information &gt; Credentials &gt; Signing Secret
         signing_secret: Optional[str] = None,
         # for single-workspace apps
@@ -1338,6 +1433,7 @@ by checking if there is a team/user in the installation data.</dd>
         client: Optional[AsyncWebClient] = None,
         # for multi-workspace apps
         installation_store: Optional[AsyncInstallationStore] = None,
+        # for either only bot scope usage or v1.0.x compatibility
         installation_store_bot_only: Optional[bool] = None,
         authorize: Optional[Callable[..., Awaitable[AuthorizeResult]]] = None,
         # for the OAuth flow
@@ -1376,6 +1472,9 @@ by checking if there is a team/user in the installation data.</dd>
             logger: The custom logger that can be used in this app.
             name: The application name that will be used in logging. If absent, the source file name will be used.
             process_before_response: True if this app runs on Function as a Service. (Default: False)
+            raise_error_for_unhandled_request: True if you want to raise exceptions for unhandled requests
+                and use @app.error listeners instead of
+                the built-in handler, which pints warning logs and returns 404 to Slack (Default: False)
             signing_secret: The Signing Secret value used for verifying requests from Slack.
             token: The bot/user access token required only for single-workspace app.
             client: The singleton `slack_sdk.web.async_client.AsyncWebClient` instance for this app.
@@ -1396,6 +1495,7 @@ by checking if there is a team/user in the installation data.</dd>
             &#34;SLACK_VERIFICATION_TOKEN&#34;, None
         )
         self._framework_logger = logger or get_bolt_logger(AsyncApp)
+        self._raise_error_for_unhandled_request = raise_error_for_unhandled_request
 
         self._token: Optional[str] = token
 
@@ -1512,6 +1612,14 @@ by checking if there is a team/user in the installation data.</dd>
                 )
                 self._async_authorize.bot_only = app_bot_only
 
+        self._async_tokens_revocation_listeners: Optional[
+            AsyncTokenRevocationListeners
+        ] = None
+        if self._async_installation_store is not None:
+            self._async_tokens_revocation_listeners = AsyncTokenRevocationListeners(
+                self._async_installation_store
+            )
+
         # --------------------------------------
         # Middleware Initialization
         # --------------------------------------
@@ -1519,10 +1627,14 @@ by checking if there is a team/user in the installation data.</dd>
         self._async_middleware_list: List[Union[Callable, AsyncMiddleware]] = []
         self._async_listeners: List[AsyncListener] = []
 
+        self._process_before_response = process_before_response
         self._async_listener_runner = AsyncioListenerRunner(
             logger=self._framework_logger,
             process_before_response=process_before_response,
             listener_error_handler=AsyncDefaultListenerErrorHandler(
+                logger=self._framework_logger
+            ),
+            listener_completion_handler=AsyncDefaultListenerCompletionHandler(
                 logger=self._framework_logger
             ),
             lazy_listener_runner=AsyncioLazyListenerRunner(
@@ -1594,6 +1706,10 @@ by checking if there is a team/user in the installation data.</dd>
     def listener_runner(self) -&gt; AsyncioListenerRunner:
         &#34;&#34;&#34;The asyncio-based executor for asynchronously running listeners.&#34;&#34;&#34;
         return self._async_listener_runner
+
+    @property
+    def process_before_response(self) -&gt; bool:
+        return self._process_before_response or False
 
     # -------------------------
     # standalone server
@@ -1683,9 +1799,26 @@ by checking if there is a team/user in the installation data.</dd>
             )
             if not middleware_state[&#34;next_called&#34;]:
                 if resp is None:
-                    return BoltResponse(
+                    # next() method was not called without providing the response to return to Slack
+                    # This should not be an intentional handling in usual use cases.
+                    resp = BoltResponse(
                         status=404, body={&#34;error&#34;: &#34;no next() calls in middleware&#34;}
                     )
+                    if self._raise_error_for_unhandled_request is True:
+                        await self._async_listener_runner.listener_error_handler.handle(
+                            error=BoltUnhandledRequestError(
+                                request=req,
+                                current_response=resp,
+                                last_global_middleware_name=middleware.name,
+                            ),
+                            request=req,
+                            response=resp,
+                        )
+                        return resp
+                    self._framework_logger.warning(
+                        warning_unhandled_by_global_middleware(middleware.name, req)
+                    )
+                    return resp
                 return resp
 
         for listener in self._async_listeners:
@@ -1727,8 +1860,27 @@ by checking if there is a team/user in the installation data.</dd>
                 if listener_response is not None:
                     return listener_response
 
+        if resp is None:
+            resp = BoltResponse(status=404, body={&#34;error&#34;: &#34;unhandled request&#34;})
+        if self._raise_error_for_unhandled_request is True:
+            await self._async_listener_runner.listener_error_handler.handle(
+                error=BoltUnhandledRequestError(
+                    request=req,
+                    current_response=resp,
+                ),
+                request=req,
+                response=resp,
+            )
+            return resp
+        return self._handle_unmatched_requests(req, resp)
+
+    def _handle_unmatched_requests(
+        self, req: AsyncBoltRequest, resp: BoltResponse
+    ) -&gt; BoltResponse:
+        # TODO: provide more info like suggestion of listeners
+        # e.g., You can handle this type of message with @app.event(&#34;app_mention&#34;)
         self._framework_logger.warning(warning_unhandled_request(req))
-        return BoltResponse(status=404, body={&#34;error&#34;: &#34;unhandled request&#34;})
+        return resp
 
     # -------------------------
     # middleware
@@ -1842,8 +1994,8 @@ by checking if there is a team/user in the installation data.</dd>
     # global error handler
 
     def error(
-        self, func: Callable[..., Awaitable[None]]
-    ) -&gt; Callable[..., Awaitable[None]]:
+        self, func: Callable[..., Awaitable[Optional[BoltResponse]]]
+    ) -&gt; Callable[..., Awaitable[Optional[BoltResponse]]]:
         &#34;&#34;&#34;Updates the global error handler. This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
@@ -1861,6 +2013,9 @@ by checking if there is a team/user in the installation data.</dd>
             func: The function that is supposed to be executed
                 when getting an unhandled error in Bolt app.
         &#34;&#34;&#34;
+        if not inspect.iscoroutinefunction(func):
+            name = get_name_for_callable(func)
+            raise BoltError(error_listener_function_must_be_coro_func(name))
         self._async_listener_runner.listener_error_handler = (
             AsyncCustomListenerErrorHandler(
                 logger=self._framework_logger,
@@ -2379,6 +2534,27 @@ by checking if there is a team/user in the installation data.</dd>
             )
 
         return __call__
+
+    # -------------------------
+    # built-in listener functions
+
+    def default_tokens_revoked_event_listener(
+        self,
+    ) -&gt; Callable[..., Awaitable[Optional[BoltResponse]]]:
+        if self._async_tokens_revocation_listeners is None:
+            raise BoltError(error_installation_store_required_for_builtin_listeners())
+        return self._async_tokens_revocation_listeners.handle_tokens_revoked_events
+
+    def default_app_uninstalled_event_listener(
+        self,
+    ) -&gt; Callable[..., Awaitable[Optional[BoltResponse]]]:
+        if self._async_tokens_revocation_listeners is None:
+            raise BoltError(error_installation_store_required_for_builtin_listeners())
+        return self._async_tokens_revocation_listeners.handle_app_uninstalled_events
+
+    def enable_token_revocation_listeners(self) -&gt; None:
+        self.event(&#34;tokens_revoked&#34;)(self.default_tokens_revoked_event_listener())
+        self.event(&#34;app_uninstalled&#34;)(self.default_app_uninstalled_event_listener())
 
     # -------------------------
 
@@ -2551,6 +2727,18 @@ def oauth_flow(self) -&gt; Optional[AsyncOAuthFlow]:
     return self._async_oauth_flow</code></pre>
 </details>
 </dd>
+<dt id="slack_bolt.app.async_app.AsyncApp.process_before_response"><code class="name">var <span class="ident">process_before_response</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def process_before_response(self) -&gt; bool:
+    return self._process_before_response or False</code></pre>
+</details>
+</dd>
 </dl>
 <h3>Methods</h3>
 <dl>
@@ -2671,9 +2859,26 @@ Only when all the middleware call <code>next()</code> method, the listener funct
         )
         if not middleware_state[&#34;next_called&#34;]:
             if resp is None:
-                return BoltResponse(
+                # next() method was not called without providing the response to return to Slack
+                # This should not be an intentional handling in usual use cases.
+                resp = BoltResponse(
                     status=404, body={&#34;error&#34;: &#34;no next() calls in middleware&#34;}
                 )
+                if self._raise_error_for_unhandled_request is True:
+                    await self._async_listener_runner.listener_error_handler.handle(
+                        error=BoltUnhandledRequestError(
+                            request=req,
+                            current_response=resp,
+                            last_global_middleware_name=middleware.name,
+                        ),
+                        request=req,
+                        response=resp,
+                    )
+                    return resp
+                self._framework_logger.warning(
+                    warning_unhandled_by_global_middleware(middleware.name, req)
+                )
+                return resp
             return resp
 
     for listener in self._async_listeners:
@@ -2715,8 +2920,19 @@ Only when all the middleware call <code>next()</code> method, the listener funct
             if listener_response is not None:
                 return listener_response
 
-    self._framework_logger.warning(warning_unhandled_request(req))
-    return BoltResponse(status=404, body={&#34;error&#34;: &#34;unhandled request&#34;})</code></pre>
+    if resp is None:
+        resp = BoltResponse(status=404, body={&#34;error&#34;: &#34;unhandled request&#34;})
+    if self._raise_error_for_unhandled_request is True:
+        await self._async_listener_runner.listener_error_handler.handle(
+            error=BoltUnhandledRequestError(
+                request=req,
+                current_response=resp,
+            ),
+            request=req,
+            response=resp,
+        )
+        return resp
+    return self._handle_unmatched_requests(req, resp)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.app.async_app.AsyncApp.attachment_action"><code class="name flex">
@@ -2879,6 +3095,40 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     return __call__</code></pre>
 </details>
 </dd>
+<dt id="slack_bolt.app.async_app.AsyncApp.default_app_uninstalled_event_listener"><code class="name flex">
+<span>def <span class="ident">default_app_uninstalled_event_listener</span></span>(<span>self) ‑> Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def default_app_uninstalled_event_listener(
+    self,
+) -&gt; Callable[..., Awaitable[Optional[BoltResponse]]]:
+    if self._async_tokens_revocation_listeners is None:
+        raise BoltError(error_installation_store_required_for_builtin_listeners())
+    return self._async_tokens_revocation_listeners.handle_app_uninstalled_events</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.app.async_app.AsyncApp.default_tokens_revoked_event_listener"><code class="name flex">
+<span>def <span class="ident">default_tokens_revoked_event_listener</span></span>(<span>self) ‑> Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def default_tokens_revoked_event_listener(
+    self,
+) -&gt; Callable[..., Awaitable[Optional[BoltResponse]]]:
+    if self._async_tokens_revocation_listeners is None:
+        raise BoltError(error_installation_store_required_for_builtin_listeners())
+    return self._async_tokens_revocation_listeners.handle_tokens_revoked_events</code></pre>
+</details>
+</dd>
 <dt id="slack_bolt.app.async_app.AsyncApp.dialog_cancellation"><code class="name flex">
 <span>def <span class="ident">dialog_cancellation</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="../middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
@@ -2966,8 +3216,22 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
     return __call__</code></pre>
 </details>
 </dd>
+<dt id="slack_bolt.app.async_app.AsyncApp.enable_token_revocation_listeners"><code class="name flex">
+<span>def <span class="ident">enable_token_revocation_listeners</span></span>(<span>self) ‑> NoneType</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def enable_token_revocation_listeners(self) -&gt; None:
+    self.event(&#34;tokens_revoked&#34;)(self.default_tokens_revoked_event_listener())
+    self.event(&#34;app_uninstalled&#34;)(self.default_app_uninstalled_event_listener())</code></pre>
+</details>
+</dd>
 <dt id="slack_bolt.app.async_app.AsyncApp.error"><code class="name flex">
-<span>def <span class="ident">error</span></span>(<span>self, func: Callable[..., Awaitable[NoneType]]) ‑> Callable[..., Awaitable[NoneType]]</span>
+<span>def <span class="ident">error</span></span>(<span>self, func: Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]) ‑> Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Updates the global error handler. This method can be used as either a decorator or a method.</p>
@@ -2992,8 +3256,8 @@ when getting an unhandled error in Bolt app.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def error(
-    self, func: Callable[..., Awaitable[None]]
-) -&gt; Callable[..., Awaitable[None]]:
+    self, func: Callable[..., Awaitable[Optional[BoltResponse]]]
+) -&gt; Callable[..., Awaitable[Optional[BoltResponse]]]:
     &#34;&#34;&#34;Updates the global error handler. This method can be used as either a decorator or a method.
 
         # Use this method as a decorator
@@ -3011,6 +3275,9 @@ when getting an unhandled error in Bolt app.</dd>
         func: The function that is supposed to be executed
             when getting an unhandled error in Bolt app.
     &#34;&#34;&#34;
+    if not inspect.iscoroutinefunction(func):
+        name = get_name_for_callable(func)
+        raise BoltError(error_listener_function_must_be_coro_func(name))
     self._async_listener_runner.listener_error_handler = (
         AsyncCustomListenerErrorHandler(
             logger=self._framework_logger,
@@ -3876,7 +4143,7 @@ def app_factory():
 <ul>
 <li>
 <h4><code><a title="slack_bolt.app.async_app.AsyncApp" href="#slack_bolt.app.async_app.AsyncApp">AsyncApp</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.AsyncSlackAppServer" href="#slack_bolt.app.async_app.AsyncApp.AsyncSlackAppServer">AsyncSlackAppServer</a></code></li>
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.action" href="#slack_bolt.app.async_app.AsyncApp.action">action</a></code></li>
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.async_dispatch" href="#slack_bolt.app.async_app.AsyncApp.async_dispatch">async_dispatch</a></code></li>
@@ -3885,9 +4152,12 @@ def app_factory():
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.block_suggestion" href="#slack_bolt.app.async_app.AsyncApp.block_suggestion">block_suggestion</a></code></li>
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.client" href="#slack_bolt.app.async_app.AsyncApp.client">client</a></code></li>
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.command" href="#slack_bolt.app.async_app.AsyncApp.command">command</a></code></li>
+<li><code><a title="slack_bolt.app.async_app.AsyncApp.default_app_uninstalled_event_listener" href="#slack_bolt.app.async_app.AsyncApp.default_app_uninstalled_event_listener">default_app_uninstalled_event_listener</a></code></li>
+<li><code><a title="slack_bolt.app.async_app.AsyncApp.default_tokens_revoked_event_listener" href="#slack_bolt.app.async_app.AsyncApp.default_tokens_revoked_event_listener">default_tokens_revoked_event_listener</a></code></li>
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.dialog_cancellation" href="#slack_bolt.app.async_app.AsyncApp.dialog_cancellation">dialog_cancellation</a></code></li>
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.dialog_submission" href="#slack_bolt.app.async_app.AsyncApp.dialog_submission">dialog_submission</a></code></li>
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.dialog_suggestion" href="#slack_bolt.app.async_app.AsyncApp.dialog_suggestion">dialog_suggestion</a></code></li>
+<li><code><a title="slack_bolt.app.async_app.AsyncApp.enable_token_revocation_listeners" href="#slack_bolt.app.async_app.AsyncApp.enable_token_revocation_listeners">enable_token_revocation_listeners</a></code></li>
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.error" href="#slack_bolt.app.async_app.AsyncApp.error">error</a></code></li>
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.event" href="#slack_bolt.app.async_app.AsyncApp.event">event</a></code></li>
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.global_shortcut" href="#slack_bolt.app.async_app.AsyncApp.global_shortcut">global_shortcut</a></code></li>
@@ -3900,6 +4170,7 @@ def app_factory():
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.name" href="#slack_bolt.app.async_app.AsyncApp.name">name</a></code></li>
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.oauth_flow" href="#slack_bolt.app.async_app.AsyncApp.oauth_flow">oauth_flow</a></code></li>
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.options" href="#slack_bolt.app.async_app.AsyncApp.options">options</a></code></li>
+<li><code><a title="slack_bolt.app.async_app.AsyncApp.process_before_response" href="#slack_bolt.app.async_app.AsyncApp.process_before_response">process_before_response</a></code></li>
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.server" href="#slack_bolt.app.async_app.AsyncApp.server">server</a></code></li>
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.shortcut" href="#slack_bolt.app.async_app.AsyncApp.shortcut">shortcut</a></code></li>
 <li><code><a title="slack_bolt.app.async_app.AsyncApp.start" href="#slack_bolt.app.async_app.AsyncApp.start">start</a></code></li>

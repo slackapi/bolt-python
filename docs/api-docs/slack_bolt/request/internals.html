@@ -171,6 +171,14 @@ def build_context(context: BoltContext, body: Dict[str, Any]) -&gt; BoltContext:
         context[&#34;channel_id&#34;] = channel_id
     if &#34;response_url&#34; in body:
         context[&#34;response_url&#34;] = body[&#34;response_url&#34;]
+    elif &#34;response_urls&#34; in body:
+        # In the case where response_url_enabled: true in a modal exists
+        response_urls = body[&#34;response_urls&#34;]
+        if len(response_urls) &gt;= 1:
+            if len(response_urls) &gt; 1:
+                context.logger.debug(debug_multiple_response_urls_detected())
+            response_url = response_urls[0].get(&#34;response_url&#34;)
+            context[&#34;response_url&#34;] = response_url
     return context
 
 
@@ -204,7 +212,15 @@ def error_message_raw_body_required_in_http_mode() -&gt; str:
 
 
 def error_message_unknown_request_body_type() -&gt; str:
-    return &#34;`body` must be either str or dict&#34;</code></pre>
+    return &#34;`body` must be either str or dict&#34;
+
+
+def debug_multiple_response_urls_detected() -&gt; str:
+    return (
+        &#34;`response_urls` in the body has multiple URLs in it. &#34;
+        &#34;If you would like to use non-primary one, &#34;
+        &#34;please manually extract the one from body[&#39;response_urls&#39;].&#34;
+    )</code></pre>
 </details>
 </section>
 <section>
@@ -239,6 +255,14 @@ def error_message_unknown_request_body_type() -&gt; str:
         context[&#34;channel_id&#34;] = channel_id
     if &#34;response_url&#34; in body:
         context[&#34;response_url&#34;] = body[&#34;response_url&#34;]
+    elif &#34;response_urls&#34; in body:
+        # In the case where response_url_enabled: true in a modal exists
+        response_urls = body[&#34;response_urls&#34;]
+        if len(response_urls) &gt;= 1:
+            if len(response_urls) &gt; 1:
+                context.logger.debug(debug_multiple_response_urls_detected())
+            response_url = response_urls[0].get(&#34;response_url&#34;)
+            context[&#34;response_url&#34;] = response_url
     return context</code></pre>
 </details>
 </dd>
@@ -267,6 +291,23 @@ def error_message_unknown_request_body_type() -&gt; str:
                     f&#34;Unsupported type ({type(value)}) of element in headers ({headers})&#34;
                 )
     return normalized_headers  # type: ignore</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.request.internals.debug_multiple_response_urls_detected"><code class="name flex">
+<span>def <span class="ident">debug_multiple_response_urls_detected</span></span>(<span>) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def debug_multiple_response_urls_detected() -&gt; str:
+    return (
+        &#34;`response_urls` in the body has multiple URLs in it. &#34;
+        &#34;If you would like to use non-primary one, &#34;
+        &#34;please manually extract the one from body[&#39;response_urls&#39;].&#34;
+    )</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.internals.error_message_raw_body_required_in_http_mode"><code class="name flex">
@@ -516,6 +557,7 @@ def error_message_unknown_request_body_type() -&gt; str:
 <ul class="">
 <li><code><a title="slack_bolt.request.internals.build_context" href="#slack_bolt.request.internals.build_context">build_context</a></code></li>
 <li><code><a title="slack_bolt.request.internals.build_normalized_headers" href="#slack_bolt.request.internals.build_normalized_headers">build_normalized_headers</a></code></li>
+<li><code><a title="slack_bolt.request.internals.debug_multiple_response_urls_detected" href="#slack_bolt.request.internals.debug_multiple_response_urls_detected">debug_multiple_response_urls_detected</a></code></li>
 <li><code><a title="slack_bolt.request.internals.error_message_raw_body_required_in_http_mode" href="#slack_bolt.request.internals.error_message_raw_body_required_in_http_mode">error_message_raw_body_required_in_http_mode</a></code></li>
 <li><code><a title="slack_bolt.request.internals.error_message_unknown_request_body_type" href="#slack_bolt.request.internals.error_message_unknown_request_body_type">error_message_unknown_request_body_type</a></code></li>
 <li><code><a title="slack_bolt.request.internals.extract_channel_id" href="#slack_bolt.request.internals.extract_channel_id">extract_channel_id</a></code></li>

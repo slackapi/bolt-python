@@ -86,6 +86,13 @@ def error_message_event_type(event_type: str) -&gt; str:
     )
 
 
+def error_installation_store_required_for_builtin_listeners() -&gt; str:
+    return (
+        &#34;To use the event listeners for token revocation handling, &#34;
+        &#34;setting a valid `installation_store` to `App`/`AsyncApp` is required.&#34;
+    )
+
+
 # -------------------------------
 # Warning
 # -------------------------------
@@ -106,7 +113,18 @@ def warning_installation_store_conflicts() -&gt; str:
     return &#34;As you gave both `installation_store` and `oauth_settings`/`auth_flow`, the top level one is unused.&#34;
 
 
-def warning_unhandled_request(req: Union[BoltRequest, &#34;AsyncBoltRequest&#34;]) -&gt; str:  # type: ignore
+def warning_unhandled_by_global_middleware(  # type: ignore
+    name: str, req: Union[BoltRequest, &#34;AsyncBoltRequest&#34;]  # type: ignore
+) -&gt; str:  # type: ignore
+    return (
+        f&#34;A global middleware ({name}) skipped calling `next()` &#34;
+        f&#34;without providing a response for the request ({req.body})&#34;
+    )
+
+
+def warning_unhandled_request(  # type: ignore
+    req: Union[BoltRequest, &#34;AsyncBoltRequest&#34;],  # type: ignore
+) -&gt; str:  # type: ignore
     return f&#34;Unhandled request ({req.body})&#34;
 
 
@@ -315,6 +333,22 @@ def debug_return_listener_middleware_response(
     return &#34;`client` must be a slack_sdk.web.async_client.AsyncWebClient&#34;</code></pre>
 </details>
 </dd>
+<dt id="slack_bolt.logger.messages.error_installation_store_required_for_builtin_listeners"><code class="name flex">
+<span>def <span class="ident">error_installation_store_required_for_builtin_listeners</span></span>(<span>) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def error_installation_store_required_for_builtin_listeners() -&gt; str:
+    return (
+        &#34;To use the event listeners for token revocation handling, &#34;
+        &#34;setting a valid `installation_store` to `App`/`AsyncApp` is required.&#34;
+    )</code></pre>
+</details>
+</dd>
 <dt id="slack_bolt.logger.messages.error_listener_function_must_be_coro_func"><code class="name flex">
 <span>def <span class="ident">error_listener_function_must_be_coro_func</span></span>(<span>func_name: str) ‑> str</span>
 </code></dt>
@@ -506,6 +540,24 @@ def debug_return_listener_middleware_response(
     )</code></pre>
 </details>
 </dd>
+<dt id="slack_bolt.logger.messages.warning_unhandled_by_global_middleware"><code class="name flex">
+<span>def <span class="ident">warning_unhandled_by_global_middleware</span></span>(<span>name: str, req: Union[<a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>, ForwardRef('AsyncBoltRequest')]) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def warning_unhandled_by_global_middleware(  # type: ignore
+    name: str, req: Union[BoltRequest, &#34;AsyncBoltRequest&#34;]  # type: ignore
+) -&gt; str:  # type: ignore
+    return (
+        f&#34;A global middleware ({name}) skipped calling `next()` &#34;
+        f&#34;without providing a response for the request ({req.body})&#34;
+    )</code></pre>
+</details>
+</dd>
 <dt id="slack_bolt.logger.messages.warning_unhandled_request"><code class="name flex">
 <span>def <span class="ident">warning_unhandled_request</span></span>(<span>req: Union[<a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>, ForwardRef('AsyncBoltRequest')]) ‑> str</span>
 </code></dt>
@@ -515,7 +567,9 @@ def debug_return_listener_middleware_response(
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def warning_unhandled_request(req: Union[BoltRequest, &#34;AsyncBoltRequest&#34;]) -&gt; str:  # type: ignore
+<pre><code class="python">def warning_unhandled_request(  # type: ignore
+    req: Union[BoltRequest, &#34;AsyncBoltRequest&#34;],  # type: ignore
+) -&gt; str:  # type: ignore
     return f&#34;Unhandled request ({req.body})&#34;</code></pre>
 </details>
 </dd>
@@ -547,6 +601,7 @@ def debug_return_listener_middleware_response(
 <li><code><a title="slack_bolt.logger.messages.error_authorize_conflicts" href="#slack_bolt.logger.messages.error_authorize_conflicts">error_authorize_conflicts</a></code></li>
 <li><code><a title="slack_bolt.logger.messages.error_client_invalid_type" href="#slack_bolt.logger.messages.error_client_invalid_type">error_client_invalid_type</a></code></li>
 <li><code><a title="slack_bolt.logger.messages.error_client_invalid_type_async" href="#slack_bolt.logger.messages.error_client_invalid_type_async">error_client_invalid_type_async</a></code></li>
+<li><code><a title="slack_bolt.logger.messages.error_installation_store_required_for_builtin_listeners" href="#slack_bolt.logger.messages.error_installation_store_required_for_builtin_listeners">error_installation_store_required_for_builtin_listeners</a></code></li>
 <li><code><a title="slack_bolt.logger.messages.error_listener_function_must_be_coro_func" href="#slack_bolt.logger.messages.error_listener_function_must_be_coro_func">error_listener_function_must_be_coro_func</a></code></li>
 <li><code><a title="slack_bolt.logger.messages.error_message_event_type" href="#slack_bolt.logger.messages.error_message_event_type">error_message_event_type</a></code></li>
 <li><code><a title="slack_bolt.logger.messages.error_oauth_flow_invalid_type_async" href="#slack_bolt.logger.messages.error_oauth_flow_invalid_type_async">error_oauth_flow_invalid_type_async</a></code></li>
@@ -560,6 +615,7 @@ def debug_return_listener_middleware_response(
 <li><code><a title="slack_bolt.logger.messages.warning_installation_store_conflicts" href="#slack_bolt.logger.messages.warning_installation_store_conflicts">warning_installation_store_conflicts</a></code></li>
 <li><code><a title="slack_bolt.logger.messages.warning_skip_uncommon_arg_name" href="#slack_bolt.logger.messages.warning_skip_uncommon_arg_name">warning_skip_uncommon_arg_name</a></code></li>
 <li><code><a title="slack_bolt.logger.messages.warning_token_skipped" href="#slack_bolt.logger.messages.warning_token_skipped">warning_token_skipped</a></code></li>
+<li><code><a title="slack_bolt.logger.messages.warning_unhandled_by_global_middleware" href="#slack_bolt.logger.messages.warning_unhandled_by_global_middleware">warning_unhandled_by_global_middleware</a></code></li>
 <li><code><a title="slack_bolt.logger.messages.warning_unhandled_request" href="#slack_bolt.logger.messages.warning_unhandled_request">warning_unhandled_request</a></code></li>
 </ul>
 </li>

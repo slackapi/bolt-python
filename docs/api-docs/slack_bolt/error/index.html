@@ -28,8 +28,30 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Bolt specific error types.&#34;&#34;&#34;
+from typing import Optional, Union
+
+
 class BoltError(Exception):
-    &#34;&#34;&#34;General class in a Bolt app&#34;&#34;&#34;</code></pre>
+    &#34;&#34;&#34;General class in a Bolt app&#34;&#34;&#34;
+
+
+class BoltUnhandledRequestError(BoltError):
+    request: &#34;BoltRequest&#34;  # type: ignore
+    body: dict
+    current_response: Optional[&#34;BoltResponse&#34;]  # type: ignore
+    last_global_middleware_name: Optional[str]
+
+    def __init__(  # type: ignore
+        self,
+        *,
+        request: Union[&#34;BoltRequest&#34;, &#34;AsyncBoltRequest&#34;],  # type: ignore
+        current_response: Optional[&#34;BoltResponse&#34;],  # type: ignore
+        last_global_middleware_name: Optional[str] = None,
+    ):
+        self.request = request
+        self.body = request.body if request is not None else {}
+        self.current_response = current_response
+        self.last_global_middleware_name = last_global_middleware_name</code></pre>
 </details>
 </section>
 <section>
@@ -59,6 +81,64 @@ class BoltError(Exception):
 <li>builtins.Exception</li>
 <li>builtins.BaseException</li>
 </ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.error.BoltUnhandledRequestError" href="#slack_bolt.error.BoltUnhandledRequestError">BoltUnhandledRequestError</a></li>
+</ul>
+</dd>
+<dt id="slack_bolt.error.BoltUnhandledRequestError"><code class="flex name class">
+<span>class <span class="ident">BoltUnhandledRequestError</span></span>
+<span>(</span><span>*, request: Union[ForwardRef('BoltRequest'), ForwardRef('AsyncBoltRequest')], current_response: Optional[ForwardRef('BoltResponse')], last_global_middleware_name: Optional[str] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>General class in a Bolt app</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BoltUnhandledRequestError(BoltError):
+    request: &#34;BoltRequest&#34;  # type: ignore
+    body: dict
+    current_response: Optional[&#34;BoltResponse&#34;]  # type: ignore
+    last_global_middleware_name: Optional[str]
+
+    def __init__(  # type: ignore
+        self,
+        *,
+        request: Union[&#34;BoltRequest&#34;, &#34;AsyncBoltRequest&#34;],  # type: ignore
+        current_response: Optional[&#34;BoltResponse&#34;],  # type: ignore
+        last_global_middleware_name: Optional[str] = None,
+    ):
+        self.request = request
+        self.body = request.body if request is not None else {}
+        self.current_response = current_response
+        self.last_global_middleware_name = last_global_middleware_name</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.error.BoltError" href="#slack_bolt.error.BoltError">BoltError</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.error.BoltUnhandledRequestError.body"><code class="name">var <span class="ident">body</span> : dict</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.error.BoltUnhandledRequestError.current_response"><code class="name">var <span class="ident">current_response</span> : Optional[BoltResponse]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.error.BoltUnhandledRequestError.last_global_middleware_name"><code class="name">var <span class="ident">last_global_middleware_name</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.error.BoltUnhandledRequestError.request"><code class="name">var <span class="ident">request</span> : BoltRequest</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 </dd>
 </dl>
 </section>
@@ -78,6 +158,15 @@ class BoltError(Exception):
 <ul>
 <li>
 <h4><code><a title="slack_bolt.error.BoltError" href="#slack_bolt.error.BoltError">BoltError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="slack_bolt.error.BoltUnhandledRequestError" href="#slack_bolt.error.BoltUnhandledRequestError">BoltUnhandledRequestError</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.error.BoltUnhandledRequestError.body" href="#slack_bolt.error.BoltUnhandledRequestError.body">body</a></code></li>
+<li><code><a title="slack_bolt.error.BoltUnhandledRequestError.current_response" href="#slack_bolt.error.BoltUnhandledRequestError.current_response">current_response</a></code></li>
+<li><code><a title="slack_bolt.error.BoltUnhandledRequestError.last_global_middleware_name" href="#slack_bolt.error.BoltUnhandledRequestError.last_global_middleware_name">last_global_middleware_name</a></code></li>
+<li><code><a title="slack_bolt.error.BoltUnhandledRequestError.request" href="#slack_bolt.error.BoltUnhandledRequestError.request">request</a></code></li>
+</ul>
 </li>
 </ul>
 </li>
