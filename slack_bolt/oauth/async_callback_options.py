@@ -91,8 +91,10 @@ class DefaultAsyncCallbackOptions(AsyncCallbackOptions):
             state_utils=state_utils,
             redirect_uri_page_renderer=redirect_uri_page_renderer,
         )
-        self.success = self._success_handler
-        self.failure = self._failure_handler
+        # Note that pytype 2021.4.26 misunderstands these assignments.
+        # Thus, we put "type: ignore" for the following two lines
+        self.success = self._success_handler  # type: ignore
+        self.failure = self._failure_handler  # type: ignore
 
     # --------------------------
     # Internal methods
