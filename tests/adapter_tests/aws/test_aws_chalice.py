@@ -18,6 +18,7 @@ from slack_bolt.adapter.aws_lambda.chalice_handler import (
     ChaliceSlackRequestHandler,
     not_found,
 )
+from slack_bolt.adapter.aws_lambda.local_lambda_client import LocalLambdaClient
 from slack_bolt.app import App
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
