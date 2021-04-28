@@ -37,7 +37,7 @@ t:
     contribute: Contributing
   ja-jp:
     basic: 基本的な概念
-#    steps: ワークフローステップ
+    steps: ワークフローステップ
 #    advanced: 応用コンセプト
     start: Bolt 入門ガイド
 #    contribute: 貢献
