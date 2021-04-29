@@ -169,47 +169,6 @@ class TestEvents:
             response = app.dispatch(request)
             assert response.status == 200
 
-    def test_self_events(self):
-        app = App(client=self.web_client, signing_secret=self.signing_secret)
-
-        event_body = {
-            "token": "verification_token",
-            "team_id": "T111",
-            "enterprise_id": "E111",
-            "api_app_id": "A111",
-            "event": {
-                "type": "reaction_added",
-                "user": "W23456789",  # bot_user_id
-                "item": {
-                    "type": "message",
-                    "channel": "C111",
-                    "ts": "1599529504.000400",
-                },
-                "reaction": "heart_eyes",
-                "item_user": "W111",
-                "event_ts": "1599616881.000800",
-            },
-            "type": "event_callback",
-            "event_id": "Ev111",
-            "event_time": 1599616881,
-            "authed_users": ["W111"],
-        }
-
-        @app.event("reaction_added")
-        def handle_app_mention(say):
-            say("What's up?")
-
-        timestamp, body = str(int(time())), json.dumps(event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
-        response = app.dispatch(request)
-        assert response.status == 200
-        assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
-        # The listener should not be executed
-        assert self.mock_received_requests.get("/chat.postMessage") is None
-
     def test_self_member_join_left_events(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
 
