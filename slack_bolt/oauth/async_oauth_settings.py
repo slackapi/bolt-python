@@ -103,12 +103,14 @@ class AsyncOAuthSettings:
             logger: The logger that will be used internally
         """
         # OAuth flow parameters/credentials
-        self.client_id = client_id or os.environ.get("SLACK_CLIENT_ID")
-        self.client_secret = client_secret or os.environ.get(
-            "SLACK_CLIENT_SECRET", None
+        client_id: Optional[str] = client_id or os.environ.get("SLACK_CLIENT_ID")
+        client_secret: Optional[str] = client_secret or os.environ.get(
+            "SLACK_CLIENT_SECRET"
         )
-        if self.client_id is None or self.client_secret is None:
+        if client_id is None or client_secret is None:
             raise BoltError("Both client_id and client_secret are required")
+        self.client_id = client_id
+        self.client_secret = client_secret
 
         self.scopes = scopes or os.environ.get("SLACK_SCOPES", "").split(",")
         if isinstance(self.scopes, str):
