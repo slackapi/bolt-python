@@ -42,9 +42,20 @@ class BoltRequest:
             context: The context in this request.
             mode: The mode used for this request. (either "http" or "socket_mode")
         """
-        if mode == "http" and not isinstance(body, str):
-            raise BoltError(error_message_raw_body_required_in_http_mode())
-        self.raw_body = body if mode == "http" else ""
+        if mode == "http":
+            # HTTP Mode
+            if not isinstance(body, str):
+                raise BoltError(error_message_raw_body_required_in_http_mode())
+            self.raw_body = body if body is not None else ""
+        else:
+            # Socket Mode
+            if body is not None and isinstance(body, str):
+                self.raw_body = body
+            else:
+                # We don't convert the dict value to str
+                # as doing so does not guarantee to keep the original structure/format.
+                self.raw_body = ""
+
         self.query = parse_query(query)
         self.headers = build_normalized_headers(headers)
         self.content_type = extract_content_type(self.headers)
@@ -56,7 +67,7 @@ class BoltRequest:
             raise BoltError(error_message_unknown_request_body_type())
 
         self.context = build_context(BoltContext(context if context else {}), self.body)
-        self.lazy_only = self.headers.get("x-slack-bolt-lazy-only", [False])[0]
+        self.lazy_only = bool(self.headers.get("x-slack-bolt-lazy-only", [False])[0])
         self.lazy_function_name = self.headers.get(
             "x-slack-bolt-lazy-function-name", [None]
         )[0]
