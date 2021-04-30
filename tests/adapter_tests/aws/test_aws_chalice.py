@@ -4,7 +4,6 @@ from time import time
 from typing import Dict, Any
 from urllib.parse import quote
 from unittest import mock
-import logging
 
 from chalice import Chalice, Response
 from chalice.app import Request
@@ -18,6 +17,7 @@ from slack_bolt.adapter.aws_lambda.chalice_handler import (
     ChaliceSlackRequestHandler,
     not_found,
 )
+
 from slack_bolt.app import App
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
@@ -315,12 +315,71 @@ class TestAwsChalice:
                 return slack_handler.handle(chalice_app.current_request)
 
             headers = self.build_headers(timestamp, body)
-            client = Client(chalice_app, Config())
+            client = Client(chalice_app)
             response = client.http.post("/slack/events", headers=headers, body=body)
 
             assert response.status_code == 200, f"Failed request: {response.body}"
             assert_auth_test_count(self, 1)
             assert self.mock_received_requests["/chat.postMessage"] == 1
+
+    @mock.patch(
+        "slack_bolt.adapter.aws_lambda.chalice_lazy_listener_runner.boto3",
+        autospec=True,
+    )
+    def test_lazy_listeners_non_cli(self, mock_boto3):
+        with mock.patch.dict(os.environ, {"AWS_CHALICE_CLI_MODE": "false"}):
+            assert os.environ.get("AWS_CHALICE_CLI_MODE") == "false"
+
+            mock_lambda = mock.MagicMock()  # mock of boto3.client('lambda')
+            mock_boto3.client.return_value = mock_lambda
+            app = App(
+                client=self.web_client,
+                signing_secret=self.signing_secret,
+                process_before_response=True,
+            )
+
+            def command_handler(ack):
+                ack()
+
+            def say_it(say):
+                say("Done!")
+
+            app.command("/hello-world")(ack=command_handler, lazy=[say_it])
+
+            input = (
+                "token=verification_token"
+                "&team_id=T111"
+                "&team_domain=test-domain"
+                "&channel_id=C111"
+                "&channel_name=random"
+                "&user_id=W111"
+                "&user_name=primary-owner"
+                "&command=%2Fhello-world"
+                "&text=Hi"
+                "&enterprise_id=E111"
+                "&enterprise_name=Org+Name"
+                "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
+                "&trigger_id=111.111.xxx"
+            )
+            timestamp, body = str(int(time())), input
+
+            chalice_app = Chalice(app_name="bolt-python-chalice")
+
+            slack_handler = ChaliceSlackRequestHandler(app=app, chalice=chalice_app)
+
+            @chalice_app.route(
+                "/slack/events",
+                methods=["POST"],
+                content_types=["application/x-www-form-urlencoded", "application/json"],
+            )
+            def events() -> Response:
+                return slack_handler.handle(chalice_app.current_request)
+
+            headers = self.build_headers(timestamp, body)
+            client = Client(chalice_app)
+            response = client.http.post("/slack/events", headers=headers, body=body)
+            assert response
+            assert mock_lambda.invoke.called
 
     def test_oauth(self):
         app = App(
