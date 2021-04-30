@@ -57,10 +57,19 @@ def get_boot_message(development_server: bool = False) -> str:
         else:
             return "Bolt app is running!"
 
-    if development_server:
-        return "⚡️ Bolt app is running! (development server)"
-    else:
-        return "⚡️ Bolt app is running!"
+    try:
+        if development_server:
+            return "⚡️ Bolt app is running! (development server)"
+        else:
+            return "⚡️ Bolt app is running!"
+    except ValueError:
+        # ValueError is a runtime exception for a given value
+        # It's a super class of UnicodeEncodeError, which may be raised in the scenario
+        # see also: https://github.com/slackapi/bolt-python/issues/170
+        if development_server:
+            return "Bolt app is running! (development server)"
+        else:
+            return "Bolt app is running!"
 
 
 def get_name_for_callable(func: Callable) -> str:

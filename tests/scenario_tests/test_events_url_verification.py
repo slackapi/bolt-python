@@ -1,17 +1,20 @@
+import json
 from time import time
 
-from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
+from slack_sdk.signature import SignatureVerifier
 
 from slack_bolt import App, BoltRequest
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-class TestSSLCheck:
+class TestEventsUrlVerification:
+    valid_token = "xoxb-valid"
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -35,44 +38,47 @@ class TestSSLCheck:
             timestamp=timestamp,
         )
 
-    def test_mock_server_is_running(self):
-        resp = self.web_client.api_test()
-        assert resp != None
+    def build_headers(self, timestamp: str, body: str):
+        return {
+            "content-type": ["application/json"],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
+        }
 
-    def test_ssl_check(self):
+    def test_default(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
 
-        timestamp, body = str(int(time())), "token=random&ssl_check=1"
+        timestamp, body = str(int(time())), json.dumps(event_body)
         request: BoltRequest = BoltRequest(
-            body=body,
-            query={},
-            headers={
-                "content-type": ["application/x-www-form-urlencoded"],
-                "x-slack-signature": [self.generate_signature(body, timestamp)],
-                "x-slack-request-timestamp": [timestamp],
-            },
+            body=body, headers=self.build_headers(timestamp, body)
         )
         response = app.dispatch(request)
         assert response.status == 200
-        assert response.body == ""
+        assert (
+            response.body
+            == """{"challenge": "3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P"}"""
+        )
+        assert_auth_test_count(self, 0)
 
-    def test_ssl_check_disabled(self):
+    def test_disabled(self):
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
-            ssl_check_enabled=False,
+            url_verification_enabled=False,
         )
 
-        timestamp, body = str(int(time())), "token=random&ssl_check=1"
+        timestamp, body = str(int(time())), json.dumps(event_body)
         request: BoltRequest = BoltRequest(
-            body=body,
-            query={},
-            headers={
-                "content-type": ["application/x-www-form-urlencoded"],
-                "x-slack-signature": [self.generate_signature(body, timestamp)],
-                "x-slack-request-timestamp": [timestamp],
-            },
+            body=body, headers=self.build_headers(timestamp, body)
         )
         response = app.dispatch(request)
         assert response.status == 404
         assert response.body == """{"error": "unhandled request"}"""
+        assert_auth_test_count(self, 0)
+
+
+event_body = {
+    "token": "Jhj5dZrVaK7ZwHHjRyZWjbDl",
+    "challenge": "3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P",
+    "type": "url_verification",
+}
