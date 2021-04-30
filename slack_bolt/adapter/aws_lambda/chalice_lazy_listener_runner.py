@@ -1,15 +1,16 @@
 import json
 from logging import Logger
-from typing import Callable, Optional, Any
+from typing import Callable, Optional
 
 import boto3
+from botocore.client import BaseClient
 
 from slack_bolt import BoltRequest
 from slack_bolt.lazy_listener import LazyListenerRunner
 
 
 class ChaliceLazyListenerRunner(LazyListenerRunner):
-    def __init__(self, logger: Logger, lambda_client: Optional[Any] = None):
+    def __init__(self, logger: Logger, lambda_client: Optional[BaseClient] = None):
         self.lambda_client = lambda_client
         self.logger = logger
 
@@ -38,4 +39,3 @@ class ChaliceLazyListenerRunner(LazyListenerRunner):
             InvocationType="Event",
             Payload=json.dumps(payload),
         )
-        self.logger.info(invocation)

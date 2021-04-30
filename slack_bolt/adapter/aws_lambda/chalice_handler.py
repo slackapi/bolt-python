@@ -1,6 +1,8 @@
 import logging
 from os import getenv
-from typing import Optional, Any
+from typing import Optional
+
+from botocore.client import BaseClient
 
 from chalice.app import Request, Response, Chalice
 
@@ -14,22 +16,22 @@ from slack_bolt.oauth import OAuthFlow
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
-try:
-    from slack_bolt.adapter.aws_lambda.local_lambda_client import LocalLambdaClient
-except ImportError:
-    LocalLambdaClient = None
-
 
 class ChaliceSlackRequestHandler:
-    def __init__(self, app: App, chalice: Chalice, lambda_client: Optional[Any] = None):  # type: ignore
+    def __init__(self, app: App, chalice: Chalice, lambda_client: Optional[BaseClient] = None):  # type: ignore
         self.app = app
         self.chalice = chalice
         self.logger = get_bolt_app_logger(app.name, ChaliceSlackRequestHandler)
 
-        if getenv("AWS_CHALICE_CLI_MODE") == "true" and not lambda_client:
+        if getenv("AWS_CHALICE_CLI_MODE") == "true" and lambda_client is None:
             try:
+                from slack_bolt.adapter.aws_lambda.local_lambda_client import (
+                    LocalLambdaClient,
+                )
+
                 lambda_client = LocalLambdaClient(self.chalice, None)
-            except NameError:
+            except ImportError:
+                logging.info("Failed to load LocalLambdaClient for CLI mode.")
                 pass
 
         self.app.listener_runner.lazy_listener_runner = ChaliceLazyListenerRunner(
