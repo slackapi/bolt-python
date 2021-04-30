@@ -330,8 +330,8 @@ class TestAwsChalice:
         with mock.patch.dict(os.environ, {"AWS_CHALICE_CLI_MODE": "false"}):
             assert os.environ.get("AWS_CHALICE_CLI_MODE") == "false"
 
-            mock_s3 = mock.MagicMock()
-            mock_boto3.client.return_value = mock_s3
+            mock_lambda = mock.MagicMock()  # mock of boto3.client('lambda')
+            mock_boto3.client.return_value = mock_lambda
             app = App(
                 client=self.web_client,
                 signing_secret=self.signing_secret,
@@ -376,10 +376,10 @@ class TestAwsChalice:
                 return slack_handler.handle(chalice_app.current_request)
 
             headers = self.build_headers(timestamp, body)
-            client = Client(chalice_app, Config())
+            client = Client(chalice_app)
             response = client.http.post("/slack/events", headers=headers, body=body)
             assert response
-            assert mock_s3.invoke.called
+            assert mock_lambda.invoke.called
 
     def test_oauth(self):
         app = App(
