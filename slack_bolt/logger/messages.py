@@ -4,7 +4,17 @@ from typing import Union
 from slack_sdk.web import SlackResponse
 
 from slack_bolt.request import BoltRequest
-
+from slack_bolt.request.payload_utils import (
+    is_action,
+    is_event,
+    is_options,
+    is_shortcut,
+    is_slash_command,
+    is_view,
+    is_workflow_step_edit,
+    is_workflow_step_save,
+    is_workflow_step_execute,
+)
 
 # -------------------------------
 # Error
@@ -94,10 +104,116 @@ def warning_unhandled_by_global_middleware(  # type: ignore
     )
 
 
+_unhandled_request_suggestion_prefix = """
+---
+[Suggestion] You can handle this type of event with the following listener function:
+"""
+
+
+def _build_unhandled_request_suggestion(default_message: str, code_snippet: str):
+    return f"""{default_message}{_unhandled_request_suggestion_prefix}{code_snippet}"""
+
+
 def warning_unhandled_request(  # type: ignore
     req: Union[BoltRequest, "AsyncBoltRequest"],  # type: ignore
 ) -> str:  # type: ignore
-    return f"Unhandled request ({req.body})"
+    default_message = f"Unhandled request ({req.body})"
+    if (
+        is_workflow_step_edit(req.body)
+        or is_workflow_step_save(req.body)
+        or is_workflow_step_execute(req.body)
+    ):
+        # @app.step
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f"""
+from slack_bolt.workflows.step import WorkflowStep
+ws = WorkflowStep(
+    callback_id="add_task",
+    edit=edit,
+    save=save,
+    execute=execute,
+)
+# Pass Step to set up listeners
+app.step(ws)
+""",
+        )
+    if is_action(req.body):
+        # @app.action
+        action_id_or_callback_id = req.body.get("callback_id")
+        if req.body.get("type") == "block_actions":
+            action_id_or_callback_id = req.body.get("actions")[0].get("action_id")
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f"""
+@app.action("{action_id_or_callback_id}")
+def handle_some_action(ack, body, logger):
+    ack()
+    logger.info(body)
+""",
+        )
+    if is_options(req.body):
+        # @app.options
+        constraints = '"action-id"'
+        if req.body.get("action_id") is not None:
+            constraints = '"' + req.body.get("action_id") + '"'
+        elif req.body.get("type") == "dialog_suggestion":
+            constraints = f"""{{"type": "dialog_suggestion", "callback_id": "{req.body.get('callback_id')}"}}"""
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f"""
+@app.options({constraints})
+def handle_some_options(ack):
+    ack(options=[ ... ])
+""",
+        )
+    if is_shortcut(req.body):
+        # @app.shortcut
+        id = req.body.get("action_id") or req.body.get("callback_id")
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f"""
+@app.shortcut("{id}")
+def handle_shortcuts(ack, body, logger):
+    ack()
+    logger.info(body)
+""",
+        )
+    if is_view(req.body):
+        # @app.view
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f"""
+@app.view("{req.body.get('view', {}).get('callback_id', 'modal-view-id')}")
+def handle_view_events(ack, body, logger):
+    ack()
+    logger.info(body)
+""",
+        )
+    if is_event(req.body):
+        # @app.event
+        event_type = req.body.get('event', {}).get('type')
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f"""
+@app.event("{event_type}")
+def handle_{event_type}_events(body, logger):
+    logger.info(body)
+""",
+        )
+    if is_slash_command(req.body):
+        # @app.command
+        command = req.body.get("command", "/your-command")
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f"""
+@app.command("{command}")
+def handle_some_command(ack, body, logger):
+    ack()
+    logger.info(body)
+""",
+        )
+    return default_message
 
 
 def warning_did_not_call_ack(listener_name: str) -> str:

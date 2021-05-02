@@ -530,8 +530,6 @@ class App:
     def _handle_unmatched_requests(
         self, req: BoltRequest, resp: BoltResponse
     ) -> BoltResponse:
-        # TODO: provide more info like suggestion of listeners
-        # e.g., You can handle this type of message with @app.event("app_mention")
         self._framework_logger.warning(warning_unhandled_request(req))
         return resp
 
