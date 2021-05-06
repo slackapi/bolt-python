@@ -79,6 +79,7 @@ from typing import Optional
 from uuid import uuid4
 from django.db.models import F
 from django.utils import timezone
+from django.utils.timezone import is_naive, make_aware
 from slack_sdk.oauth import InstallationStore, OAuthStateStore
 from slack_sdk.oauth.installation_store import Bot, Installation
 from slack_sdk.webhook import WebhookClient
