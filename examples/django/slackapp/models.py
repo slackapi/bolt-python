@@ -231,10 +231,11 @@ from slack_bolt import App, BoltContext
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 
 logger = logging.getLogger(__name__)
-client_id, client_secret, signing_secret = (
+client_id, client_secret, signing_secret, scopes = (
     os.environ["SLACK_CLIENT_ID"],
     os.environ["SLACK_CLIENT_SECRET"],
     os.environ["SLACK_SIGNING_SECRET"],
+    os.environ.get("SLACK_SCOPES", "commands").split(","),
 )
 
 app = App(
@@ -246,6 +247,7 @@ app = App(
     oauth_settings=OAuthSettings(
         client_id=client_id,
         client_secret=client_secret,
+        scopes=scopes,
         state_store=DjangoOAuthStateStore(
             expiration_seconds=120,
             logger=logger,
