@@ -17,8 +17,13 @@ class TestUnmatchedPatternSuggestions:
     def test_block_actions(self):
         req: BoltRequest = BoltRequest(body=block_actions, mode="socket_mode")
         message = warning_unhandled_request(req)
+        filtered_body = {
+            "type": "block_actions",
+            "block_id": "b",
+            "action_id": "action-id-value",
+        }
         assert (
-            f"""Unhandled request ({req.body})
+            f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -33,8 +38,19 @@ def handle_some_action(ack, body, logger):
     def test_attachment_actions(self):
         req: BoltRequest = BoltRequest(body=attachment_actions, mode="socket_mode")
         message = warning_unhandled_request(req)
+        filtered_body = {
+            "type": "interactive_message",
+            "callback_id": "pick_channel_for_fun",
+            "actions": [
+                {
+                    "name": "channel_list",
+                    "type": "select",
+                    "selected_options": [{"value": "C111"}],
+                }
+            ],
+        }
         assert (
-            f"""Unhandled request ({req.body})
+            f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -48,9 +64,13 @@ def handle_some_action(ack, body, logger):
 
     def test_app_mention_event(self):
         req: BoltRequest = BoltRequest(body=app_mention_event, mode="socket_mode")
+        filtered_body = {
+            "type": "event_callback",
+            "event": {"type": "app_mention"},
+        }
         message = warning_unhandled_request(req)
         assert (
-            f"""Unhandled request ({req.body})
+            f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -64,8 +84,12 @@ def handle_app_mention_events(body, logger):
     def test_commands(self):
         req: BoltRequest = BoltRequest(body=slash_command, mode="socket_mode")
         message = warning_unhandled_request(req)
+        filtered_body = {
+            "type": None,
+            "command": "/start-conv",
+        }
         assert (
-            f"""Unhandled request ({req.body})
+            f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -78,11 +102,14 @@ def handle_some_command(ack, body, logger):
         )
 
     def test_shortcut(self):
-        for body in [global_shortcut, message_shortcut]:
-            req: BoltRequest = BoltRequest(body=body, mode="socket_mode")
-            message = warning_unhandled_request(req)
-            assert (
-                f"""Unhandled request ({req.body})
+        req: BoltRequest = BoltRequest(body=global_shortcut, mode="socket_mode")
+        message = warning_unhandled_request(req)
+        filtered_body = {
+            "type": "shortcut",
+            "callback_id": "test-shortcut",
+        }
+        assert (
+            f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -91,15 +118,37 @@ def handle_shortcuts(ack, body, logger):
     ack()
     logger.info(body)
 """
-                == message
-            )
+            == message
+        )
+
+        req: BoltRequest = BoltRequest(body=message_shortcut, mode="socket_mode")
+        message = warning_unhandled_request(req)
+        filtered_body = {
+            "type": "message_action",
+            "callback_id": "test-shortcut",
+        }
+        assert (
+            f"""Unhandled request ({filtered_body})
+---
+[Suggestion] You can handle this type of event with the following listener function:
+
+@app.shortcut("test-shortcut")
+def handle_shortcuts(ack, body, logger):
+    ack()
+    logger.info(body)
+"""
+            == message
+        )
 
     def test_view(self):
-        for body in [view_submission, view_closed]:
-            req: BoltRequest = BoltRequest(body=body, mode="socket_mode")
-            message = warning_unhandled_request(req)
-            assert (
-                f"""Unhandled request ({req.body})
+        req: BoltRequest = BoltRequest(body=view_submission, mode="socket_mode")
+        message = warning_unhandled_request(req)
+        filtered_body = {
+            "type": "view_submission",
+            "view": {"type": "modal", "callback_id": "view-id"},
+        }
+        assert (
+            f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -108,14 +157,40 @@ def handle_view_events(ack, body, logger):
     ack()
     logger.info(body)
 """
-                == message
-            )
+            == message
+        )
+
+        req: BoltRequest = BoltRequest(body=view_closed, mode="socket_mode")
+        message = warning_unhandled_request(req)
+        filtered_body = {
+            "type": "view_closed",
+            "view": {"type": "modal", "callback_id": "view-id"},
+        }
+        assert (
+            f"""Unhandled request ({filtered_body})
+---
+[Suggestion] You can handle this type of event with the following listener function:
+
+@app.view("view-id")
+def handle_view_events(ack, body, logger):
+    ack()
+    logger.info(body)
+"""
+            == message
+        )
 
     def test_block_suggestion(self):
         req: BoltRequest = BoltRequest(body=block_suggestion, mode="socket_mode")
         message = warning_unhandled_request(req)
+        filtered_body = {
+            "type": "block_suggestion",
+            "view": {"type": "modal", "callback_id": "view-id"},
+            "block_id": "block-id",
+            "action_id": "the-id",
+            "value": "search word",
+        }
         assert (
-            f"""Unhandled request ({req.body})
+            f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -129,8 +204,13 @@ def handle_some_options(ack):
     def test_dialog_suggestion(self):
         req: BoltRequest = BoltRequest(body=dialog_suggestion, mode="socket_mode")
         message = warning_unhandled_request(req)
+        filtered_body = {
+            "type": "dialog_suggestion",
+            "callback_id": "the-id",
+            "value": "search keyword",
+        }
         assert (
-            f"""Unhandled request ({req.body})
+            f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -142,17 +222,20 @@ def handle_some_options(ack):
         )
 
     def test_step(self):
-        for body in [step_edit_payload, step_save_payload, step_execute_payload]:
-            req: BoltRequest = BoltRequest(body=body, mode="socket_mode")
-            message = warning_unhandled_request(req)
-            assert (
-                f"""Unhandled request ({req.body})
+        req: BoltRequest = BoltRequest(body=step_edit_payload, mode="socket_mode")
+        message = warning_unhandled_request(req)
+        filtered_body = {
+            "type": "workflow_step_edit",
+            "callback_id": "copy_review",
+        }
+        assert (
+            f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
 from slack_bolt.workflows.step import WorkflowStep
 ws = WorkflowStep(
-    callback_id="add_task",
+    callback_id="copy_review",
     edit=edit,
     save=save,
     execute=execute,
@@ -160,8 +243,54 @@ ws = WorkflowStep(
 # Pass Step to set up listeners
 app.step(ws)
 """
-                == message
-            )
+            == message
+        )
+        req: BoltRequest = BoltRequest(body=step_save_payload, mode="socket_mode")
+        message = warning_unhandled_request(req)
+        filtered_body = {
+            "type": "view_submission",
+            "view": {"type": "workflow_step", "callback_id": "copy_review"},
+        }
+        assert (
+            f"""Unhandled request ({filtered_body})
+---
+[Suggestion] You can handle this type of event with the following listener function:
+
+from slack_bolt.workflows.step import WorkflowStep
+ws = WorkflowStep(
+    callback_id="copy_review",
+    edit=edit,
+    save=save,
+    execute=execute,
+)
+# Pass Step to set up listeners
+app.step(ws)
+"""
+            == message
+        )
+        req: BoltRequest = BoltRequest(body=step_execute_payload, mode="socket_mode")
+        message = warning_unhandled_request(req)
+        filtered_body = {
+            "type": "event_callback",
+            "event": {"type": "workflow_step_execute"},
+        }
+        assert (
+            f"""Unhandled request ({filtered_body})
+---
+[Suggestion] You can handle this type of event with the following listener function:
+
+from slack_bolt.workflows.step import WorkflowStep
+ws = WorkflowStep(
+    callback_id="your-callback-id",
+    edit=edit,
+    save=save,
+    execute=execute,
+)
+# Pass Step to set up listeners
+app.step(ws)
+"""
+            == message
+        )
 
 
 block_actions = {

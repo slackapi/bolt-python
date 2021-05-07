@@ -1,5 +1,5 @@
 import time
-from typing import Union
+from typing import Union, Dict, Any, Optional
 
 from slack_sdk.web import SlackResponse
 
@@ -110,6 +110,69 @@ _unhandled_request_suggestion_prefix = """
 """
 
 
+def _build_filtered_body(body: Optional[Dict[str, Any]]) -> dict:
+    if body is None:
+        return {}
+
+    payload_type = body.get("type")
+    filtered_body = {"type": payload_type}
+
+    if "view" in body:
+        view = body["view"]
+        # view_submission, view_closed, workflow_step_save
+        filtered_body["view"] = {
+            "type": view.get("type"),
+            "callback_id": view.get("callback_id"),
+        }
+
+    if payload_type == "block_actions":
+        # Block Kit Interactivity
+        actions = body.get("actions", [])
+        if len(actions) > 0 and actions[0] is not None:
+            filtered_body["block_id"] = actions[0].get("block_id")
+            filtered_body["action_id"] = actions[0].get("action_id")
+    if payload_type == "block_suggestion":
+        # Block Kit - external data source
+        filtered_body["block_id"] = body.get("block_id")
+        filtered_body["action_id"] = body.get("action_id")
+        filtered_body["value"] = body.get("value")
+
+    if payload_type == "event_callback" and "event" in body:
+        # Events API, workflow_step_execute
+        event_payload = body.get("event", {})
+        filtered_event = {"type": event_payload.get("type")}
+        if "subtype" in body["event"]:
+            filtered_event["subtype"] = event_payload.get("subtype")
+        filtered_body["event"] = filtered_event
+
+    if "command" in body:
+        # Slash Commands
+        filtered_body["command"] = body.get("command")
+
+    if payload_type in ["workflow_step_edit", "shortcut", "message_action"]:
+        # Workflow Steps, Global Shortcuts, Message Shortcuts
+        filtered_body["callback_id"] = body.get("callback_id")
+
+    if payload_type == "interactive_message":
+        # Actions in Attachments
+        filtered_body["callback_id"] = body.get("callback_id")
+        filtered_body["actions"] = body.get("actions")
+
+    if payload_type == "dialog_suggestion":
+        # Dialogs - external data source
+        filtered_body["callback_id"] = body.get("callback_id")
+        filtered_body["value"] = body.get("value")
+    if payload_type == "dialog_submission":
+        # Dialogs - clicking submit button
+        filtered_body["callback_id"] = body.get("callback_id")
+        filtered_body["submission"] = body.get("submission")
+    if payload_type == "dialog_cancellation":
+        # Dialogs - clicking cancel button
+        filtered_body["callback_id"] = body.get("callback_id")
+
+    return filtered_body
+
+
 def _build_unhandled_request_suggestion(default_message: str, code_snippet: str):
     return f"""{default_message}{_unhandled_request_suggestion_prefix}{code_snippet}"""
 
@@ -117,19 +180,25 @@ def _build_unhandled_request_suggestion(default_message: str, code_snippet: str)
 def warning_unhandled_request(  # type: ignore
     req: Union[BoltRequest, "AsyncBoltRequest"],  # type: ignore
 ) -> str:  # type: ignore
-    default_message = f"Unhandled request ({req.body})"
+    filtered_body = _build_filtered_body(req.body)
+    default_message = f"Unhandled request ({filtered_body})"
     if (
         is_workflow_step_edit(req.body)
         or is_workflow_step_save(req.body)
         or is_workflow_step_execute(req.body)
     ):
         # @app.step
+        callback_id = (
+            filtered_body.get("callback_id")
+            or filtered_body.get("view", {}).get("callback_id")  # type: ignore
+            or "your-callback-id"
+        )
         return _build_unhandled_request_suggestion(
             default_message,
             f"""
 from slack_bolt.workflows.step import WorkflowStep
 ws = WorkflowStep(
-    callback_id="add_task",
+    callback_id="{callback_id}",
     edit=edit,
     save=save,
     execute=execute,
@@ -192,7 +261,7 @@ def handle_view_events(ack, body, logger):
         )
     if is_event(req.body):
         # @app.event
-        event_type = req.body.get('event', {}).get('type')
+        event_type = req.body.get("event", {}).get("type")
         return _build_unhandled_request_suggestion(
             default_message,
             f"""
