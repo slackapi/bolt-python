@@ -12,13 +12,13 @@ python_version=`python --version | awk '{print $2}'`
 if [[ $test_target != "" ]]
 then
   black slack_bolt/ tests/ && \
-    pytest $1
+    pytest -vv $1
 else
   if [ ${python_version:0:3} == "3.8" ]
   then
     # pytype's behavior can be different in older Python versions
     black slack_bolt/ tests/ \
-      && pytest \
+      && pytest -vv \
       && pip install -e ".[adapter]" \
       && pip install -U pip setuptools wheel \
       && pip install -U pytype \
