@@ -27,12 +27,12 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">import logging
-import json
 from os import getenv
+from typing import Optional
+
+from botocore.client import BaseClient
 
 from chalice.app import Request, Response, Chalice
-from chalice.config import Config
-from chalice.test import BaseClient, LambdaContext, InvokeResponse
 
 from slack_bolt.adapter.aws_lambda.chalice_lazy_listener_runner import (
     ChaliceLazyListenerRunner,
@@ -45,38 +45,22 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
-class LocalLambdaClient(BaseClient):
-    &#34;&#34;&#34;Lambda client implementing `invoke` for use when running with Chalice CLI&#34;&#34;&#34;
-
-    def __init__(self, app: Chalice, config: Config) -&gt; None:
-        self._app = app
-        self._config = config
-
-    def invoke(
-        self,
-        FunctionName: str = None,
-        InvocationType: str = &#34;Event&#34;,
-        Payload: str = &#34;{}&#34;,
-    ) -&gt; InvokeResponse:
-        scoped = self._config.scope(self._config.chalice_stage, FunctionName)
-        lambda_context = LambdaContext(
-            FunctionName, memory_size=scoped.lambda_memory_size
-        )
-
-        with self._patched_env_vars(scoped.environment_variables):
-            response = self._app(json.loads(Payload), lambda_context)
-        return InvokeResponse(payload=response)
-
-
 class ChaliceSlackRequestHandler:
-    def __init__(self, app: App, chalice: Chalice):  # type: ignore
+    def __init__(self, app: App, chalice: Chalice, lambda_client: Optional[BaseClient] = None):  # type: ignore
         self.app = app
         self.chalice = chalice
         self.logger = get_bolt_app_logger(app.name, ChaliceSlackRequestHandler)
 
-        lambda_client = None
-        if getenv(&#34;AWS_CHALICE_CLI_MODE&#34;) == &#34;true&#34;:
-            lambda_client = LocalLambdaClient(self.chalice, Config())
+        if getenv(&#34;AWS_CHALICE_CLI_MODE&#34;) == &#34;true&#34; and lambda_client is None:
+            try:
+                from slack_bolt.adapter.aws_lambda.local_lambda_client import (
+                    LocalLambdaClient,
+                )
+
+                lambda_client = LocalLambdaClient(self.chalice, None)
+            except ImportError:
+                logging.info(&#34;Failed to load LocalLambdaClient for CLI mode.&#34;)
+                pass
 
         self.app.listener_runner.lazy_listener_runner = ChaliceLazyListenerRunner(
             logger=self.logger, lambda_client=lambda_client
@@ -225,7 +209,7 @@ def not_found() -&gt; Response:
 <dl>
 <dt id="slack_bolt.adapter.aws_lambda.chalice_handler.ChaliceSlackRequestHandler"><code class="flex name class">
 <span>class <span class="ident">ChaliceSlackRequestHandler</span></span>
-<span>(</span><span>app: <a title="slack_bolt.app.app.App" href="../../app/app.html#slack_bolt.app.app.App">App</a>, chalice: chalice.app.Chalice)</span>
+<span>(</span><span>app: <a title="slack_bolt.app.app.App" href="../../app/app.html#slack_bolt.app.app.App">App</a>, chalice: chalice.app.Chalice, lambda_client: Optional[botocore.client.BaseClient] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -234,14 +218,21 @@ def not_found() -&gt; Response:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ChaliceSlackRequestHandler:
-    def __init__(self, app: App, chalice: Chalice):  # type: ignore
+    def __init__(self, app: App, chalice: Chalice, lambda_client: Optional[BaseClient] = None):  # type: ignore
         self.app = app
         self.chalice = chalice
         self.logger = get_bolt_app_logger(app.name, ChaliceSlackRequestHandler)
 
-        lambda_client = None
-        if getenv(&#34;AWS_CHALICE_CLI_MODE&#34;) == &#34;true&#34;:
-            lambda_client = LocalLambdaClient(self.chalice, Config())
+        if getenv(&#34;AWS_CHALICE_CLI_MODE&#34;) == &#34;true&#34; and lambda_client is None:
+            try:
+                from slack_bolt.adapter.aws_lambda.local_lambda_client import (
+                    LocalLambdaClient,
+                )
+
+                lambda_client = LocalLambdaClient(self.chalice, None)
+            except ImportError:
+                logging.info(&#34;Failed to load LocalLambdaClient for CLI mode.&#34;)
+                pass
 
         self.app.listener_runner.lazy_listener_runner = ChaliceLazyListenerRunner(
             logger=self.logger, lambda_client=lambda_client
@@ -377,71 +368,6 @@ def clear_all_log_handlers(cls):
 </dd>
 </dl>
 </dd>
-<dt id="slack_bolt.adapter.aws_lambda.chalice_handler.LocalLambdaClient"><code class="flex name class">
-<span>class <span class="ident">LocalLambdaClient</span></span>
-<span>(</span><span>app: chalice.app.Chalice, config: chalice.config.Config)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Lambda client implementing <code>invoke</code> for use when running with Chalice CLI</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class LocalLambdaClient(BaseClient):
-    &#34;&#34;&#34;Lambda client implementing `invoke` for use when running with Chalice CLI&#34;&#34;&#34;
-
-    def __init__(self, app: Chalice, config: Config) -&gt; None:
-        self._app = app
-        self._config = config
-
-    def invoke(
-        self,
-        FunctionName: str = None,
-        InvocationType: str = &#34;Event&#34;,
-        Payload: str = &#34;{}&#34;,
-    ) -&gt; InvokeResponse:
-        scoped = self._config.scope(self._config.chalice_stage, FunctionName)
-        lambda_context = LambdaContext(
-            FunctionName, memory_size=scoped.lambda_memory_size
-        )
-
-        with self._patched_env_vars(scoped.environment_variables):
-            response = self._app(json.loads(Payload), lambda_context)
-        return InvokeResponse(payload=response)</code></pre>
-</details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li>chalice.test.BaseClient</li>
-</ul>
-<h3>Methods</h3>
-<dl>
-<dt id="slack_bolt.adapter.aws_lambda.chalice_handler.LocalLambdaClient.invoke"><code class="name flex">
-<span>def <span class="ident">invoke</span></span>(<span>self, FunctionName: str = None, InvocationType: str = 'Event', Payload: str = '{}') ‑> chalice.test.InvokeResponse</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def invoke(
-    self,
-    FunctionName: str = None,
-    InvocationType: str = &#34;Event&#34;,
-    Payload: str = &#34;{}&#34;,
-) -&gt; InvokeResponse:
-    scoped = self._config.scope(self._config.chalice_stage, FunctionName)
-    lambda_context = LambdaContext(
-        FunctionName, memory_size=scoped.lambda_memory_size
-    )
-
-    with self._patched_env_vars(scoped.environment_variables):
-        response = self._app(json.loads(Payload), lambda_context)
-    return InvokeResponse(payload=response)</code></pre>
-</details>
-</dd>
-</dl>
-</dd>
 </dl>
 </section>
 </article>
@@ -470,12 +396,6 @@ def clear_all_log_handlers(cls):
 <ul class="">
 <li><code><a title="slack_bolt.adapter.aws_lambda.chalice_handler.ChaliceSlackRequestHandler.clear_all_log_handlers" href="#slack_bolt.adapter.aws_lambda.chalice_handler.ChaliceSlackRequestHandler.clear_all_log_handlers">clear_all_log_handlers</a></code></li>
 <li><code><a title="slack_bolt.adapter.aws_lambda.chalice_handler.ChaliceSlackRequestHandler.handle" href="#slack_bolt.adapter.aws_lambda.chalice_handler.ChaliceSlackRequestHandler.handle">handle</a></code></li>
-</ul>
-</li>
-<li>
-<h4><code><a title="slack_bolt.adapter.aws_lambda.chalice_handler.LocalLambdaClient" href="#slack_bolt.adapter.aws_lambda.chalice_handler.LocalLambdaClient">LocalLambdaClient</a></code></h4>
-<ul class="">
-<li><code><a title="slack_bolt.adapter.aws_lambda.chalice_handler.LocalLambdaClient.invoke" href="#slack_bolt.adapter.aws_lambda.chalice_handler.LocalLambdaClient.invoke">invoke</a></code></li>
 </ul>
 </li>
 </ul>

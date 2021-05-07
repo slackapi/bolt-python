@@ -28,16 +28,17 @@
 </summary>
 <pre><code class="python">import json
 from logging import Logger
-from typing import Callable, Optional, Any
+from typing import Callable, Optional
 
 import boto3
+from botocore.client import BaseClient
 
 from slack_bolt import BoltRequest
 from slack_bolt.lazy_listener import LazyListenerRunner
 
 
 class ChaliceLazyListenerRunner(LazyListenerRunner):
-    def __init__(self, logger: Logger, lambda_client: Optional[Any] = None):
+    def __init__(self, logger: Logger, lambda_client: Optional[BaseClient] = None):
         self.lambda_client = lambda_client
         self.logger = logger
 
@@ -65,8 +66,7 @@ class ChaliceLazyListenerRunner(LazyListenerRunner):
             FunctionName=request.context[&#34;aws_lambda_function_name&#34;],
             InvocationType=&#34;Event&#34;,
             Payload=json.dumps(payload),
-        )
-        self.logger.info(invocation)</code></pre>
+        )</code></pre>
 </details>
 </section>
 <section>
@@ -80,7 +80,7 @@ class ChaliceLazyListenerRunner(LazyListenerRunner):
 <dl>
 <dt id="slack_bolt.adapter.aws_lambda.chalice_lazy_listener_runner.ChaliceLazyListenerRunner"><code class="flex name class">
 <span>class <span class="ident">ChaliceLazyListenerRunner</span></span>
-<span>(</span><span>logger: logging.Logger, lambda_client: Optional[Any] = None)</span>
+<span>(</span><span>logger: logging.Logger, lambda_client: Optional[botocore.client.BaseClient] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -89,7 +89,7 @@ class ChaliceLazyListenerRunner(LazyListenerRunner):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ChaliceLazyListenerRunner(LazyListenerRunner):
-    def __init__(self, logger: Logger, lambda_client: Optional[Any] = None):
+    def __init__(self, logger: Logger, lambda_client: Optional[BaseClient] = None):
         self.lambda_client = lambda_client
         self.logger = logger
 
@@ -117,8 +117,7 @@ class ChaliceLazyListenerRunner(LazyListenerRunner):
             FunctionName=request.context[&#34;aws_lambda_function_name&#34;],
             InvocationType=&#34;Event&#34;,
             Payload=json.dumps(payload),
-        )
-        self.logger.info(invocation)</code></pre>
+        )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">

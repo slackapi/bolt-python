@@ -85,10 +85,19 @@ def get_boot_message(development_server: bool = False) -&gt; str:
         else:
             return &#34;Bolt app is running!&#34;
 
-    if development_server:
-        return &#34;⚡️ Bolt app is running! (development server)&#34;
-    else:
-        return &#34;⚡️ Bolt app is running!&#34;
+    try:
+        if development_server:
+            return &#34;⚡️ Bolt app is running! (development server)&#34;
+        else:
+            return &#34;⚡️ Bolt app is running!&#34;
+    except ValueError:
+        # ValueError is a runtime exception for a given value
+        # It&#39;s a super class of UnicodeEncodeError, which may be raised in the scenario
+        # see also: https://github.com/slackapi/bolt-python/issues/170
+        if development_server:
+            return &#34;Bolt app is running! (development server)&#34;
+        else:
+            return &#34;Bolt app is running!&#34;
 
 
 def get_name_for_callable(func: Callable) -&gt; str:
@@ -205,10 +214,19 @@ def get_name_for_callable(func: Callable) -&gt; str:
         else:
             return &#34;Bolt app is running!&#34;
 
-    if development_server:
-        return &#34;⚡️ Bolt app is running! (development server)&#34;
-    else:
-        return &#34;⚡️ Bolt app is running!&#34;</code></pre>
+    try:
+        if development_server:
+            return &#34;⚡️ Bolt app is running! (development server)&#34;
+        else:
+            return &#34;⚡️ Bolt app is running!&#34;
+    except ValueError:
+        # ValueError is a runtime exception for a given value
+        # It&#39;s a super class of UnicodeEncodeError, which may be raised in the scenario
+        # see also: https://github.com/slackapi/bolt-python/issues/170
+        if development_server:
+            return &#34;Bolt app is running! (development server)&#34;
+        else:
+            return &#34;Bolt app is running!&#34;</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.util.utils.get_name_for_callable"><code class="name flex">

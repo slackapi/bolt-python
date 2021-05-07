@@ -27,12 +27,22 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">import time
-from typing import Union
+from typing import Union, Dict, Any, Optional
 
 from slack_sdk.web import SlackResponse
 
 from slack_bolt.request import BoltRequest
-
+from slack_bolt.request.payload_utils import (
+    is_action,
+    is_event,
+    is_options,
+    is_shortcut,
+    is_slash_command,
+    is_view,
+    is_workflow_step_edit,
+    is_workflow_step_save,
+    is_workflow_step_execute,
+)
 
 # -------------------------------
 # Error
@@ -122,10 +132,185 @@ def warning_unhandled_by_global_middleware(  # type: ignore
     )
 
 
+_unhandled_request_suggestion_prefix = &#34;&#34;&#34;
+---
+[Suggestion] You can handle this type of event with the following listener function:
+&#34;&#34;&#34;
+
+
+def _build_filtered_body(body: Optional[Dict[str, Any]]) -&gt; dict:
+    if body is None:
+        return {}
+
+    payload_type = body.get(&#34;type&#34;)
+    filtered_body = {&#34;type&#34;: payload_type}
+
+    if &#34;view&#34; in body:
+        view = body[&#34;view&#34;]
+        # view_submission, view_closed, workflow_step_save
+        filtered_body[&#34;view&#34;] = {
+            &#34;type&#34;: view.get(&#34;type&#34;),
+            &#34;callback_id&#34;: view.get(&#34;callback_id&#34;),
+        }
+
+    if payload_type == &#34;block_actions&#34;:
+        # Block Kit Interactivity
+        actions = body.get(&#34;actions&#34;, [])
+        if len(actions) &gt; 0 and actions[0] is not None:
+            filtered_body[&#34;block_id&#34;] = actions[0].get(&#34;block_id&#34;)
+            filtered_body[&#34;action_id&#34;] = actions[0].get(&#34;action_id&#34;)
+    if payload_type == &#34;block_suggestion&#34;:
+        # Block Kit - external data source
+        filtered_body[&#34;block_id&#34;] = body.get(&#34;block_id&#34;)
+        filtered_body[&#34;action_id&#34;] = body.get(&#34;action_id&#34;)
+        filtered_body[&#34;value&#34;] = body.get(&#34;value&#34;)
+
+    if payload_type == &#34;event_callback&#34; and &#34;event&#34; in body:
+        # Events API, workflow_step_execute
+        event_payload = body.get(&#34;event&#34;, {})
+        filtered_event = {&#34;type&#34;: event_payload.get(&#34;type&#34;)}
+        if &#34;subtype&#34; in body[&#34;event&#34;]:
+            filtered_event[&#34;subtype&#34;] = event_payload.get(&#34;subtype&#34;)
+        filtered_body[&#34;event&#34;] = filtered_event
+
+    if &#34;command&#34; in body:
+        # Slash Commands
+        filtered_body[&#34;command&#34;] = body.get(&#34;command&#34;)
+
+    if payload_type in [&#34;workflow_step_edit&#34;, &#34;shortcut&#34;, &#34;message_action&#34;]:
+        # Workflow Steps, Global Shortcuts, Message Shortcuts
+        filtered_body[&#34;callback_id&#34;] = body.get(&#34;callback_id&#34;)
+
+    if payload_type == &#34;interactive_message&#34;:
+        # Actions in Attachments
+        filtered_body[&#34;callback_id&#34;] = body.get(&#34;callback_id&#34;)
+        filtered_body[&#34;actions&#34;] = body.get(&#34;actions&#34;)
+
+    if payload_type == &#34;dialog_suggestion&#34;:
+        # Dialogs - external data source
+        filtered_body[&#34;callback_id&#34;] = body.get(&#34;callback_id&#34;)
+        filtered_body[&#34;value&#34;] = body.get(&#34;value&#34;)
+    if payload_type == &#34;dialog_submission&#34;:
+        # Dialogs - clicking submit button
+        filtered_body[&#34;callback_id&#34;] = body.get(&#34;callback_id&#34;)
+        filtered_body[&#34;submission&#34;] = body.get(&#34;submission&#34;)
+    if payload_type == &#34;dialog_cancellation&#34;:
+        # Dialogs - clicking cancel button
+        filtered_body[&#34;callback_id&#34;] = body.get(&#34;callback_id&#34;)
+
+    return filtered_body
+
+
+def _build_unhandled_request_suggestion(default_message: str, code_snippet: str):
+    return f&#34;&#34;&#34;{default_message}{_unhandled_request_suggestion_prefix}{code_snippet}&#34;&#34;&#34;
+
+
 def warning_unhandled_request(  # type: ignore
     req: Union[BoltRequest, &#34;AsyncBoltRequest&#34;],  # type: ignore
 ) -&gt; str:  # type: ignore
-    return f&#34;Unhandled request ({req.body})&#34;
+    filtered_body = _build_filtered_body(req.body)
+    default_message = f&#34;Unhandled request ({filtered_body})&#34;
+    if (
+        is_workflow_step_edit(req.body)
+        or is_workflow_step_save(req.body)
+        or is_workflow_step_execute(req.body)
+    ):
+        # @app.step
+        callback_id = (
+            filtered_body.get(&#34;callback_id&#34;)
+            or filtered_body.get(&#34;view&#34;, {}).get(&#34;callback_id&#34;)  # type: ignore
+            or &#34;your-callback-id&#34;
+        )
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+from slack_bolt.workflows.step import WorkflowStep
+ws = WorkflowStep(
+    callback_id=&#34;{callback_id}&#34;,
+    edit=edit,
+    save=save,
+    execute=execute,
+)
+# Pass Step to set up listeners
+app.step(ws)
+&#34;&#34;&#34;,
+        )
+    if is_action(req.body):
+        # @app.action
+        action_id_or_callback_id = req.body.get(&#34;callback_id&#34;)
+        if req.body.get(&#34;type&#34;) == &#34;block_actions&#34;:
+            action_id_or_callback_id = req.body.get(&#34;actions&#34;)[0].get(&#34;action_id&#34;)
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+@app.action(&#34;{action_id_or_callback_id}&#34;)
+def handle_some_action(ack, body, logger):
+    ack()
+    logger.info(body)
+&#34;&#34;&#34;,
+        )
+    if is_options(req.body):
+        # @app.options
+        constraints = &#39;&#34;action-id&#34;&#39;
+        if req.body.get(&#34;action_id&#34;) is not None:
+            constraints = &#39;&#34;&#39; + req.body.get(&#34;action_id&#34;) + &#39;&#34;&#39;
+        elif req.body.get(&#34;type&#34;) == &#34;dialog_suggestion&#34;:
+            constraints = f&#34;&#34;&#34;{{&#34;type&#34;: &#34;dialog_suggestion&#34;, &#34;callback_id&#34;: &#34;{req.body.get(&#39;callback_id&#39;)}&#34;}}&#34;&#34;&#34;
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+@app.options({constraints})
+def handle_some_options(ack):
+    ack(options=[ ... ])
+&#34;&#34;&#34;,
+        )
+    if is_shortcut(req.body):
+        # @app.shortcut
+        id = req.body.get(&#34;action_id&#34;) or req.body.get(&#34;callback_id&#34;)
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+@app.shortcut(&#34;{id}&#34;)
+def handle_shortcuts(ack, body, logger):
+    ack()
+    logger.info(body)
+&#34;&#34;&#34;,
+        )
+    if is_view(req.body):
+        # @app.view
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+@app.view(&#34;{req.body.get(&#39;view&#39;, {}).get(&#39;callback_id&#39;, &#39;modal-view-id&#39;)}&#34;)
+def handle_view_events(ack, body, logger):
+    ack()
+    logger.info(body)
+&#34;&#34;&#34;,
+        )
+    if is_event(req.body):
+        # @app.event
+        event_type = req.body.get(&#34;event&#34;, {}).get(&#34;type&#34;)
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+@app.event(&#34;{event_type}&#34;)
+def handle_{event_type}_events(body, logger):
+    logger.info(body)
+&#34;&#34;&#34;,
+        )
+    if is_slash_command(req.body):
+        # @app.command
+        command = req.body.get(&#34;command&#34;, &#34;/your-command&#34;)
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+@app.command(&#34;{command}&#34;)
+def handle_some_command(ack, body, logger):
+    ack()
+    logger.info(body)
+&#34;&#34;&#34;,
+        )
+    return default_message
 
 
 def warning_did_not_call_ack(listener_name: str) -&gt; str:
@@ -570,7 +755,109 @@ def debug_return_listener_middleware_response(
 <pre><code class="python">def warning_unhandled_request(  # type: ignore
     req: Union[BoltRequest, &#34;AsyncBoltRequest&#34;],  # type: ignore
 ) -&gt; str:  # type: ignore
-    return f&#34;Unhandled request ({req.body})&#34;</code></pre>
+    filtered_body = _build_filtered_body(req.body)
+    default_message = f&#34;Unhandled request ({filtered_body})&#34;
+    if (
+        is_workflow_step_edit(req.body)
+        or is_workflow_step_save(req.body)
+        or is_workflow_step_execute(req.body)
+    ):
+        # @app.step
+        callback_id = (
+            filtered_body.get(&#34;callback_id&#34;)
+            or filtered_body.get(&#34;view&#34;, {}).get(&#34;callback_id&#34;)  # type: ignore
+            or &#34;your-callback-id&#34;
+        )
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+from slack_bolt.workflows.step import WorkflowStep
+ws = WorkflowStep(
+    callback_id=&#34;{callback_id}&#34;,
+    edit=edit,
+    save=save,
+    execute=execute,
+)
+# Pass Step to set up listeners
+app.step(ws)
+&#34;&#34;&#34;,
+        )
+    if is_action(req.body):
+        # @app.action
+        action_id_or_callback_id = req.body.get(&#34;callback_id&#34;)
+        if req.body.get(&#34;type&#34;) == &#34;block_actions&#34;:
+            action_id_or_callback_id = req.body.get(&#34;actions&#34;)[0].get(&#34;action_id&#34;)
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+@app.action(&#34;{action_id_or_callback_id}&#34;)
+def handle_some_action(ack, body, logger):
+    ack()
+    logger.info(body)
+&#34;&#34;&#34;,
+        )
+    if is_options(req.body):
+        # @app.options
+        constraints = &#39;&#34;action-id&#34;&#39;
+        if req.body.get(&#34;action_id&#34;) is not None:
+            constraints = &#39;&#34;&#39; + req.body.get(&#34;action_id&#34;) + &#39;&#34;&#39;
+        elif req.body.get(&#34;type&#34;) == &#34;dialog_suggestion&#34;:
+            constraints = f&#34;&#34;&#34;{{&#34;type&#34;: &#34;dialog_suggestion&#34;, &#34;callback_id&#34;: &#34;{req.body.get(&#39;callback_id&#39;)}&#34;}}&#34;&#34;&#34;
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+@app.options({constraints})
+def handle_some_options(ack):
+    ack(options=[ ... ])
+&#34;&#34;&#34;,
+        )
+    if is_shortcut(req.body):
+        # @app.shortcut
+        id = req.body.get(&#34;action_id&#34;) or req.body.get(&#34;callback_id&#34;)
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+@app.shortcut(&#34;{id}&#34;)
+def handle_shortcuts(ack, body, logger):
+    ack()
+    logger.info(body)
+&#34;&#34;&#34;,
+        )
+    if is_view(req.body):
+        # @app.view
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+@app.view(&#34;{req.body.get(&#39;view&#39;, {}).get(&#39;callback_id&#39;, &#39;modal-view-id&#39;)}&#34;)
+def handle_view_events(ack, body, logger):
+    ack()
+    logger.info(body)
+&#34;&#34;&#34;,
+        )
+    if is_event(req.body):
+        # @app.event
+        event_type = req.body.get(&#34;event&#34;, {}).get(&#34;type&#34;)
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+@app.event(&#34;{event_type}&#34;)
+def handle_{event_type}_events(body, logger):
+    logger.info(body)
+&#34;&#34;&#34;,
+        )
+    if is_slash_command(req.body):
+        # @app.command
+        command = req.body.get(&#34;command&#34;, &#34;/your-command&#34;)
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+@app.command(&#34;{command}&#34;)
+def handle_some_command(ack, body, logger):
+    ack()
+    logger.info(body)
+&#34;&#34;&#34;,
+        )
+    return default_message</code></pre>
 </details>
 </dd>
 </dl>

@@ -131,12 +131,14 @@ class AsyncOAuthSettings:
             logger: The logger that will be used internally
         &#34;&#34;&#34;
         # OAuth flow parameters/credentials
-        self.client_id = client_id or os.environ.get(&#34;SLACK_CLIENT_ID&#34;)
-        self.client_secret = client_secret or os.environ.get(
-            &#34;SLACK_CLIENT_SECRET&#34;, None
+        client_id: Optional[str] = client_id or os.environ.get(&#34;SLACK_CLIENT_ID&#34;)
+        client_secret: Optional[str] = client_secret or os.environ.get(
+            &#34;SLACK_CLIENT_SECRET&#34;
         )
-        if self.client_id is None or self.client_secret is None:
+        if client_id is None or client_secret is None:
             raise BoltError(&#34;Both client_id and client_secret are required&#34;)
+        self.client_id = client_id
+        self.client_secret = client_secret
 
         self.scopes = scopes or os.environ.get(&#34;SLACK_SCOPES&#34;, &#34;&#34;).split(&#34;,&#34;)
         if isinstance(self.scopes, str):
@@ -336,12 +338,14 @@ class AsyncOAuthSettings:
             logger: The logger that will be used internally
         &#34;&#34;&#34;
         # OAuth flow parameters/credentials
-        self.client_id = client_id or os.environ.get(&#34;SLACK_CLIENT_ID&#34;)
-        self.client_secret = client_secret or os.environ.get(
-            &#34;SLACK_CLIENT_SECRET&#34;, None
+        client_id: Optional[str] = client_id or os.environ.get(&#34;SLACK_CLIENT_ID&#34;)
+        client_secret: Optional[str] = client_secret or os.environ.get(
+            &#34;SLACK_CLIENT_SECRET&#34;
         )
-        if self.client_id is None or self.client_secret is None:
+        if client_id is None or client_secret is None:
             raise BoltError(&#34;Both client_id and client_secret are required&#34;)
+        self.client_id = client_id
+        self.client_secret = client_secret
 
         self.scopes = scopes or os.environ.get(&#34;SLACK_SCOPES&#34;, &#34;&#34;).split(&#34;,&#34;)
         if isinstance(self.scopes, str):

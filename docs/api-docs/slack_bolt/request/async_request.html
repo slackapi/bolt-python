@@ -70,9 +70,21 @@ class AsyncBoltRequest:
             context: The context in this request.
             mode: The mode used for this request. (either &#34;http&#34; or &#34;socket_mode&#34;)
         &#34;&#34;&#34;
-        if mode == &#34;http&#34; and not isinstance(body, str):
-            raise BoltError(error_message_raw_body_required_in_http_mode())
-        self.raw_body = body if mode == &#34;http&#34; else &#34;&#34;
+
+        if mode == &#34;http&#34;:
+            # HTTP Mode
+            if not isinstance(body, str):
+                raise BoltError(error_message_raw_body_required_in_http_mode())
+            self.raw_body = body if body is not None else &#34;&#34;
+        else:
+            # Socket Mode
+            if body is not None and isinstance(body, str):
+                self.raw_body = body
+            else:
+                # We don&#39;t convert the dict value to str
+                # as doing so does not guarantee to keep the original structure/format.
+                self.raw_body = &#34;&#34;
+
         self.query = parse_query(query)
         self.headers = build_normalized_headers(headers)
         self.content_type = extract_content_type(self.headers)
@@ -85,7 +97,7 @@ class AsyncBoltRequest:
         self.context = build_async_context(
             AsyncBoltContext(context if context else {}), self.body
         )
-        self.lazy_only = self.headers.get(&#34;x-slack-bolt-lazy-only&#34;, [False])[0]
+        self.lazy_only = bool(self.headers.get(&#34;x-slack-bolt-lazy-only&#34;, [False])[0])
         self.lazy_function_name = self.headers.get(
             &#34;x-slack-bolt-lazy-function-name&#34;, [None]
         )[0]
@@ -153,9 +165,21 @@ class AsyncBoltRequest:
             context: The context in this request.
             mode: The mode used for this request. (either &#34;http&#34; or &#34;socket_mode&#34;)
         &#34;&#34;&#34;
-        if mode == &#34;http&#34; and not isinstance(body, str):
-            raise BoltError(error_message_raw_body_required_in_http_mode())
-        self.raw_body = body if mode == &#34;http&#34; else &#34;&#34;
+
+        if mode == &#34;http&#34;:
+            # HTTP Mode
+            if not isinstance(body, str):
+                raise BoltError(error_message_raw_body_required_in_http_mode())
+            self.raw_body = body if body is not None else &#34;&#34;
+        else:
+            # Socket Mode
+            if body is not None and isinstance(body, str):
+                self.raw_body = body
+            else:
+                # We don&#39;t convert the dict value to str
+                # as doing so does not guarantee to keep the original structure/format.
+                self.raw_body = &#34;&#34;
+
         self.query = parse_query(query)
         self.headers = build_normalized_headers(headers)
         self.content_type = extract_content_type(self.headers)
@@ -168,7 +192,7 @@ class AsyncBoltRequest:
         self.context = build_async_context(
             AsyncBoltContext(context if context else {}), self.body
         )
-        self.lazy_only = self.headers.get(&#34;x-slack-bolt-lazy-only&#34;, [False])[0]
+        self.lazy_only = bool(self.headers.get(&#34;x-slack-bolt-lazy-only&#34;, [False])[0])
         self.lazy_function_name = self.headers.get(
             &#34;x-slack-bolt-lazy-function-name&#34;, [None]
         )[0]
