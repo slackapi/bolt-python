@@ -4,7 +4,7 @@ Follow the instructions [here](https://slack.dev/bolt-python/concepts#authentica
 pip install -r requirements.txt
 export SLACK_CLIENT_ID=
 export SLACK_CLIENT_SECRET=
-export SLACK_SCOPES=commands.chat:write
+export SLACK_SCOPES=commands,chat:write
 export SLACK_SIGNING_SECRET=
 
 python manage.py migrate
