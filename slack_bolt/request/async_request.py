@@ -9,7 +9,6 @@ from slack_bolt.request.internals import (
     build_normalized_headers,
     extract_content_type,
     error_message_raw_body_required_in_http_mode,
-    error_message_unknown_request_body_type,
 )
 
 
@@ -45,7 +44,7 @@ class AsyncBoltRequest:
 
         if mode == "http":
             # HTTP Mode
-            if not isinstance(body, str):
+            if body is not None and not isinstance(body, str):
                 raise BoltError(error_message_raw_body_required_in_http_mode())
             self.raw_body = body if body is not None else ""
         else:
@@ -60,12 +59,14 @@ class AsyncBoltRequest:
         self.query = parse_query(query)
         self.headers = build_normalized_headers(headers)
         self.content_type = extract_content_type(self.headers)
+
         if isinstance(body, str):
             self.body = parse_body(self.raw_body, self.content_type)
         elif isinstance(body, dict):
             self.body = body
         else:
-            raise BoltError(error_message_unknown_request_body_type())
+            self.body = {}
+
         self.context = build_async_context(
             AsyncBoltContext(context if context else {}), self.body
         )
