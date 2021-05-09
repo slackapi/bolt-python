@@ -3,7 +3,7 @@ from slack_sdk import WebClient
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 
-from slack_bolt import App, Say
+from slack_bolt import App, Say, BoltRequest
 from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.error import BoltError
 from slack_bolt.oauth import OAuthFlow
@@ -187,3 +187,38 @@ class TestApp:
             installation_store=store1,
         )
         assert app.installation_store is store1
+
+    def test_none_body(self):
+        app = App(signing_secret="valid", client=self.web_client)
+
+        req = BoltRequest(body=None, headers={}, mode="http")
+        response = app.dispatch(req)
+        # request verification failure
+        assert response.status == 401
+        assert response.body == '{"error": "invalid request"}'
+
+        req = BoltRequest(body=None, headers={}, mode="socket_mode")
+        response = app.dispatch(req)
+        # request verification is skipped for Socket Mode
+        assert response.status == 404
+        assert response.body == '{"error": "unhandled request"}'
+
+    def test_none_body_no_middleware(self):
+        app = App(
+            signing_secret="valid",
+            client=self.web_client,
+            ssl_check_enabled=False,
+            ignoring_self_events_enabled=False,
+            request_verification_enabled=False,
+            token_verification_enabled=False,
+            url_verification_enabled=False,
+        )
+        req = BoltRequest(body=None, headers={}, mode="http")
+        response = app.dispatch(req)
+        assert response.status == 404
+        assert response.body == '{"error": "unhandled request"}'
+
+        req = BoltRequest(body=None, headers={}, mode="socket_mode")
+        response = app.dispatch(req)
+        assert response.status == 404
+        assert response.body == '{"error": "unhandled request"}'
