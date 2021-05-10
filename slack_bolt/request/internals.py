@@ -183,10 +183,6 @@ def error_message_raw_body_required_in_http_mode() -> str:
     return "`body` must be a raw string data when running in the HTTP server mode"
 
 
-def error_message_unknown_request_body_type() -> str:
-    return "`body` must be either str or dict"
-
-
 def debug_multiple_response_urls_detected() -> str:
     return (
         "`response_urls` in the body has multiple URLs in it. "
