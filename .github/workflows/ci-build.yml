@@ -33,10 +33,13 @@ jobs:
       run: |
         pytest tests/slack_bolt/
         pytest tests/scenario_tests/
-    - name: Run tests for Socket Mode adapters
+    - name: Install dependencies for adapters
       run: |
         pip install -e ".[adapter]"
-        pytest tests/adapter_tests/socket_mode/
+    # TODO: temporarily disabled Socket Mode tests due to GitHub Actions instability (May 12, 2021)
+#    - name: Run tests for Socket Mode adapters
+#      run: |
+#        pytest tests/adapter_tests/socket_mode/
     - name: Run tests for HTTP Mode adapters (AWS)
       run: |
         pytest tests/adapter_tests/aws/
