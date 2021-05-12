@@ -63,6 +63,7 @@ setuptools.setup(
             "falcon>=2,<3",
             "fastapi<1",
             "Flask>=1,<2",
+            "Werkzeug<2",  # Flask is not yet compatible with the major version
             "pyramid>=1,<2",
             "sanic>=20,<21",
             "starlette>=0.13,<1",
