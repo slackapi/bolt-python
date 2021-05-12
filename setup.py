@@ -17,6 +17,7 @@ test_dependencies = [
     "pytest-asyncio<1",  # for async
     "aiohttp>=3,<4",  # for async
     "Flask-Sockets>=0.2,<1",
+    "Werkzeug<2",  # Flask-Sockets is not yet compatible with the major version
     "black==20.8b1",
 ]
 
@@ -62,6 +63,7 @@ setuptools.setup(
             "falcon>=2,<3",
             "fastapi<1",
             "Flask>=1,<2",
+            "Werkzeug<2",  # Flask is not yet compatible with the major version
             "pyramid>=1,<2",
             "sanic>=20,<21",
             "starlette>=0.13,<1",
