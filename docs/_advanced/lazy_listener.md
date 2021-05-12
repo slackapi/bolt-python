@@ -92,7 +92,7 @@ def handler(event, context):
     return slack_handler.handle(event, context)
 ```
 
-Please note that the followig IAM permissions would be required for running this example app.
+Please note that the following IAM permissions would be required for running this example app.
 
 ```json
 {
