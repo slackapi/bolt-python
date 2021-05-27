@@ -12,7 +12,7 @@ All listeners have access to a `context` dictionary, which can be used to enrich
 </div>
 
 ```python
-# Listener middleware to fetch tasks from external system using userId
+# Listener middleware to fetch tasks from external system using user ID
 def fetch_tasks(context, event, next):
     user = event["user"]
     try:
