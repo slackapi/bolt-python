@@ -20,7 +20,7 @@ order: 1
 | `headers: Dict[str, Union[str, List[str]]]` | Request headers | No |
 | `context: BoltContext` | Any context for the request | No |
 
-`BoltRequest` will return [an instance of `BoltResponse`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/response/response.py) from the Bolt app.
+Your adapter will return [an instance of `BoltResponse`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/response/response.py) from the Bolt app.
 
 For more in-depth examples of custom adapters, look at the implementations of the [built-in adapters](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter).
 </div>
