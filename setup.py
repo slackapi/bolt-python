@@ -18,7 +18,7 @@ test_dependencies = [
     "aiohttp>=3,<4",  # for async
     "Flask-Sockets>=0.2,<1",
     "Werkzeug<2",  # TODO: support Flask 2.x
-    "black==20.8b1",
+    "black==21.5b1",
 ]
 
 setuptools.setup(
@@ -32,10 +32,17 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/slackapi/bolt-python",
     packages=setuptools.find_packages(
-        exclude=["examples", "integration_tests", "tests", "tests.*",]
+        exclude=[
+            "examples",
+            "integration_tests",
+            "tests",
+            "tests.*",
+        ]
     ),
     include_package_data=True,  # MANIFEST.in
-    install_requires=["slack_sdk>=3.5.0,<4",],
+    install_requires=[
+        "slack_sdk>=3.5.0,<4",
+    ],
     setup_requires=["pytest-runner==5.2"],
     tests_require=test_dependencies,
     test_suite="tests",
@@ -53,7 +60,7 @@ setuptools.setup(
             # used only under src/slack_bolt/adapter
             "boto3<=2",
             # TODO: Upgrade to v2
-            "moto<2", # For AWS tests
+            "moto<2",  # For AWS tests
             "bottle>=0.12,<1",
             "boddle>=0.2,<0.3",  # For Bottle app tests
             "chalice>=1.22.4,<2",
@@ -73,7 +80,7 @@ setuptools.setup(
             "uvicorn<1",
             "gunicorn>=20,<21",
             # Socket Mode 3rd party implementation
-            "websocket_client>=0.57,<1"
+            "websocket_client>=0.57,<1",
         ],
         # pip install -e ".[testing]"
         "testing": test_dependencies,
