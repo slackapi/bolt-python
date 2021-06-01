@@ -18,7 +18,7 @@ order: 12
 ```python
 # view_submission イベントを処理
 @app.view("view_1")
-def handle_submission(ack, body, client, view):
+def handle_submission(ack, body, client, view, logger):
     # `block_c`という block_id に `dreamy_input` を持つ input ブロックがある場合
     hopes_and_dreams = view["state"]["values"]["block_c"]["dreamy_input"]
     user = body["user"]["id"]
@@ -42,7 +42,11 @@ def handle_submission(ack, body, client, view):
     except Exception as e:
         # エラーをハンドリング
         msg = "There was an error with your submission"
-    finally:
-        # ユーザーにメッセージを送信
+
+    # ユーザーにメッセージを送信
+    try:
         client.chat_postMessage(channel=user, text=msg)
+    except e:
+        logger.exception(f"Failed to post a message {e}")
+
 ```

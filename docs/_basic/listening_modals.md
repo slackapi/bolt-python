@@ -18,7 +18,7 @@ Read more about view submissions in our <a href="https://api.slack.com/surfaces/
 ```python
 # Handle a view_submission event
 @app.view("view_1")
-def handle_submission(ack, body, client, view):
+def handle_submission(ack, body, client, view, logger):
     # Assume there's an input block with `block_c` as the block_id and `dreamy_input`
     hopes_and_dreams = view["state"]["values"]["block_c"]["dreamy_input"]
     user = body["user"]["id"]
@@ -42,7 +42,10 @@ def handle_submission(ack, body, client, view):
     except Exception as e:
         # Handle error
         msg = "There was an error with your submission"
-    finally:
-        # Message the user
+
+    # Message the user
+    try:
         client.chat_postMessage(channel=user, text=msg)
+    except e:
+        logger.exception(f"Failed to post a message {e}")
 ```
