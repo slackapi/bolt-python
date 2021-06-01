@@ -13,6 +13,8 @@ To listen to messages that [your app has access to receive](https://api.slack.co
 
 </div>
 
+<div>
+<span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
 # This will match any message that contains 👋
 @app.message(":wave:")
@@ -20,6 +22,7 @@ def say_hello(message, say):
     user = message['user']
     say(f"Hi there, <@{user}>!")
 ```
+</div>
 
 <details class="secondary-wrapper">
 <summary markdown="0">

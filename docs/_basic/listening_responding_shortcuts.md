@@ -21,6 +21,8 @@ When setting up shortcuts within your app configuration, as with other URLs, you
 
 </div>
 
+<div>
+<span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
 # The open_modal shortcut listens to a shortcut with the callback_id "open_modal"
 @app.shortcut("open_modal")
@@ -56,6 +58,7 @@ def open_modal(ack, shortcut, client):
         }
     )
 ```
+</div>
 
 <details class="secondary-wrapper">
   <summary class="section-head" markdown="0">

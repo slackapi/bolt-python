@@ -10,9 +10,10 @@ order: 6
 アクションへの応答には、主に 2 つの方法があります。1 つ目の最も一般的なやり方は `say()` を使用する方法です。そのイベントが発生した会話（チャンネルや DM）にメッセージを返します。
 
 2 つ目は、`respond()` を使用する方法です。これは、アクションに関連づけられた `response_url` を使ったメッセージ送信を行うためのユーティリティです。
-
 </div>
 
+<div>
+<span class="annotation">指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # 'approve_button' という action_id のインタラクティブコンポーネントがトリガーされると、このリスナーが呼ばれる
 @app.action("approve_button")
@@ -21,6 +22,7 @@ def approve_request(ack, say):
     ack()
     say("Request approved 👍")
 ```
+</div>
 
 <details class="secondary-wrapper">
 <summary class="section-head" markdown="0">

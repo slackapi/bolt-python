@@ -14,6 +14,8 @@ Bolt アプリは `action` メソッドを用いて、ボタンのクリック�
 
 </div>
 
+<div>
+<span class="annotation">指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # 'approve_button' という action_id のブロックエレメントがトリガーされるたびに、このリスナーが呼び出させれる
 @app.action("approve_button")
@@ -21,6 +23,7 @@ def update_message(ack):
     ack()
     # アクションへの反応としてメッセージを更新
 ```
+</div>
 
 <details class="secondary-wrapper">
 <summary class="section-head" markdown="0">

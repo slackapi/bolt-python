@@ -15,6 +15,8 @@ We recommend calling `ack()` right away before sending a new message or fetching
 
 </div>
 
+<div>
+<span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
 # Example of responding to an external_select options request
 @app.options("menu_selection")
@@ -31,3 +33,4 @@ def show_menu_options(ack):
     ]
     ack(options=options)
 ```
+</div>

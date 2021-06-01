@@ -11,7 +11,7 @@ After the configuration modal is opened, your app will listen for the `view_subm
 
 Within the `save` callback, the `update()` method can be used to save the builder's step configuration by passing in the following arguments:
 
-- `inputs` is an dictionary representing the data your app expects to receive from the user upon workflow step execution.
+- `inputs` is a dictionary representing the data your app expects to receive from the user upon workflow step execution.
 - `outputs` is a list of objects containing data that your app will provide upon the workflow step's completion. Outputs can then be used in subsequent steps of the workflow.
 - `step_name` overrides the default Step name
 - `step_image_url` overrides the default Step image
@@ -20,6 +20,8 @@ To learn more about how to structure these parameters, [read the documentation](
 
 </div>
 
+<div>
+<span class="annotation">Refer to the module documents (<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">common</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html" target="_blank">step-specific</a>) to learn the available arguments.</span>
 ```python
 def save(ack, view, update):
     ack()
@@ -54,3 +56,4 @@ ws = WorkflowStep(
 )
 app.step(ws)
 ```
+</div>

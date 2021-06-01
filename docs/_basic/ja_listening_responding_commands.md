@@ -17,6 +17,8 @@ order: 9
 
 </div>
 
+<div>
+<span class="annotation">指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # echoコマンドは受け取ったコマンドをそのまま返す
 @app.command("/echo")
@@ -25,3 +27,4 @@ def repeat_text(ack, say, command):
     ack()
     say(f"{command['text']}")
 ```
+</div>

@@ -15,6 +15,8 @@ order: 10
 
 </div>
 
+<div>
+<span class="annotation">指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # ショートカットの呼び出しをリッスン
 @app.shortcut("open_modal")
@@ -56,3 +58,4 @@ def open_modal(ack, body, client):
         }
     )
 ```
+</div>

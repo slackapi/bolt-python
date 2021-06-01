@@ -14,6 +14,8 @@ You'll notice in all `action()` examples, `ack()` is used. It is required to cal
 
 </div>
 
+<div>
+<span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
 # Your listener will be called every time a block element with the action_id "approve_button" is triggered
 @app.action("approve_button")
@@ -21,6 +23,7 @@ def update_message(ack):
     ack()
     # Update the message to reflect the action
 ```
+</div>
 
 <details class="secondary-wrapper">
 <summary class="section-head" markdown="0">

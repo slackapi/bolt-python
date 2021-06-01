@@ -17,6 +17,8 @@ When setting up commands within your app configuration, you'll append `/slack/ev
 
 </div>
 
+<div>
+<span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
 # The echo command simply echoes on command
 @app.command("/echo")
@@ -25,3 +27,4 @@ def repeat_text(ack, say, command):
     ack()
     say(f"{command['text']}")
 ```
+</div>

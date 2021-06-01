@@ -13,6 +13,8 @@ The second way to respond to actions is using `respond()`, which is a utility to
 
 </div>
 
+<div>
+<span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
 # Your listener will be called every time an interactive component with the action_id “approve_button” is triggered
 @app.action("approve_button")
@@ -21,6 +23,7 @@ def approve_request(ack, say):
     ack()
     say("Request approved 👍")
 ```
+</div>
 
 <details class="secondary-wrapper">
 <summary class="section-head" markdown="0">

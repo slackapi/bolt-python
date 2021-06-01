@@ -11,6 +11,8 @@ Global middleware is run for all incoming events, before any listener middleware
 Both global and listener middleware must call `next()` to pass control of the execution chain to the next middleware. 
 </div>
 
+<div>
+<span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
 @app.use
 def auth_acme(client, context, logger, payload, next):
@@ -32,3 +34,4 @@ def auth_acme(client, context, logger, payload, next):
     # Pass control to the next middleware
     next()
 ```
+</div>

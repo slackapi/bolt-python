@@ -13,12 +13,15 @@ In the case that you'd like to send a message outside of a listener or you want 
 
 </div>
 
+<div>
+<span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
 # Listens for messages containing "knock knock" and responds with an italicized "who's there?"
 @app.message("knock knock")
 def ask_who(message, say):
     say("_Who's there?_")
 ```
+</div>
 
 <details class="secondary-wrapper">
 <summary markdown="0">

@@ -10,9 +10,10 @@ order: 1
 [あなたのアプリがアクセス権限を持つ](https://api.slack.com/messaging/retrieving#permissions)メッセージの投稿イベントをリッスンするには `message()` メソッドを利用します。このメソッドは `type` が `message` ではないイベントを処理対象から除外します。
 
 `message()` の引数には `str` 型または `re.Pattern` オブジェクトを指定できます。この条件のパターンに一致しないメッセージは除外されます。
-
 </div>
 
+<div>
+<span class="annotation">指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # '👋' が含まれるすべてのメッセージに一致
 @app.message(":wave:")
@@ -20,6 +21,7 @@ def say_hello(message, say):
     user = message['user']
     say(f"Hi there, <@{user}>!")
 ```
+</div>
 
 <details class="secondary-wrapper">
 <summary markdown="0">
