@@ -12,6 +12,8 @@ Bolt の初期化に使用するトークンは `context` オブジェクトに�
 
 </div>
 
+<div>
+<span class="annotation">指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 @app.message("wake me up")
 def say_hello(client, message):
@@ -24,3 +26,4 @@ def say_hello(client, message):
         text="Summer has come and passed"
     )
 ```
+</div>

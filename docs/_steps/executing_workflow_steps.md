@@ -15,6 +15,8 @@ Within the `execute` callback, your app must either call `complete()` to indicat
 
 </div>
 
+<div>
+<span class="annotation">Refer to the module documents (<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">common</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html" target="_blank">step-specific</a>) to learn the available arguments.</span>
 ```python
 def execute(step, complete, fail):
     inputs = step["inputs"]
@@ -37,3 +39,4 @@ ws = WorkflowStep(
 )
 app.step(ws)
 ```
+</div>

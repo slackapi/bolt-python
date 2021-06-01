@@ -13,6 +13,8 @@ The `event()` method requires an `eventType` of type `str`.
 
 </div>
 
+<div>
+<span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
 # When a user joins the workspace, send a message in a predefined channel asking them to introduce themselves
 @app.event("team_join")
@@ -22,6 +24,7 @@ def ask_for_introduction(event, say):
     text = f"Welcome to the team, <@{user_id}>! 🎉 You can introduce yourself in this channel."
     say(text=text, channel=welcome_channel_id)
 ```
+</div>
 
 <details class="secondary-wrapper" >
   

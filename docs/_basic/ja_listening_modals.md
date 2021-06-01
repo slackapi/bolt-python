@@ -15,6 +15,8 @@ order: 12
 
 </div>
 
+<div>
+<span class="annotation">指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # view_submission イベントを処理
 @app.view("view_1")
@@ -46,3 +48,4 @@ def handle_submission(ack, body, client, view):
         # ユーザーにメッセージを送信
         client.chat_postMessage(channel=user, text=msg)
 ```
+</div>

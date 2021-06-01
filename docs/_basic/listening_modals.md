@@ -15,6 +15,8 @@ Read more about view submissions in our <a href="https://api.slack.com/surfaces/
 
 </div>
 
+<div>
+<span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
 # Handle a view_submission event
 @app.view("view_1")
@@ -46,3 +48,4 @@ def handle_submission(ack, body, client, view):
         # Message the user
         client.chat_postMessage(channel=user, text=msg)
 ```
+</div>

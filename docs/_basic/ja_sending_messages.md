@@ -13,12 +13,15 @@ order: 2
 
 </div>
 
+<div>
+<span class="annotation">指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # 'knock knock' が含まれるメッセージをリッスンし、イタリック体で 'Who's there?' と返信
 @app.message("knock knock")
 def ask_who(message, say):
     say("_Who's there?_")
 ```
+</div>
 
 <details class="secondary-wrapper">
 <summary markdown="0">

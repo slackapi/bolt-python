@@ -12,6 +12,8 @@ The token used to initialize Bolt can be found in the `context` object, which is
 
 </div>
 
+<div>
+<span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
 @app.message("wake me up")
 def say_hello(client, message):
@@ -24,3 +26,4 @@ def say_hello(client, message):
         text="Summer has come and passed"
     )
 ```
+</div>

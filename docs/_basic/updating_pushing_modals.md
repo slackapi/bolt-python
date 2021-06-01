@@ -19,6 +19,8 @@ Learn more about updating and pushing views in our <a href="https://api.slack.co
 
 </div>
 
+<div>
+<span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
 # Listen for a button invocation with action_id `button_abc` (assume it's inside of a modal)
 @app.action("button_abc")
@@ -51,3 +53,4 @@ def update_modal(ack, body, client):
         }
     )
 ```
+</div>

@@ -16,6 +16,8 @@ order: 14
 
 </div>
 
+<div>
+<span class="annotation">指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # 外部データを使用する選択メニューオプションに応答するサンプル例
 @app.options("external_action")
@@ -32,3 +34,4 @@ def show_options(ack):
     ]
     ack(options=options)
 ```
+</div>

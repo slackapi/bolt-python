@@ -11,6 +11,8 @@ order: 13
 <a href="https://api.slack.com/events/app_home_opened">`app_home_opened`</a> イベントをサブスクライブすると、ユーザーが App Home を開く操作をリッスンできます。
 </div>
 
+<div>
+<span class="annotation">指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 @app.event("app_home_opened")
 def update_home_tab(client, event, logger):
@@ -40,7 +42,7 @@ def update_home_tab(client, event, logger):
                 ]
             }
         )
-
     except Exception as e:
         logger.error(f"Error publishing home tab: {e}")
 ```
+</div>

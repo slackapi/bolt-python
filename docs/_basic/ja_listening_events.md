@@ -13,6 +13,8 @@ order: 3
 
 </div>
 
+<div>
+<span class="annotation">指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # ユーザーがワークスペースに参加した際に、自己紹介を促すメッセージを指定のチャンネルに送信
 @app.event("team_join")
@@ -22,6 +24,7 @@ def ask_for_introduction(event, say):
     text = f"Welcome to the team, <@{user_id}>! 🎉 You can introduce yourself in this channel."
     say(text=text, channel=welcome_channel_id)
 ```
+</div>
 
 <details class="secondary-wrapper" >
   

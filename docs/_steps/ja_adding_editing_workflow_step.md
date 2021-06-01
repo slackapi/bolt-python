@@ -17,6 +17,8 @@ order: 3
 
 </div>
 
+<div>
+<span class="annotation">指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">共通</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html" target="_blank">ステップ用</a>）</span>
 ```python
 def edit(ack, step, configure):
     ack()
@@ -53,3 +55,4 @@ ws = WorkflowStep(
 )
 app.step(ws)
 ```
+</div>

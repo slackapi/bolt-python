@@ -11,6 +11,8 @@ order: 13
 You can subscribe to the <a href="https://api.slack.com/events/app_home_opened">`app_home_opened`</a> event to listen for when users open your App Home.
 </div>
 
+<div>
+<span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
 @app.event("app_home_opened")
 def update_home_tab(client, event, logger):
@@ -40,7 +42,7 @@ def update_home_tab(client, event, logger):
                 ]
             }
         )
-
     except Exception as e:
         logger.error(f"Error publishing home tab: {e}")
 ```
+</div>

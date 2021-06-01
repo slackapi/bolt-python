@@ -15,6 +15,8 @@ Read more about modal composition in the <a href="https://api.slack.com/surfaces
 
 </div>
 
+<div>
+<span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
 # Listen for a shortcut invocation
 @app.shortcut("open_modal")
@@ -56,3 +58,4 @@ def open_modal(ack, body, client):
         }
     )
 ```
+</div>

@@ -9,6 +9,8 @@ order: 5
 Listener middleware is only run for the listener in which it's passed. You can pass any number of middleware functions to the listener using the `middleware` parameter, which must be a list that contains one to many middleware functions.
 </div>
 
+<div>
+<span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
 # Listener middleware which filters out messages with "bot_message" subtype
 def no_bot_messages(message, next):
@@ -21,3 +23,4 @@ def no_bot_messages(message, next):
 def log_message(logger, event):
     logger.info(f"(MSG) User: {event['user']}\nMessage: {event['text']}")
 ```
+</div>

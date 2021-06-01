@@ -11,6 +11,8 @@ order: 6
 グローバルミドルウェアでもリスナーミドルウェアでも、次のミドルウェアに実行チェーンの制御をリレーするために、`next()` を呼び出す必要があります。 
 </div>
 
+<div>
+<span class="annotation">指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 @app.use
 def auth_abc(client, context, logger, payload, next):
@@ -32,3 +34,4 @@ def auth_abc(client, context, logger, payload, next):
     # 次のミドルウェアに実行権を渡します
     next()
 ```
+</div>

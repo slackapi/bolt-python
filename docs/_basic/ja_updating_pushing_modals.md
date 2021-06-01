@@ -19,6 +19,8 @@ order: 11
 
 </div>
 
+<div>
+<span class="annotation">指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # モーダルに含まれる、`button_abc` という action_id のボタンの呼び出しをリッスン
 @app.action("button_abc")
@@ -51,3 +53,5 @@ def update_modal(ack, body, client):
         }
     )
 ```
+</div>
+

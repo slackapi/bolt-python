@@ -278,6 +278,10 @@ pre tbody td.gl pre {
   line-height: 1.9em;
 }
 
+.content .section-wrapper .annotation {
+  font-size: 0.7em;
+}
+
 .content .section-wrapper h3 {
   grid-area: head;
   font-size: 1.45em;
