@@ -27,6 +27,8 @@ class Say:
         attachments: Optional[Sequence[Union[Dict, Attachment]]] = None,
         channel: Optional[str] = None,
         thread_ts: Optional[str] = None,
+        unfurl_links: Optional[bool] = None,
+        unfurl_media: Optional[bool] = None,
         **kwargs,
     ) -> SlackResponse:
         if _can_say(self, channel):
@@ -39,6 +41,8 @@ class Say:
                     blocks=blocks,
                     attachments=attachments,
                     thread_ts=thread_ts,
+                    unfurl_links=unfurl_links,
+                    unfurl_media=unfurl_media,
                     **kwargs,
                 )
             elif isinstance(text_or_whole_response, dict):

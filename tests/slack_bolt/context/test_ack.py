@@ -54,6 +54,19 @@ class TestAck:
             '{"text": "foo", "blocks": [{"type": "divider"}]}',
         )
 
+    def test_unfurl_options(self):
+        ack = Ack()
+        response: BoltResponse = ack(
+            text="foo",
+            blocks=[{"type": "divider"}],
+            unfurl_links=True,
+            unfurl_media=True,
+        )
+        assert (response.status, response.body) == (
+            200,
+            '{"text": "foo", "unfurl_links": true, "unfurl_media": true, "blocks": [{"type": "divider"}]}',
+        )
+
     sample_options = [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]
 
     def test_options(self):

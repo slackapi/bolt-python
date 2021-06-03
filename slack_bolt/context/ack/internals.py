@@ -14,6 +14,8 @@ def _set_response(
     text_or_whole_response: Union[str, dict] = "",
     blocks: Optional[Sequence[Union[dict, Block]]] = None,
     attachments: Optional[Sequence[Union[dict, Attachment]]] = None,
+    unfurl_links: Optional[bool] = None,
+    unfurl_media: Optional[bool] = None,
     response_type: Optional[str] = None,  # in_channel / ephemeral
     # block_suggestion / dialog_suggestion
     options: Optional[Sequence[Union[dict, Option]]] = None,
@@ -28,6 +30,10 @@ def _set_response(
         body = {"text": text}
         if response_type:
             body["response_type"] = response_type
+        if unfurl_links is not None:
+            body["unfurl_links"] = unfurl_links
+        if unfurl_media is not None:
+            body["unfurl_media"] = unfurl_media
         if attachments and len(attachments) > 0:
             body.update(
                 {"text": text, "attachments": convert_to_dict_list(attachments)}

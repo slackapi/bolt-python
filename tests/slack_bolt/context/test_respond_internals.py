@@ -43,3 +43,9 @@ class TestRespondInternals:
     def test_build_message_delete_original(self):
         message = _build_message(delete_original=True)
         assert message is not None
+
+    def test_build_message_unfurl_options(self):
+        message = _build_message(text="Hi there!", unfurl_links=True, unfurl_media=True)
+        assert message is not None
+        assert message.get("unfurl_links") is True
+        assert message.get("unfurl_media") is True

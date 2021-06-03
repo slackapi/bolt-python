@@ -23,3 +23,9 @@ class TestRespond:
         respond = Respond(response_url=response_url)
         response = respond({"text": "Hi there!"})
         assert response.status_code == 200
+
+    def test_unfurl_options(self):
+        response_url = "http://localhost:8888"
+        respond = Respond(response_url=response_url)
+        response = respond(text="Hi there!", unfurl_media=True, unfurl_links=True)
+        assert response.status_code == 200

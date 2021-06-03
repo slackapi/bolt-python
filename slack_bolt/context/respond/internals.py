@@ -13,6 +13,8 @@ def _build_message(
     response_type: Optional[str] = None,
     replace_original: Optional[bool] = None,
     delete_original: Optional[bool] = None,
+    unfurl_links: Optional[bool] = None,
+    unfurl_media: Optional[bool] = None,
 ) -> Dict[str, Any]:
     message = {"text": text}
     if blocks is not None and len(blocks) > 0:
@@ -25,4 +27,8 @@ def _build_message(
         message["replace_original"] = replace_original
     if delete_original is not None:
         message["delete_original"] = delete_original
+    if unfurl_links is not None:
+        message["unfurl_links"] = unfurl_links
+    if unfurl_media is not None:
+        message["unfurl_media"] = unfurl_media
     return message
