@@ -211,10 +211,6 @@ def error_message_raw_body_required_in_http_mode() -&gt; str:
     return &#34;`body` must be a raw string data when running in the HTTP server mode&#34;
 
 
-def error_message_unknown_request_body_type() -&gt; str:
-    return &#34;`body` must be either str or dict&#34;
-
-
 def debug_multiple_response_urls_detected() -&gt; str:
     return (
         &#34;`response_urls` in the body has multiple URLs in it. &#34;
@@ -321,19 +317,6 @@ def debug_multiple_response_urls_detected() -&gt; str:
 </summary>
 <pre><code class="python">def error_message_raw_body_required_in_http_mode() -&gt; str:
     return &#34;`body` must be a raw string data when running in the HTTP server mode&#34;</code></pre>
-</details>
-</dd>
-<dt id="slack_bolt.request.internals.error_message_unknown_request_body_type"><code class="name flex">
-<span>def <span class="ident">error_message_unknown_request_body_type</span></span>(<span>) ‑> str</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def error_message_unknown_request_body_type() -&gt; str:
-    return &#34;`body` must be either str or dict&#34;</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.internals.extract_channel_id"><code class="name flex">
@@ -559,7 +542,6 @@ def debug_multiple_response_urls_detected() -&gt; str:
 <li><code><a title="slack_bolt.request.internals.build_normalized_headers" href="#slack_bolt.request.internals.build_normalized_headers">build_normalized_headers</a></code></li>
 <li><code><a title="slack_bolt.request.internals.debug_multiple_response_urls_detected" href="#slack_bolt.request.internals.debug_multiple_response_urls_detected">debug_multiple_response_urls_detected</a></code></li>
 <li><code><a title="slack_bolt.request.internals.error_message_raw_body_required_in_http_mode" href="#slack_bolt.request.internals.error_message_raw_body_required_in_http_mode">error_message_raw_body_required_in_http_mode</a></code></li>
-<li><code><a title="slack_bolt.request.internals.error_message_unknown_request_body_type" href="#slack_bolt.request.internals.error_message_unknown_request_body_type">error_message_unknown_request_body_type</a></code></li>
 <li><code><a title="slack_bolt.request.internals.extract_channel_id" href="#slack_bolt.request.internals.extract_channel_id">extract_channel_id</a></code></li>
 <li><code><a title="slack_bolt.request.internals.extract_content_type" href="#slack_bolt.request.internals.extract_content_type">extract_content_type</a></code></li>
 <li><code><a title="slack_bolt.request.internals.extract_enterprise_id" href="#slack_bolt.request.internals.extract_enterprise_id">extract_enterprise_id</a></code></li>

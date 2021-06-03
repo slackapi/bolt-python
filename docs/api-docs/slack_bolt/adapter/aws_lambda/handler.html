@@ -103,6 +103,12 @@ class SlackRequestHandler:
 
 
 def to_bolt_request(event) -&gt; BoltRequest:
+    &#34;&#34;&#34;Note that this handler supports only the payload format 2.0.
+    This means you can use this with HTTP API while REST API is not supported.
+
+    Read https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html
+    for more details.
+    &#34;&#34;&#34;
     body = event.get(&#34;body&#34;, &#34;&#34;)
     if event[&#34;isBase64Encoded&#34;]:
         body = base64.b64decode(body).decode(&#34;utf-8&#34;)
@@ -177,12 +183,21 @@ def not_found() -&gt; Dict[str, Any]:
 <span>def <span class="ident">to_bolt_request</span></span>(<span>event) ‑> <a title="slack_bolt.request.request.BoltRequest" href="../../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a></span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Note that this handler supports only the payload format 2.0.
+This means you can use this with HTTP API while REST API is not supported.</p>
+<p>Read <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html">https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html</a>
+for more details.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def to_bolt_request(event) -&gt; BoltRequest:
+    &#34;&#34;&#34;Note that this handler supports only the payload format 2.0.
+    This means you can use this with HTTP API while REST API is not supported.
+
+    Read https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html
+    for more details.
+    &#34;&#34;&#34;
     body = event.get(&#34;body&#34;, &#34;&#34;)
     if event[&#34;isBase64Encoded&#34;]:
         body = base64.b64decode(body).decode(&#34;utf-8&#34;)
