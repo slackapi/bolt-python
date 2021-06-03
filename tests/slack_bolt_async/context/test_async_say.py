@@ -33,6 +33,14 @@ class TestAsyncSay:
         assert response.status_code == 200
 
     @pytest.mark.asyncio
+    async def test_say_unfurl_options(self):
+        say = AsyncSay(client=self.web_client, channel="C111")
+        response: AsyncSlackResponse = await say(
+            text="Hi there!", unfurl_links=True, unfurl_media=True
+        )
+        assert response.status_code == 200
+
+    @pytest.mark.asyncio
     async def test_say_dict(self):
         say = AsyncSay(client=self.web_client, channel="C111")
         response: AsyncSlackResponse = await say({"text": "Hi!"})

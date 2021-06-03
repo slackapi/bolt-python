@@ -22,6 +22,20 @@ class TestAsyncAsyncAck:
             '{"text": "foo", "blocks": [{"type": "divider"}]}',
         )
 
+    @pytest.mark.asyncio
+    async def test_unfurl_options(self):
+        ack = AsyncAck()
+        response: BoltResponse = await ack(
+            text="foo",
+            blocks=[{"type": "divider"}],
+            unfurl_links=True,
+            unfurl_media=True,
+        )
+        assert (response.status, response.body) == (
+            200,
+            '{"text": "foo", "unfurl_links": true, "unfurl_media": true, "blocks": [{"type": "divider"}]}',
+        )
+
     sample_attachments = [
         {
             "fallback": "Plain-text summary of the attachment.",
