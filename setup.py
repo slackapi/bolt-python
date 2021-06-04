@@ -80,7 +80,7 @@ setuptools.setup(
             "uvicorn<1",
             "gunicorn>=20,<21",
             # Socket Mode 3rd party implementation
-            "websocket_client>=0.57,<1",
+            "websocket_client>=1,<2",
         ],
         # pip install -e ".[testing]"
         "testing": test_dependencies,
