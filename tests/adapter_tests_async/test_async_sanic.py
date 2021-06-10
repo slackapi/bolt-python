@@ -224,5 +224,5 @@ class TestSanic:
         )
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
-        assert response.headers.get("content-length") == "565"
+        assert response.headers.get("content-length") == "597"
         assert "https://slack.com/oauth/v2/authorize?state=" in response.text
