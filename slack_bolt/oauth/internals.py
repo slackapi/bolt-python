@@ -74,6 +74,7 @@ class CallbackResponseBuilder:
 def _build_default_install_page_html(url: str) -> str:
     return f"""<html>
 <head>
+<link rel="icon" href="data:,">
 <style>
 body {{
   padding: 10px 15px;
