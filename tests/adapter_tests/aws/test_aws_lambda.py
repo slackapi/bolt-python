@@ -318,3 +318,41 @@ class TestAWSLambda:
         assert response["statusCode"] == 200
         assert response["headers"]["content-type"] == "text/html; charset=utf-8"
         assert "https://slack.com/oauth/v2/authorize?state=" in response.get("body")
+
+    @mock_lambda
+    def test_oauth_redirect(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            oauth_settings=OAuthSettings(
+                client_id="111.111",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+            ),
+        )
+
+        event = {
+            "body": "",
+            "queryStringParameters": {"code": "1234567890", "state": "uuid4-value"},
+            "headers": {},
+            "cookies": ["slack-app-oauth-state=uuid4-value"],
+            "requestContext": {"http": {"method": "GET"}},
+            "isBase64Encoded": False,
+        }
+        response = SlackRequestHandler(app).handle(event, self.context)
+        assert response["statusCode"] == 401
+        assert response["headers"]["content-type"] == "text/html; charset=utf-8"
+        assert response.get("body") is not None
+
+        event = {
+            "body": "",
+            "queryStringParameters": {"code": "1234567890", "state": "uuid4-value"},
+            "headers": {},
+            "multiValueHeaders": {"Cookie": ["slack-app-oauth-state=uuid4-value"]},
+            "requestContext": {"httpMethod": "GET"},
+            "isBase64Encoded": False,
+        }
+        response = SlackRequestHandler(app).handle(event, self.context)
+        assert response["statusCode"] == 401
+        assert response["headers"]["content-type"] == "text/html; charset=utf-8"
+        assert response.get("body") is not None

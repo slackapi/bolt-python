@@ -84,8 +84,10 @@ def to_bolt_request(event) -> BoltRequest:
     body = event.get("body", "")
     if event["isBase64Encoded"]:
         body = base64.b64decode(body).decode("utf-8")
-    multiValueHeaders = event.get("multiValueHeaders", {})
-    cookies: Sequence[str] = multiValueHeaders.get("Cookie", [])
+    cookies: Sequence[str] = event.get("cookies", [])
+    if event.get("requestContext", {}).get("http", {}).get("method") is None: # judging whether payload format version is v1.0 or not
+        multiValueHeaders = event.get("multiValueHeaders", {})
+        cookies = multiValueHeaders.get("Cookie", [])
     headers = event.get("headers", {})
     headers["cookie"] = cookies
     return BoltRequest(
