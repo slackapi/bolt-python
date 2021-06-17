@@ -5,6 +5,7 @@ from urllib.parse import quote
 from moto import mock_lambda
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
+from slack_sdk.oauth import OAuthStateStore
 
 from slack_bolt.adapter.aws_lambda import SlackRequestHandler
 from slack_bolt.adapter.aws_lambda.handler import not_found
@@ -321,6 +322,10 @@ class TestAWSLambda:
 
     @mock_lambda
     def test_oauth_redirect(self):
+        class TestStateStore(OAuthStateStore):
+            def consume(self, state: str) -> bool:
+                return state == "uuid4-value"
+
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
@@ -328,6 +333,7 @@ class TestAWSLambda:
                 client_id="111.111",
                 client_secret="xxx",
                 scopes=["chat:write", "commands"],
+                state_store=TestStateStore(),
             ),
         )
 
@@ -340,7 +346,7 @@ class TestAWSLambda:
             "isBase64Encoded": False,
         }
         response = SlackRequestHandler(app).handle(event, self.context)
-        assert response["statusCode"] == 401
+        assert response["statusCode"] == 200
         assert response["headers"]["content-type"] == "text/html; charset=utf-8"
         assert response.get("body") is not None
 
@@ -353,6 +359,6 @@ class TestAWSLambda:
             "isBase64Encoded": False,
         }
         response = SlackRequestHandler(app).handle(event, self.context)
-        assert response["statusCode"] == 401
+        assert response["statusCode"] == 200
         assert response["headers"]["content-type"] == "text/html; charset=utf-8"
         assert response.get("body") is not None
