@@ -20,9 +20,13 @@ class AsyncMessageListenerMatches(AsyncMiddleware):
     ) -> BoltResponse:
         text = req.body.get("event", {}).get("text", "")
         if text:
-            m = re.search(self.keyword, text)
-            if m is not None:
-                req.context["matches"] = m.groups()  # tuple
+            m = re.findall(self.keyword, text)
+            if m is not None and m != []:
+                if type(m[0]) is not tuple:
+                    m = tuple(m)
+                else:
+                    m = m[0]
+                req.context["matches"] = m  # tuple or list
                 return await next()
 
         # As the text doesn't match, skip running the listener
