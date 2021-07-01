@@ -63,6 +63,9 @@ class TestAsyncMessage:
     def build_request2(self) -> AsyncBoltRequest:
         return self.build_request_from_body(message_body2)
 
+    def build_request3(self) -> AsyncBoltRequest:
+        return self.build_request_from_body(message_body3)
+
     @pytest.mark.asyncio
     async def test_string_keyword(self):
         app = AsyncApp(
@@ -104,6 +107,21 @@ class TestAsyncMessage:
         )
 
         request = self.build_request2()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_auth_test_count_async(self, 1)
+        await asyncio.sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
+    @pytest.mark.asyncio
+    async def test_string_keyword_capturing_multi_capture(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.message(re.compile("([a-z|A-Z]{3,}-[0-9]+)"))(verify_matches_multi)
+
+        request = self.build_request3()
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
@@ -268,7 +286,36 @@ message_body2 = {
 }
 
 
+message_body3 = {
+    "token": "verification_token",
+    "team_id": "T111",
+    "enterprise_id": "E111",
+    "api_app_id": "A111",
+    "event": {
+        "client_msg_id": "a8744611-0210-4f85-9f15-5faf7fb225c8",
+        "type": "message",
+        "text": "Please fix JIRA-1234, SCM-567 and BUG-169 as soon as you can!",
+        "user": "W111",
+        "ts": "1596183880.004200",
+        "team": "T111",
+        "channel": "C111",
+        "event_ts": "1596183880.004200",
+        "channel_type": "channel",
+    },
+    "type": "event_callback",
+    "event_id": "Ev111",
+    "event_time": 1596183880,
+    "authed_users": ["W111"],
+}
+
+
 async def verify_matches(context, say):
     assert context["matches"] == ("103", "you")
     assert context.matches == ("103", "you")
+    await say("Thanks!")
+
+
+async def verify_matches_multi(context, say, body, payload, message):
+    assert context["matches"] == ("JIRA-1234", "SCM-567", "BUG-169")
+    assert context.matches == ("JIRA-1234", "SCM-567", "BUG-169")
     await say("Thanks!")

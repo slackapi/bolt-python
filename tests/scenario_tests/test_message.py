@@ -57,6 +57,9 @@ class TestMessage:
     def build_request2(self) -> BoltRequest:
         return self.build_request_from_body(message_body2)
 
+    def build_request3(self) -> BoltRequest:
+        return self.build_request_from_body(message_body3)
+
     def test_string_keyword(self):
         app = App(
             client=self.web_client,
@@ -95,6 +98,20 @@ class TestMessage:
         )
 
         request = self.build_request2()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+        time.sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
+    def test_string_keyword_capturing_multi_capture(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.message(re.compile("([a-z|A-Z]{3,}-[0-9]+)"))(verify_matches_multi)
+
+        request = self.build_request3()
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
@@ -253,9 +270,40 @@ message_body2 = {
 }
 
 
+message_body3 = {
+    "token": "verification_token",
+    "team_id": "T111",
+    "enterprise_id": "E111",
+    "api_app_id": "A111",
+    "event": {
+        "client_msg_id": "a8744611-0210-4f85-9f15-5faf7fb225c8",
+        "type": "message",
+        "text": "Please fix JIRA-1234, SCM-567 and BUG-169 as soon as you can!",
+        "user": "W111",
+        "ts": "1596183880.004200",
+        "team": "T111",
+        "channel": "C111",
+        "event_ts": "1596183880.004200",
+        "channel_type": "channel",
+    },
+    "type": "event_callback",
+    "event_id": "Ev111",
+    "event_time": 1596183880,
+    "authed_users": ["W111"],
+}
+
+
 def verify_matches(context, say, body, payload, message):
     assert context["matches"] == ("103", "you")
     assert context.matches == ("103", "you")
+    assert body["event"] == message
+    assert payload == message
+    say("Thanks!")
+
+
+def verify_matches_multi(context, say, body, payload, message):
+    assert context["matches"] == ("JIRA-1234", "SCM-567", "BUG-169")
+    assert context.matches == ("JIRA-1234", "SCM-567", "BUG-169")
     assert body["event"] == message
     assert payload == message
     say("Thanks!")
