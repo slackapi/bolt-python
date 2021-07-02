@@ -87,28 +87,28 @@ request, there's a method to build a listener function.
 
 ```python
 # Listen for an event from the Events API
-app.event(event_type, fn)
+app.event(event_type)(fn)
 
 # Convenience method to listen to only `message` events using a string or re.Pattern
-app.message([pattern ,] fn)
+app.message([pattern ,])(fn)
 
 # Listen for an action from a Block Kit element (buttons, select menus, date pickers, etc)
-app.action(action_id, fn)
+app.action(action_id)(fn)
 
 # Listen for dialog submissions
-app.action({"callback_id": callbackId}, fn)
+app.action({"callback_id": callbackId})(fn)
 
 # Listen for a global or message shortcuts
-app.shortcut(callback_id, fn)
+app.shortcut(callback_id)(fn)
 
 # Listen for slash commands
-app.command(command_name, fn)
+app.command(command_name)(fn)
 
 # Listen for view_submission modal events
-app.view(callback_id, fn)
+app.view(callback_id)(fn)
 
 # Listen for options requests (from select menus with an external data source)
-app.options(action_id, fn)
+app.options(action_id)(fn)
 ```
 
 The recommended way to use these methods are decorators:
