@@ -15,6 +15,8 @@ order: 2
 
 `WorkflowStep` のインスタンスを作成したら、それを`app.step()` メソッドに渡します。これによって、アプリがワークフローステップのイベントをリッスンし、設定オブジェクトで指定されたコールバックを使ってそれに応答できるようになります。
 
+また、デコレーターとして利用できる `WorkflowStepBuilder` クラスを使ってワークフローステップを定義することもできます。 詳細は、[こちらのドキュメント](https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder)のコード例などを参考にしてください。
+
 </div>
 
 <div>
