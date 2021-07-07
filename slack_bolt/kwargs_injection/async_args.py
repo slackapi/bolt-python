@@ -71,6 +71,8 @@ class AsyncArgs:
     # middleware
     next: Callable[[], Awaitable[None]]
     """`next()` utility function, which tells the middleware chain that it can continue with the next one"""
+    next_: Callable[[], Awaitable[None]]
+    """An alias of `next()` for avoiding the Python built-in method overrides in middleware functions"""
 
     def __init__(
         self,
@@ -115,3 +117,4 @@ class AsyncArgs:
         self.say: AsyncSay = say
         self.respond: AsyncRespond = respond
         self.next: Callable[[], Awaitable[None]] = next
+        self.next_: Callable[[], Awaitable[None]] = next

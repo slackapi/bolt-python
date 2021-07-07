@@ -22,6 +22,9 @@ class AsyncSingleTeamAuthorization(AsyncAuthorization):
         *,
         req: AsyncBoltRequest,
         resp: BoltResponse,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> BoltResponse:
         if _is_no_auth_required(req):

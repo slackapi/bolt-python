@@ -16,6 +16,7 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
+# Note that async middleware system does not support instance methods n a class.
 class TestAsyncMiddleware:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
@@ -95,6 +96,56 @@ class TestAsyncMiddleware:
         assert response.body == "acknowledged!"
         await assert_auth_test_count_async(self, 1)
 
+    @pytest.mark.asyncio
+    async def test_decorator_next_call(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        @app.middleware
+        async def just_next(next):
+            await next()
+
+        app.shortcut("test-shortcut")(just_ack)
+
+        response = await app.async_dispatch(self.build_request())
+        assert response.status == 200
+        assert response.body == "acknowledged!"
+        await assert_auth_test_count_async(self, 1)
+
+    @pytest.mark.asyncio
+    async def test_next_underscore_call(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.use(just_next_)
+        app.shortcut("test-shortcut")(just_ack)
+
+        response = await app.async_dispatch(self.build_request())
+        assert response.status == 200
+        assert response.body == "acknowledged!"
+        await assert_auth_test_count_async(self, 1)
+
+    @pytest.mark.asyncio
+    async def test_decorator_next_underscore_call(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        @app.middleware
+        async def just_next_(next_):
+            await next_()
+
+        app.shortcut("test-shortcut")(just_ack)
+
+        response = await app.async_dispatch(self.build_request())
+        assert response.status == 200
+        assert response.body == "acknowledged!"
+        await assert_auth_test_count_async(self, 1)
+
 
 async def just_ack(ack):
     await ack("acknowledged!")
@@ -106,3 +157,7 @@ async def no_next():
 
 async def just_next(next):
     await next()
+
+
+async def just_next_(next_):
+    await next_()

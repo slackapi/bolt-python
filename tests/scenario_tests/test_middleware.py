@@ -87,6 +87,53 @@ class TestMiddleware:
         assert response.body == "acknowledged!"
         assert_auth_test_count(self, 1)
 
+    def test_decorator_next_call(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        @app.middleware
+        def just_next(next):
+            next()
+
+        app.shortcut("test-shortcut")(just_ack)
+
+        response = app.dispatch(self.build_request())
+        assert response.status == 200
+        assert response.body == "acknowledged!"
+        assert_auth_test_count(self, 1)
+
+    def test_next_call_(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.use(just_next_)
+        app.shortcut("test-shortcut")(just_ack)
+
+        response = app.dispatch(self.build_request())
+        assert response.status == 200
+        assert response.body == "acknowledged!"
+        assert_auth_test_count(self, 1)
+
+    def test_decorator_next_call_(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        @app.middleware
+        def just_next_(next_):
+            next_()
+
+        app.shortcut("test-shortcut")(just_ack)
+
+        response = app.dispatch(self.build_request())
+        assert response.status == 200
+        assert response.body == "acknowledged!"
+        assert_auth_test_count(self, 1)
+
     def test_class_call(self):
         class NextClass:
             def __call__(self, next):
@@ -97,6 +144,23 @@ class TestMiddleware:
             signing_secret=self.signing_secret,
         )
         app.use(NextClass())
+        app.shortcut("test-shortcut")(just_ack)
+
+        response = app.dispatch(self.build_request())
+        assert response.status == 200
+        assert response.body == "acknowledged!"
+        assert_auth_test_count(self, 1)
+
+    def test_class_call_(self):
+        class NextUnderscoreClass:
+            def __call__(self, next_):
+                next_()
+
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.use(NextUnderscoreClass())
         app.shortcut("test-shortcut")(just_ack)
 
         response = app.dispatch(self.build_request())
@@ -115,3 +179,7 @@ def no_next():
 
 def just_next(next):
     next()
+
+
+def just_next_(next_):
+    next_()

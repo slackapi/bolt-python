@@ -72,6 +72,8 @@ class Args:
     # middleware
     next: Callable[[], None]
     """`next()` utility function, which tells the middleware chain that it can continue with the next one"""
+    next_: Callable[[], None]
+    """An alias of `next()` for avoiding the Python built-in method overrides in middleware functions"""
 
     def __init__(
         self,
@@ -93,6 +95,9 @@ class Args:
         ack: Ack,
         say: Say,
         respond: Respond,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
         next: Callable[[], None],
         **kwargs  # noqa
     ):
@@ -116,3 +121,4 @@ class Args:
         self.say: Say = say
         self.respond: Respond = respond
         self.next: Callable[[], None] = next
+        self.next_: Callable[[], None] = next
