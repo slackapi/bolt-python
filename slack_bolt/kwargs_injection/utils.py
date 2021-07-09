@@ -52,6 +52,7 @@ def build_required_kwargs(
         "respond": request.context.respond,
         # middleware
         "next": next_func,
+        "next_": next_func,  # for the middleware using Python's built-in `next()` function
     }
     all_available_args["payload"] = (
         all_available_args["options"]

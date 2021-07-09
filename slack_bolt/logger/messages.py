@@ -99,7 +99,7 @@ def warning_unhandled_by_global_middleware(  # type: ignore
     name: str, req: Union[BoltRequest, "AsyncBoltRequest"]  # type: ignore
 ) -> str:  # type: ignore
     return (
-        f"A global middleware ({name}) skipped calling `next()` "
+        f"A global middleware ({name}) skipped calling either `next()` or `next_()` "
         f"without providing a response for the request ({req.body})"
     )
 

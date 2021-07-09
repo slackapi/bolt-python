@@ -19,6 +19,9 @@ class UrlVerification(Middleware):  # type: ignore
         *,
         req: BoltRequest,
         resp: BoltResponse,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
         next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         if self._is_url_verification_request(req.body):

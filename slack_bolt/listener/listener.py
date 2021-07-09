@@ -45,10 +45,10 @@ class Listener(metaclass=ABCMeta):
         for m in self.middleware:
             middleware_state = {"next_called": False}
 
-            def next():
+            def next_():
                 middleware_state["next_called"] = True
 
-            resp = m.process(req=req, resp=resp, next=next)
+            resp = m.process(req=req, resp=resp, next=next_)
             if not middleware_state["next_called"]:
                 # next() was not called in this middleware
                 return (resp, True)

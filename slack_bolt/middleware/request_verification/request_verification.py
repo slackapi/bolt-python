@@ -26,6 +26,9 @@ class RequestVerification(Middleware):  # type: ignore
         *,
         req: BoltRequest,
         resp: BoltResponse,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
         next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         if self._can_skip(req.mode, req.body):

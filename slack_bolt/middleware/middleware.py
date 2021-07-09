@@ -14,6 +14,9 @@ class Middleware(metaclass=ABCMeta):
         *,
         req: BoltRequest,
         resp: BoltResponse,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
         next: Callable[[], BoltResponse],
     ) -> Optional[BoltResponse]:
         """Processes a request data before other middleware and listeners.
@@ -23,6 +26,14 @@ class Middleware(metaclass=ABCMeta):
             def simple_middleware(req, resp, next):
                 # do something here
                 next()
+
+        This `process(req, resp, next)` method is supposed to be invoked only inside bolt-python.
+        If you want to avoid the name `next()` in your middleware functions, you can use `next_()` method instead.
+
+            @app.middleware
+            def simple_middleware(req, resp, next_):
+                # do something here
+                next_()
 
         Args:
             req: The incoming request
