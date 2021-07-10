@@ -3,13 +3,7 @@ from abc import ABCMeta, abstractmethod
 from logging import Logger
 from typing import Callable, Dict, Any, Awaitable, Optional
 
-from slack_bolt.listener.async_internals import (
-    _build_all_available_args,
-)
-from slack_bolt.listener.internals import (
-    _convert_all_available_args_to_kwargs,
-)
-
+from slack_bolt.kwargs_injection.async_utils import build_async_required_kwargs
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 
@@ -46,16 +40,13 @@ class AsyncCustomListenerErrorHandler(AsyncListenerErrorHandler):
         request: AsyncBoltRequest,
         response: Optional[BoltResponse],
     ) -> None:
-        all_available_args = _build_all_available_args(
+        kwargs: Dict[str, Any] = build_async_required_kwargs(
+            required_arg_names=self.arg_names,
             logger=self.logger,
             error=error,
             request=request,
             response=response,
-        )
-        kwargs: Dict[str, Any] = _convert_all_available_args_to_kwargs(
-            all_available_args=all_available_args,
-            arg_names=self.arg_names,
-            logger=self.logger,
+            next_keys_required=False,
         )
         returned_response = await self.func(**kwargs)
         if returned_response is not None and isinstance(

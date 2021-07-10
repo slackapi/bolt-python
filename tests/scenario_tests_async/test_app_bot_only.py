@@ -74,8 +74,9 @@ class TestAppBotOnly:
         app.event("app_mention")(whats_up)
 
         request = self.build_valid_app_mention_request()
-        with pytest.raises(ValueError):
-            await app.async_dispatch(request)
+        response = await app.async_dispatch(request)
+        assert response.status == 500
+        assert response.body == ""
 
     @pytest.mark.asyncio
     async def test_bot_only(self):

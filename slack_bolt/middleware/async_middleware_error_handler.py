@@ -8,10 +8,11 @@ from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 
 
-class AsyncListenerCompletionHandler(metaclass=ABCMeta):
+class AsyncMiddlewareErrorHandler(metaclass=ABCMeta):
     @abstractmethod
     async def handle(
         self,
+        error: Exception,
         request: AsyncBoltRequest,
         response: Optional[BoltResponse],
     ) -> None:
@@ -25,34 +26,46 @@ class AsyncListenerCompletionHandler(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-class AsyncCustomListenerCompletionHandler(AsyncListenerCompletionHandler):
-    def __init__(self, logger: Logger, func: Callable[..., Awaitable[None]]):
+class AsyncCustomMiddlewareErrorHandler(AsyncMiddlewareErrorHandler):
+    def __init__(
+        self, logger: Logger, func: Callable[..., Awaitable[Optional[BoltResponse]]]
+    ):
         self.func = func
         self.logger = logger
         self.arg_names = inspect.getfullargspec(func).args
 
     async def handle(
         self,
+        error: Exception,
         request: AsyncBoltRequest,
         response: Optional[BoltResponse],
     ) -> None:
         kwargs: Dict[str, Any] = build_async_required_kwargs(
             required_arg_names=self.arg_names,
             logger=self.logger,
+            error=error,
             request=request,
             response=response,
             next_keys_required=False,
         )
-        await self.func(**kwargs)
+        returned_response = await self.func(**kwargs)
+        if returned_response is not None and isinstance(
+            returned_response, BoltResponse
+        ):
+            response.status = returned_response.status
+            response.headers = returned_response.headers
+            response.body = returned_response.body
 
 
-class AsyncDefaultListenerCompletionHandler(AsyncListenerCompletionHandler):
+class AsyncDefaultMiddlewareErrorHandler(AsyncMiddlewareErrorHandler):
     def __init__(self, logger: Logger):
         self.logger = logger
 
     async def handle(
         self,
+        error: Exception,
         request: AsyncBoltRequest,
         response: Optional[BoltResponse],
     ):
-        pass
+        message = f"Failed to run a middleware function (error: {error})"
+        self.logger.exception(message)
