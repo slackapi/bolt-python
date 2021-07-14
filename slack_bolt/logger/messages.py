@@ -182,6 +182,7 @@ def warning_unhandled_request(  # type: ignore
 ) -> str:  # type: ignore
     filtered_body = _build_filtered_body(req.body)
     default_message = f"Unhandled request ({filtered_body})"
+    is_async = type(req) != BoltRequest
     if (
         is_workflow_step_edit(req.body)
         or is_workflow_step_save(req.body)
@@ -196,8 +197,8 @@ def warning_unhandled_request(  # type: ignore
         return _build_unhandled_request_suggestion(
             default_message,
             f"""
-from slack_bolt.workflows.step import WorkflowStep
-ws = WorkflowStep(
+from slack_bolt.workflows.step{'.async_step' if is_async else ''} import {'Async' if is_async else ''}WorkflowStep
+ws = {'Async' if is_async else ''}WorkflowStep(
     callback_id="{callback_id}",
     edit=edit,
     save=save,
@@ -216,8 +217,8 @@ app.step(ws)
             default_message,
             f"""
 @app.action("{action_id_or_callback_id}")
-def handle_some_action(ack, body, logger):
-    ack()
+{'async ' if is_async else ''}def handle_some_action(ack, body, logger):
+    {'await ' if is_async else ''}ack()
     logger.info(body)
 """,
         )
@@ -232,8 +233,8 @@ def handle_some_action(ack, body, logger):
             default_message,
             f"""
 @app.options({constraints})
-def handle_some_options(ack):
-    ack(options=[ ... ])
+{'async ' if is_async else ''}def handle_some_options(ack):
+    {'await ' if is_async else ''}ack(options=[ ... ])
 """,
         )
     if is_shortcut(req.body):
@@ -243,8 +244,8 @@ def handle_some_options(ack):
             default_message,
             f"""
 @app.shortcut("{id}")
-def handle_shortcuts(ack, body, logger):
-    ack()
+{'async ' if is_async else ''}def handle_shortcuts(ack, body, logger):
+    {'await ' if is_async else ''}ack()
     logger.info(body)
 """,
         )
@@ -254,8 +255,8 @@ def handle_shortcuts(ack, body, logger):
             default_message,
             f"""
 @app.view("{req.body.get('view', {}).get('callback_id', 'modal-view-id')}")
-def handle_view_events(ack, body, logger):
-    ack()
+{'async ' if is_async else ''}def handle_view_events(ack, body, logger):
+    {'await ' if is_async else ''}ack()
     logger.info(body)
 """,
         )
@@ -266,7 +267,7 @@ def handle_view_events(ack, body, logger):
             default_message,
             f"""
 @app.event("{event_type}")
-def handle_{event_type}_events(body, logger):
+{'async ' if is_async else ''}def handle_{event_type}_events(body, logger):
     logger.info(body)
 """,
         )
@@ -277,8 +278,8 @@ def handle_{event_type}_events(body, logger):
             default_message,
             f"""
 @app.command("{command}")
-def handle_some_command(ack, body, logger):
-    ack()
+{'async ' if is_async else ''}def handle_some_command(ack, body, logger):
+    {'await ' if is_async else ''}ack()
     logger.info(body)
 """,
         )
