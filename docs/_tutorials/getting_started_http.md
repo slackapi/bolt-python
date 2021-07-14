@@ -1,12 +1,12 @@
 ---
-title: Getting started
-order: 0
-slug: getting-started
+title: Getting started with HTTP
+order: 5
+slug: getting-started-http
 lang: en
 layout: tutorial
-permalink: /tutorial/getting-started
+permalink: /tutorial/getting-started-http
 redirect_from:
-  - /getting-started
+  - /tutorial/getting-started-http
 ---
 # Getting started with Bolt for Python
 
@@ -41,13 +41,13 @@ There are three main token types available to a Slack app: user (`xoxp`), bot (`
 - [Bot tokens](https://api.slack.com/authentication/token-types#bot) are associated with bot users, and are only granted once in a workspace where someone installs the app. The bot token your app uses will be the same no matter which user performed the installation. Bot tokens are the token type that _most_ apps use.
 - [App-level tokens](https://api.slack.com/authentication/token-types#app) represent your app across organizations, including installations by all individual users on all workspaces in a given organization and are commonly used for creating websocket connections to your app.
 
-We're going to use bot and app tokens for this guide.
+For brevity, we're going to use bot tokens for this guide.
 
 1. Navigate to the **OAuth & Permissions** on the left sidebar and scroll down to the **Bot Token Scopes** section. Click **Add an OAuth Scope**.
 
 2. For now, we'll just add one scope: [`chat:write`](https://api.slack.com/scopes/chat:write). This grants your app the permission to post messages in channels it's a member of.
 
-3. Scroll up to the top of the **OAuth & Permissions** page and click **Install App to Workspace**. You'll be led through Slack's OAuth UI, where you should allow your app to be installed to your development workspace.
+3. Scroll up to the top of the OAuth & Permissions page and click **Install App to Workspace**. You'll be led through Slack's OAuth UI, where you should allow your app to be installed to your development workspace.
 
 4. Once you authorize the installation, you'll land on the **OAuth & Permissions** page and see a **Bot User OAuth Access Token**.
 
@@ -127,19 +127,17 @@ Your app should let you know that it's up and running. 🎉
 
 ---
 
-### Setting up events
+### Setting up events over http
 Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and listen and respond to events. 
 
-To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api). For this guide, we are going to be using [Socket Mode](https://api.slack.com/apis/connections/socket), our recommended option for those just getting started and building something for their team.
+To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api).
 
-> 💡 Socket Mode lets apps use the Events API and interactive components without exposing a public HTTP endpoint. This can be helpful during development, or if you're receiving requests from behind a firewall. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/bolt-js/deployments/aws-lambda) or [Heroku](/bolt-js/deployments/heroku)), or apps intended for distribution via the Slack App Directory. To continue this setting up guide with HTTP, head over [here](/bolt-python/tutorial/getting-started-http#setting-up-events).  
+Let's enable events for your app: 
+1. Go back to your app configuration page (click on the app [from your app management page](https://api.slack.com/apps)). Click **Event Subscriptions** on the left sidebar. Toggle the switch labeled **Enable Events**.
 
+2. Add your Request URL. Slack will send HTTP POST requests corresponding to events to this [Request URL](https://api.slack.com/apis/connections/events-api#the-events-api__subscribing-to-event-types__events-api-request-urls) endpoint. Bolt uses the `/slack/events` path to listen to all incoming requests (whether shortcuts, events, or interactivity payloads). When configuring your Request URL within your app configuration, you'll append `/slack/events`, e.g. `https://<your-domain>/slack/events`. 💡 As long as your Bolt app is still running, your URL should become verified.
 
-Okay, let's enable Socket Mode:
-
-1. Head to your app's configuration page (click on the app [from your app management page](https://api.slack.com/apps)). Navigate to **Socket Mode** on the left side menu and toggle to enable. 
-
-2. Go to **Basic Information** and scroll down under the App Token section and click **Generate Token and Scopes** to generate an app-level token. Add the `connections:write` scope to this token and save the generated `xapp` token, we'll use that in just a moment. 
+> 💡 For local development, you can use a proxy service like ngrok to create a public URL and tunnel requests to your development environment. We've written a separate tutorial about [using ngrok with Slack for local development](https://api.slack.com/tutorials/tunneling-with-ngrok) that should help you get everything set up. And when you get to hosting your app, we've collected some of the most common hosting providers Slack developers use to host their apps [on our API site](https://api.slack.com/docs/hosting). 
 
 Finally, it's time to tell Slack what events we'd like to listen for.
 
@@ -153,31 +151,6 @@ Scroll down to **Subscribe to Bot Events**. There are four events related to mes
 
 If you want your bot to listen to messages from everywhere it is added to, choose all four message events. After you’ve selected the events you want your bot to listen to, click the green **Save Changes** button.
 
-Back in your project, make sure to store the `xapp` token you saved earlier in your environment, the same way you stored your `xoxb` token earlier. 
-
-```shell
-export SLACK_APP_TOKEN=xapp-<your-app-level-token>
-```
-
-Update your Bolt app initialization code to import and use the `SocketModeHandler` and restart the app.
-
-```python
-import os
-from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler # add this
-
-# Initializes your app with your bot token and signing secret
-app = App(
-    token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
-)
-
-# Start your app
-if __name__ == "__main__": 
-    handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]) # update this
-    handler.start(port=int(os.environ.get("PORT", 3000))) # update this
-```
-
 ---
 
 ### Listening and responding to a message
@@ -188,7 +161,6 @@ The following example listens and responds to all messages in channels/DMs where
 ```python
 import os
 from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 # Initializes your app with your bot token and signing secret
 app = App(
@@ -206,8 +178,7 @@ def message_hello(message, say):
 
 # Start your app
 if __name__ == "__main__":
-    handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"])
-    handler.start(port=int(os.environ.get("PORT", 3000)))
+    app.start(port=int(os.environ.get("PORT", 3000)))
 ```
 
 If you restart your app, so long as your bot user has been added to the channel/DM, when you send any message that contains "hello", it will respond.
@@ -237,7 +208,6 @@ Below, the code from the last section is modified to send a message containing a
 ```python
 import os
 from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 # Initializes your app with your bot token and signing secret
 app = App(
@@ -266,8 +236,7 @@ def message_hello(message, say):
 
 # Start your app
 if __name__ == "__main__":
-    handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"])
-    handler.start(port=int(os.environ.get("PORT", 3000)))
+    app.start(port=int(os.environ.get("PORT", 3000)))
 ```
 
 The value inside of `say()` is now an object that contains an array of `blocks`. Blocks are the building components of a Slack message and can range from text to images to datepickers. In this case, your app will respond with a section block that includes a button as an accessory. Since we're using `blocks`, the `text` is a fallback for notifications and accessibility.
@@ -283,7 +252,6 @@ Let's add a handler to send a followup message when someone clicks the button:
 ```python
 import os
 from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 # Initializes your app with your bot token and signing secret
 app = App(
@@ -318,8 +286,7 @@ def action_button_click(body, ack, say):
 
 # Start your app
 if __name__ == "__main__":
-    handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"])
-    handler.start(port=int(os.environ.get("PORT", 3000)))
+    app.start(port=int(os.environ.get("PORT", 3000)))
 ```
 
 You can see that we used `app.action()` to listen for the `action_id` that we named `button_click`. If you restart your app and click the button, you'll see a new message from your app that says you clicked the button.
@@ -337,4 +304,4 @@ Now that you have a basic app up and running, you can start exploring how to mak
 
 * Bolt allows you to [call Web API methods](/bolt-python/concepts#web-api) with the client attached to your app. There are [over 220 methods](https://api.slack.com/methods) on our API site.
 
-* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform. For apps that do not use Socket Mode, typically only the bot (`xoxb`) token and signing secret are required. For example of this, see [Getting Started with HTTP](/bolt-js/tutorial/getting-started-http). 
+* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform.
