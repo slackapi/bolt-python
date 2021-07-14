@@ -218,8 +218,11 @@ class App:
 
         self._installation_store: Optional[InstallationStore] = installation_store
         if self._installation_store is not None and self._authorize is None:
+            settings = oauth_flow.settings if oauth_flow is not None else oauth_settings
             self._authorize = InstallationStoreAuthorize(
                 installation_store=self._installation_store,
+                client_id=settings.client_id if settings is not None else None,
+                client_secret=settings.client_secret if settings is not None else None,
                 logger=self._framework_logger,
                 bot_only=installation_store_bot_only,
             )
