@@ -12,6 +12,10 @@ from slack_bolt.listener.async_listener_completion_handler import (
     AsyncDefaultListenerCompletionHandler,
 )
 from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
+from slack_bolt.middleware.async_middleware_error_handler import (
+    AsyncCustomMiddlewareErrorHandler,
+    AsyncDefaultMiddlewareErrorHandler,
+)
 from slack_bolt.middleware.message_listener_matches.async_message_listener_matches import (
     AsyncMessageListenerMatches,
 )
@@ -334,6 +338,9 @@ class AsyncApp:
                 logger=self._framework_logger,
             ),
         )
+        self._async_middleware_error_handler = AsyncDefaultMiddlewareErrorHandler(
+            logger=self._framework_logger,
+        )
 
         self._init_middleware_list_done = False
         self._init_async_middleware_list(
@@ -499,89 +506,101 @@ class AsyncApp:
         async def async_middleware_next():
             middleware_state["next_called"] = True
 
-        for middleware in self._async_middleware_list:
-            middleware_state["next_called"] = False
-            if self._framework_logger.level <= logging.DEBUG:
-                self._framework_logger.debug(f"Applying {middleware.name}")
-            resp = await middleware.async_process(
-                req=req, resp=resp, next=async_middleware_next
-            )
-            if not middleware_state["next_called"]:
-                if resp is None:
-                    # next() method was not called without providing the response to return to Slack
-                    # This should not be an intentional handling in usual use cases.
-                    resp = BoltResponse(
-                        status=404, body={"error": "no next() calls in middleware"}
-                    )
-                    if self._raise_error_for_unhandled_request is True:
-                        await self._async_listener_runner.listener_error_handler.handle(
-                            error=BoltUnhandledRequestError(
+        try:
+            for middleware in self._async_middleware_list:
+                middleware_state["next_called"] = False
+                if self._framework_logger.level <= logging.DEBUG:
+                    self._framework_logger.debug(f"Applying {middleware.name}")
+                resp = await middleware.async_process(
+                    req=req, resp=resp, next=async_middleware_next
+                )
+                if not middleware_state["next_called"]:
+                    if resp is None:
+                        # next() method was not called without providing the response to return to Slack
+                        # This should not be an intentional handling in usual use cases.
+                        resp = BoltResponse(
+                            status=404, body={"error": "no next() calls in middleware"}
+                        )
+                        if self._raise_error_for_unhandled_request is True:
+                            await self._async_listener_runner.listener_error_handler.handle(
+                                error=BoltUnhandledRequestError(
+                                    request=req,
+                                    current_response=resp,
+                                    last_global_middleware_name=middleware.name,
+                                ),
                                 request=req,
-                                current_response=resp,
-                                last_global_middleware_name=middleware.name,
-                            ),
-                            request=req,
-                            response=resp,
+                                response=resp,
+                            )
+                            return resp
+                        self._framework_logger.warning(
+                            warning_unhandled_by_global_middleware(middleware.name, req)
                         )
                         return resp
-                    self._framework_logger.warning(
-                        warning_unhandled_by_global_middleware(middleware.name, req)
-                    )
                     return resp
-                return resp
 
-        for listener in self._async_listeners:
-            listener_name = get_name_for_callable(listener.ack_function)
-            self._framework_logger.debug(debug_checking_listener(listener_name))
-            if await listener.async_matches(req=req, resp=resp):
-                # run all the middleware attached to this listener first
-                (
-                    middleware_resp,
-                    next_was_not_called,
-                ) = await listener.run_async_middleware(req=req, resp=resp)
-                if next_was_not_called:
+            for listener in self._async_listeners:
+                listener_name = get_name_for_callable(listener.ack_function)
+                self._framework_logger.debug(debug_checking_listener(listener_name))
+                if await listener.async_matches(req=req, resp=resp):
+                    # run all the middleware attached to this listener first
+                    (
+                        middleware_resp,
+                        next_was_not_called,
+                    ) = await listener.run_async_middleware(req=req, resp=resp)
+                    if next_was_not_called:
+                        if middleware_resp is not None:
+                            if self._framework_logger.level <= logging.DEBUG:
+                                debug_message = (
+                                    debug_return_listener_middleware_response(
+                                        listener_name,
+                                        middleware_resp.status,
+                                        middleware_resp.body,
+                                        starting_time,
+                                    )
+                                )
+                                self._framework_logger.debug(debug_message)
+                            return middleware_resp
+                        # The last listener middleware didn't call next() method.
+                        # This means the listener is not for this incoming request.
+                        continue
+
                     if middleware_resp is not None:
-                        if self._framework_logger.level <= logging.DEBUG:
-                            debug_message = debug_return_listener_middleware_response(
-                                listener_name,
-                                middleware_resp.status,
-                                middleware_resp.body,
-                                starting_time,
-                            )
-                            self._framework_logger.debug(debug_message)
-                        return middleware_resp
-                    # The last listener middleware didn't call next() method.
-                    # This means the listener is not for this incoming request.
-                    continue
+                        resp = middleware_resp
 
-                if middleware_resp is not None:
-                    resp = middleware_resp
+                    self._framework_logger.debug(debug_running_listener(listener_name))
+                    listener_response: Optional[
+                        BoltResponse
+                    ] = await self._async_listener_runner.run(
+                        request=req,
+                        response=resp,
+                        listener_name=listener_name,
+                        listener=listener,
+                    )
+                    if listener_response is not None:
+                        return listener_response
 
-                self._framework_logger.debug(debug_running_listener(listener_name))
-                listener_response: Optional[
-                    BoltResponse
-                ] = await self._async_listener_runner.run(
+            if resp is None:
+                resp = BoltResponse(status=404, body={"error": "unhandled request"})
+            if self._raise_error_for_unhandled_request is True:
+                await self._async_listener_runner.listener_error_handler.handle(
+                    error=BoltUnhandledRequestError(
+                        request=req,
+                        current_response=resp,
+                    ),
                     request=req,
                     response=resp,
-                    listener_name=listener_name,
-                    listener=listener,
                 )
-                if listener_response is not None:
-                    return listener_response
+                return resp
+            return self._handle_unmatched_requests(req, resp)
 
-        if resp is None:
-            resp = BoltResponse(status=404, body={"error": "unhandled request"})
-        if self._raise_error_for_unhandled_request is True:
-            await self._async_listener_runner.listener_error_handler.handle(
-                error=BoltUnhandledRequestError(
-                    request=req,
-                    current_response=resp,
-                ),
+        except Exception as error:
+            resp = BoltResponse(status=500, body="")
+            await self._async_middleware_error_handler.handle(
+                error=error,
                 request=req,
                 response=resp,
             )
             return resp
-        return self._handle_unmatched_requests(req, resp)
 
     def _handle_unmatched_requests(
         self, req: AsyncBoltRequest, resp: BoltResponse
@@ -728,6 +747,10 @@ class AsyncApp:
                 logger=self._framework_logger,
                 func=func,
             )
+        )
+        self._async_middleware_error_handler = AsyncCustomMiddlewareErrorHandler(
+            logger=self._framework_logger,
+            func=func,
         )
         return func
 
