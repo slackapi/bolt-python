@@ -257,3 +257,30 @@ class TestAsyncErrorHandler:
         response = await app.async_dispatch(self.build_valid_request())
         assert response.status == 404
         assert response.body == "TODO"
+
+    @pytest.mark.asyncio
+    async def test_middleware_errors(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        @app.middleware
+        async def broken_middleware(next_):
+            assert next_ is not None
+            raise RuntimeError("Something wrong!")
+
+        response = await app.async_dispatch(self.build_valid_request())
+        assert response.status == 500
+        assert response.body == ""
+
+        @app.error
+        async def handle_errors(body, next_, error):
+            assert next_ is None
+            assert body is not None
+            assert isinstance(error, RuntimeError)
+            return BoltResponse(status=503, body="as expected")
+
+        response = await app.async_dispatch(self.build_valid_request())
+        assert response.status == 503
+        assert response.body == "as expected"
