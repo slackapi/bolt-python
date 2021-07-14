@@ -99,6 +99,7 @@ class AsyncOAuthSettings:
             authorization_url: Set a URL if you want to customize the URL `https://slack.com/oauth/v2/authorize`
             installation_store: Specify the instance of `InstallationStore` (Default: `FileInstallationStore`)
             installation_store_bot_only: Use `InstallationStore#find_bot()` if True (Default: False)
+            token_rotation_expiration_minutes: Minutes before refreshing tokens (Default: 2 hours)
             state_store: Specify the instance of `InstallationStore` (Default: `FileOAuthStateStore`)
             state_cookie_name: The cookie name that is set for installers' browser. (Default: "slack-app-oauth-state")
             state_expiration_seconds: The seconds that the state value is alive (Default: 600 seconds)
