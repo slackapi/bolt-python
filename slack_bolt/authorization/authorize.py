@@ -223,22 +223,22 @@ class InstallationStoreAuthorize(Authorize):
                 )
                 if bot is not None:
                     bot_token = bot.bot_token
+                    if bot.bot_refresh_token is not None:
+                        # Token rotation
+                        if self.token_rotator is None:
+                            raise BoltError(self._config_error_message)
+                        refreshed = self.token_rotator.perform_bot_token_rotation(
+                            bot=bot,
+                            minutes_before_expiration=self.token_rotation_expiration_minutes,
+                        )
+                        if refreshed is not None:
+                            self.installation_store.save_bot(refreshed)
+                            bot_token = refreshed.bot_token
+
             except NotImplementedError as _:
                 self.find_bot_available = False
             except Exception as e:
                 self.logger.info(f"Failed to call find_bot method: {e}")
-
-            if bot.bot_refresh_token is not None:
-                # Token rotation
-                if self.token_rotator is None:
-                    raise BoltError(self._config_error_message)
-                refreshed = self.token_rotator.perform_bot_token_rotation(
-                    bot=bot,
-                    minutes_before_expiration=self.token_rotation_expiration_minutes,
-                )
-                if refreshed is not None:
-                    self.installation_store.save_bot(refreshed)
-                    bot_token = refreshed.bot_token
 
         token: Optional[str] = bot_token or user_token
         if token is None:
