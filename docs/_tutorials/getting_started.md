@@ -16,6 +16,8 @@ This guide is meant to walk you through getting up and running with a Slack app 
 
 When you're finished, you'll have this ⚡️[Getting Started with Slack app](https://github.com/slackapi/bolt-python/tree/main/examples/getting_started) to run, modify, and make your own.
 
+> 💡 For this guide, we are going to be using [Socket Mode](https://api.slack.com/apis/connections/socket), our recommended option for those just getting started and building something for their team. If you already know you're going to want to use HTTP as your app's communication protocol, head over to our parallel guide, [Getting Started with HTTP](/bolt-js/tutorial/getting-started-http). 
+ 
 ---
 
 ### Create an app
@@ -114,7 +116,7 @@ app = App(
 
 # Start your app
 if __name__ == "__main__":
-    app.start(port=int(os.environ.get("PORT", 3000)))
+    app.start()
 ```
 
 Your token and signing secret are enough to create your first Bolt app. Save your `app.py` file then on the command line run the following:
@@ -174,8 +176,7 @@ app = App(
 
 # Start your app
 if __name__ == "__main__": 
-    handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]) # update this
-    handler.start(port=int(os.environ.get("PORT", 3000))) # update this
+    SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start() # add this
 ```
 
 ---
@@ -206,8 +207,7 @@ def message_hello(message, say):
 
 # Start your app
 if __name__ == "__main__":
-    handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"])
-    handler.start(port=int(os.environ.get("PORT", 3000)))
+    SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
 ```
 
 If you restart your app, so long as your bot user has been added to the channel/DM, when you send any message that contains "hello", it will respond.
@@ -266,8 +266,8 @@ def message_hello(message, say):
 
 # Start your app
 if __name__ == "__main__":
-    handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"])
-    handler.start(port=int(os.environ.get("PORT", 3000)))
+    SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
+
 ```
 
 The value inside of `say()` is now an object that contains an array of `blocks`. Blocks are the building components of a Slack message and can range from text to images to datepickers. In this case, your app will respond with a section block that includes a button as an accessory. Since we're using `blocks`, the `text` is a fallback for notifications and accessibility.
@@ -318,8 +318,7 @@ def action_button_click(body, ack, say):
 
 # Start your app
 if __name__ == "__main__":
-    handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"])
-    handler.start(port=int(os.environ.get("PORT", 3000)))
+    SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
 ```
 
 You can see that we used `app.action()` to listen for the `action_id` that we named `button_click`. If you restart your app and click the button, you'll see a new message from your app that says you clicked the button.

@@ -49,7 +49,7 @@ For brevity, we're going to use bot tokens for this guide.
 
 3. Scroll up to the top of the OAuth & Permissions page and click **Install App to Workspace**. You'll be led through Slack's OAuth UI, where you should allow your app to be installed to your development workspace.
 
-4. Once you authorize the installation, you'll land on the **OAuth & Permissions** page and see a **Bot User OAuth Access Token**.
+4. Once you authorize the installation, you'll land on the **OAuth & Permissions** page and see a **Bot User OAuth Access Token**. We'll use that in just a moment.
 
 ![OAuth Tokens](../assets/bot-token.png "Bot OAuth Token")
 
