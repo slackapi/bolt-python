@@ -25,7 +25,7 @@ First thing's first: before you start developing with Bolt, you'll want to [crea
 
 After you fill out an app name (_you can change it later_) and pick a workspace to install it to, hit the `Create App` button and you'll land on your app's **Basic Information** page.
 
-This page contains an overview of your app in addition to important credentials you'll need later, like the `Signing Secret` under the **App Credentials** header.
+This page contains an overview of your app in addition to important credentials you'll want to reference later. 
 
 ![Basic Information page](../assets/basic-information-page.png "Basic Information page")
 
@@ -41,7 +41,7 @@ There are three main token types available to a Slack app: user (`xoxp`), bot (`
 - [Bot tokens](https://api.slack.com/authentication/token-types#bot) are associated with bot users, and are only granted once in a workspace where someone installs the app. The bot token your app uses will be the same no matter which user performed the installation. Bot tokens are the token type that _most_ apps use.
 - [App-level tokens](https://api.slack.com/authentication/token-types#app) represent your app across organizations, including installations by all individual users on all workspaces in a given organization and are commonly used for creating websocket connections to your app.
 
-We're going to use bot and app tokens for this guide.
+We're going to use bot and app-level tokens for this guide.
 
 1. Navigate to the **OAuth & Permissions** on the left sidebar and scroll down to the **Bot Token Scopes** section. Click **Add an OAuth Scope**.
 
@@ -132,7 +132,7 @@ Your app behaves similarly to people on your team — it can post messages, add 
 
 To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api). For this guide, we are going to be using [Socket Mode](https://api.slack.com/apis/connections/socket), our recommended option for those just getting started and building something for their team.
 
-> 💡 Socket Mode lets apps use the Events API and interactive components without exposing a public HTTP endpoint. This can be helpful during development, or if you're receiving requests from behind a firewall. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/bolt-js/deployments/aws-lambda) or [Heroku](/bolt-js/deployments/heroku)), or apps intended for distribution via the Slack App Directory. To continue this setting up guide with HTTP, head over [here](/bolt-python/tutorial/getting-started-http#setting-up-events).  
+> 💡 Socket Mode lets apps use the Events API and interactive components without exposing a public HTTP endpoint. This can be helpful during development, or if you're receiving requests from behind a firewall. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/bolt-js/deployments/aws-lambda) or [Heroku](/bolt-js/deployments/heroku)), or apps intended for distribution via the Slack App Directory. To continue with this getting started guide with HTTP, head over [here](/bolt-python/tutorial/getting-started-http#setting-up-events).  
 
 
 Okay, let's enable Socket Mode:
@@ -159,7 +159,7 @@ Back in your project, make sure to store the `xapp` token you saved earlier in y
 export SLACK_APP_TOKEN=xapp-<your-app-level-token>
 ```
 
-Update your Bolt app initialization code to import and use the `SocketModeHandler` and restart the app.
+Update your Bolt app initialization code to import and use the `SocketModeHandler`. Restart the app.
 
 ```python
 import os
@@ -327,7 +327,7 @@ You can see that we used `app.action()` to listen for the `action_id` that we na
 ---
 
 ### Next steps
-You just built your first [Bolt for Python app](https://github.com/slackapi/bolt-python/tree/main/examples/getting_started)! 🎉
+You just built your first [Bolt for Python app](https://github.com/slackapi/bolt-python/tree/main/examples/getting_started) with Socket Mode! 🎉
 
 Now that you have a basic app up and running, you can start exploring how to make your Bolt app stand out. Here are some ideas about what to explore next:
 
@@ -337,4 +337,4 @@ Now that you have a basic app up and running, you can start exploring how to mak
 
 * Bolt allows you to [call Web API methods](/bolt-python/concepts#web-api) with the client attached to your app. There are [over 220 methods](https://api.slack.com/methods) on our API site.
 
-* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform. For apps that do not use Socket Mode, typically only the bot (`xoxb`) token and signing secret are required. For example of this, see [Getting Started with HTTP](/bolt-js/tutorial/getting-started-http). 
+* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform. For apps that do not use Socket Mode, typically only the bot (`xoxb`) token and signing secret are required. For example of this, see our parallel guide [Getting Started with HTTP](/bolt-js/tutorial/getting-started-http). 
