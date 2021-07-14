@@ -338,9 +338,13 @@ class AsyncOAuthFlow:
                 bot_id=bot_id,
                 bot_user_id=oauth_response.get("bot_user_id"),
                 bot_scopes=oauth_response.get("scope"),  # comma-separated string
+                bot_refresh_token=oauth_response.get("refresh_token"),  # since v1.7
+                bot_token_expires_in=oauth_response.get("expires_in"),  # since v1.7
                 user_id=installer.get("id"),
                 user_token=installer.get("access_token"),
                 user_scopes=installer.get("scope"),  # comma-separated string
+                user_refresh_token=installer.get("refresh_token"),  # since v1.7
+                user_token_expires_in=installer.get("expires_in"),  # since v1.7
                 incoming_webhook_url=incoming_webhook.get("url"),
                 incoming_webhook_channel=incoming_webhook.get("channel"),
                 incoming_webhook_channel_id=incoming_webhook.get("channel_id"),

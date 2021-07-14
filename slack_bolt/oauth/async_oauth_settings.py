@@ -41,6 +41,7 @@ class AsyncOAuthSettings:
     # Installation Management
     installation_store: AsyncInstallationStore
     installation_store_bot_only: bool
+    token_rotation_expiration_minutes: int
     authorize: AsyncAuthorize
     # state parameter related configurations
     state_store: AsyncOAuthStateStore
@@ -73,6 +74,7 @@ class AsyncOAuthSettings:
         # Installation Management
         installation_store: Optional[AsyncInstallationStore] = None,
         installation_store_bot_only: bool = False,
+        token_rotation_expiration_minutes: int = 120,
         # state parameter related configurations
         state_store: Optional[AsyncOAuthStateStore] = None,
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
@@ -140,8 +142,12 @@ class AsyncOAuthSettings:
             installation_store or get_or_create_default_installation_store(client_id)
         )
         self.installation_store_bot_only = installation_store_bot_only
+        self.token_rotation_expiration_minutes = token_rotation_expiration_minutes
         self.authorize = AsyncInstallationStoreAuthorize(
             logger=logger,
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            token_rotation_expiration_minutes=self.token_rotation_expiration_minutes,
             installation_store=self.installation_store,
             bot_only=self.installation_store_bot_only,
         )
