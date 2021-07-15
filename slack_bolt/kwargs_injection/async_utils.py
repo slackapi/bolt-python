@@ -27,6 +27,8 @@ def build_async_required_kwargs(
     response: Optional[BoltResponse],
     next_func: Callable[[], None] = None,
     this_func: Optional[Callable] = None,
+    error: Optional[Exception] = None,  # for error handlers
+    next_keys_required: bool = True,  # False for listeners / middleware / error handlers
 ) -> Dict[str, Any]:
     all_available_args = {
         "logger": logger,
@@ -53,7 +55,13 @@ def build_async_required_kwargs(
         # middleware
         "next": next_func,
         "next_": next_func,  # for the middleware using Python's built-in `next()` function
+        # error handler
+        "error": error,  # Exception
     }
+    if not next_keys_required:
+        all_available_args.pop("next")
+        all_available_args.pop("next_")
+
     all_available_args["payload"] = (
         all_available_args["options"]
         or all_available_args["shortcut"]
