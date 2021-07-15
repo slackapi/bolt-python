@@ -161,17 +161,17 @@ Back in your project, make sure to store the `xapp` token you saved earlier in y
 export SLACK_APP_TOKEN=xapp-<your-app-level-token>
 ```
 
-Update your Bolt app initialization code to import and use the `SocketModeHandler`. Restart the app.
+Update your Bolt app initialization code to import and use the `SocketModeHandler`. You'll notice that the signing secret is no longer required when initilizing your app with the Socket Mode handler. We've left it in this example in case you ever need to switch from Socket Mode to HTTP. Restart the app.
 
 ```python
 import os
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler # add this
 
-# Initializes your app with your bot token and signing secret
+# Initializes your app with your bot token and socket mode handler
 app = App(
     token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+    # signing_secret=os.environ.get("SLACK_SIGNING_SECRET") # not required for socket mode
 )
 
 # Start your app
@@ -191,10 +191,10 @@ import os
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-# Initializes your app with your bot token and signing secret
+# Initializes your app with your bot token and socket mode handler
 app = App(
     token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+    # signing_secret=os.environ.get("SLACK_SIGNING_SECRET") # not required for socket mode
 )
 
 # Listens to incoming messages that contain "hello"
@@ -235,10 +235,10 @@ import os
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-# Initializes your app with your bot token and signing secret
+# Initializes your app with your bot token and socket mode handler
 app = App(
     token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+    # signing_secret=os.environ.get("SLACK_SIGNING_SECRET") # not required for socket mode
 )
 
 # Listens to incoming messages that contain "hello"
