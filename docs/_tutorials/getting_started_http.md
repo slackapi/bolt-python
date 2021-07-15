@@ -94,7 +94,7 @@ export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
 > 🔒 Remember to keep your tokens and signing secret secure. At a minimum, you should avoid checking them into public version control, and access them via environment variables as we've done above. Checkout the API documentation for more on [best practices for app security](https://api.slack.com/authentication/best-practices).
 
-Now, lets create your app. Install the `slack_bolt` Python package to your virtual environment using the following command:
+Now, let's create your app. Install the `slack_bolt` Python package to your virtual environment using the following command:
 
 ```shell
 pip install slack_bolt
@@ -304,4 +304,4 @@ Now that you have a basic app up and running, you can start exploring how to mak
 
 * Bolt allows you to [call Web API methods](/bolt-python/concepts#web-api) with the client attached to your app. There are [over 220 methods](https://api.slack.com/methods) on our API site.
 
-* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform.
+* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform. If you are using Socket Mode instead of HTTP, an additional (`xapp`) token with `connections:write` scopes is required.
