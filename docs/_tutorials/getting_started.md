@@ -16,7 +16,7 @@ This guide is meant to walk you through getting up and running with a Slack app 
 
 When you're finished, you'll have this ⚡️[Getting Started with Slack app](https://github.com/slackapi/bolt-python/tree/main/examples/getting_started) to run, modify, and make your own.
 
-> 💡 For this guide, we are going to be using [Socket Mode](https://api.slack.com/apis/connections/socket), our recommended option for those just getting started and building something for their team. If you already know you're going to want to use HTTP as your app's communication protocol, head over to our parallel guide, [Getting Started with HTTP](/bolt-js/tutorial/getting-started-http). 
+> 💡 For this guide, we are going to be using [Socket Mode](https://api.slack.com/apis/connections/socket), our recommended option for those just getting started and building something for their team. If you already know you're going to want to use HTTP as your app's communication protocol, head over to our parallel guide, [Getting Started over HTTP](/bolt-python/tutorial/getting-started-http). 
  
 ---
 
@@ -96,7 +96,7 @@ export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
 > 🔒 Remember to keep your tokens and signing secret secure. At a minimum, you should avoid checking them into public version control, and access them via environment variables as we've done above. Checkout the API documentation for more on [best practices for app security](https://api.slack.com/authentication/best-practices).
 
-Now, lets create your app. Install the `slack_bolt` Python package to your virtual environment using the following command:
+Now, let's create your app. Install the `slack_bolt` Python package to your virtual environment using the following command:
 
 ```shell
 pip install slack_bolt
@@ -134,7 +134,7 @@ Your app behaves similarly to people on your team — it can post messages, add 
 
 To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api). For this guide, we are going to be using [Socket Mode](https://api.slack.com/apis/connections/socket), our recommended option for those just getting started and building something for their team.
 
-> 💡 Socket Mode lets apps use the Events API and interactive components without exposing a public HTTP endpoint. This can be helpful during development, or if you're receiving requests from behind a firewall. HTTP is more useful for apps being deployed to hosting environments (like [AWS](/bolt-js/deployments/aws-lambda) or [Heroku](/bolt-js/deployments/heroku)), or apps intended for distribution via the Slack App Directory. To continue with this getting started guide with HTTP, head over [here](/bolt-python/tutorial/getting-started-http#setting-up-events).  
+> 💡 Socket Mode lets apps use the Events API and interactive components without exposing a public HTTP endpoint. This can be helpful during development, or if you're receiving requests from behind a firewall. HTTP is more useful for apps being deployed to hosting environments, or apps intended for distribution via the Slack App Directory. To continue with this getting started guide with HTTP, head over [here](/bolt-python/tutorial/getting-started-http#setting-up-events-over-http).  
 
 
 Okay, let's enable Socket Mode:
@@ -218,13 +218,9 @@ This is a basic example, but it gives you a place to start customizing your app 
 
 ### Sending and responding to actions
 
-To use features like buttons, select menus, datepickers, modals, and shortcuts, you’ll need to enable interactivity. Similar to events, you'll need to specify a URL for Slack to send the action (such as *user clicked a button*).
+To use features like buttons, select menus, datepickers, modals, and shortcuts, you’ll need to enable interactivity. Head over to **Interactivity & Shortcuts** in your app configuration.
 
-Back on your app configuration page, click on **Interactivity & Shortcuts** on the left side. You'll see that there's another **Request URL** box.
-
-> 💡 By default, Bolt is configured to use the same endpoint for interactive components that it uses for events, so use the same request URL as above (for example, `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up to handle interactivity!
-
-![Configuring a Request URL](../assets/request-url-config.png "Configuring a Request URL")
+> 💡 You’ll notice that with Socket Mode on, basic interactivity is enabled for us by default, so no further action here is needed. If you’re using HTTP, you’ll need to supply a Request URL for Slack to send events to.
 
 When interactivity is enabled, interactions with shortcuts, modals, or interactive components (such as buttons, select menus, and datepickers) will be sent to your app as events.
 
@@ -336,4 +332,4 @@ Now that you have a basic app up and running, you can start exploring how to mak
 
 * Bolt allows you to [call Web API methods](/bolt-python/concepts#web-api) with the client attached to your app. There are [over 220 methods](https://api.slack.com/methods) on our API site.
 
-* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform. For apps that do not use Socket Mode, typically only the bot (`xoxb`) token and signing secret are required. For example of this, see our parallel guide [Getting Started with HTTP](/bolt-js/tutorial/getting-started-http). 
+* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform. For apps that do not use Socket Mode, typically only the bot (`xoxb`) token and signing secret are required. For example of this, see our parallel guide [Getting Started with HTTP](/bolt-python/tutorial/getting-started-http). 
