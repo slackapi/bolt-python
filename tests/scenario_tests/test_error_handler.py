@@ -242,3 +242,29 @@ class TestErrorHandler:
         response = app.dispatch(self.build_valid_request())
         assert response.status == 404
         assert response.body == "TODO"
+
+    def test_global_middleware_errors(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        @app.middleware
+        def broken_middleware(next_):
+            assert next_ is not None
+            raise RuntimeError("Something wrong!")
+
+        response = app.dispatch(self.build_valid_request())
+        assert response.status == 500
+        assert response.body == ""
+
+        @app.error
+        def handle_errors(body, next_, error):
+            assert next_ is None
+            assert body is not None
+            assert isinstance(error, RuntimeError)
+            return BoltResponse(status=503, body="as expected")
+
+        response = app.dispatch(self.build_valid_request())
+        assert response.status == 503
+        assert response.body == "as expected"
