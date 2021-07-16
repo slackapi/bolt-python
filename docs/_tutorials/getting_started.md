@@ -51,14 +51,14 @@ We're going to use bot and app-level tokens for this guide.
 
 3. Scroll up to the top of the **OAuth & Permissions** page and click **Install App to Workspace**. You'll be led through Slack's OAuth UI, where you should allow your app to be installed to your development workspace.
 
-4. Once you authorize the installation, you'll land on the **OAuth & Permissions** page and see a **Bot User OAuth Access Token**.
+4. Once you authorize the installation, you'll land on the **OAuth & Permissions** page and see a **Bot User OAuth Access Token**. 
+
+![OAuth Tokens](../assets/bot-token.png "Bot OAuth Token")
 
 5. Then head over to **Basic Information** and scroll down under the App Token section and click **Generate Token and Scopes** to generate an app-level token. Add the `connections:write` scope to this token and save the generated `xapp` token, we'll use both these tokens in just a moment. 
 
 6. Navigate to **Socket Mode** on the left side menu and toggle to enable. 
 
-
-![OAuth Tokens](../assets/bot-token.png "Bot OAuth Token")
 
 > 💡 Treat your tokens like passwords and [keep them safe](https://api.slack.com/docs/oauth-safety). Your app uses tokens to post and retrieve information from Slack workspaces.
 
