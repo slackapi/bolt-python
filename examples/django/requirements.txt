@@ -1,2 +1,2 @@
 Django>=3.2,<4
-slack-bolt>=1.6,<2
+slack-bolt>=1.7,<2
