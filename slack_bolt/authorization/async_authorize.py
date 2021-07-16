@@ -7,10 +7,12 @@ from slack_sdk.oauth.installation_store import Bot, Installation
 from slack_sdk.oauth.installation_store.async_installation_store import (
     AsyncInstallationStore,
 )
+from slack_sdk.oauth.token_rotation.async_rotator import AsyncTokenRotator
 
 from slack_bolt.authorization.async_authorize_args import AsyncAuthorizeArgs
 from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.context.async_context import AsyncBoltContext
+from slack_bolt.error import BoltError
 
 
 class AsyncAuthorize:
@@ -94,12 +96,18 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
     authorize_result_cache: Dict[str, AuthorizeResult]
     find_installation_available: Optional[bool]
     find_bot_available: Optional[bool]
+    token_rotator: Optional[AsyncTokenRotator]
+
+    _config_error_message: str = "AsyncInstallationStore with client_id/client_secret are required for token rotation"
 
     def __init__(
         self,
         *,
         logger: Logger,
         installation_store: AsyncInstallationStore,
+        client_id: Optional[str] = None,
+        client_secret: Optional[str] = None,
+        token_rotation_expiration_minutes: Optional[int] = None,
         # For v1.0.x compatibility and people who still want its simplicity
         # use only InstallationStore#find_bot(enterprise_id, team_id)
         bot_only: bool = False,
@@ -112,6 +120,16 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
         self.authorize_result_cache = {}
         self.find_installation_available = None
         self.find_bot_available = None
+        if client_id is not None and client_secret is not None:
+            self.token_rotator = AsyncTokenRotator(
+                client_id=client_id,
+                client_secret=client_secret,
+            )
+        else:
+            self.token_rotator = None
+        self.token_rotation_expiration_minutes = (
+            token_rotation_expiration_minutes or 120
+        )
 
     async def __call__(
         self,
@@ -171,6 +189,20 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                         installation.user_token,
                     )
 
+                    if installation.user_refresh_token is not None:
+                        if self.token_rotator is None:
+                            raise BoltError(self._config_error_message)
+                        refreshed = await self.token_rotator.perform_token_rotation(
+                            installation=installation,
+                            token_rotation_expiration_minutes=self.token_rotation_expiration_minutes,
+                        )
+                        if refreshed is not None:
+                            await self.installation_store.async_save(refreshed)
+                            bot_token, user_token = (
+                                refreshed.bot_token,
+                                refreshed.user_token,
+                            )
+
             except NotImplementedError as _:
                 self.find_installation_available = False
 
@@ -194,6 +226,18 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                 )
                 if bot is not None:
                     bot_token = bot.bot_token
+                    if bot.bot_refresh_token is not None:
+                        # Token rotation
+                        if self.token_rotator is None:
+                            raise BoltError(self._config_error_message)
+                        refreshed = await self.token_rotator.perform_bot_token_rotation(
+                            bot=bot,
+                            token_rotation_expiration_minutes=self.token_rotation_expiration_minutes,
+                        )
+                        if refreshed is not None:
+                            await self.installation_store.async_save_bot(refreshed)
+                            bot_token = refreshed.bot_token
+
             except NotImplementedError as _:
                 self.find_bot_available = False
             except Exception as e:

@@ -22,14 +22,16 @@ client_id, client_secret, signing_secret, scopes = (
 
 app = App(
     signing_secret=signing_secret,
-    installation_store=DjangoInstallationStore(
-        client_id=client_id,
-        logger=logger,
-    ),
     oauth_settings=OAuthSettings(
         client_id=client_id,
         client_secret=client_secret,
         scopes=scopes,
+        # If you want to test token rotation, enabling the following line will make it easy
+        # token_rotation_expiration_minutes=1000000,
+        installation_store=DjangoInstallationStore(
+            client_id=client_id,
+            logger=logger,
+        ),
         state_store=DjangoOAuthStateStore(
             expiration_seconds=120,
             logger=logger,

@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+# Set this flag to False if you want to enable oauth_app instead
 is_simple_app = True
 
 if is_simple_app:
