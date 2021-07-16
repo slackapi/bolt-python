@@ -1,4 +1,5 @@
 import inspect
+import os
 from logging import Logger
 from typing import Optional, Callable, Dict, Any
 
@@ -6,10 +7,12 @@ from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth import InstallationStore
 from slack_sdk.oauth.installation_store import Bot
 from slack_sdk.oauth.installation_store.models.installation import Installation
+from slack_sdk.oauth.token_rotation.rotator import TokenRotator
 
 from slack_bolt.authorization.authorize_args import AuthorizeArgs
 from slack_bolt.authorization.authorize_result import AuthorizeResult
 from slack_bolt.context.context import BoltContext
+from slack_bolt.error import BoltError
 
 
 class Authorize:
@@ -97,12 +100,20 @@ class InstallationStoreAuthorize(Authorize):
     bot_only: bool
     find_installation_available: bool
     find_bot_available: bool
+    token_rotator: Optional[TokenRotator]
+
+    _config_error_message: str = (
+        "InstallationStore with client_id/client_secret are required for token rotation"
+    )
 
     def __init__(
         self,
         *,
         logger: Logger,
         installation_store: InstallationStore,
+        client_id: Optional[str] = None,
+        client_secret: Optional[str] = None,
+        token_rotation_expiration_minutes: Optional[int] = None,
         # For v1.0.x compatibility and people who still want its simplicity
         # use only InstallationStore#find_bot(enterprise_id, team_id)
         bot_only: bool = False,
@@ -117,6 +128,16 @@ class InstallationStoreAuthorize(Authorize):
             installation_store, "find_installation"
         )
         self.find_bot_available = hasattr(installation_store, "find_bot")
+        if client_id is not None and client_secret is not None:
+            self.token_rotator = TokenRotator(
+                client_id=client_id,
+                client_secret=client_secret,
+            )
+        else:
+            self.token_rotator = None
+        self.token_rotation_expiration_minutes = (
+            token_rotation_expiration_minutes or 120
+        )
 
     def __call__(
         self,
@@ -165,6 +186,19 @@ class InstallationStoreAuthorize(Authorize):
                         installation.bot_token,
                         installation.user_token,
                     )
+                    if installation.user_refresh_token is not None:
+                        if self.token_rotator is None:
+                            raise BoltError(self._config_error_message)
+                        refreshed = self.token_rotator.perform_token_rotation(
+                            installation=installation,
+                            minutes_before_expiration=self.token_rotation_expiration_minutes,
+                        )
+                        if refreshed is not None:
+                            self.installation_store.save(refreshed)
+                            bot_token, user_token = (
+                                refreshed.bot_token,
+                                refreshed.user_token,
+                            )
 
             except NotImplementedError as _:
                 self.find_installation_available = False
@@ -189,6 +223,18 @@ class InstallationStoreAuthorize(Authorize):
                 )
                 if bot is not None:
                     bot_token = bot.bot_token
+                    if bot.bot_refresh_token is not None:
+                        # Token rotation
+                        if self.token_rotator is None:
+                            raise BoltError(self._config_error_message)
+                        refreshed = self.token_rotator.perform_bot_token_rotation(
+                            bot=bot,
+                            minutes_before_expiration=self.token_rotation_expiration_minutes,
+                        )
+                        if refreshed is not None:
+                            self.installation_store.save_bot(refreshed)
+                            bot_token = refreshed.bot_token
+
             except NotImplementedError as _:
                 self.find_bot_available = False
             except Exception as e:

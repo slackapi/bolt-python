@@ -9,7 +9,8 @@ app = App(
     oauth_flow=OAuthFlow.sqlite3(
         database="./slackapp.db",
         token_rotation_expiration_minutes=60 * 24,  # for testing
-    )
+    ),
+    installation_store_bot_only=True,
 )
 
 

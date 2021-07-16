@@ -107,6 +107,7 @@ class OAuthFlow:
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
         installation_store_bot_only: bool = False,
+        token_rotation_expiration_minutes: int = 120,
         client: Optional[WebClient] = None,
         logger: Optional[Logger] = None,
     ) -> "OAuthFlow":
@@ -140,6 +141,7 @@ class OAuthFlow:
                     logger=logger,
                 ),
                 installation_store_bot_only=installation_store_bot_only,
+                token_rotation_expiration_minutes=token_rotation_expiration_minutes,
                 # state parameter related configurations
                 state_store=SQLite3OAuthStateStore(
                     database=database,
@@ -333,9 +335,13 @@ class OAuthFlow:
                 bot_id=bot_id,
                 bot_user_id=oauth_response.get("bot_user_id"),
                 bot_scopes=oauth_response.get("scope"),  # comma-separated string
+                bot_refresh_token=oauth_response.get("refresh_token"),  # since v1.7
+                bot_token_expires_in=oauth_response.get("expires_in"),  # since v1.7
                 user_id=installer.get("id"),
                 user_token=installer.get("access_token"),
                 user_scopes=installer.get("scope"),  # comma-separated string
+                user_refresh_token=installer.get("refresh_token"),  # since v1.7
+                user_token_expires_in=installer.get("expires_in"),  # since v1.7
                 incoming_webhook_url=incoming_webhook.get("url"),
                 incoming_webhook_channel=incoming_webhook.get("channel"),
                 incoming_webhook_channel_id=incoming_webhook.get("channel_id"),

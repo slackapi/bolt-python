@@ -36,6 +36,7 @@ class OAuthSettings:
     # Installation Management
     installation_store: InstallationStore
     installation_store_bot_only: bool
+    token_rotation_expiration_minutes: int
     authorize: Authorize
     # state parameter related configurations
     state_store: OAuthStateStore
@@ -68,6 +69,7 @@ class OAuthSettings:
         # Installation Management
         installation_store: Optional[InstallationStore] = None,
         installation_store_bot_only: bool = False,
+        token_rotation_expiration_minutes: int = 120,
         # state parameter related configurations
         state_store: Optional[OAuthStateStore] = None,
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
@@ -92,6 +94,7 @@ class OAuthSettings:
             authorization_url: Set a URL if you want to customize the URL `https://slack.com/oauth/v2/authorize`
             installation_store: Specify the instance of `InstallationStore` (Default: `FileInstallationStore`)
             installation_store_bot_only: Use `InstallationStore#find_bot()` if True (Default: False)
+            token_rotation_expiration_minutes: Minutes before refreshing tokens (Default: 2 hours)
             state_store: Specify the instance of `InstallationStore` (Default: `FileOAuthStateStore`)
             state_cookie_name: The cookie name that is set for installers' browser. (Default: "slack-app-oauth-state")
             state_expiration_seconds: The seconds that the state value is alive (Default: 600 seconds)
@@ -134,8 +137,12 @@ class OAuthSettings:
             installation_store or get_or_create_default_installation_store(client_id)
         )
         self.installation_store_bot_only = installation_store_bot_only
+        self.token_rotation_expiration_minutes = token_rotation_expiration_minutes
         self.authorize = InstallationStoreAuthorize(
             logger=logger,
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            token_rotation_expiration_minutes=self.token_rotation_expiration_minutes,
             installation_store=self.installation_store,
             bot_only=self.installation_store_bot_only,
         )
