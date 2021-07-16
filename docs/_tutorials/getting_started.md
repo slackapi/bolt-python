@@ -88,7 +88,7 @@ which python3
 # Output: /path/to/first-bolt-app/.venv/bin/python3
 ```
 
-Before we install the Bolt for Python package to your new project, let's save the **bot token** and **signing secret** that were generated when you configured your app. 
+Before we install the Bolt for Python package to your new project, let's save the **bot token** and **app-level token** that were generated when you configured your app. 
 
 1. **Copy your bot (xoxb) token from the OAuth & Permissions page** and store it in a new environment variable. The following example works on Linux and macOS; but [similar commands are available on Windows](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153).
 ```shell
