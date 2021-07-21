@@ -1,4 +1,5 @@
-from typing import Callable
+from logging import Logger
+from typing import Callable, Optional
 
 from slack_bolt.logger import get_bolt_logger
 from slack_bolt.middleware.middleware import Middleware
@@ -7,7 +8,10 @@ from slack_bolt.response import BoltResponse
 
 
 class SslCheck(Middleware):  # type: ignore
-    def __init__(self, verification_token: str = None):
+    verification_token: Optional[str]
+    logger: Logger
+
+    def __init__(self, verification_token: Optional[str] = None):
         """Handles `ssl_check` requests.
         Refer to https://api.slack.com/interactivity/slash-commands for details.
 
