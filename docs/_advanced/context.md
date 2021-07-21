@@ -2,7 +2,7 @@
 title: Adding context
 lang: en
 slug: context
-order: 7
+order: 9
 ---
 
 <div class="section-content">
