@@ -42,7 +42,6 @@ class CallableAuthorize(Authorize):
         self.arg_names = inspect.getfullargspec(func).args
 
     def __call__(
-
         self,
         *,
         context: BoltContext,
