@@ -1,5 +1,5 @@
 ---
-title: Acknowledging events
+title: Acknowledging requests
 lang: en
 slug: acknowledge
 order: 7
@@ -7,9 +7,9 @@ order: 7
 
 <div class="section-content">
 
-Actions, commands, and options events must **always** be acknowledged using the `ack()` function. This lets Slack know that the event was received and updates the Slack user interface accordingly.
+Actions, commands, and options requests must **always** be acknowledged using the `ack()` function. This lets Slack know that the request was received and updates the Slack user interface accordingly.
 
-Depending on the type of event, your acknowledgement may be different. For example, when acknowledging a menu selection associated with an external data source, you would call `ack()` with a list of relevant [options](https://api.slack.com/reference/block-kit/composition-objects#option).
+Depending on the type of request, your acknowledgement may be different. For example, when acknowledging a menu selection associated with an external data source, you would call `ack()` with a list of relevant [options](https://api.slack.com/reference/block-kit/composition-objects#option).
 
 We recommend calling `ack()` right away before sending a new message or fetching information from your database since you only have 3 seconds to respond.
 

@@ -31,7 +31,7 @@ def handle_submission(ack, body, client, view, logger):
     if len(errors) > 0:
         ack(response_action="errors", errors=errors)
         return
-    # Acknowledge the view_submission event and close the modal
+    # Acknowledge the view_submission request and close the modal
     ack()
     # Do whatever you want with the input data - here we're saving it to a DB
     # then sending the user a verification of their submission
