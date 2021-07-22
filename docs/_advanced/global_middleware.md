@@ -2,7 +2,7 @@
 title: Global middleware
 lang: en
 slug: global-middleware
-order: 6
+order: 8
 ---
 
 <div class="section-content">

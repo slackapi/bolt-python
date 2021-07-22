@@ -14,7 +14,7 @@ class LocalLambdaClient(BaseClient):
 
     def invoke(
         self,
-        FunctionName: str = None,
+        FunctionName: str,
         InvocationType: str = "Event",
         Payload: str = "{}",
     ) -> InvokeResponse:

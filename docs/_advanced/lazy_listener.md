@@ -2,7 +2,7 @@
 title: Lazy listeners (FaaS)
 lang: en
 slug: lazy-listeners
-order: 9
+order: 10
 ---
 
 <div class="section-content">
