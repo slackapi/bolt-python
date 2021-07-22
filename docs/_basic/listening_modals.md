@@ -7,7 +7,7 @@ order: 12
 
 <div class="section-content">
 
-If a <a href="https://api.slack.com/reference/block-kit/views">view payload</a> contains any input blocks, you must listen to `view_submission` events to receive their values. To listen to `view_submission` events, you can use the built-in `view()` method. `view()` requires a `callback_id` of type `str` or `re.Pattern`.
+If a <a href="https://api.slack.com/reference/block-kit/views">view payload</a> contains any input blocks, you must listen to `view_submission` requests to receive their values. To listen to `view_submission` requests, you can use the built-in `view()` method. `view()` requires a `callback_id` of type `str` or `re.Pattern`.
 
 You can access the value of the `input` blocks by accessing the `state` object. `state` contains a `values` object that uses the `block_id` and unique `action_id` to store the input values.
 
@@ -18,7 +18,7 @@ Read more about view submissions in our <a href="https://api.slack.com/surfaces/
 <div>
 <span class="annotation">Refer to <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">the module document</a> to learn the available listener arguments.</span>
 ```python
-# Handle a view_submission event
+# Handle a view_submission request
 @app.view("view_1")
 def handle_submission(ack, body, client, view, logger):
     # Assume there's an input block with `block_c` as the block_id and `dreamy_input`

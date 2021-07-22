@@ -7,7 +7,7 @@ order: 9
 
 <div class="section-content">
 
-Your app can use the `command()` method to listen to incoming slash command events. The method requires a `command_name` of type `str`.
+Your app can use the `command()` method to listen to incoming slash command requests. The method requires a `command_name` of type `str`.
 
 Commands must be acknowledged with `ack()` to inform Slack your app has received the request.
 
