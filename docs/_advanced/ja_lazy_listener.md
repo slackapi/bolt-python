@@ -2,7 +2,7 @@
 title: Lazy リスナー（FaaS）
 lang: ja-jp
 slug: lazy-listeners
-order: 9
+order: 10
 ---
 
 <div class="section-content">

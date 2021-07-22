@@ -2,7 +2,7 @@
 title: リスナーミドルウェア
 lang: ja-jp
 slug: listener-middleware
-order: 5
+order: 7
 ---
 
 <div class="section-content">
