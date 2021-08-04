@@ -1,23 +1,21 @@
 ---
-title: Bolt 入門ガイド
-order: 0
-slug: getting-started
+title: Bolt 入門ガイド HTTP
+order: 5
+slug: getting-started-http
 lang: ja-jp
 layout: tutorial
-permalink: /ja-jp/tutorial/getting-started
+permalink: /ja-jp/tutorial/getting-started-http
 redirect_from:
-  - /ja-jp/getting-started
-  - /getting-started/ja-jp
+  - /ja-jp/getting-started-http
+  - /getting-started-http/ja-jp
 ---
-# Bolt 入門ガイド
+# Bolt 入門ガイド HTTP
 
 <div class="section-content">
-このガイドでは、Bolt for Python を使った Slack アプリの設定と起動する方法について説明します。ここで説明する手順は、新しい Slack アプリを作成し、ローカルの開発環境をセットアップし、Slack ワークスペースからのメッセージをリッスンして応答するアプリを開発するという流れになります。
+このガイドでは、**HTTP上で Bolt for Python** を使った Slack アプリの設定と起動する方法について説明します。ここで説明する手順は、新しい Slack アプリを作成し、ローカルの開発環境をセットアップし、Slack ワークスペースからのメッセージをリッスンして応答するアプリを開発するという流れになります。
 </div>
 
 この手順を全て終わらせたら、あなたはきっと ⚡️[Slack アプリのはじめ方](https://github.com/slackapi/bolt-python/tree/main/examples/getting_started)のサンプルアプリを動作させたり、それに変更を加えたり、自分のアプリを作ったりすることができるようになるでしょう。
-
-> 💡 このガイドでは、[Socket Mode](https://api.slack.com/apis/connections/socket) を利用します。Socket Modeを使い始めるオススメの方法は、あなたのチームの為に何かを作ることです。すでにあなたのアプリがHTTPの通信プロトコルを利用したいとわかっている場合には、このドキュメントと並列する [Getting Started over HTTP](/bolt-python/tutorial/getting-started-http) を参照してください。
 
 ---
 
@@ -28,7 +26,8 @@ redirect_from:
 
 アプリ名を入力し（_後で変更可能_）、インストール先のワークスペースを選択したら、「`Create App`」ボタンをクリックすると、アプリの **Basic Information** ページが表示されます。
 
-このページでは、アプリの概要や、重要な認証情報も確認できます。この情報は後ほど参照します。
+このページでは、アプリの概要を確認できます。また、「**App Credentials**」ヘッダーの下では「`Signing Secret`」などの重要な認証情報も確認できます。これらの認証情報は後で必要になります。
+
 
 ![Basic Information ページ](../../assets/basic-information-page.png "Basic Information ページ")
 
@@ -44,7 +43,7 @@ Slack アプリで使用できるトークンには、ユーザートークン�
 - [ボットトークン](https://api.slack.com/authentication/token-types#bot) はボットユーザーに関連づけられ、1 つのワークスペースでは最初に誰かがそのアプリをインストールした際に一度だけ発行されます。どのユーザーがインストールを実行しても、アプリが使用するボットトークンは同じになります。_ほとんど_のアプリで使用されるのは、ボットトークンです。
 - [アプリレベルトークン](https://api.slack.com/authentication/token-types#app) は、組織に渡ってあなたのアプリを表すものです。所属する組織内の全てのワークスペースに、全ての個人ユーザによってインストールされたアプリについても同様です。アプリレベルトークンは、ウェブソケット通信を行うアプリを作る際に通常使われます。
 
-このガイドではボットトークンとアプリレベルトークンを使用します。
+説明を簡潔にするために、このガイドではボットトークンを使用します。
 
 1. 左サイドバーの「**OAuth & Permissions**」をクリックし、「**Bot Token Scopes**」セクションまで下にスクロールします。「**Add an OAuth Scope**」をクリックします。
 
@@ -52,13 +51,9 @@ Slack アプリで使用できるトークンには、ユーザートークン�
 
 3. OAuth & Permissions ページの一番上までスクロールし、「**Install App to Workspace**」をクリックします。Slack の OAuth 確認画面 が表示されます。この画面で開発用ワークスペースへのアプリのインストールを承認します。
 
-4. インストールを承認すると **OAuth & Permissions** ページが表示され、**Bot User OAuth Access Token** を確認できるでしょう。
+4. インストールを承認すると **OAuth & Permissions** ページが表示され、**Bot User OAuth Access Token** を確認できるでしょう。このトークンはこのあと利用します。
 
 ![OAuth トークン](../../assets/bot-token.png "ボット用 OAuth トークン")
-
-5. 次に「**Basic Informationのページ**」まで戻り、アプリトークンのセクションまで下にスクロールし「**Generate Token and Scopes**」をクリックしてアプリレベルトークンを作成します。このトークンに `connections:write` のスコープを付与し、作成された `xapp`トークンを保存します。これらのトークンはこのあと利用します。
-
-6. 左サイドメニューの「**Socket Mode**」を有効にします。
 
 > 💡 トークンはパスワードと同様に取り扱い、[安全な方法で保管してください](https://api.slack.com/docs/oauth-safety)。アプリはこのトークンを使って Slack ワークスペースで投稿をしたり、情報の取得をしたりします。
 
@@ -88,16 +83,16 @@ which python3
 # 出力結果 : /path/to/first-bolt-app/.venv/bin/python3
 ```
 
-Bolt for Python のパッケージを新しいプロジェクトにインストールする前に、アプリの設定時に作成された **ボットトークン** と **アプリレベルトークン** を保存しましょう。
+Bolt for Python のパッケージを新しいプロジェクトにインストールする前に、アプリの設定時に作成された **ボットトークン** と **署名シークレット** を保存しましょう。
 
-1. **OAuth & Permissions ページのボットトークン (xoxb) をコピー**して、新しい環境変数に保存します。以下のコマンド例は Linux と macOS で利用できます。[Windows でもこれに似たコマンドが利用できます](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153)。
+1. **OAuth & Permissions ページの署名シークレットをコピー**して、新しい環境変数に保存します。以下のコマンド例は Linux と macOS で利用できます。[Windows でもこれに似たコマンドが利用できます](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153)。
 ```shell
-export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
+export SLACK_SIGNING_SECRET=<your-signing-secret>
 ```
 
-2. **OAuth & Permissions ページのアプリレベルトークン（xapp）をコピー**して、別の環境変数に保存します。
+2. **OAuth & Permissions ページのボットトークン (xoxb) をコピー**して、新しい環境変数に保存します。以下のコマンド例は Linux と macOS で利用できます。[Windows でもこれに似たコマンドが利用できます](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153)。
 ```shell
-export SLACK_APP_TOKEN=<your-app-level-token>
+export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
 
 > 🔒 全てのトークンは安全に保管してください。最低限、パブリックなバージョンコントロールにチェックインすることは避けてください。また、上記の例のように環境変数を介してアクセスするようにしてください。詳細な情報は [best practices for app security](https://api.slack.com/authentication/best-practices).のドキュメントを参照してください。
@@ -116,12 +111,15 @@ import os
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-# ボットトークンとソケットモードハンドラーを使ってアプリを初期化します
-app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
+# ボットトークンと署名シークレットを使ってアプリを初期化します
+app = App(
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+)
 
 # アプリを起動します
 if __name__ == "__main__":
-    SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
+    app.start(port=int(os.environ.get("PORT", 3000)))
 ```
 
 このようにトークンがあれば、最初の Bolt アプリが作成できます。「`app.py`」ファイルを保存して、コマンドラインで以下を実行します。
@@ -134,12 +132,17 @@ python3 app.py
 
 ---
 
-### イベントを設定する
+### HTTPを利用したイベントを設定する
 アプリはワークスペース内の他のメンバーと同じように振る舞い、メッセージを投稿したり、絵文字リアクションを追加したり、イベントをリッスンして返答したりできます。
 
 Slack ワークスペースで発生するイベント（メッセージが投稿されたときや、メッセージに対するリアクションがつけられたときなど）をリッスンするには、[Events API を使って特定の種類のイベントをサブスクライブします](https://api.slack.com/events-api)。
 
-> 💡 このチュートリアルの序盤でソケットモードを有効にしました。ソケットモードを使うことで、アプリがパブリックなHTTPエンドポイントを公開せず、イベントAPIやインタラクティブコンポーネントを利用できるようになります。このことは、開発時やファイヤーウォールの裏からのリクエストを受ける際に便利です。HTTPはホスティングされた環境にデプロイされたアプリや、Slack App Directoryで配布されるアプリに向いています。これらの情報については、[このドキュメント](/bolt-python/tutorial/getting-started-http).を参照してください。
+それでは、アプリのイベント設定を有効化してみましょう。
+
+1. [アプリ管理ページ](https://api.slack.com/apps)でアプリをクリックします。次に、左サイドバーの「**Event Subscriptions**」をクリックします。「**Enable Events**」というラベルのスイッチをオンに切り替えます。
+2. リクエストURLを追加します。Slackはイベントに対応するHTTP POSTリクエストをこの [Request URL](https://api.slack.com/apis/connections/events-api#the-events-api__subscribing-to-event-types__events-api-request-urls) のエンドポイントに送信します。Bolt は `/slack/events` のエンドポイントで、全ての受信リクエストをリッスンします。これらのリクエストにはショートカット、イベント、インタラクションペイロードが含まれます。アプリの設定でエンドポイントを指定するときは、すべての Request URL の末尾に「/slack/events」を追加してください。例えば、 `https://<your-domain>/slack/events` のようになります。Bolt アプリが起動した状態のままなら、URL の検証が成功するはずです。
+
+> 💡 ローカルでの開発時には、ngrok のような開発用プロキシサービスを利用することができます。開発用プロキシを利用すると、リクエストを開発環境にトンネルするパブリック URL を作成できます。[Slack のローカル開発で ngrok を使用する方法](https://api.slack.com/tutorials/tunneling-with-ngrok)については、別のチュートリアルを用意していますので参考にしてください。また、アプリのホスティングが必要になった場合には、[API サイトに](https://api.slack.com/docs/hosting) Slack開発者達がアプリのホスティングよく利用するホスティングプロバイダーを集めています。
 
 それでは、Slackにどのイベントをリッスンするかを教えてあげましょう。
 
@@ -163,10 +166,12 @@ Slack ワークスペースで発生するイベント（メッセージが投�
 ```python
 import os
 from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-# ボットトークンとソケットモードハンドラーを使ってアプリを初期化します
-app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
+# ボットトークンと署名シークレットを使ってアプリを初期化します
+app = App(
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+)
 
 # 'hello' を含むメッセージをリッスンします
 # 指定可能なリスナーのメソッド引数の一覧は以下のモジュールドキュメントを参考にしてください：
@@ -178,7 +183,7 @@ def message_hello(message, say):
 
 # アプリを起動します
 if __name__ == "__main__":
-    SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
+    app.start(port=int(os.environ.get("PORT", 3000)))
 ```
 
 アプリを再起動し、ボットユーザーが参加しているチャンネルまたはダイレクトメッセージに「hello」というメッセージを投稿すれば、アプリが応答するでしょう。
@@ -189,14 +194,18 @@ if __name__ == "__main__":
 
 ### アクションを送信して応答する
 
-インタラクティブ機能を有効にすると、ボタン、選択メニュー、日付ピッカー、モーダル、ショートカットなどの機能が利用できるようになります。アプリ設定ページの「**Interactivity & Shortcuts**」を見てみましょう。
+インタラクティブ機能を有効にすると、ボタン、選択メニュー、日付ピッカー、モーダル、ショートカットなどの機能が利用できるようになります。イベントと同様に、Slack からのアクション（*ユーザーがボタンをクリックした*など）の送信先となる URL を設定する必要があります。
 
-> 💡 ソケッットモードを有効にしていると、デフォルトで、基本的なインタラクティブ機能が有効になっていることに気づくでしょう。追加のアクションは不要です。HTTPを使っている場合は、Slackに対して、イベントを送信する為のリクエストURLを設定する必要があります。
+アプリ設定ページに戻り、左サイドメニューの「**Interactivity & Shortcuts**」をクリックします。別の **Request URL** ボックスを見つけます。
+
+> 💡 デフォルトでは、Bolt はイベントに使用しているのと同じエンドポイントをインタラクティブコンポーネントにも使用するように設定されているため、上記と同じリクエスト URL（この例では「`https://8e8ec2d7.ngrok.io/slack/events`」）を使用します。このままの状態で、右下隅にある「**Save Changes**」ボタンを押してください。これでインタラクティブ機能がアプリで利用できるようになりました。
+
+![Request URL の設定](../../assets/request-url-config.png "Request URL の設定")
 
 インタラクティブ機能が有効化されている時、ショートカット、モーダル、インタラクティブコンポーネント (ボタンや、選択メニュー、日付ピッカー) とのインタラクションはイベントとしてアプリに対して送信されます。
 
 それでは、アプリのコードに戻り、これらのイベントを処理する為のロジックを追加しましょう。
-- まず、ボタンを含んだメッセージをアプリから送信します。
+- まず、インタラクティブコンポーネントを含んだメッセージをアプリから送信します（このケースではボタン）。
 - 次に、ユーザーから返されるボタンクリックのアクションをリッスンし、それに応答します。
 
 以下のコードの後の部分を編集し、文字列だけのメッセージの代わりに、ボタンを含んだメッセージを送信するようにしてみます。
@@ -204,10 +213,12 @@ if __name__ == "__main__":
 ```python
 import os
 from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-# ボットトークンとソケットモードハンドラーを使ってアプリを初期化します
-app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
+# ボットトークンと署名シークレットを使ってアプリを初期化します
+app = App(
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+)
 
 # 'hello' を含むメッセージをリッスンします
 @app.message("hello")
@@ -228,15 +239,9 @@ def message_hello(message, say):
         text=f"Hey there <@{message['user']}>!"
     )
 
-@app.action("button_click")
-def action_button_click(body, ack, say):
-    # Acknowledge the action
-    ack()
-    say(f"<@{body['user']['id']}> clicked the button")
-
 # アプリを起動します
 if __name__ == "__main__":
-    SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
+    app.start(port=int(os.environ.get("PORT", 3000)))
 ```
 
 `say()` の中の値を `blocks` という配列のオブジェクトに変えました。ブロックは Slack メッセージを構成するコンポーネントであり、テキストや画像、日付ピッカーなど、さまざまなタイプのブロックがあります。この例では `accessory` に `button` を持たせた「section」のブロックを、アプリからの応答に含めています。`blocks` を使用する場合、`text` は通知やアクセシビリティのためのフォールバックとなります。
@@ -252,10 +257,12 @@ if __name__ == "__main__":
 ```python
 import os
 from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 # ボットトークンと署名シークレットを使ってアプリを初期化します
-app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
+app = App(
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+)
 
 # 'hello' を含むメッセージをリッスンします
 @app.message("hello")
@@ -300,4 +307,4 @@ if __name__ == "__main__":
 * [基本的な概念](/bolt-python/concepts#basic)について読む。Bolt アプリがアクセスできるさまざまメソッドや機能について知ることができます。
 * [`events()` メソッド](/bolt-python/concepts#event-listening)でボットがリッスンできるイベントをほかにも試してみる。すべてのイベントの一覧は [API サイト](https://api.slack.com/events)で確認できます。
 * Bolt では、アプリにアタッチされたクライアントから [Web API メソッドを呼び出す](/bolt-python/concepts#web-api)ことができます。API サイトに [220 以上のメソッド](https://api.slack.com/methods)を一覧しています。
-* [API サイト](https://api.slack.com/docs/token-types)でほかのタイプのトークンを確認する。アプリで実行したいアクションによって、異なるトークンが必要になる場合があります。ソケットモードを使わないアプリでは、通常はボットトークン (`xoxb`) と署名シークレットが必要です。これについての例は、このチュートリアルと並列する [Getting Started with HTTP](/bolt-python/tutorial/getting-started-http) を参照してください。
+* [API サイト](https://api.slack.com/docs/token-types)でほかのタイプのトークンを確認する。アプリで実行したいアクションによって、異なるトークンが必要になる場合があります。HTTPの代わりにソケットモードを利用したい場合には、`connections:write` のスコープを追加した、追加のトークン (`xapp`) が必要です。
