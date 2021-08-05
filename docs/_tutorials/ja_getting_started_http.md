@@ -1,5 +1,5 @@
 ---
-title: Bolt 入門ガイド HTTP
+title: Bolt 入門ガイド（HTTP）
 order: 5
 slug: getting-started-http
 lang: ja-jp
@@ -9,7 +9,7 @@ redirect_from:
   - /ja-jp/getting-started-http
   - /getting-started-http/ja-jp
 ---
-# Bolt 入門ガイド HTTP
+# Bolt 入門ガイド（HTTP）
 
 <div class="section-content">
 このガイドでは、**HTTP上で Bolt for Python** を使った Slack アプリの設定と起動する方法について説明します。ここで説明する手順は、新しい Slack アプリを作成し、ローカルの開発環境をセットアップし、Slack ワークスペースからのメッセージをリッスンして応答するアプリを開発するという流れになります。
