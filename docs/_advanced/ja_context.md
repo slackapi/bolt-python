@@ -2,7 +2,7 @@
 title: コンテキストの追加
 lang: ja-jp
 slug: context
-order: 7
+order: 9
 ---
 
 <div class="section-content">

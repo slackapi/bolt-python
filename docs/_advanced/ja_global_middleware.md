@@ -2,7 +2,7 @@
 title: グローバルミドルウェア
 lang: ja-jp
 slug: global-middleware
-order: 6
+order: 8
 ---
 
 <div class="section-content">
