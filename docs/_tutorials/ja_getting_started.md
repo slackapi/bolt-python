@@ -17,7 +17,7 @@ redirect_from:
 
 この手順を全て終わらせたら、あなたはきっと ⚡️[Slack アプリのはじめ方](https://github.com/slackapi/bolt-python/tree/main/examples/getting_started)のサンプルアプリを動作させたり、それに変更を加えたり、自分のアプリを作ったりすることができるようになるでしょう。
 
-> 💡 このガイドでは[ソケットモード](https://api.slack.com/apis/connections/socket) を利用します。ソケットモードは、Slack アプリ開発をとりあえず始めてみるときやあなたのチームだけのためのアプリをつくるときにおすすめのやり方です。もしすでに HTTP をアプリのコミュニケーションプロトコルとしてするとわかっているなら、HTTP　の方式に対応した同様のドキュメントである [Bolt 入門ガイド（HTTP）](/bolt-python/tutorial/getting-started-http) を参照してください。
+> 💡 このガイドでは[ソケットモード](https://api.slack.com/apis/connections/socket) を利用します。ソケットモードは、Slack アプリ開発をとりあえず始めてみるときやあなたのチームだけのためのアプリをつくるときにおすすめのやり方です。もしすでに HTTP をアプリのコミュニケーションプロトコルとしてするとわかっているなら、HTTP の方式に対応した同様のドキュメントである [Bolt 入門ガイド（HTTP）](/bolt-python/ja-jp/tutorial/getting-started-http) を参照してください。
 
 ---
 
@@ -139,7 +139,7 @@ python3 app.py
 
 Slack ワークスペースで発生するイベント（メッセージが投稿されたときや、メッセージに対するリアクションがつけられたときなど）をリッスンするには、[Events API を使って特定の種類のイベントをサブスクライブします](https://api.slack.com/events-api)。
 
-> 💡 このチュートリアルの序盤でソケットモードを有効にしました。ソケットモードを使うことで、アプリが公開された HTTP エンドポイントを公開せずに Events API やインタラクティブコンポーネントを利用できるようになります。このことは、開発時やファイヤーウォールの裏からのリクエストを受ける際に便利です。HTTP での方式はホスティング環境にデプロイするアプリや Slack App Directoryで配布されるアプリに適しています。HTTP での情報については[このドキュメント](/bolt-python/tutorial/getting-started-http)を参照してください。
+> 💡 このチュートリアルの序盤でソケットモードを有効にしました。ソケットモードを使うことで、アプリが公開された HTTP エンドポイントを公開せずに Events API やインタラクティブコンポーネントを利用できるようになります。このことは、開発時やファイヤーウォールの裏からのリクエストを受ける際に便利です。HTTP での方式はホスティング環境にデプロイするアプリや Slack App Directoryで配布されるアプリに適しています。HTTP での情報については[このドキュメント](/bolt-python/ja-jp/tutorial/getting-started-http)を参照してください。
 
 それでは、私たちがどのイベントをリッスンしたいかを Slack に伝えましょう。
 
@@ -300,4 +300,4 @@ if __name__ == "__main__":
 * [基本的な概念](/bolt-python/concepts#basic)について読む。Bolt アプリがアクセスできるさまざまメソッドや機能について知ることができます。
 * [`events()` メソッド](/bolt-python/concepts#event-listening)でボットがリッスンできるイベントをほかにも試してみる。すべてのイベントの一覧は [API サイト](https://api.slack.com/events)で確認できます。
 * Bolt では、アプリにアタッチされたクライアントから [Web API メソッドを呼び出す](/bolt-python/concepts#web-api)ことができます。API サイトに [220 以上のメソッド](https://api.slack.com/methods)を一覧しています。
-* [API サイト](https://api.slack.com/docs/token-types)でほかのタイプのトークンを確認する。アプリで実行したいアクションによって、異なるトークンが必要になる場合があります。ソケットモードを使わないアプリでは、通常はボットトークン (`xoxb`) と署名シークレットが必要です。これについての例は、このチュートリアルと並列する [Getting Started with HTTP](/bolt-python/tutorial/getting-started-http) を参照してください。
+* [API サイト](https://api.slack.com/docs/token-types)でほかのタイプのトークンを確認する。アプリで実行したいアクションによって、異なるトークンが必要になる場合があります。ソケットモードを使わないアプリでは、通常はボットトークン (`xoxb`) と署名シークレットが必要です。これについての例は、このチュートリアルと並列する [Bolt 入門ガイド（HTTP）](/bolt-python/ja-jp/tutorial/getting-started-http)を参照してください。
