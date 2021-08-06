@@ -7,7 +7,7 @@ order: 6
 
 <div class="section-content">
 
-There are two main ways to respond to actions. The first (and most common) way is to use `say()`, which sends a message back to the conversation where the incoming event took place.
+There are two main ways to respond to actions. The first (and most common) way is to use `say()`, which sends a message back to the conversation where the incoming request took place.
 
 The second way to respond to actions is using `respond()`, which is a utility to use the `response_url` associated with the action.
 
