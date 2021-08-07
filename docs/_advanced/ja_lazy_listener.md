@@ -31,7 +31,7 @@ def run_long_process(respond, body):
 app.command("/start-process")(
     # この場合でも ack() は 3 秒以内に呼ばれます
     ack=respond_to_slack_within_3_seconds,
-    # Lazy 関数がリクエストの処理を担当します
+    # Lazy 関数がイベントの処理を担当します
     lazy=[run_long_process]
 )
 ```
