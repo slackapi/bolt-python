@@ -285,7 +285,7 @@ def action_button_click(body, ack, say):
 
 # アプリを起動します
 if __name__ == "__main__":
-    app.start(port=int(os.environ.get("PORT", 3000)))
+    SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
 ```
 
 `app.action()` を使って、先ほど命名した `button_click` という `action_id` をリッスンしています。アプリを再起動し、ボタンをクリックすると、アプリからの「clicked the button」というメッセージが新たに表示されるでしょう。
@@ -297,7 +297,7 @@ if __name__ == "__main__":
 
 ここまでで基本的なアプリをセットアップして実行することはできたので、次は自分だけの Bolt アプリを作る方法を調べてみましょう。参考になりそうな記事をいくつかご紹介します。
 
-* [基本的な概念](/bolt-python/concepts#basic)について読む。Bolt アプリがアクセスできるさまざまメソッドや機能について知ることができます。
-* [`events()` メソッド](/bolt-python/concepts#event-listening)でボットがリッスンできるイベントをほかにも試してみる。すべてのイベントの一覧は [API サイト](https://api.slack.com/events)で確認できます。
+* [基本的な概念](/bolt-python/concepts#basic)について読んでみてください。Bolt アプリがアクセスできるさまざまメソッドや機能について知ることができます。
+* [`events()` メソッド](/bolt-python/concepts#event-listening)でボットがリッスンできるイベントをほかにも試してみましょう。すべてのイベントの一覧は [API サイト](https://api.slack.com/events)で確認できます。
 * Bolt では、アプリにアタッチされたクライアントから [Web API メソッドを呼び出す](/bolt-python/concepts#web-api)ことができます。API サイトに [220 以上のメソッド](https://api.slack.com/methods)を一覧しています。
-* [API サイト](https://api.slack.com/docs/token-types)でほかのタイプのトークンを確認する。アプリで実行したいアクションによって、異なるトークンが必要になる場合があります。ソケットモードを使わないアプリでは、通常はボットトークン (`xoxb`) と署名シークレットが必要です。これについての例は、このチュートリアルと並列する [Bolt 入門ガイド（HTTP）](/bolt-python/ja-jp/tutorial/getting-started-http)を参照してください。
+* [API サイト](https://api.slack.com/docs/token-types)でほかのタイプのトークンを確認してみてください。アプリで実行したいアクションによって、異なるトークンが必要になる場合があります。ソケットモードを使わないアプリでは、通常はボットトークン (`xoxb`) と署名シークレットが必要です。ソケットモードを使わない場合の例については、 HTTP 方式のやり方としてこのチュートリアルと対になっている [Bolt 入門ガイド（HTTP）](/bolt-python/ja-jp/tutorial/getting-started-http)を参照してください。
