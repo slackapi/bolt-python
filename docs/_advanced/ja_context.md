@@ -6,7 +6,7 @@ order: 9
 ---
 
 <div class="section-content">
-すべてのリスナーは `context` ディクショナリにアクセスできます。リスナーはこれを使ってイベントの付加情報を得ることができます。受信イベントに含まれる `user_id`、`team_id`、`channel_id`、`enterprise_id` などの情報は、Bolt によって自動的に設定されます。
+すべてのリスナーは `context` ディクショナリにアクセスできます。リスナーはこれを使ってリクエストの付加情報を得ることができます。受信リクエストに含まれる `user_id`、`team_id`、`channel_id`、`enterprise_id` などの情報は、Bolt によって自動的に設定されます。
 
 `context` は単純なディクショナリで、変更を直接加えることもできます。
 </div>

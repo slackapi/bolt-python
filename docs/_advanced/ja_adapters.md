@@ -6,11 +6,11 @@ order: 0
 ---
 
 <div class="section-content">
-アダプターは Slack から届く受信イベントの受付とパーズを担当し、それらのイベントを <a href="https://github.com/slackapi/bolt-python/blob/main/slack_bolt/request/request.py">`BoltRequest`</a> の形式に変換して Bolt アプリに引き渡します。
+アダプターは Slack から届く受信リクエストの受付とパーズを担当し、それらのリクエストを <a href="https://github.com/slackapi/bolt-python/blob/main/slack_bolt/request/request.py">`BoltRequest`</a> の形式に変換して Bolt アプリに引き渡します。
 
 デフォルトでは、Bolt の組み込みの <a href="https://docs.python.org/3/library/http.server.html">`HTTPServer`</a> アダプターが使われます。このアダプターは、ローカルで開発するのには問題がありませんが、<b>本番環境での利用は推奨されていません</b>。Bolt for Python には複数の組み込みのアダプターが用意されており、必要に応じてインポートしてアプリで使用することができます。組み込みのアダプターは Flask、Django、Starlette をはじめとする様々な人気の Python フレームワークをサポートしています。これらのアダプターは、あなたが選択した本番環境で利用可能な Webサーバーとともに利用することができます。
 
-アダプターを使用するには、任意のフレームワークを使ってアプリを開発し、そのコードに対応するアダプターをインポートします。その後、アダプターのインスタンスを初期化して、受信イベントの受付とパーズを行う関数を呼び出します。
+アダプターを使用するには、任意のフレームワークを使ってアプリを開発し、そのコードに対応するアダプターをインポートします。その後、アダプターのインスタンスを初期化して、受信リクエストの受付とパーズを行う関数を呼び出します。
 
 すべてのアダプターの一覧と、設定や使い方のサンプルは、リポジトリの <a href="https://github.com/slackapi/bolt-python/tree/main/examples">`examples` フォルダ</a>をご覧ください。
 </div>
