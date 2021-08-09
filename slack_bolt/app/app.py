@@ -433,7 +433,7 @@ class App:
         Args:
             port: The port to listen on (Default: 3000)
             path: The path to handle request from Slack (Default: `/slack/events`)
-            logger_enabled: The flag to enable http.server logging if True (Default: True)
+            http_server_logger_enabled: The flag to enable http.server logging if True (Default: True)
         """
         self._development_server = SlackAppDevelopmentServer(
             port=port,
