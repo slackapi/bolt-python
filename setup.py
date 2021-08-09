@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 
 import setuptools
 
@@ -72,8 +73,8 @@ setuptools.setup(
             "Flask>=1,<2",
             "Werkzeug<2",  # TODO: support Flask 2.x
             "pyramid>=1,<2",
-            "sanic>=21,<22",
-            "sanic-testing>=0.6",
+            "sanic>=21,<22" if sys.version_info.minor > 6 else "sanic>=20,<21",
+            "sanic-testing>=0.6" if sys.version_info.minor > 6 else "",
             "starlette>=0.13,<1",
             "requests>=2,<3",  # For starlette's TestClient
             "tornado>=6,<7",
