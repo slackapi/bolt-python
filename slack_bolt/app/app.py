@@ -5,7 +5,7 @@ import os
 import time
 from concurrent.futures.thread import ThreadPoolExecutor
 from http.server import SimpleHTTPRequestHandler, HTTPServer
-from typing import List, Union, Pattern, Callable, Dict, Optional, Sequence
+from typing import List, Union, Pattern, Callable, Dict, Optional, Sequence, Any
 
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import InstallationStore
@@ -415,7 +415,12 @@ class App:
     # -------------------------
     # standalone server
 
-    def start(self, port: int = 3000, path: str = "/slack/events") -> None:
+    def start(
+        self,
+        port: int = 3000,
+        path: str = "/slack/events",
+        http_server_logger_enabled: bool = True,
+    ) -> None:
         """Starts a web server for local development.
 
             # With the default settings, `http://localhost:3000/slack/events`
@@ -428,12 +433,14 @@ class App:
         Args:
             port: The port to listen on (Default: 3000)
             path: The path to handle request from Slack (Default: `/slack/events`)
+            http_server_logger_enabled: The flag to enable http.server logging if True (Default: True)
         """
         self._development_server = SlackAppDevelopmentServer(
             port=port,
             path=path,
             app=self,
             oauth_flow=self.oauth_flow,
+            http_server_logger_enabled=http_server_logger_enabled,
         )
         self._development_server.start()
 
@@ -1309,6 +1316,7 @@ class SlackAppDevelopmentServer:
         path: str,
         app: App,
         oauth_flow: Optional[OAuthFlow] = None,
+        http_server_logger_enabled: bool = True,
     ):
         """Slack App Development Server
 
@@ -1325,18 +1333,25 @@ class SlackAppDevelopmentServer:
             path: the path to receive incoming requests
             app: the `App` instance to execute
             oauth_flow: the `OAuthFlow` instance to use for OAuth flow
+            http_server_logger_enabled: The flag to turn on/off http.server's logging
         """
         self._port: int = port
         self._bolt_endpoint_path: str = path
         self._bolt_app: App = app
         self._bolt_oauth_flow: Optional[OAuthFlow] = oauth_flow
+        self._http_server_logger_enabled = http_server_logger_enabled
 
         _port: int = self._port
         _bolt_endpoint_path: str = self._bolt_endpoint_path
         _bolt_app: App = self._bolt_app
         _bolt_oauth_flow: Optional[OAuthFlow] = self._bolt_oauth_flow
+        _http_server_logger_enabled = self._http_server_logger_enabled
 
         class SlackAppHandler(SimpleHTTPRequestHandler):
+            def log_message(self, format: str, *args: Any) -> None:
+                if _http_server_logger_enabled is True:
+                    super().log_message(format, *args)
+
             def do_GET(self):
                 if _bolt_oauth_flow:
                     request_path, _, query = self.path.partition("?")
