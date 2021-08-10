@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 
 import setuptools
 
@@ -18,7 +19,7 @@ test_dependencies = [
     "aiohttp>=3,<4",  # for async
     "Flask-Sockets>=0.2,<1",
     "Werkzeug<2",  # TODO: support Flask 2.x
-    "black==21.5b1",
+    "black==21.7b0",
 ]
 
 setuptools.setup(
@@ -41,7 +42,7 @@ setuptools.setup(
     ),
     include_package_data=True,  # MANIFEST.in
     install_requires=[
-        "slack_sdk>=3.8.0,<4",
+        "slack_sdk>=3.9.0rc1,<4",  # TODO: Update once v3.9.0 is released
     ],
     setup_requires=["pytest-runner==5.2"],
     tests_require=test_dependencies,
@@ -52,7 +53,7 @@ setuptools.setup(
             # async features heavily depends on aiohttp
             "aiohttp>=3,<4",
             # Socket Mode 3rd party implementation
-            "websockets>=8,<9",
+            "websockets>=8,<10",
         ],
         # pip install -e ".[adapter]"
         # NOTE: any of async ones requires pip install -e ".[async]" too
@@ -72,7 +73,8 @@ setuptools.setup(
             "Flask>=1,<2",
             "Werkzeug<2",  # TODO: support Flask 2.x
             "pyramid>=1,<2",
-            "sanic>=20,<21",
+            "sanic>=21,<22" if sys.version_info.minor > 6 else "sanic>=20,<21",
+            "sanic-testing>=0.6" if sys.version_info.minor > 6 else "",
             "starlette>=0.13,<1",
             "requests>=2,<3",  # For starlette's TestClient
             "tornado>=6,<7",
