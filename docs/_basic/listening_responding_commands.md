@@ -22,9 +22,9 @@ When setting up commands within your app configuration, you'll append `/slack/ev
 ```python
 # The echo command simply echoes on command
 @app.command("/echo")
-def repeat_text(ack, say, command):
+def repeat_text(ack, respond, command):
     # Acknowledge command request
     ack()
-    say(f"{command['text']}")
+    respond(f"{command['text']}")
 ```
 </div>
