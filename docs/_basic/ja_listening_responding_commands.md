@@ -22,9 +22,9 @@ order: 9
 ```python
 # echoコマンドは受け取ったコマンドをそのまま返す
 @app.command("/echo")
-def repeat_text(ack, say, command):
+def repeat_text(ack, respond, command):
     # command リクエストを確認
     ack()
-    say(f"{command['text']}")
+    respond(f"{command['text']}")
 ```
 </div>
