@@ -288,6 +288,9 @@ class AsyncApp:
             )
             if self._async_authorize is None:
                 self._async_authorize = self._async_oauth_flow.settings.authorize
+            self._async_authorize.token_rotation_expiration_minutes = (
+                oauth_settings.token_rotation_expiration_minutes
+            )
 
         if (
             self._async_installation_store is not None
