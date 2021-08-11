@@ -189,7 +189,10 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                         installation.user_token,
                     )
 
-                    if installation.user_refresh_token is not None:
+                    if (
+                        installation.user_refresh_token is not None
+                        or installation.bot_refresh_token is not None
+                    ):
                         if self.token_rotator is None:
                             raise BoltError(self._config_error_message)
                         refreshed = await self.token_rotator.perform_token_rotation(
