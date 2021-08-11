@@ -270,6 +270,9 @@ class App:
             )
             if self._authorize is None:
                 self._authorize = self._oauth_flow.settings.authorize
+            self._authorize.token_rotation_expiration_minutes = (
+                oauth_settings.token_rotation_expiration_minutes
+            )
 
         if (
             self._installation_store is not None or self._authorize is not None
