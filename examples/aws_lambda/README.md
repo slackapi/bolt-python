@@ -123,7 +123,6 @@ Instructions on how to set up and deploy each example are provided below.
   - `SLACK_INSTALLATION_S3_BUCKET_NAME`: The name of one of the S3 buckets you
       created
   - `SLACK_STATE_S3_BUCKET_NAME`: The name of the other S3 bucket you created
-  - `SLACK_LAMBDA_PATH`: ??? TODO
 6. Let's deploy the Lambda! Run `./deploy_oauth.sh`. By default it deploys to the
    us-east-1 region in AWS - you can change this at the top of `aws_lambda_oauth_config.yaml` if you wish.
 7. Load up AWS Lambda inside the AWS Console - make sure you are in the correct
