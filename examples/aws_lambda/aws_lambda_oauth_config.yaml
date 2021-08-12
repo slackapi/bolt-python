@@ -1,6 +1,6 @@
 region: us-east-1
 
-function_name: bolt_py_function
+function_name: bolt_py_oauth_function
 handler: aws_lambda_oauth.handler
 description: My first lambda function
 runtime: python3.8
@@ -43,4 +43,4 @@ environment_variables:
 
 # Build options
 build:
-  source_directories: vendor # a comma delimited list of directories in your project root that contains source to package.
+  source_directories: slack_bolt # a comma delimited list of directories in your project root that contains source to package.

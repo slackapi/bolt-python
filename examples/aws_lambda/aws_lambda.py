@@ -1,7 +1,5 @@
 import logging
-import sys
 
-sys.path.insert(1, "vendor")
 from slack_bolt import App
 from slack_bolt.adapter.aws_lambda import SlackRequestHandler
 
