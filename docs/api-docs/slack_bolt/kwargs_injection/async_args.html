@@ -99,6 +99,8 @@ class AsyncArgs:
     # middleware
     next: Callable[[], Awaitable[None]]
     &#34;&#34;&#34;`next()` utility function, which tells the middleware chain that it can continue with the next one&#34;&#34;&#34;
+    next_: Callable[[], Awaitable[None]]
+    &#34;&#34;&#34;An alias of `next()` for avoiding the Python built-in method overrides in middleware functions&#34;&#34;&#34;
 
     def __init__(
         self,
@@ -142,7 +144,8 @@ class AsyncArgs:
         self.ack: AsyncAck = ack
         self.say: AsyncSay = say
         self.respond: AsyncRespond = respond
-        self.next: Callable[[], Awaitable[None]] = next</code></pre>
+        self.next: Callable[[], Awaitable[None]] = next
+        self.next_: Callable[[], Awaitable[None]] = next</code></pre>
 </details>
 </section>
 <section>
@@ -236,6 +239,8 @@ async def handle_buttons(ack, respond, logger, context, body, client):
     # middleware
     next: Callable[[], Awaitable[None]]
     &#34;&#34;&#34;`next()` utility function, which tells the middleware chain that it can continue with the next one&#34;&#34;&#34;
+    next_: Callable[[], Awaitable[None]]
+    &#34;&#34;&#34;An alias of `next()` for avoiding the Python built-in method overrides in middleware functions&#34;&#34;&#34;
 
     def __init__(
         self,
@@ -279,7 +284,8 @@ async def handle_buttons(ack, respond, logger, context, body, client):
         self.ack: AsyncAck = ack
         self.say: AsyncSay = say
         self.respond: AsyncRespond = respond
-        self.next: Callable[[], Awaitable[None]] = next</code></pre>
+        self.next: Callable[[], Awaitable[None]] = next
+        self.next_: Callable[[], Awaitable[None]] = next</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -322,6 +328,10 @@ async def handle_buttons(ack, respond, logger, context, body, client):
 <dt id="slack_bolt.kwargs_injection.async_args.AsyncArgs.next"><code class="name">var <span class="ident">next</span> : Callable[[], Awaitable[NoneType]]</code></dt>
 <dd>
 <div class="desc"><p><code>next()</code> utility function, which tells the middleware chain that it can continue with the next one</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.async_args.AsyncArgs.next_"><code class="name">var <span class="ident">next_</span> : Callable[[], Awaitable[NoneType]]</code></dt>
+<dd>
+<div class="desc"><p>An alias of <code>next()</code> for avoiding the Python built-in method overrides in middleware functions</p></div>
 </dd>
 <dt id="slack_bolt.kwargs_injection.async_args.AsyncArgs.options"><code class="name">var <span class="ident">options</span> : Optional[Dict[str, Any]]</code></dt>
 <dd>
@@ -394,6 +404,7 @@ async def handle_buttons(ack, respond, logger, context, body, client):
 <li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.logger" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.logger">logger</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.message" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.message">message</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.next" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.next">next</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.next_" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.next_">next_</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.options" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.options">options</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.payload" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.payload">payload</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.req" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.req">req</a></code></li>

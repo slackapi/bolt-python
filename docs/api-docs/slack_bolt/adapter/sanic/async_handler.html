@@ -59,7 +59,8 @@ def to_sanic_response(bolt_resp: BoltResponse) -&gt; HTTPResponse:
                 resp.cookies[name][&#34;expires&#34;] = expire
             resp.cookies[name][&#34;path&#34;] = c.get(&#34;path&#34;)
             resp.cookies[name][&#34;domain&#34;] = c.get(&#34;domain&#34;)
-            resp.cookies[name][&#34;max-age&#34;] = c.get(&#34;max-age&#34;)
+            if c.get(&#34;max-age&#34;) is not None and len(c.get(&#34;max-age&#34;)) &gt; 0:
+                resp.cookies[name][&#34;max-age&#34;] = int(c.get(&#34;max-age&#34;))
             resp.cookies[name][&#34;secure&#34;] = True
             resp.cookies[name][&#34;httponly&#34;] = True
     return resp
@@ -142,7 +143,8 @@ class AsyncSlackRequestHandler:
                 resp.cookies[name][&#34;expires&#34;] = expire
             resp.cookies[name][&#34;path&#34;] = c.get(&#34;path&#34;)
             resp.cookies[name][&#34;domain&#34;] = c.get(&#34;domain&#34;)
-            resp.cookies[name][&#34;max-age&#34;] = c.get(&#34;max-age&#34;)
+            if c.get(&#34;max-age&#34;) is not None and len(c.get(&#34;max-age&#34;)) &gt; 0:
+                resp.cookies[name][&#34;max-age&#34;] = int(c.get(&#34;max-age&#34;))
             resp.cookies[name][&#34;secure&#34;] = True
             resp.cookies[name][&#34;httponly&#34;] = True
     return resp</code></pre>

@@ -42,7 +42,7 @@ setuptools.setup(
     ),
     include_package_data=True,  # MANIFEST.in
     install_requires=[
-        "slack_sdk>=3.9.0rc1,<4",  # TODO: Update once v3.9.0 is released
+        "slack_sdk>=3.9.0,<4",
     ],
     setup_requires=["pytest-runner==5.2"],
     tests_require=test_dependencies,

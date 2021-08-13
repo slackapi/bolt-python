@@ -33,7 +33,7 @@ import os
 import time
 from concurrent.futures.thread import ThreadPoolExecutor
 from http.server import SimpleHTTPRequestHandler, HTTPServer
-from typing import List, Union, Pattern, Callable, Dict, Optional, Sequence
+from typing import List, Union, Pattern, Callable, Dict, Optional, Sequence, Any
 
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import InstallationStore
@@ -90,6 +90,10 @@ from slack_bolt.middleware import (
     CustomMiddleware,
 )
 from slack_bolt.middleware.message_listener_matches import MessageListenerMatches
+from slack_bolt.middleware.middleware_error_handler import (
+    DefaultMiddlewareErrorHandler,
+    CustomMiddlewareErrorHandler,
+)
 from slack_bolt.middleware.url_verification import UrlVerification
 from slack_bolt.oauth import OAuthFlow
 from slack_bolt.oauth.internals import select_consistent_installation_store
@@ -242,8 +246,11 @@ class App:
 
         self._installation_store: Optional[InstallationStore] = installation_store
         if self._installation_store is not None and self._authorize is None:
+            settings = oauth_flow.settings if oauth_flow is not None else oauth_settings
             self._authorize = InstallationStoreAuthorize(
                 installation_store=self._installation_store,
+                client_id=settings.client_id if settings is not None else None,
+                client_secret=settings.client_secret if settings is not None else None,
                 logger=self._framework_logger,
                 bot_only=installation_store_bot_only,
             )
@@ -291,6 +298,9 @@ class App:
             )
             if self._authorize is None:
                 self._authorize = self._oauth_flow.settings.authorize
+            self._authorize.token_rotation_expiration_minutes = (
+                oauth_settings.token_rotation_expiration_minutes
+            )
 
         if (
             self._installation_store is not None or self._authorize is not None
@@ -336,6 +346,9 @@ class App:
                 logger=self._framework_logger,
                 executor=listener_executor,
             ),
+        )
+        self._middleware_error_handler = DefaultMiddlewareErrorHandler(
+            logger=self._framework_logger,
         )
 
         self._init_middleware_list_done = False
@@ -433,7 +446,12 @@ class App:
     # -------------------------
     # standalone server
 
-    def start(self, port: int = 3000, path: str = &#34;/slack/events&#34;) -&gt; None:
+    def start(
+        self,
+        port: int = 3000,
+        path: str = &#34;/slack/events&#34;,
+        http_server_logger_enabled: bool = True,
+    ) -&gt; None:
         &#34;&#34;&#34;Starts a web server for local development.
 
             # With the default settings, `http://localhost:3000/slack/events`
@@ -446,12 +464,14 @@ class App:
         Args:
             port: The port to listen on (Default: 3000)
             path: The path to handle request from Slack (Default: `/slack/events`)
+            http_server_logger_enabled: The flag to enable http.server logging if True (Default: True)
         &#34;&#34;&#34;
         self._development_server = SlackAppDevelopmentServer(
             port=port,
             path=path,
             app=self,
             oauth_flow=self.oauth_flow,
+            http_server_logger_enabled=http_server_logger_enabled,
         )
         self._development_server.start()
 
@@ -476,84 +496,99 @@ class App:
         def middleware_next():
             middleware_state[&#34;next_called&#34;] = True
 
-        for middleware in self._middleware_list:
-            middleware_state[&#34;next_called&#34;] = False
-            if self._framework_logger.level &lt;= logging.DEBUG:
-                self._framework_logger.debug(debug_applying_middleware(middleware.name))
-            resp = middleware.process(req=req, resp=resp, next=middleware_next)
-            if not middleware_state[&#34;next_called&#34;]:
-                if resp is None:
-                    # next() method was not called without providing the response to return to Slack
-                    # This should not be an intentional handling in usual use cases.
-                    resp = BoltResponse(
-                        status=404, body={&#34;error&#34;: &#34;no next() calls in middleware&#34;}
+        try:
+            for middleware in self._middleware_list:
+                middleware_state[&#34;next_called&#34;] = False
+                if self._framework_logger.level &lt;= logging.DEBUG:
+                    self._framework_logger.debug(
+                        debug_applying_middleware(middleware.name)
                     )
-                    if self._raise_error_for_unhandled_request is True:
-                        self._listener_runner.listener_error_handler.handle(
-                            error=BoltUnhandledRequestError(
+                resp = middleware.process(req=req, resp=resp, next=middleware_next)
+                if not middleware_state[&#34;next_called&#34;]:
+                    if resp is None:
+                        # next() method was not called without providing the response to return to Slack
+                        # This should not be an intentional handling in usual use cases.
+                        resp = BoltResponse(
+                            status=404, body={&#34;error&#34;: &#34;no next() calls in middleware&#34;}
+                        )
+                        if self._raise_error_for_unhandled_request is True:
+                            self._listener_runner.listener_error_handler.handle(
+                                error=BoltUnhandledRequestError(
+                                    request=req,
+                                    current_response=resp,
+                                    last_global_middleware_name=middleware.name,
+                                ),
                                 request=req,
-                                current_response=resp,
-                                last_global_middleware_name=middleware.name,
-                            ),
-                            request=req,
-                            response=resp,
+                                response=resp,
+                            )
+                            return resp
+                        self._framework_logger.warning(
+                            warning_unhandled_by_global_middleware(middleware.name, req)
                         )
                         return resp
-                    self._framework_logger.warning(
-                        warning_unhandled_by_global_middleware(middleware.name, req)
-                    )
                     return resp
-                return resp
 
-        for listener in self._listeners:
-            listener_name = get_name_for_callable(listener.ack_function)
-            self._framework_logger.debug(debug_checking_listener(listener_name))
-            if listener.matches(req=req, resp=resp):
-                # run all the middleware attached to this listener first
-                middleware_resp, next_was_not_called = listener.run_middleware(
-                    req=req, resp=resp
-                )
-                if next_was_not_called:
+            for listener in self._listeners:
+                listener_name = get_name_for_callable(listener.ack_function)
+                self._framework_logger.debug(debug_checking_listener(listener_name))
+                if listener.matches(req=req, resp=resp):
+                    # run all the middleware attached to this listener first
+                    middleware_resp, next_was_not_called = listener.run_middleware(
+                        req=req, resp=resp
+                    )
+                    if next_was_not_called:
+                        if middleware_resp is not None:
+                            if self._framework_logger.level &lt;= logging.DEBUG:
+                                debug_message = (
+                                    debug_return_listener_middleware_response(
+                                        listener_name,
+                                        middleware_resp.status,
+                                        middleware_resp.body,
+                                        starting_time,
+                                    )
+                                )
+                                self._framework_logger.debug(debug_message)
+                            return middleware_resp
+                        # The last listener middleware didn&#39;t call next() method.
+                        # This means the listener is not for this incoming request.
+                        continue
+
                     if middleware_resp is not None:
-                        if self._framework_logger.level &lt;= logging.DEBUG:
-                            debug_message = debug_return_listener_middleware_response(
-                                listener_name,
-                                middleware_resp.status,
-                                middleware_resp.body,
-                                starting_time,
-                            )
-                            self._framework_logger.debug(debug_message)
-                        return middleware_resp
-                    # The last listener middleware didn&#39;t call next() method.
-                    # This means the listener is not for this incoming request.
-                    continue
+                        resp = middleware_resp
 
-                if middleware_resp is not None:
-                    resp = middleware_resp
+                    self._framework_logger.debug(debug_running_listener(listener_name))
+                    listener_response: Optional[
+                        BoltResponse
+                    ] = self._listener_runner.run(
+                        request=req,
+                        response=resp,
+                        listener_name=listener_name,
+                        listener=listener,
+                    )
+                    if listener_response is not None:
+                        return listener_response
 
-                self._framework_logger.debug(debug_running_listener(listener_name))
-                listener_response: Optional[BoltResponse] = self._listener_runner.run(
+            if resp is None:
+                resp = BoltResponse(status=404, body={&#34;error&#34;: &#34;unhandled request&#34;})
+            if self._raise_error_for_unhandled_request is True:
+                self._listener_runner.listener_error_handler.handle(
+                    error=BoltUnhandledRequestError(
+                        request=req,
+                        current_response=resp,
+                    ),
                     request=req,
                     response=resp,
-                    listener_name=listener_name,
-                    listener=listener,
                 )
-                if listener_response is not None:
-                    return listener_response
-
-        if resp is None:
-            resp = BoltResponse(status=404, body={&#34;error&#34;: &#34;unhandled request&#34;})
-        if self._raise_error_for_unhandled_request is True:
-            self._listener_runner.listener_error_handler.handle(
-                error=BoltUnhandledRequestError(
-                    request=req,
-                    current_response=resp,
-                ),
+                return resp
+            return self._handle_unmatched_requests(req, resp)
+        except Exception as error:
+            resp = BoltResponse(status=500, body=&#34;&#34;)
+            self._middleware_error_handler.handle(
+                error=error,
                 request=req,
                 response=resp,
             )
             return resp
-        return self._handle_unmatched_requests(req, resp)
 
     def _handle_unmatched_requests(
         self, req: BoltRequest, resp: BoltResponse
@@ -689,6 +724,10 @@ class App:
                 when getting an unhandled error in Bolt app.
         &#34;&#34;&#34;
         self._listener_runner.listener_error_handler = CustomListenerErrorHandler(
+            logger=self._framework_logger,
+            func=func,
+        )
+        self._middleware_error_handler = CustomMiddlewareErrorHandler(
             logger=self._framework_logger,
             func=func,
         )
@@ -1308,6 +1347,7 @@ class SlackAppDevelopmentServer:
         path: str,
         app: App,
         oauth_flow: Optional[OAuthFlow] = None,
+        http_server_logger_enabled: bool = True,
     ):
         &#34;&#34;&#34;Slack App Development Server
 
@@ -1324,18 +1364,25 @@ class SlackAppDevelopmentServer:
             path: the path to receive incoming requests
             app: the `App` instance to execute
             oauth_flow: the `OAuthFlow` instance to use for OAuth flow
+            http_server_logger_enabled: The flag to turn on/off http.server&#39;s logging
         &#34;&#34;&#34;
         self._port: int = port
         self._bolt_endpoint_path: str = path
         self._bolt_app: App = app
         self._bolt_oauth_flow: Optional[OAuthFlow] = oauth_flow
+        self._http_server_logger_enabled = http_server_logger_enabled
 
         _port: int = self._port
         _bolt_endpoint_path: str = self._bolt_endpoint_path
         _bolt_app: App = self._bolt_app
         _bolt_oauth_flow: Optional[OAuthFlow] = self._bolt_oauth_flow
+        _http_server_logger_enabled = self._http_server_logger_enabled
 
         class SlackAppHandler(SimpleHTTPRequestHandler):
+            def log_message(self, format: str, *args: Any) -&gt; None:
+                if _http_server_logger_enabled is True:
+                    super().log_message(format, *args)
+
             def do_GET(self):
                 if _bolt_oauth_flow:
                     request_path, _, query = self.path.partition(&#34;?&#34;)
@@ -1641,8 +1688,11 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         self._installation_store: Optional[InstallationStore] = installation_store
         if self._installation_store is not None and self._authorize is None:
+            settings = oauth_flow.settings if oauth_flow is not None else oauth_settings
             self._authorize = InstallationStoreAuthorize(
                 installation_store=self._installation_store,
+                client_id=settings.client_id if settings is not None else None,
+                client_secret=settings.client_secret if settings is not None else None,
                 logger=self._framework_logger,
                 bot_only=installation_store_bot_only,
             )
@@ -1690,6 +1740,9 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             )
             if self._authorize is None:
                 self._authorize = self._oauth_flow.settings.authorize
+            self._authorize.token_rotation_expiration_minutes = (
+                oauth_settings.token_rotation_expiration_minutes
+            )
 
         if (
             self._installation_store is not None or self._authorize is not None
@@ -1735,6 +1788,9 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                 logger=self._framework_logger,
                 executor=listener_executor,
             ),
+        )
+        self._middleware_error_handler = DefaultMiddlewareErrorHandler(
+            logger=self._framework_logger,
         )
 
         self._init_middleware_list_done = False
@@ -1832,7 +1888,12 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
     # -------------------------
     # standalone server
 
-    def start(self, port: int = 3000, path: str = &#34;/slack/events&#34;) -&gt; None:
+    def start(
+        self,
+        port: int = 3000,
+        path: str = &#34;/slack/events&#34;,
+        http_server_logger_enabled: bool = True,
+    ) -&gt; None:
         &#34;&#34;&#34;Starts a web server for local development.
 
             # With the default settings, `http://localhost:3000/slack/events`
@@ -1845,12 +1906,14 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         Args:
             port: The port to listen on (Default: 3000)
             path: The path to handle request from Slack (Default: `/slack/events`)
+            http_server_logger_enabled: The flag to enable http.server logging if True (Default: True)
         &#34;&#34;&#34;
         self._development_server = SlackAppDevelopmentServer(
             port=port,
             path=path,
             app=self,
             oauth_flow=self.oauth_flow,
+            http_server_logger_enabled=http_server_logger_enabled,
         )
         self._development_server.start()
 
@@ -1875,84 +1938,99 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         def middleware_next():
             middleware_state[&#34;next_called&#34;] = True
 
-        for middleware in self._middleware_list:
-            middleware_state[&#34;next_called&#34;] = False
-            if self._framework_logger.level &lt;= logging.DEBUG:
-                self._framework_logger.debug(debug_applying_middleware(middleware.name))
-            resp = middleware.process(req=req, resp=resp, next=middleware_next)
-            if not middleware_state[&#34;next_called&#34;]:
-                if resp is None:
-                    # next() method was not called without providing the response to return to Slack
-                    # This should not be an intentional handling in usual use cases.
-                    resp = BoltResponse(
-                        status=404, body={&#34;error&#34;: &#34;no next() calls in middleware&#34;}
+        try:
+            for middleware in self._middleware_list:
+                middleware_state[&#34;next_called&#34;] = False
+                if self._framework_logger.level &lt;= logging.DEBUG:
+                    self._framework_logger.debug(
+                        debug_applying_middleware(middleware.name)
                     )
-                    if self._raise_error_for_unhandled_request is True:
-                        self._listener_runner.listener_error_handler.handle(
-                            error=BoltUnhandledRequestError(
+                resp = middleware.process(req=req, resp=resp, next=middleware_next)
+                if not middleware_state[&#34;next_called&#34;]:
+                    if resp is None:
+                        # next() method was not called without providing the response to return to Slack
+                        # This should not be an intentional handling in usual use cases.
+                        resp = BoltResponse(
+                            status=404, body={&#34;error&#34;: &#34;no next() calls in middleware&#34;}
+                        )
+                        if self._raise_error_for_unhandled_request is True:
+                            self._listener_runner.listener_error_handler.handle(
+                                error=BoltUnhandledRequestError(
+                                    request=req,
+                                    current_response=resp,
+                                    last_global_middleware_name=middleware.name,
+                                ),
                                 request=req,
-                                current_response=resp,
-                                last_global_middleware_name=middleware.name,
-                            ),
-                            request=req,
-                            response=resp,
+                                response=resp,
+                            )
+                            return resp
+                        self._framework_logger.warning(
+                            warning_unhandled_by_global_middleware(middleware.name, req)
                         )
                         return resp
-                    self._framework_logger.warning(
-                        warning_unhandled_by_global_middleware(middleware.name, req)
-                    )
                     return resp
-                return resp
 
-        for listener in self._listeners:
-            listener_name = get_name_for_callable(listener.ack_function)
-            self._framework_logger.debug(debug_checking_listener(listener_name))
-            if listener.matches(req=req, resp=resp):
-                # run all the middleware attached to this listener first
-                middleware_resp, next_was_not_called = listener.run_middleware(
-                    req=req, resp=resp
-                )
-                if next_was_not_called:
+            for listener in self._listeners:
+                listener_name = get_name_for_callable(listener.ack_function)
+                self._framework_logger.debug(debug_checking_listener(listener_name))
+                if listener.matches(req=req, resp=resp):
+                    # run all the middleware attached to this listener first
+                    middleware_resp, next_was_not_called = listener.run_middleware(
+                        req=req, resp=resp
+                    )
+                    if next_was_not_called:
+                        if middleware_resp is not None:
+                            if self._framework_logger.level &lt;= logging.DEBUG:
+                                debug_message = (
+                                    debug_return_listener_middleware_response(
+                                        listener_name,
+                                        middleware_resp.status,
+                                        middleware_resp.body,
+                                        starting_time,
+                                    )
+                                )
+                                self._framework_logger.debug(debug_message)
+                            return middleware_resp
+                        # The last listener middleware didn&#39;t call next() method.
+                        # This means the listener is not for this incoming request.
+                        continue
+
                     if middleware_resp is not None:
-                        if self._framework_logger.level &lt;= logging.DEBUG:
-                            debug_message = debug_return_listener_middleware_response(
-                                listener_name,
-                                middleware_resp.status,
-                                middleware_resp.body,
-                                starting_time,
-                            )
-                            self._framework_logger.debug(debug_message)
-                        return middleware_resp
-                    # The last listener middleware didn&#39;t call next() method.
-                    # This means the listener is not for this incoming request.
-                    continue
+                        resp = middleware_resp
 
-                if middleware_resp is not None:
-                    resp = middleware_resp
+                    self._framework_logger.debug(debug_running_listener(listener_name))
+                    listener_response: Optional[
+                        BoltResponse
+                    ] = self._listener_runner.run(
+                        request=req,
+                        response=resp,
+                        listener_name=listener_name,
+                        listener=listener,
+                    )
+                    if listener_response is not None:
+                        return listener_response
 
-                self._framework_logger.debug(debug_running_listener(listener_name))
-                listener_response: Optional[BoltResponse] = self._listener_runner.run(
+            if resp is None:
+                resp = BoltResponse(status=404, body={&#34;error&#34;: &#34;unhandled request&#34;})
+            if self._raise_error_for_unhandled_request is True:
+                self._listener_runner.listener_error_handler.handle(
+                    error=BoltUnhandledRequestError(
+                        request=req,
+                        current_response=resp,
+                    ),
                     request=req,
                     response=resp,
-                    listener_name=listener_name,
-                    listener=listener,
                 )
-                if listener_response is not None:
-                    return listener_response
-
-        if resp is None:
-            resp = BoltResponse(status=404, body={&#34;error&#34;: &#34;unhandled request&#34;})
-        if self._raise_error_for_unhandled_request is True:
-            self._listener_runner.listener_error_handler.handle(
-                error=BoltUnhandledRequestError(
-                    request=req,
-                    current_response=resp,
-                ),
+                return resp
+            return self._handle_unmatched_requests(req, resp)
+        except Exception as error:
+            resp = BoltResponse(status=500, body=&#34;&#34;)
+            self._middleware_error_handler.handle(
+                error=error,
                 request=req,
                 response=resp,
             )
             return resp
-        return self._handle_unmatched_requests(req, resp)
 
     def _handle_unmatched_requests(
         self, req: BoltRequest, resp: BoltResponse
@@ -2088,6 +2166,10 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                 when getting an unhandled error in Bolt app.
         &#34;&#34;&#34;
         self._listener_runner.listener_error_handler = CustomListenerErrorHandler(
+            logger=self._framework_logger,
+            func=func,
+        )
+        self._middleware_error_handler = CustomMiddlewareErrorHandler(
             logger=self._framework_logger,
             func=func,
         )
@@ -3180,84 +3262,99 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
     def middleware_next():
         middleware_state[&#34;next_called&#34;] = True
 
-    for middleware in self._middleware_list:
-        middleware_state[&#34;next_called&#34;] = False
-        if self._framework_logger.level &lt;= logging.DEBUG:
-            self._framework_logger.debug(debug_applying_middleware(middleware.name))
-        resp = middleware.process(req=req, resp=resp, next=middleware_next)
-        if not middleware_state[&#34;next_called&#34;]:
-            if resp is None:
-                # next() method was not called without providing the response to return to Slack
-                # This should not be an intentional handling in usual use cases.
-                resp = BoltResponse(
-                    status=404, body={&#34;error&#34;: &#34;no next() calls in middleware&#34;}
+    try:
+        for middleware in self._middleware_list:
+            middleware_state[&#34;next_called&#34;] = False
+            if self._framework_logger.level &lt;= logging.DEBUG:
+                self._framework_logger.debug(
+                    debug_applying_middleware(middleware.name)
                 )
-                if self._raise_error_for_unhandled_request is True:
-                    self._listener_runner.listener_error_handler.handle(
-                        error=BoltUnhandledRequestError(
+            resp = middleware.process(req=req, resp=resp, next=middleware_next)
+            if not middleware_state[&#34;next_called&#34;]:
+                if resp is None:
+                    # next() method was not called without providing the response to return to Slack
+                    # This should not be an intentional handling in usual use cases.
+                    resp = BoltResponse(
+                        status=404, body={&#34;error&#34;: &#34;no next() calls in middleware&#34;}
+                    )
+                    if self._raise_error_for_unhandled_request is True:
+                        self._listener_runner.listener_error_handler.handle(
+                            error=BoltUnhandledRequestError(
+                                request=req,
+                                current_response=resp,
+                                last_global_middleware_name=middleware.name,
+                            ),
                             request=req,
-                            current_response=resp,
-                            last_global_middleware_name=middleware.name,
-                        ),
-                        request=req,
-                        response=resp,
+                            response=resp,
+                        )
+                        return resp
+                    self._framework_logger.warning(
+                        warning_unhandled_by_global_middleware(middleware.name, req)
                     )
                     return resp
-                self._framework_logger.warning(
-                    warning_unhandled_by_global_middleware(middleware.name, req)
-                )
                 return resp
-            return resp
 
-    for listener in self._listeners:
-        listener_name = get_name_for_callable(listener.ack_function)
-        self._framework_logger.debug(debug_checking_listener(listener_name))
-        if listener.matches(req=req, resp=resp):
-            # run all the middleware attached to this listener first
-            middleware_resp, next_was_not_called = listener.run_middleware(
-                req=req, resp=resp
-            )
-            if next_was_not_called:
+        for listener in self._listeners:
+            listener_name = get_name_for_callable(listener.ack_function)
+            self._framework_logger.debug(debug_checking_listener(listener_name))
+            if listener.matches(req=req, resp=resp):
+                # run all the middleware attached to this listener first
+                middleware_resp, next_was_not_called = listener.run_middleware(
+                    req=req, resp=resp
+                )
+                if next_was_not_called:
+                    if middleware_resp is not None:
+                        if self._framework_logger.level &lt;= logging.DEBUG:
+                            debug_message = (
+                                debug_return_listener_middleware_response(
+                                    listener_name,
+                                    middleware_resp.status,
+                                    middleware_resp.body,
+                                    starting_time,
+                                )
+                            )
+                            self._framework_logger.debug(debug_message)
+                        return middleware_resp
+                    # The last listener middleware didn&#39;t call next() method.
+                    # This means the listener is not for this incoming request.
+                    continue
+
                 if middleware_resp is not None:
-                    if self._framework_logger.level &lt;= logging.DEBUG:
-                        debug_message = debug_return_listener_middleware_response(
-                            listener_name,
-                            middleware_resp.status,
-                            middleware_resp.body,
-                            starting_time,
-                        )
-                        self._framework_logger.debug(debug_message)
-                    return middleware_resp
-                # The last listener middleware didn&#39;t call next() method.
-                # This means the listener is not for this incoming request.
-                continue
+                    resp = middleware_resp
 
-            if middleware_resp is not None:
-                resp = middleware_resp
+                self._framework_logger.debug(debug_running_listener(listener_name))
+                listener_response: Optional[
+                    BoltResponse
+                ] = self._listener_runner.run(
+                    request=req,
+                    response=resp,
+                    listener_name=listener_name,
+                    listener=listener,
+                )
+                if listener_response is not None:
+                    return listener_response
 
-            self._framework_logger.debug(debug_running_listener(listener_name))
-            listener_response: Optional[BoltResponse] = self._listener_runner.run(
+        if resp is None:
+            resp = BoltResponse(status=404, body={&#34;error&#34;: &#34;unhandled request&#34;})
+        if self._raise_error_for_unhandled_request is True:
+            self._listener_runner.listener_error_handler.handle(
+                error=BoltUnhandledRequestError(
+                    request=req,
+                    current_response=resp,
+                ),
                 request=req,
                 response=resp,
-                listener_name=listener_name,
-                listener=listener,
             )
-            if listener_response is not None:
-                return listener_response
-
-    if resp is None:
-        resp = BoltResponse(status=404, body={&#34;error&#34;: &#34;unhandled request&#34;})
-    if self._raise_error_for_unhandled_request is True:
-        self._listener_runner.listener_error_handler.handle(
-            error=BoltUnhandledRequestError(
-                request=req,
-                current_response=resp,
-            ),
+            return resp
+        return self._handle_unmatched_requests(req, resp)
+    except Exception as error:
+        resp = BoltResponse(status=500, body=&#34;&#34;)
+        self._middleware_error_handler.handle(
+            error=error,
             request=req,
             response=resp,
         )
-        return resp
-    return self._handle_unmatched_requests(req, resp)</code></pre>
+        return resp</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.app.app.App.enable_token_revocation_listeners"><code class="name flex">
@@ -3320,6 +3417,10 @@ when getting an unhandled error in Bolt app.</dd>
             when getting an unhandled error in Bolt app.
     &#34;&#34;&#34;
     self._listener_runner.listener_error_handler = CustomListenerErrorHandler(
+        logger=self._framework_logger,
+        func=func,
+    )
+    self._middleware_error_handler = CustomMiddlewareErrorHandler(
         logger=self._framework_logger,
         func=func,
     )
@@ -3779,7 +3880,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.app.app.App.start"><code class="name flex">
-<span>def <span class="ident">start</span></span>(<span>self, port: int = 3000, path: str = '/slack/events') ‑> NoneType</span>
+<span>def <span class="ident">start</span></span>(<span>self, port: int = 3000, path: str = '/slack/events', http_server_logger_enabled: bool = True) ‑> NoneType</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Starts a web server for local development.</p>
@@ -3795,12 +3896,19 @@ For production, consider using a production-ready WSGI server such as Gunicorn.<
 <dd>The port to listen on (Default: 3000)</dd>
 <dt><strong><code>path</code></strong></dt>
 <dd>The path to handle request from Slack (Default: <code>/slack/events</code>)</dd>
+<dt><strong><code>http_server_logger_enabled</code></strong></dt>
+<dd>The flag to enable http.server logging if True (Default: True)</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def start(self, port: int = 3000, path: str = &#34;/slack/events&#34;) -&gt; None:
+<pre><code class="python">def start(
+    self,
+    port: int = 3000,
+    path: str = &#34;/slack/events&#34;,
+    http_server_logger_enabled: bool = True,
+) -&gt; None:
     &#34;&#34;&#34;Starts a web server for local development.
 
         # With the default settings, `http://localhost:3000/slack/events`
@@ -3813,12 +3921,14 @@ For production, consider using a production-ready WSGI server such as Gunicorn.<
     Args:
         port: The port to listen on (Default: 3000)
         path: The path to handle request from Slack (Default: `/slack/events`)
+        http_server_logger_enabled: The flag to enable http.server logging if True (Default: True)
     &#34;&#34;&#34;
     self._development_server = SlackAppDevelopmentServer(
         port=port,
         path=path,
         app=self,
         oauth_flow=self.oauth_flow,
+        http_server_logger_enabled=http_server_logger_enabled,
     )
     self._development_server.start()</code></pre>
 </details>
@@ -4092,7 +4202,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#vie
 </dd>
 <dt id="slack_bolt.app.app.SlackAppDevelopmentServer"><code class="flex name class">
 <span>class <span class="ident">SlackAppDevelopmentServer</span></span>
-<span>(</span><span>port: int, path: str, app: <a title="slack_bolt.app.app.App" href="#slack_bolt.app.app.App">App</a>, oauth_flow: Optional[<a title="slack_bolt.oauth.oauth_flow.OAuthFlow" href="../oauth/oauth_flow.html#slack_bolt.oauth.oauth_flow.OAuthFlow">OAuthFlow</a>] = None)</span>
+<span>(</span><span>port: int, path: str, app: <a title="slack_bolt.app.app.App" href="#slack_bolt.app.app.App">App</a>, oauth_flow: Optional[<a title="slack_bolt.oauth.oauth_flow.OAuthFlow" href="../oauth/oauth_flow.html#slack_bolt.oauth.oauth_flow.OAuthFlow">OAuthFlow</a>] = None, http_server_logger_enabled: bool = True)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Slack App Development Server</p>
@@ -4112,6 +4222,8 @@ along with a production-grade server when running the app for end users.
 <dd>the <code><a title="slack_bolt.app.app.App" href="#slack_bolt.app.app.App">App</a></code> instance to execute</dd>
 <dt><strong><code>oauth_flow</code></strong></dt>
 <dd>the <code>OAuthFlow</code> instance to use for OAuth flow</dd>
+<dt><strong><code>http_server_logger_enabled</code></strong></dt>
+<dd>The flag to turn on/off http.server's logging</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -4124,6 +4236,7 @@ along with a production-grade server when running the app for end users.
         path: str,
         app: App,
         oauth_flow: Optional[OAuthFlow] = None,
+        http_server_logger_enabled: bool = True,
     ):
         &#34;&#34;&#34;Slack App Development Server
 
@@ -4140,18 +4253,25 @@ along with a production-grade server when running the app for end users.
             path: the path to receive incoming requests
             app: the `App` instance to execute
             oauth_flow: the `OAuthFlow` instance to use for OAuth flow
+            http_server_logger_enabled: The flag to turn on/off http.server&#39;s logging
         &#34;&#34;&#34;
         self._port: int = port
         self._bolt_endpoint_path: str = path
         self._bolt_app: App = app
         self._bolt_oauth_flow: Optional[OAuthFlow] = oauth_flow
+        self._http_server_logger_enabled = http_server_logger_enabled
 
         _port: int = self._port
         _bolt_endpoint_path: str = self._bolt_endpoint_path
         _bolt_app: App = self._bolt_app
         _bolt_oauth_flow: Optional[OAuthFlow] = self._bolt_oauth_flow
+        _http_server_logger_enabled = self._http_server_logger_enabled
 
         class SlackAppHandler(SimpleHTTPRequestHandler):
+            def log_message(self, format: str, *args: Any) -&gt; None:
+                if _http_server_logger_enabled is True:
+                    super().log_message(format, *args)
+
             def do_GET(self):
                 if _bolt_oauth_flow:
                     request_path, _, query = self.path.partition(&#34;?&#34;)

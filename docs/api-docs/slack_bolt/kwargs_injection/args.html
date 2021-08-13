@@ -100,6 +100,8 @@ class Args:
     # middleware
     next: Callable[[], None]
     &#34;&#34;&#34;`next()` utility function, which tells the middleware chain that it can continue with the next one&#34;&#34;&#34;
+    next_: Callable[[], None]
+    &#34;&#34;&#34;An alias of `next()` for avoiding the Python built-in method overrides in middleware functions&#34;&#34;&#34;
 
     def __init__(
         self,
@@ -121,6 +123,9 @@ class Args:
         ack: Ack,
         say: Say,
         respond: Respond,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
         next: Callable[[], None],
         **kwargs  # noqa
     ):
@@ -143,7 +148,8 @@ class Args:
         self.ack: Ack = ack
         self.say: Say = say
         self.respond: Respond = respond
-        self.next: Callable[[], None] = next</code></pre>
+        self.next: Callable[[], None] = next
+        self.next_: Callable[[], None] = next</code></pre>
 </details>
 </section>
 <section>
@@ -237,6 +243,8 @@ def handle_buttons(ack, respond, logger, context, body, client):
     # middleware
     next: Callable[[], None]
     &#34;&#34;&#34;`next()` utility function, which tells the middleware chain that it can continue with the next one&#34;&#34;&#34;
+    next_: Callable[[], None]
+    &#34;&#34;&#34;An alias of `next()` for avoiding the Python built-in method overrides in middleware functions&#34;&#34;&#34;
 
     def __init__(
         self,
@@ -258,6 +266,9 @@ def handle_buttons(ack, respond, logger, context, body, client):
         ack: Ack,
         say: Say,
         respond: Respond,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
         next: Callable[[], None],
         **kwargs  # noqa
     ):
@@ -280,7 +291,8 @@ def handle_buttons(ack, respond, logger, context, body, client):
         self.ack: Ack = ack
         self.say: Say = say
         self.respond: Respond = respond
-        self.next: Callable[[], None] = next</code></pre>
+        self.next: Callable[[], None] = next
+        self.next_: Callable[[], None] = next</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -323,6 +335,10 @@ def handle_buttons(ack, respond, logger, context, body, client):
 <dt id="slack_bolt.kwargs_injection.args.Args.next"><code class="name">var <span class="ident">next</span> : Callable[[], NoneType]</code></dt>
 <dd>
 <div class="desc"><p><code>next()</code> utility function, which tells the middleware chain that it can continue with the next one</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.args.Args.next_"><code class="name">var <span class="ident">next_</span> : Callable[[], NoneType]</code></dt>
+<dd>
+<div class="desc"><p>An alias of <code>next()</code> for avoiding the Python built-in method overrides in middleware functions</p></div>
 </dd>
 <dt id="slack_bolt.kwargs_injection.args.Args.options"><code class="name">var <span class="ident">options</span> : Optional[Dict[str, Any]]</code></dt>
 <dd>
@@ -395,6 +411,7 @@ def handle_buttons(ack, respond, logger, context, body, client):
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.logger" href="#slack_bolt.kwargs_injection.args.Args.logger">logger</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.message" href="#slack_bolt.kwargs_injection.args.Args.message">message</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.next" href="#slack_bolt.kwargs_injection.args.Args.next">next</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.args.Args.next_" href="#slack_bolt.kwargs_injection.args.Args.next_">next_</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.options" href="#slack_bolt.kwargs_injection.args.Args.options">options</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.payload" href="#slack_bolt.kwargs_injection.args.Args.payload">payload</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.req" href="#slack_bolt.kwargs_injection.args.Args.req">req</a></code></li>

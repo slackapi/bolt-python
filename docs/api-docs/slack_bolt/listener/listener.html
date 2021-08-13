@@ -73,10 +73,10 @@ class Listener(metaclass=ABCMeta):
         for m in self.middleware:
             middleware_state = {&#34;next_called&#34;: False}
 
-            def next():
+            def next_():
                 middleware_state[&#34;next_called&#34;] = True
 
-            resp = m.process(req=req, resp=resp, next=next)
+            resp = m.process(req=req, resp=resp, next=next_)
             if not middleware_state[&#34;next_called&#34;]:
                 # next() was not called in this middleware
                 return (resp, True)
@@ -154,10 +154,10 @@ class Listener(metaclass=ABCMeta):
         for m in self.middleware:
             middleware_state = {&#34;next_called&#34;: False}
 
-            def next():
+            def next_():
                 middleware_state[&#34;next_called&#34;] = True
 
-            resp = m.process(req=req, resp=resp, next=next)
+            resp = m.process(req=req, resp=resp, next=next_)
             if not middleware_state[&#34;next_called&#34;]:
                 # next() was not called in this middleware
                 return (resp, True)
@@ -300,10 +300,10 @@ def run_ack_function(
     for m in self.middleware:
         middleware_state = {&#34;next_called&#34;: False}
 
-        def next():
+        def next_():
             middleware_state[&#34;next_called&#34;] = True
 
-        resp = m.process(req=req, resp=resp, next=next)
+        resp = m.process(req=req, resp=resp, next=next_)
         if not middleware_state[&#34;next_called&#34;]:
             # next() was not called in this middleware
             return (resp, True)

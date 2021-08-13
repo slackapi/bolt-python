@@ -55,6 +55,8 @@ def build_async_required_kwargs(
     response: Optional[BoltResponse],
     next_func: Callable[[], None] = None,
     this_func: Optional[Callable] = None,
+    error: Optional[Exception] = None,  # for error handlers
+    next_keys_required: bool = True,  # False for listeners / middleware / error handlers
 ) -&gt; Dict[str, Any]:
     all_available_args = {
         &#34;logger&#34;: logger,
@@ -80,7 +82,14 @@ def build_async_required_kwargs(
         &#34;respond&#34;: request.context.respond,
         # middleware
         &#34;next&#34;: next_func,
+        &#34;next_&#34;: next_func,  # for the middleware using Python&#39;s built-in `next()` function
+        # error handler
+        &#34;error&#34;: error,  # Exception
     }
+    if not next_keys_required:
+        all_available_args.pop(&#34;next&#34;)
+        all_available_args.pop(&#34;next_&#34;)
+
     all_available_args[&#34;payload&#34;] = (
         all_available_args[&#34;options&#34;]
         or all_available_args[&#34;shortcut&#34;]
@@ -137,7 +146,7 @@ def build_async_required_kwargs(
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="slack_bolt.kwargs_injection.async_utils.build_async_required_kwargs"><code class="name flex">
-<span>def <span class="ident">build_async_required_kwargs</span></span>(<span>*, logger: logging.Logger, required_arg_names: Sequence[str], request: <a title="slack_bolt.request.async_request.AsyncBoltRequest" href="../request/async_request.html#slack_bolt.request.async_request.AsyncBoltRequest">AsyncBoltRequest</a>, response: Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>], next_func: Callable[[], NoneType] = None, this_func: Optional[Callable] = None) ‑> Dict[str, Any]</span>
+<span>def <span class="ident">build_async_required_kwargs</span></span>(<span>*, logger: logging.Logger, required_arg_names: Sequence[str], request: <a title="slack_bolt.request.async_request.AsyncBoltRequest" href="../request/async_request.html#slack_bolt.request.async_request.AsyncBoltRequest">AsyncBoltRequest</a>, response: Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>], next_func: Callable[[], NoneType] = None, this_func: Optional[Callable] = None, error: Optional[Exception] = None, next_keys_required: bool = True) ‑> Dict[str, Any]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -153,6 +162,8 @@ def build_async_required_kwargs(
     response: Optional[BoltResponse],
     next_func: Callable[[], None] = None,
     this_func: Optional[Callable] = None,
+    error: Optional[Exception] = None,  # for error handlers
+    next_keys_required: bool = True,  # False for listeners / middleware / error handlers
 ) -&gt; Dict[str, Any]:
     all_available_args = {
         &#34;logger&#34;: logger,
@@ -178,7 +189,14 @@ def build_async_required_kwargs(
         &#34;respond&#34;: request.context.respond,
         # middleware
         &#34;next&#34;: next_func,
+        &#34;next_&#34;: next_func,  # for the middleware using Python&#39;s built-in `next()` function
+        # error handler
+        &#34;error&#34;: error,  # Exception
     }
+    if not next_keys_required:
+        all_available_args.pop(&#34;next&#34;)
+        all_available_args.pop(&#34;next_&#34;)
+
     all_available_args[&#34;payload&#34;] = (
         all_available_args[&#34;options&#34;]
         or all_available_args[&#34;shortcut&#34;]

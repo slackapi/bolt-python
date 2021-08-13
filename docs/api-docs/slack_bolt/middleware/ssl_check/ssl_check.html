@@ -26,7 +26,8 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from typing import Callable
+<pre><code class="python">from logging import Logger
+from typing import Callable, Optional
 
 from slack_bolt.logger import get_bolt_logger
 from slack_bolt.middleware.middleware import Middleware
@@ -35,7 +36,10 @@ from slack_bolt.response import BoltResponse
 
 
 class SslCheck(Middleware):  # type: ignore
-    def __init__(self, verification_token: str = None):
+    verification_token: Optional[str]
+    logger: Logger
+
+    def __init__(self, verification_token: Optional[str] = None):
         &#34;&#34;&#34;Handles `ssl_check` requests.
         Refer to https://api.slack.com/interactivity/slash-commands for details.
 
@@ -51,6 +55,9 @@ class SslCheck(Middleware):  # type: ignore
         *,
         req: BoltRequest,
         resp: BoltResponse,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
         next: Callable[[], BoltResponse],
     ) -&gt; BoltResponse:
         if self._is_ssl_check_request(req.body):
@@ -89,7 +96,7 @@ class SslCheck(Middleware):  # type: ignore
 <dl>
 <dt id="slack_bolt.middleware.ssl_check.ssl_check.SslCheck"><code class="flex name class">
 <span>class <span class="ident">SslCheck</span></span>
-<span>(</span><span>verification_token: str = None)</span>
+<span>(</span><span>verification_token: Optional[str] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
@@ -106,7 +113,10 @@ Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://ap
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class SslCheck(Middleware):  # type: ignore
-    def __init__(self, verification_token: str = None):
+    verification_token: Optional[str]
+    logger: Logger
+
+    def __init__(self, verification_token: Optional[str] = None):
         &#34;&#34;&#34;Handles `ssl_check` requests.
         Refer to https://api.slack.com/interactivity/slash-commands for details.
 
@@ -122,6 +132,9 @@ Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://ap
         *,
         req: BoltRequest,
         resp: BoltResponse,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
         next: Callable[[], BoltResponse],
     ) -&gt; BoltResponse:
         if self._is_ssl_check_request(req.body):
@@ -156,6 +169,17 @@ Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://ap
 <ul class="hlist">
 <li><a title="slack_bolt.middleware.ssl_check.async_ssl_check.AsyncSslCheck" href="async_ssl_check.html#slack_bolt.middleware.ssl_check.async_ssl_check.AsyncSslCheck">AsyncSslCheck</a></li>
 </ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.middleware.ssl_check.ssl_check.SslCheck.logger"><code class="name">var <span class="ident">logger</span> : logging.Logger</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.middleware.ssl_check.ssl_check.SslCheck.verification_token"><code class="name">var <span class="ident">verification_token</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 <h3>Inherited members</h3>
 <ul class="hlist">
 <li><code><b><a title="slack_bolt.middleware.middleware.Middleware" href="../middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a></b></code>:
@@ -184,6 +208,10 @@ Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://ap
 <ul>
 <li>
 <h4><code><a title="slack_bolt.middleware.ssl_check.ssl_check.SslCheck" href="#slack_bolt.middleware.ssl_check.ssl_check.SslCheck">SslCheck</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.middleware.ssl_check.ssl_check.SslCheck.logger" href="#slack_bolt.middleware.ssl_check.ssl_check.SslCheck.logger">logger</a></code></li>
+<li><code><a title="slack_bolt.middleware.ssl_check.ssl_check.SslCheck.verification_token" href="#slack_bolt.middleware.ssl_check.ssl_check.SslCheck.verification_token">verification_token</a></code></li>
+</ul>
 </li>
 </ul>
 </li>

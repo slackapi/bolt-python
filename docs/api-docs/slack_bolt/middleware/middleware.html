@@ -42,6 +42,9 @@ class Middleware(metaclass=ABCMeta):
         *,
         req: BoltRequest,
         resp: BoltResponse,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
         next: Callable[[], BoltResponse],
     ) -&gt; Optional[BoltResponse]:
         &#34;&#34;&#34;Processes a request data before other middleware and listeners.
@@ -51,6 +54,14 @@ class Middleware(metaclass=ABCMeta):
             def simple_middleware(req, resp, next):
                 # do something here
                 next()
+
+        This `process(req, resp, next)` method is supposed to be invoked only inside bolt-python.
+        If you want to avoid the name `next()` in your middleware functions, you can use `next_()` method instead.
+
+            @app.middleware
+            def simple_middleware(req, resp, next_):
+                # do something here
+                next_()
 
         Args:
             req: The incoming request
@@ -95,6 +106,9 @@ class Middleware(metaclass=ABCMeta):
         *,
         req: BoltRequest,
         resp: BoltResponse,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
         next: Callable[[], BoltResponse],
     ) -&gt; Optional[BoltResponse]:
         &#34;&#34;&#34;Processes a request data before other middleware and listeners.
@@ -104,6 +118,14 @@ class Middleware(metaclass=ABCMeta):
             def simple_middleware(req, resp, next):
                 # do something here
                 next()
+
+        This `process(req, resp, next)` method is supposed to be invoked only inside bolt-python.
+        If you want to avoid the name `next()` in your middleware functions, you can use `next_()` method instead.
+
+            @app.middleware
+            def simple_middleware(req, resp, next_):
+                # do something here
+                next_()
 
         Args:
             req: The incoming request
@@ -160,6 +182,13 @@ def simple_middleware(req, resp, next):
     # do something here
     next()
 </code></pre>
+<p>This <code>process(req, resp, next)</code> method is supposed to be invoked only inside bolt-python.
+If you want to avoid the name <code>next()</code> in your middleware functions, you can use <code>next_()</code> method instead.</p>
+<pre><code>@app.middleware
+def simple_middleware(req, resp, next_):
+    # do something here
+    next_()
+</code></pre>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>req</code></strong></dt>
@@ -181,6 +210,9 @@ def process(
     *,
     req: BoltRequest,
     resp: BoltResponse,
+    # As this method is not supposed to be invoked by bolt-python users,
+    # the naming conflict with the built-in one affects
+    # only the internals of this method
     next: Callable[[], BoltResponse],
 ) -&gt; Optional[BoltResponse]:
     &#34;&#34;&#34;Processes a request data before other middleware and listeners.
@@ -190,6 +222,14 @@ def process(
         def simple_middleware(req, resp, next):
             # do something here
             next()
+
+    This `process(req, resp, next)` method is supposed to be invoked only inside bolt-python.
+    If you want to avoid the name `next()` in your middleware functions, you can use `next_()` method instead.
+
+        @app.middleware
+        def simple_middleware(req, resp, next_):
+            # do something here
+            next_()
 
     Args:
         req: The incoming request

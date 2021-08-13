@@ -44,13 +44,20 @@ class AsyncMessageListenerMatches(AsyncMiddleware):
         *,
         req: AsyncBoltRequest,
         resp: BoltResponse,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
         next: Callable[[], Awaitable[BoltResponse]],
     ) -&gt; BoltResponse:
         text = req.body.get(&#34;event&#34;, {}).get(&#34;text&#34;, &#34;&#34;)
         if text:
-            m = re.search(self.keyword, text)
-            if m is not None:
-                req.context[&#34;matches&#34;] = m.groups()  # tuple
+            m = re.findall(self.keyword, text)
+            if m is not None and m != []:
+                if type(m[0]) is not tuple:
+                    m = tuple(m)
+                else:
+                    m = m[0]
+                req.context[&#34;matches&#34;] = m  # tuple or list
                 return await next()
 
         # As the text doesn&#39;t match, skip running the listener
@@ -87,13 +94,20 @@ class AsyncMessageListenerMatches(AsyncMiddleware):
         *,
         req: AsyncBoltRequest,
         resp: BoltResponse,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
         next: Callable[[], Awaitable[BoltResponse]],
     ) -&gt; BoltResponse:
         text = req.body.get(&#34;event&#34;, {}).get(&#34;text&#34;, &#34;&#34;)
         if text:
-            m = re.search(self.keyword, text)
-            if m is not None:
-                req.context[&#34;matches&#34;] = m.groups()  # tuple
+            m = re.findall(self.keyword, text)
+            if m is not None and m != []:
+                if type(m[0]) is not tuple:
+                    m = tuple(m)
+                else:
+                    m = m[0]
+                req.context[&#34;matches&#34;] = m  # tuple or list
                 return await next()
 
         # As the text doesn&#39;t match, skip running the listener

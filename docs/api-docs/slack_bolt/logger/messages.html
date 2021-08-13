@@ -127,7 +127,7 @@ def warning_unhandled_by_global_middleware(  # type: ignore
     name: str, req: Union[BoltRequest, &#34;AsyncBoltRequest&#34;]  # type: ignore
 ) -&gt; str:  # type: ignore
     return (
-        f&#34;A global middleware ({name}) skipped calling `next()` &#34;
+        f&#34;A global middleware ({name}) skipped calling either `next()` or `next_()` &#34;
         f&#34;without providing a response for the request ({req.body})&#34;
     )
 
@@ -210,6 +210,7 @@ def warning_unhandled_request(  # type: ignore
 ) -&gt; str:  # type: ignore
     filtered_body = _build_filtered_body(req.body)
     default_message = f&#34;Unhandled request ({filtered_body})&#34;
+    is_async = type(req) != BoltRequest
     if (
         is_workflow_step_edit(req.body)
         or is_workflow_step_save(req.body)
@@ -224,8 +225,8 @@ def warning_unhandled_request(  # type: ignore
         return _build_unhandled_request_suggestion(
             default_message,
             f&#34;&#34;&#34;
-from slack_bolt.workflows.step import WorkflowStep
-ws = WorkflowStep(
+from slack_bolt.workflows.step{&#39;.async_step&#39; if is_async else &#39;&#39;} import {&#39;Async&#39; if is_async else &#39;&#39;}WorkflowStep
+ws = {&#39;Async&#39; if is_async else &#39;&#39;}WorkflowStep(
     callback_id=&#34;{callback_id}&#34;,
     edit=edit,
     save=save,
@@ -244,8 +245,8 @@ app.step(ws)
             default_message,
             f&#34;&#34;&#34;
 @app.action(&#34;{action_id_or_callback_id}&#34;)
-def handle_some_action(ack, body, logger):
-    ack()
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_some_action(ack, body, logger):
+    {&#39;await &#39; if is_async else &#39;&#39;}ack()
     logger.info(body)
 &#34;&#34;&#34;,
         )
@@ -260,8 +261,8 @@ def handle_some_action(ack, body, logger):
             default_message,
             f&#34;&#34;&#34;
 @app.options({constraints})
-def handle_some_options(ack):
-    ack(options=[ ... ])
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_some_options(ack):
+    {&#39;await &#39; if is_async else &#39;&#39;}ack(options=[ ... ])
 &#34;&#34;&#34;,
         )
     if is_shortcut(req.body):
@@ -271,8 +272,8 @@ def handle_some_options(ack):
             default_message,
             f&#34;&#34;&#34;
 @app.shortcut(&#34;{id}&#34;)
-def handle_shortcuts(ack, body, logger):
-    ack()
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_shortcuts(ack, body, logger):
+    {&#39;await &#39; if is_async else &#39;&#39;}ack()
     logger.info(body)
 &#34;&#34;&#34;,
         )
@@ -282,8 +283,8 @@ def handle_shortcuts(ack, body, logger):
             default_message,
             f&#34;&#34;&#34;
 @app.view(&#34;{req.body.get(&#39;view&#39;, {}).get(&#39;callback_id&#39;, &#39;modal-view-id&#39;)}&#34;)
-def handle_view_events(ack, body, logger):
-    ack()
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_view_events(ack, body, logger):
+    {&#39;await &#39; if is_async else &#39;&#39;}ack()
     logger.info(body)
 &#34;&#34;&#34;,
         )
@@ -294,7 +295,7 @@ def handle_view_events(ack, body, logger):
             default_message,
             f&#34;&#34;&#34;
 @app.event(&#34;{event_type}&#34;)
-def handle_{event_type}_events(body, logger):
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_{event_type}_events(body, logger):
     logger.info(body)
 &#34;&#34;&#34;,
         )
@@ -305,8 +306,8 @@ def handle_{event_type}_events(body, logger):
             default_message,
             f&#34;&#34;&#34;
 @app.command(&#34;{command}&#34;)
-def handle_some_command(ack, body, logger):
-    ack()
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_some_command(ack, body, logger):
+    {&#39;await &#39; if is_async else &#39;&#39;}ack()
     logger.info(body)
 &#34;&#34;&#34;,
         )
@@ -738,7 +739,7 @@ def debug_return_listener_middleware_response(
     name: str, req: Union[BoltRequest, &#34;AsyncBoltRequest&#34;]  # type: ignore
 ) -&gt; str:  # type: ignore
     return (
-        f&#34;A global middleware ({name}) skipped calling `next()` &#34;
+        f&#34;A global middleware ({name}) skipped calling either `next()` or `next_()` &#34;
         f&#34;without providing a response for the request ({req.body})&#34;
     )</code></pre>
 </details>
@@ -757,6 +758,7 @@ def debug_return_listener_middleware_response(
 ) -&gt; str:  # type: ignore
     filtered_body = _build_filtered_body(req.body)
     default_message = f&#34;Unhandled request ({filtered_body})&#34;
+    is_async = type(req) != BoltRequest
     if (
         is_workflow_step_edit(req.body)
         or is_workflow_step_save(req.body)
@@ -771,8 +773,8 @@ def debug_return_listener_middleware_response(
         return _build_unhandled_request_suggestion(
             default_message,
             f&#34;&#34;&#34;
-from slack_bolt.workflows.step import WorkflowStep
-ws = WorkflowStep(
+from slack_bolt.workflows.step{&#39;.async_step&#39; if is_async else &#39;&#39;} import {&#39;Async&#39; if is_async else &#39;&#39;}WorkflowStep
+ws = {&#39;Async&#39; if is_async else &#39;&#39;}WorkflowStep(
     callback_id=&#34;{callback_id}&#34;,
     edit=edit,
     save=save,
@@ -791,8 +793,8 @@ app.step(ws)
             default_message,
             f&#34;&#34;&#34;
 @app.action(&#34;{action_id_or_callback_id}&#34;)
-def handle_some_action(ack, body, logger):
-    ack()
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_some_action(ack, body, logger):
+    {&#39;await &#39; if is_async else &#39;&#39;}ack()
     logger.info(body)
 &#34;&#34;&#34;,
         )
@@ -807,8 +809,8 @@ def handle_some_action(ack, body, logger):
             default_message,
             f&#34;&#34;&#34;
 @app.options({constraints})
-def handle_some_options(ack):
-    ack(options=[ ... ])
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_some_options(ack):
+    {&#39;await &#39; if is_async else &#39;&#39;}ack(options=[ ... ])
 &#34;&#34;&#34;,
         )
     if is_shortcut(req.body):
@@ -818,8 +820,8 @@ def handle_some_options(ack):
             default_message,
             f&#34;&#34;&#34;
 @app.shortcut(&#34;{id}&#34;)
-def handle_shortcuts(ack, body, logger):
-    ack()
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_shortcuts(ack, body, logger):
+    {&#39;await &#39; if is_async else &#39;&#39;}ack()
     logger.info(body)
 &#34;&#34;&#34;,
         )
@@ -829,8 +831,8 @@ def handle_shortcuts(ack, body, logger):
             default_message,
             f&#34;&#34;&#34;
 @app.view(&#34;{req.body.get(&#39;view&#39;, {}).get(&#39;callback_id&#39;, &#39;modal-view-id&#39;)}&#34;)
-def handle_view_events(ack, body, logger):
-    ack()
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_view_events(ack, body, logger):
+    {&#39;await &#39; if is_async else &#39;&#39;}ack()
     logger.info(body)
 &#34;&#34;&#34;,
         )
@@ -841,7 +843,7 @@ def handle_view_events(ack, body, logger):
             default_message,
             f&#34;&#34;&#34;
 @app.event(&#34;{event_type}&#34;)
-def handle_{event_type}_events(body, logger):
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_{event_type}_events(body, logger):
     logger.info(body)
 &#34;&#34;&#34;,
         )
@@ -852,8 +854,8 @@ def handle_{event_type}_events(body, logger):
             default_message,
             f&#34;&#34;&#34;
 @app.command(&#34;{command}&#34;)
-def handle_some_command(ack, body, logger):
-    ack()
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_some_command(ack, body, logger):
+    {&#39;await &#39; if is_async else &#39;&#39;}ack()
     logger.info(body)
 &#34;&#34;&#34;,
         )

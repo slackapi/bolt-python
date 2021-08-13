@@ -113,6 +113,10 @@ def to_bolt_request(event) -&gt; BoltRequest:
     if event[&#34;isBase64Encoded&#34;]:
         body = base64.b64decode(body).decode(&#34;utf-8&#34;)
     cookies: Sequence[str] = event.get(&#34;cookies&#34;, [])
+    if cookies is None or len(cookies) == 0:
+        # In the case of format v1
+        multiValueHeaders = event.get(&#34;multiValueHeaders&#34;, {})
+        cookies = multiValueHeaders.get(&#34;Cookie&#34;, [])
     headers = event.get(&#34;headers&#34;, {})
     headers[&#34;cookie&#34;] = cookies
     return BoltRequest(
@@ -202,6 +206,10 @@ for more details.</p></div>
     if event[&#34;isBase64Encoded&#34;]:
         body = base64.b64decode(body).decode(&#34;utf-8&#34;)
     cookies: Sequence[str] = event.get(&#34;cookies&#34;, [])
+    if cookies is None or len(cookies) == 0:
+        # In the case of format v1
+        multiValueHeaders = event.get(&#34;multiValueHeaders&#34;, {})
+        cookies = multiValueHeaders.get(&#34;Cookie&#34;, [])
     headers = event.get(&#34;headers&#34;, {})
     headers[&#34;cookie&#34;] = cookies
     return BoltRequest(

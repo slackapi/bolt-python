@@ -42,7 +42,7 @@ class LocalLambdaClient(BaseClient):
 
     def invoke(
         self,
-        FunctionName: str = None,
+        FunctionName: str,
         InvocationType: str = &#34;Event&#34;,
         Payload: str = &#34;{}&#34;,
     ) -&gt; InvokeResponse:
@@ -84,7 +84,7 @@ class LocalLambdaClient(BaseClient):
 
     def invoke(
         self,
-        FunctionName: str = None,
+        FunctionName: str,
         InvocationType: str = &#34;Event&#34;,
         Payload: str = &#34;{}&#34;,
     ) -&gt; InvokeResponse:
@@ -104,7 +104,7 @@ class LocalLambdaClient(BaseClient):
 <h3>Methods</h3>
 <dl>
 <dt id="slack_bolt.adapter.aws_lambda.local_lambda_client.LocalLambdaClient.invoke"><code class="name flex">
-<span>def <span class="ident">invoke</span></span>(<span>self, FunctionName: str = None, InvocationType: str = 'Event', Payload: str = '{}') ‑> chalice.test.InvokeResponse</span>
+<span>def <span class="ident">invoke</span></span>(<span>self, FunctionName: str, InvocationType: str = 'Event', Payload: str = '{}') ‑> chalice.test.InvokeResponse</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -114,7 +114,7 @@ class LocalLambdaClient(BaseClient):
 </summary>
 <pre><code class="python">def invoke(
     self,
-    FunctionName: str = None,
+    FunctionName: str,
     InvocationType: str = &#34;Event&#34;,
     Payload: str = &#34;{}&#34;,
 ) -&gt; InvokeResponse:

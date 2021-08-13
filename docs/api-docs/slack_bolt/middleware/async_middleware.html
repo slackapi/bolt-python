@@ -42,6 +42,9 @@ class AsyncMiddleware(metaclass=ABCMeta):
         *,
         req: AsyncBoltRequest,
         resp: BoltResponse,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
         next: Callable[[], Awaitable[BoltResponse]],
     ) -&gt; Optional[BoltResponse]:
         &#34;&#34;&#34;Processes a request data before other middleware and listeners.
@@ -51,6 +54,14 @@ class AsyncMiddleware(metaclass=ABCMeta):
             async def simple_middleware(req, resp, next):
                 # do something here
                 await next()
+
+        This `async_process(req, resp, next)` method is supposed to be invoked only inside bolt-python.
+        If you want to avoid the name `next()` in your middleware functions, you can use `next_()` method instead.
+
+            @app.middleware
+            async def simple_middleware(req, resp, next_):
+                # do something here
+                await next_()
 
         Args:
             req: The incoming request
@@ -95,6 +106,9 @@ class AsyncMiddleware(metaclass=ABCMeta):
         *,
         req: AsyncBoltRequest,
         resp: BoltResponse,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
         next: Callable[[], Awaitable[BoltResponse]],
     ) -&gt; Optional[BoltResponse]:
         &#34;&#34;&#34;Processes a request data before other middleware and listeners.
@@ -104,6 +118,14 @@ class AsyncMiddleware(metaclass=ABCMeta):
             async def simple_middleware(req, resp, next):
                 # do something here
                 await next()
+
+        This `async_process(req, resp, next)` method is supposed to be invoked only inside bolt-python.
+        If you want to avoid the name `next()` in your middleware functions, you can use `next_()` method instead.
+
+            @app.middleware
+            async def simple_middleware(req, resp, next_):
+                # do something here
+                await next_()
 
         Args:
             req: The incoming request
@@ -160,6 +182,13 @@ async def simple_middleware(req, resp, next):
     # do something here
     await next()
 </code></pre>
+<p>This <code>async_process(req, resp, next)</code> method is supposed to be invoked only inside bolt-python.
+If you want to avoid the name <code>next()</code> in your middleware functions, you can use <code>next_()</code> method instead.</p>
+<pre><code>@app.middleware
+async def simple_middleware(req, resp, next_):
+    # do something here
+    await next_()
+</code></pre>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>req</code></strong></dt>
@@ -181,6 +210,9 @@ async def async_process(
     *,
     req: AsyncBoltRequest,
     resp: BoltResponse,
+    # As this method is not supposed to be invoked by bolt-python users,
+    # the naming conflict with the built-in one affects
+    # only the internals of this method
     next: Callable[[], Awaitable[BoltResponse]],
 ) -&gt; Optional[BoltResponse]:
     &#34;&#34;&#34;Processes a request data before other middleware and listeners.
@@ -190,6 +222,14 @@ async def async_process(
         async def simple_middleware(req, resp, next):
             # do something here
             await next()
+
+    This `async_process(req, resp, next)` method is supposed to be invoked only inside bolt-python.
+    If you want to avoid the name `next()` in your middleware functions, you can use `next_()` method instead.
+
+        @app.middleware
+        async def simple_middleware(req, resp, next_):
+            # do something here
+            await next_()
 
     Args:
         req: The incoming request

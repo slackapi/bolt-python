@@ -69,6 +69,7 @@ class AsyncOAuthSettings:
     # Installation Management
     installation_store: AsyncInstallationStore
     installation_store_bot_only: bool
+    token_rotation_expiration_minutes: int
     authorize: AsyncAuthorize
     # state parameter related configurations
     state_store: AsyncOAuthStateStore
@@ -101,6 +102,7 @@ class AsyncOAuthSettings:
         # Installation Management
         installation_store: Optional[AsyncInstallationStore] = None,
         installation_store_bot_only: bool = False,
+        token_rotation_expiration_minutes: int = 120,
         # state parameter related configurations
         state_store: Optional[AsyncOAuthStateStore] = None,
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
@@ -125,6 +127,7 @@ class AsyncOAuthSettings:
             authorization_url: Set a URL if you want to customize the URL `https://slack.com/oauth/v2/authorize`
             installation_store: Specify the instance of `InstallationStore` (Default: `FileInstallationStore`)
             installation_store_bot_only: Use `InstallationStore#find_bot()` if True (Default: False)
+            token_rotation_expiration_minutes: Minutes before refreshing tokens (Default: 2 hours)
             state_store: Specify the instance of `InstallationStore` (Default: `FileOAuthStateStore`)
             state_cookie_name: The cookie name that is set for installers&#39; browser. (Default: &#34;slack-app-oauth-state&#34;)
             state_expiration_seconds: The seconds that the state value is alive (Default: 600 seconds)
@@ -168,8 +171,12 @@ class AsyncOAuthSettings:
             installation_store or get_or_create_default_installation_store(client_id)
         )
         self.installation_store_bot_only = installation_store_bot_only
+        self.token_rotation_expiration_minutes = token_rotation_expiration_minutes
         self.authorize = AsyncInstallationStoreAuthorize(
             logger=logger,
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            token_rotation_expiration_minutes=self.token_rotation_expiration_minutes,
             installation_store=self.installation_store,
             bot_only=self.installation_store_bot_only,
         )
@@ -211,7 +218,7 @@ class AsyncOAuthSettings:
 <dl>
 <dt id="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings"><code class="flex name class">
 <span>class <span class="ident">AsyncOAuthSettings</span></span>
-<span>(</span><span>*, client_id: Optional[str] = None, client_secret: Optional[str] = None, scopes: Union[Sequence[str], str, NoneType] = None, user_scopes: Union[Sequence[str], str, NoneType] = None, redirect_uri: Optional[str] = None, install_path: str = '/slack/install', install_page_rendering_enabled: bool = True, redirect_uri_path: str = '/slack/oauth_redirect', callback_options: Optional[<a title="slack_bolt.oauth.async_callback_options.AsyncCallbackOptions" href="async_callback_options.html#slack_bolt.oauth.async_callback_options.AsyncCallbackOptions">AsyncCallbackOptions</a>] = None, success_url: Optional[str] = None, failure_url: Optional[str] = None, authorization_url: Optional[str] = None, installation_store: Optional[slack_sdk.oauth.installation_store.async_installation_store.AsyncInstallationStore] = None, installation_store_bot_only: bool = False, state_store: Optional[slack_sdk.oauth.state_store.async_state_store.AsyncOAuthStateStore] = None, state_cookie_name: str = 'slack-app-oauth-state', state_expiration_seconds: int = 600, logger: logging.Logger = &lt;Logger slack_bolt.oauth.async_oauth_settings (WARNING)&gt;)</span>
+<span>(</span><span>*, client_id: Optional[str] = None, client_secret: Optional[str] = None, scopes: Union[str, Sequence[str], NoneType] = None, user_scopes: Union[str, Sequence[str], NoneType] = None, redirect_uri: Optional[str] = None, install_path: str = '/slack/install', install_page_rendering_enabled: bool = True, redirect_uri_path: str = '/slack/oauth_redirect', callback_options: Optional[<a title="slack_bolt.oauth.async_callback_options.AsyncCallbackOptions" href="async_callback_options.html#slack_bolt.oauth.async_callback_options.AsyncCallbackOptions">AsyncCallbackOptions</a>] = None, success_url: Optional[str] = None, failure_url: Optional[str] = None, authorization_url: Optional[str] = None, installation_store: Optional[slack_sdk.oauth.installation_store.async_installation_store.AsyncInstallationStore] = None, installation_store_bot_only: bool = False, token_rotation_expiration_minutes: int = 120, state_store: Optional[slack_sdk.oauth.state_store.async_state_store.AsyncOAuthStateStore] = None, state_cookie_name: str = 'slack-app-oauth-state', state_expiration_seconds: int = 600, logger: logging.Logger = &lt;Logger slack_bolt.oauth.async_oauth_settings (WARNING)&gt;)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>The settings for Slack App installation (OAuth flow).</p>
@@ -245,6 +252,8 @@ class AsyncOAuthSettings:
 <dd>Specify the instance of <code>InstallationStore</code> (Default: <code>FileInstallationStore</code>)</dd>
 <dt><strong><code>installation_store_bot_only</code></strong></dt>
 <dd>Use <code>InstallationStore#find_bot()</code> if True (Default: False)</dd>
+<dt><strong><code>token_rotation_expiration_minutes</code></strong></dt>
+<dd>Minutes before refreshing tokens (Default: 2 hours)</dd>
 <dt><strong><code>state_store</code></strong></dt>
 <dd>Specify the instance of <code>InstallationStore</code> (Default: <code>FileOAuthStateStore</code>)</dd>
 <dt><strong><code>state_cookie_name</code></strong></dt>
@@ -276,6 +285,7 @@ class AsyncOAuthSettings:
     # Installation Management
     installation_store: AsyncInstallationStore
     installation_store_bot_only: bool
+    token_rotation_expiration_minutes: int
     authorize: AsyncAuthorize
     # state parameter related configurations
     state_store: AsyncOAuthStateStore
@@ -308,6 +318,7 @@ class AsyncOAuthSettings:
         # Installation Management
         installation_store: Optional[AsyncInstallationStore] = None,
         installation_store_bot_only: bool = False,
+        token_rotation_expiration_minutes: int = 120,
         # state parameter related configurations
         state_store: Optional[AsyncOAuthStateStore] = None,
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
@@ -332,6 +343,7 @@ class AsyncOAuthSettings:
             authorization_url: Set a URL if you want to customize the URL `https://slack.com/oauth/v2/authorize`
             installation_store: Specify the instance of `InstallationStore` (Default: `FileInstallationStore`)
             installation_store_bot_only: Use `InstallationStore#find_bot()` if True (Default: False)
+            token_rotation_expiration_minutes: Minutes before refreshing tokens (Default: 2 hours)
             state_store: Specify the instance of `InstallationStore` (Default: `FileOAuthStateStore`)
             state_cookie_name: The cookie name that is set for installers&#39; browser. (Default: &#34;slack-app-oauth-state&#34;)
             state_expiration_seconds: The seconds that the state value is alive (Default: 600 seconds)
@@ -375,8 +387,12 @@ class AsyncOAuthSettings:
             installation_store or get_or_create_default_installation_store(client_id)
         )
         self.installation_store_bot_only = installation_store_bot_only
+        self.token_rotation_expiration_minutes = token_rotation_expiration_minutes
         self.authorize = AsyncInstallationStoreAuthorize(
             logger=logger,
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            token_rotation_expiration_minutes=self.token_rotation_expiration_minutes,
             installation_store=self.installation_store,
             bot_only=self.installation_store_bot_only,
         )
@@ -492,6 +508,10 @@ class AsyncOAuthSettings:
 <dd>
 <div class="desc"></div>
 </dd>
+<dt id="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings.token_rotation_expiration_minutes"><code class="name">var <span class="ident">token_rotation_expiration_minutes</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings.user_scopes"><code class="name">var <span class="ident">user_scopes</span> : Optional[Sequence[str]]</code></dt>
 <dd>
 <div class="desc"></div>
@@ -538,6 +558,7 @@ class AsyncOAuthSettings:
 <li><code><a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings.state_store" href="#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings.state_store">state_store</a></code></li>
 <li><code><a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings.state_utils" href="#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings.state_utils">state_utils</a></code></li>
 <li><code><a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings.success_url" href="#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings.success_url">success_url</a></code></li>
+<li><code><a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings.token_rotation_expiration_minutes" href="#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings.token_rotation_expiration_minutes">token_rotation_expiration_minutes</a></code></li>
 <li><code><a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings.user_scopes" href="#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings.user_scopes">user_scopes</a></code></li>
 </ul>
 </li>

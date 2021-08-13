@@ -135,6 +135,7 @@ class OAuthFlow:
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
         installation_store_bot_only: bool = False,
+        token_rotation_expiration_minutes: int = 120,
         client: Optional[WebClient] = None,
         logger: Optional[Logger] = None,
     ) -&gt; &#34;OAuthFlow&#34;:
@@ -168,6 +169,7 @@ class OAuthFlow:
                     logger=logger,
                 ),
                 installation_store_bot_only=installation_store_bot_only,
+                token_rotation_expiration_minutes=token_rotation_expiration_minutes,
                 # state parameter related configurations
                 state_store=SQLite3OAuthStateStore(
                     database=database,
@@ -361,9 +363,13 @@ class OAuthFlow:
                 bot_id=bot_id,
                 bot_user_id=oauth_response.get(&#34;bot_user_id&#34;),
                 bot_scopes=oauth_response.get(&#34;scope&#34;),  # comma-separated string
+                bot_refresh_token=oauth_response.get(&#34;refresh_token&#34;),  # since v1.7
+                bot_token_expires_in=oauth_response.get(&#34;expires_in&#34;),  # since v1.7
                 user_id=installer.get(&#34;id&#34;),
                 user_token=installer.get(&#34;access_token&#34;),
                 user_scopes=installer.get(&#34;scope&#34;),  # comma-separated string
+                user_refresh_token=installer.get(&#34;refresh_token&#34;),  # since v1.7
+                user_token_expires_in=installer.get(&#34;expires_in&#34;),  # since v1.7
                 incoming_webhook_url=incoming_webhook.get(&#34;url&#34;),
                 incoming_webhook_channel=incoming_webhook.get(&#34;channel&#34;),
                 incoming_webhook_channel_id=incoming_webhook.get(&#34;channel_id&#34;),
@@ -496,6 +502,7 @@ class OAuthFlow:
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
         installation_store_bot_only: bool = False,
+        token_rotation_expiration_minutes: int = 120,
         client: Optional[WebClient] = None,
         logger: Optional[Logger] = None,
     ) -&gt; &#34;OAuthFlow&#34;:
@@ -529,6 +536,7 @@ class OAuthFlow:
                     logger=logger,
                 ),
                 installation_store_bot_only=installation_store_bot_only,
+                token_rotation_expiration_minutes=token_rotation_expiration_minutes,
                 # state parameter related configurations
                 state_store=SQLite3OAuthStateStore(
                     database=database,
@@ -722,9 +730,13 @@ class OAuthFlow:
                 bot_id=bot_id,
                 bot_user_id=oauth_response.get(&#34;bot_user_id&#34;),
                 bot_scopes=oauth_response.get(&#34;scope&#34;),  # comma-separated string
+                bot_refresh_token=oauth_response.get(&#34;refresh_token&#34;),  # since v1.7
+                bot_token_expires_in=oauth_response.get(&#34;expires_in&#34;),  # since v1.7
                 user_id=installer.get(&#34;id&#34;),
                 user_token=installer.get(&#34;access_token&#34;),
                 user_scopes=installer.get(&#34;scope&#34;),  # comma-separated string
+                user_refresh_token=installer.get(&#34;refresh_token&#34;),  # since v1.7
+                user_token_expires_in=installer.get(&#34;expires_in&#34;),  # since v1.7
                 incoming_webhook_url=incoming_webhook.get(&#34;url&#34;),
                 incoming_webhook_channel=incoming_webhook.get(&#34;channel&#34;),
                 incoming_webhook_channel_id=incoming_webhook.get(&#34;channel_id&#34;),
@@ -784,7 +796,7 @@ class OAuthFlow:
 <h3>Static methods</h3>
 <dl>
 <dt id="slack_bolt.oauth.oauth_flow.OAuthFlow.sqlite3"><code class="name flex">
-<span>def <span class="ident">sqlite3</span></span>(<span>database: str, client_id: Optional[str] = None, client_secret: Optional[str] = None, scopes: Optional[Sequence[str]] = None, user_scopes: Optional[Sequence[str]] = None, redirect_uri: Optional[str] = None, install_path: Optional[str] = None, redirect_uri_path: Optional[str] = None, callback_options: Optional[<a title="slack_bolt.oauth.callback_options.CallbackOptions" href="callback_options.html#slack_bolt.oauth.callback_options.CallbackOptions">CallbackOptions</a>] = None, success_url: Optional[str] = None, failure_url: Optional[str] = None, authorization_url: Optional[str] = None, state_cookie_name: str = 'slack-app-oauth-state', state_expiration_seconds: int = 600, installation_store_bot_only: bool = False, client: Optional[slack_sdk.web.client.WebClient] = None, logger: Optional[logging.Logger] = None) ‑> <a title="slack_bolt.oauth.oauth_flow.OAuthFlow" href="#slack_bolt.oauth.oauth_flow.OAuthFlow">OAuthFlow</a></span>
+<span>def <span class="ident">sqlite3</span></span>(<span>database: str, client_id: Optional[str] = None, client_secret: Optional[str] = None, scopes: Optional[Sequence[str]] = None, user_scopes: Optional[Sequence[str]] = None, redirect_uri: Optional[str] = None, install_path: Optional[str] = None, redirect_uri_path: Optional[str] = None, callback_options: Optional[<a title="slack_bolt.oauth.callback_options.CallbackOptions" href="callback_options.html#slack_bolt.oauth.callback_options.CallbackOptions">CallbackOptions</a>] = None, success_url: Optional[str] = None, failure_url: Optional[str] = None, authorization_url: Optional[str] = None, state_cookie_name: str = 'slack-app-oauth-state', state_expiration_seconds: int = 600, installation_store_bot_only: bool = False, token_rotation_expiration_minutes: int = 120, client: Optional[slack_sdk.web.client.WebClient] = None, logger: Optional[logging.Logger] = None) ‑> <a title="slack_bolt.oauth.oauth_flow.OAuthFlow" href="#slack_bolt.oauth.oauth_flow.OAuthFlow">OAuthFlow</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -814,6 +826,7 @@ def sqlite3(
     state_cookie_name: str = OAuthStateUtils.default_cookie_name,
     state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
     installation_store_bot_only: bool = False,
+    token_rotation_expiration_minutes: int = 120,
     client: Optional[WebClient] = None,
     logger: Optional[Logger] = None,
 ) -&gt; &#34;OAuthFlow&#34;:
@@ -847,6 +860,7 @@ def sqlite3(
                 logger=logger,
             ),
             installation_store_bot_only=installation_store_bot_only,
+            token_rotation_expiration_minutes=token_rotation_expiration_minutes,
             # state parameter related configurations
             state_store=SQLite3OAuthStateStore(
                 database=database,
@@ -1120,9 +1134,13 @@ def logger(self) -&gt; Logger:
             bot_id=bot_id,
             bot_user_id=oauth_response.get(&#34;bot_user_id&#34;),
             bot_scopes=oauth_response.get(&#34;scope&#34;),  # comma-separated string
+            bot_refresh_token=oauth_response.get(&#34;refresh_token&#34;),  # since v1.7
+            bot_token_expires_in=oauth_response.get(&#34;expires_in&#34;),  # since v1.7
             user_id=installer.get(&#34;id&#34;),
             user_token=installer.get(&#34;access_token&#34;),
             user_scopes=installer.get(&#34;scope&#34;),  # comma-separated string
+            user_refresh_token=installer.get(&#34;refresh_token&#34;),  # since v1.7
+            user_token_expires_in=installer.get(&#34;expires_in&#34;),  # since v1.7
             incoming_webhook_url=incoming_webhook.get(&#34;url&#34;),
             incoming_webhook_channel=incoming_webhook.get(&#34;channel&#34;),
             incoming_webhook_channel_id=incoming_webhook.get(&#34;channel_id&#34;),
