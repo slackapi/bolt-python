@@ -26,7 +26,7 @@ setuptools.setup(
     name="slack_bolt",
     version=__version__,
     license="MIT",
-    author="Slack Technologies, Inc.",
+    author="Slack Technologies, LLC",
     author_email="opensource@slack.com",
     description="The Bolt Framework for Python",
     long_description=long_description,
