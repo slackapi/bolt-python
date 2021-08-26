@@ -147,7 +147,7 @@ class AsyncApp:
 
         Refer to https://slack.dev/bolt-python/concepts#async for details.
 
-        If yoy would like to build an OAuth app for enabling the app to run with multiple workspaces,
+        If you would like to build an OAuth app for enabling the app to run with multiple workspaces,
         refer to https://slack.dev/bolt-python/concepts#authenticating-oauth to learn how to configure the app.
 
         Args:
