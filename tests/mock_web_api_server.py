@@ -8,7 +8,7 @@ from http import HTTPStatus
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from typing import Type
 from unittest import TestCase
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs, ParseResult
 
 from multiprocessing import Process
 from urllib.request import urlopen, Request
@@ -90,38 +90,38 @@ class MockHandler(SimpleHTTPRequestHandler):
 """
 
     def _handle(self):
-        self.received_requests[self.path] = self.received_requests.get(self.path, 0) + 1
+        parsed_path: ParseResult = urlparse(self.path)
+        path = parsed_path.path
+        self.received_requests[path] = self.received_requests.get(path, 0) + 1
         try:
-            if self.path == "/webhook":
+            if path == "/webhook":
                 self.send_response(200)
                 self.set_common_headers()
                 self.wfile.write("OK".encode("utf-8"))
                 return
 
-            if self.path == "/received_requests.json":
+            if path == "/received_requests.json":
                 self.send_response(200)
                 self.set_common_headers()
                 self.wfile.write(json.dumps(self.received_requests).encode("utf-8"))
                 return
 
             body = {"ok": True}
-            if self.path == "/oauth.v2.access":
+            if path == "/oauth.v2.access":
                 self.send_response(200)
                 self.set_common_headers()
                 self.wfile.write(self.oauth_v2_access_response.encode("utf-8"))
                 return
 
             if self.is_valid_user_token():
-                if self.path == "/auth.test":
+                if path == "/auth.test":
                     self.send_response(200)
                     self.set_common_headers()
                     self.wfile.write(self.user_auth_test_response.encode("utf-8"))
                     return
 
             if self.is_valid_token():
-                parsed_path = urlparse(self.path)
-
-                if self.path == "/auth.test":
+                if path == "/auth.test":
                     self.send_response(200)
                     self.set_common_headers()
                     self.wfile.write(self.bot_auth_test_response.encode("utf-8"))
@@ -148,7 +148,7 @@ class MockHandler(SimpleHTTPRequestHandler):
                             k: v[0] for k, v in parse_qs(parsed_path.query).items()
                         }
 
-                self.logger.info(f"request body: {request_body}")
+                self.logger.info(f"request: {path} {request_body}")
 
                 header = self.headers["authorization"]
                 pattern = str(header).split("xoxb-", 1)[1]
