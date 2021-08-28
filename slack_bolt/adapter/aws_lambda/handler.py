@@ -75,12 +75,6 @@ class SlackRequestHandler:
 
 
 def to_bolt_request(event) -> BoltRequest:
-    """Note that this handler supports only the payload format 2.0.
-    This means you can use this with HTTP API while REST API is not supported.
-
-    Read https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html
-    for more details.
-    """
     body = event.get("body", "")
     if event["isBase64Encoded"]:
         body = base64.b64decode(body).decode("utf-8")
@@ -88,7 +82,10 @@ def to_bolt_request(event) -> BoltRequest:
     if cookies is None or len(cookies) == 0:
         # In the case of format v1
         multiValueHeaders = event.get("multiValueHeaders", {})
-        cookies = multiValueHeaders.get("Cookie", [])
+        cookies = multiValueHeaders.get("cookie", [])
+        if len(cookies) == 0:
+            # Try using uppercase
+            cookies = multiValueHeaders.get("Cookie", [])
     headers = event.get("headers", {})
     headers["cookie"] = cookies
     return BoltRequest(
