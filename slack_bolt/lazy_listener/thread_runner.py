@@ -1,4 +1,4 @@
-from concurrent.futures.thread import ThreadPoolExecutor
+from concurrent.futures import Executor
 from logging import Logger
 from typing import Callable
 
@@ -13,7 +13,7 @@ class ThreadLazyListenerRunner(LazyListenerRunner):
     def __init__(
         self,
         logger: Logger,
-        executor: ThreadPoolExecutor,
+        executor: Executor,
     ):
         self.logger = logger
         self.executor = executor
