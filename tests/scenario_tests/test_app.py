@@ -1,3 +1,5 @@
+from concurrent.futures import Executor
+
 import pytest
 from slack_sdk import WebClient
 from slack_sdk.oauth.installation_store import FileInstallationStore
@@ -55,6 +57,22 @@ class TestApp:
         app = App(signing_secret="valid", client=self.web_client)
         with pytest.raises(BoltError):
             app.action({"type": "invalid_type", "action_id": "a"})(self.simple_listener)
+
+    def test_listener_executor(self):
+        class TestExecutor(Executor):
+            """A stupid executor that does nothing."""
+
+            pass
+
+        executor = TestExecutor()
+        app = App(
+            signing_secret="valid",
+            client=self.web_client,
+            listener_executor=executor,
+        )
+
+        assert app.listener_runner.listener_executor == executor
+        assert app.listener_runner.lazy_listener_runner.executor == executor
 
     # --------------------------
     # single team auth
