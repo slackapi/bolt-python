@@ -60,7 +60,7 @@ class TestApp:
 
     def test_listener_executor(self):
         class TestExecutor(Executor):
-            """A stupid executor that does nothing."""
+            """A executor that does nothing for testing"""
 
             pass
 
