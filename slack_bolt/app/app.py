@@ -114,6 +114,7 @@ class App:
         oauth_flow: Optional[OAuthFlow] = None,
         # No need to set (the value is used only in response to ssl_check requests)
         verification_token: Optional[str] = None,
+        # Set this one only when you want to customize the executor
         listener_executor: Optional[Executor] = None,
     ):
         """Bolt App that provides functionalities to register middleware/listeners.
@@ -175,7 +176,7 @@ class App:
             oauth_settings: The settings related to Slack app installation flow (OAuth flow)
             oauth_flow: Instantiated `slack_bolt.oauth.OAuthFlow`. This is always prioritized over oauth_settings.
             verification_token: Deprecated verification mechanism. This can used only for ssl_check requests.
-            listener_executor: Optional executor to run background tasks. If absent, a `ThreadPoolExecutor` will
+            listener_executor: Custom executor to run background tasks. If absent, the default `ThreadPoolExecutor` will
                 be used.
         """
         signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET")
