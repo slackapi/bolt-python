@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import time
+from concurrent.futures import Executor
 from concurrent.futures.thread import ThreadPoolExecutor
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from typing import List, Union, Pattern, Callable, Dict, Optional, Sequence, Any
@@ -113,6 +114,8 @@ class App:
         oauth_flow: Optional[OAuthFlow] = None,
         # No need to set (the value is used only in response to ssl_check requests)
         verification_token: Optional[str] = None,
+        # Set this one only when you want to customize the executor
+        listener_executor: Optional[Executor] = None,
     ):
         """Bolt App that provides functionalities to register middleware/listeners.
 
@@ -173,6 +176,8 @@ class App:
             oauth_settings: The settings related to Slack app installation flow (OAuth flow)
             oauth_flow: Instantiated `slack_bolt.oauth.OAuthFlow`. This is always prioritized over oauth_settings.
             verification_token: Deprecated verification mechanism. This can used only for ssl_check requests.
+            listener_executor: Custom executor to run background tasks. If absent, the default `ThreadPoolExecutor` will
+                be used.
         """
         signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET")
         token = token or os.environ.get("SLACK_BOT_TOKEN")
@@ -302,7 +307,9 @@ class App:
         self._middleware_list: List[Union[Callable, Middleware]] = []
         self._listeners: List[Listener] = []
 
-        listener_executor = ThreadPoolExecutor(max_workers=5)
+        if listener_executor is None:
+            listener_executor = ThreadPoolExecutor(max_workers=5)
+
         self._process_before_response = process_before_response
         self._listener_runner = ThreadListenerRunner(
             logger=self._framework_logger,

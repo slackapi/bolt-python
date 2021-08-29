@@ -1,5 +1,5 @@
 import time
-from concurrent.futures.thread import ThreadPoolExecutor
+from concurrent.futures import Executor
 from logging import Logger
 from typing import Optional, Callable
 
@@ -22,7 +22,7 @@ class ThreadListenerRunner:
     process_before_response: bool
     listener_error_handler: ListenerErrorHandler
     listener_completion_handler: ListenerCompletionHandler
-    listener_executor: ThreadPoolExecutor
+    listener_executor: Executor
     lazy_listener_runner: LazyListenerRunner
 
     def __init__(
@@ -31,7 +31,7 @@ class ThreadListenerRunner:
         process_before_response: bool,
         listener_error_handler: ListenerErrorHandler,
         listener_completion_handler: ListenerCompletionHandler,
-        listener_executor: ThreadPoolExecutor,
+        listener_executor: Executor,
         lazy_listener_runner: LazyListenerRunner,
     ):
         self.logger = logger
