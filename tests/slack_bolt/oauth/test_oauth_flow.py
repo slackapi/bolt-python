@@ -56,10 +56,11 @@ class TestOAuthFlow:
         resp = oauth_flow.handle_installation(req)
         assert resp.status == 200
         assert resp.headers.get("content-type") == ["text/html; charset=utf-8"]
+        assert resp.headers.get("set-cookie") is not None
         assert "https://slack.com/oauth/v2/authorize?state=" in resp.body
 
     # https://github.com/slackapi/bolt-python/issues/183
-    # For direct install URL suppport
+    # For direct install URL support
     def test_handle_installation_no_rendering(self):
         oauth_flow = OAuthFlow(
             settings=OAuthSettings(
@@ -77,6 +78,25 @@ class TestOAuthFlow:
         assert resp.status == 302
         location_header = resp.headers.get("location")[0]
         assert "https://slack.com/oauth/v2/authorize?state=" in location_header
+        assert resp.headers.get("set-cookie") is not None
+
+    def test_handle_installation_no_state_validation(self):
+        oauth_flow = OAuthFlow(
+            settings=OAuthSettings(
+                client_id="111.222",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+                user_scopes=["search:read"],
+                installation_store=FileInstallationStore(),
+                install_page_rendering_enabled=False,  # disabled
+                state_validation_enabled=False,  # disabled
+                state_store=None,
+            )
+        )
+        req = BoltRequest(body="")
+        resp = oauth_flow.handle_installation(req)
+        assert resp.status == 302
+        assert resp.headers.get("set-cookie") is None
 
     def test_scopes_as_str(self):
         settings = OAuthSettings(
@@ -159,6 +179,27 @@ class TestOAuthFlow:
         )
         resp = oauth_flow.handle_callback(req)
         assert resp.status == 400
+
+    def test_handle_callback_no_state_validation(self):
+        oauth_flow = OAuthFlow(
+            client=WebClient(base_url=self.mock_api_server_base_url),
+            settings=OAuthSettings(
+                client_id="111.222",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+                installation_store=FileInstallationStore(),
+                state_validation_enabled=False,  # disabled
+                state_store=None,
+            ),
+        )
+        state = oauth_flow.issue_new_state(None)
+        req = BoltRequest(
+            body="",
+            query=f"code=foo&state=invalid",
+            headers={"cookie": [f"{oauth_flow.settings.state_cookie_name}={state}"]},
+        )
+        resp = oauth_flow.handle_callback(req)
+        assert resp.status == 200
 
     def test_handle_callback_using_options(self):
         def success(args: SuccessArgs) -> BoltResponse:

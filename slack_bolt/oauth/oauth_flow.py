@@ -158,30 +158,33 @@ class OAuthFlow:
     # -----------------------------
 
     def handle_installation(self, request: BoltRequest) -> BoltResponse:
-        state = self.issue_new_state(request)
-        url = self.build_authorize_url(state, request)
-        set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(
-            state
-        )
+        set_cookie_value: Optional[str] = None
+        url = self.build_authorize_url("", request)
+        if self.settings.state_validation_enabled is True:
+            state = self.issue_new_state(request)
+            url = self.build_authorize_url(state, request)
+            set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(
+                state
+            )
+
         if self.settings.install_page_rendering_enabled:
             html = self.build_install_page_html(url, request)
             return BoltResponse(
                 status=200,
                 body=html,
-                headers={
-                    "Content-Type": "text/html; charset=utf-8",
-                    "Set-Cookie": [set_cookie_value],
-                },
+                headers=self.append_set_cookie_headers(
+                    {"Content-Type": "text/html; charset=utf-8"},
+                    set_cookie_value,
+                ),
             )
         else:
             return BoltResponse(
                 status=302,
                 body="",
-                headers={
-                    "Content-Type": "text/html; charset=utf-8",
-                    "Location": url,
-                    "Set-Cookie": [set_cookie_value],
-                },
+                headers=self.append_set_cookie_headers(
+                    {"Content-Type": "text/html; charset=utf-8", "Location": url},
+                    set_cookie_value,
+                ),
             )
 
     # ----------------------
@@ -195,6 +198,11 @@ class OAuthFlow:
 
     def build_install_page_html(self, url: str, request: BoltRequest) -> str:
         return _build_default_install_page_html(url)
+
+    def append_set_cookie_headers(self, headers: dict, set_cookie_value: Optional[str]):
+        if set_cookie_value is not None:
+            headers["Set-Cookie"] = [set_cookie_value]
+        return headers
 
     # -----------------------------
     # Callback
@@ -216,29 +224,30 @@ class OAuthFlow:
             )
 
         # state parameter verification
-        state = request.query.get("state", [None])[0]
-        if not self.settings.state_utils.is_valid_browser(state, request.headers):
-            return self.failure_handler(
-                FailureArgs(
-                    request=request,
-                    reason="invalid_browser",
-                    suggested_status_code=400,
-                    settings=self.settings,
-                    default=self.default_callback_options,
+        if self.settings.state_validation_enabled is True:
+            state = request.query.get("state", [None])[0]
+            if not self.settings.state_utils.is_valid_browser(state, request.headers):
+                return self.failure_handler(
+                    FailureArgs(
+                        request=request,
+                        reason="invalid_browser",
+                        suggested_status_code=400,
+                        settings=self.settings,
+                        default=self.default_callback_options,
+                    )
                 )
-            )
 
-        valid_state_consumed = self.settings.state_store.consume(state)
-        if not valid_state_consumed:
-            return self.failure_handler(
-                FailureArgs(
-                    request=request,
-                    reason="invalid_state",
-                    suggested_status_code=401,
-                    settings=self.settings,
-                    default=self.default_callback_options,
+            valid_state_consumed = self.settings.state_store.consume(state)
+            if not valid_state_consumed:
+                return self.failure_handler(
+                    FailureArgs(
+                        request=request,
+                        reason="invalid_state",
+                        suggested_status_code=401,
+                        settings=self.settings,
+                        default=self.default_callback_options,
+                    )
                 )
-            )
 
         # run installation
         code = request.query.get("code", [None])[0]
