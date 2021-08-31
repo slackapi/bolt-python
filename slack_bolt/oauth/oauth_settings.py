@@ -39,6 +39,7 @@ class OAuthSettings:
     token_rotation_expiration_minutes: int
     authorize: Authorize
     # state parameter related configurations
+    state_validation_enabled: bool
     state_store: OAuthStateStore
     state_cookie_name: str
     state_expiration_seconds: int
@@ -71,6 +72,7 @@ class OAuthSettings:
         installation_store_bot_only: bool = False,
         token_rotation_expiration_minutes: int = 120,
         # state parameter related configurations
+        state_validation_enabled: bool = True,
         state_store: Optional[OAuthStateStore] = None,
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
@@ -95,6 +97,7 @@ class OAuthSettings:
             installation_store: Specify the instance of `InstallationStore` (Default: `FileInstallationStore`)
             installation_store_bot_only: Use `InstallationStore#find_bot()` if True (Default: False)
             token_rotation_expiration_minutes: Minutes before refreshing tokens (Default: 2 hours)
+            state_validation_enabled: Set False if your OAuth flow omits the state parameter validation (Default: True)
             state_store: Specify the instance of `InstallationStore` (Default: `FileOAuthStateStore`)
             state_cookie_name: The cookie name that is set for installers' browser. (Default: "slack-app-oauth-state")
             state_expiration_seconds: The seconds that the state value is alive (Default: 600 seconds)
@@ -147,6 +150,7 @@ class OAuthSettings:
             bot_only=self.installation_store_bot_only,
         )
         # state parameter related configurations
+        self.state_validation_enabled = state_validation_enabled
         self.state_store = state_store or FileOAuthStateStore(
             expiration_seconds=state_expiration_seconds,
             client_id=client_id,

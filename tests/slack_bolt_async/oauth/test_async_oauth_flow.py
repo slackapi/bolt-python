@@ -6,6 +6,7 @@ from urllib.parse import quote
 import pytest
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
+from slack_sdk.oauth.state_store.async_state_store import AsyncOAuthStateStore
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 
@@ -108,6 +109,7 @@ class TestAsyncOAuthFlow:
         assert resp.status == 200
         assert resp.headers.get("content-type") == ["text/html; charset=utf-8"]
         assert "https://slack.com/oauth/v2/authorize?state=" in resp.body
+        assert resp.headers.get("set-cookie") is not None
 
     @pytest.mark.asyncio
     async def test_handle_installation_no_rendering(self):
@@ -126,6 +128,27 @@ class TestAsyncOAuthFlow:
         assert resp.status == 302
         location_header = resp.headers.get("location")[0]
         assert "https://slack.com/oauth/v2/authorize?state=" in location_header
+        assert resp.headers.get("set-cookie") is not None
+
+    @pytest.mark.asyncio
+    async def test_handle_installation_no_state_validation(self):
+        oauth_flow = AsyncOAuthFlow(
+            settings=AsyncOAuthSettings(
+                client_id="111.222",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+                installation_store=FileInstallationStore(),
+                install_page_rendering_enabled=False,  # disabled
+                state_validation_enabled=False,  # disabled
+                state_store=FileOAuthStateStore(expiration_seconds=120),
+            )
+        )
+        req = AsyncBoltRequest(body="")
+        resp = await oauth_flow.handle_installation(req)
+        assert resp.status == 302
+        location_header = resp.headers.get("location")[0]
+        assert "https://slack.com/oauth/v2/authorize?state=" in location_header
+        assert resp.headers.get("set-cookie") is None
 
     @pytest.mark.asyncio
     async def test_handle_callback(self):
@@ -200,6 +223,54 @@ class TestAsyncOAuthFlow:
         )
         resp = await oauth_flow.handle_callback(req)
         assert resp.status == 400
+
+    @pytest.mark.asyncio
+    async def test_handle_callback_invalid_state(self):
+        class MyOAuthStateStore(AsyncOAuthStateStore):
+            async def async_issue(self, *args, **kwargs) -> str:
+                return "expired_one"
+
+            async def async_consume(self, state: str) -> bool:
+                return False
+
+        oauth_flow = AsyncOAuthFlow(
+            settings=AsyncOAuthSettings(
+                client_id="111.222",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+                state_store=MyOAuthStateStore(),
+            )
+        )
+        state = await oauth_flow.issue_new_state(None)
+        req = AsyncBoltRequest(
+            body="",
+            query=f"code=foo&state={state}",
+            headers={"cookie": [f"{oauth_flow.settings.state_cookie_name}={state}"]},
+        )
+        resp = await oauth_flow.handle_callback(req)
+        assert resp.status == 401
+
+    @pytest.mark.asyncio
+    async def test_handle_callback_no_state_validation(self):
+        oauth_flow = AsyncOAuthFlow(
+            client=AsyncWebClient(base_url=self.mock_api_server_base_url),
+            settings=AsyncOAuthSettings(
+                client_id="111.222",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+                installation_store=FileInstallationStore(),
+                state_validation_enabled=False,  # disabled
+                state_store=None,
+            ),
+        )
+        state = await oauth_flow.issue_new_state(None)
+        req = AsyncBoltRequest(
+            body="",
+            query=f"code=foo&state=invalid",
+            headers={"cookie": [f"{oauth_flow.settings.state_cookie_name}={state}"]},
+        )
+        resp = await oauth_flow.handle_callback(req)
+        assert resp.status == 200
 
     @pytest.mark.asyncio
     async def test_handle_callback_using_options(self):
