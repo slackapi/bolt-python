@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.2" />
+<meta name="generator" content="pdoc 0.10.0" />
 <title>slack_bolt.app.async_app API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -3370,7 +3370,7 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 </details>
 </dd>
 <dt id="slack_bolt.app.async_app.AsyncApp.enable_token_revocation_listeners"><code class="name flex">
-<span>def <span class="ident">enable_token_revocation_listeners</span></span>(<span>self) ‑> NoneType</span>
+<span>def <span class="ident">enable_token_revocation_listeners</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -3445,7 +3445,7 @@ when getting an unhandled error in Bolt app.</dd>
 </details>
 </dd>
 <dt id="slack_bolt.app.async_app.AsyncApp.event"><code class="name flex">
-<span>def <span class="ident">event</span></span>(<span>self, event: Union[str, Pattern, Dict[str, Union[str, Sequence[Union[str, Pattern, NoneType]]]]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="../middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">event</span></span>(<span>self, event: Union[str, Pattern, Dict[str, Union[str, Sequence[Union[str, Pattern, ForwardRef(None)]]]]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="../middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new event listener. This method can be used as either a decorator or a method.</p>
@@ -3937,7 +3937,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.app.async_app.AsyncApp.start"><code class="name flex">
-<span>def <span class="ident">start</span></span>(<span>self, port: int = 3000, path: str = '/slack/events') ‑> NoneType</span>
+<span>def <span class="ident">start</span></span>(<span>self, port: int = 3000, path: str = '/slack/events') ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Start a web server using AIOHTTP.
@@ -3964,7 +3964,7 @@ Refer to <a href="https://docs.aiohttp.org/">https://docs.aiohttp.org/</a> for m
 </details>
 </dd>
 <dt id="slack_bolt.app.async_app.AsyncApp.step"><code class="name flex">
-<span>def <span class="ident">step</span></span>(<span>self, callback_id: Union[str, Pattern, <a title="slack_bolt.workflows.step.async_step.AsyncWorkflowStep" href="../workflows/step/async_step.html#slack_bolt.workflows.step.async_step.AsyncWorkflowStep">AsyncWorkflowStep</a>, <a title="slack_bolt.workflows.step.async_step.AsyncWorkflowStepBuilder" href="../workflows/step/async_step.html#slack_bolt.workflows.step.async_step.AsyncWorkflowStepBuilder">AsyncWorkflowStepBuilder</a>], edit: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="../listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable], NoneType] = None, save: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="../listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable], NoneType] = None, execute: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="../listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable], NoneType] = None)</span>
+<span>def <span class="ident">step</span></span>(<span>self, callback_id: Union[str, Pattern, <a title="slack_bolt.workflows.step.async_step.AsyncWorkflowStep" href="../workflows/step/async_step.html#slack_bolt.workflows.step.async_step.AsyncWorkflowStep">AsyncWorkflowStep</a>, <a title="slack_bolt.workflows.step.async_step.AsyncWorkflowStepBuilder" href="../workflows/step/async_step.html#slack_bolt.workflows.step.async_step.AsyncWorkflowStepBuilder">AsyncWorkflowStepBuilder</a>], edit: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="../listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable], ForwardRef(None)] = None, save: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="../listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable], ForwardRef(None)] = None, execute: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="../listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable], ForwardRef(None)] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new Workflow Step listener.
@@ -4345,7 +4345,7 @@ def app_factory():
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
 </footer>
 </body>
 </html>

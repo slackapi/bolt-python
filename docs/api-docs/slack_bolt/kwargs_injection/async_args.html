@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.2" />
+<meta name="generator" content="pdoc 0.10.0" />
 <title>slack_bolt.kwargs_injection.async_args API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -159,7 +159,7 @@ class AsyncArgs:
 <dl>
 <dt id="slack_bolt.kwargs_injection.async_args.AsyncArgs"><code class="flex name class">
 <span>class <span class="ident">AsyncArgs</span></span>
-<span>(</span><span>*, logger: logging.Logger, client: slack_sdk.web.async_client.AsyncWebClient, req: <a title="slack_bolt.request.async_request.AsyncBoltRequest" href="../request/async_request.html#slack_bolt.request.async_request.AsyncBoltRequest">AsyncBoltRequest</a>, resp: <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>, context: <a title="slack_bolt.context.async_context.AsyncBoltContext" href="../context/async_context.html#slack_bolt.context.async_context.AsyncBoltContext">AsyncBoltContext</a>, body: Dict[str, Any], payload: Dict[str, Any], options: Optional[Dict[str, Any]] = None, shortcut: Optional[Dict[str, Any]] = None, action: Optional[Dict[str, Any]] = None, view: Optional[Dict[str, Any]] = None, command: Optional[Dict[str, Any]] = None, event: Optional[Dict[str, Any]] = None, message: Optional[Dict[str, Any]] = None, ack: <a title="slack_bolt.context.ack.async_ack.AsyncAck" href="../context/ack/async_ack.html#slack_bolt.context.ack.async_ack.AsyncAck">AsyncAck</a>, say: <a title="slack_bolt.context.say.async_say.AsyncSay" href="../context/say/async_say.html#slack_bolt.context.say.async_say.AsyncSay">AsyncSay</a>, respond: <a title="slack_bolt.context.respond.async_respond.AsyncRespond" href="../context/respond/async_respond.html#slack_bolt.context.respond.async_respond.AsyncRespond">AsyncRespond</a>, next: Callable[[], Awaitable[NoneType]], **kwargs)</span>
+<span>(</span><span>*, logger: logging.Logger, client: slack_sdk.web.async_client.AsyncWebClient, req: <a title="slack_bolt.request.async_request.AsyncBoltRequest" href="../request/async_request.html#slack_bolt.request.async_request.AsyncBoltRequest">AsyncBoltRequest</a>, resp: <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>, context: <a title="slack_bolt.context.async_context.AsyncBoltContext" href="../context/async_context.html#slack_bolt.context.async_context.AsyncBoltContext">AsyncBoltContext</a>, body: Dict[str, Any], payload: Dict[str, Any], options: Optional[Dict[str, Any]] = None, shortcut: Optional[Dict[str, Any]] = None, action: Optional[Dict[str, Any]] = None, view: Optional[Dict[str, Any]] = None, command: Optional[Dict[str, Any]] = None, event: Optional[Dict[str, Any]] = None, message: Optional[Dict[str, Any]] = None, ack: <a title="slack_bolt.context.ack.async_ack.AsyncAck" href="../context/ack/async_ack.html#slack_bolt.context.ack.async_ack.AsyncAck">AsyncAck</a>, say: <a title="slack_bolt.context.say.async_say.AsyncSay" href="../context/say/async_say.html#slack_bolt.context.say.async_say.AsyncSay">AsyncSay</a>, respond: <a title="slack_bolt.context.respond.async_respond.AsyncRespond" href="../context/respond/async_respond.html#slack_bolt.context.respond.async_respond.AsyncRespond">AsyncRespond</a>, next: Callable[[], Awaitable[None]], **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>All the arguments in this class are available in any middleware / listeners.
@@ -325,11 +325,11 @@ async def handle_buttons(ack, respond, logger, context, body, client):
 <dd>
 <div class="desc"><p>An alias for payload in an <code>@app.message</code> listener</p></div>
 </dd>
-<dt id="slack_bolt.kwargs_injection.async_args.AsyncArgs.next"><code class="name">var <span class="ident">next</span> : Callable[[], Awaitable[NoneType]]</code></dt>
+<dt id="slack_bolt.kwargs_injection.async_args.AsyncArgs.next"><code class="name">var <span class="ident">next</span> : Callable[[], Awaitable[None]]</code></dt>
 <dd>
 <div class="desc"><p><code>next()</code> utility function, which tells the middleware chain that it can continue with the next one</p></div>
 </dd>
-<dt id="slack_bolt.kwargs_injection.async_args.AsyncArgs.next_"><code class="name">var <span class="ident">next_</span> : Callable[[], Awaitable[NoneType]]</code></dt>
+<dt id="slack_bolt.kwargs_injection.async_args.AsyncArgs.next_"><code class="name">var <span class="ident">next_</span> : Callable[[], Awaitable[None]]</code></dt>
 <dd>
 <div class="desc"><p>An alias of <code>next()</code> for avoiding the Python built-in method overrides in middleware functions</p></div>
 </dd>
@@ -423,7 +423,7 @@ async def handle_buttons(ack, respond, logger, context, body, client):
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
 </footer>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.2" />
+<meta name="generator" content="pdoc 0.10.0" />
 <title>slack_bolt.oauth.oauth_flow API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -186,30 +186,33 @@ class OAuthFlow:
     # -----------------------------
 
     def handle_installation(self, request: BoltRequest) -&gt; BoltResponse:
-        state = self.issue_new_state(request)
-        url = self.build_authorize_url(state, request)
-        set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(
-            state
-        )
+        set_cookie_value: Optional[str] = None
+        url = self.build_authorize_url(&#34;&#34;, request)
+        if self.settings.state_validation_enabled is True:
+            state = self.issue_new_state(request)
+            url = self.build_authorize_url(state, request)
+            set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(
+                state
+            )
+
         if self.settings.install_page_rendering_enabled:
             html = self.build_install_page_html(url, request)
             return BoltResponse(
                 status=200,
                 body=html,
-                headers={
-                    &#34;Content-Type&#34;: &#34;text/html; charset=utf-8&#34;,
-                    &#34;Set-Cookie&#34;: [set_cookie_value],
-                },
+                headers=self.append_set_cookie_headers(
+                    {&#34;Content-Type&#34;: &#34;text/html; charset=utf-8&#34;},
+                    set_cookie_value,
+                ),
             )
         else:
             return BoltResponse(
                 status=302,
                 body=&#34;&#34;,
-                headers={
-                    &#34;Content-Type&#34;: &#34;text/html; charset=utf-8&#34;,
-                    &#34;Location&#34;: url,
-                    &#34;Set-Cookie&#34;: [set_cookie_value],
-                },
+                headers=self.append_set_cookie_headers(
+                    {&#34;Content-Type&#34;: &#34;text/html; charset=utf-8&#34;, &#34;Location&#34;: url},
+                    set_cookie_value,
+                ),
             )
 
     # ----------------------
@@ -223,6 +226,11 @@ class OAuthFlow:
 
     def build_install_page_html(self, url: str, request: BoltRequest) -&gt; str:
         return _build_default_install_page_html(url)
+
+    def append_set_cookie_headers(self, headers: dict, set_cookie_value: Optional[str]):
+        if set_cookie_value is not None:
+            headers[&#34;Set-Cookie&#34;] = [set_cookie_value]
+        return headers
 
     # -----------------------------
     # Callback
@@ -244,29 +252,30 @@ class OAuthFlow:
             )
 
         # state parameter verification
-        state = request.query.get(&#34;state&#34;, [None])[0]
-        if not self.settings.state_utils.is_valid_browser(state, request.headers):
-            return self.failure_handler(
-                FailureArgs(
-                    request=request,
-                    reason=&#34;invalid_browser&#34;,
-                    suggested_status_code=400,
-                    settings=self.settings,
-                    default=self.default_callback_options,
+        if self.settings.state_validation_enabled is True:
+            state = request.query.get(&#34;state&#34;, [None])[0]
+            if not self.settings.state_utils.is_valid_browser(state, request.headers):
+                return self.failure_handler(
+                    FailureArgs(
+                        request=request,
+                        reason=&#34;invalid_browser&#34;,
+                        suggested_status_code=400,
+                        settings=self.settings,
+                        default=self.default_callback_options,
+                    )
                 )
-            )
 
-        valid_state_consumed = self.settings.state_store.consume(state)
-        if not valid_state_consumed:
-            return self.failure_handler(
-                FailureArgs(
-                    request=request,
-                    reason=&#34;invalid_state&#34;,
-                    suggested_status_code=401,
-                    settings=self.settings,
-                    default=self.default_callback_options,
+            valid_state_consumed = self.settings.state_store.consume(state)
+            if not valid_state_consumed:
+                return self.failure_handler(
+                    FailureArgs(
+                        request=request,
+                        reason=&#34;invalid_state&#34;,
+                        suggested_status_code=401,
+                        settings=self.settings,
+                        default=self.default_callback_options,
+                    )
                 )
-            )
 
         # run installation
         code = request.query.get(&#34;code&#34;, [None])[0]
@@ -553,30 +562,33 @@ class OAuthFlow:
     # -----------------------------
 
     def handle_installation(self, request: BoltRequest) -&gt; BoltResponse:
-        state = self.issue_new_state(request)
-        url = self.build_authorize_url(state, request)
-        set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(
-            state
-        )
+        set_cookie_value: Optional[str] = None
+        url = self.build_authorize_url(&#34;&#34;, request)
+        if self.settings.state_validation_enabled is True:
+            state = self.issue_new_state(request)
+            url = self.build_authorize_url(state, request)
+            set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(
+                state
+            )
+
         if self.settings.install_page_rendering_enabled:
             html = self.build_install_page_html(url, request)
             return BoltResponse(
                 status=200,
                 body=html,
-                headers={
-                    &#34;Content-Type&#34;: &#34;text/html; charset=utf-8&#34;,
-                    &#34;Set-Cookie&#34;: [set_cookie_value],
-                },
+                headers=self.append_set_cookie_headers(
+                    {&#34;Content-Type&#34;: &#34;text/html; charset=utf-8&#34;},
+                    set_cookie_value,
+                ),
             )
         else:
             return BoltResponse(
                 status=302,
                 body=&#34;&#34;,
-                headers={
-                    &#34;Content-Type&#34;: &#34;text/html; charset=utf-8&#34;,
-                    &#34;Location&#34;: url,
-                    &#34;Set-Cookie&#34;: [set_cookie_value],
-                },
+                headers=self.append_set_cookie_headers(
+                    {&#34;Content-Type&#34;: &#34;text/html; charset=utf-8&#34;, &#34;Location&#34;: url},
+                    set_cookie_value,
+                ),
             )
 
     # ----------------------
@@ -590,6 +602,11 @@ class OAuthFlow:
 
     def build_install_page_html(self, url: str, request: BoltRequest) -&gt; str:
         return _build_default_install_page_html(url)
+
+    def append_set_cookie_headers(self, headers: dict, set_cookie_value: Optional[str]):
+        if set_cookie_value is not None:
+            headers[&#34;Set-Cookie&#34;] = [set_cookie_value]
+        return headers
 
     # -----------------------------
     # Callback
@@ -611,29 +628,30 @@ class OAuthFlow:
             )
 
         # state parameter verification
-        state = request.query.get(&#34;state&#34;, [None])[0]
-        if not self.settings.state_utils.is_valid_browser(state, request.headers):
-            return self.failure_handler(
-                FailureArgs(
-                    request=request,
-                    reason=&#34;invalid_browser&#34;,
-                    suggested_status_code=400,
-                    settings=self.settings,
-                    default=self.default_callback_options,
+        if self.settings.state_validation_enabled is True:
+            state = request.query.get(&#34;state&#34;, [None])[0]
+            if not self.settings.state_utils.is_valid_browser(state, request.headers):
+                return self.failure_handler(
+                    FailureArgs(
+                        request=request,
+                        reason=&#34;invalid_browser&#34;,
+                        suggested_status_code=400,
+                        settings=self.settings,
+                        default=self.default_callback_options,
+                    )
                 )
-            )
 
-        valid_state_consumed = self.settings.state_store.consume(state)
-        if not valid_state_consumed:
-            return self.failure_handler(
-                FailureArgs(
-                    request=request,
-                    reason=&#34;invalid_state&#34;,
-                    suggested_status_code=401,
-                    settings=self.settings,
-                    default=self.default_callback_options,
+            valid_state_consumed = self.settings.state_store.consume(state)
+            if not valid_state_consumed:
+                return self.failure_handler(
+                    FailureArgs(
+                        request=request,
+                        reason=&#34;invalid_state&#34;,
+                        suggested_status_code=401,
+                        settings=self.settings,
+                        default=self.default_callback_options,
+                    )
                 )
-            )
 
         # run installation
         code = request.query.get(&#34;code&#34;, [None])[0]
@@ -907,6 +925,21 @@ def logger(self) -&gt; Logger:
 </dl>
 <h3>Methods</h3>
 <dl>
+<dt id="slack_bolt.oauth.oauth_flow.OAuthFlow.append_set_cookie_headers"><code class="name flex">
+<span>def <span class="ident">append_set_cookie_headers</span></span>(<span>self, headers: dict, set_cookie_value: Optional[str])</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def append_set_cookie_headers(self, headers: dict, set_cookie_value: Optional[str]):
+    if set_cookie_value is not None:
+        headers[&#34;Set-Cookie&#34;] = [set_cookie_value]
+    return headers</code></pre>
+</details>
+</dd>
 <dt id="slack_bolt.oauth.oauth_flow.OAuthFlow.build_authorize_url"><code class="name flex">
 <span>def <span class="ident">build_authorize_url</span></span>(<span>self, state: str, request: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>) ‑> str</span>
 </code></dt>
@@ -958,29 +991,30 @@ def logger(self) -&gt; Logger:
         )
 
     # state parameter verification
-    state = request.query.get(&#34;state&#34;, [None])[0]
-    if not self.settings.state_utils.is_valid_browser(state, request.headers):
-        return self.failure_handler(
-            FailureArgs(
-                request=request,
-                reason=&#34;invalid_browser&#34;,
-                suggested_status_code=400,
-                settings=self.settings,
-                default=self.default_callback_options,
+    if self.settings.state_validation_enabled is True:
+        state = request.query.get(&#34;state&#34;, [None])[0]
+        if not self.settings.state_utils.is_valid_browser(state, request.headers):
+            return self.failure_handler(
+                FailureArgs(
+                    request=request,
+                    reason=&#34;invalid_browser&#34;,
+                    suggested_status_code=400,
+                    settings=self.settings,
+                    default=self.default_callback_options,
+                )
             )
-        )
 
-    valid_state_consumed = self.settings.state_store.consume(state)
-    if not valid_state_consumed:
-        return self.failure_handler(
-            FailureArgs(
-                request=request,
-                reason=&#34;invalid_state&#34;,
-                suggested_status_code=401,
-                settings=self.settings,
-                default=self.default_callback_options,
+        valid_state_consumed = self.settings.state_store.consume(state)
+        if not valid_state_consumed:
+            return self.failure_handler(
+                FailureArgs(
+                    request=request,
+                    reason=&#34;invalid_state&#34;,
+                    suggested_status_code=401,
+                    settings=self.settings,
+                    default=self.default_callback_options,
+                )
             )
-        )
 
     # run installation
     code = request.query.get(&#34;code&#34;, [None])[0]
@@ -1044,30 +1078,33 @@ def logger(self) -&gt; Logger:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def handle_installation(self, request: BoltRequest) -&gt; BoltResponse:
-    state = self.issue_new_state(request)
-    url = self.build_authorize_url(state, request)
-    set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(
-        state
-    )
+    set_cookie_value: Optional[str] = None
+    url = self.build_authorize_url(&#34;&#34;, request)
+    if self.settings.state_validation_enabled is True:
+        state = self.issue_new_state(request)
+        url = self.build_authorize_url(state, request)
+        set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(
+            state
+        )
+
     if self.settings.install_page_rendering_enabled:
         html = self.build_install_page_html(url, request)
         return BoltResponse(
             status=200,
             body=html,
-            headers={
-                &#34;Content-Type&#34;: &#34;text/html; charset=utf-8&#34;,
-                &#34;Set-Cookie&#34;: [set_cookie_value],
-            },
+            headers=self.append_set_cookie_headers(
+                {&#34;Content-Type&#34;: &#34;text/html; charset=utf-8&#34;},
+                set_cookie_value,
+            ),
         )
     else:
         return BoltResponse(
             status=302,
             body=&#34;&#34;,
-            headers={
-                &#34;Content-Type&#34;: &#34;text/html; charset=utf-8&#34;,
-                &#34;Location&#34;: url,
-                &#34;Set-Cookie&#34;: [set_cookie_value],
-            },
+            headers=self.append_set_cookie_headers(
+                {&#34;Content-Type&#34;: &#34;text/html; charset=utf-8&#34;, &#34;Location&#34;: url},
+                set_cookie_value,
+            ),
         )</code></pre>
 </details>
 </dd>
@@ -1194,6 +1231,7 @@ def logger(self) -&gt; Logger:
 <li>
 <h4><code><a title="slack_bolt.oauth.oauth_flow.OAuthFlow" href="#slack_bolt.oauth.oauth_flow.OAuthFlow">OAuthFlow</a></code></h4>
 <ul class="">
+<li><code><a title="slack_bolt.oauth.oauth_flow.OAuthFlow.append_set_cookie_headers" href="#slack_bolt.oauth.oauth_flow.OAuthFlow.append_set_cookie_headers">append_set_cookie_headers</a></code></li>
 <li><code><a title="slack_bolt.oauth.oauth_flow.OAuthFlow.build_authorize_url" href="#slack_bolt.oauth.oauth_flow.OAuthFlow.build_authorize_url">build_authorize_url</a></code></li>
 <li><code><a title="slack_bolt.oauth.oauth_flow.OAuthFlow.build_install_page_html" href="#slack_bolt.oauth.oauth_flow.OAuthFlow.build_install_page_html">build_install_page_html</a></code></li>
 <li><code><a title="slack_bolt.oauth.oauth_flow.OAuthFlow.client" href="#slack_bolt.oauth.oauth_flow.OAuthFlow.client">client</a></code></li>
@@ -1219,7 +1257,7 @@ def logger(self) -&gt; Logger:
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
 </footer>
 </body>
 </html>
