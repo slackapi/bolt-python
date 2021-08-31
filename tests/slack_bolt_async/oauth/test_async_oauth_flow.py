@@ -6,6 +6,7 @@ from urllib.parse import quote
 import pytest
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
+from slack_sdk.oauth.state_store.async_state_store import AsyncOAuthStateStore
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 
@@ -222,6 +223,32 @@ class TestAsyncOAuthFlow:
         )
         resp = await oauth_flow.handle_callback(req)
         assert resp.status == 400
+
+    @pytest.mark.asyncio
+    async def test_handle_callback_invalid_state(self):
+        class MyOAuthStateStore(AsyncOAuthStateStore):
+            async def async_issue(self, *args, **kwargs) -> str:
+                return "expired_one"
+
+            async def async_consume(self, state: str) -> bool:
+                return False
+
+        oauth_flow = AsyncOAuthFlow(
+            settings=AsyncOAuthSettings(
+                client_id="111.222",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+                state_store=MyOAuthStateStore(),
+            )
+        )
+        state = await oauth_flow.issue_new_state(None)
+        req = AsyncBoltRequest(
+            body="",
+            query=f"code=foo&state={state}",
+            headers={"cookie": [f"{oauth_flow.settings.state_cookie_name}={state}"]},
+        )
+        resp = await oauth_flow.handle_callback(req)
+        assert resp.status == 401
 
     @pytest.mark.asyncio
     async def test_handle_callback_no_state_validation(self):

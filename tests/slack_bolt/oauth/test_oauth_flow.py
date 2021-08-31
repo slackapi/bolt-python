@@ -4,7 +4,10 @@ from urllib.parse import quote
 
 from slack_sdk import WebClient
 from slack_sdk.oauth.installation_store import FileInstallationStore
-from slack_sdk.oauth.state_store import FileOAuthStateStore
+from slack_sdk.oauth.state_store import (
+    OAuthStateStore,
+    FileOAuthStateStore,
+)
 from slack_sdk.signature import SignatureVerifier
 
 from slack_bolt import BoltRequest, BoltResponse, App
@@ -179,6 +182,31 @@ class TestOAuthFlow:
         )
         resp = oauth_flow.handle_callback(req)
         assert resp.status == 400
+
+    def test_handle_callback_already_expired_state(self):
+        class MyOAuthStateStore(OAuthStateStore):
+            def issue(self, *args, **kwargs) -> str:
+                return "expired_one"
+
+            def consume(self, state: str) -> bool:
+                return False
+
+        oauth_flow = OAuthFlow(
+            settings=OAuthSettings(
+                client_id="111.222",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+                state_store=MyOAuthStateStore(),
+            )
+        )
+        state = oauth_flow.issue_new_state(None)
+        req = BoltRequest(
+            body="",
+            query=f"code=foo&state={state}",
+            headers={"cookie": [f"{oauth_flow.settings.state_cookie_name}={state}"]},
+        )
+        resp = oauth_flow.handle_callback(req)
+        assert resp.status == 401
 
     def test_handle_callback_no_state_validation(self):
         oauth_flow = OAuthFlow(
