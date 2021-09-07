@@ -684,7 +684,7 @@ class App:
 
     def error(
         self, func: Callable[..., Optional[BoltResponse]]
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[BoltResponse]]:
         """Updates the global error handler. This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
@@ -722,7 +722,7 @@ class App:
         ],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new event listener. This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
@@ -763,7 +763,7 @@ class App:
         keyword: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new message event listener. This method can be used as either a decorator or a method.
         Check the `App#event` method's docstring for details.
 
@@ -811,7 +811,7 @@ class App:
         command: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new slash command listener.
         This method can be used as either a decorator or a method.
 
@@ -854,7 +854,7 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new shortcut listener.
         This method can be used as either a decorator or a method.
 
@@ -900,7 +900,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new global shortcut listener."""
 
         def __call__(*args, **kwargs):
@@ -917,7 +917,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new message shortcut listener."""
 
         def __call__(*args, **kwargs):
@@ -937,7 +937,7 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new action listener. This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
@@ -976,7 +976,7 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `block_actions` action listener.
         Refer to https://api.slack.com/reference/interaction-payloads/block-actions for details.
         """
@@ -995,7 +995,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `interactive_message` action listener.
         Refer to https://api.slack.com/legacy/message-buttons for details."""
 
@@ -1013,7 +1013,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `dialog_submission` listener.
         Refer to https://api.slack.com/dialogs for details."""
 
@@ -1031,7 +1031,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `dialog_cancellation` listener.
         Refer to https://api.slack.com/dialogs for details."""
 
@@ -1052,7 +1052,7 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `view_submission`/`view_closed` event listener.
         This method can be used as either a decorator or a method.
 
@@ -1102,7 +1102,7 @@ class App:
         constraints: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `view_submission` listener.
         Refer to https://api.slack.com/reference/interaction-payloads/views#view_submission for details."""
 
@@ -1120,7 +1120,7 @@ class App:
         constraints: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `view_closed` listener.
         Refer to https://api.slack.com/reference/interaction-payloads/views#view_closed for details."""
 
@@ -1141,7 +1141,7 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new options listener.
         This method can be used as either a decorator or a method.
 
@@ -1191,7 +1191,7 @@ class App:
         action_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `block_suggestion` listener."""
 
         def __call__(*args, **kwargs):
@@ -1208,7 +1208,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `dialog_suggestion` listener.
         Refer to https://api.slack.com/dialogs for details."""
 
