@@ -1333,7 +1333,7 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]],
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]],
         auto_acknowledgement: bool = False,
-    ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
+    ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         value_to_return = None
         if not isinstance(functions, list):
             functions = list(functions)

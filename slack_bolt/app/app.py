@@ -1281,7 +1281,7 @@ class App:
         matchers: Optional[Sequence[Callable[..., bool]]],
         middleware: Optional[Sequence[Union[Callable, Middleware]]],
         auto_acknowledgement: bool = False,
-    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         value_to_return = None
         if not isinstance(functions, list):
             functions = list(functions)
