@@ -684,7 +684,7 @@ class App:
 
     def error(
         self, func: Callable[..., Optional[BoltResponse]]
-    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    ) -> Callable[..., Optional[BoltResponse]]:
         """Updates the global error handler. This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
