@@ -118,14 +118,24 @@ class AsyncOAuthSettings:
         self.client_id = client_id
         self.client_secret = client_secret
 
-        self.scopes = scopes or os.environ.get("SLACK_SCOPES", "").split(",")
+        # NOTE: pytype says that self.scopes can be str, not Sequence[str].
+        # That's true but we will check the pattern in the following if statement.
+        # Thus, we ignore the warnings here. This is the same for user_scopes too.
+        self.scopes = (  # type: ignore
+            scopes  # type: ignore
+            if scopes is not None
+            else os.environ.get("SLACK_SCOPES", "").split(",")  # type: ignore
+        )  # type: ignore
         if isinstance(self.scopes, str):
             self.scopes = self.scopes.split(",")
-        self.user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", "").split(
-            ","
-        )
+        self.user_scopes = (  # type: ignore
+            user_scopes
+            if user_scopes is not None
+            else os.environ.get("SLACK_USER_SCOPES", "").split(",")  # type: ignore
+        )  # type: ignore
         if isinstance(self.user_scopes, str):
             self.user_scopes = self.user_scopes.split(",")
+
         self.redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI")
         # Handler configuration
         self.install_path = install_path or os.environ.get(
