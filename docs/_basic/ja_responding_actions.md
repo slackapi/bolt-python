@@ -26,7 +26,7 @@ def approve_request(ack, say):
 
 <details class="secondary-wrapper">
 <summary class="section-head" markdown="0">
-<h4 class="section-head">respond() の使用</h4>
+<h4 class="section-head">respond() の利用</h4>
 </summary>
 
 <div class="secondary-content" markdown="0">

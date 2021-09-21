@@ -13,7 +13,7 @@ order: 3
 
 `edit` コールバック内で `configure()` ユーティリティを使用すると、対応する `blocks` 引数にビューのblocks 部分だけを渡して、ステップの設定モーダルを簡単に表示させることができます。必要な入力内容が揃うまで設定の保存を無効にするには、`True` の値をセットした `submit_disabled` を渡します。
 
-設定モーダルの開き方について詳しくは、[ドキュメントを参照してください](https://api.slack.com/workflows/steps#handle_config_view)。
+設定モーダルの開き方に関する詳細は、[こちらのドキュメント](https://api.slack.com/workflows/steps#handle_config_view)を参照してください。
 
 </div>
 

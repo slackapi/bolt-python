@@ -25,7 +25,7 @@ def say_hello(message, say):
 
 <details class="secondary-wrapper">
 <summary markdown="0">
-<h4 class="secondary-header">正規表現パターンの使用</h4>
+<h4 class="secondary-header">正規表現パターンの利用</h4>
 </summary>
 
 <div class="secondary-content" markdown="0">

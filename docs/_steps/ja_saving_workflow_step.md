@@ -16,7 +16,7 @@ order: 4
 - `step_name` : ステップのデフォルトの名前をオーバーライドします。
 - `step_image_url` : ステップのデフォルトの画像をオーバーライドします。
 
-これらのパラメータの構成方法について詳しくは、[ドキュメントを参照してください](https://api.slack.com/reference/workflows/workflow_step)。
+これらのパラメータの構成方法に関する詳細は、[こちらのドキュメント](https://api.slack.com/reference/workflows/workflow_step)を参照してください。
 
 </div>
 
