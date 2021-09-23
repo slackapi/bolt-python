@@ -21,13 +21,13 @@ Read more about view submissions in our <a href="https://api.slack.com/surfaces/
 # Handle a view_submission request
 @app.view("view_1")
 def handle_submission(ack, body, client, view, logger):
-    # Assume there's an input block with `block_c` as the block_id and `dreamy_input`
-    hopes_and_dreams = view["state"]["values"]["block_c"]["dreamy_input"]
+    # Assume there's an input block with `input_c` as the block_id and `dreamy_input`
+    hopes_and_dreams = view["state"]["values"]["input_c"]["dreamy_input"]
     user = body["user"]["id"]
     # Validate the inputs
     errors = {}
     if hopes_and_dreams is not None and len(hopes_and_dreams) <= 5:
-        errors["block_c"] = "The value must be longer than 5 characters"
+        errors["input_c"] = "The value must be longer than 5 characters"
     if len(errors) > 0:
         ack(response_action="errors", errors=errors)
         return
