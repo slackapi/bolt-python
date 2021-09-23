@@ -21,13 +21,13 @@ order: 12
 # view_submission リクエストを処理
 @app.view("view_1")
 def handle_submission(ack, body, client, view, logger):
-    # `block_c`という block_id に `dreamy_input` を持つ input ブロックがある場合
-    hopes_and_dreams = view["state"]["values"]["block_c"]["dreamy_input"]
+    # `input_c`という block_id に `dreamy_input` を持つ input ブロックがある場合
+    hopes_and_dreams = view["state"]["values"]["input_c"]["dreamy_input"]
     user = body["user"]["id"]
     # 入力値を検証
     errors = {}
     if hopes_and_dreams is not None and len(hopes_and_dreams) <= 5:
-        errors["block_c"] = "The value must be longer than 5 characters"
+        errors["input_c"] = "The value must be longer than 5 characters"
     if len(errors) > 0:
         ack(response_action="errors", errors=errors)
         return
