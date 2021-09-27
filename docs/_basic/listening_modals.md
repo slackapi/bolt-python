@@ -11,6 +11,19 @@ If a <a href="https://api.slack.com/reference/block-kit/views">view payload</a> 
 
 You can access the value of the `input` blocks by accessing the `state` object. `state` contains a `values` object that uses the `block_id` and unique `action_id` to store the input values.
 
+---
+
+##### Update views on submission
+
+To update a view in response to a `view_submission` event, you may pass a `response_action` of type `update` with a newly composed `view` to display in your acknowledgement.
+
+```python
+# Update the view on submission 
+@app.view("view_1")
+def handle_submission(ack, body):
+    ack(response_action="update", view=build_new_view(body))
+```
+Similarly, there are options for [displaying errors](https://api.slack.com/surfaces/modals/using#displaying_errors) in response to view submissions.
 Read more about view submissions in our <a href="https://api.slack.com/surfaces/modals/using#interactions">API documentation</a>.
 
 </div>
