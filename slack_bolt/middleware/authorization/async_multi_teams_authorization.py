@@ -62,8 +62,13 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
                 req.context.client.token = token
                 return await next()
             else:
-                # Just in case
-                self.logger.error("auth.test API call result is unexpectedly None")
+                # This situation can arise if:
+                # * A developer installed the app from the "Install to Workspace" button in Slack app config page
+                # * The InstallationStore failed to save or deleted the installation for this workspace
+                self.logger.error(
+                    "Although the app should be installed into this workspace, "
+                    "the AuthorizeResult (returned value from authorize) for it was not found."
+                )
                 return _build_error_response()
 
         except SlackApiError as e:
