@@ -60,6 +60,23 @@ class CallbackResponseBuilder:
         )
         self._logger.debug(debug_message)
 
+        # Adding a bit more details ot the error code for helping installers understand what's happening.
+        # This modification in the HTML page works only when developers use this built-in failure handler.
+        if reason == "invalid_browser":
+            reason = (
+                f"{reason}: Perhaps, you reloaded this page or "
+                "didn't start the OAuth flow from the valid starting URL. "
+                "Another possibility is that your /slack/install URL might not be https:// URL."
+            )
+        elif reason == "invalid_state":
+            reason = f"{reason}: The state parameter is no longer valid."
+        elif reason == "missing_code":
+            reason = f"{reason}: The code parameter is missing in this redirection."
+        elif reason == "storage_error":
+            reason = f"{reason}: The app's server-side has some issue. Contact the app developer."
+        else:
+            reason = f"{reason}: This error code is returned from Slack. Refer to the documents for details."
+
         html = self._redirect_uri_page_renderer.render_failure_page(reason)
         return BoltResponse(
             status=status,
