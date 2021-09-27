@@ -1,5 +1,4 @@
 import inspect
-import os
 from logging import Logger
 from typing import Optional, Callable, Dict, Any
 
@@ -16,6 +15,9 @@ from slack_bolt.error import BoltError
 
 
 class Authorize:
+    """This provides authorize function that returns AuthorizeResult
+    for an incoming request from Slack."""
+
     def __init__(self):
         pass
 
@@ -31,6 +33,10 @@ class Authorize:
 
 
 class CallableAuthorize(Authorize):
+    """When you pass the authorize argument in AsyncApp constructor,
+    This authorize implementation will be used.
+    """
+
     def __init__(
         self,
         *,
@@ -96,6 +102,11 @@ class CallableAuthorize(Authorize):
 
 
 class InstallationStoreAuthorize(Authorize):
+    """If you use the OAuth flow settings, this authorize implementation will be used.
+    As long as your own InstallationStore (or the built-in ones) works as you expect,
+    you can expect that the authorize layer should work for you without any customization.
+    """
+
     authorize_result_cache: Dict[str, AuthorizeResult]
     bot_only: bool
     find_installation_available: bool
