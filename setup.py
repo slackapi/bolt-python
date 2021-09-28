@@ -19,7 +19,7 @@ test_dependencies = [
     "aiohttp>=3,<4",  # for async
     "Flask-Sockets>=0.2,<1",
     "Werkzeug<2",  # TODO: support Flask 2.x
-    "black==21.7b0",
+    "black==21.9b0",
 ]
 
 setuptools.setup(
