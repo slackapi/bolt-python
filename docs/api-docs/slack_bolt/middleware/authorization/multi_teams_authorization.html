@@ -95,8 +95,13 @@ class MultiTeamsAuthorization(Authorization):
                 req.context.client.token = token
                 return next()
             else:
-                # Just in case
-                self.logger.error(&#34;auth.test API call result is unexpectedly None&#34;)
+                # This situation can arise if:
+                # * A developer installed the app from the &#34;Install to Workspace&#34; button in Slack app config page
+                # * The InstallationStore failed to save or deleted the installation for this workspace
+                self.logger.error(
+                    &#34;Although the app should be installed into this workspace, &#34;
+                    &#34;the AuthorizeResult (returned value from authorize) for it was not found.&#34;
+                )
                 return _build_error_response()
 
         except SlackApiError as e:
@@ -181,8 +186,13 @@ class MultiTeamsAuthorization(Authorization):
                 req.context.client.token = token
                 return next()
             else:
-                # Just in case
-                self.logger.error(&#34;auth.test API call result is unexpectedly None&#34;)
+                # This situation can arise if:
+                # * A developer installed the app from the &#34;Install to Workspace&#34; button in Slack app config page
+                # * The InstallationStore failed to save or deleted the installation for this workspace
+                self.logger.error(
+                    &#34;Although the app should be installed into this workspace, &#34;
+                    &#34;the AuthorizeResult (returned value from authorize) for it was not found.&#34;
+                )
                 return _build_error_response()
 
         except SlackApiError as e:

@@ -88,7 +88,10 @@ class CallbackResponseBuilder:
         )
         self._logger.debug(debug_message)
 
-        html = self._redirect_uri_page_renderer.render_failure_page(reason)
+        # Adding a bit more details to the error code to help installers understand what&#39;s happening.
+        # This modification in the HTML page works only when developers use this built-in failure handler.
+        detailed_error = build_detailed_error(reason)
+        html = self._redirect_uri_page_renderer.render_failure_page(detailed_error)
         return BoltResponse(
             status=status,
             headers={
@@ -153,7 +156,24 @@ def select_consistent_installation_store(
             return app_store
     else:
         # only oauth_flow_store is available
-        return oauth_flow_store</code></pre>
+        return oauth_flow_store
+
+
+def build_detailed_error(reason: str) -&gt; str:
+    if reason == &#34;invalid_browser&#34;:
+        return (
+            f&#34;{reason}: This can occur due to page reload, &#34;
+            &#34;not beginning the OAuth flow from the valid starting URL, or &#34;
+            &#34;the /slack/install URL not using https://&#34;
+        )
+    elif reason == &#34;invalid_state&#34;:
+        return f&#34;{reason}: The state parameter is no longer valid.&#34;
+    elif reason == &#34;missing_code&#34;:
+        return f&#34;{reason}: The code parameter is missing in this redirection.&#34;
+    elif reason == &#34;storage_error&#34;:
+        return f&#34;{reason}: The app&#39;s server encountered an issue. Contact the app developer.&#34;
+    else:
+        return f&#34;{reason}: This error code is returned from Slack. Refer to the documents for details.&#34;</code></pre>
 </details>
 </section>
 <section>
@@ -163,6 +183,32 @@ def select_consistent_installation_store(
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="slack_bolt.oauth.internals.build_detailed_error"><code class="name flex">
+<span>def <span class="ident">build_detailed_error</span></span>(<span>reason: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_detailed_error(reason: str) -&gt; str:
+    if reason == &#34;invalid_browser&#34;:
+        return (
+            f&#34;{reason}: This can occur due to page reload, &#34;
+            &#34;not beginning the OAuth flow from the valid starting URL, or &#34;
+            &#34;the /slack/install URL not using https://&#34;
+        )
+    elif reason == &#34;invalid_state&#34;:
+        return f&#34;{reason}: The state parameter is no longer valid.&#34;
+    elif reason == &#34;missing_code&#34;:
+        return f&#34;{reason}: The code parameter is missing in this redirection.&#34;
+    elif reason == &#34;storage_error&#34;:
+        return f&#34;{reason}: The app&#39;s server encountered an issue. Contact the app developer.&#34;
+    else:
+        return f&#34;{reason}: This error code is returned from Slack. Refer to the documents for details.&#34;</code></pre>
+</details>
+</dd>
 <dt id="slack_bolt.oauth.internals.get_or_create_default_installation_store"><code class="name flex">
 <span>def <span class="ident">get_or_create_default_installation_store</span></span>(<span>client_id: str) ‑> slack_sdk.oauth.installation_store.installation_store.InstallationStore</span>
 </code></dt>
@@ -277,7 +323,10 @@ def select_consistent_installation_store(
         )
         self._logger.debug(debug_message)
 
-        html = self._redirect_uri_page_renderer.render_failure_page(reason)
+        # Adding a bit more details to the error code to help installers understand what&#39;s happening.
+        # This modification in the HTML page works only when developers use this built-in failure handler.
+        detailed_error = build_detailed_error(reason)
+        html = self._redirect_uri_page_renderer.render_failure_page(detailed_error)
         return BoltResponse(
             status=status,
             headers={
@@ -304,6 +353,7 @@ def select_consistent_installation_store(
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="slack_bolt.oauth.internals.build_detailed_error" href="#slack_bolt.oauth.internals.build_detailed_error">build_detailed_error</a></code></li>
 <li><code><a title="slack_bolt.oauth.internals.get_or_create_default_installation_store" href="#slack_bolt.oauth.internals.get_or_create_default_installation_store">get_or_create_default_installation_store</a></code></li>
 <li><code><a title="slack_bolt.oauth.internals.select_consistent_installation_store" href="#slack_bolt.oauth.internals.select_consistent_installation_store">select_consistent_installation_store</a></code></li>
 </ul>

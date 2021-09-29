@@ -44,6 +44,9 @@ from slack_bolt.error import BoltError
 
 
 class AsyncAuthorize:
+    &#34;&#34;&#34;This provides authorize function that returns AuthorizeResult
+    for an incoming request from Slack.&#34;&#34;&#34;
+
     def __init__(self):
         pass
 
@@ -59,6 +62,10 @@ class AsyncAuthorize:
 
 
 class AsyncCallableAuthorize(AsyncAuthorize):
+    &#34;&#34;&#34;When you pass the authorize argument in AsyncApp constructor,
+    This authorize implementation will be used.
+    &#34;&#34;&#34;
+
     def __init__(
         self, *, logger: Logger, func: Callable[..., Awaitable[AuthorizeResult]]
     ):
@@ -121,6 +128,11 @@ class AsyncCallableAuthorize(AsyncAuthorize):
 
 
 class AsyncInstallationStoreAuthorize(AsyncAuthorize):
+    &#34;&#34;&#34;If you use the OAuth flow settings, this authorize implementation will be used.
+    As long as your own InstallationStore (or the built-in ones) works as you expect,
+    you can expect that the authorize layer should work for you without any customization.
+    &#34;&#34;&#34;
+
     authorize_result_cache: Dict[str, AuthorizeResult]
     find_installation_available: Optional[bool]
     find_bot_available: Optional[bool]
@@ -325,12 +337,16 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
 <span>class <span class="ident">AsyncAuthorize</span></span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>This provides authorize function that returns AuthorizeResult
+for an incoming request from Slack.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncAuthorize:
+    &#34;&#34;&#34;This provides authorize function that returns AuthorizeResult
+    for an incoming request from Slack.&#34;&#34;&#34;
+
     def __init__(self):
         pass
 
@@ -355,12 +371,17 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
 <span>(</span><span>*, logger: logging.Logger, func: Callable[..., Awaitable[<a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]])</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>When you pass the authorize argument in AsyncApp constructor,
+This authorize implementation will be used.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncCallableAuthorize(AsyncAuthorize):
+    &#34;&#34;&#34;When you pass the authorize argument in AsyncApp constructor,
+    This authorize implementation will be used.
+    &#34;&#34;&#34;
+
     def __init__(
         self, *, logger: Logger, func: Callable[..., Awaitable[AuthorizeResult]]
     ):
@@ -431,12 +452,19 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
 <span>(</span><span>*, logger: logging.Logger, installation_store: slack_sdk.oauth.installation_store.async_installation_store.AsyncInstallationStore, client_id: Optional[str] = None, client_secret: Optional[str] = None, token_rotation_expiration_minutes: Optional[int] = None, bot_only: bool = False, cache_enabled: bool = False)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>If you use the OAuth flow settings, this authorize implementation will be used.
+As long as your own InstallationStore (or the built-in ones) works as you expect,
+you can expect that the authorize layer should work for you without any customization.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncInstallationStoreAuthorize(AsyncAuthorize):
+    &#34;&#34;&#34;If you use the OAuth flow settings, this authorize implementation will be used.
+    As long as your own InstallationStore (or the built-in ones) works as you expect,
+    you can expect that the authorize layer should work for you without any customization.
+    &#34;&#34;&#34;
+
     authorize_result_cache: Dict[str, AuthorizeResult]
     find_installation_available: Optional[bool]
     find_bot_available: Optional[bool]
