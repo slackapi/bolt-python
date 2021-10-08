@@ -842,7 +842,10 @@ class AsyncApp:
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             # As of Jan 2021, most bot messages no longer have the subtype bot_message.
             # By contrast, messages posted using classic app's bot token still have the subtype.
-            constraints = {"type": "message", "subtype": (None, "bot_message")}
+            constraints = {
+                "type": "message",
+                "subtype": (None, "bot_message", "thread_broadcast"),
+            }
             primary_matcher = builtin_matchers.event(
                 constraints=constraints, asyncio=True
             )
