@@ -7,9 +7,23 @@ order: 12
 
 <div class="section-content">
 
-<a href="https://api.slack.com/reference/block-kit/views">モーダルのペイロード</a>に input ブロックを含める場合、その入力値を受け取るために`view_submission` リクエストをリッスンする必要があります。`view_submission` リクエストのリッスンには、組み込みの`view()` メソッドを利用することができます。`view()` の引数には、`str` 型または `re.Pattern` 型の `callback_id` を指定します。
+<a href="https://api.slack.com/reference/block-kit/views">モーダルのペイロード</a>に `input` ブロックを含める場合、その入力値を受け取るために`view_submission` リクエストをリッスンする必要があります。`view_submission` リクエストのリッスンには、組み込みの`view()` メソッドを利用することができます。`view()` の引数には、`str` 型または `re.Pattern` 型の `callback_id` を指定します。
 
 `input` ブロックの値にアクセスするには `state` オブジェクトを参照します。`state` 内には `values` というオブジェクトがあり、`block_id` と一意の `action_id` に紐づける形で入力値を保持しています。
+
+---
+
+##### モーダル送信でのビューの更新
+
+`view_submission` リクエストに対してモーダルを更新するには、`update` 型の `response_action` と新しく作成した `view` を指定すると確認を示します。
+
+```python
+# モーダル送信でのビューの更新
+@app.view("view_1")
+def handle_submission(ack, body):
+    ack(response_action="update", view=build_new_view(body))
+```
+この例と同様に、モーダルでの送信イベントに対して、<a href="https://api.slack.com/surfaces/modals/using#displaying_errors">エラーを表示する</a>プションもあります。
 
 モーダルの送信について詳しくは、<a href="https://api.slack.com/surfaces/modals/using#interactions">API ドキュメント</a>を参照してください。
 
