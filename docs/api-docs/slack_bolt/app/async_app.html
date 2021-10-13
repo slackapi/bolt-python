@@ -868,9 +868,19 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            # As of Jan 2021, most bot messages no longer have the subtype bot_message.
-            # By contrast, messages posted using classic app&#39;s bot token still have the subtype.
-            constraints = {&#34;type&#34;: &#34;message&#34;, &#34;subtype&#34;: (None, &#34;bot_message&#34;)}
+            constraints = {
+                &#34;type&#34;: &#34;message&#34;,
+                &#34;subtype&#34;: (
+                    # In most cases, new message events come with no subtype.
+                    None,
+                    # As of Jan 2021, most bot messages no longer have the subtype bot_message.
+                    # By contrast, messages posted using classic app&#39;s bot token still have the subtype.
+                    &#34;bot_message&#34;,
+                    # If an end-user posts a message with &#34;Also send to #channel&#34; checked,
+                    # the message event comes with this subtype.
+                    &#34;thread_broadcast&#34;,
+                ),
+            }
             primary_matcher = builtin_matchers.event(
                 constraints=constraints, asyncio=True
             )
@@ -2245,9 +2255,19 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            # As of Jan 2021, most bot messages no longer have the subtype bot_message.
-            # By contrast, messages posted using classic app&#39;s bot token still have the subtype.
-            constraints = {&#34;type&#34;: &#34;message&#34;, &#34;subtype&#34;: (None, &#34;bot_message&#34;)}
+            constraints = {
+                &#34;type&#34;: &#34;message&#34;,
+                &#34;subtype&#34;: (
+                    # In most cases, new message events come with no subtype.
+                    None,
+                    # As of Jan 2021, most bot messages no longer have the subtype bot_message.
+                    # By contrast, messages posted using classic app&#39;s bot token still have the subtype.
+                    &#34;bot_message&#34;,
+                    # If an end-user posts a message with &#34;Also send to #channel&#34; checked,
+                    # the message event comes with this subtype.
+                    &#34;thread_broadcast&#34;,
+                ),
+            }
             primary_matcher = builtin_matchers.event(
                 constraints=constraints, asyncio=True
             )
@@ -3615,9 +3635,19 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        # As of Jan 2021, most bot messages no longer have the subtype bot_message.
-        # By contrast, messages posted using classic app&#39;s bot token still have the subtype.
-        constraints = {&#34;type&#34;: &#34;message&#34;, &#34;subtype&#34;: (None, &#34;bot_message&#34;)}
+        constraints = {
+            &#34;type&#34;: &#34;message&#34;,
+            &#34;subtype&#34;: (
+                # In most cases, new message events come with no subtype.
+                None,
+                # As of Jan 2021, most bot messages no longer have the subtype bot_message.
+                # By contrast, messages posted using classic app&#39;s bot token still have the subtype.
+                &#34;bot_message&#34;,
+                # If an end-user posts a message with &#34;Also send to #channel&#34; checked,
+                # the message event comes with this subtype.
+                &#34;thread_broadcast&#34;,
+            ),
+        }
         primary_matcher = builtin_matchers.event(
             constraints=constraints, asyncio=True
         )
