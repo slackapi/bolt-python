@@ -15,7 +15,7 @@ order: 12
 
 ##### モーダル送信でのビューの更新
 
-`view_submission` リクエストに対してモーダルを更新するには、`update` 型の `response_action` と新しく作成した `view` を指定すると確認を示します。
+`view_submission` リクエストに対してモーダルを更新するには、リクエストの確認の中で `update` を指定した `response_action` と新しく作成した `view` を指定します。
 
 ```python
 # モーダル送信でのビューの更新
@@ -23,7 +23,7 @@ order: 12
 def handle_submission(ack, body):
     ack(response_action="update", view=build_new_view(body))
 ```
-この例と同様に、モーダルでの送信イベントに対して、<a href="https://api.slack.com/surfaces/modals/using#displaying_errors">エラーを表示する</a>プションもあります。
+この例と同様に、モーダルでの送信リクエストに対して、<a href="https://api.slack.com/surfaces/modals/using#displaying_errors">エラーを表示する</a>ためのオプションもあります。
 
 モーダルの送信について詳しくは、<a href="https://api.slack.com/surfaces/modals/using#interactions">API ドキュメント</a>を参照してください。
 
