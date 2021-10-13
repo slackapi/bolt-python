@@ -15,7 +15,7 @@ order: 12
 
 ##### モーダル送信でのビューの更新
 
-`view_submission` リクエストに対してモーダルを更新するには、リクエストの確認の中で `update` を指定した `response_action` と新しく作成した `view` を指定します。
+`view_submission` リクエストに対してモーダルを更新するには、リクエストの確認の中で `update` という `response_action` と新しく作成した `view` を指定します。
 
 ```python
 # モーダル送信でのビューの更新
