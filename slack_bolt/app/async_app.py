@@ -183,7 +183,7 @@ class AsyncApp:
             oauth_flow: Instantiated `slack_bolt.oauth.AsyncOAuthFlow`. This is always prioritized over oauth_settings.
             verification_token: Deprecated verification mechanism. This can used only for ssl_check requests.
         """
-        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET")
+        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET", "")
         token = token or os.environ.get("SLACK_BOT_TOKEN")
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
@@ -327,7 +327,7 @@ class AsyncApp:
         # Middleware Initialization
         # --------------------------------------
 
-        self._async_middleware_list: List[Union[Callable, AsyncMiddleware]] = []
+        self._async_middleware_list: List[AsyncMiddleware] = []
         self._async_listeners: List[AsyncListener] = []
 
         self._process_before_response = process_before_response
@@ -506,7 +506,7 @@ class AsyncApp:
         starting_time = time.time()
         self._init_context(req)
 
-        resp: BoltResponse = BoltResponse(status=200, body="")
+        resp: Optional[BoltResponse] = BoltResponse(status=200, body="")
         middleware_state = {"next_called": False}
 
         async def async_middleware_next():
@@ -642,7 +642,8 @@ class AsyncApp:
         if len(args) > 0:
             middleware_or_callable = args[0]
             if isinstance(middleware_or_callable, AsyncMiddleware):
-                self._async_middleware_list.append(middleware_or_callable)
+                middleware: AsyncMiddleware = middleware_or_callable
+                self._async_middleware_list.append(middleware)
             elif isinstance(middleware_or_callable, Callable):
                 self._async_middleware_list.append(
                     AsyncCustomMiddleware(

@@ -29,7 +29,7 @@ class AsyncSlackAppServer:
         """
         self.port = port
         self.path = path
-        self.bolt_app: "AsyncApp" = app
+        self.bolt_app: "AsyncApp" = app  # type: ignore
         self.web_app = web.Application()
         self._bolt_oauth_flow = self.bolt_app.oauth_flow
         if self._bolt_oauth_flow:

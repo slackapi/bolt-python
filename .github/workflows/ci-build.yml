@@ -72,10 +72,7 @@ jobs:
       run: |
         python_version=`python -V`
         if [ ${python_version:7:3} == "3.8" ]; then
-          pip install -e ".[async]"
-          pip install -e ".[adapter]"
-          # TODO: upgrade pytype
-          pip install "pytype==2021.9.27" && pytype slack_bolt/
+          ./scripts/run_pytype.sh
         fi
     - name: Run all tests for codecov (3.9 only)
       run: |
