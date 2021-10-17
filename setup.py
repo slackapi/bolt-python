@@ -13,7 +13,7 @@ with open(f"{here}/README.md", "r") as fh:
     long_description = fh.read()
 
 test_dependencies = [
-    "pytest>=5,<6",
+    "pytest>=6.2.5,<7",
     "pytest-cov>=2,<3",
     "pytest-asyncio<1",  # for async
     "aiohttp>=3,<4",  # for async
