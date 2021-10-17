@@ -15,11 +15,14 @@ with open(f"{here}/README.md", "r") as fh:
 test_dependencies = [
     "pytest>=6.2.5,<7",
     "pytest-cov>=2,<3",
-    "pytest-asyncio<1",  # for async
-    "aiohttp>=3,<4",  # for async
     "Flask-Sockets>=0.2,<1",
     "Werkzeug<2",  # TODO: support Flask 2.x
     "black==21.9b0",
+]
+
+async_test_dependencies = test_dependencies + [
+    "pytest-asyncio<1",  # for async
+    "aiohttp>=3,<4",  # for async
 ]
 
 setuptools.setup(
@@ -45,7 +48,7 @@ setuptools.setup(
         "slack_sdk>=3.9.0,<4",
     ],
     setup_requires=["pytest-runner==5.2"],
-    tests_require=test_dependencies,
+    tests_require=async_test_dependencies,
     test_suite="tests",
     extras_require={
         # pip install -e ".[async]"
@@ -84,8 +87,10 @@ setuptools.setup(
             # Socket Mode 3rd party implementation
             "websocket_client>=1,<2",
         ],
+        # pip install -e ".[testing_without_asyncio]"
+        "testing_without_asyncio": test_dependencies,
         # pip install -e ".[testing]"
-        "testing": test_dependencies,
+        "testing": async_test_dependencies,
     },
     classifiers=[
         "Programming Language :: Python :: 3.6",
