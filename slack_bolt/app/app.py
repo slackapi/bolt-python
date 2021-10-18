@@ -179,7 +179,7 @@ class App:
             listener_executor: Custom executor to run background tasks. If absent, the default `ThreadPoolExecutor` will
                 be used.
         """
-        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET")
+        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET", "")
         token = token or os.environ.get("SLACK_BOT_TOKEN")
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
@@ -304,7 +304,7 @@ class App:
         # Middleware Initialization
         # --------------------------------------
 
-        self._middleware_list: List[Union[Callable, Middleware]] = []
+        self._middleware_list: List[Middleware] = []
         self._listeners: List[Listener] = []
 
         if listener_executor is None:
@@ -469,7 +469,7 @@ class App:
         starting_time = time.time()
         self._init_context(req)
 
-        resp: BoltResponse = BoltResponse(status=200, body="")
+        resp: Optional[BoltResponse] = BoltResponse(status=200, body="")
         middleware_state = {"next_called": False}
 
         def middleware_next():
@@ -607,7 +607,8 @@ class App:
         if len(args) > 0:
             middleware_or_callable = args[0]
             if isinstance(middleware_or_callable, Middleware):
-                self._middleware_list.append(middleware_or_callable)
+                middleware: Middleware = middleware_or_callable
+                self._middleware_list.append(middleware)
             elif isinstance(middleware_or_callable, Callable):
                 self._middleware_list.append(
                     CustomMiddleware(app_name=self.name, func=middleware_or_callable)
