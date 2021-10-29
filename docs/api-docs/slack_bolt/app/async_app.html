@@ -211,7 +211,7 @@ class AsyncApp:
             oauth_flow: Instantiated `slack_bolt.oauth.AsyncOAuthFlow`. This is always prioritized over oauth_settings.
             verification_token: Deprecated verification mechanism. This can used only for ssl_check requests.
         &#34;&#34;&#34;
-        signing_secret = signing_secret or os.environ.get(&#34;SLACK_SIGNING_SECRET&#34;)
+        signing_secret = signing_secret or os.environ.get(&#34;SLACK_SIGNING_SECRET&#34;, &#34;&#34;)
         token = token or os.environ.get(&#34;SLACK_BOT_TOKEN&#34;)
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
@@ -355,7 +355,7 @@ class AsyncApp:
         # Middleware Initialization
         # --------------------------------------
 
-        self._async_middleware_list: List[Union[Callable, AsyncMiddleware]] = []
+        self._async_middleware_list: List[AsyncMiddleware] = []
         self._async_listeners: List[AsyncListener] = []
 
         self._process_before_response = process_before_response
@@ -534,7 +534,7 @@ class AsyncApp:
         starting_time = time.time()
         self._init_context(req)
 
-        resp: BoltResponse = BoltResponse(status=200, body=&#34;&#34;)
+        resp: Optional[BoltResponse] = BoltResponse(status=200, body=&#34;&#34;)
         middleware_state = {&#34;next_called&#34;: False}
 
         async def async_middleware_next():
@@ -670,7 +670,8 @@ class AsyncApp:
         if len(args) &gt; 0:
             middleware_or_callable = args[0]
             if isinstance(middleware_or_callable, AsyncMiddleware):
-                self._async_middleware_list.append(middleware_or_callable)
+                middleware: AsyncMiddleware = middleware_or_callable
+                self._async_middleware_list.append(middleware)
             elif isinstance(middleware_or_callable, Callable):
                 self._async_middleware_list.append(
                     AsyncCustomMiddleware(
@@ -1598,7 +1599,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             oauth_flow: Instantiated `slack_bolt.oauth.AsyncOAuthFlow`. This is always prioritized over oauth_settings.
             verification_token: Deprecated verification mechanism. This can used only for ssl_check requests.
         &#34;&#34;&#34;
-        signing_secret = signing_secret or os.environ.get(&#34;SLACK_SIGNING_SECRET&#34;)
+        signing_secret = signing_secret or os.environ.get(&#34;SLACK_SIGNING_SECRET&#34;, &#34;&#34;)
         token = token or os.environ.get(&#34;SLACK_BOT_TOKEN&#34;)
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
@@ -1742,7 +1743,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         # Middleware Initialization
         # --------------------------------------
 
-        self._async_middleware_list: List[Union[Callable, AsyncMiddleware]] = []
+        self._async_middleware_list: List[AsyncMiddleware] = []
         self._async_listeners: List[AsyncListener] = []
 
         self._process_before_response = process_before_response
@@ -1921,7 +1922,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         starting_time = time.time()
         self._init_context(req)
 
-        resp: BoltResponse = BoltResponse(status=200, body=&#34;&#34;)
+        resp: Optional[BoltResponse] = BoltResponse(status=200, body=&#34;&#34;)
         middleware_state = {&#34;next_called&#34;: False}
 
         async def async_middleware_next():
@@ -2057,7 +2058,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         if len(args) &gt; 0:
             middleware_or_callable = args[0]
             if isinstance(middleware_or_callable, AsyncMiddleware):
-                self._async_middleware_list.append(middleware_or_callable)
+                middleware: AsyncMiddleware = middleware_or_callable
+                self._async_middleware_list.append(middleware)
             elif isinstance(middleware_or_callable, Callable):
                 self._async_middleware_list.append(
                     AsyncCustomMiddleware(
@@ -3005,7 +3007,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     starting_time = time.time()
     self._init_context(req)
 
-    resp: BoltResponse = BoltResponse(status=200, body=&#34;&#34;)
+    resp: Optional[BoltResponse] = BoltResponse(status=200, body=&#34;&#34;)
     middleware_state = {&#34;next_called&#34;: False}
 
     async def async_middleware_next():
@@ -3732,7 +3734,8 @@ app.middleware(middleware_func)
     if len(args) &gt; 0:
         middleware_or_callable = args[0]
         if isinstance(middleware_or_callable, AsyncMiddleware):
-            self._async_middleware_list.append(middleware_or_callable)
+            middleware: AsyncMiddleware = middleware_or_callable
+            self._async_middleware_list.append(middleware)
         elif isinstance(middleware_or_callable, Callable):
             self._async_middleware_list.append(
                 AsyncCustomMiddleware(

@@ -57,7 +57,7 @@ class AsyncSlackAppServer:
         &#34;&#34;&#34;
         self.port = port
         self.path = path
-        self.bolt_app: &#34;AsyncApp&#34; = app
+        self.bolt_app: &#34;AsyncApp&#34; = app  # type: ignore
         self.web_app = web.Application()
         self._bolt_oauth_flow = self.bolt_app.oauth_flow
         if self._bolt_oauth_flow:
@@ -161,7 +161,7 @@ Refer to <a href="https://docs.aiohttp.org/en/stable/web.html">https://docs.aioh
         &#34;&#34;&#34;
         self.port = port
         self.path = path
-        self.bolt_app: &#34;AsyncApp&#34; = app
+        self.bolt_app: &#34;AsyncApp&#34; = app  # type: ignore
         self.web_app = web.Application()
         self._bolt_oauth_flow = self.bolt_app.oauth_flow
         if self._bolt_oauth_flow:

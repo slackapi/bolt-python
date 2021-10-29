@@ -207,7 +207,7 @@ class App:
             listener_executor: Custom executor to run background tasks. If absent, the default `ThreadPoolExecutor` will
                 be used.
         &#34;&#34;&#34;
-        signing_secret = signing_secret or os.environ.get(&#34;SLACK_SIGNING_SECRET&#34;)
+        signing_secret = signing_secret or os.environ.get(&#34;SLACK_SIGNING_SECRET&#34;, &#34;&#34;)
         token = token or os.environ.get(&#34;SLACK_BOT_TOKEN&#34;)
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
@@ -332,7 +332,7 @@ class App:
         # Middleware Initialization
         # --------------------------------------
 
-        self._middleware_list: List[Union[Callable, Middleware]] = []
+        self._middleware_list: List[Middleware] = []
         self._listeners: List[Listener] = []
 
         if listener_executor is None:
@@ -497,7 +497,7 @@ class App:
         starting_time = time.time()
         self._init_context(req)
 
-        resp: BoltResponse = BoltResponse(status=200, body=&#34;&#34;)
+        resp: Optional[BoltResponse] = BoltResponse(status=200, body=&#34;&#34;)
         middleware_state = {&#34;next_called&#34;: False}
 
         def middleware_next():
@@ -635,7 +635,8 @@ class App:
         if len(args) &gt; 0:
             middleware_or_callable = args[0]
             if isinstance(middleware_or_callable, Middleware):
-                self._middleware_list.append(middleware_or_callable)
+                middleware: Middleware = middleware_or_callable
+                self._middleware_list.append(middleware)
             elif isinstance(middleware_or_callable, Callable):
                 self._middleware_list.append(
                     CustomMiddleware(app_name=self.name, func=middleware_or_callable)
@@ -1668,7 +1669,7 @@ be used.</dd>
             listener_executor: Custom executor to run background tasks. If absent, the default `ThreadPoolExecutor` will
                 be used.
         &#34;&#34;&#34;
-        signing_secret = signing_secret or os.environ.get(&#34;SLACK_SIGNING_SECRET&#34;)
+        signing_secret = signing_secret or os.environ.get(&#34;SLACK_SIGNING_SECRET&#34;, &#34;&#34;)
         token = token or os.environ.get(&#34;SLACK_BOT_TOKEN&#34;)
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
@@ -1793,7 +1794,7 @@ be used.</dd>
         # Middleware Initialization
         # --------------------------------------
 
-        self._middleware_list: List[Union[Callable, Middleware]] = []
+        self._middleware_list: List[Middleware] = []
         self._listeners: List[Listener] = []
 
         if listener_executor is None:
@@ -1958,7 +1959,7 @@ be used.</dd>
         starting_time = time.time()
         self._init_context(req)
 
-        resp: BoltResponse = BoltResponse(status=200, body=&#34;&#34;)
+        resp: Optional[BoltResponse] = BoltResponse(status=200, body=&#34;&#34;)
         middleware_state = {&#34;next_called&#34;: False}
 
         def middleware_next():
@@ -2096,7 +2097,8 @@ be used.</dd>
         if len(args) &gt; 0:
             middleware_or_callable = args[0]
             if isinstance(middleware_or_callable, Middleware):
-                self._middleware_list.append(middleware_or_callable)
+                middleware: Middleware = middleware_or_callable
+                self._middleware_list.append(middleware)
             elif isinstance(middleware_or_callable, Callable):
                 self._middleware_list.append(
                     CustomMiddleware(app_name=self.name, func=middleware_or_callable)
@@ -3292,7 +3294,7 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
     starting_time = time.time()
     self._init_context(req)
 
-    resp: BoltResponse = BoltResponse(status=200, body=&#34;&#34;)
+    resp: Optional[BoltResponse] = BoltResponse(status=200, body=&#34;&#34;)
     middleware_state = {&#34;next_called&#34;: False}
 
     def middleware_next():
@@ -3732,7 +3734,8 @@ app.middleware(middleware_func)
     if len(args) &gt; 0:
         middleware_or_callable = args[0]
         if isinstance(middleware_or_callable, Middleware):
-            self._middleware_list.append(middleware_or_callable)
+            middleware: Middleware = middleware_or_callable
+            self._middleware_list.append(middleware)
         elif isinstance(middleware_or_callable, Callable):
             self._middleware_list.append(
                 CustomMiddleware(app_name=self.name, func=middleware_or_callable)
