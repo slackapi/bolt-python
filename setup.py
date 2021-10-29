@@ -14,7 +14,7 @@ with open(f"{here}/README.md", "r") as fh:
 
 test_dependencies = [
     "pytest>=6.2.5,<7",
-    "pytest-cov>=2,<3",
+    "pytest-cov>=3,<4",
     "Flask-Sockets>=0.2,<1",
     "Werkzeug<2",  # TODO: support Flask 2.x
     "black==21.9b0",
@@ -67,18 +67,18 @@ setuptools.setup(
             "moto<2",  # For AWS tests
             "bottle>=0.12,<1",
             "boddle>=0.2,<0.3",  # For Bottle app tests
-            "chalice>=1.22.4,<2",
+            "chalice>=1.26.1,<2",
             "click>=7,<8",  # for chalice
             "CherryPy>=18,<19",
             "Django>=3,<4",
             "falcon>=2,<3",
-            "fastapi<1",
+            "fastapi>=0.70.0,<1",
             "Flask>=1,<2",
             "Werkzeug<2",  # TODO: support Flask 2.x
             "pyramid>=1,<2",
             "sanic>=21,<22" if sys.version_info.minor > 6 else "sanic>=20,<21",
-            "sanic-testing>=0.6" if sys.version_info.minor > 6 else "",
-            "starlette>=0.13,<1",
+            "sanic-testing>=0.7" if sys.version_info.minor > 6 else "",
+            "starlette>=0.14,<1",
             "requests>=2,<3",  # For starlette's TestClient
             "tornado>=6,<7",
             # server
