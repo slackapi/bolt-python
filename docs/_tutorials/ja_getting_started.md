@@ -228,12 +228,6 @@ def message_hello(message, say):
         text=f"Hey there <@{message['user']}>!"
     )
 
-@app.action("button_click")
-def action_button_click(body, ack, say):
-    # アクションのリクエストを確認
-    ack()
-    say(f"<@{body['user']['id']}> clicked the button")
-
 # アプリを起動します
 if __name__ == "__main__":
     SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
