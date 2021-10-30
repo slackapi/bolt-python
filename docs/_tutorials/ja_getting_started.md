@@ -95,7 +95,7 @@ Bolt for Python のパッケージを新しいプロジェクトにインスト�
 export SLACK_BOT_TOKEN=xoxb-<ボットトークン>
 ```
 
-2. **OAuth & Permissions ページのアプリレベルトークン（xapp）をコピー**して、別の環境変数に保存します。
+2. **Basic Information ページのアプリレベルトークン（xapp）をコピー**して、別の環境変数に保存します。
 ```shell
 export SLACK_APP_TOKEN=<アプリレベルトークン>
 ```
