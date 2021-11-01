@@ -54,15 +54,15 @@ def to_django_response(bolt_resp: BoltResponse) -> HttpResponse:
     return resp
 
 
-from django.db import connections
+from django.db import close_old_connections
 
 
 def release_thread_local_connections(logger: Logger, execution_type: str):
-    connections.close_all()
+    close_old_connections()
     if logger.level <= logging.DEBUG:
         current: Thread = current_thread()
         logger.debug(
-            f"Released thread-bound DB connections (thread name: {current.name}, execution type: {execution_type})"
+            f"close_old_connections called to manage thread-bound DB connections (thread name: {current.name}, execution type: {execution_type})"
         )
 
 
@@ -124,8 +124,8 @@ class SlackRequestHandler:
             Bolt skipped to set it to slack_sdk.adapter.django.DjangoListenerCompletionHandler.
             We strongly recommend having the following lines of code in your listener_completion_handler:
 
-            from django.db import connections
-            connections.close_all()
+            from django.db import close_old_connections
+            close_old_connections()
             """
             self.app.logger.warning(message)
             return
