@@ -54,15 +54,16 @@ def to_django_response(bolt_resp: BoltResponse) -> HttpResponse:
     return resp
 
 
-from django.db import connections
+from django.db import close_old_connections
 
 
-def release_thread_local_connections(logger: Logger, execution_type: str):
-    connections.close_all()
+def release_thread_local_connections(logger: Logger, execution_timing: str):
+    close_old_connections()
     if logger.level <= logging.DEBUG:
         current: Thread = current_thread()
         logger.debug(
-            f"Released thread-bound DB connections (thread name: {current.name}, execution type: {execution_type})"
+            "Released thread-bound old DB connections "
+            f"(thread name: {current.name}, execution timing: {execution_timing})"
         )
 
 
@@ -73,7 +74,7 @@ class DjangoListenerCompletionHandler(ListenerCompletionHandler):
     """
 
     def handle(self, request: BoltRequest, response: Optional[BoltResponse]) -> None:
-        release_thread_local_connections(request.context.logger, "listener")
+        release_thread_local_connections(request.context.logger, "listener-completion")
 
 
 class DjangoThreadLazyListenerRunner(ThreadLazyListenerRunner):
@@ -89,7 +90,7 @@ class DjangoThreadLazyListenerRunner(ThreadLazyListenerRunner):
                 func()
             finally:
                 release_thread_local_connections(
-                    request.context.logger, "lazy-listener"
+                    request.context.logger, "lazy-listener-completion"
                 )
 
         self.executor.submit(wrapped_func)
@@ -120,14 +121,12 @@ class SlackRequestHandler:
         if current_completion_handler is not None and not isinstance(
             current_completion_handler, DefaultListenerCompletionHandler
         ):
+            # As we run release_thread_local_connections() before listener executions,
+            # it's okay to skip calling the same connection clean-up method at the listener completion.
             message = """As you've already set app.listener_runner.listener_completion_handler to your own one,
             Bolt skipped to set it to slack_sdk.adapter.django.DjangoListenerCompletionHandler.
-            We strongly recommend having the following lines of code in your listener_completion_handler:
-
-            from django.db import connections
-            connections.close_all()
             """
-            self.app.logger.warning(message)
+            self.app.logger.info(message)
             return
         # for proper management of thread-local Django DB connections
         self.app.listener_runner.listener_completion_handler = (
@@ -146,6 +145,13 @@ class SlackRequestHandler:
                     bolt_resp = oauth_flow.handle_callback(to_bolt_request(req))
                     return to_django_response(bolt_resp)
         elif req.method == "POST":
+            # As bolt-python utilizes threads for async `ack()` method execution,
+            # we have to manually clean old/stale Django ORM connections bound to the "unmanaged" threads
+            # Refer to https://github.com/slackapi/bolt-python/issues/280 for more details.
+            release_thread_local_connections(
+                self.app.logger, "before-listener-invocation"
+            )
+            # And then, run the App listener/lazy listener here
             bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(req))
             return to_django_response(bolt_resp)
 
