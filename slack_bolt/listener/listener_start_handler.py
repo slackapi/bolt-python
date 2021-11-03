@@ -8,14 +8,18 @@ from slack_bolt.request.request import BoltRequest
 from slack_bolt.response.response import BoltResponse
 
 
-class ListenerCompletionHandler(metaclass=ABCMeta):
+class ListenerStartHandler(metaclass=ABCMeta):
     @abstractmethod
     def handle(
         self,
         request: BoltRequest,
         response: Optional[BoltResponse],
     ) -> None:
-        """Do something extra after the listener execution
+        """Do something extra before the listener execution.
+
+        This handler is useful if a developer needs to maintain/clean up
+        thread-local resources such as Django ORM database connections
+        before a listener execution starts.
 
         Args:
             request: The request.
@@ -24,7 +28,7 @@ class ListenerCompletionHandler(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-class CustomListenerCompletionHandler(ListenerCompletionHandler):
+class CustomListenerStartHandler(ListenerStartHandler):
     def __init__(self, logger: Logger, func: Callable[..., None]):
         self.func = func
         self.logger = logger
@@ -45,7 +49,7 @@ class CustomListenerCompletionHandler(ListenerCompletionHandler):
         self.func(**kwargs)
 
 
-class DefaultListenerCompletionHandler(ListenerCompletionHandler):
+class DefaultListenerStartHandler(ListenerStartHandler):
     def __init__(self, logger: Logger):
         self.logger = logger
 

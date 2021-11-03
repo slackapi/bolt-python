@@ -8,14 +8,14 @@ from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 
 
-class AsyncListenerCompletionHandler(metaclass=ABCMeta):
+class AsyncListenerStartHandler(metaclass=ABCMeta):
     @abstractmethod
     async def handle(
         self,
         request: AsyncBoltRequest,
         response: Optional[BoltResponse],
     ) -> None:
-        """Do something extra after the listener execution
+        """Do something extra before the listener execution
 
         Args:
             request: The request.
@@ -24,7 +24,7 @@ class AsyncListenerCompletionHandler(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-class AsyncCustomListenerCompletionHandler(AsyncListenerCompletionHandler):
+class AsyncCustomListenerStartHandler(AsyncListenerStartHandler):
     def __init__(self, logger: Logger, func: Callable[..., Awaitable[None]]):
         self.func = func
         self.logger = logger
@@ -45,7 +45,7 @@ class AsyncCustomListenerCompletionHandler(AsyncListenerCompletionHandler):
         await self.func(**kwargs)
 
 
-class AsyncDefaultListenerCompletionHandler(AsyncListenerCompletionHandler):
+class AsyncDefaultListenerStartHandler(AsyncListenerStartHandler):
     def __init__(self, logger: Logger):
         self.logger = logger
 

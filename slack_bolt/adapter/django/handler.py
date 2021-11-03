@@ -9,6 +9,10 @@ from slack_bolt.app import App
 from slack_bolt.error import BoltError
 from slack_bolt.lazy_listener import ThreadLazyListenerRunner
 from slack_bolt.lazy_listener.internals import build_runnable_function
+from slack_bolt.listener.listener_start_handler import (
+    ListenerStartHandler,
+    DefaultListenerStartHandler,
+)
 from slack_bolt.listener.listener_completion_handler import (
     ListenerCompletionHandler,
     DefaultListenerCompletionHandler,
@@ -67,6 +71,16 @@ def release_thread_local_connections(logger: Logger, execution_timing: str):
         )
 
 
+class DjangoListenerStartHandler(ListenerStartHandler):
+    """Django sets DB connections as a thread-local variable per thread.
+    If the thread is not managed on the Django app side, the connections won't be released by Django.
+    This handler releases the connections every time a ThreadListenerRunner execution completes.
+    """
+
+    def handle(self, request: BoltRequest, response: Optional[BoltResponse]) -> None:
+        release_thread_local_connections(request.context.logger, "listener-start")
+
+
 class DjangoListenerCompletionHandler(ListenerCompletionHandler):
     """Django sets DB connections as a thread-local variable per thread.
     If the thread is not managed on the Django app side, the connections won't be released by Django.
@@ -86,6 +100,9 @@ class DjangoThreadLazyListenerRunner(ThreadLazyListenerRunner):
         )
 
         def wrapped_func():
+            release_thread_local_connections(
+                request.context.logger, "before-lazy-listener"
+            )
             try:
                 func()
             finally:
@@ -117,6 +134,29 @@ class SlackRequestHandler:
             self.app.logger.debug("App.process_before_response is set to True")
             return
 
+        current_start_handler = listener_runner.listener_start_handler
+        if current_start_handler is not None and not isinstance(
+            current_start_handler, DefaultListenerStartHandler
+        ):
+            # As we run release_thread_local_connections() before listener executions,
+            # it's okay to skip calling the same connection clean-up method at the listener completion.
+            message = """As you've already set app.listener_runner.listener_start_handler to your own one,
+            Bolt skipped to set it to slack_sdk.adapter.django.DjangoListenerStartHandler.
+            
+            If you go with your own handler here, we highly recommend having the following lines of code 
+            in your handle() method to clean up unmanaged stale/old database connections:
+
+            from django.db import close_old_connections
+            close_old_connections()
+            """
+            self.app.logger.info(message)
+        else:
+            # for proper management of thread-local Django DB connections
+            self.app.listener_runner.listener_start_handler = (
+                DjangoListenerStartHandler()
+            )
+            self.app.logger.debug("DjangoListenerStartHandler has been enabled")
+
         current_completion_handler = listener_runner.listener_completion_handler
         if current_completion_handler is not None and not isinstance(
             current_completion_handler, DefaultListenerCompletionHandler
@@ -145,13 +185,6 @@ class SlackRequestHandler:
                     bolt_resp = oauth_flow.handle_callback(to_bolt_request(req))
                     return to_django_response(bolt_resp)
         elif req.method == "POST":
-            # As bolt-python utilizes threads for async `ack()` method execution,
-            # we have to manually clean old/stale Django ORM connections bound to the "unmanaged" threads
-            # Refer to https://github.com/slackapi/bolt-python/issues/280 for more details.
-            release_thread_local_connections(
-                self.app.logger, "before-listener-invocation"
-            )
-            # And then, run the App listener/lazy listener here
             bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(req))
             return to_django_response(bolt_resp)
 

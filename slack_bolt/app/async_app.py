@@ -8,6 +8,9 @@ from aiohttp import web
 
 from slack_bolt.app.async_server import AsyncSlackAppServer
 from slack_bolt.listener.async_builtins import AsyncTokenRevocationListeners
+from slack_bolt.listener.async_listener_start_handler import (
+    AsyncDefaultListenerStartHandler,
+)
 from slack_bolt.listener.async_listener_completion_handler import (
     AsyncDefaultListenerCompletionHandler,
 )
@@ -335,6 +338,9 @@ class AsyncApp:
             logger=self._framework_logger,
             process_before_response=process_before_response,
             listener_error_handler=AsyncDefaultListenerErrorHandler(
+                logger=self._framework_logger
+            ),
+            listener_start_handler=AsyncDefaultListenerStartHandler(
                 logger=self._framework_logger
             ),
             listener_completion_handler=AsyncDefaultListenerCompletionHandler(
