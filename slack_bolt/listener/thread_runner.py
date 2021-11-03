@@ -5,6 +5,7 @@ from typing import Optional, Callable
 
 from slack_bolt.lazy_listener import LazyListenerRunner
 from slack_bolt.listener import Listener
+from slack_bolt.listener.listener_start_handler import ListenerStartHandler
 from slack_bolt.listener.listener_completion_handler import ListenerCompletionHandler
 from slack_bolt.listener.listener_error_handler import ListenerErrorHandler
 from slack_bolt.logger.messages import (
@@ -21,6 +22,7 @@ class ThreadListenerRunner:
     logger: Logger
     process_before_response: bool
     listener_error_handler: ListenerErrorHandler
+    listener_start_handler: ListenerStartHandler
     listener_completion_handler: ListenerCompletionHandler
     listener_executor: Executor
     lazy_listener_runner: LazyListenerRunner
@@ -30,6 +32,7 @@ class ThreadListenerRunner:
         logger: Logger,
         process_before_response: bool,
         listener_error_handler: ListenerErrorHandler,
+        listener_start_handler: ListenerStartHandler,
         listener_completion_handler: ListenerCompletionHandler,
         listener_executor: Executor,
         lazy_listener_runner: LazyListenerRunner,
@@ -37,6 +40,7 @@ class ThreadListenerRunner:
         self.logger = logger
         self.process_before_response = process_before_response
         self.listener_error_handler = listener_error_handler
+        self.listener_start_handler = listener_start_handler
         self.listener_completion_handler = listener_completion_handler
         self.listener_executor = listener_executor
         self.lazy_listener_runner = lazy_listener_runner
@@ -54,6 +58,10 @@ class ThreadListenerRunner:
         if self.process_before_response:
             if not request.lazy_only:
                 try:
+                    self.listener_start_handler.handle(
+                        request=request,
+                        response=response,
+                    )
                     returned_value = listener.run_ack_function(
                         request=request, response=response
                     )
@@ -109,6 +117,10 @@ class ThreadListenerRunner:
                 def run_ack_function_asynchronously():
                     nonlocal ack, request, response
                     try:
+                        self.listener_start_handler.handle(
+                            request=request,
+                            response=response,
+                        )
                         listener.run_ack_function(request=request, response=response)
                     except Exception as e:
                         # The default response status code is 500 in this case.

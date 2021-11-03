@@ -23,6 +23,7 @@ from slack_bolt.lazy_listener.thread_runner import ThreadLazyListenerRunner
 from slack_bolt.listener.builtins import TokenRevocationListeners
 from slack_bolt.listener.custom_listener import CustomListener
 from slack_bolt.listener.listener import Listener
+from slack_bolt.listener.listener_start_handler import DefaultListenerStartHandler
 from slack_bolt.listener.listener_completion_handler import (
     DefaultListenerCompletionHandler,
 )
@@ -315,6 +316,9 @@ class App:
             logger=self._framework_logger,
             process_before_response=process_before_response,
             listener_error_handler=DefaultListenerErrorHandler(
+                logger=self._framework_logger
+            ),
+            listener_start_handler=DefaultListenerStartHandler(
                 logger=self._framework_logger
             ),
             listener_completion_handler=DefaultListenerCompletionHandler(

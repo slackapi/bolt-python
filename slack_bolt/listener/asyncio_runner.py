@@ -7,6 +7,9 @@ from typing import Optional, Callable, Awaitable
 from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.lazy_listener.async_runner import AsyncLazyListenerRunner
 from slack_bolt.listener.async_listener import AsyncListener
+from slack_bolt.listener.async_listener_start_handler import (
+    AsyncListenerStartHandler,
+)
 from slack_bolt.listener.async_listener_completion_handler import (
     AsyncListenerCompletionHandler,
 )
@@ -25,6 +28,7 @@ class AsyncioListenerRunner:
     logger: Logger
     process_before_response: bool
     listener_error_handler: AsyncListenerErrorHandler
+    listener_start_handler: AsyncListenerStartHandler
     listener_completion_handler: AsyncListenerCompletionHandler
     lazy_listener_runner: AsyncLazyListenerRunner
 
@@ -33,12 +37,14 @@ class AsyncioListenerRunner:
         logger: Logger,
         process_before_response: bool,
         listener_error_handler: AsyncListenerErrorHandler,
+        listener_start_handler: AsyncListenerStartHandler,
         listener_completion_handler: AsyncListenerCompletionHandler,
         lazy_listener_runner: AsyncLazyListenerRunner,
     ):
         self.logger = logger
         self.process_before_response = process_before_response
         self.listener_error_handler = listener_error_handler
+        self.listener_start_handler = listener_start_handler
         self.listener_completion_handler = listener_completion_handler
         self.lazy_listener_runner = lazy_listener_runner
 
@@ -55,6 +61,9 @@ class AsyncioListenerRunner:
         if self.process_before_response:
             if not request.lazy_only:
                 try:
+                    await self.listener_start_handler.handle(
+                        request=request, response=response
+                    )
                     returned_value = await listener.run_ack_function(
                         request=request, response=response
                     )
@@ -113,6 +122,9 @@ class AsyncioListenerRunner:
                     response: BoltResponse,
                 ):
                     try:
+                        await self.listener_start_handler.handle(
+                            request=request, response=response
+                        )
                         await listener.run_ack_function(
                             request=request, response=response
                         )
