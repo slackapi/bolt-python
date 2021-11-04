@@ -17,7 +17,7 @@ test_dependencies = [
     "pytest-cov>=3,<4",
     "Flask-Sockets>=0.2,<1",
     "Werkzeug<2",  # TODO: support Flask 2.x
-    "black==21.9b0",
+    "black==21.10b0",
 ]
 
 async_test_dependencies = test_dependencies + [
