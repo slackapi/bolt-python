@@ -37,6 +37,10 @@ from slack_bolt.app import App
 from slack_bolt.error import BoltError
 from slack_bolt.lazy_listener import ThreadLazyListenerRunner
 from slack_bolt.lazy_listener.internals import build_runnable_function
+from slack_bolt.listener.listener_start_handler import (
+    ListenerStartHandler,
+    DefaultListenerStartHandler,
+)
 from slack_bolt.listener.listener_completion_handler import (
     ListenerCompletionHandler,
     DefaultListenerCompletionHandler,
@@ -82,16 +86,27 @@ def to_django_response(bolt_resp: BoltResponse) -&gt; HttpResponse:
     return resp
 
 
-from django.db import connections
+from django.db import close_old_connections
 
 
-def release_thread_local_connections(logger: Logger, execution_type: str):
-    connections.close_all()
+def release_thread_local_connections(logger: Logger, execution_timing: str):
+    close_old_connections()
     if logger.level &lt;= logging.DEBUG:
         current: Thread = current_thread()
         logger.debug(
-            f&#34;Released thread-bound DB connections (thread name: {current.name}, execution type: {execution_type})&#34;
+            &#34;Released thread-bound old DB connections &#34;
+            f&#34;(thread name: {current.name}, execution timing: {execution_timing})&#34;
         )
+
+
+class DjangoListenerStartHandler(ListenerStartHandler):
+    &#34;&#34;&#34;Django sets DB connections as a thread-local variable per thread.
+    If the thread is not managed on the Django app side, the connections won&#39;t be released by Django.
+    This handler releases the connections every time a ThreadListenerRunner execution completes.
+    &#34;&#34;&#34;
+
+    def handle(self, request: BoltRequest, response: Optional[BoltResponse]) -&gt; None:
+        release_thread_local_connections(request.context.logger, &#34;listener-start&#34;)
 
 
 class DjangoListenerCompletionHandler(ListenerCompletionHandler):
@@ -101,7 +116,7 @@ class DjangoListenerCompletionHandler(ListenerCompletionHandler):
     &#34;&#34;&#34;
 
     def handle(self, request: BoltRequest, response: Optional[BoltResponse]) -&gt; None:
-        release_thread_local_connections(request.context.logger, &#34;listener&#34;)
+        release_thread_local_connections(request.context.logger, &#34;listener-completion&#34;)
 
 
 class DjangoThreadLazyListenerRunner(ThreadLazyListenerRunner):
@@ -113,11 +128,14 @@ class DjangoThreadLazyListenerRunner(ThreadLazyListenerRunner):
         )
 
         def wrapped_func():
+            release_thread_local_connections(
+                request.context.logger, &#34;before-lazy-listener&#34;
+            )
             try:
                 func()
             finally:
                 release_thread_local_connections(
-                    request.context.logger, &#34;lazy-listener&#34;
+                    request.context.logger, &#34;lazy-listener-completion&#34;
                 )
 
         self.executor.submit(wrapped_func)
@@ -144,18 +162,39 @@ class SlackRequestHandler:
             self.app.logger.debug(&#34;App.process_before_response is set to True&#34;)
             return
 
+        current_start_handler = listener_runner.listener_start_handler
+        if current_start_handler is not None and not isinstance(
+            current_start_handler, DefaultListenerStartHandler
+        ):
+            # As we run release_thread_local_connections() before listener executions,
+            # it&#39;s okay to skip calling the same connection clean-up method at the listener completion.
+            message = &#34;&#34;&#34;As you&#39;ve already set app.listener_runner.listener_start_handler to your own one,
+            Bolt skipped to set it to slack_sdk.adapter.django.DjangoListenerStartHandler.
+            
+            If you go with your own handler here, we highly recommend having the following lines of code 
+            in your handle() method to clean up unmanaged stale/old database connections:
+
+            from django.db import close_old_connections
+            close_old_connections()
+            &#34;&#34;&#34;
+            self.app.logger.info(message)
+        else:
+            # for proper management of thread-local Django DB connections
+            self.app.listener_runner.listener_start_handler = (
+                DjangoListenerStartHandler()
+            )
+            self.app.logger.debug(&#34;DjangoListenerStartHandler has been enabled&#34;)
+
         current_completion_handler = listener_runner.listener_completion_handler
         if current_completion_handler is not None and not isinstance(
             current_completion_handler, DefaultListenerCompletionHandler
         ):
+            # As we run release_thread_local_connections() before listener executions,
+            # it&#39;s okay to skip calling the same connection clean-up method at the listener completion.
             message = &#34;&#34;&#34;As you&#39;ve already set app.listener_runner.listener_completion_handler to your own one,
             Bolt skipped to set it to slack_sdk.adapter.django.DjangoListenerCompletionHandler.
-            We strongly recommend having the following lines of code in your listener_completion_handler:
-
-            from django.db import connections
-            connections.close_all()
             &#34;&#34;&#34;
-            self.app.logger.warning(message)
+            self.app.logger.info(message)
             return
         # for proper management of thread-local Django DB connections
         self.app.listener_runner.listener_completion_handler = (
@@ -188,7 +227,7 @@ class SlackRequestHandler:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="slack_bolt.adapter.django.handler.release_thread_local_connections"><code class="name flex">
-<span>def <span class="ident">release_thread_local_connections</span></span>(<span>logger: logging.Logger, execution_type: str)</span>
+<span>def <span class="ident">release_thread_local_connections</span></span>(<span>logger: logging.Logger, execution_timing: str)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -196,12 +235,13 @@ class SlackRequestHandler:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def release_thread_local_connections(logger: Logger, execution_type: str):
-    connections.close_all()
+<pre><code class="python">def release_thread_local_connections(logger: Logger, execution_timing: str):
+    close_old_connections()
     if logger.level &lt;= logging.DEBUG:
         current: Thread = current_thread()
         logger.debug(
-            f&#34;Released thread-bound DB connections (thread name: {current.name}, execution type: {execution_type})&#34;
+            &#34;Released thread-bound old DB connections &#34;
+            f&#34;(thread name: {current.name}, execution timing: {execution_timing})&#34;
         )</code></pre>
 </details>
 </dd>
@@ -281,7 +321,7 @@ This handler releases the connections every time a ThreadListenerRunner executio
     &#34;&#34;&#34;
 
     def handle(self, request: BoltRequest, response: Optional[BoltResponse]) -&gt; None:
-        release_thread_local_connections(request.context.logger, &#34;listener&#34;)</code></pre>
+        release_thread_local_connections(request.context.logger, &#34;listener-completion&#34;)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -292,6 +332,39 @@ This handler releases the connections every time a ThreadListenerRunner executio
 <li><code><b><a title="slack_bolt.listener.listener_completion_handler.ListenerCompletionHandler" href="../../listener/listener_completion_handler.html#slack_bolt.listener.listener_completion_handler.ListenerCompletionHandler">ListenerCompletionHandler</a></b></code>:
 <ul class="hlist">
 <li><code><a title="slack_bolt.listener.listener_completion_handler.ListenerCompletionHandler.handle" href="../../listener/listener_completion_handler.html#slack_bolt.listener.listener_completion_handler.ListenerCompletionHandler.handle">handle</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="slack_bolt.adapter.django.handler.DjangoListenerStartHandler"><code class="flex name class">
+<span>class <span class="ident">DjangoListenerStartHandler</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Django sets DB connections as a thread-local variable per thread.
+If the thread is not managed on the Django app side, the connections won't be released by Django.
+This handler releases the connections every time a ThreadListenerRunner execution completes.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DjangoListenerStartHandler(ListenerStartHandler):
+    &#34;&#34;&#34;Django sets DB connections as a thread-local variable per thread.
+    If the thread is not managed on the Django app side, the connections won&#39;t be released by Django.
+    This handler releases the connections every time a ThreadListenerRunner execution completes.
+    &#34;&#34;&#34;
+
+    def handle(self, request: BoltRequest, response: Optional[BoltResponse]) -&gt; None:
+        release_thread_local_connections(request.context.logger, &#34;listener-start&#34;)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.listener.listener_start_handler.ListenerStartHandler" href="../../listener/listener_start_handler.html#slack_bolt.listener.listener_start_handler.ListenerStartHandler">ListenerStartHandler</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="slack_bolt.listener.listener_start_handler.ListenerStartHandler" href="../../listener/listener_start_handler.html#slack_bolt.listener.listener_start_handler.ListenerStartHandler">ListenerStartHandler</a></b></code>:
+<ul class="hlist">
+<li><code><a title="slack_bolt.listener.listener_start_handler.ListenerStartHandler.handle" href="../../listener/listener_start_handler.html#slack_bolt.listener.listener_start_handler.ListenerStartHandler.handle">handle</a></code></li>
 </ul>
 </li>
 </ul>
@@ -315,11 +388,14 @@ This handler releases the connections every time a ThreadListenerRunner executio
         )
 
         def wrapped_func():
+            release_thread_local_connections(
+                request.context.logger, &#34;before-lazy-listener&#34;
+            )
             try:
                 func()
             finally:
                 release_thread_local_connections(
-                    request.context.logger, &#34;lazy-listener&#34;
+                    request.context.logger, &#34;lazy-listener-completion&#34;
                 )
 
         self.executor.submit(wrapped_func)</code></pre>
@@ -377,18 +453,39 @@ This handler releases the connections every time a ThreadListenerRunner executio
             self.app.logger.debug(&#34;App.process_before_response is set to True&#34;)
             return
 
+        current_start_handler = listener_runner.listener_start_handler
+        if current_start_handler is not None and not isinstance(
+            current_start_handler, DefaultListenerStartHandler
+        ):
+            # As we run release_thread_local_connections() before listener executions,
+            # it&#39;s okay to skip calling the same connection clean-up method at the listener completion.
+            message = &#34;&#34;&#34;As you&#39;ve already set app.listener_runner.listener_start_handler to your own one,
+            Bolt skipped to set it to slack_sdk.adapter.django.DjangoListenerStartHandler.
+            
+            If you go with your own handler here, we highly recommend having the following lines of code 
+            in your handle() method to clean up unmanaged stale/old database connections:
+
+            from django.db import close_old_connections
+            close_old_connections()
+            &#34;&#34;&#34;
+            self.app.logger.info(message)
+        else:
+            # for proper management of thread-local Django DB connections
+            self.app.listener_runner.listener_start_handler = (
+                DjangoListenerStartHandler()
+            )
+            self.app.logger.debug(&#34;DjangoListenerStartHandler has been enabled&#34;)
+
         current_completion_handler = listener_runner.listener_completion_handler
         if current_completion_handler is not None and not isinstance(
             current_completion_handler, DefaultListenerCompletionHandler
         ):
+            # As we run release_thread_local_connections() before listener executions,
+            # it&#39;s okay to skip calling the same connection clean-up method at the listener completion.
             message = &#34;&#34;&#34;As you&#39;ve already set app.listener_runner.listener_completion_handler to your own one,
             Bolt skipped to set it to slack_sdk.adapter.django.DjangoListenerCompletionHandler.
-            We strongly recommend having the following lines of code in your listener_completion_handler:
-
-            from django.db import connections
-            connections.close_all()
             &#34;&#34;&#34;
-            self.app.logger.warning(message)
+            self.app.logger.info(message)
             return
         # for proper management of thread-local Django DB connections
         self.app.listener_runner.listener_completion_handler = (
@@ -467,6 +564,9 @@ This handler releases the connections every time a ThreadListenerRunner executio
 <ul>
 <li>
 <h4><code><a title="slack_bolt.adapter.django.handler.DjangoListenerCompletionHandler" href="#slack_bolt.adapter.django.handler.DjangoListenerCompletionHandler">DjangoListenerCompletionHandler</a></code></h4>
+</li>
+<li>
+<h4><code><a title="slack_bolt.adapter.django.handler.DjangoListenerStartHandler" href="#slack_bolt.adapter.django.handler.DjangoListenerStartHandler">DjangoListenerStartHandler</a></code></h4>
 </li>
 <li>
 <h4><code><a title="slack_bolt.adapter.django.handler.DjangoThreadLazyListenerRunner" href="#slack_bolt.adapter.django.handler.DjangoThreadLazyListenerRunner">DjangoThreadLazyListenerRunner</a></code></h4>

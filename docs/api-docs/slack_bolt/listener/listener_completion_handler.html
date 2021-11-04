@@ -43,7 +43,7 @@ class ListenerCompletionHandler(metaclass=ABCMeta):
         request: BoltRequest,
         response: Optional[BoltResponse],
     ) -&gt; None:
-        &#34;&#34;&#34;Handles an unhandled exception.
+        &#34;&#34;&#34;Do something extra after the listener execution
 
         Args:
             request: The request.
@@ -187,7 +187,7 @@ class DefaultListenerCompletionHandler(ListenerCompletionHandler):
         request: BoltRequest,
         response: Optional[BoltResponse],
     ) -&gt; None:
-        &#34;&#34;&#34;Handles an unhandled exception.
+        &#34;&#34;&#34;Do something extra after the listener execution
 
         Args:
             request: The request.
@@ -207,7 +207,7 @@ class DefaultListenerCompletionHandler(ListenerCompletionHandler):
 <span>def <span class="ident">handle</span></span>(<span>self, request: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>, response: Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]) ‑> None</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Handles an unhandled exception.</p>
+<div class="desc"><p>Do something extra after the listener execution</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>request</code></strong></dt>
@@ -225,7 +225,7 @@ def handle(
     request: BoltRequest,
     response: Optional[BoltResponse],
 ) -&gt; None:
-    &#34;&#34;&#34;Handles an unhandled exception.
+    &#34;&#34;&#34;Do something extra after the listener execution
 
     Args:
         request: The request.

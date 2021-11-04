@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>slack_bolt.listener.async_listener_completion_handler API documentation</title>
+<title>slack_bolt.listener.listener_start_handler API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,7 +19,7 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>slack_bolt.listener.async_listener_completion_handler</code></h1>
+<h1 class="title">Module <code>slack_bolt.listener.listener_start_handler</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
@@ -29,21 +29,25 @@
 <pre><code class="python">import inspect
 from abc import ABCMeta, abstractmethod
 from logging import Logger
-from typing import Callable, Dict, Any, Awaitable, Optional
+from typing import Callable, Dict, Any, Optional
 
-from slack_bolt.kwargs_injection.async_utils import build_async_required_kwargs
-from slack_bolt.request.async_request import AsyncBoltRequest
-from slack_bolt.response import BoltResponse
+from slack_bolt.kwargs_injection import build_required_kwargs
+from slack_bolt.request.request import BoltRequest
+from slack_bolt.response.response import BoltResponse
 
 
-class AsyncListenerCompletionHandler(metaclass=ABCMeta):
+class ListenerStartHandler(metaclass=ABCMeta):
     @abstractmethod
-    async def handle(
+    def handle(
         self,
-        request: AsyncBoltRequest,
+        request: BoltRequest,
         response: Optional[BoltResponse],
     ) -&gt; None:
-        &#34;&#34;&#34;Do something extra after the listener execution
+        &#34;&#34;&#34;Do something extra before the listener execution.
+
+        This handler is useful if a developer needs to maintain/clean up
+        thread-local resources such as Django ORM database connections
+        before a listener execution starts.
 
         Args:
             request: The request.
@@ -52,34 +56,34 @@ class AsyncListenerCompletionHandler(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-class AsyncCustomListenerCompletionHandler(AsyncListenerCompletionHandler):
-    def __init__(self, logger: Logger, func: Callable[..., Awaitable[None]]):
+class CustomListenerStartHandler(ListenerStartHandler):
+    def __init__(self, logger: Logger, func: Callable[..., None]):
         self.func = func
         self.logger = logger
         self.arg_names = inspect.getfullargspec(func).args
 
-    async def handle(
+    def handle(
         self,
-        request: AsyncBoltRequest,
+        request: BoltRequest,
         response: Optional[BoltResponse],
-    ) -&gt; None:
-        kwargs: Dict[str, Any] = build_async_required_kwargs(
+    ):
+        kwargs: Dict[str, Any] = build_required_kwargs(
             required_arg_names=self.arg_names,
             logger=self.logger,
             request=request,
             response=response,
             next_keys_required=False,
         )
-        await self.func(**kwargs)
+        self.func(**kwargs)
 
 
-class AsyncDefaultListenerCompletionHandler(AsyncListenerCompletionHandler):
+class DefaultListenerStartHandler(ListenerStartHandler):
     def __init__(self, logger: Logger):
         self.logger = logger
 
-    async def handle(
+    def handle(
         self,
-        request: AsyncBoltRequest,
+        request: BoltRequest,
         response: Optional[BoltResponse],
     ):
         pass</code></pre>
@@ -94,9 +98,9 @@ class AsyncDefaultListenerCompletionHandler(AsyncListenerCompletionHandler):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="slack_bolt.listener.async_listener_completion_handler.AsyncCustomListenerCompletionHandler"><code class="flex name class">
-<span>class <span class="ident">AsyncCustomListenerCompletionHandler</span></span>
-<span>(</span><span>logger: logging.Logger, func: Callable[..., Awaitable[None]])</span>
+<dt id="slack_bolt.listener.listener_start_handler.CustomListenerStartHandler"><code class="flex name class">
+<span>class <span class="ident">CustomListenerStartHandler</span></span>
+<span>(</span><span>logger: logging.Logger, func: Callable[..., None])</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -104,41 +108,41 @@ class AsyncDefaultListenerCompletionHandler(AsyncListenerCompletionHandler):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class AsyncCustomListenerCompletionHandler(AsyncListenerCompletionHandler):
-    def __init__(self, logger: Logger, func: Callable[..., Awaitable[None]]):
+<pre><code class="python">class CustomListenerStartHandler(ListenerStartHandler):
+    def __init__(self, logger: Logger, func: Callable[..., None]):
         self.func = func
         self.logger = logger
         self.arg_names = inspect.getfullargspec(func).args
 
-    async def handle(
+    def handle(
         self,
-        request: AsyncBoltRequest,
+        request: BoltRequest,
         response: Optional[BoltResponse],
-    ) -&gt; None:
-        kwargs: Dict[str, Any] = build_async_required_kwargs(
+    ):
+        kwargs: Dict[str, Any] = build_required_kwargs(
             required_arg_names=self.arg_names,
             logger=self.logger,
             request=request,
             response=response,
             next_keys_required=False,
         )
-        await self.func(**kwargs)</code></pre>
+        self.func(**kwargs)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler" href="#slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler">AsyncListenerCompletionHandler</a></li>
+<li><a title="slack_bolt.listener.listener_start_handler.ListenerStartHandler" href="#slack_bolt.listener.listener_start_handler.ListenerStartHandler">ListenerStartHandler</a></li>
 </ul>
 <h3>Inherited members</h3>
 <ul class="hlist">
-<li><code><b><a title="slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler" href="#slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler">AsyncListenerCompletionHandler</a></b></code>:
+<li><code><b><a title="slack_bolt.listener.listener_start_handler.ListenerStartHandler" href="#slack_bolt.listener.listener_start_handler.ListenerStartHandler">ListenerStartHandler</a></b></code>:
 <ul class="hlist">
-<li><code><a title="slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler.handle" href="#slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler.handle">handle</a></code></li>
+<li><code><a title="slack_bolt.listener.listener_start_handler.ListenerStartHandler.handle" href="#slack_bolt.listener.listener_start_handler.ListenerStartHandler.handle">handle</a></code></li>
 </ul>
 </li>
 </ul>
 </dd>
-<dt id="slack_bolt.listener.async_listener_completion_handler.AsyncDefaultListenerCompletionHandler"><code class="flex name class">
-<span>class <span class="ident">AsyncDefaultListenerCompletionHandler</span></span>
+<dt id="slack_bolt.listener.listener_start_handler.DefaultListenerStartHandler"><code class="flex name class">
+<span>class <span class="ident">DefaultListenerStartHandler</span></span>
 <span>(</span><span>logger: logging.Logger)</span>
 </code></dt>
 <dd>
@@ -147,32 +151,32 @@ class AsyncDefaultListenerCompletionHandler(AsyncListenerCompletionHandler):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class AsyncDefaultListenerCompletionHandler(AsyncListenerCompletionHandler):
+<pre><code class="python">class DefaultListenerStartHandler(ListenerStartHandler):
     def __init__(self, logger: Logger):
         self.logger = logger
 
-    async def handle(
+    def handle(
         self,
-        request: AsyncBoltRequest,
+        request: BoltRequest,
         response: Optional[BoltResponse],
     ):
         pass</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler" href="#slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler">AsyncListenerCompletionHandler</a></li>
+<li><a title="slack_bolt.listener.listener_start_handler.ListenerStartHandler" href="#slack_bolt.listener.listener_start_handler.ListenerStartHandler">ListenerStartHandler</a></li>
 </ul>
 <h3>Inherited members</h3>
 <ul class="hlist">
-<li><code><b><a title="slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler" href="#slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler">AsyncListenerCompletionHandler</a></b></code>:
+<li><code><b><a title="slack_bolt.listener.listener_start_handler.ListenerStartHandler" href="#slack_bolt.listener.listener_start_handler.ListenerStartHandler">ListenerStartHandler</a></b></code>:
 <ul class="hlist">
-<li><code><a title="slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler.handle" href="#slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler.handle">handle</a></code></li>
+<li><code><a title="slack_bolt.listener.listener_start_handler.ListenerStartHandler.handle" href="#slack_bolt.listener.listener_start_handler.ListenerStartHandler.handle">handle</a></code></li>
 </ul>
 </li>
 </ul>
 </dd>
-<dt id="slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler"><code class="flex name class">
-<span>class <span class="ident">AsyncListenerCompletionHandler</span></span>
+<dt id="slack_bolt.listener.listener_start_handler.ListenerStartHandler"><code class="flex name class">
+<span>class <span class="ident">ListenerStartHandler</span></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -180,14 +184,18 @@ class AsyncDefaultListenerCompletionHandler(AsyncListenerCompletionHandler):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class AsyncListenerCompletionHandler(metaclass=ABCMeta):
+<pre><code class="python">class ListenerStartHandler(metaclass=ABCMeta):
     @abstractmethod
-    async def handle(
+    def handle(
         self,
-        request: AsyncBoltRequest,
+        request: BoltRequest,
         response: Optional[BoltResponse],
     ) -&gt; None:
-        &#34;&#34;&#34;Do something extra after the listener execution
+        &#34;&#34;&#34;Do something extra before the listener execution.
+
+        This handler is useful if a developer needs to maintain/clean up
+        thread-local resources such as Django ORM database connections
+        before a listener execution starts.
 
         Args:
             request: The request.
@@ -197,16 +205,20 @@ class AsyncDefaultListenerCompletionHandler(AsyncListenerCompletionHandler):
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
-<li><a title="slack_bolt.listener.async_listener_completion_handler.AsyncCustomListenerCompletionHandler" href="#slack_bolt.listener.async_listener_completion_handler.AsyncCustomListenerCompletionHandler">AsyncCustomListenerCompletionHandler</a></li>
-<li><a title="slack_bolt.listener.async_listener_completion_handler.AsyncDefaultListenerCompletionHandler" href="#slack_bolt.listener.async_listener_completion_handler.AsyncDefaultListenerCompletionHandler">AsyncDefaultListenerCompletionHandler</a></li>
+<li><a title="slack_bolt.adapter.django.handler.DjangoListenerStartHandler" href="../adapter/django/handler.html#slack_bolt.adapter.django.handler.DjangoListenerStartHandler">DjangoListenerStartHandler</a></li>
+<li><a title="slack_bolt.listener.listener_start_handler.CustomListenerStartHandler" href="#slack_bolt.listener.listener_start_handler.CustomListenerStartHandler">CustomListenerStartHandler</a></li>
+<li><a title="slack_bolt.listener.listener_start_handler.DefaultListenerStartHandler" href="#slack_bolt.listener.listener_start_handler.DefaultListenerStartHandler">DefaultListenerStartHandler</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler.handle"><code class="name flex">
-<span>async def <span class="ident">handle</span></span>(<span>self, request: <a title="slack_bolt.request.async_request.AsyncBoltRequest" href="../request/async_request.html#slack_bolt.request.async_request.AsyncBoltRequest">AsyncBoltRequest</a>, response: Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]) ‑> None</span>
+<dt id="slack_bolt.listener.listener_start_handler.ListenerStartHandler.handle"><code class="name flex">
+<span>def <span class="ident">handle</span></span>(<span>self, request: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>, response: Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]) ‑> None</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Do something extra after the listener execution</p>
+<div class="desc"><p>Do something extra before the listener execution.</p>
+<p>This handler is useful if a developer needs to maintain/clean up
+thread-local resources such as Django ORM database connections
+before a listener execution starts.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>request</code></strong></dt>
@@ -219,12 +231,16 @@ class AsyncDefaultListenerCompletionHandler(AsyncListenerCompletionHandler):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
-async def handle(
+def handle(
     self,
-    request: AsyncBoltRequest,
+    request: BoltRequest,
     response: Optional[BoltResponse],
 ) -&gt; None:
-    &#34;&#34;&#34;Do something extra after the listener execution
+    &#34;&#34;&#34;Do something extra before the listener execution.
+
+    This handler is useful if a developer needs to maintain/clean up
+    thread-local resources such as Django ORM database connections
+    before a listener execution starts.
 
     Args:
         request: The request.
@@ -252,15 +268,15 @@ async def handle(
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="slack_bolt.listener.async_listener_completion_handler.AsyncCustomListenerCompletionHandler" href="#slack_bolt.listener.async_listener_completion_handler.AsyncCustomListenerCompletionHandler">AsyncCustomListenerCompletionHandler</a></code></h4>
+<h4><code><a title="slack_bolt.listener.listener_start_handler.CustomListenerStartHandler" href="#slack_bolt.listener.listener_start_handler.CustomListenerStartHandler">CustomListenerStartHandler</a></code></h4>
 </li>
 <li>
-<h4><code><a title="slack_bolt.listener.async_listener_completion_handler.AsyncDefaultListenerCompletionHandler" href="#slack_bolt.listener.async_listener_completion_handler.AsyncDefaultListenerCompletionHandler">AsyncDefaultListenerCompletionHandler</a></code></h4>
+<h4><code><a title="slack_bolt.listener.listener_start_handler.DefaultListenerStartHandler" href="#slack_bolt.listener.listener_start_handler.DefaultListenerStartHandler">DefaultListenerStartHandler</a></code></h4>
 </li>
 <li>
-<h4><code><a title="slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler" href="#slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler">AsyncListenerCompletionHandler</a></code></h4>
+<h4><code><a title="slack_bolt.listener.listener_start_handler.ListenerStartHandler" href="#slack_bolt.listener.listener_start_handler.ListenerStartHandler">ListenerStartHandler</a></code></h4>
 <ul class="">
-<li><code><a title="slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler.handle" href="#slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler.handle">handle</a></code></li>
+<li><code><a title="slack_bolt.listener.listener_start_handler.ListenerStartHandler.handle" href="#slack_bolt.listener.listener_start_handler.ListenerStartHandler.handle">handle</a></code></li>
 </ul>
 </li>
 </ul>

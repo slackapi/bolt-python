@@ -35,6 +35,9 @@ from typing import Optional, Callable, Awaitable
 from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.lazy_listener.async_runner import AsyncLazyListenerRunner
 from slack_bolt.listener.async_listener import AsyncListener
+from slack_bolt.listener.async_listener_start_handler import (
+    AsyncListenerStartHandler,
+)
 from slack_bolt.listener.async_listener_completion_handler import (
     AsyncListenerCompletionHandler,
 )
@@ -53,6 +56,7 @@ class AsyncioListenerRunner:
     logger: Logger
     process_before_response: bool
     listener_error_handler: AsyncListenerErrorHandler
+    listener_start_handler: AsyncListenerStartHandler
     listener_completion_handler: AsyncListenerCompletionHandler
     lazy_listener_runner: AsyncLazyListenerRunner
 
@@ -61,12 +65,14 @@ class AsyncioListenerRunner:
         logger: Logger,
         process_before_response: bool,
         listener_error_handler: AsyncListenerErrorHandler,
+        listener_start_handler: AsyncListenerStartHandler,
         listener_completion_handler: AsyncListenerCompletionHandler,
         lazy_listener_runner: AsyncLazyListenerRunner,
     ):
         self.logger = logger
         self.process_before_response = process_before_response
         self.listener_error_handler = listener_error_handler
+        self.listener_start_handler = listener_start_handler
         self.listener_completion_handler = listener_completion_handler
         self.lazy_listener_runner = lazy_listener_runner
 
@@ -83,6 +89,9 @@ class AsyncioListenerRunner:
         if self.process_before_response:
             if not request.lazy_only:
                 try:
+                    await self.listener_start_handler.handle(
+                        request=request, response=response
+                    )
                     returned_value = await listener.run_ack_function(
                         request=request, response=response
                     )
@@ -141,6 +150,9 @@ class AsyncioListenerRunner:
                     response: BoltResponse,
                 ):
                     try:
+                        await self.listener_start_handler.handle(
+                            request=request, response=response
+                        )
                         await listener.run_ack_function(
                             request=request, response=response
                         )
@@ -238,7 +250,7 @@ class AsyncioListenerRunner:
 <dl>
 <dt id="slack_bolt.listener.asyncio_runner.AsyncioListenerRunner"><code class="flex name class">
 <span>class <span class="ident">AsyncioListenerRunner</span></span>
-<span>(</span><span>logger: logging.Logger, process_before_response: bool, listener_error_handler: <a title="slack_bolt.listener.async_listener_error_handler.AsyncListenerErrorHandler" href="async_listener_error_handler.html#slack_bolt.listener.async_listener_error_handler.AsyncListenerErrorHandler">AsyncListenerErrorHandler</a>, listener_completion_handler: <a title="slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler" href="async_listener_completion_handler.html#slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler">AsyncListenerCompletionHandler</a>, lazy_listener_runner: <a title="slack_bolt.lazy_listener.async_runner.AsyncLazyListenerRunner" href="../lazy_listener/async_runner.html#slack_bolt.lazy_listener.async_runner.AsyncLazyListenerRunner">AsyncLazyListenerRunner</a>)</span>
+<span>(</span><span>logger: logging.Logger, process_before_response: bool, listener_error_handler: <a title="slack_bolt.listener.async_listener_error_handler.AsyncListenerErrorHandler" href="async_listener_error_handler.html#slack_bolt.listener.async_listener_error_handler.AsyncListenerErrorHandler">AsyncListenerErrorHandler</a>, listener_start_handler: <a title="slack_bolt.listener.async_listener_start_handler.AsyncListenerStartHandler" href="async_listener_start_handler.html#slack_bolt.listener.async_listener_start_handler.AsyncListenerStartHandler">AsyncListenerStartHandler</a>, listener_completion_handler: <a title="slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler" href="async_listener_completion_handler.html#slack_bolt.listener.async_listener_completion_handler.AsyncListenerCompletionHandler">AsyncListenerCompletionHandler</a>, lazy_listener_runner: <a title="slack_bolt.lazy_listener.async_runner.AsyncLazyListenerRunner" href="../lazy_listener/async_runner.html#slack_bolt.lazy_listener.async_runner.AsyncLazyListenerRunner">AsyncLazyListenerRunner</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -250,6 +262,7 @@ class AsyncioListenerRunner:
     logger: Logger
     process_before_response: bool
     listener_error_handler: AsyncListenerErrorHandler
+    listener_start_handler: AsyncListenerStartHandler
     listener_completion_handler: AsyncListenerCompletionHandler
     lazy_listener_runner: AsyncLazyListenerRunner
 
@@ -258,12 +271,14 @@ class AsyncioListenerRunner:
         logger: Logger,
         process_before_response: bool,
         listener_error_handler: AsyncListenerErrorHandler,
+        listener_start_handler: AsyncListenerStartHandler,
         listener_completion_handler: AsyncListenerCompletionHandler,
         lazy_listener_runner: AsyncLazyListenerRunner,
     ):
         self.logger = logger
         self.process_before_response = process_before_response
         self.listener_error_handler = listener_error_handler
+        self.listener_start_handler = listener_start_handler
         self.listener_completion_handler = listener_completion_handler
         self.lazy_listener_runner = lazy_listener_runner
 
@@ -280,6 +295,9 @@ class AsyncioListenerRunner:
         if self.process_before_response:
             if not request.lazy_only:
                 try:
+                    await self.listener_start_handler.handle(
+                        request=request, response=response
+                    )
                     returned_value = await listener.run_ack_function(
                         request=request, response=response
                     )
@@ -338,6 +356,9 @@ class AsyncioListenerRunner:
                     response: BoltResponse,
                 ):
                     try:
+                        await self.listener_start_handler.handle(
+                            request=request, response=response
+                        )
                         await listener.run_ack_function(
                             request=request, response=response
                         )
@@ -437,6 +458,10 @@ class AsyncioListenerRunner:
 <dd>
 <div class="desc"></div>
 </dd>
+<dt id="slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.listener_start_handler"><code class="name">var <span class="ident">listener_start_handler</span> : <a title="slack_bolt.listener.async_listener_start_handler.AsyncListenerStartHandler" href="async_listener_start_handler.html#slack_bolt.listener.async_listener_start_handler.AsyncListenerStartHandler">AsyncListenerStartHandler</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.logger"><code class="name">var <span class="ident">logger</span> : logging.Logger</code></dt>
 <dd>
 <div class="desc"></div>
@@ -470,6 +495,9 @@ class AsyncioListenerRunner:
     if self.process_before_response:
         if not request.lazy_only:
             try:
+                await self.listener_start_handler.handle(
+                    request=request, response=response
+                )
                 returned_value = await listener.run_ack_function(
                     request=request, response=response
                 )
@@ -528,6 +556,9 @@ class AsyncioListenerRunner:
                 response: BoltResponse,
             ):
                 try:
+                    await self.listener_start_handler.handle(
+                        request=request, response=response
+                    )
                     await listener.run_ack_function(
                         request=request, response=response
                     )
@@ -613,6 +644,7 @@ class AsyncioListenerRunner:
 <li><code><a title="slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.lazy_listener_runner" href="#slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.lazy_listener_runner">lazy_listener_runner</a></code></li>
 <li><code><a title="slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.listener_completion_handler" href="#slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.listener_completion_handler">listener_completion_handler</a></code></li>
 <li><code><a title="slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.listener_error_handler" href="#slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.listener_error_handler">listener_error_handler</a></code></li>
+<li><code><a title="slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.listener_start_handler" href="#slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.listener_start_handler">listener_start_handler</a></code></li>
 <li><code><a title="slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.logger" href="#slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.logger">logger</a></code></li>
 <li><code><a title="slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.process_before_response" href="#slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.process_before_response">process_before_response</a></code></li>
 <li><code><a title="slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.run" href="#slack_bolt.listener.asyncio_runner.AsyncioListenerRunner.run">run</a></code></li>
