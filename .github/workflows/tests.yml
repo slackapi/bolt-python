@@ -1,16 +1,14 @@
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-name: CI Build
+name: Run all the unit tests
 
 on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
-    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       matrix:
         python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
@@ -68,17 +66,3 @@ jobs:
       run: |
         pip install -e ".[async]"
         pytest tests/adapter_tests_async/
-    - name: Run pytype verification (3.8 only)
-      run: |
-        python_version=`python -V`
-        if [ ${python_version:7:3} == "3.8" ]; then
-          ./scripts/run_pytype.sh
-        fi
-    - name: Run all tests for codecov (3.9 only)
-      run: |
-        python_version=`python -V`
-        if [ ${python_version:7:3} == "3.9" ]; then
-          pip install -e ".[async]"
-          pip install -e ".[testing]"
-          pytest --cov=slack_bolt/ && bash <(curl -s https://codecov.io/bash)
-        fi
