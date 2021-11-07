@@ -85,7 +85,7 @@ which python3
 
 Bolt for Python のパッケージを新しいプロジェクトにインストールする前に、アプリの設定時に作成された **ボットトークン** と **署名シークレット** を保存しましょう。
 
-1. **OAuth & Permissions ページの署名シークレットをコピー**して、新しい環境変数に保存します。以下のコマンド例は Linux と macOS で利用できます。[Windows でもこれに似たコマンドが利用できます](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153)。
+1. **Basic Information ページの署名シークレットをコピー**して、新しい環境変数に保存します。以下のコマンド例は Linux と macOS で利用できます。[Windows でもこれに似たコマンドが利用できます](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153)。
 ```shell
 export SLACK_SIGNING_SECRET=<your-signing-secret>
 ```
