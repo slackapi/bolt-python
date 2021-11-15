@@ -33,9 +33,13 @@ class DjangoInstallationStore(InstallationStore):
         i = installation.to_dict()
         if is_naive(i["installed_at"]):
             i["installed_at"] = make_aware(i["installed_at"])
-        if "bot_token_expires_at" in i and is_naive(i["bot_token_expires_at"]):
+        if i.get("bot_token_expires_at") is not None and is_naive(
+            i["bot_token_expires_at"]
+        ):
             i["bot_token_expires_at"] = make_aware(i["bot_token_expires_at"])
-        if "user_token_expires_at" in i and is_naive(i["user_token_expires_at"]):
+        if i.get("user_token_expires_at") is not None and is_naive(
+            i["user_token_expires_at"]
+        ):
             i["user_token_expires_at"] = make_aware(i["user_token_expires_at"])
         i["client_id"] = self.client_id
         row_to_update = (
@@ -58,7 +62,7 @@ class DjangoInstallationStore(InstallationStore):
         b = bot.to_dict()
         if is_naive(b["installed_at"]):
             b["installed_at"] = make_aware(b["installed_at"])
-        if "bot_token_expires_at" in b is not None and is_naive(
+        if b.get("bot_token_expires_at") is not None and is_naive(
             b["bot_token_expires_at"]
         ):
             b["bot_token_expires_at"] = make_aware(b["bot_token_expires_at"])
