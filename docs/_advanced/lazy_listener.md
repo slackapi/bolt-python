@@ -6,9 +6,9 @@ order: 10
 ---
 
 <div class="section-content">
-⚠️ Lazy listener functions are a beta feature which make it easier to deploy Bolt for Python apps to FaaS (Function-as-a-Service) environments. As the feature is developed, Bolt for Python's API is subject to change.
+Lazy Listeners are a feature which make it easier to deploy Slack apps to FaaS (Function-as-a-Service) environments. Please note that this feature is only available in Bolt for Python, and we are not planning to add the same to other Bolt frameworks.
 
-Typically when handling actions, commands, shortcuts, options and view submissions, you must acknowledge the request from Slack by calling `ack()` within 3 seconds. Calling `ack()` results in sending a HTTP 200 OK response to Slack, letting Slack know that you're handling the response. We normally encourage you to do this as the very first step in your handler function. 
+Typically when handling actions, commands, shortcuts, options and view submissions, you must acknowledge the request from Slack by calling `ack()` within 3 seconds. Calling `ack()` results in sending an HTTP 200 OK response to Slack, letting Slack know that you're handling the response. We normally encourage you to do this as the very first step in your handler function. 
 
 However, when running your app on FaaS or similar runtimes which **do not allow you to run threads or processes after returning an HTTP response**, we cannot follow the typical pattern of acknowledgement first, processing later. To work with these runtimes, set the `process_before_response` flag to `True`. When this flag is true, the Bolt framework holds off sending an HTTP response until all the things in a listener function are done. You need to complete your processing within 3 seconds or you will run into errors with Slack timeouts. Note that in the case of events, while the listener doesn't need to explicitly call the `ack()` method, it still needs to complete its function within 3 seconds as well.
 
