@@ -35,7 +35,7 @@ oauth_settings = OAuthSettings(
 )
 
 app = App(
-    signing_secret=os.environ["SIGNING_SECRET"],
+    signing_secret=os.environ["SLACK_SIGNING_SECRET"],
     oauth_settings=oauth_settings
 )
 ```

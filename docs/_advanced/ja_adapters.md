@@ -18,7 +18,7 @@ order: 0
 ```python
 from slack_bolt import App
 app = App(
-    signing_secret=os.environ.get("SIGNING_SECRET"),
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
     token=os.environ.get("SLACK_BOT_TOKEN")
 )
 
