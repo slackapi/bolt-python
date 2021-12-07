@@ -31,7 +31,7 @@ def approve_request(ack, say):
 
 <div class="secondary-content" markdown="0">
 
-`respond()` は `response_url` を使って送信するときに便利なメソッドで、これらと同じような動作をします。投稿するメッセージのペイロードには JSON オブジェクトを渡すことができ、メッセージはやり取りの発生元に反映されます。オプションのプロパティとして `response_type`（値は `in_channel` または `ephemeral`）、`replace_original`、`delete_original` などを指定できます。
+`respond()` は `response_url` を使って送信するときに便利なメソッドで、これらと同じような動作をします。投稿するメッセージのペイロードには、全ての[メッセージペイロードのプロパティ](https://api.slack.com/reference/messaging/payload)とオプションのプロパティとして `response_type`（値は `"in_channel"` または `"ephemeral"`）、`replace_original`、`delete_original`、`unfurl_links`、`unfurl_media` などを指定できます。こうすることによってアプリから送信されるメッセージは、やり取りの発生元に反映されます。
 
 </div>
 

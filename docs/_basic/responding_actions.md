@@ -32,7 +32,7 @@ def approve_request(ack, say):
 
 <div class="secondary-content" markdown="0">
 
-Since `respond()` is a utility for calling the `response_url`, it behaves in the same way. You can pass a JSON object with a new message payload that will be published back to the source of the original interaction with optional properties like `response_type` (which has a value of `in_channel` or `ephemeral`), `replace_original`, and `delete_original`.
+Since `respond()` is a utility for calling the `response_url`, it behaves in the same way. You can pass [all the message payload properties](https://api.slack.com/reference/messaging/payload) as keyword arguments along with optional properties like `response_type` (which has a value of `"in_channel"` or `"ephemeral"`), `replace_original`, `delete_original`, `unfurl_links`, and `unfurl_media`. With that, your app can send a new message payload that will be published back to the source of the original interaction.
 
 </div>
 
