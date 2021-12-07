@@ -25,7 +25,7 @@ def handle_submission(ack, body):
 ```
 この例と同様に、モーダルでの送信リクエストに対して、<a href="https://api.slack.com/surfaces/modals/using#displaying_errors">エラーを表示する</a>ためのオプションもあります。
 
-モーダルの送信について詳しくは、<a href="https://api.slack.com/surfaces/modals/using#interactions">API ドキュメント</a>を参照してください。
+モーダルの送信について詳しくは、<a href="https://api.slack.com/surfaces/modals/using#handling_submissions">API ドキュメント</a>を参照してください。
 
 </div>
 

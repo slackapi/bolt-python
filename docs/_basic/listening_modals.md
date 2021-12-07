@@ -24,7 +24,7 @@ def handle_submission(ack, body):
     ack(response_action="update", view=build_new_view(body))
 ```
 Similarly, there are options for [displaying errors](https://api.slack.com/surfaces/modals/using#displaying_errors) in response to view submissions.
-Read more about view submissions in our <a href="https://api.slack.com/surfaces/modals/using#interactions">API documentation</a>.
+Read more about view submissions in our <a href="https://api.slack.com/surfaces/modals/using#handling_submissions">API documentation</a>.
 
 </div>
 
