@@ -85,7 +85,9 @@ setuptools.setup(
             "uvicorn<1",
             "gunicorn>=20,<21",
             # Socket Mode 3rd party implementation
-            "websocket_client>=1,<2",
+            # TODO: 1.2.2 has a regression (https://github.com/websocket-client/websocket-client/issues/769)
+            # ERROR on_error invoked (error: AttributeError, message: 'Dispatcher' object has no attribute 'read')
+            "websocket_client>=1,<1.2.2",
         ],
         # pip install -e ".[testing_without_asyncio]"
         "testing_without_asyncio": test_dependencies,
