@@ -39,4 +39,4 @@ if __name__ == "__main__":
 # pip install slack_bolt
 # export SLACK_SIGNING_SECRET=***
 # export MY_TOKEN=xoxb-***
-# python app.py
+# python app_authorize.py
