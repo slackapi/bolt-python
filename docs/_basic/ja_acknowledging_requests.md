@@ -9,11 +9,11 @@ order: 7
 
 アクション（action）、コマンド（command）、ショートカット（shortcut）、オプション（options）、およびモーダルからのデータ送信（view_submission）の各リクエストは、**必ず** `ack()` 関数を使って確認を行う必要があります。これによってリクエストが受信されたことが Slack に認識され、Slack のユーザーインターフェイスが適切に更新されます。
 
-リクエストの種類によっては、確認で通知方法が異なる場合があります。例えば、外部データソースを使用する選択メニューのオプションのリクエストに対する確認では、適切な[オプション](https://api.slack.com/reference/block-kit/composition-objects#option)のリストとともに `ack()` を呼び出します。モーダルからのデータ送信に対する確認では、 `response_action` を渡すことで[モーダル更新](#update-views-on-submission)ができます。
+リクエストの種類によっては、確認で通知方法が異なる場合があります。例えば、外部データソースを使用する選択メニューのオプションのリクエストに対する確認では、適切な[オプション](https://api.slack.com/reference/block-kit/composition-objects#option)のリストとともに `ack()` を呼び出します。モーダルからのデータ送信に対する確認では、 `response_action` を渡すことで[モーダルの更新](#update-views-on-submission)などを行えます。
 
-確認までの猶予は 3 秒しかないため、新しいメッセージの送信や、データベースからの情報の取得というような時間のかかるプロセスは、`ack()` を呼び出した後で行うことをおすすめします。
+確認までの猶予は 3 秒しかないため、新しいメッセージの送信やデータベースからの情報の取得といった時間のかかる処理は、`ack()` を呼び出した後で行うことをおすすめします。
 
- FaaS / serverless 環境を使う場合、 `ack()` するタイミングが異なります。 これについての詳細は [Lazy listeners (FaaS)](#lazy-listeners) にて参照してください。 
+ FaaS / serverless 環境を使う場合、 `ack()` するタイミングが異なります。 これに関する詳細は [Lazy listeners (FaaS)](#lazy-listeners) を参照してください。 
 </div>
 
 <div>
