@@ -73,11 +73,11 @@ class BoltRequest:
         )[0]
         self.mode = mode
 
-    def to_copiable(self) -> "BoltRequest":
+    def to_copyable(self) -> "BoltRequest":
         return BoltRequest(
             body=self.raw_body,
             query=self.query,
             headers=self.headers,
-            context=self.context.to_copiable(),
+            context=self.context.to_copyable(),
             mode=self.mode,
         )

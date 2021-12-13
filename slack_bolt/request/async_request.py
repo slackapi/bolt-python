@@ -76,11 +76,11 @@ class AsyncBoltRequest:
         )[0]
         self.mode = mode
 
-    def to_copiable(self) -> "AsyncBoltRequest":
+    def to_copyable(self) -> "AsyncBoltRequest":
         return AsyncBoltRequest(
             body=self.raw_body,
             query=self.query,
             headers=self.headers,
-            context=self.context.to_copiable(),
+            context=self.context.to_copyable(),
             mode=self.mode,
         )
