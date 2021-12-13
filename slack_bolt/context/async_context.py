@@ -12,7 +12,7 @@ from slack_bolt.util.utils import create_copy
 class AsyncBoltContext(BaseContext):
     """Context object associated with a request from Slack."""
 
-    def create_copy(self) -> "AsyncBoltContext":
+    def to_copiable(self) -> "AsyncBoltContext":
         new_dict = {}
         for prop_name, prop_value in self.items():
             if prop_name in self.standard_property_names:
