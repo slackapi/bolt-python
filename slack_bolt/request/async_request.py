@@ -75,3 +75,12 @@ class AsyncBoltRequest:
             "x-slack-bolt-lazy-function-name", [None]
         )[0]
         self.mode = mode
+
+    def to_copiable(self) -> "AsyncBoltRequest":
+        return AsyncBoltRequest(
+            body=self.raw_body,
+            query=self.query,
+            headers=self.headers,
+            context=self.context.create_no_custom_prop_copy(),
+            mode=self.mode,
+        )

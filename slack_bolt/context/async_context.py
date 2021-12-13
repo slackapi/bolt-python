@@ -6,10 +6,28 @@ from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.context.base_context import BaseContext
 from slack_bolt.context.respond.async_respond import AsyncRespond
 from slack_bolt.context.say.async_say import AsyncSay
+from slack_bolt.util.utils import create_copy
 
 
 class AsyncBoltContext(BaseContext):
     """Context object associated with a request from Slack."""
+
+    def create_no_custom_prop_copy(self) -> "AsyncBoltContext":
+        new_dict = {}
+        for prop_name, prop_value in self.items():
+            if prop_name in self.standard_property_names:
+                # all the standard properties are copiable
+                new_dict[prop_name] = prop_value
+            else:
+                try:
+                    copied_value = create_copy(prop_value)
+                    new_dict[prop_name] = copied_value
+                except TypeError as te:
+                    self.logger.debug(
+                        f"Skipped settings '{prop_name}' to a copied request for lazy listeners "
+                        f"as it's not possible to make a deep copy (error: {te})"
+                    )
+        return AsyncBoltContext(new_dict)
 
     @property
     def client(self) -> Optional[AsyncWebClient]:

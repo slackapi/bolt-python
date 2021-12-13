@@ -195,7 +195,7 @@ class ThreadListenerRunner:
 
     @staticmethod
     def _build_lazy_request(request: BoltRequest, lazy_func_name: str) -> BoltRequest:
-        copied_request = create_copy(request)
+        copied_request = create_copy(request.to_copiable())
         copied_request.method = "NONE"
         copied_request.lazy_only = True
         copied_request.lazy_function_name = lazy_func_name

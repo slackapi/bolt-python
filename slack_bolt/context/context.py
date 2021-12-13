@@ -7,10 +7,29 @@ from slack_bolt.context.ack import Ack
 from slack_bolt.context.base_context import BaseContext
 from slack_bolt.context.respond import Respond
 from slack_bolt.context.say import Say
+from slack_bolt.util.utils import create_copy
 
 
 class BoltContext(BaseContext):
     """Context object associated with a request from Slack."""
+
+    def create_no_custom_prop_copy(self) -> "BoltContext":
+        new_dict = {}
+        for prop_name, prop_value in self.items():
+            if prop_name in self.standard_property_names:
+                # all the standard properties are copiable
+                new_dict[prop_name] = prop_value
+            else:
+                try:
+                    copied_value = create_copy(prop_value)
+                    new_dict[prop_name] = copied_value
+                except TypeError as te:
+                    self.logger.warning(
+                        f"Skipped setting '{prop_name}' to a copied request for lazy listeners "
+                        "due to a deep-copy creation error. Consider passing the value not as part of context object "
+                        f"(error: {te})"
+                    )
+        return BoltContext(new_dict)
 
     @property
     def client(self) -> Optional[WebClient]:

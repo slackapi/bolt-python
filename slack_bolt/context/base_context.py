@@ -7,6 +7,27 @@ from slack_bolt.authorization import AuthorizeResult
 class BaseContext(dict):
     """Context object associated with a request from Slack."""
 
+    standard_property_names = [
+        "logger",
+        "token",
+        "enterprise_id",
+        "is_enterprise_install",
+        "team_id",
+        "user_id",
+        "channel_id",
+        "response_url",
+        "matches",
+        "authorize_result",
+        "bot_token",
+        "bot_id",
+        "bot_user_id",
+        "user_token",
+        "client",
+        "ack",
+        "say",
+        "respond",
+    ]
+
     @property
     def logger(self) -> Logger:
         """The properly configured logger that is available for middleware/listeners."""
