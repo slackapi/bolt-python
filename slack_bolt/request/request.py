@@ -78,6 +78,6 @@ class BoltRequest:
             body=self.raw_body,
             query=self.query,
             headers=self.headers,
-            context=self.context.create_no_custom_prop_copy(),
+            context=self.context.create_copy(),
             mode=self.mode,
         )
