@@ -9,11 +9,11 @@ order: 7
 
 Actions, commands, shortcuts, options requests, and view submissions must **always** be acknowledged using the `ack()` function. This lets Slack know that the request was received so that it may update the Slack user interface accordingly.
 
-Depending on the type of request, your acknowledgement may be different. For example, when acknowledging a menu selection associated with an external data source, you would call `ack()` with a list of relevant [options](https://api.slack.com/reference/block-kit/composition-objects#option). When acknowledging a view submission, you may supply a `response_action` as part of your acknowledge to update the view. Please see the relevant sections of the docs for more detail on options for `ack()` these different requests. 
+Depending on the type of request, your acknowledgement may be different. For example, when acknowledging a menu selection associated with an external data source, you would call `ack()` with a list of relevant [options](https://api.slack.com/reference/block-kit/composition-objects#option). When acknowledging a view submission, you may supply a `response_action` as part of your acknowledgement to [update the view](#update-views-on-submission). 
 
 We recommend calling `ack()` right away before initiating any time-consuming processes such as fetching information from your database or sending a new message, since you only have 3 seconds to respond before Slack registers a timeout error.
 
-💡 When working in a FaaS / serverless environment, our guidelines for when to `ack()` are different. See the section on **Lazy listeners (FaaS)** for more detail on this.  
+💡 When working in a FaaS / serverless environment, our guidelines for when to `ack()` are different. See the section on [Lazy listeners (FaaS)](#lazy-listeners) for more detail on this.  
 </div>
 
 <div>
