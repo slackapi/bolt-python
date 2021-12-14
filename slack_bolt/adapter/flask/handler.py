@@ -17,6 +17,9 @@ def to_bolt_request(req: Request) -> BoltRequest:
 def to_flask_response(bolt_resp: BoltResponse) -> Response:
     resp: Response = make_response(bolt_resp.body, bolt_resp.status)
     for k, values in bolt_resp.headers.items():
+        if k.lower() == "content-type" and resp.headers.get("content-type") is not None:
+            # Remove the one set by Flask
+            resp.headers.pop("content-type")
         for v in values:
             resp.headers.add_header(k, v)
     return resp

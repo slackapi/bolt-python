@@ -99,6 +99,7 @@ class TestFlask:
                 headers=self.build_headers(timestamp, body),
             )
             assert rv.status_code == 200
+            assert rv.headers.get("content-type") == "text/plain;charset=utf-8"
             assert_auth_test_count(self, 1)
 
     def test_shortcuts(self):
@@ -142,6 +143,7 @@ class TestFlask:
                 headers=self.build_headers(timestamp, body),
             )
             assert rv.status_code == 200
+            assert rv.headers.get("content-type") == "text/plain;charset=utf-8"
             assert_auth_test_count(self, 1)
 
     def test_commands(self):
@@ -185,6 +187,7 @@ class TestFlask:
                 headers=self.build_headers(timestamp, body),
             )
             assert rv.status_code == 200
+            assert rv.headers.get("content-type") == "text/plain;charset=utf-8"
             assert_auth_test_count(self, 1)
 
     def test_oauth(self):
@@ -205,4 +208,35 @@ class TestFlask:
 
         with flask_app.test_client() as client:
             rv = client.get("/slack/install")
+            assert rv.headers.get("content-type") == "text/html; charset=utf-8"
             assert rv.status_code == 200
+
+    def test_url_verification(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        input = {
+            "token": "Jhj5dZrVaK7ZwHHjRyZWjbDl",
+            "challenge": "3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P",
+            "type": "url_verification",
+        }
+
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
+
+        flask_app = Flask(__name__)
+
+        @flask_app.route("/slack/events", methods=["POST"])
+        def endpoint():
+            return SlackRequestHandler(app).handle(request)
+
+        with flask_app.test_client() as client:
+            rv = client.post(
+                "/slack/events",
+                data=body,
+                headers=self.build_headers(timestamp, body),
+            )
+            assert rv.status_code == 200
+            assert rv.headers.get("content-type") == "application/json;charset=utf-8"
+            assert_auth_test_count(self, 1)

@@ -32,4 +32,4 @@ if __name__ == "__main__":
 # pip install slack_bolt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
-# python app.py
+# python async_app.py
