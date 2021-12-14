@@ -1,3 +1,6 @@
+# pytype: skip-file
+# Note: Since 2021.12.8, the pytype code analyzer does not properly work for this file
+
 from logging import Logger
 from typing import Optional, Tuple
 

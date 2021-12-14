@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime  # type: ignore
 from http import HTTPStatus
 
 from falcon import Request, Response
