@@ -2,7 +2,7 @@ import json
 from time import time
 from urllib.parse import quote
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 from starlette.requests import Request
@@ -214,3 +214,51 @@ class TestFastAPI:
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
         assert "https://slack.com/oauth/v2/authorize?state=" in response.text
+
+    def test_custom_props(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        def shortcut_handler(ack, context):
+            assert context.get("foo") == "FOO"
+            ack()
+
+        app.shortcut("test-shortcut")(shortcut_handler)
+
+        input = {
+            "type": "shortcut",
+            "token": "verification_token",
+            "action_ts": "111.111",
+            "team": {
+                "id": "T111",
+                "domain": "workspace-domain",
+                "enterprise_id": "E111",
+                "enterprise_name": "Org Name",
+            },
+            "user": {"id": "W111", "username": "primary-owner", "team_id": "T111"},
+            "callback_id": "test-shortcut",
+            "trigger_id": "111.111.xxxxxx",
+        }
+
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
+
+        api = FastAPI()
+        app_handler = SlackRequestHandler(app)
+
+        def get_foo():
+            yield "FOO"
+
+        @api.post("/slack/events")
+        async def endpoint(req: Request, foo: str = Depends(get_foo)):
+            return await app_handler.handle(req, {"foo": foo})
+
+        client = TestClient(api)
+        response = client.post(
+            "/slack/events",
+            data=body,
+            headers=self.build_headers(timestamp, body),
+        )
+        assert response.status_code == 200
+        assert_auth_test_count(self, 1)
