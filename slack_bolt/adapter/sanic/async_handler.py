@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime  # type: ignore
 
 from sanic.request import Request
 from sanic.response import HTTPResponse

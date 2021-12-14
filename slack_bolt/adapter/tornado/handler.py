@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime  # type: ignore
 
 from tornado.httputil import HTTPServerRequest
 from tornado.web import RequestHandler
