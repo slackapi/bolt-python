@@ -45,6 +45,9 @@ def to_bolt_request(req: Request) -&gt; BoltRequest:
 def to_flask_response(bolt_resp: BoltResponse) -&gt; Response:
     resp: Response = make_response(bolt_resp.body, bolt_resp.status)
     for k, values in bolt_resp.headers.items():
+        if k.lower() == &#34;content-type&#34; and resp.headers.get(&#34;content-type&#34;) is not None:
+            # Remove the one set by Flask
+            resp.headers.pop(&#34;content-type&#34;)
         for v in values:
             resp.headers.add_header(k, v)
     return resp
@@ -107,6 +110,9 @@ class SlackRequestHandler:
 <pre><code class="python">def to_flask_response(bolt_resp: BoltResponse) -&gt; Response:
     resp: Response = make_response(bolt_resp.body, bolt_resp.status)
     for k, values in bolt_resp.headers.items():
+        if k.lower() == &#34;content-type&#34; and resp.headers.get(&#34;content-type&#34;) is not None:
+            # Remove the one set by Flask
+            resp.headers.pop(&#34;content-type&#34;)
         for v in values:
             resp.headers.add_header(k, v)
     return resp</code></pre>

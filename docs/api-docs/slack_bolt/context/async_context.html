@@ -34,10 +34,28 @@ from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.context.base_context import BaseContext
 from slack_bolt.context.respond.async_respond import AsyncRespond
 from slack_bolt.context.say.async_say import AsyncSay
+from slack_bolt.util.utils import create_copy
 
 
 class AsyncBoltContext(BaseContext):
     &#34;&#34;&#34;Context object associated with a request from Slack.&#34;&#34;&#34;
+
+    def to_copyable(self) -&gt; &#34;AsyncBoltContext&#34;:
+        new_dict = {}
+        for prop_name, prop_value in self.items():
+            if prop_name in self.standard_property_names:
+                # all the standard properties are copiable
+                new_dict[prop_name] = prop_value
+            else:
+                try:
+                    copied_value = create_copy(prop_value)
+                    new_dict[prop_name] = copied_value
+                except TypeError as te:
+                    self.logger.debug(
+                        f&#34;Skipped settings &#39;{prop_name}&#39; to a copied request for lazy listeners &#34;
+                        f&#34;as it&#39;s not possible to make a deep copy (error: {te})&#34;
+                    )
+        return AsyncBoltContext(new_dict)
 
     @property
     def client(self) -&gt; Optional[AsyncWebClient]:
@@ -151,6 +169,23 @@ class AsyncBoltContext(BaseContext):
 </summary>
 <pre><code class="python">class AsyncBoltContext(BaseContext):
     &#34;&#34;&#34;Context object associated with a request from Slack.&#34;&#34;&#34;
+
+    def to_copyable(self) -&gt; &#34;AsyncBoltContext&#34;:
+        new_dict = {}
+        for prop_name, prop_value in self.items():
+            if prop_name in self.standard_property_names:
+                # all the standard properties are copiable
+                new_dict[prop_name] = prop_value
+            else:
+                try:
+                    copied_value = create_copy(prop_value)
+                    new_dict[prop_name] = copied_value
+                except TypeError as te:
+                    self.logger.debug(
+                        f&#34;Skipped settings &#39;{prop_name}&#39; to a copied request for lazy listeners &#34;
+                        f&#34;as it&#39;s not possible to make a deep copy (error: {te})&#34;
+                    )
+        return AsyncBoltContext(new_dict)
 
     @property
     def client(self) -&gt; Optional[AsyncWebClient]:
@@ -426,6 +461,36 @@ def say(self) -&gt; AsyncSay:
 </details>
 </dd>
 </dl>
+<h3>Methods</h3>
+<dl>
+<dt id="slack_bolt.context.async_context.AsyncBoltContext.to_copyable"><code class="name flex">
+<span>def <span class="ident">to_copyable</span></span>(<span>self) ‑> <a title="slack_bolt.context.async_context.AsyncBoltContext" href="#slack_bolt.context.async_context.AsyncBoltContext">AsyncBoltContext</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_copyable(self) -&gt; &#34;AsyncBoltContext&#34;:
+    new_dict = {}
+    for prop_name, prop_value in self.items():
+        if prop_name in self.standard_property_names:
+            # all the standard properties are copiable
+            new_dict[prop_name] = prop_value
+        else:
+            try:
+                copied_value = create_copy(prop_value)
+                new_dict[prop_name] = copied_value
+            except TypeError as te:
+                self.logger.debug(
+                    f&#34;Skipped settings &#39;{prop_name}&#39; to a copied request for lazy listeners &#34;
+                    f&#34;as it&#39;s not possible to make a deep copy (error: {te})&#34;
+                )
+    return AsyncBoltContext(new_dict)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Inherited members</h3>
 <ul class="hlist">
 <li><code><b><a title="slack_bolt.context.base_context.BaseContext" href="base_context.html#slack_bolt.context.base_context.BaseContext">BaseContext</a></b></code>:
@@ -471,6 +536,7 @@ def say(self) -&gt; AsyncSay:
 <li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.client" href="#slack_bolt.context.async_context.AsyncBoltContext.client">client</a></code></li>
 <li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.respond" href="#slack_bolt.context.async_context.AsyncBoltContext.respond">respond</a></code></li>
 <li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.say" href="#slack_bolt.context.async_context.AsyncBoltContext.say">say</a></code></li>
+<li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.to_copyable" href="#slack_bolt.context.async_context.AsyncBoltContext.to_copyable">to_copyable</a></code></li>
 </ul>
 </li>
 </ul>

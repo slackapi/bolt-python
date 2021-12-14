@@ -99,7 +99,16 @@ class BoltRequest:
         self.lazy_function_name = self.headers.get(
             &#34;x-slack-bolt-lazy-function-name&#34;, [None]
         )[0]
-        self.mode = mode</code></pre>
+        self.mode = mode
+
+    def to_copyable(self) -&gt; &#34;BoltRequest&#34;:
+        return BoltRequest(
+            body=self.raw_body,
+            query=self.query,
+            headers=self.headers,
+            context=self.context.to_copyable(),
+            mode=self.mode,
+        )</code></pre>
 </details>
 </section>
 <section>
@@ -193,7 +202,16 @@ class BoltRequest:
         self.lazy_function_name = self.headers.get(
             &#34;x-slack-bolt-lazy-function-name&#34;, [None]
         )[0]
-        self.mode = mode</code></pre>
+        self.mode = mode
+
+    def to_copyable(self) -&gt; &#34;BoltRequest&#34;:
+        return BoltRequest(
+            body=self.raw_body,
+            query=self.query,
+            headers=self.headers,
+            context=self.context.to_copyable(),
+            mode=self.mode,
+        )</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -234,6 +252,28 @@ class BoltRequest:
 <div class="desc"></div>
 </dd>
 </dl>
+<h3>Methods</h3>
+<dl>
+<dt id="slack_bolt.request.request.BoltRequest.to_copyable"><code class="name flex">
+<span>def <span class="ident">to_copyable</span></span>(<span>self) ‑> <a title="slack_bolt.request.request.BoltRequest" href="#slack_bolt.request.request.BoltRequest">BoltRequest</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_copyable(self) -&gt; &#34;BoltRequest&#34;:
+    return BoltRequest(
+        body=self.raw_body,
+        query=self.query,
+        headers=self.headers,
+        context=self.context.to_copyable(),
+        mode=self.mode,
+    )</code></pre>
+</details>
+</dd>
+</dl>
 </dd>
 </dl>
 </section>
@@ -263,6 +303,7 @@ class BoltRequest:
 <li><code><a title="slack_bolt.request.request.BoltRequest.mode" href="#slack_bolt.request.request.BoltRequest.mode">mode</a></code></li>
 <li><code><a title="slack_bolt.request.request.BoltRequest.query" href="#slack_bolt.request.request.BoltRequest.query">query</a></code></li>
 <li><code><a title="slack_bolt.request.request.BoltRequest.raw_body" href="#slack_bolt.request.request.BoltRequest.raw_body">raw_body</a></code></li>
+<li><code><a title="slack_bolt.request.request.BoltRequest.to_copyable" href="#slack_bolt.request.request.BoltRequest.to_copyable">to_copyable</a></code></li>
 </ul>
 </li>
 </ul>

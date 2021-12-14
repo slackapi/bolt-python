@@ -35,10 +35,29 @@ from slack_bolt.context.ack import Ack
 from slack_bolt.context.base_context import BaseContext
 from slack_bolt.context.respond import Respond
 from slack_bolt.context.say import Say
+from slack_bolt.util.utils import create_copy
 
 
 class BoltContext(BaseContext):
     &#34;&#34;&#34;Context object associated with a request from Slack.&#34;&#34;&#34;
+
+    def to_copyable(self) -&gt; &#34;BoltContext&#34;:
+        new_dict = {}
+        for prop_name, prop_value in self.items():
+            if prop_name in self.standard_property_names:
+                # all the standard properties are copiable
+                new_dict[prop_name] = prop_value
+            else:
+                try:
+                    copied_value = create_copy(prop_value)
+                    new_dict[prop_name] = copied_value
+                except TypeError as te:
+                    self.logger.warning(
+                        f&#34;Skipped setting &#39;{prop_name}&#39; to a copied request for lazy listeners &#34;
+                        &#34;due to a deep-copy creation error. Consider passing the value not as part of context object &#34;
+                        f&#34;(error: {te})&#34;
+                    )
+        return BoltContext(new_dict)
 
     @property
     def client(self) -&gt; Optional[WebClient]:
@@ -152,6 +171,24 @@ class BoltContext(BaseContext):
 </summary>
 <pre><code class="python">class BoltContext(BaseContext):
     &#34;&#34;&#34;Context object associated with a request from Slack.&#34;&#34;&#34;
+
+    def to_copyable(self) -&gt; &#34;BoltContext&#34;:
+        new_dict = {}
+        for prop_name, prop_value in self.items():
+            if prop_name in self.standard_property_names:
+                # all the standard properties are copiable
+                new_dict[prop_name] = prop_value
+            else:
+                try:
+                    copied_value = create_copy(prop_value)
+                    new_dict[prop_name] = copied_value
+                except TypeError as te:
+                    self.logger.warning(
+                        f&#34;Skipped setting &#39;{prop_name}&#39; to a copied request for lazy listeners &#34;
+                        &#34;due to a deep-copy creation error. Consider passing the value not as part of context object &#34;
+                        f&#34;(error: {te})&#34;
+                    )
+        return BoltContext(new_dict)
 
     @property
     def client(self) -&gt; Optional[WebClient]:
@@ -427,6 +464,37 @@ def say(self) -&gt; Say:
 </details>
 </dd>
 </dl>
+<h3>Methods</h3>
+<dl>
+<dt id="slack_bolt.context.context.BoltContext.to_copyable"><code class="name flex">
+<span>def <span class="ident">to_copyable</span></span>(<span>self) ‑> <a title="slack_bolt.context.context.BoltContext" href="#slack_bolt.context.context.BoltContext">BoltContext</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_copyable(self) -&gt; &#34;BoltContext&#34;:
+    new_dict = {}
+    for prop_name, prop_value in self.items():
+        if prop_name in self.standard_property_names:
+            # all the standard properties are copiable
+            new_dict[prop_name] = prop_value
+        else:
+            try:
+                copied_value = create_copy(prop_value)
+                new_dict[prop_name] = copied_value
+            except TypeError as te:
+                self.logger.warning(
+                    f&#34;Skipped setting &#39;{prop_name}&#39; to a copied request for lazy listeners &#34;
+                    &#34;due to a deep-copy creation error. Consider passing the value not as part of context object &#34;
+                    f&#34;(error: {te})&#34;
+                )
+    return BoltContext(new_dict)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Inherited members</h3>
 <ul class="hlist">
 <li><code><b><a title="slack_bolt.context.base_context.BaseContext" href="base_context.html#slack_bolt.context.base_context.BaseContext">BaseContext</a></b></code>:
@@ -472,6 +540,7 @@ def say(self) -&gt; Say:
 <li><code><a title="slack_bolt.context.context.BoltContext.client" href="#slack_bolt.context.context.BoltContext.client">client</a></code></li>
 <li><code><a title="slack_bolt.context.context.BoltContext.respond" href="#slack_bolt.context.context.BoltContext.respond">respond</a></code></li>
 <li><code><a title="slack_bolt.context.context.BoltContext.say" href="#slack_bolt.context.context.BoltContext.say">say</a></code></li>
+<li><code><a title="slack_bolt.context.context.BoltContext.to_copyable" href="#slack_bolt.context.context.BoltContext.to_copyable">to_copyable</a></code></li>
 </ul>
 </li>
 </ul>

@@ -102,7 +102,16 @@ class AsyncBoltRequest:
         self.lazy_function_name = self.headers.get(
             &#34;x-slack-bolt-lazy-function-name&#34;, [None]
         )[0]
-        self.mode = mode</code></pre>
+        self.mode = mode
+
+    def to_copyable(self) -&gt; &#34;AsyncBoltRequest&#34;:
+        return AsyncBoltRequest(
+            body=self.raw_body,
+            query=self.query,
+            headers=self.headers,
+            context=self.context.to_copyable(),
+            mode=self.mode,
+        )</code></pre>
 </details>
 </section>
 <section>
@@ -199,7 +208,16 @@ class AsyncBoltRequest:
         self.lazy_function_name = self.headers.get(
             &#34;x-slack-bolt-lazy-function-name&#34;, [None]
         )[0]
-        self.mode = mode</code></pre>
+        self.mode = mode
+
+    def to_copyable(self) -&gt; &#34;AsyncBoltRequest&#34;:
+        return AsyncBoltRequest(
+            body=self.raw_body,
+            query=self.query,
+            headers=self.headers,
+            context=self.context.to_copyable(),
+            mode=self.mode,
+        )</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -240,6 +258,28 @@ class AsyncBoltRequest:
 <div class="desc"></div>
 </dd>
 </dl>
+<h3>Methods</h3>
+<dl>
+<dt id="slack_bolt.request.async_request.AsyncBoltRequest.to_copyable"><code class="name flex">
+<span>def <span class="ident">to_copyable</span></span>(<span>self) ‑> <a title="slack_bolt.request.async_request.AsyncBoltRequest" href="#slack_bolt.request.async_request.AsyncBoltRequest">AsyncBoltRequest</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_copyable(self) -&gt; &#34;AsyncBoltRequest&#34;:
+    return AsyncBoltRequest(
+        body=self.raw_body,
+        query=self.query,
+        headers=self.headers,
+        context=self.context.to_copyable(),
+        mode=self.mode,
+    )</code></pre>
+</details>
+</dd>
+</dl>
 </dd>
 </dl>
 </section>
@@ -269,6 +309,7 @@ class AsyncBoltRequest:
 <li><code><a title="slack_bolt.request.async_request.AsyncBoltRequest.mode" href="#slack_bolt.request.async_request.AsyncBoltRequest.mode">mode</a></code></li>
 <li><code><a title="slack_bolt.request.async_request.AsyncBoltRequest.query" href="#slack_bolt.request.async_request.AsyncBoltRequest.query">query</a></code></li>
 <li><code><a title="slack_bolt.request.async_request.AsyncBoltRequest.raw_body" href="#slack_bolt.request.async_request.AsyncBoltRequest.raw_body">raw_body</a></code></li>
+<li><code><a title="slack_bolt.request.async_request.AsyncBoltRequest.to_copyable" href="#slack_bolt.request.async_request.AsyncBoltRequest.to_copyable">to_copyable</a></code></li>
 </ul>
 </li>
 </ul>

@@ -26,7 +26,10 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from logging import Logger
+<pre><code class="python"># pytype: skip-file
+# Note: Since 2021.12.8, the pytype code analyzer does not properly work for this file
+
+from logging import Logger
 from typing import Optional, Tuple
 
 from slack_bolt.authorization import AuthorizeResult
@@ -34,6 +37,27 @@ from slack_bolt.authorization import AuthorizeResult
 
 class BaseContext(dict):
     &#34;&#34;&#34;Context object associated with a request from Slack.&#34;&#34;&#34;
+
+    standard_property_names = [
+        &#34;logger&#34;,
+        &#34;token&#34;,
+        &#34;enterprise_id&#34;,
+        &#34;is_enterprise_install&#34;,
+        &#34;team_id&#34;,
+        &#34;user_id&#34;,
+        &#34;channel_id&#34;,
+        &#34;response_url&#34;,
+        &#34;matches&#34;,
+        &#34;authorize_result&#34;,
+        &#34;bot_token&#34;,
+        &#34;bot_id&#34;,
+        &#34;bot_user_id&#34;,
+        &#34;user_token&#34;,
+        &#34;client&#34;,
+        &#34;ack&#34;,
+        &#34;say&#34;,
+        &#34;respond&#34;,
+    ]
 
     @property
     def logger(self) -&gt; Logger:
@@ -143,6 +167,27 @@ class BaseContext(dict):
 <pre><code class="python">class BaseContext(dict):
     &#34;&#34;&#34;Context object associated with a request from Slack.&#34;&#34;&#34;
 
+    standard_property_names = [
+        &#34;logger&#34;,
+        &#34;token&#34;,
+        &#34;enterprise_id&#34;,
+        &#34;is_enterprise_install&#34;,
+        &#34;team_id&#34;,
+        &#34;user_id&#34;,
+        &#34;channel_id&#34;,
+        &#34;response_url&#34;,
+        &#34;matches&#34;,
+        &#34;authorize_result&#34;,
+        &#34;bot_token&#34;,
+        &#34;bot_id&#34;,
+        &#34;bot_user_id&#34;,
+        &#34;user_token&#34;,
+        &#34;client&#34;,
+        &#34;ack&#34;,
+        &#34;say&#34;,
+        &#34;respond&#34;,
+    ]
+
     @property
     def logger(self) -&gt; Logger:
         &#34;&#34;&#34;The properly configured logger that is available for middleware/listeners.&#34;&#34;&#34;
@@ -237,6 +282,13 @@ class BaseContext(dict):
 <li><a title="slack_bolt.context.async_context.AsyncBoltContext" href="async_context.html#slack_bolt.context.async_context.AsyncBoltContext">AsyncBoltContext</a></li>
 <li><a title="slack_bolt.context.context.BoltContext" href="context.html#slack_bolt.context.context.BoltContext">BoltContext</a></li>
 </ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.context.base_context.BaseContext.standard_property_names"><code class="name">var <span class="ident">standard_property_names</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 <h3>Instance variables</h3>
 <dl>
 <dt id="slack_bolt.context.base_context.BaseContext.authorize_result"><code class="name">var <span class="ident">authorize_result</span> : Optional[<a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="../authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]</code></dt>
@@ -479,6 +531,7 @@ def user_token(self) -&gt; Optional[str]:
 <li><code><a title="slack_bolt.context.base_context.BaseContext.matches" href="#slack_bolt.context.base_context.BaseContext.matches">matches</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.response_url" href="#slack_bolt.context.base_context.BaseContext.response_url">response_url</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.set_authorize_result" href="#slack_bolt.context.base_context.BaseContext.set_authorize_result">set_authorize_result</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.standard_property_names" href="#slack_bolt.context.base_context.BaseContext.standard_property_names">standard_property_names</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.team_id" href="#slack_bolt.context.base_context.BaseContext.team_id">team_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.token" href="#slack_bolt.context.base_context.BaseContext.token">token</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.user_id" href="#slack_bolt.context.base_context.BaseContext.user_id">user_id</a></code></li>
