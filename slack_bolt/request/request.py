@@ -1,3 +1,5 @@
+import json
+import sys
 from typing import Dict, Optional, Union, Any, Sequence
 
 from slack_bolt.context.context import BoltContext
@@ -50,9 +52,16 @@ class BoltRequest:
             # Socket Mode
             if body is not None and isinstance(body, str):
                 self.raw_body = body
+            # After Python 3.7, dicts in all Python versions will preserve insertion order.
+            elif (
+                body is not None
+                and isinstance(body, dict)
+                and sys.version_info >= (3, 6)
+            ):
+                self.raw_body = json.dumps(body)
+            # Prior to Python 3.6, we can't convert the dict value to str while guaranteeing preservation of the
+            # original structure/format.
             else:
-                # We don't convert the dict value to str
-                # as doing so does not guarantee to keep the original structure/format.
                 self.raw_body = ""
 
         self.query = parse_query(query)
