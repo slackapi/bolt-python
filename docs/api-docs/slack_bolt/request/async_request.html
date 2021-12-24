@@ -105,8 +105,9 @@ class AsyncBoltRequest:
         self.mode = mode
 
     def to_copyable(self) -&gt; &#34;AsyncBoltRequest&#34;:
+        body: Union[str, dict] = self.raw_body if self.mode == &#34;http&#34; else self.body
         return AsyncBoltRequest(
-            body=self.raw_body,
+            body=body,
             query=self.query,
             headers=self.headers,
             context=self.context.to_copyable(),
@@ -211,8 +212,9 @@ class AsyncBoltRequest:
         self.mode = mode
 
     def to_copyable(self) -&gt; &#34;AsyncBoltRequest&#34;:
+        body: Union[str, dict] = self.raw_body if self.mode == &#34;http&#34; else self.body
         return AsyncBoltRequest(
-            body=self.raw_body,
+            body=body,
             query=self.query,
             headers=self.headers,
             context=self.context.to_copyable(),
@@ -270,8 +272,9 @@ class AsyncBoltRequest:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def to_copyable(self) -&gt; &#34;AsyncBoltRequest&#34;:
+    body: Union[str, dict] = self.raw_body if self.mode == &#34;http&#34; else self.body
     return AsyncBoltRequest(
-        body=self.raw_body,
+        body=body,
         query=self.query,
         headers=self.headers,
         context=self.context.to_copyable(),
