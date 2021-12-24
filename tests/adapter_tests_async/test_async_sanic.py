@@ -219,9 +219,7 @@ class TestSanic:
         async def endpoint(req: Request):
             return await app_handler.handle(req)
 
-        _, response = await api.asgi_client.get(
-            url="/slack/install", allow_redirects=False
-        )
+        _, response = await api.asgi_client.get(url="/slack/install")
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
 
