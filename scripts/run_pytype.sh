@@ -5,5 +5,5 @@ script_dir=$(dirname $0)
 cd ${script_dir}/.. && \
   pip install -e ".[async]" && \
   pip install -e ".[adapter]" && \
-  pip install "pytype==2021.12.8" && \
+  pip install "pytype==2021.12.15" && \
   pytype slack_bolt/
