@@ -77,8 +77,9 @@ class AsyncBoltRequest:
         self.mode = mode
 
     def to_copyable(self) -> "AsyncBoltRequest":
+        body: Union[str, dict] = self.raw_body if self.mode == "http" else self.body
         return AsyncBoltRequest(
-            body=self.raw_body,
+            body=body,
             query=self.query,
             headers=self.headers,
             context=self.context.to_copyable(),
