@@ -860,8 +860,8 @@ class AsyncApp:
                     "thread_broadcast",
                 ),
             }
-            primary_matcher = builtin_matchers.event(
-                constraints=constraints, asyncio=True
+            primary_matcher = builtin_matchers.message_event(
+                constraints=constraints, keyword=keyword, asyncio=True
             )
             middleware.insert(0, AsyncMessageListenerMatches(keyword))
             return self._register_listener(

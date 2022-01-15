@@ -219,8 +219,27 @@ class TestAsyncMessage:
         assert response.status == 200
 
         await asyncio.sleep(0.3)
-        assert called["first"] == False
-        assert called["second"] == True
+        assert called["first"] is False
+        assert called["second"] is True
+
+    @pytest.mark.asyncio
+    async def test_issue_561_matchers(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        async def just_fail():
+            raise "This matcher should not be called!"
+
+        @app.message("xxx", matchers=[just_fail])
+        async def just_ack():
+            raise "This listener should not be called!"
+
+        request = self.build_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 404
+        await assert_auth_test_count_async(self, 1)
 
 
 message_body = {

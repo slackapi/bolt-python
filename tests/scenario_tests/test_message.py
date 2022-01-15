@@ -205,6 +205,24 @@ class TestMessage:
         assert called["first"] == False
         assert called["second"] == True
 
+    def test_issue_561_matchers(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        def just_fail():
+            raise "This matcher should not be called!"
+
+        @app.message("xxx", matchers=[just_fail])
+        def just_ack():
+            raise "This listener should not be called!"
+
+        request = self.build_request()
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert_auth_test_count(self, 1)
+
 
 message_body = {
     "token": "verification_token",

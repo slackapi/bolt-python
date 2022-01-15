@@ -810,7 +810,9 @@ class App:
                     "thread_broadcast",
                 ),
             }
-            primary_matcher = builtin_matchers.event(constraints=constraints)
+            primary_matcher = builtin_matchers.message_event(
+                keyword=keyword, constraints=constraints
+            )
             middleware.insert(0, MessageListenerMatches(keyword))
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware, True
