@@ -164,7 +164,7 @@ def _check_event_subtype(event_payload: dict, constraints: dict) -> bool:
             return "subtype" in event_payload and _matches(
                 expected_subtype, event_payload["subtype"]
             )
-    return False
+    return True
 
 
 def _verify_message_event_type(event_type: str) -> None:
