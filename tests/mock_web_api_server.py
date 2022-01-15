@@ -6,7 +6,7 @@ import threading
 import time
 from http import HTTPStatus
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-from typing import Type
+from typing import Type, Optional
 from unittest import TestCase
 from urllib.parse import urlparse, parse_qs, ParseResult
 
@@ -65,7 +65,46 @@ class MockHandler(SimpleHTTPRequestHandler):
         "token_type": "user"
     }
 }
-                """
+"""
+    oauth_v2_access_bot_refresh_response = """
+    {
+        "ok": true,
+        "app_id": "A0KRD7HC3",
+        "access_token": "xoxb-valid-refreshed",
+        "expires_in": 43200,
+        "refresh_token": "xoxe-1-valid-bot-refreshed",
+        "token_type": "bot",
+        "scope": "chat:write,commands",
+        "bot_user_id": "U0KRQLJ9H",
+        "team": {
+            "name": "Slack Softball Team",
+            "id": "T9TK3CUKW"
+        },
+        "enterprise": {
+            "name": "slack-sports",
+            "id": "E12345678"
+        }
+    }
+"""
+    oauth_v2_access_user_refresh_response = """
+        {
+            "ok": true,
+            "app_id": "A0KRD7HC3",
+            "access_token": "xoxp-valid-refreshed",
+            "expires_in": 43200,
+            "refresh_token": "xoxe-1-valid-user-refreshed",
+            "token_type": "user",
+            "scope": "search:read",
+            "team": {
+                "name": "Slack Softball Team",
+                "id": "T9TK3CUKW"
+            },
+            "enterprise": {
+                "name": "slack-sports",
+                "id": "E12345678"
+            }
+        }
+    """
     bot_auth_test_response = """
 {
     "ok": true,
@@ -108,10 +147,31 @@ class MockHandler(SimpleHTTPRequestHandler):
 
             body = {"ok": True}
             if path == "/oauth.v2.access":
-                self.send_response(200)
-                self.set_common_headers()
-                self.wfile.write(self.oauth_v2_access_response.encode("utf-8"))
-                return
+                if self.headers.get("authorization") is not None:
+                    request_body = self._parse_request_body(
+                        parsed_path=parsed_path,
+                        content_len=int(self.headers.get("Content-Length") or 0),
+                    )
+                    self.logger.info(f"request body: {request_body}")
+
+                    if request_body.get("grant_type") == "refresh_token":
+                        if "bot-valid" in request_body.get("refresh_token"):
+                            self.send_response(200)
+                            self.set_common_headers()
+                            body = self.oauth_v2_access_bot_refresh_response
+                            self.wfile.write(body.encode("utf-8"))
+                            return
+                        if "user-valid" in request_body.get("refresh_token"):
+                            self.send_response(200)
+                            self.set_common_headers()
+                            body = self.oauth_v2_access_user_refresh_response
+                            self.wfile.write(body.encode("utf-8"))
+                            return
+                    if request_body.get("code") is not None:
+                        self.send_response(200)
+                        self.set_common_headers()
+                        self.wfile.write(self.oauth_v2_access_response.encode("utf-8"))
+                        return
 
             if self.is_valid_user_token():
                 if path == "/auth.test":
@@ -127,27 +187,10 @@ class MockHandler(SimpleHTTPRequestHandler):
                     self.wfile.write(self.bot_auth_test_response.encode("utf-8"))
                     return
 
-                len_header = self.headers.get("Content-Length") or 0
-                content_len = int(len_header)
-                post_body = self.rfile.read(content_len)
-                request_body = None
-                if post_body:
-                    try:
-                        post_body = post_body.decode("utf-8")
-                        if post_body.startswith("{"):
-                            request_body = json.loads(post_body)
-                        else:
-                            request_body = {
-                                k: v[0] for k, v in parse_qs(post_body).items()
-                            }
-                    except UnicodeDecodeError:
-                        pass
-                else:
-                    if parsed_path and parsed_path.query:
-                        request_body = {
-                            k: v[0] for k, v in parse_qs(parsed_path.query).items()
-                        }
-
+                request_body = self._parse_request_body(
+                    parsed_path=parsed_path,
+                    content_len=int(self.headers.get("Content-Length") or 0),
+                )
                 self.logger.info(f"request: {path} {request_body}")
 
                 header = self.headers["authorization"]
@@ -174,6 +217,23 @@ class MockHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         self._handle()
+
+    def _parse_request_body(self, parsed_path: str, content_len: int) -> Optional[dict]:
+        post_body = self.rfile.read(content_len)
+        request_body = None
+        if post_body:
+            try:
+                post_body = post_body.decode("utf-8")
+                if post_body.startswith("{"):
+                    request_body = json.loads(post_body)
+                else:
+                    request_body = {k: v[0] for k, v in parse_qs(post_body).items()}
+            except UnicodeDecodeError:
+                pass
+        else:
+            if parsed_path and parsed_path.query:
+                request_body = {k: v[0] for k, v in parse_qs(parsed_path.query).items()}
+        return request_body
 
 
 #

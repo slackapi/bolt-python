@@ -8,6 +8,7 @@ from slack_sdk.oauth.installation_store.async_installation_store import (
     AsyncInstallationStore,
 )
 from slack_sdk.oauth.token_rotation.async_rotator import AsyncTokenRotator
+from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.authorization.async_authorize_args import AsyncAuthorizeArgs
 from slack_bolt.authorization import AuthorizeResult
@@ -124,6 +125,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
         # use only InstallationStore#find_bot(enterprise_id, team_id)
         bot_only: bool = False,
         cache_enabled: bool = False,
+        client: Optional[AsyncWebClient] = None,
     ):
         self.logger = logger
         self.installation_store = installation_store
@@ -136,6 +138,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
             self.token_rotator = AsyncTokenRotator(
                 client_id=client_id,
                 client_secret=client_secret,
+                client=client,
             )
         else:
             self.token_rotator = None

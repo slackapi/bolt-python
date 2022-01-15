@@ -7,6 +7,7 @@ from slack_sdk.oauth import InstallationStore
 from slack_sdk.oauth.installation_store.models.bot import Bot
 from slack_sdk.oauth.installation_store.models.installation import Installation
 from slack_sdk.oauth.token_rotation.rotator import TokenRotator
+from slack_sdk.web import WebClient
 
 from slack_bolt.authorization.authorize_args import AuthorizeArgs
 from slack_bolt.authorization.authorize_result import AuthorizeResult
@@ -129,6 +130,7 @@ class InstallationStoreAuthorize(Authorize):
         # use only InstallationStore#find_bot(enterprise_id, team_id)
         bot_only: bool = False,
         cache_enabled: bool = False,
+        client: Optional[WebClient] = None,
     ):
         self.logger = logger
         self.installation_store = installation_store
@@ -143,6 +145,7 @@ class InstallationStoreAuthorize(Authorize):
             self.token_rotator = TokenRotator(
                 client_id=client_id,
                 client_secret=client_secret,
+                client=client,
             )
         else:
             self.token_rotator = None

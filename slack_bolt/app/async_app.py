@@ -239,6 +239,7 @@ class AsyncApp:
                 client_secret=settings.client_secret if settings is not None else None,
                 logger=self._framework_logger,
                 bot_only=installation_store_bot_only,
+                client=self._async_client,  # for proxy use cases etc.
             )
 
         self._async_oauth_flow: Optional[AsyncOAuthFlow] = None
