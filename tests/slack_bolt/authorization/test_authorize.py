@@ -195,6 +195,22 @@ class TestAuthorize:
         assert result.user_token == "xoxp-valid"
         assert_auth_test_count(self, 1)  # cached
 
+    def test_fetch_different_user_token(self):
+        installation_store = ValidUserTokenInstallationStore()
+        authorize = InstallationStoreAuthorize(
+            logger=installation_store.logger, installation_store=installation_store
+        )
+        context = BoltContext()
+        context["client"] = WebClient(base_url=self.mock_api_server_base_url)
+        result = authorize(
+            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W222"
+        )
+        assert result.bot_id == "BZYBOTHED"
+        assert result.bot_user_id == "W23456789"
+        assert result.bot_token == "xoxb-valid"
+        assert result.user_token == "xoxp-valid"
+        assert_auth_test_count(self, 1)
+
 
 class LegacyMemoryInstallationStore(InstallationStore):
     @property
@@ -257,3 +273,45 @@ class BotOnlyMemoryInstallationStore(LegacyMemoryInstallationStore):
         is_enterprise_install: Optional[bool] = False,
     ) -> Optional[Installation]:
         raise ValueError
+
+
+class ValidUserTokenInstallationStore(InstallationStore):
+    @property
+    def logger(self) -> Logger:
+        return logging.getLogger(__name__)
+
+    def save(self, installation: Installation):
+        pass
+
+    def find_installation(
+        self,
+        *,
+        enterprise_id: Optional[str],
+        team_id: Optional[str],
+        user_id: Optional[str] = None,
+        is_enterprise_install: Optional[bool] = False,
+    ) -> Optional[Installation]:
+        if user_id is None:
+            return Installation(
+                app_id="A111",
+                enterprise_id="E111",
+                team_id="T0G9PQBBK",
+                bot_token="xoxb-valid",
+                bot_id="B",
+                bot_user_id="W",
+                bot_scopes=["commands", "chat:write"],
+                user_id="W11111",
+                user_token="xoxp-different-installer",
+                user_scopes=["search:read"],
+                installed_at=datetime.datetime.now().timestamp(),
+            )
+        elif user_id == "W222":
+            return Installation(
+                app_id="A111",
+                enterprise_id="E111",
+                team_id="T0G9PQBBK",
+                user_id="W222",
+                user_token="xoxp-valid",
+                user_scopes=["search:read"],
+                installed_at=datetime.datetime.now().timestamp(),
+            )
