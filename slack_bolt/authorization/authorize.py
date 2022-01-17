@@ -4,9 +4,10 @@ from typing import Optional, Callable, Dict, Any
 
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth import InstallationStore
-from slack_sdk.oauth.installation_store import Bot
+from slack_sdk.oauth.installation_store.models.bot import Bot
 from slack_sdk.oauth.installation_store.models.installation import Installation
 from slack_sdk.oauth.token_rotation.rotator import TokenRotator
+from slack_sdk.web import WebClient
 
 from slack_bolt.authorization.authorize_args import AuthorizeArgs
 from slack_bolt.authorization.authorize_result import AuthorizeResult
@@ -33,8 +34,8 @@ class Authorize:
 
 
 class CallableAuthorize(Authorize):
-    """When you pass the authorize argument in AsyncApp constructor,
-    This authorize implementation will be used.
+    """When you pass the `authorize` argument in AsyncApp constructor,
+    This `authorize` implementation will be used.
     """
 
     def __init__(
@@ -102,9 +103,9 @@ class CallableAuthorize(Authorize):
 
 
 class InstallationStoreAuthorize(Authorize):
-    """If you use the OAuth flow settings, this authorize implementation will be used.
+    """If you use the OAuth flow settings, this `authorize` implementation will be used.
     As long as your own InstallationStore (or the built-in ones) works as you expect,
-    you can expect that the authorize layer should work for you without any customization.
+    you can expect that the `authorize` layer should work for you without any customization.
     """
 
     authorize_result_cache: Dict[str, AuthorizeResult]
@@ -129,6 +130,7 @@ class InstallationStoreAuthorize(Authorize):
         # use only InstallationStore#find_bot(enterprise_id, team_id)
         bot_only: bool = False,
         cache_enabled: bool = False,
+        client: Optional[WebClient] = None,
     ):
         self.logger = logger
         self.installation_store = installation_store
@@ -143,6 +145,7 @@ class InstallationStoreAuthorize(Authorize):
             self.token_rotator = TokenRotator(
                 client_id=client_id,
                 client_secret=client_secret,
+                client=client,
             )
         else:
             self.token_rotator = None
@@ -168,61 +171,78 @@ class InstallationStoreAuthorize(Authorize):
             try:
                 # Note that this is the latest information for the org/workspace.
                 # The installer may not be the user associated with this incoming request.
-                installation: Optional[
+                latest_installation: Optional[
                     Installation
                 ] = self.installation_store.find_installation(
                     enterprise_id=enterprise_id,
                     team_id=team_id,
                     is_enterprise_install=context.is_enterprise_install,
                 )
-                if installation is not None:
-                    if installation.user_id != user_id:
+                # If the user_token in the latest_installation is not for the user associated with this request,
+                # we'll fetch a different installation for the user below.
+                # The example use cases are:
+                # - The app's installation requires both bot and user tokens
+                # - The app has two installation paths 1) bot installation 2) individual user authorization
+                this_user_installation: Optional[Installation] = None
+
+                if latest_installation is not None:
+                    # Save the latest bot token
+                    bot_token = latest_installation.bot_token  # this still can be None
+                    user_token = (
+                        latest_installation.user_token
+                    )  # this still can be None
+
+                    if latest_installation.user_id != user_id:
                         # First off, remove the user token as the installer is a different user
-                        installation.user_token = None
-                        installation.user_scopes = []
+                        latest_installation.user_token = None
+                        latest_installation.user_scopes = []
 
                         # try to fetch the request user's installation
                         # to reflect the user's access token if exists
-                        user_installation = self.installation_store.find_installation(
-                            enterprise_id=enterprise_id,
-                            team_id=team_id,
-                            user_id=user_id,
-                            is_enterprise_install=context.is_enterprise_install,
-                        )
-                        if user_installation is not None:
-                            # Overwrite the installation with the one for this user
-                            installation = user_installation
-
-                    bot_token, user_token = (
-                        installation.bot_token,
-                        installation.user_token,
-                    )
-                    if (
-                        installation.user_refresh_token is not None
-                        or installation.bot_refresh_token is not None
-                    ):
-                        if self.token_rotator is None:
-                            raise BoltError(self._config_error_message)
-                        refreshed = self.token_rotator.perform_token_rotation(
-                            installation=installation,
-                            minutes_before_expiration=self.token_rotation_expiration_minutes,
-                        )
-                        if refreshed is not None:
-                            self.installation_store.save(refreshed)
-                            bot_token, user_token = (
-                                refreshed.bot_token,
-                                refreshed.user_token,
+                        this_user_installation = (
+                            self.installation_store.find_installation(
+                                enterprise_id=enterprise_id,
+                                team_id=team_id,
+                                user_id=user_id,
+                                is_enterprise_install=context.is_enterprise_install,
                             )
+                        )
+                        if this_user_installation is not None:
+                            user_token = this_user_installation.user_token
+                            if latest_installation.bot_token is None:
+                                # If latest_installation has a bot token, we never overwrite the value
+                                bot_token = this_user_installation.bot_token
+
+                            # If token rotation is enabled, running rotation may be needed here
+                            refreshed = self._rotate_and_save_tokens_if_necessary(
+                                this_user_installation
+                            )
+                            if refreshed is not None:
+                                user_token = refreshed.user_token
+                                if latest_installation.bot_token is None:
+                                    # If latest_installation has a bot token, we never overwrite the value
+                                    bot_token = refreshed.bot_token
+
+                    # If token rotation is enabled, running rotation may be needed here
+                    refreshed = self._rotate_and_save_tokens_if_necessary(
+                        latest_installation
+                    )
+                    if refreshed is not None:
+                        bot_token = refreshed.bot_token
+                        if this_user_installation is None:
+                            # Only when we don't have `this_user_installation` here,
+                            # the `user_token` is for the user associated with this request
+                            user_token = refreshed.user_token
 
             except NotImplementedError as _:
                 self.find_installation_available = False
 
         if (
-            # If you intentionally use only find_bot / delete_bot,
+            # If you intentionally use only `find_bot` / `delete_bot`,
             self.bot_only
-            # If find_installation method is not available,
+            # If the `find_installation` method is not available,
             or not self.find_installation_available
-            # If find_installation did not return data and find_bot method is available,
+            # If the `find_installation` method did not return data and find_bot method is available,
             or (
                 self.find_bot_available is True
                 and bot_token is None
@@ -290,3 +310,26 @@ class InstallationStoreAuthorize(Authorize):
             "No installation data found "
             f"for enterprise_id: {enterprise_id} team_id: {team_id}"
         )
+
+    def _rotate_and_save_tokens_if_necessary(
+        self, installation: Optional[Installation]
+    ) -> Optional[Installation]:
+        if installation is None or (
+            installation.user_refresh_token is None
+            and installation.bot_refresh_token is None
+        ):
+            # No need to rotate tokens
+            return None
+
+        if self.token_rotator is None:
+            # Token rotation is required but this Bolt app is not properly configured
+            raise BoltError(self._config_error_message)
+
+        refreshed: Optional[Installation] = self.token_rotator.perform_token_rotation(
+            installation=installation,
+            minutes_before_expiration=self.token_rotation_expiration_minutes,
+        )
+        if refreshed is not None:
+            # Save the refreshed data in database for following requests
+            self.installation_store.save(refreshed)
+        return refreshed
