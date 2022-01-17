@@ -1,5 +1,6 @@
 # pytype: skip-file
 import inspect
+import re
 import sys
 
 from slack_bolt.error import BoltError
@@ -95,37 +96,10 @@ def event(
 
         def func(body: Dict[str, Any]) -> bool:
             if is_event(body):
-                event = body["event"]
-                if not _matches(constraints["type"], event["type"]):
-                    return False
-                if "subtype" in constraints:
-                    expected_subtype: Union[
-                        str, Sequence[Optional[Union[str, Pattern]]]
-                    ] = constraints["subtype"]
-                    if expected_subtype is None:
-                        # "subtype" in constraints is intentionally None for this pattern
-                        return "subtype" not in event
-                    elif isinstance(expected_subtype, (str, Pattern)):
-                        return "subtype" in event and _matches(
-                            expected_subtype, event["subtype"]
-                        )
-                    elif isinstance(expected_subtype, Sequence):
-                        subtypes: Sequence[
-                            Optional[Union[str, Pattern]]
-                        ] = expected_subtype
-                        for expected in subtypes:
-                            actual: Optional[str] = event.get("subtype")
-                            if expected is None:
-                                if actual is None:
-                                    return True
-                            elif actual is not None and _matches(expected, actual):
-                                return True
-                        return False
-                    else:
-                        return "subtype" in event and _matches(
-                            expected_subtype, event["subtype"]
-                        )
-                return True
+                return _check_event_subtype(
+                    event_payload=body["event"],
+                    constraints=constraints,
+                )
             return False
 
         return build_listener_matcher(func, asyncio)
@@ -133,6 +107,64 @@ def event(
     raise BoltError(
         f"event ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
     )
+
+
+def message_event(
+    constraints: Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]],
+    keyword: Union[str, Pattern],
+    asyncio: bool = False,
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+    if "type" in constraints and keyword is not None:
+        _verify_message_event_type(constraints["type"])
+
+        def func(body: Dict[str, Any]) -> bool:
+            if is_event(body):
+                is_valid_subtype = _check_event_subtype(
+                    event_payload=body["event"],
+                    constraints=constraints,
+                )
+                if is_valid_subtype is True:
+                    # Check keyword matching
+                    text = body.get("event", {}).get("text", "")
+                    match_result = re.findall(keyword, text)
+                    if match_result is not None and match_result != []:
+                        return True
+            return False
+
+        return build_listener_matcher(func, asyncio)
+
+    raise BoltError(f"event ({constraints}: {type(constraints)}) must be dict")
+
+
+def _check_event_subtype(event_payload: dict, constraints: dict) -> bool:
+    if not _matches(constraints["type"], event_payload["type"]):
+        return False
+    if "subtype" in constraints:
+        expected_subtype: Union[
+            str, Sequence[Optional[Union[str, Pattern]]]
+        ] = constraints["subtype"]
+        if expected_subtype is None:
+            # "subtype" in constraints is intentionally None for this pattern
+            return "subtype" not in event_payload
+        elif isinstance(expected_subtype, (str, Pattern)):
+            return "subtype" in event_payload and _matches(
+                expected_subtype, event_payload["subtype"]
+            )
+        elif isinstance(expected_subtype, Sequence):
+            subtypes: Sequence[Optional[Union[str, Pattern]]] = expected_subtype
+            for expected in subtypes:
+                actual: Optional[str] = event_payload.get("subtype")
+                if expected is None:
+                    if actual is None:
+                        return True
+                elif actual is not None and _matches(expected, actual):
+                    return True
+            return False
+        else:
+            return "subtype" in event_payload and _matches(
+                expected_subtype, event_payload["subtype"]
+            )
+    return True
 
 
 def _verify_message_event_type(event_type: str) -> None:
