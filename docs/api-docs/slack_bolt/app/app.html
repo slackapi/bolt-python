@@ -259,6 +259,7 @@ class App:
                 client_secret=settings.client_secret if settings is not None else None,
                 logger=self._framework_logger,
                 bot_only=installation_store_bot_only,
+                client=self._client,  # for proxy use cases etc.
             )
 
         self._oauth_flow: Optional[OAuthFlow] = None
@@ -838,7 +839,9 @@ class App:
                     &#34;thread_broadcast&#34;,
                 ),
             }
-            primary_matcher = builtin_matchers.event(constraints=constraints)
+            primary_matcher = builtin_matchers.message_event(
+                keyword=keyword, constraints=constraints
+            )
             middleware.insert(0, MessageListenerMatches(keyword))
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware, True
@@ -1724,6 +1727,7 @@ be used.</dd>
                 client_secret=settings.client_secret if settings is not None else None,
                 logger=self._framework_logger,
                 bot_only=installation_store_bot_only,
+                client=self._client,  # for proxy use cases etc.
             )
 
         self._oauth_flow: Optional[OAuthFlow] = None
@@ -2303,7 +2307,9 @@ be used.</dd>
                     &#34;thread_broadcast&#34;,
                 ),
             }
-            primary_matcher = builtin_matchers.event(constraints=constraints)
+            primary_matcher = builtin_matchers.message_event(
+                keyword=keyword, constraints=constraints
+            )
             middleware.insert(0, MessageListenerMatches(keyword))
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware, True
@@ -3656,7 +3662,9 @@ Only when all the middleware call <code>next()</code> method, the listener funct
                 &#34;thread_broadcast&#34;,
             ),
         }
-        primary_matcher = builtin_matchers.event(constraints=constraints)
+        primary_matcher = builtin_matchers.message_event(
+            keyword=keyword, constraints=constraints
+        )
         middleware.insert(0, MessageListenerMatches(keyword))
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware, True

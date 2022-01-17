@@ -28,6 +28,7 @@
 </summary>
 <pre><code class="python"># pytype: skip-file
 import inspect
+import re
 import sys
 
 from slack_bolt.error import BoltError
@@ -123,37 +124,10 @@ def event(
 
         def func(body: Dict[str, Any]) -&gt; bool:
             if is_event(body):
-                event = body[&#34;event&#34;]
-                if not _matches(constraints[&#34;type&#34;], event[&#34;type&#34;]):
-                    return False
-                if &#34;subtype&#34; in constraints:
-                    expected_subtype: Union[
-                        str, Sequence[Optional[Union[str, Pattern]]]
-                    ] = constraints[&#34;subtype&#34;]
-                    if expected_subtype is None:
-                        # &#34;subtype&#34; in constraints is intentionally None for this pattern
-                        return &#34;subtype&#34; not in event
-                    elif isinstance(expected_subtype, (str, Pattern)):
-                        return &#34;subtype&#34; in event and _matches(
-                            expected_subtype, event[&#34;subtype&#34;]
-                        )
-                    elif isinstance(expected_subtype, Sequence):
-                        subtypes: Sequence[
-                            Optional[Union[str, Pattern]]
-                        ] = expected_subtype
-                        for expected in subtypes:
-                            actual: Optional[str] = event.get(&#34;subtype&#34;)
-                            if expected is None:
-                                if actual is None:
-                                    return True
-                            elif actual is not None and _matches(expected, actual):
-                                return True
-                        return False
-                    else:
-                        return &#34;subtype&#34; in event and _matches(
-                            expected_subtype, event[&#34;subtype&#34;]
-                        )
-                return True
+                return _check_event_subtype(
+                    event_payload=body[&#34;event&#34;],
+                    constraints=constraints,
+                )
             return False
 
         return build_listener_matcher(func, asyncio)
@@ -161,6 +135,64 @@ def event(
     raise BoltError(
         f&#34;event ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;
     )
+
+
+def message_event(
+    constraints: Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]],
+    keyword: Union[str, Pattern],
+    asyncio: bool = False,
+) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
+    if &#34;type&#34; in constraints and keyword is not None:
+        _verify_message_event_type(constraints[&#34;type&#34;])
+
+        def func(body: Dict[str, Any]) -&gt; bool:
+            if is_event(body):
+                is_valid_subtype = _check_event_subtype(
+                    event_payload=body[&#34;event&#34;],
+                    constraints=constraints,
+                )
+                if is_valid_subtype is True:
+                    # Check keyword matching
+                    text = body.get(&#34;event&#34;, {}).get(&#34;text&#34;, &#34;&#34;)
+                    match_result = re.findall(keyword, text)
+                    if match_result is not None and match_result != []:
+                        return True
+            return False
+
+        return build_listener_matcher(func, asyncio)
+
+    raise BoltError(f&#34;event ({constraints}: {type(constraints)}) must be dict&#34;)
+
+
+def _check_event_subtype(event_payload: dict, constraints: dict) -&gt; bool:
+    if not _matches(constraints[&#34;type&#34;], event_payload[&#34;type&#34;]):
+        return False
+    if &#34;subtype&#34; in constraints:
+        expected_subtype: Union[
+            str, Sequence[Optional[Union[str, Pattern]]]
+        ] = constraints[&#34;subtype&#34;]
+        if expected_subtype is None:
+            # &#34;subtype&#34; in constraints is intentionally None for this pattern
+            return &#34;subtype&#34; not in event_payload
+        elif isinstance(expected_subtype, (str, Pattern)):
+            return &#34;subtype&#34; in event_payload and _matches(
+                expected_subtype, event_payload[&#34;subtype&#34;]
+            )
+        elif isinstance(expected_subtype, Sequence):
+            subtypes: Sequence[Optional[Union[str, Pattern]]] = expected_subtype
+            for expected in subtypes:
+                actual: Optional[str] = event_payload.get(&#34;subtype&#34;)
+                if expected is None:
+                    if actual is None:
+                        return True
+                elif actual is not None and _matches(expected, actual):
+                    return True
+            return False
+        else:
+            return &#34;subtype&#34; in event_payload and _matches(
+                expected_subtype, event_payload[&#34;subtype&#34;]
+            )
+    return True
 
 
 def _verify_message_event_type(event_type: str) -&gt; None:
@@ -770,37 +802,10 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 
         def func(body: Dict[str, Any]) -&gt; bool:
             if is_event(body):
-                event = body[&#34;event&#34;]
-                if not _matches(constraints[&#34;type&#34;], event[&#34;type&#34;]):
-                    return False
-                if &#34;subtype&#34; in constraints:
-                    expected_subtype: Union[
-                        str, Sequence[Optional[Union[str, Pattern]]]
-                    ] = constraints[&#34;subtype&#34;]
-                    if expected_subtype is None:
-                        # &#34;subtype&#34; in constraints is intentionally None for this pattern
-                        return &#34;subtype&#34; not in event
-                    elif isinstance(expected_subtype, (str, Pattern)):
-                        return &#34;subtype&#34; in event and _matches(
-                            expected_subtype, event[&#34;subtype&#34;]
-                        )
-                    elif isinstance(expected_subtype, Sequence):
-                        subtypes: Sequence[
-                            Optional[Union[str, Pattern]]
-                        ] = expected_subtype
-                        for expected in subtypes:
-                            actual: Optional[str] = event.get(&#34;subtype&#34;)
-                            if expected is None:
-                                if actual is None:
-                                    return True
-                            elif actual is not None and _matches(expected, actual):
-                                return True
-                        return False
-                    else:
-                        return &#34;subtype&#34; in event and _matches(
-                            expected_subtype, event[&#34;subtype&#34;]
-                        )
-                return True
+                return _check_event_subtype(
+                    event_payload=body[&#34;event&#34;],
+                    constraints=constraints,
+                )
             return False
 
         return build_listener_matcher(func, asyncio)
@@ -827,6 +832,42 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
         return is_global_shortcut(body) and _matches(callback_id, body[&#34;callback_id&#34;])
 
     return build_listener_matcher(func, asyncio)</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.listener_matcher.builtins.message_event"><code class="name flex">
+<span>def <span class="ident">message_event</span></span>(<span>constraints: Dict[str, Union[str, Sequence[Union[str, re.Pattern, ForwardRef(None)]]]], keyword: Union[str, re.Pattern], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def message_event(
+    constraints: Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]],
+    keyword: Union[str, Pattern],
+    asyncio: bool = False,
+) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
+    if &#34;type&#34; in constraints and keyword is not None:
+        _verify_message_event_type(constraints[&#34;type&#34;])
+
+        def func(body: Dict[str, Any]) -&gt; bool:
+            if is_event(body):
+                is_valid_subtype = _check_event_subtype(
+                    event_payload=body[&#34;event&#34;],
+                    constraints=constraints,
+                )
+                if is_valid_subtype is True:
+                    # Check keyword matching
+                    text = body.get(&#34;event&#34;, {}).get(&#34;text&#34;, &#34;&#34;)
+                    match_result = re.findall(keyword, text)
+                    if match_result is not None and match_result != []:
+                        return True
+            return False
+
+        return build_listener_matcher(func, asyncio)
+
+    raise BoltError(f&#34;event ({constraints}: {type(constraints)}) must be dict&#34;)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.message_shortcut"><code class="name flex">
@@ -1120,6 +1161,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <li><code><a title="slack_bolt.listener_matcher.builtins.dialog_suggestion" href="#slack_bolt.listener_matcher.builtins.dialog_suggestion">dialog_suggestion</a></code></li>
 <li><code><a title="slack_bolt.listener_matcher.builtins.event" href="#slack_bolt.listener_matcher.builtins.event">event</a></code></li>
 <li><code><a title="slack_bolt.listener_matcher.builtins.global_shortcut" href="#slack_bolt.listener_matcher.builtins.global_shortcut">global_shortcut</a></code></li>
+<li><code><a title="slack_bolt.listener_matcher.builtins.message_event" href="#slack_bolt.listener_matcher.builtins.message_event">message_event</a></code></li>
 <li><code><a title="slack_bolt.listener_matcher.builtins.message_shortcut" href="#slack_bolt.listener_matcher.builtins.message_shortcut">message_shortcut</a></code></li>
 <li><code><a title="slack_bolt.listener_matcher.builtins.options" href="#slack_bolt.listener_matcher.builtins.options">options</a></code></li>
 <li><code><a title="slack_bolt.listener_matcher.builtins.shortcut" href="#slack_bolt.listener_matcher.builtins.shortcut">shortcut</a></code></li>

@@ -267,6 +267,7 @@ class AsyncApp:
                 client_secret=settings.client_secret if settings is not None else None,
                 logger=self._framework_logger,
                 bot_only=installation_store_bot_only,
+                client=self._async_client,  # for proxy use cases etc.
             )
 
         self._async_oauth_flow: Optional[AsyncOAuthFlow] = None
@@ -888,8 +889,8 @@ class AsyncApp:
                     &#34;thread_broadcast&#34;,
                 ),
             }
-            primary_matcher = builtin_matchers.event(
-                constraints=constraints, asyncio=True
+            primary_matcher = builtin_matchers.message_event(
+                constraints=constraints, keyword=keyword, asyncio=True
             )
             middleware.insert(0, AsyncMessageListenerMatches(keyword))
             return self._register_listener(
@@ -1658,6 +1659,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                 client_secret=settings.client_secret if settings is not None else None,
                 logger=self._framework_logger,
                 bot_only=installation_store_bot_only,
+                client=self._async_client,  # for proxy use cases etc.
             )
 
         self._async_oauth_flow: Optional[AsyncOAuthFlow] = None
@@ -2279,8 +2281,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                     &#34;thread_broadcast&#34;,
                 ),
             }
-            primary_matcher = builtin_matchers.event(
-                constraints=constraints, asyncio=True
+            primary_matcher = builtin_matchers.message_event(
+                constraints=constraints, keyword=keyword, asyncio=True
             )
             middleware.insert(0, AsyncMessageListenerMatches(keyword))
             return self._register_listener(
@@ -3659,8 +3661,8 @@ Only when all the middleware call <code>next()</code> method, the listener funct
                 &#34;thread_broadcast&#34;,
             ),
         }
-        primary_matcher = builtin_matchers.event(
-            constraints=constraints, asyncio=True
+        primary_matcher = builtin_matchers.message_event(
+            constraints=constraints, keyword=keyword, asyncio=True
         )
         middleware.insert(0, AsyncMessageListenerMatches(keyword))
         return self._register_listener(
