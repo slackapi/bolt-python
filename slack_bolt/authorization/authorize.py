@@ -179,7 +179,10 @@ class InstallationStoreAuthorize(Authorize):
                     is_enterprise_install=context.is_enterprise_install,
                 )
                 # If the user_token in the latest_installation is not for the user associated with this request,
-                # we'll fetch a different installation for the user below
+                # we'll fetch a different installation for the user below.
+                # The example use cases are:
+                # - The app's installation requires both bot and user tokens
+                # - The app has two installation paths 1) bot installation 2) individual user authorization
                 this_user_installation: Optional[Installation] = None
 
                 if latest_installation is not None:
