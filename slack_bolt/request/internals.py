@@ -78,6 +78,8 @@ def extract_enterprise_id(payload: Dict[str, Any]) -> Optional[str]:
 
 def extract_team_id(payload: Dict[str, Any]) -> Optional[str]:
     if payload.get("team") is not None:
+        # With org-wide installations, payload.team in interactivity payloads can be None
+        # You need to extract either payload.user.team_id or payload.view.team_id as below
         team = payload.get("team")
         if isinstance(team, str):
             return team
@@ -93,6 +95,8 @@ def extract_team_id(payload: Dict[str, Any]) -> Optional[str]:
         return extract_team_id(payload["event"])
     if payload.get("user") is not None:
         return payload.get("user")["team_id"]
+    if payload.get("view") is not None:
+        return payload.get("view")["team_id"]
     return None
 
 
