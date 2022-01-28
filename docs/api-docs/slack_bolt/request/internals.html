@@ -106,6 +106,8 @@ def extract_enterprise_id(payload: Dict[str, Any]) -&gt; Optional[str]:
 
 def extract_team_id(payload: Dict[str, Any]) -&gt; Optional[str]:
     if payload.get(&#34;team&#34;) is not None:
+        # With org-wide installations, payload.team in interactivity payloads can be None
+        # You need to extract either payload.user.team_id or payload.view.team_id as below
         team = payload.get(&#34;team&#34;)
         if isinstance(team, str):
             return team
@@ -121,6 +123,8 @@ def extract_team_id(payload: Dict[str, Any]) -&gt; Optional[str]:
         return extract_team_id(payload[&#34;event&#34;])
     if payload.get(&#34;user&#34;) is not None:
         return payload.get(&#34;user&#34;)[&#34;team_id&#34;]
+    if payload.get(&#34;view&#34;) is not None:
+        return payload.get(&#34;view&#34;)[&#34;team_id&#34;]
     return None
 
 
@@ -420,6 +424,8 @@ def debug_multiple_response_urls_detected() -&gt; str:
 </summary>
 <pre><code class="python">def extract_team_id(payload: Dict[str, Any]) -&gt; Optional[str]:
     if payload.get(&#34;team&#34;) is not None:
+        # With org-wide installations, payload.team in interactivity payloads can be None
+        # You need to extract either payload.user.team_id or payload.view.team_id as below
         team = payload.get(&#34;team&#34;)
         if isinstance(team, str):
             return team
@@ -435,6 +441,8 @@ def debug_multiple_response_urls_detected() -&gt; str:
         return extract_team_id(payload[&#34;event&#34;])
     if payload.get(&#34;user&#34;) is not None:
         return payload.get(&#34;user&#34;)[&#34;team_id&#34;]
+    if payload.get(&#34;view&#34;) is not None:
+        return payload.get(&#34;view&#34;)[&#34;team_id&#34;]
     return None</code></pre>
 </details>
 </dd>

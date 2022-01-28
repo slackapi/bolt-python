@@ -70,10 +70,10 @@ def _set_response(
         elif blocks and len(blocks) &gt; 0:
             body.update({&#34;text&#34;: text, &#34;blocks&#34;: convert_to_dict_list(blocks)})
             self.response = BoltResponse(status=200, body=body)
-        elif options and len(options) &gt; 0:
+        elif options is not None:
             body = {&#34;options&#34;: convert_to_dict_list(options)}
             self.response = BoltResponse(status=200, body=body)
-        elif option_groups and len(option_groups) &gt; 0:
+        elif option_groups is not None:
             body = {&#34;option_groups&#34;: convert_to_dict_list(option_groups)}
             self.response = BoltResponse(status=200, body=body)
         elif response_action:
