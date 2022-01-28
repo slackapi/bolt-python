@@ -195,6 +195,36 @@ class TestAsyncBlockSuggestion:
         assert response.status == 404
         await assert_auth_test_count_async(self, 1)
 
+    @pytest.mark.asyncio
+    async def test_empty_options(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.options("mes_a")(show_empty_options)
+
+        request = self.build_valid_multi_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert response.body == """{"options": []}"""
+        assert response.headers["content-type"][0] == "application/json;charset=utf-8"
+        await assert_auth_test_count_async(self, 1)
+
+    @pytest.mark.asyncio
+    async def test_empty_option_groups(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.options("mes_a")(show_empty_option_groups)
+
+        request = self.build_valid_multi_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert response.body == """{"option_groups": []}"""
+        assert response.headers["content-type"][0] == "application/json;charset=utf-8"
+        await assert_auth_test_count_async(self, 1)
+
 
 body = {
     "type": "block_suggestion",
@@ -311,3 +341,15 @@ async def show_multi_options(ack, body, payload, options):
     assert body == options
     assert payload == options
     await ack(multi_response)
+
+
+async def show_empty_options(ack, body, payload, options):
+    assert body == options
+    assert payload == options
+    await ack(options=[])
+
+
+async def show_empty_option_groups(ack, body, payload, options):
+    assert body == options
+    assert payload == options
+    await ack(option_groups=[])

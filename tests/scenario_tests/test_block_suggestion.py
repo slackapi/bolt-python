@@ -180,6 +180,34 @@ class TestBlockSuggestion:
         assert response.status == 404
         assert_auth_test_count(self, 1)
 
+    def test_empty_options(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.options("mes_a")(show_empty_options)
+
+        request = self.build_valid_multi_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert response.body == """{"options": []}"""
+        assert response.headers["content-type"][0] == "application/json;charset=utf-8"
+        assert_auth_test_count(self, 1)
+
+    def test_empty_option_groups(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.options("mes_a")(show_empty_option_groups)
+
+        request = self.build_valid_multi_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert response.body == """{"option_groups": []}"""
+        assert response.headers["content-type"][0] == "application/json;charset=utf-8"
+        assert_auth_test_count(self, 1)
+
 
 body = {
     "type": "block_suggestion",
@@ -296,3 +324,15 @@ def show_multi_options(ack, body, payload, options):
     assert body == options
     assert payload == options
     ack(multi_response)
+
+
+def show_empty_options(ack, body, payload, options):
+    assert body == options
+    assert payload == options
+    ack(options=[])
+
+
+def show_empty_option_groups(ack, body, payload, options):
+    assert body == options
+    assert payload == options
+    ack(option_groups=[])
