@@ -222,6 +222,11 @@ class InstallationStoreAuthorize(Authorize):
                                 if latest_installation.bot_token is None:
                                     # If latest_installation has a bot token, we never overwrite the value
                                     bot_token = refreshed.bot_token
+                        
+                        # Handle when user has no installations (ie. when this_user_installation returns None)
+                        # ensures user_token isn't passed to the wrong user
+                        else:
+                            user_token = None
 
                     # If token rotation is enabled, running rotation may be needed here
                     refreshed = self._rotate_and_save_tokens_if_necessary(

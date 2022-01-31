@@ -207,7 +207,9 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                                 is_enterprise_install=context.is_enterprise_install,
                             )
                         )
+
                         if this_user_installation is not None:
+
                             user_token = this_user_installation.user_token
                             if latest_installation.bot_token is None:
                                 # If latest_installation has a bot token, we never overwrite the value
@@ -222,6 +224,12 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                                 if latest_installation.bot_token is None:
                                     # If latest_installation has a bot token, we never overwrite the value
                                     bot_token = refreshed.bot_token
+                    
+                        # Handle when user has no installations (ie. when this_user_installation returns None)
+                        # ensures user_token isn't passed to the wrong user
+                        else:
+                            user_token = None
+
 
                     # If token rotation is enabled, running rotation may be needed here
                     refreshed = await self._rotate_and_save_tokens_if_necessary(
