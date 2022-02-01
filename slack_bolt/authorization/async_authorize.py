@@ -194,7 +194,10 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
 
                     if latest_installation.user_id != user_id:
                         # First off, remove the user token as the installer is a different user
+                        user_token = None
                         latest_installation.user_token = None
+                        latest_installation.user_refresh_token = None
+                        latest_installation.user_token_expires_at = None
                         latest_installation.user_scopes = []
 
                         # try to fetch the request user's installation

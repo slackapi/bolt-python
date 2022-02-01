@@ -245,6 +245,55 @@ class TestAuthorize:
         assert result.user_token == "xoxp-valid-refreshed"
         assert_auth_test_count(self, 1)
 
+    def test_remove_latest_user_token_if_it_is_not_relevant(self):
+        installation_store = ValidUserTokenInstallationStore()
+        authorize = InstallationStoreAuthorize(
+            logger=installation_store.logger, installation_store=installation_store
+        )
+        context = BoltContext()
+        context["client"] = WebClient(base_url=self.mock_api_server_base_url)
+        result = authorize(
+            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W333"
+        )
+        assert result.bot_id == "BZYBOTHED"
+        assert result.bot_user_id == "W23456789"
+        assert result.bot_token == "xoxb-valid"
+        assert result.user_token is None
+        assert_auth_test_count(self, 1)
+
+    def test_rotate_only_bot_token(self):
+        context = BoltContext()
+        mock_client = WebClient(base_url=self.mock_api_server_base_url)
+        context["client"] = mock_client
+
+        installation_store = ValidUserTokenRotationInstallationStore()
+        invalid_authorize = InstallationStoreAuthorize(
+            logger=installation_store.logger, installation_store=installation_store
+        )
+        with pytest.raises(BoltError):
+            invalid_authorize(
+                context=context,
+                enterprise_id="E111",
+                team_id="T0G9PQBBK",
+                user_id="W333",
+            )
+
+        authorize = InstallationStoreAuthorize(
+            client_id="111.222",
+            client_secret="secret",
+            client=mock_client,
+            logger=installation_store.logger,
+            installation_store=installation_store,
+        )
+        result = authorize(
+            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W333"
+        )
+        assert result.bot_id == "BZYBOTHED"
+        assert result.bot_user_id == "W23456789"
+        assert result.bot_token == "xoxb-valid-refreshed"
+        assert result.user_token is None
+        assert_auth_test_count(self, 1)
+
 
 class LegacyMemoryInstallationStore(InstallationStore):
     @property

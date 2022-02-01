@@ -155,19 +155,21 @@ class MockHandler(SimpleHTTPRequestHandler):
                     self.logger.info(f"request body: {request_body}")
 
                     if request_body.get("grant_type") == "refresh_token":
-                        if "bot-valid" in request_body.get("refresh_token"):
-                            self.send_response(200)
-                            self.set_common_headers()
-                            body = self.oauth_v2_access_bot_refresh_response
-                            self.wfile.write(body.encode("utf-8"))
-                            return
-                        if "user-valid" in request_body.get("refresh_token"):
-                            self.send_response(200)
-                            self.set_common_headers()
-                            body = self.oauth_v2_access_user_refresh_response
-                            self.wfile.write(body.encode("utf-8"))
-                            return
-                    if request_body.get("code") is not None:
+                        refresh_token = request_body.get("refresh_token")
+                        if refresh_token is not None:
+                            if "bot-valid" in refresh_token:
+                                self.send_response(200)
+                                self.set_common_headers()
+                                body = self.oauth_v2_access_bot_refresh_response
+                                self.wfile.write(body.encode("utf-8"))
+                                return
+                            if "user-valid" in refresh_token:
+                                self.send_response(200)
+                                self.set_common_headers()
+                                body = self.oauth_v2_access_user_refresh_response
+                                self.wfile.write(body.encode("utf-8"))
+                                return
+                    elif request_body.get("code") is not None:
                         self.send_response(200)
                         self.set_common_headers()
                         self.wfile.write(self.oauth_v2_access_response.encode("utf-8"))
