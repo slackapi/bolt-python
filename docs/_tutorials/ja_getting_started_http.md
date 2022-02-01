@@ -142,7 +142,7 @@ Slack ワークスペースで発生するイベント（メッセージが投�
 1. [アプリ管理ページ](https://api.slack.com/apps)でアプリをクリックします。次に、左サイドバーの「**Event Subscriptions**」をクリックします。「**Enable Events**」というラベルのスイッチをオンに切り替えます。
 2. リクエストURLを追加します。Slackはイベントに対応するHTTP POSTリクエストをこの [Request URL](https://api.slack.com/apis/connections/events-api#the-events-api__subscribing-to-event-types__events-api-request-urls) のエンドポイントに送信します。Bolt は `/slack/events` のエンドポイントで、全ての受信リクエストをリッスンします。これらのリクエストにはショートカット、イベント、インタラクションペイロードが含まれます。アプリの設定でエンドポイントを指定するときは、すべての Request URL の末尾に「/slack/events」を追加してください。例えば、 `https://<your-domain>/slack/events` のようになります。Bolt アプリが起動した状態のままなら、URL の検証が成功するはずです。
 
-> 💡 ローカルでの開発時には、ngrok のような開発用プロキシサービスを利用することができます。開発用プロキシを利用すると、リクエストを開発環境にトンネルするパブリック URL を作成できます。[Slack のローカル開発で ngrok を使用する方法](https://api.slack.com/tutorials/tunneling-with-ngrok)については、別のチュートリアルを用意していますので参考にしてください。また、アプリのホスティングが必要になった場合には、[API サイトに](https://api.slack.com/docs/hosting) Slack開発者達がアプリのホスティングよく利用するホスティングプロバイダーを集めています。
+> 💡 ローカル開発では、[ngrok](https://ngrok.com/)のようなプロキシサービスを使って公開 URL を作成し、リクエストを開発環境にトンネリングすることができます。このトンネリングの方法については、[ngrok のガイド](https://ngrok.com/docs#getting-started-expose)を参照してください。また、アプリのホスティングが必要になった場合には、[API サイトに](https://api.slack.com/docs/hosting) Slack開発者達がアプリのホスティングよく利用するホスティングプロバイダーを集めています。
 
 それでは、Slackにどのイベントをリッスンするかを教えてあげましょう。
 
