@@ -272,6 +272,57 @@ class TestAsyncAuthorize:
         assert result.user_token == "xoxp-valid-refreshed"
         await assert_auth_test_count_async(self, 1)
 
+    @pytest.mark.asyncio
+    async def test_remove_latest_user_token_if_it_is_not_relevant(self):
+        installation_store = ValidUserTokenInstallationStore()
+        authorize = AsyncInstallationStoreAuthorize(
+            logger=installation_store.logger, installation_store=installation_store
+        )
+        context = AsyncBoltContext()
+        context["client"] = AsyncWebClient(base_url=self.mock_api_server_base_url)
+        result = await authorize(
+            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W333"
+        )
+        assert result.bot_id == "BZYBOTHED"
+        assert result.bot_user_id == "W23456789"
+        assert result.bot_token == "xoxb-valid"
+        assert result.user_token is None
+        await assert_auth_test_count_async(self, 1)
+
+    @pytest.mark.asyncio
+    async def test_rotate_only_bot_token(self):
+        context = AsyncBoltContext()
+        mock_client = AsyncWebClient(base_url=self.mock_api_server_base_url)
+        context["client"] = mock_client
+
+        installation_store = ValidUserTokenRotationInstallationStore()
+        invalid_authorize = AsyncInstallationStoreAuthorize(
+            logger=installation_store.logger, installation_store=installation_store
+        )
+        with pytest.raises(BoltError):
+            await invalid_authorize(
+                context=context,
+                enterprise_id="E111",
+                team_id="T0G9PQBBK",
+                user_id="W333",
+            )
+
+        authorize = AsyncInstallationStoreAuthorize(
+            client_id="111.222",
+            client_secret="secret",
+            client=mock_client,
+            logger=installation_store.logger,
+            installation_store=installation_store,
+        )
+        result = await authorize(
+            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W333"
+        )
+        assert result.bot_id == "BZYBOTHED"
+        assert result.bot_user_id == "W23456789"
+        assert result.bot_token == "xoxb-valid-refreshed"
+        assert result.user_token is None
+        await assert_auth_test_count_async(self, 1)
+
 
 class LegacyMemoryInstallationStore(AsyncInstallationStore):
     @property
