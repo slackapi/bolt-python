@@ -20,6 +20,7 @@ else
     black slack_bolt/ tests/ \
       && pytest -vv \
       && pip install -e ".[adapter]" \
+      && pip install -e ".[adapter_testing]" \
       && pip install -U pip setuptools wheel \
       && pip install -U pytype \
       && pytype slack_bolt/

@@ -1,7 +1,7 @@
 from datetime import datetime  # type: ignore
 from http import HTTPStatus
 
-from falcon import Request, Response
+from falcon import Request, Response, version as falcon_version
 
 from slack_bolt import BoltResponse
 from slack_bolt.app import App
@@ -50,7 +50,11 @@ class SlackAppResource:
         )
 
     def _write_response(self, bolt_resp: BoltResponse, resp: Response):
-        resp.body = bolt_resp.body
+        if falcon_version.__version__.startswith("2."):
+            resp.body = bolt_resp.body
+        else:
+            resp.text = bolt_resp.body
+
         status = HTTPStatus(bolt_resp.status)
         resp.status = str(f"{status.value} {status.phrase}")
         resp.set_headers(bolt_resp.first_headers_without_set_cookie())
