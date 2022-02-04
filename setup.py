@@ -16,8 +16,18 @@ test_dependencies = [
     "pytest>=6.2.5,<7",
     "pytest-cov>=3,<4",
     "Flask-Sockets>=0.2,<1",  # TODO: This module is not yet Flask 2.x compatible
-    "Werkzeug>=2,<3",
+    "Werkzeug>=1,<2",  # TODO: Flask-Sockets is not yet compatible with Flask 2.x
     "black==22.1.0",
+]
+
+adapter_test_dependencies = [
+    "moto>=3,<4",  # For AWS tests
+    "docker>=5,<6",  # Used by moto
+    "boddle>=0.2,<0.3",  # For Bottle app tests
+    "Flask>=1,<2",  # TODO: Flask-Sockets is not yet compatible with Flask 2.x
+    "Werkzeug>=1,<2",  # TODO: Flask-Sockets is not yet compatible with Flask 2.x
+    "sanic-testing>=0.7" if sys.version_info.minor > 6 else "",
+    "requests>=2,<3",  # For Starlette's TestClient
 ]
 
 async_test_dependencies = test_dependencies + [
@@ -88,15 +98,7 @@ setuptools.setup(
         # pip install -e ".[testing]"
         "testing": async_test_dependencies,
         # pip install -e ".[adapter_testing]"
-        "adapter_testing": [
-            "moto>=3,<4",  # For AWS tests
-            "docker>=5,<6",  # Used by moto
-            "boddle>=0.2,<0.3",  # For Bottle app tests
-            "Flask>=1,<2",  # TODO: Flask-Sockets is not yet compatible with Flask 2.x
-            "Werkzeug>=1,<2",  # TODO: Flask-Sockets is not yet compatible with Flask 2.x
-            "sanic-testing>=0.7" if sys.version_info.minor > 6 else "",
-            "requests>=2,<3",  # For starlette's TestClient
-        ],
+        "adapter_testing": adapter_test_dependencies,
     },
     classifiers=[
         "Programming Language :: Python :: 3.6",
