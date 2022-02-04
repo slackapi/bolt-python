@@ -34,6 +34,7 @@ jobs:
     - name: Run tests for Socket Mode adapters
       run: |
         pip install -e ".[adapter]"
+        pip install -e ".[adapter_testing]"
         pytest tests/adapter_tests/socket_mode/
     - name: Run tests for HTTP Mode adapters (AWS)
       run: |
@@ -47,8 +48,12 @@ jobs:
     - name: Run tests for HTTP Mode adapters (Django)
       run: |
         pytest tests/adapter_tests/django/
-    - name: Run tests for HTTP Mode adapters (Falcon)
+    - name: Run tests for HTTP Mode adapters (Falcon 3.x)
       run: |
+        pytest tests/adapter_tests/falcon/
+    - name: Run tests for HTTP Mode adapters (Falcon 2.x)
+      run: |
+        pip install "falcon<3"
         pytest tests/adapter_tests/falcon/
     - name: Run tests for HTTP Mode adapters (Flask)
       run: |

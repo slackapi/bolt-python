@@ -29,6 +29,7 @@ jobs:
         pip install -e ".[async]"
         pip install -e ".[adapter]"
         pip install -e ".[testing]"
+        pip install -e ".[adapter_testing]"
     - name: Run all tests for codecov
       run: |
         pytest --cov=slack_bolt/ && bash <(curl -s https://codecov.io/bash)

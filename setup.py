@@ -15,9 +15,19 @@ with open(f"{here}/README.md", "r") as fh:
 test_dependencies = [
     "pytest>=6.2.5,<7",
     "pytest-cov>=3,<4",
-    "Flask-Sockets>=0.2,<1",
-    "Werkzeug<2",  # TODO: support Flask 2.x
-    "black==21.12b0",
+    "Flask-Sockets>=0.2,<1",  # TODO: This module is not yet Flask 2.x compatible
+    "Werkzeug>=1,<2",  # TODO: Flask-Sockets is not yet compatible with Flask 2.x
+    "black==22.1.0",
+]
+
+adapter_test_dependencies = [
+    "moto>=3,<4",  # For AWS tests
+    "docker>=5,<6",  # Used by moto
+    "boddle>=0.2,<0.3",  # For Bottle app tests
+    "Flask>=1,<2",  # TODO: Flask-Sockets is not yet compatible with Flask 2.x
+    "Werkzeug>=1,<2",  # TODO: Flask-Sockets is not yet compatible with Flask 2.x
+    "sanic-testing>=0.7" if sys.version_info.minor > 6 else "",
+    "requests>=2,<3",  # For Starlette's TestClient
 ]
 
 async_test_dependencies = test_dependencies + [
@@ -63,36 +73,32 @@ setuptools.setup(
         "adapter": [
             # used only under src/slack_bolt/adapter
             "boto3<=2",
-            # TODO: Upgrade to v2
-            "moto<2",  # For AWS tests
             "bottle>=0.12,<1",
-            "boddle>=0.2,<0.3",  # For Bottle app tests
-            "chalice>=1.26.1,<2",
+            "chalice>=1.26.5,<2",
             "click>=7,<8",  # for chalice
             "CherryPy>=18,<19",
-            "Django>=3,<4",
-            "falcon>=2,<3",
+            "Django>=3,<5",
+            "falcon>=2,<4",
             "fastapi>=0.70.0,<1",
-            "Flask>=1,<2",
-            "Werkzeug<2",  # TODO: support Flask 2.x
-            "pyramid>=1,<2",
+            "Flask>=1,<3",
+            "Werkzeug>=2,<3",
+            "pyramid>=1,<3",
             "sanic>=21,<22" if sys.version_info.minor > 6 else "sanic>=20,<21",
-            "sanic-testing>=0.7" if sys.version_info.minor > 6 else "",
             "starlette>=0.14,<1",
-            "requests>=2,<3",  # For starlette's TestClient
             "tornado>=6,<7",
             # server
             "uvicorn<1",
             "gunicorn>=20,<21",
             # Socket Mode 3rd party implementation
-            # TODO: 1.2.2 has a regression (https://github.com/websocket-client/websocket-client/issues/769)
-            # ERROR on_error invoked (error: AttributeError, message: 'Dispatcher' object has no attribute 'read')
-            "websocket_client>=1,<1.2.2",
+            # Note: 1.2.2 has a regression (https://github.com/websocket-client/websocket-client/issues/769)
+            "websocket_client>=1.2.3,<2",
         ],
         # pip install -e ".[testing_without_asyncio]"
         "testing_without_asyncio": test_dependencies,
         # pip install -e ".[testing]"
         "testing": async_test_dependencies,
+        # pip install -e ".[adapter_testing]"
+        "adapter_testing": adapter_test_dependencies,
     },
     classifiers=[
         "Programming Language :: Python :: 3.6",

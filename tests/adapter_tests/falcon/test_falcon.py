@@ -3,6 +3,8 @@ from time import time
 from urllib.parse import quote
 
 import falcon
+
+
 from falcon import testing
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
@@ -16,6 +18,13 @@ from tests.mock_web_api_server import (
     assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
+
+
+def new_falcon_app():
+    if falcon.version.__version__.startswith("2."):
+        return falcon.API()
+    else:
+        return falcon.App()
 
 
 class TestFalcon:
@@ -87,7 +96,7 @@ class TestFalcon:
         }
         timestamp, body = str(int(time())), json.dumps(input)
 
-        api = falcon.API()
+        api = new_falcon_app()
         resource = SlackAppResource(app)
         api.add_route("/slack/events", resource)
 
@@ -128,7 +137,7 @@ class TestFalcon:
 
         timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
 
-        api = falcon.API()
+        api = new_falcon_app()
         resource = SlackAppResource(app)
         api.add_route("/slack/events", resource)
 
@@ -169,7 +178,7 @@ class TestFalcon:
         )
         timestamp, body = str(int(time())), input
 
-        api = falcon.API()
+        api = new_falcon_app()
         resource = SlackAppResource(app)
         api.add_route("/slack/events", resource)
 
@@ -192,7 +201,7 @@ class TestFalcon:
                 scopes=["chat:write", "commands"],
             ),
         )
-        api = falcon.API()
+        api = new_falcon_app()
         resource = SlackAppResource(app)
         api.add_route("/slack/install", resource)
 
