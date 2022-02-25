@@ -474,14 +474,18 @@ class AsyncApp:
     from .async_server import AsyncSlackAppServer
 
     def server(
-        self, port: int = 3000, path: str = &#34;/slack/events&#34;
+        self,
+        port: int = 3000,
+        path: str = &#34;/slack/events&#34;,
+        host: Optional[str] = None,
     ) -&gt; AsyncSlackAppServer:
         &#34;&#34;&#34;Configure a web server using AIOHTTP.
         Refer to https://docs.aiohttp.org/ for more details about AIOHTTP.
 
         Args:
             port: The port to listen on (Default: 3000)
-            path:The path to handle request from Slack (Default: `/slack/events`)
+            path: The path to handle request from Slack (Default: `/slack/events`)
+            host: The hostname to serve the web endpoints. (Default: 0.0.0.0)
         &#34;&#34;&#34;
         if (
             self._server is None
@@ -492,6 +496,7 @@ class AsyncApp:
                 port=port,
                 path=path,
                 app=self,
+                host=host,
             )
         return self._server
 
@@ -516,15 +521,18 @@ class AsyncApp:
         &#34;&#34;&#34;
         return self.server(path=path).web_app
 
-    def start(self, port: int = 3000, path: str = &#34;/slack/events&#34;) -&gt; None:
+    def start(
+        self, port: int = 3000, path: str = &#34;/slack/events&#34;, host: Optional[str] = None
+    ) -&gt; None:
         &#34;&#34;&#34;Start a web server using AIOHTTP.
         Refer to https://docs.aiohttp.org/ for more details about AIOHTTP.
 
         Args:
             port: The port to listen on (Default: 3000)
-            path:The path to handle request from Slack (Default: `/slack/events`)
+            path: The path to handle request from Slack (Default: `/slack/events`)
+            host: The hostname to serve the web endpoints. (Default: 0.0.0.0)
         &#34;&#34;&#34;
-        self.server(port=port, path=path).start()
+        self.server(port=port, path=path, host=host).start()
 
     # -------------------------
     # main dispatcher
@@ -1866,14 +1874,18 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
     from .async_server import AsyncSlackAppServer
 
     def server(
-        self, port: int = 3000, path: str = &#34;/slack/events&#34;
+        self,
+        port: int = 3000,
+        path: str = &#34;/slack/events&#34;,
+        host: Optional[str] = None,
     ) -&gt; AsyncSlackAppServer:
         &#34;&#34;&#34;Configure a web server using AIOHTTP.
         Refer to https://docs.aiohttp.org/ for more details about AIOHTTP.
 
         Args:
             port: The port to listen on (Default: 3000)
-            path:The path to handle request from Slack (Default: `/slack/events`)
+            path: The path to handle request from Slack (Default: `/slack/events`)
+            host: The hostname to serve the web endpoints. (Default: 0.0.0.0)
         &#34;&#34;&#34;
         if (
             self._server is None
@@ -1884,6 +1896,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                 port=port,
                 path=path,
                 app=self,
+                host=host,
             )
         return self._server
 
@@ -1908,15 +1921,18 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         &#34;&#34;&#34;
         return self.server(path=path).web_app
 
-    def start(self, port: int = 3000, path: str = &#34;/slack/events&#34;) -&gt; None:
+    def start(
+        self, port: int = 3000, path: str = &#34;/slack/events&#34;, host: Optional[str] = None
+    ) -&gt; None:
         &#34;&#34;&#34;Start a web server using AIOHTTP.
         Refer to https://docs.aiohttp.org/ for more details about AIOHTTP.
 
         Args:
             port: The port to listen on (Default: 3000)
-            path:The path to handle request from Slack (Default: `/slack/events`)
+            path: The path to handle request from Slack (Default: `/slack/events`)
+            host: The hostname to serve the web endpoints. (Default: 0.0.0.0)
         &#34;&#34;&#34;
-        self.server(port=port, path=path).start()
+        self.server(port=port, path=path, host=host).start()
 
     # -------------------------
     # main dispatcher
@@ -3856,7 +3872,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.app.async_app.AsyncApp.server"><code class="name flex">
-<span>def <span class="ident">server</span></span>(<span>self, port: int = 3000, path: str = '/slack/events') ‑> <a title="slack_bolt.app.async_server.AsyncSlackAppServer" href="async_server.html#slack_bolt.app.async_server.AsyncSlackAppServer">AsyncSlackAppServer</a></span>
+<span>def <span class="ident">server</span></span>(<span>self, port: int = 3000, path: str = '/slack/events', host: Optional[str] = None) ‑> <a title="slack_bolt.app.async_server.AsyncSlackAppServer" href="async_server.html#slack_bolt.app.async_server.AsyncSlackAppServer">AsyncSlackAppServer</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Configure a web server using AIOHTTP.
@@ -3865,21 +3881,28 @@ Refer to <a href="https://docs.aiohttp.org/">https://docs.aiohttp.org/</a> for m
 <dl>
 <dt><strong><code>port</code></strong></dt>
 <dd>The port to listen on (Default: 3000)</dd>
-</dl>
-<p>path:The path to handle request from Slack (Default: <code>/slack/events</code>)</p></div>
+<dt><strong><code>path</code></strong></dt>
+<dd>The path to handle request from Slack (Default: <code>/slack/events</code>)</dd>
+<dt><strong><code>host</code></strong></dt>
+<dd>The hostname to serve the web endpoints. (Default: 0.0.0.0)</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def server(
-    self, port: int = 3000, path: str = &#34;/slack/events&#34;
+    self,
+    port: int = 3000,
+    path: str = &#34;/slack/events&#34;,
+    host: Optional[str] = None,
 ) -&gt; AsyncSlackAppServer:
     &#34;&#34;&#34;Configure a web server using AIOHTTP.
     Refer to https://docs.aiohttp.org/ for more details about AIOHTTP.
 
     Args:
         port: The port to listen on (Default: 3000)
-        path:The path to handle request from Slack (Default: `/slack/events`)
+        path: The path to handle request from Slack (Default: `/slack/events`)
+        host: The hostname to serve the web endpoints. (Default: 0.0.0.0)
     &#34;&#34;&#34;
     if (
         self._server is None
@@ -3890,6 +3913,7 @@ Refer to <a href="https://docs.aiohttp.org/">https://docs.aiohttp.org/</a> for m
             port=port,
             path=path,
             app=self,
+            host=host,
         )
     return self._server</code></pre>
 </details>
@@ -3981,7 +4005,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.app.async_app.AsyncApp.start"><code class="name flex">
-<span>def <span class="ident">start</span></span>(<span>self, port: int = 3000, path: str = '/slack/events') ‑> None</span>
+<span>def <span class="ident">start</span></span>(<span>self, port: int = 3000, path: str = '/slack/events', host: Optional[str] = None) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Start a web server using AIOHTTP.
@@ -3990,21 +4014,27 @@ Refer to <a href="https://docs.aiohttp.org/">https://docs.aiohttp.org/</a> for m
 <dl>
 <dt><strong><code>port</code></strong></dt>
 <dd>The port to listen on (Default: 3000)</dd>
-</dl>
-<p>path:The path to handle request from Slack (Default: <code>/slack/events</code>)</p></div>
+<dt><strong><code>path</code></strong></dt>
+<dd>The path to handle request from Slack (Default: <code>/slack/events</code>)</dd>
+<dt><strong><code>host</code></strong></dt>
+<dd>The hostname to serve the web endpoints. (Default: 0.0.0.0)</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def start(self, port: int = 3000, path: str = &#34;/slack/events&#34;) -&gt; None:
+<pre><code class="python">def start(
+    self, port: int = 3000, path: str = &#34;/slack/events&#34;, host: Optional[str] = None
+) -&gt; None:
     &#34;&#34;&#34;Start a web server using AIOHTTP.
     Refer to https://docs.aiohttp.org/ for more details about AIOHTTP.
 
     Args:
         port: The port to listen on (Default: 3000)
-        path:The path to handle request from Slack (Default: `/slack/events`)
+        path: The path to handle request from Slack (Default: `/slack/events`)
+        host: The hostname to serve the web endpoints. (Default: 0.0.0.0)
     &#34;&#34;&#34;
-    self.server(port=port, path=path).start()</code></pre>
+    self.server(port=port, path=path, host=host).start()</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.app.async_app.AsyncApp.step"><code class="name flex">
