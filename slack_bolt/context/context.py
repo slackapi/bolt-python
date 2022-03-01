@@ -118,5 +118,9 @@ class BoltContext(BaseContext):
             Callable `respond()` function
         """
         if "respond" not in self:
-            self["respond"] = Respond(response_url=self.response_url)
+            self["respond"] = Respond(
+                response_url=self.response_url,
+                proxy=self.client.proxy,
+                ssl=self.client.ssl,
+            )
         return self["respond"]
