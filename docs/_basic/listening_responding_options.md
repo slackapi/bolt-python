@@ -13,6 +13,7 @@ While it's recommended to use `action_id` for `external_select` menus, dialogs d
 
 To respond to options requests, you'll need to call `ack()` with a valid `options` or `option_groups` list. Both [external select response examples](https://api.slack.com/reference/messaging/block-elements#external-select) and [dialog response examples](https://api.slack.com/dialogs#dynamic_select_elements_external) can be found on our API site.
 
+Additionally, you may want to apply filtering logic to the returned options based on user input. This can be accomplished by using the `payload` argument to your options listener and checking for the contents of the `value` property within it. Based on the `value` you can return different options. All Bolt Python listeners and middleware handlers have access to [many useful arguments](https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) - be sure to check them out!
 </div>
 
 <div>
@@ -20,7 +21,7 @@ To respond to options requests, you'll need to call `ack()` with a valid `option
 ```python
 # Example of responding to an external_select options request
 @app.options("external_action")
-def show_options(ack):
+def show_options(ack, payload):
     options = [
         {
             "text": {"type": "plain_text", "text": "Option 1"},
@@ -31,6 +32,9 @@ def show_options(ack):
             "value": "1-2",
         },
     ]
+    keyword = payload.get("value")
+    if keyword is not None and len(keyword) > 0:
+        options = [o for o in options if keyword in o["text"]["text"]]
     ack(options=options)
 ```
 </div>

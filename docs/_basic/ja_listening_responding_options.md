@@ -14,6 +14,8 @@ order: 14
 
 オプションのリクエストに応答するときは、有効なオプションを含む `options` または `option_groups` のリストとともに `ack()` を呼び出す必要があります。API サイトにある[外部データを使用する選択メニューに応答するサンプル例](https://api.slack.com/reference/messaging/block-elements#external-select)と、[ダイアログでの応答例](https://api.slack.com/dialogs#dynamic_select_elements_external)を参考にしてください。
 
+さらに、ユーザー入力に基づいて、返されたオプションにフィルタリングロジックを適用することもできます。 これは、オプションリスナーへの `payload`引数を使用し、その中の` value`プロパティの内容をチェックすることで実現できます。 `value`に基づいて、さまざまなオプションを返すことができます。 すべてのBoltPythonリスナーとミドルウェアハンドラーは、多くの有用な引数にアクセスできます。必ずチェックしてください。
+
 </div>
 
 <div>
@@ -21,17 +23,20 @@ order: 14
 ```python
 # 外部データを使用する選択メニューオプションに応答するサンプル例
 @app.options("external_action")
-def show_options(ack):
+def show_options(ack, payload):
     options = [
         {
-            "text": {"type": "plain_text", "text":"Option 1"},
-            "value":"1-1",
+            "text": {"type": "plain_text", "text": "Option 1"},
+            "value": "1-1",
         },
         {
-            "text": {"type": "plain_text", "text":"Option 2"},
-            "value":"1-2",
+            "text": {"type": "plain_text", "text": "Option 2"},
+            "value": "1-2",
         },
     ]
+    keyword = payload.get("value")
+    if keyword is not None and len(keyword) > 0:
+        options = [o for o in options if keyword in o["text"]["text"]]
     ack(options=options)
 ```
 </div>
