@@ -14,7 +14,7 @@ order: 14
 
 オプションのリクエストに応答するときは、有効なオプションを含む `options` または `option_groups` のリストとともに `ack()` を呼び出す必要があります。API サイトにある[外部データを使用する選択メニューに応答するサンプル例](https://api.slack.com/reference/messaging/block-elements#external-select)と、[ダイアログでの応答例](https://api.slack.com/dialogs#dynamic_select_elements_external)を参考にしてください。
 
-さらに、ユーザー入力に基づいて、返されたオプションにフィルタリングロジックを適用することもできます。 これは、オプションリスナーへの `payload`引数を使用し、その中の` value`プロパティの内容をチェックすることで実現できます。 `value`に基づいて、さまざまなオプションを返すことができます。 すべてのBoltPythonリスナーとミドルウェアハンドラーは、多くの有用な引数にアクセスできます。必ずチェックしてください。
+さらに、ユーザーが入力したキーワードに基づいたオプションを返すようフィルタリングロジックを適用することもできます。 これは `payload` という引数の ` value` の値に基づいて、それぞれのパターンで異なるオプションの一覧を返すように実装することができます。 Bolt for Python のすべてのリスナーやミドルウェアでは、[多くの有用な引数](https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html)にアクセスすることができますので、チェックしてみてください。
 
 </div>
 
