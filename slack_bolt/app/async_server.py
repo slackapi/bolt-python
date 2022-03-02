@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from aiohttp import web
 
@@ -10,6 +11,7 @@ from slack_bolt.util.utils import get_boot_message
 class AsyncSlackAppServer:
     port: int
     path: str
+    host: str
     bolt_app: "AsyncApp"  # type:ignore
     web_app: web.Application
 
@@ -18,6 +20,7 @@ class AsyncSlackAppServer:
         port: int,
         path: str,
         app: "AsyncApp",  # type:ignore
+        host: Optional[str] = None,
     ):
         """Standalone AIOHTTP Web Server.
         Refer to https://docs.aiohttp.org/en/stable/web.html for details of AIOHTTP.
@@ -26,9 +29,11 @@ class AsyncSlackAppServer:
             port: The port to listen on
             path: The path to receive incoming requests from Slack
             app: The `AsyncApp` instance that is used for processing requests
+            host: The hostname to serve the web endpoints. (Default: 0.0.0.0)
         """
         self.port = port
         self.path = path
+        self.host = host if host is not None else "0.0.0.0"
         self.bolt_app: "AsyncApp" = app  # type: ignore
         self.web_app = web.Application()
         self._bolt_oauth_flow = self.bolt_app.oauth_flow
@@ -72,11 +77,12 @@ class AsyncSlackAppServer:
         bolt_resp: BoltResponse = await self.bolt_app.async_dispatch(bolt_req)
         return await to_aiohttp_response(bolt_resp)
 
-    def start(self) -> None:
+    def start(self, host: Optional[str] = None) -> None:
         """Starts a new web server process."""
         if self.bolt_app.logger.level > logging.INFO:
             print(get_boot_message())
         else:
             self.bolt_app.logger.info(get_boot_message())
 
-        web.run_app(self.web_app, host="0.0.0.0", port=self.port)
+        _host = host if host is not None else self.host
+        web.run_app(self.web_app, host=_host, port=self.port)

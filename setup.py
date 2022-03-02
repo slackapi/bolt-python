@@ -17,6 +17,7 @@ test_dependencies = [
     "pytest-cov>=3,<4",
     "Flask-Sockets>=0.2,<1",  # TODO: This module is not yet Flask 2.x compatible
     "Werkzeug>=1,<2",  # TODO: Flask-Sockets is not yet compatible with Flask 2.x
+    "itsdangerous==2.0.1",  # TODO: Flask-Sockets is not yet compatible with Flask 2.x
     "black==22.1.0",
 ]
 

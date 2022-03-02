@@ -27,6 +27,7 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">import logging
+from typing import Optional
 
 from aiohttp import web
 
@@ -38,6 +39,7 @@ from slack_bolt.util.utils import get_boot_message
 class AsyncSlackAppServer:
     port: int
     path: str
+    host: str
     bolt_app: &#34;AsyncApp&#34;  # type:ignore
     web_app: web.Application
 
@@ -46,6 +48,7 @@ class AsyncSlackAppServer:
         port: int,
         path: str,
         app: &#34;AsyncApp&#34;,  # type:ignore
+        host: Optional[str] = None,
     ):
         &#34;&#34;&#34;Standalone AIOHTTP Web Server.
         Refer to https://docs.aiohttp.org/en/stable/web.html for details of AIOHTTP.
@@ -54,9 +57,11 @@ class AsyncSlackAppServer:
             port: The port to listen on
             path: The path to receive incoming requests from Slack
             app: The `AsyncApp` instance that is used for processing requests
+            host: The hostname to serve the web endpoints. (Default: 0.0.0.0)
         &#34;&#34;&#34;
         self.port = port
         self.path = path
+        self.host = host if host is not None else &#34;0.0.0.0&#34;
         self.bolt_app: &#34;AsyncApp&#34; = app  # type: ignore
         self.web_app = web.Application()
         self._bolt_oauth_flow = self.bolt_app.oauth_flow
@@ -100,14 +105,15 @@ class AsyncSlackAppServer:
         bolt_resp: BoltResponse = await self.bolt_app.async_dispatch(bolt_req)
         return await to_aiohttp_response(bolt_resp)
 
-    def start(self) -&gt; None:
+    def start(self, host: Optional[str] = None) -&gt; None:
         &#34;&#34;&#34;Starts a new web server process.&#34;&#34;&#34;
         if self.bolt_app.logger.level &gt; logging.INFO:
             print(get_boot_message())
         else:
             self.bolt_app.logger.info(get_boot_message())
 
-        web.run_app(self.web_app, host=&#34;0.0.0.0&#34;, port=self.port)</code></pre>
+        _host = host if host is not None else self.host
+        web.run_app(self.web_app, host=_host, port=self.port)</code></pre>
 </details>
 </section>
 <section>
@@ -121,7 +127,7 @@ class AsyncSlackAppServer:
 <dl>
 <dt id="slack_bolt.app.async_server.AsyncSlackAppServer"><code class="flex name class">
 <span>class <span class="ident">AsyncSlackAppServer</span></span>
-<span>(</span><span>port: int, path: str, app: AsyncApp)</span>
+<span>(</span><span>port: int, path: str, app: AsyncApp, host: Optional[str] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Standalone AIOHTTP Web Server.
@@ -134,6 +140,8 @@ Refer to <a href="https://docs.aiohttp.org/en/stable/web.html">https://docs.aioh
 <dd>The path to receive incoming requests from Slack</dd>
 <dt><strong><code>app</code></strong></dt>
 <dd>The <code>AsyncApp</code> instance that is used for processing requests</dd>
+<dt><strong><code>host</code></strong></dt>
+<dd>The hostname to serve the web endpoints. (Default: 0.0.0.0)</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -142,6 +150,7 @@ Refer to <a href="https://docs.aiohttp.org/en/stable/web.html">https://docs.aioh
 <pre><code class="python">class AsyncSlackAppServer:
     port: int
     path: str
+    host: str
     bolt_app: &#34;AsyncApp&#34;  # type:ignore
     web_app: web.Application
 
@@ -150,6 +159,7 @@ Refer to <a href="https://docs.aiohttp.org/en/stable/web.html">https://docs.aioh
         port: int,
         path: str,
         app: &#34;AsyncApp&#34;,  # type:ignore
+        host: Optional[str] = None,
     ):
         &#34;&#34;&#34;Standalone AIOHTTP Web Server.
         Refer to https://docs.aiohttp.org/en/stable/web.html for details of AIOHTTP.
@@ -158,9 +168,11 @@ Refer to <a href="https://docs.aiohttp.org/en/stable/web.html">https://docs.aioh
             port: The port to listen on
             path: The path to receive incoming requests from Slack
             app: The `AsyncApp` instance that is used for processing requests
+            host: The hostname to serve the web endpoints. (Default: 0.0.0.0)
         &#34;&#34;&#34;
         self.port = port
         self.path = path
+        self.host = host if host is not None else &#34;0.0.0.0&#34;
         self.bolt_app: &#34;AsyncApp&#34; = app  # type: ignore
         self.web_app = web.Application()
         self._bolt_oauth_flow = self.bolt_app.oauth_flow
@@ -204,18 +216,23 @@ Refer to <a href="https://docs.aiohttp.org/en/stable/web.html">https://docs.aioh
         bolt_resp: BoltResponse = await self.bolt_app.async_dispatch(bolt_req)
         return await to_aiohttp_response(bolt_resp)
 
-    def start(self) -&gt; None:
+    def start(self, host: Optional[str] = None) -&gt; None:
         &#34;&#34;&#34;Starts a new web server process.&#34;&#34;&#34;
         if self.bolt_app.logger.level &gt; logging.INFO:
             print(get_boot_message())
         else:
             self.bolt_app.logger.info(get_boot_message())
 
-        web.run_app(self.web_app, host=&#34;0.0.0.0&#34;, port=self.port)</code></pre>
+        _host = host if host is not None else self.host
+        web.run_app(self.web_app, host=_host, port=self.port)</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
 <dt id="slack_bolt.app.async_server.AsyncSlackAppServer.bolt_app"><code class="name">var <span class="ident">bolt_app</span> : AsyncApp</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.app.async_server.AsyncSlackAppServer.host"><code class="name">var <span class="ident">host</span> : str</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -279,7 +296,7 @@ Refer to <a href="https://docs.aiohttp.org/en/stable/web.html">https://docs.aioh
 </details>
 </dd>
 <dt id="slack_bolt.app.async_server.AsyncSlackAppServer.start"><code class="name flex">
-<span>def <span class="ident">start</span></span>(<span>self) ‑> None</span>
+<span>def <span class="ident">start</span></span>(<span>self, host: Optional[str] = None) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Starts a new web server process.</p></div>
@@ -287,14 +304,15 @@ Refer to <a href="https://docs.aiohttp.org/en/stable/web.html">https://docs.aioh
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def start(self) -&gt; None:
+<pre><code class="python">def start(self, host: Optional[str] = None) -&gt; None:
     &#34;&#34;&#34;Starts a new web server process.&#34;&#34;&#34;
     if self.bolt_app.logger.level &gt; logging.INFO:
         print(get_boot_message())
     else:
         self.bolt_app.logger.info(get_boot_message())
 
-    web.run_app(self.web_app, host=&#34;0.0.0.0&#34;, port=self.port)</code></pre>
+    _host = host if host is not None else self.host
+    web.run_app(self.web_app, host=_host, port=self.port)</code></pre>
 </details>
 </dd>
 </dl>
@@ -321,6 +339,7 @@ Refer to <a href="https://docs.aiohttp.org/en/stable/web.html">https://docs.aioh
 <li><code><a title="slack_bolt.app.async_server.AsyncSlackAppServer.bolt_app" href="#slack_bolt.app.async_server.AsyncSlackAppServer.bolt_app">bolt_app</a></code></li>
 <li><code><a title="slack_bolt.app.async_server.AsyncSlackAppServer.handle_get_requests" href="#slack_bolt.app.async_server.AsyncSlackAppServer.handle_get_requests">handle_get_requests</a></code></li>
 <li><code><a title="slack_bolt.app.async_server.AsyncSlackAppServer.handle_post_requests" href="#slack_bolt.app.async_server.AsyncSlackAppServer.handle_post_requests">handle_post_requests</a></code></li>
+<li><code><a title="slack_bolt.app.async_server.AsyncSlackAppServer.host" href="#slack_bolt.app.async_server.AsyncSlackAppServer.host">host</a></code></li>
 <li><code><a title="slack_bolt.app.async_server.AsyncSlackAppServer.path" href="#slack_bolt.app.async_server.AsyncSlackAppServer.path">path</a></code></li>
 <li><code><a title="slack_bolt.app.async_server.AsyncSlackAppServer.port" href="#slack_bolt.app.async_server.AsyncSlackAppServer.port">port</a></code></li>
 <li><code><a title="slack_bolt.app.async_server.AsyncSlackAppServer.start" href="#slack_bolt.app.async_server.AsyncSlackAppServer.start">start</a></code></li>
