@@ -146,7 +146,11 @@ class BoltContext(BaseContext):
             Callable `respond()` function
         &#34;&#34;&#34;
         if &#34;respond&#34; not in self:
-            self[&#34;respond&#34;] = Respond(response_url=self.response_url)
+            self[&#34;respond&#34;] = Respond(
+                response_url=self.response_url,
+                proxy=self.client.proxy,
+                ssl=self.client.ssl,
+            )
         return self[&#34;respond&#34;]</code></pre>
 </details>
 </section>
@@ -277,7 +281,11 @@ class BoltContext(BaseContext):
             Callable `respond()` function
         &#34;&#34;&#34;
         if &#34;respond&#34; not in self:
-            self[&#34;respond&#34;] = Respond(response_url=self.response_url)
+            self[&#34;respond&#34;] = Respond(
+                response_url=self.response_url,
+                proxy=self.client.proxy,
+                ssl=self.client.ssl,
+            )
         return self[&#34;respond&#34;]</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -416,7 +424,11 @@ def respond(self) -&gt; Optional[Respond]:
         Callable `respond()` function
     &#34;&#34;&#34;
     if &#34;respond&#34; not in self:
-        self[&#34;respond&#34;] = Respond(response_url=self.response_url)
+        self[&#34;respond&#34;] = Respond(
+            response_url=self.response_url,
+            proxy=self.client.proxy,
+            ssl=self.client.ssl,
+        )
     return self[&#34;respond&#34;]</code></pre>
 </details>
 </dd>

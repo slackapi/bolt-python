@@ -27,6 +27,7 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from typing import Optional, Union, Sequence
+from ssl import SSLContext
 
 from slack_sdk.models.attachments import Attachment
 from slack_sdk.models.blocks import Block
@@ -37,9 +38,19 @@ from slack_bolt.context.respond.internals import _build_message
 
 class Respond:
     response_url: Optional[str]
+    proxy: Optional[str]
+    ssl: Optional[SSLContext]
 
-    def __init__(self, *, response_url: Optional[str]):
-        self.response_url: Optional[str] = response_url
+    def __init__(
+        self,
+        *,
+        response_url: Optional[str],
+        proxy: Optional[str] = None,
+        ssl: Optional[SSLContext] = None,
+    ):
+        self.response_url = response_url
+        self.proxy = proxy
+        self.ssl = ssl
 
     def __call__(
         self,
@@ -53,7 +64,11 @@ class Respond:
         unfurl_media: Optional[bool] = None,
     ) -&gt; WebhookResponse:
         if self.response_url is not None:
-            client = WebhookClient(self.response_url)
+            client = WebhookClient(
+                url=self.response_url,
+                proxy=self.proxy,
+                ssl=self.ssl,
+            )
             text_or_whole_response: Union[str, dict] = text
             if isinstance(text_or_whole_response, str):
                 text = text_or_whole_response
@@ -90,7 +105,7 @@ class Respond:
 <dl>
 <dt id="slack_bolt.context.respond.respond.Respond"><code class="flex name class">
 <span>class <span class="ident">Respond</span></span>
-<span>(</span><span>*, response_url: Optional[str])</span>
+<span>(</span><span>*, response_url: Optional[str], proxy: Optional[str] = None, ssl: Optional[ssl.SSLContext] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -100,9 +115,19 @@ class Respond:
 </summary>
 <pre><code class="python">class Respond:
     response_url: Optional[str]
+    proxy: Optional[str]
+    ssl: Optional[SSLContext]
 
-    def __init__(self, *, response_url: Optional[str]):
-        self.response_url: Optional[str] = response_url
+    def __init__(
+        self,
+        *,
+        response_url: Optional[str],
+        proxy: Optional[str] = None,
+        ssl: Optional[SSLContext] = None,
+    ):
+        self.response_url = response_url
+        self.proxy = proxy
+        self.ssl = ssl
 
     def __call__(
         self,
@@ -116,7 +141,11 @@ class Respond:
         unfurl_media: Optional[bool] = None,
     ) -&gt; WebhookResponse:
         if self.response_url is not None:
-            client = WebhookClient(self.response_url)
+            client = WebhookClient(
+                url=self.response_url,
+                proxy=self.proxy,
+                ssl=self.ssl,
+            )
             text_or_whole_response: Union[str, dict] = text
             if isinstance(text_or_whole_response, str):
                 text = text_or_whole_response
@@ -143,7 +172,15 @@ class Respond:
 </details>
 <h3>Class variables</h3>
 <dl>
+<dt id="slack_bolt.context.respond.respond.Respond.proxy"><code class="name">var <span class="ident">proxy</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="slack_bolt.context.respond.respond.Respond.response_url"><code class="name">var <span class="ident">response_url</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.context.respond.respond.Respond.ssl"><code class="name">var <span class="ident">ssl</span> : Optional[ssl.SSLContext]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -168,7 +205,9 @@ class Respond:
 <li>
 <h4><code><a title="slack_bolt.context.respond.respond.Respond" href="#slack_bolt.context.respond.respond.Respond">Respond</a></code></h4>
 <ul class="">
+<li><code><a title="slack_bolt.context.respond.respond.Respond.proxy" href="#slack_bolt.context.respond.respond.Respond.proxy">proxy</a></code></li>
 <li><code><a title="slack_bolt.context.respond.respond.Respond.response_url" href="#slack_bolt.context.respond.respond.Respond.response_url">response_url</a></code></li>
+<li><code><a title="slack_bolt.context.respond.respond.Respond.ssl" href="#slack_bolt.context.respond.respond.Respond.ssl">ssl</a></code></li>
 </ul>
 </li>
 </ul>
