@@ -1,17 +1,43 @@
+import asyncio
+from ssl import SSLContext
+
 import pytest
 from slack_sdk import WebClient
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
+from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.authorization import AuthorizeResult
+from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.error import BoltError
 from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
 from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
+from slack_bolt.request.async_request import AsyncBoltRequest
+from tests.mock_web_api_server import (
+    setup_mock_web_api_server,
+    cleanup_mock_web_api_server,
+)
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
 class TestAsyncApp:
+    signing_secret = "secret"
+    valid_token = "xoxb-valid"
+    mock_api_server_base_url = "http://localhost:8888"
+
+    @pytest.fixture
+    def event_loop(self):
+        old_os_env = remove_os_env_temporarily()
+        try:
+            setup_mock_web_api_server(self)
+            loop = asyncio.get_event_loop()
+            yield loop
+            loop.close()
+            cleanup_mock_web_api_server(self)
+        finally:
+            restore_os_env(old_os_env)
+
     def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()
 
@@ -163,3 +189,61 @@ class TestAsyncApp:
             installation_store=store1,
         )
         assert app.installation_store is store1
+
+    @pytest.mark.asyncio
+    async def test_proxy_ssl_for_respond(self):
+        ssl = SSLContext()
+        web_client = AsyncWebClient(
+            token=self.valid_token,
+            base_url=self.mock_api_server_base_url,
+            proxy="http://proxy-host:9000/",
+            ssl=ssl,
+        )
+
+        async def my_authorize():
+            return AuthorizeResult(
+                enterprise_id="E111",
+                team_id="T111",
+            )
+
+        app = AsyncApp(
+            signing_secret="valid",
+            client=web_client,
+            authorize=my_authorize,
+        )
+
+        event_body = {
+            "token": "verification_token",
+            "team_id": "T111",
+            "enterprise_id": "E111",
+            "api_app_id": "A111",
+            "event": {
+                "client_msg_id": "9cbd4c5b-7ddf-4ede-b479-ad21fca66d63",
+                "type": "app_mention",
+                "text": "<@W111> Hi there!",
+                "user": "W222",
+                "ts": "1595926230.009600",
+                "team": "T111",
+                "channel": "C111",
+                "event_ts": "1595926230.009600",
+            },
+            "type": "event_callback",
+            "event_id": "Ev111",
+            "event_time": 1595926230,
+        }
+
+        result = {"called": False}
+
+        @app.event("app_mention")
+        async def handle(context: AsyncBoltContext, respond):
+            assert context.respond.proxy == "http://proxy-host:9000/"
+            assert context.respond.ssl == ssl
+            assert respond.proxy == "http://proxy-host:9000/"
+            assert respond.ssl == ssl
+            result["called"] = True
+
+        req = AsyncBoltRequest(body=event_body, headers={}, mode="socket_mode")
+        response = await app.async_dispatch(req)
+        assert response.status == 200
+        await asyncio.sleep(0.5)  # wait a bit after auto ack()
+        assert result["called"] is True

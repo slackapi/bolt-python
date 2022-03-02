@@ -1,11 +1,12 @@
 from concurrent.futures import Executor
+from ssl import SSLContext
 
 import pytest
 from slack_sdk import WebClient
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 
-from slack_bolt import App, Say, BoltRequest
+from slack_bolt import App, Say, BoltRequest, BoltContext
 from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.error import BoltError
 from slack_bolt.oauth import OAuthFlow
@@ -240,3 +241,55 @@ class TestApp:
         response = app.dispatch(req)
         assert response.status == 404
         assert response.body == '{"error": "unhandled request"}'
+
+    def test_proxy_ssl_for_respond(self):
+        ssl = SSLContext()
+        web_client = WebClient(
+            token=self.valid_token,
+            base_url=self.mock_api_server_base_url,
+            proxy="http://proxy-host:9000/",
+            ssl=ssl,
+        )
+        app = App(
+            signing_secret="valid",
+            client=web_client,
+            authorize=lambda: AuthorizeResult(
+                enterprise_id="E111",
+                team_id="T111",
+            ),
+        )
+
+        event_body = {
+            "token": "verification_token",
+            "team_id": "T111",
+            "enterprise_id": "E111",
+            "api_app_id": "A111",
+            "event": {
+                "client_msg_id": "9cbd4c5b-7ddf-4ede-b479-ad21fca66d63",
+                "type": "app_mention",
+                "text": "<@W111> Hi there!",
+                "user": "W222",
+                "ts": "1595926230.009600",
+                "team": "T111",
+                "channel": "C111",
+                "event_ts": "1595926230.009600",
+            },
+            "type": "event_callback",
+            "event_id": "Ev111",
+            "event_time": 1595926230,
+        }
+
+        result = {"called": False}
+
+        @app.event("app_mention")
+        def handle(context: BoltContext, respond):
+            assert context.respond.proxy == "http://proxy-host:9000/"
+            assert context.respond.ssl == ssl
+            assert respond.proxy == "http://proxy-host:9000/"
+            assert respond.ssl == ssl
+            result["called"] = True
+
+        req = BoltRequest(body=event_body, headers={}, mode="socket_mode")
+        response = app.dispatch(req)
+        assert response.status == 200
+        assert result["called"] is True

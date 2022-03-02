@@ -1,4 +1,5 @@
 from typing import Optional, Union, Sequence
+from ssl import SSLContext
 
 from slack_sdk.models.attachments import Attachment
 from slack_sdk.models.blocks import Block
@@ -9,9 +10,19 @@ from slack_bolt.context.respond.internals import _build_message
 
 class AsyncRespond:
     response_url: Optional[str]
+    proxy: Optional[str]
+    ssl: Optional[SSLContext]
 
-    def __init__(self, *, response_url: Optional[str]):
-        self.response_url: Optional[str] = response_url
+    def __init__(
+        self,
+        *,
+        response_url: Optional[str],
+        proxy: Optional[str] = None,
+        ssl: Optional[SSLContext] = None,
+    ):
+        self.response_url = response_url
+        self.proxy = proxy
+        self.ssl = ssl
 
     async def __call__(
         self,
@@ -25,7 +36,11 @@ class AsyncRespond:
         unfurl_media: Optional[bool] = None,
     ) -> WebhookResponse:
         if self.response_url is not None:
-            client = AsyncWebhookClient(self.response_url)
+            client = AsyncWebhookClient(
+                url=self.response_url,
+                proxy=self.proxy,
+                ssl=self.ssl,
+            )
             text_or_whole_response: Union[str, dict] = text
             if isinstance(text_or_whole_response, str):
                 message = _build_message(

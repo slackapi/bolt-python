@@ -116,5 +116,9 @@ class AsyncBoltContext(BaseContext):
             Callable `respond()` function
         """
         if "respond" not in self:
-            self["respond"] = AsyncRespond(response_url=self.response_url)
+            self["respond"] = AsyncRespond(
+                response_url=self.response_url,
+                proxy=self.client.proxy,
+                ssl=self.client.ssl,
+            )
         return self["respond"]
