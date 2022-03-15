@@ -20,10 +20,7 @@ from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
 def new_falcon_app():
-    if falcon.version.__version__.startswith("2."):
-        raise NotImplementedError("ASGI Falcon requires version >= 3.0")
-    else:
-        return falcon.asgi.App()
+    return falcon.asgi.App()
 
 
 class TestAsyncFalcon:
