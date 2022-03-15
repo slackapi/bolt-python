@@ -97,6 +97,6 @@ api.add_route("/slack/events", resource)
 # pip install -r requirements.txt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
-# uvicorn --reload -h 0.0.0.0 -p 3000 app:api
+# uvicorn --reload -h 0.0.0.0 -p 3000 async_oauth_app:api
 api.add_route("/slack/install", resource)
 api.add_route("/slack/oauth_redirect", resource)
