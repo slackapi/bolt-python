@@ -70,4 +70,5 @@ jobs:
     - name: Run tests for HTTP Mode adapters (asyncio-based libraries)
       run: |
         pip install -e ".[async]"
+        pip install "falcon>=3,<4"
         pytest tests/adapter_tests_async/

@@ -79,7 +79,7 @@ setuptools.setup(
             "click>=7,<8",  # for chalice
             "CherryPy>=18,<19",
             "Django>=3,<5",
-            "falcon>=2,<4",
+            "falcon>=3,<4",
             "fastapi>=0.70.0,<1",
             "Flask>=1,<3",
             "Werkzeug>=2,<3",
