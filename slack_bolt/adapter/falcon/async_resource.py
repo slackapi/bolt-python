@@ -60,6 +60,7 @@ class AsyncSlackAppResource:
         )
 
     async def _write_response(self, bolt_resp: BoltResponse, resp: Response):
+        resp.text = bolt_resp.body
         status = HTTPStatus(bolt_resp.status)
         resp.status = str(f"{status.value} {status.phrase}")
         resp.set_headers(bolt_resp.first_headers_without_set_cookie())
