@@ -106,7 +106,7 @@ def build_listener_matcher(
 
 def event(
     constraints: Union[
-        str, Pattern, Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]]
+        str, Pattern, Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]]
     ],
     asyncio: bool = False,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
@@ -138,7 +138,7 @@ def event(
 
 
 def message_event(
-    constraints: Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]],
+    constraints: Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]],
     keyword: Union[str, Pattern],
     asyncio: bool = False,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
@@ -784,7 +784,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 </summary>
 <pre><code class="python">def event(
     constraints: Union[
-        str, Pattern, Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]]
+        str, Pattern, Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]]
     ],
     asyncio: bool = False,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
@@ -844,7 +844,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def message_event(
-    constraints: Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]],
+    constraints: Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]],
     keyword: Union[str, Pattern],
     asyncio: bool = False,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
