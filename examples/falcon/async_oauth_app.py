@@ -9,7 +9,9 @@ app = AsyncApp()
 
 
 # @app.command("/bolt-py-proto", [lambda body: body["team_id"] == "T03E94MJU"])
-async def test_command(logger: logging.Logger, body: dict, ack: AsyncAck, respond: AsyncRespond):
+async def test_command(
+    logger: logging.Logger, body: dict, ack: AsyncAck, respond: AsyncRespond
+):
     logger.info(body)
     await ack("thanks!")
     await respond(

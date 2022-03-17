@@ -24,7 +24,9 @@ class AsyncSlackAppResource:
 
     def __init__(self, app: AsyncApp):  # type: ignore
         if falcon_version.__version__.startswith("2."):
-            raise BoltError("This ASGI compatible adapter requires Falcon version >= 3.0")
+            raise BoltError(
+                "This ASGI compatible adapter requires Falcon version >= 3.0"
+            )
 
         self.app = app
 
