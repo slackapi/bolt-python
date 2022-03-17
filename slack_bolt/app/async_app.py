@@ -782,7 +782,9 @@ class AsyncApp:
     def event(
         self,
         event: Union[
-            str, Pattern, Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]]
+            str,
+            Pattern,
+            Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]],
         ],
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,

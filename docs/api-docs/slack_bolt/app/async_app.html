@@ -810,7 +810,7 @@ class AsyncApp:
     def event(
         self,
         event: Union[
-            str, Pattern, Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]]
+            str, Pattern, Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]]
         ],
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
@@ -2210,7 +2210,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
     def event(
         self,
         event: Union[
-            str, Pattern, Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]]
+            str, Pattern, Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]]
         ],
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
@@ -3530,7 +3530,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 <pre><code class="python">def event(
     self,
     event: Union[
-        str, Pattern, Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]]
+        str, Pattern, Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]]
     ],
     matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
     middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,

@@ -78,7 +78,9 @@ def build_listener_matcher(
 
 def event(
     constraints: Union[
-        str, Pattern, Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]]
+        str,
+        Pattern,
+        Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]],
     ],
     asyncio: bool = False,
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
@@ -110,7 +112,9 @@ def event(
 
 
 def message_event(
-    constraints: Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]],
+    constraints: Dict[
+        str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]
+    ],
     keyword: Union[str, Pattern],
     asyncio: bool = False,
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
@@ -140,8 +144,8 @@ def _check_event_subtype(event_payload: dict, constraints: dict) -> bool:
     if not _matches(constraints["type"], event_payload["type"]):
         return False
     if "subtype" in constraints:
-        expected_subtype: Union[
-            str, Sequence[Optional[Union[str, Pattern]]]
+        expected_subtype: Optional[
+            Union[str, Sequence[Optional[Union[str, Pattern]]]]
         ] = constraints["subtype"]
         if expected_subtype is None:
             # "subtype" in constraints is intentionally None for this pattern
