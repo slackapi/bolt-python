@@ -35,7 +35,7 @@ def ask_for_introduction(event, say):
 <div class="secondary-content" markdown="0">
 `message()` リスナーは `event("message")` と等価の機能を提供します。
 
-`subtype` という追加のキーを指定して、イベントのサブタイプでフィルタリングすることもできます。よく使われるサブタイプには、`bot_message` や `message_replied` があります。詳しくは[メッセージイベントページ](https://api.slack.com/events/message#message_subtypes)を参照してください。
+`subtype` という追加のキーを指定して、イベントのサブタイプでフィルタリングすることもできます。よく使われるサブタイプには、`bot_message` や `message_replied` があります。詳しくは[メッセージイベントページ](https://api.slack.com/events/message#message_subtypes)を参照してください。サブタイプなしのイベントだけにフルターするために明に `None` を指定することもできます。
 
 </div>
 
