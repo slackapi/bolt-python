@@ -34,9 +34,11 @@ def _configure_from_base_logger(new_logger: Logger, base_logger: Logger):
     new_logger.disabled = base_logger.disabled
     new_logger.level = base_logger.level
     for h in base_logger.handlers:
-        new_logger.addHandler(h)
+        if h not in new_logger.handlers:
+            new_logger.addHandler(h)
     for f in base_logger.filters:
-        new_logger.addFilter(f)
+        if f not in new_logger.handlers:
+            new_logger.addFilter(f)
 
 
 def _configure_from_root(new_logger: Logger):
