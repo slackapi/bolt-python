@@ -225,7 +225,7 @@ class TestAsyncApp:
 
     @pytest.mark.asyncio
     async def test_argument_logger_propagation(self):
-        custom_logger = logging.getLogger("foo")
+        custom_logger = logging.getLogger(f"{__name__}-logger-test")
         custom_logger.setLevel(logging.INFO)
         added_handler = logging.NullHandler()
         custom_logger.addHandler(added_handler)
