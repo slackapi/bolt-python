@@ -101,6 +101,7 @@ class AsyncCustomListener(AsyncListener):
         matchers: Sequence[AsyncListenerMatcher],
         middleware: Sequence[AsyncMiddleware],
         auto_acknowledgement: bool = False,
+        base_logger: Optional[Logger] = None,
     ):
         self.app_name = app_name
         self.ack_function = ack_function
@@ -109,7 +110,7 @@ class AsyncCustomListener(AsyncListener):
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
         self.arg_names = inspect.getfullargspec(ack_function).args
-        self.logger = get_bolt_app_logger(app_name, self.ack_function)
+        self.logger = get_bolt_app_logger(app_name, self.ack_function, base_logger)
 
     async def run_ack_function(
         self,

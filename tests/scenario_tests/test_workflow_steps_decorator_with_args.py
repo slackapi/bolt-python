@@ -1,4 +1,5 @@
 import json
+import logging
 import time as time_module
 from time import time
 from urllib.parse import quote
@@ -96,6 +97,44 @@ class TestWorkflowStepsDecorator:
         )
         response = self.app.dispatch(request)
         assert response.status == 404
+
+    def test_logger_propagation(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            logger=custom_logger,
+        )
+        app.step(logger_test_step)
+
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(edit_payload))}"
+        headers = {
+            "content-type": ["application/x-www-form-urlencoded"],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
+        }
+        request: BoltRequest = BoltRequest(body=body, headers=headers)
+        response = app.dispatch(request)
+        assert response.status == 200
+
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(save_payload))}"
+        headers = {
+            "content-type": ["application/x-www-form-urlencoded"],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
+        }
+        request: BoltRequest = BoltRequest(body=body, headers=headers)
+        response = app.dispatch(request)
+        assert response.status == 200
+
+        timestamp, body = str(int(time())), json.dumps(execute_payload)
+        headers = {
+            "content-type": ["application/json"],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
+        }
+        request: BoltRequest = BoltRequest(body=body, headers=headers)
+        response = app.dispatch(request)
+        assert response.status == 200
 
 
 edit_payload = {
@@ -273,6 +312,10 @@ execute_payload = {
 }
 
 
+#
+# The normal pattern tests
+#
+
 # https://api.slack.com/tutorials/workflow-builder-steps
 
 
@@ -427,3 +470,64 @@ def execute(step: dict, client: WebClient, complete: Complete, fail: Fail):
         )
     except Exception as err:
         fail(error={"message": f"Something wrong! {err}"})
+
+
+#
+# Logger propagation tests
+#
+
+custom_logger = logging.getLogger(f"{__name__}-{time()}-logger-test")
+custom_logger.setLevel(logging.INFO)
+added_handler = logging.NullHandler()
+custom_logger.addHandler(added_handler)
+added_filter = logging.Filter()
+custom_logger.addFilter(added_filter)
+
+logger_test_step = WorkflowStep.builder(
+    "copy_review",
+    base_logger=custom_logger,  # to pass this logger to middleware / middleware matchers
+)
+
+
+def _verify_logger(logger: logging.Logger):
+    assert logger.level == custom_logger.level
+    assert len(logger.handlers) == len(custom_logger.handlers)
+    assert logger.handlers[-1] == custom_logger.handlers[-1]
+    assert len(logger.filters) == len(custom_logger.filters)
+    assert logger.filters[-1] == custom_logger.filters[-1]
+
+
+def logger_middleware(next, logger):
+    _verify_logger(logger)
+    next()
+
+
+def logger_matcher(logger):
+    _verify_logger(logger)
+    return True
+
+
+@logger_test_step.edit(
+    middleware=[logger_middleware],
+    matchers=[logger_matcher],
+)
+def edit_for_logger_test(ack: Ack, logger: logging.Logger):
+    _verify_logger(logger)
+    ack()
+
+
+@logger_test_step.save(
+    middleware=[logger_middleware],
+    matchers=[logger_matcher],
+)
+def save_for_logger_test(ack: Ack, logger: logging.Logger):
+    _verify_logger(logger)
+    ack()
+
+
+@logger_test_step.execute(
+    middleware=[logger_middleware],
+    matchers=[logger_matcher],
+)
+def execute_for_logger_test(logger: logging.Logger):
+    _verify_logger(logger)

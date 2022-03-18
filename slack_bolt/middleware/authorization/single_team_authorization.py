@@ -1,3 +1,4 @@
+from logging import Logger
 from typing import Callable, Optional
 
 from slack_bolt.logger import get_bolt_logger
@@ -16,14 +17,20 @@ from ...authorization import AuthorizeResult
 
 
 class SingleTeamAuthorization(Authorization):
-    def __init__(self, *, auth_test_result: Optional[SlackResponse] = None):
+    def __init__(
+        self,
+        *,
+        auth_test_result: Optional[SlackResponse] = None,
+        base_logger: Optional[Logger] = None,
+    ):
         """Single-workspace authorization.
 
         Args:
             auth_test_result: The initial `auth.test` API call result.
+            base_logger: The base logger
         """
         self.auth_test_result = auth_test_result
-        self.logger = get_bolt_logger(SingleTeamAuthorization)
+        self.logger = get_bolt_logger(SingleTeamAuthorization, base_logger=base_logger)
 
     def process(
         self,

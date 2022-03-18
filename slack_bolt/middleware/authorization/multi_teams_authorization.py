@@ -1,3 +1,4 @@
+from logging import Logger
 from typing import Callable, Optional
 
 from slack_sdk.errors import SlackApiError
@@ -22,14 +23,16 @@ class MultiTeamsAuthorization(Authorization):
         self,
         *,
         authorize: Authorize,
+        base_logger: Optional[Logger] = None,
     ):
         """Multi-workspace authorization.
 
         Args:
             authorize: The function to authorize incoming requests from Slack.
+            base_logger: The base logger
         """
         self.authorize = authorize
-        self.logger = get_bolt_logger(MultiTeamsAuthorization)
+        self.logger = get_bolt_logger(MultiTeamsAuthorization, base_logger=base_logger)
 
     def process(
         self,

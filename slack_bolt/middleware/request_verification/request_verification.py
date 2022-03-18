@@ -1,4 +1,5 @@
-from typing import Callable, Dict, Any
+from logging import Logger
+from typing import Callable, Dict, Any, Optional
 
 from slack_sdk.signature import SignatureVerifier
 
@@ -9,7 +10,7 @@ from slack_bolt.response import BoltResponse
 
 
 class RequestVerification(Middleware):  # type: ignore
-    def __init__(self, signing_secret: str):
+    def __init__(self, signing_secret: str, base_logger: Optional[Logger] = None):
         """Verifies an incoming request by checking the validity of
         `x-slack-signature`, `x-slack-request-timestamp`, and its body data.
 
@@ -17,9 +18,10 @@ class RequestVerification(Middleware):  # type: ignore
 
         Args:
             signing_secret: The signing secret
+            base_logger: The base logger
         """
         self.verifier = SignatureVerifier(signing_secret=signing_secret)
-        self.logger = get_bolt_logger(RequestVerification)
+        self.logger = get_bolt_logger(RequestVerification, base_logger=base_logger)
 
     def process(
         self,

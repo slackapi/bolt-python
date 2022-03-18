@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from ssl import SSLContext
 
 import pytest
@@ -193,44 +194,16 @@ class TestAsyncApp:
     @pytest.mark.asyncio
     async def test_proxy_ssl_for_respond(self):
         ssl = SSLContext()
-        web_client = AsyncWebClient(
-            token=self.valid_token,
-            base_url=self.mock_api_server_base_url,
-            proxy="http://proxy-host:9000/",
-            ssl=ssl,
-        )
-
-        async def my_authorize():
-            return AuthorizeResult(
-                enterprise_id="E111",
-                team_id="T111",
-            )
-
         app = AsyncApp(
             signing_secret="valid",
-            client=web_client,
+            client=AsyncWebClient(
+                token=self.valid_token,
+                base_url=self.mock_api_server_base_url,
+                proxy="http://proxy-host:9000/",
+                ssl=ssl,
+            ),
             authorize=my_authorize,
         )
-
-        event_body = {
-            "token": "verification_token",
-            "team_id": "T111",
-            "enterprise_id": "E111",
-            "api_app_id": "A111",
-            "event": {
-                "client_msg_id": "9cbd4c5b-7ddf-4ede-b479-ad21fca66d63",
-                "type": "app_mention",
-                "text": "<@W111> Hi there!",
-                "user": "W222",
-                "ts": "1595926230.009600",
-                "team": "T111",
-                "channel": "C111",
-                "event_ts": "1595926230.009600",
-            },
-            "type": "event_callback",
-            "event_id": "Ev111",
-            "event_time": 1595926230,
-        }
 
         result = {"called": False}
 
@@ -242,8 +215,102 @@ class TestAsyncApp:
             assert respond.ssl == ssl
             result["called"] = True
 
-        req = AsyncBoltRequest(body=event_body, headers={}, mode="socket_mode")
+        req = AsyncBoltRequest(
+            body=app_mention_event_body, headers={}, mode="socket_mode"
+        )
         response = await app.async_dispatch(req)
         assert response.status == 200
         await asyncio.sleep(0.5)  # wait a bit after auto ack()
         assert result["called"] is True
+
+    @pytest.mark.asyncio
+    async def test_argument_logger_propagation(self):
+        import time
+
+        custom_logger = logging.getLogger(f"{__name__}-{time.time()}-async-logger-test")
+        custom_logger.setLevel(logging.INFO)
+        added_handler = logging.NullHandler()
+        custom_logger.addHandler(added_handler)
+        added_filter = logging.Filter()
+        custom_logger.addFilter(added_filter)
+
+        app = AsyncApp(
+            signing_secret="valid",
+            client=AsyncWebClient(
+                token=self.valid_token,
+                base_url=self.mock_api_server_base_url,
+            ),
+            authorize=my_authorize,
+            logger=custom_logger,
+        )
+
+        result = {"called": False}
+
+        def _verify_logger(logger: logging.Logger):
+            assert logger.level == custom_logger.level
+            assert len(logger.handlers) == len(custom_logger.handlers)
+            # TODO: this assertion fails only with codecov
+            # assert logger.handlers[-1] == custom_logger.handlers[-1]
+            assert logger.handlers[-1].name == custom_logger.handlers[-1].name
+            assert len(logger.filters) == len(custom_logger.filters)
+            # TODO: this assertion fails only with codecov
+            # assert logger.filters[-1] == custom_logger.filters[-1]
+            assert logger.filters[-1].name == custom_logger.filters[-1].name
+
+        @app.use
+        async def global_middleware(logger, next):
+            _verify_logger(logger)
+            await next()
+
+        async def listener_middleware(logger, next):
+            _verify_logger(logger)
+            await next()
+
+        async def listener_matcher(logger):
+            _verify_logger(logger)
+            return True
+
+        @app.event(
+            "app_mention",
+            middleware=[listener_middleware],
+            matchers=[listener_matcher],
+        )
+        async def handle(logger: logging.Logger):
+            _verify_logger(logger)
+            result["called"] = True
+
+        req = AsyncBoltRequest(
+            body=app_mention_event_body, headers={}, mode="socket_mode"
+        )
+        response = await app.async_dispatch(req)
+        assert response.status == 200
+        await asyncio.sleep(0.5)  # wait a bit after auto ack()
+        assert result["called"] is True
+
+
+async def my_authorize():
+    return AuthorizeResult(
+        enterprise_id="E111",
+        team_id="T111",
+    )
+
+
+app_mention_event_body = {
+    "token": "verification_token",
+    "team_id": "T111",
+    "enterprise_id": "E111",
+    "api_app_id": "A111",
+    "event": {
+        "client_msg_id": "9cbd4c5b-7ddf-4ede-b479-ad21fca66d63",
+        "type": "app_mention",
+        "text": "<@W111> Hi there!",
+        "user": "W222",
+        "ts": "1595926230.009600",
+        "team": "T111",
+        "channel": "C111",
+        "event_ts": "1595926230.009600",
+    },
+    "type": "event_callback",
+    "event_id": "Ev111",
+    "event_time": 1595926230,
+}

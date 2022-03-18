@@ -1,4 +1,5 @@
-from typing import Callable
+from logging import Logger
+from typing import Callable, Optional
 
 from slack_bolt.logger import get_bolt_logger
 from slack_bolt.middleware.middleware import Middleware
@@ -7,12 +8,15 @@ from slack_bolt.response import BoltResponse
 
 
 class UrlVerification(Middleware):  # type: ignore
-    def __init__(self):
+    def __init__(self, base_logger: Optional[Logger] = None):
         """Handles url_verification requests.
 
         Refer to https://api.slack.com/events/url_verification for details.
+
+        Args:
+            base_logger: The base logger
         """
-        self.logger = get_bolt_logger(UrlVerification)
+        self.logger = get_bolt_logger(UrlVerification, base_logger=base_logger)
 
     def process(
         self,

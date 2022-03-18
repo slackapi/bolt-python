@@ -1,3 +1,4 @@
+from logging import Logger
 from typing import Callable, Optional, Awaitable
 
 from slack_sdk.errors import SlackApiError
@@ -14,14 +15,17 @@ from ...authorization.async_authorize import AsyncAuthorize
 class AsyncMultiTeamsAuthorization(AsyncAuthorization):
     authorize: AsyncAuthorize
 
-    def __init__(self, authorize: AsyncAuthorize):
+    def __init__(self, authorize: AsyncAuthorize, base_logger: Optional[Logger] = None):
         """Multi-workspace authorization.
 
         Args:
             authorize: The function to authorize incoming requests from Slack.
+            base_logger: The base logger
         """
         self.authorize = authorize
-        self.logger = get_bolt_logger(AsyncMultiTeamsAuthorization)
+        self.logger = get_bolt_logger(
+            AsyncMultiTeamsAuthorization, base_logger=base_logger
+        )
 
     async def async_process(
         self,

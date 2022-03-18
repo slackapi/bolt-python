@@ -21,7 +21,9 @@ class ChaliceSlackRequestHandler:
     def __init__(self, app: App, chalice: Chalice, lambda_client: Optional[BaseClient] = None):  # type: ignore
         self.app = app
         self.chalice = chalice
-        self.logger = get_bolt_app_logger(app.name, ChaliceSlackRequestHandler)
+        self.logger = get_bolt_app_logger(
+            app.name, ChaliceSlackRequestHandler, app.logger
+        )
 
         if getenv("AWS_CHALICE_CLI_MODE") == "true" and lambda_client is None:
             try:

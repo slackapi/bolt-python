@@ -14,7 +14,7 @@ from slack_bolt.response import BoltResponse
 class SlackRequestHandler:
     def __init__(self, app: App):  # type: ignore
         self.app = app
-        self.logger = get_bolt_app_logger(app.name, SlackRequestHandler)
+        self.logger = get_bolt_app_logger(app.name, SlackRequestHandler, app.logger)
         self.app.listener_runner.lazy_listener_runner = LambdaLazyListenerRunner(
             self.logger
         )

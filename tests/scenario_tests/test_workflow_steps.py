@@ -1,4 +1,5 @@
 import json
+import logging
 import time as time_module
 from time import time
 from urllib.parse import quote
@@ -167,6 +168,65 @@ class TestWorkflowSteps:
         app = self.build_process_before_response_app("copy_review___")
         response = app.dispatch(request)
         assert response.status == 404
+
+    def test_custom_logger_propagation(self):
+        custom_logger = logging.getLogger(f"{__name__}-{time()}-logger-test")
+        custom_logger.setLevel(logging.INFO)
+        added_handler = logging.NullHandler()
+        custom_logger.addHandler(added_handler)
+        added_filter = logging.Filter()
+        custom_logger.addFilter(added_filter)
+
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            logger=custom_logger,
+        )
+
+        def verify_logger_is_properly_passed(ack: Ack, logger: logging.Logger):
+            assert logger.level == custom_logger.level
+            assert len(logger.handlers) == len(custom_logger.handlers)
+            assert logger.handlers[-1] == custom_logger.handlers[-1]
+            assert len(logger.filters) == len(custom_logger.filters)
+            assert logger.filters[-1] == custom_logger.filters[-1]
+            ack()
+
+        app.step(
+            callback_id="copy_review",
+            edit=verify_logger_is_properly_passed,
+            save=verify_logger_is_properly_passed,
+            execute=verify_logger_is_properly_passed,
+        )
+
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(edit_payload))}"
+        headers = {
+            "content-type": ["application/x-www-form-urlencoded"],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
+        }
+        request: BoltRequest = BoltRequest(body=body, headers=headers)
+        response = app.dispatch(request)
+        assert response.status == 200
+
+        timestamp, body = str(int(time())), f"payload={quote(json.dumps(save_payload))}"
+        headers = {
+            "content-type": ["application/x-www-form-urlencoded"],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
+        }
+        request: BoltRequest = BoltRequest(body=body, headers=headers)
+        response = app.dispatch(request)
+        assert response.status == 200
+
+        timestamp, body = str(int(time())), json.dumps(execute_payload)
+        headers = {
+            "content-type": ["application/json"],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
+        }
+        request: BoltRequest = BoltRequest(body=body, headers=headers)
+        response = app.dispatch(request)
+        assert response.status == 200
 
 
 edit_payload = {
