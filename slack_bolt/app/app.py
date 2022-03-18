@@ -146,7 +146,6 @@ class App:
 
         Args:
             logger: The custom logger that can be used in this app.
-                The log level will be shared among all the loggers in this app.
             name: The application name that will be used in logging. If absent, the source file name will be used.
             process_before_response: True if this app runs on Function as a Service. (Default: False)
             raise_error_for_unhandled_request: True if you want to raise exceptions for unhandled requests
