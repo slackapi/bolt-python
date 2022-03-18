@@ -33,14 +33,16 @@ def get_bolt_app_logger(
 def _configure_from_base_logger(new_logger: Logger, base_logger: Logger):
     new_logger.disabled = base_logger.disabled
     new_logger.level = base_logger.level
-    if len(new_logger.handlers) == 0:
-        for h in base_logger.handlers:
-            if h not in new_logger.handlers:
-                new_logger.addHandler(h)
-    if len(new_logger.filters) == 0:
-        for f in base_logger.filters:
-            if f not in new_logger.filters:
-                new_logger.addFilter(f)
+    if len(new_logger.handlers) > 0:
+        new_logger.handlers.clear()
+    for h in base_logger.handlers:
+        if h not in new_logger.handlers:
+            new_logger.addHandler(h)
+    if len(new_logger.filters) > 0:
+        new_logger.filters.clear()
+    for f in base_logger.filters:
+        if f not in new_logger.filters:
+            new_logger.addFilter(f)
 
 
 def _configure_from_root(new_logger: Logger):
