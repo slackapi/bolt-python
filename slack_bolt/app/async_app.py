@@ -194,7 +194,11 @@ class AsyncApp:
         self._verification_token: Optional[str] = verification_token or os.environ.get(
             "SLACK_VERIFICATION_TOKEN", None
         )
+        # If a logger is explicitly passed when initializing, the logger works as the base logger.
+        # The base logger's logging settings will be propagated to all the loggers created by bolt-python.
         self._base_logger = logger
+        # The framework logger is supposed to be used for the internal logging.
+        # Also, it's accessible via `app.logger` as the app's singleton logger.
         self._framework_logger = logger or get_bolt_logger(AsyncApp)
         self._raise_error_for_unhandled_request = raise_error_for_unhandled_request
 
