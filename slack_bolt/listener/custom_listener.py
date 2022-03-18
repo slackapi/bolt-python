@@ -30,6 +30,7 @@ class CustomListener(Listener):
         matchers: Sequence[ListenerMatcher],
         middleware: Sequence[Middleware],  # type: ignore
         auto_acknowledgement: bool = False,
+        base_logger: Optional[Logger] = None,
     ):
         self.app_name = app_name
         self.ack_function = ack_function
@@ -38,7 +39,7 @@ class CustomListener(Listener):
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
         self.arg_names = inspect.getfullargspec(ack_function).args
-        self.logger = get_bolt_app_logger(app_name, self.ack_function)
+        self.logger = get_bolt_app_logger(app_name, self.ack_function, base_logger)
 
     def run_ack_function(
         self,

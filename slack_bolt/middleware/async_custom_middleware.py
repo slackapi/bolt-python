@@ -1,6 +1,6 @@
 import inspect
 from logging import Logger
-from typing import Callable, Awaitable, Any, Sequence
+from typing import Callable, Awaitable, Any, Sequence, Optional
 
 from slack_bolt.kwargs_injection.async_utils import build_async_required_kwargs
 from slack_bolt.logger import get_bolt_app_logger
@@ -16,7 +16,13 @@ class AsyncCustomMiddleware(AsyncMiddleware):
     arg_names: Sequence[str]
     logger: Logger
 
-    def __init__(self, *, app_name: str, func: Callable[..., Awaitable[Any]]):
+    def __init__(
+        self,
+        *,
+        app_name: str,
+        func: Callable[..., Awaitable[Any]],
+        base_logger: Optional[Logger] = None,
+    ):
         self.app_name = app_name
         if inspect.iscoroutinefunction(func):
             self.func = func
@@ -24,7 +30,7 @@ class AsyncCustomMiddleware(AsyncMiddleware):
             raise ValueError("Async middleware function must be an async function")
 
         self.arg_names = inspect.getfullargspec(func).args
-        self.logger = get_bolt_app_logger(self.app_name, self.func)
+        self.logger = get_bolt_app_logger(self.app_name, self.func, base_logger)
 
     async def async_process(
         self,

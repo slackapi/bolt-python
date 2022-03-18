@@ -1,4 +1,5 @@
 from functools import wraps
+from logging import Logger
 from typing import Callable, Union, Optional, Awaitable, Sequence, List, Pattern
 
 from slack_sdk.web.async_client import AsyncWebClient
@@ -31,6 +32,7 @@ class AsyncWorkflowStepBuilder:
     """
 
     callback_id: Union[str, Pattern]
+    _base_logger: Optional[Logger]
     _edit: Optional[AsyncListener]
     _save: Optional[AsyncListener]
     _execute: Optional[AsyncListener]
@@ -39,6 +41,7 @@ class AsyncWorkflowStepBuilder:
         self,
         callback_id: Union[str, Pattern],
         app_name: Optional[str] = None,
+        base_logger: Optional[Logger] = None,
     ):
         """This builder is supposed to be used as decorator.
 
@@ -61,9 +64,11 @@ class AsyncWorkflowStepBuilder:
         Args:
             callback_id: The callback_id for the workflow
             app_name: The application name mainly for logging
+            base_logger: The base logger
         """
         self.callback_id = callback_id
         self.app_name = app_name or __name__
+        self._base_logger = base_logger
         self._edit = None
         self._save = None
         self._execute = None
@@ -217,7 +222,7 @@ class AsyncWorkflowStepBuilder:
 
         return _inner
 
-    def build(self) -> "AsyncWorkflowStep":
+    def build(self, base_logger: Optional[Logger] = None) -> "AsyncWorkflowStep":
         """Constructs a WorkflowStep object. This method may raise an exception
         if the builder doesn't have enough configurations to build the object.
 
@@ -237,6 +242,7 @@ class AsyncWorkflowStepBuilder:
             save=self._save,
             execute=self._execute,
             app_name=self.app_name,
+            base_logger=base_logger,
         )
 
     # ---------------------------------------
@@ -257,6 +263,7 @@ class AsyncWorkflowStepBuilder:
             name=name,
             matchers=self.to_listener_matchers(self.app_name, matchers),
             middleware=self.to_listener_middleware(self.app_name, middleware),
+            base_logger=self._base_logger,
         )
 
     @staticmethod
@@ -319,16 +326,39 @@ class AsyncWorkflowStep:
             Callable[..., Awaitable[BoltResponse]], AsyncListener, Sequence[Callable]
         ],
         app_name: Optional[str] = None,
+        base_logger: Optional[Logger] = None,
     ):
         self.callback_id = callback_id
         app_name = app_name or __name__
-        self.edit = self.build_listener(callback_id, app_name, edit, "edit")
-        self.save = self.build_listener(callback_id, app_name, save, "save")
-        self.execute = self.build_listener(callback_id, app_name, execute, "execute")
+        self.edit = self.build_listener(
+            callback_id=callback_id,
+            app_name=app_name,
+            listener_or_functions=edit,
+            name="edit",
+            base_logger=base_logger,
+        )
+        self.save = self.build_listener(
+            callback_id=callback_id,
+            app_name=app_name,
+            listener_or_functions=save,
+            name="save",
+            base_logger=base_logger,
+        )
+        self.execute = self.build_listener(
+            callback_id=callback_id,
+            app_name=app_name,
+            listener_or_functions=execute,
+            name="execute",
+            base_logger=base_logger,
+        )
 
     @classmethod
-    def builder(cls, callback_id: Union[str, Pattern]) -> AsyncWorkflowStepBuilder:
-        return AsyncWorkflowStepBuilder(callback_id)
+    def builder(
+        cls,
+        callback_id: Union[str, Pattern],
+        base_logger: Optional[Logger] = None,
+    ) -> AsyncWorkflowStepBuilder:
+        return AsyncWorkflowStepBuilder(callback_id, base_logger=base_logger)
 
     @classmethod
     def build_listener(
@@ -339,6 +369,7 @@ class AsyncWorkflowStep:
         name: str,
         matchers: Optional[List[AsyncListenerMatcher]] = None,
         middleware: Optional[List[AsyncMiddleware]] = None,
+        base_logger: Optional[Logger] = None,
     ):
         if listener_or_functions is None:
             raise BoltError(f"{name} listener is required (callback_id: {callback_id})")
@@ -350,9 +381,13 @@ class AsyncWorkflowStep:
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
             matchers = matchers if matchers else []
-            matchers.insert(0, cls._build_primary_matcher(name, callback_id))
+            matchers.insert(
+                0, cls._build_primary_matcher(name, callback_id, base_logger)
+            )
             middleware = middleware if middleware else []
-            middleware.insert(0, cls._build_single_middleware(name, callback_id))
+            middleware.insert(
+                0, cls._build_single_middleware(name, callback_id, base_logger)
+            )
             functions = listener_or_functions
             ack_function = functions.pop(0)
             return AsyncCustomListener(
@@ -362,6 +397,7 @@ class AsyncWorkflowStep:
                 ack_function=ack_function,
                 lazy_functions=functions,
                 auto_acknowledgement=name == "execute",
+                base_logger=base_logger,
             )
         else:
             raise BoltError(
@@ -370,25 +406,39 @@ class AsyncWorkflowStep:
 
     @classmethod
     def _build_primary_matcher(
-        cls, name: str, callback_id: str
+        cls,
+        name: str,
+        callback_id: str,
+        base_logger: Optional[Logger] = None,
     ) -> AsyncListenerMatcher:
         if name == "edit":
-            return workflow_step_edit(callback_id, asyncio=True)
+            return workflow_step_edit(
+                callback_id, asyncio=True, base_logger=base_logger
+            )
         elif name == "save":
-            return workflow_step_save(callback_id, asyncio=True)
+            return workflow_step_save(
+                callback_id, asyncio=True, base_logger=base_logger
+            )
         elif name == "execute":
-            return workflow_step_execute(callback_id, asyncio=True)
+            return workflow_step_execute(
+                callback_id, asyncio=True, base_logger=base_logger
+            )
         else:
             raise ValueError(f"Invalid name {name}")
 
     @classmethod
-    def _build_single_middleware(cls, name: str, callback_id: str) -> AsyncMiddleware:
+    def _build_single_middleware(
+        cls,
+        name: str,
+        callback_id: str,
+        base_logger: Optional[Logger] = None,
+    ) -> AsyncMiddleware:
         if name == "edit":
-            return _build_edit_listener_middleware(callback_id)
+            return _build_edit_listener_middleware(callback_id, base_logger)
         elif name == "save":
-            return _build_save_listener_middleware()
+            return _build_save_listener_middleware(base_logger)
         elif name == "execute":
-            return _build_execute_listener_middleware()
+            return _build_execute_listener_middleware(base_logger)
         else:
             raise ValueError(f"Invalid name {name}")
 
@@ -398,7 +448,10 @@ class AsyncWorkflowStep:
 #######################
 
 
-def _build_edit_listener_middleware(callback_id: str) -> AsyncMiddleware:
+def _build_edit_listener_middleware(
+    callback_id: str,
+    base_logger: Optional[Logger] = None,
+) -> AsyncMiddleware:
     async def edit_listener_middleware(
         context: AsyncBoltContext,
         client: AsyncWebClient,
@@ -412,7 +465,11 @@ def _build_edit_listener_middleware(callback_id: str) -> AsyncMiddleware:
         )
         return await next()
 
-    return AsyncCustomMiddleware(app_name=__name__, func=edit_listener_middleware)
+    return AsyncCustomMiddleware(
+        app_name=__name__,
+        func=edit_listener_middleware,
+        base_logger=base_logger,
+    )
 
 
 #######################
@@ -420,7 +477,9 @@ def _build_edit_listener_middleware(callback_id: str) -> AsyncMiddleware:
 #######################
 
 
-def _build_save_listener_middleware() -> AsyncMiddleware:
+def _build_save_listener_middleware(
+    base_logger: Optional[Logger] = None,
+) -> AsyncMiddleware:
     async def save_listener_middleware(
         context: AsyncBoltContext,
         client: AsyncWebClient,
@@ -433,7 +492,11 @@ def _build_save_listener_middleware() -> AsyncMiddleware:
         )
         return await next()
 
-    return AsyncCustomMiddleware(app_name=__name__, func=save_listener_middleware)
+    return AsyncCustomMiddleware(
+        app_name=__name__,
+        func=save_listener_middleware,
+        base_logger=base_logger,
+    )
 
 
 #######################
@@ -441,7 +504,9 @@ def _build_save_listener_middleware() -> AsyncMiddleware:
 #######################
 
 
-def _build_execute_listener_middleware() -> AsyncMiddleware:
+def _build_execute_listener_middleware(
+    base_logger: Optional[Logger] = None,
+) -> AsyncMiddleware:
     async def execute_listener_middleware(
         context: AsyncBoltContext,
         client: AsyncWebClient,
@@ -458,4 +523,8 @@ def _build_execute_listener_middleware() -> AsyncMiddleware:
         )
         return await next()
 
-    return AsyncCustomMiddleware(app_name=__name__, func=execute_listener_middleware)
+    return AsyncCustomMiddleware(
+        app_name=__name__,
+        func=execute_listener_middleware,
+        base_logger=base_logger,
+    )

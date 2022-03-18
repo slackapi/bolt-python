@@ -1,4 +1,5 @@
 from functools import wraps
+from logging import Logger
 from typing import Callable, Union, Optional, Sequence, Pattern, List
 
 from slack_bolt.context.context import BoltContext
@@ -26,6 +27,7 @@ class WorkflowStepBuilder:
     """
 
     callback_id: Union[str, Pattern]
+    _base_logger: Optional[Logger]
     _edit: Optional[Listener]
     _save: Optional[Listener]
     _execute: Optional[Listener]
@@ -34,6 +36,7 @@ class WorkflowStepBuilder:
         self,
         callback_id: Union[str, Pattern],
         app_name: Optional[str] = None,
+        base_logger: Optional[Logger] = None,
     ):
         """This builder is supposed to be used as decorator.
 
@@ -56,9 +59,11 @@ class WorkflowStepBuilder:
         Args:
             callback_id: The callback_id for the workflow
             app_name: The application name mainly for logging
+            base_logger: The base logger
         """
         self.callback_id = callback_id
         self.app_name = app_name or __name__
+        self._base_logger = base_logger
         self._edit = None
         self._save = None
         self._execute = None
@@ -207,7 +212,7 @@ class WorkflowStepBuilder:
 
         return _inner
 
-    def build(self) -> "WorkflowStep":
+    def build(self, base_logger: Optional[Logger] = None) -> "WorkflowStep":
         """Constructs a WorkflowStep object. This method may raise an exception
         if the builder doesn't have enough configurations to build the object.
 
@@ -227,6 +232,7 @@ class WorkflowStepBuilder:
             save=self._save,
             execute=self._execute,
             app_name=self.app_name,
+            base_logger=base_logger,
         )
 
     # ---------------------------------------
@@ -243,14 +249,20 @@ class WorkflowStepBuilder:
             app_name=self.app_name,
             listener_or_functions=listener_or_functions,
             name=name,
-            matchers=self.to_listener_matchers(self.app_name, matchers),
-            middleware=self.to_listener_middleware(self.app_name, middleware),
+            matchers=self.to_listener_matchers(
+                self.app_name, matchers, self._base_logger
+            ),
+            middleware=self.to_listener_middleware(
+                self.app_name, middleware, self._base_logger
+            ),
+            base_logger=self._base_logger,
         )
 
     @staticmethod
     def to_listener_matchers(
         app_name: str,
         matchers: Optional[List[Union[Callable[..., bool], ListenerMatcher]]],
+        base_logger: Optional[Logger] = None,
     ) -> List[ListenerMatcher]:
         _matchers = []
         if matchers is not None:
@@ -258,14 +270,22 @@ class WorkflowStepBuilder:
                 if isinstance(m, ListenerMatcher):
                     _matchers.append(m)
                 elif isinstance(m, Callable):
-                    _matchers.append(CustomListenerMatcher(app_name=app_name, func=m))
+                    _matchers.append(
+                        CustomListenerMatcher(
+                            app_name=app_name,
+                            func=m,
+                            base_logger=base_logger,
+                        )
+                    )
                 else:
                     raise ValueError(f"Invalid matcher: {type(m)}")
         return _matchers  # type: ignore
 
     @staticmethod
     def to_listener_middleware(
-        app_name: str, middleware: Optional[List[Union[Callable, Middleware]]]
+        app_name: str,
+        middleware: Optional[List[Union[Callable, Middleware]]],
+        base_logger: Optional[Logger] = None,
     ) -> List[Middleware]:
         _middleware = []
         if middleware is not None:
@@ -273,7 +293,13 @@ class WorkflowStepBuilder:
                 if isinstance(m, Middleware):
                     _middleware.append(m)
                 elif isinstance(m, Callable):
-                    _middleware.append(CustomMiddleware(app_name=app_name, func=m))
+                    _middleware.append(
+                        CustomMiddleware(
+                            app_name=app_name,
+                            func=m,
+                            base_logger=base_logger,
+                        )
+                    )
                 else:
                     raise ValueError(f"Invalid middleware: {type(m)}")
         return _middleware  # type: ignore
@@ -303,16 +329,40 @@ class WorkflowStep:
             Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]
         ],
         app_name: Optional[str] = None,
+        base_logger: Optional[Logger] = None,
     ):
         self.callback_id = callback_id
         app_name = app_name or __name__
-        self.edit = self.build_listener(callback_id, app_name, edit, "edit")
-        self.save = self.build_listener(callback_id, app_name, save, "save")
-        self.execute = self.build_listener(callback_id, app_name, execute, "execute")
+        self.edit = self.build_listener(
+            callback_id=callback_id,
+            app_name=app_name,
+            listener_or_functions=edit,
+            name="edit",
+            base_logger=base_logger,
+        )
+        self.save = self.build_listener(
+            callback_id=callback_id,
+            app_name=app_name,
+            listener_or_functions=save,
+            name="save",
+            base_logger=base_logger,
+        )
+        self.execute = self.build_listener(
+            callback_id=callback_id,
+            app_name=app_name,
+            listener_or_functions=execute,
+            name="execute",
+            base_logger=base_logger,
+        )
 
     @classmethod
-    def builder(cls, callback_id: Union[str, Pattern]) -> WorkflowStepBuilder:
-        return WorkflowStepBuilder(callback_id)
+    def builder(
+        cls, callback_id: Union[str, Pattern], base_logger: Optional[Logger] = None
+    ) -> WorkflowStepBuilder:
+        return WorkflowStepBuilder(
+            callback_id,
+            base_logger=base_logger,
+        )
 
     @classmethod
     def build_listener(
@@ -323,6 +373,7 @@ class WorkflowStep:
         name: str,
         matchers: Optional[List[ListenerMatcher]] = None,
         middleware: Optional[List[Middleware]] = None,
+        base_logger: Optional[Logger] = None,
     ) -> Listener:
         if listener_or_functions is None:
             raise BoltError(f"{name} listener is required (callback_id: {callback_id})")
@@ -334,9 +385,23 @@ class WorkflowStep:
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
             matchers = matchers if matchers else []
-            matchers.insert(0, cls._build_primary_matcher(name, callback_id))
+            matchers.insert(
+                0,
+                cls._build_primary_matcher(
+                    name,
+                    callback_id,
+                    base_logger=base_logger,
+                ),
+            )
             middleware = middleware if middleware else []
-            middleware.insert(0, cls._build_single_middleware(name, callback_id))
+            middleware.insert(
+                0,
+                cls._build_single_middleware(
+                    name,
+                    callback_id,
+                    base_logger=base_logger,
+                ),
+            )
             functions = listener_or_functions
             ack_function = functions.pop(0)
             return CustomListener(
@@ -346,6 +411,7 @@ class WorkflowStep:
                 ack_function=ack_function,
                 lazy_functions=functions,
                 auto_acknowledgement=name == "execute",
+                base_logger=base_logger,
             )
         else:
             raise BoltError(
@@ -353,24 +419,34 @@ class WorkflowStep:
             )
 
     @classmethod
-    def _build_primary_matcher(cls, name, callback_id) -> ListenerMatcher:
+    def _build_primary_matcher(
+        cls,
+        name: str,
+        callback_id: Union[str, Pattern],
+        base_logger: Optional[Logger] = None,
+    ) -> ListenerMatcher:
         if name == "edit":
-            return workflow_step_edit(callback_id)
+            return workflow_step_edit(callback_id, base_logger=base_logger)
         elif name == "save":
-            return workflow_step_save(callback_id)
+            return workflow_step_save(callback_id, base_logger=base_logger)
         elif name == "execute":
-            return workflow_step_execute(callback_id)
+            return workflow_step_execute(callback_id, base_logger=base_logger)
         else:
             raise ValueError(f"Invalid name {name}")
 
     @classmethod
-    def _build_single_middleware(cls, name, callback_id) -> Middleware:
+    def _build_single_middleware(
+        cls,
+        name: str,
+        callback_id: Union[str, Pattern],
+        base_logger: Optional[Logger] = None,
+    ) -> Middleware:
         if name == "edit":
-            return _build_edit_listener_middleware(callback_id)
+            return _build_edit_listener_middleware(callback_id, base_logger=base_logger)
         elif name == "save":
-            return _build_save_listener_middleware()
+            return _build_save_listener_middleware(base_logger=base_logger)
         elif name == "execute":
-            return _build_execute_listener_middleware()
+            return _build_execute_listener_middleware(base_logger=base_logger)
         else:
             raise ValueError(f"Invalid name {name}")
 
@@ -380,7 +456,9 @@ class WorkflowStep:
 #######################
 
 
-def _build_edit_listener_middleware(callback_id: str) -> Middleware:
+def _build_edit_listener_middleware(
+    callback_id: str, base_logger: Optional[Logger] = None
+) -> Middleware:
     def edit_listener_middleware(
         context: BoltContext,
         client: WebClient,
@@ -394,7 +472,11 @@ def _build_edit_listener_middleware(callback_id: str) -> Middleware:
         )
         return next()
 
-    return CustomMiddleware(app_name=__name__, func=edit_listener_middleware)
+    return CustomMiddleware(
+        app_name=__name__,
+        func=edit_listener_middleware,
+        base_logger=base_logger,
+    )
 
 
 #######################
@@ -402,7 +484,7 @@ def _build_edit_listener_middleware(callback_id: str) -> Middleware:
 #######################
 
 
-def _build_save_listener_middleware() -> Middleware:
+def _build_save_listener_middleware(base_logger: Optional[Logger] = None) -> Middleware:
     def save_listener_middleware(
         context: BoltContext,
         client: WebClient,
@@ -415,7 +497,11 @@ def _build_save_listener_middleware() -> Middleware:
         )
         return next()
 
-    return CustomMiddleware(app_name=__name__, func=save_listener_middleware)
+    return CustomMiddleware(
+        app_name=__name__,
+        func=save_listener_middleware,
+        base_logger=base_logger,
+    )
 
 
 #######################
@@ -423,7 +509,9 @@ def _build_save_listener_middleware() -> Middleware:
 #######################
 
 
-def _build_execute_listener_middleware() -> Middleware:
+def _build_execute_listener_middleware(
+    base_logger: Optional[Logger] = None,
+) -> Middleware:
     def execute_listener_middleware(
         context: BoltContext,
         client: WebClient,
@@ -440,4 +528,8 @@ def _build_execute_listener_middleware() -> Middleware:
         )
         return next()
 
-    return CustomMiddleware(app_name=__name__, func=execute_listener_middleware)
+    return CustomMiddleware(
+        app_name=__name__,
+        func=execute_listener_middleware,
+        base_logger=base_logger,
+    )

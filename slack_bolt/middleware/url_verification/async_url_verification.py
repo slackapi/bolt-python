@@ -1,4 +1,5 @@
-from typing import Callable, Awaitable
+from logging import Logger
+from typing import Callable, Awaitable, Optional
 
 from slack_bolt.logger import get_bolt_logger
 from .url_verification import UrlVerification
@@ -8,8 +9,8 @@ from slack_bolt.response import BoltResponse
 
 
 class AsyncUrlVerification(UrlVerification, AsyncMiddleware):
-    def __init__(self):
-        self.logger = get_bolt_logger(AsyncUrlVerification)
+    def __init__(self, base_logger: Optional[Logger] = None):
+        self.logger = get_bolt_logger(AsyncUrlVerification, base_logger=base_logger)
 
     async def async_process(
         self,

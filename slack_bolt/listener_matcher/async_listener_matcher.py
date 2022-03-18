@@ -21,7 +21,7 @@ class AsyncListenerMatcher(metaclass=ABCMeta):
 
 import inspect
 from logging import Logger
-from typing import Callable, Awaitable, Sequence
+from typing import Callable, Awaitable, Sequence, Optional
 
 from slack_bolt.kwargs_injection.async_utils import build_async_required_kwargs
 from slack_bolt.logger import get_bolt_app_logger
@@ -35,11 +35,17 @@ class AsyncCustomListenerMatcher(AsyncListenerMatcher):
     arg_names: Sequence[str]
     logger: Logger
 
-    def __init__(self, *, app_name: str, func: Callable[..., Awaitable[bool]]):
+    def __init__(
+        self,
+        *,
+        app_name: str,
+        func: Callable[..., Awaitable[bool]],
+        base_logger: Optional[Logger] = None
+    ):
         self.app_name = app_name
         self.func = func
         self.arg_names = inspect.getfullargspec(func).args
-        self.logger = get_bolt_app_logger(self.app_name, self.func)
+        self.logger = get_bolt_app_logger(self.app_name, self.func, base_logger)
 
     async def async_matches(self, req: AsyncBoltRequest, resp: BoltResponse) -> bool:
         return await self.func(

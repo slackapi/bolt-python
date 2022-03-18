@@ -1,3 +1,4 @@
+import logging
 from concurrent.futures import Executor
 from ssl import SSLContext
 
@@ -259,26 +260,6 @@ class TestApp:
             ),
         )
 
-        event_body = {
-            "token": "verification_token",
-            "team_id": "T111",
-            "enterprise_id": "E111",
-            "api_app_id": "A111",
-            "event": {
-                "client_msg_id": "9cbd4c5b-7ddf-4ede-b479-ad21fca66d63",
-                "type": "app_mention",
-                "text": "<@W111> Hi there!",
-                "user": "W222",
-                "ts": "1595926230.009600",
-                "team": "T111",
-                "channel": "C111",
-                "event_ts": "1595926230.009600",
-            },
-            "type": "event_callback",
-            "event_id": "Ev111",
-            "event_time": 1595926230,
-        }
-
         result = {"called": False}
 
         @app.event("app_mention")
@@ -289,7 +270,84 @@ class TestApp:
             assert respond.ssl == ssl
             result["called"] = True
 
-        req = BoltRequest(body=event_body, headers={}, mode="socket_mode")
+        req = BoltRequest(body=app_mention_event_body, headers={}, mode="socket_mode")
         response = app.dispatch(req)
         assert response.status == 200
         assert result["called"] is True
+
+    def test_argument_logger_propagation(self):
+        custom_logger = logging.getLogger("foo")
+        custom_logger.setLevel(logging.INFO)
+        added_handler = logging.NullHandler()
+        custom_logger.addHandler(added_handler)
+        added_filter = logging.Filter()
+        custom_logger.addFilter(added_filter)
+
+        app = App(
+            signing_secret="valid",
+            client=WebClient(
+                token=self.valid_token,
+                base_url=self.mock_api_server_base_url,
+            ),
+            authorize=lambda: AuthorizeResult(
+                enterprise_id="E111",
+                team_id="T111",
+            ),
+            logger=custom_logger,
+        )
+        result = {"called": False}
+
+        def _verify_logger(logger: logging.Logger):
+            assert logger.level == custom_logger.level
+            assert len(logger.handlers) == len(custom_logger.handlers)
+            assert logger.handlers[-1] == custom_logger.handlers[-1]
+            assert len(logger.filters) == len(custom_logger.filters)
+            assert logger.filters[-1] == custom_logger.filters[-1]
+
+        @app.use
+        def global_middleware(logger, next):
+            _verify_logger(logger)
+            next()
+
+        def listener_middleware(logger, next):
+            _verify_logger(logger)
+            next()
+
+        def listener_matcher(logger):
+            _verify_logger(logger)
+            return True
+
+        @app.event(
+            "app_mention",
+            middleware=[listener_middleware],
+            matchers=[listener_matcher],
+        )
+        def handle(logger: logging.Logger):
+            _verify_logger(logger)
+            result["called"] = True
+
+        req = BoltRequest(body=app_mention_event_body, headers={}, mode="socket_mode")
+        response = app.dispatch(req)
+        assert response.status == 200
+        assert result["called"] is True
+
+
+app_mention_event_body = {
+    "token": "verification_token",
+    "team_id": "T111",
+    "enterprise_id": "E111",
+    "api_app_id": "A111",
+    "event": {
+        "client_msg_id": "9cbd4c5b-7ddf-4ede-b479-ad21fca66d63",
+        "type": "app_mention",
+        "text": "<@W111> Hi there!",
+        "user": "W222",
+        "ts": "1595926230.009600",
+        "team": "T111",
+        "channel": "C111",
+        "event_ts": "1595926230.009600",
+    },
+    "type": "event_callback",
+    "event_id": "Ev111",
+    "event_time": 1595926230,
+}

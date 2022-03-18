@@ -1,6 +1,6 @@
 import inspect
 from logging import Logger
-from typing import Callable, Sequence
+from typing import Callable, Sequence, Optional
 
 from slack_bolt.kwargs_injection import build_required_kwargs
 from slack_bolt.logger import get_bolt_app_logger
@@ -15,11 +15,17 @@ class CustomListenerMatcher(ListenerMatcher):
     arg_names: Sequence[str]
     logger: Logger
 
-    def __init__(self, *, app_name: str, func: Callable[..., bool]):
+    def __init__(
+        self,
+        *,
+        app_name: str,
+        func: Callable[..., bool],
+        base_logger: Optional[Logger] = None
+    ):
         self.app_name = app_name
         self.func = func
         self.arg_names = inspect.getfullargspec(func).args
-        self.logger = get_bolt_app_logger(self.app_name, self.func)
+        self.logger = get_bolt_app_logger(self.app_name, self.func, base_logger)
 
     def matches(self, req: BoltRequest, resp: BoltResponse) -> bool:
         return self.func(
