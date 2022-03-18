@@ -217,6 +217,11 @@ class App:
         self._verification_token: Optional[str] = verification_token or os.environ.get(
             &#34;SLACK_VERIFICATION_TOKEN&#34;, None
         )
+        # If a logger is explicitly passed when initializing, the logger works as the base logger.
+        # The base logger&#39;s logging settings will be propagated to all the loggers created by bolt-python.
+        self._base_logger = logger
+        # The framework logger is supposed to be used for the internal logging.
+        # Also, it&#39;s accessible via `app.logger` as the app&#39;s singleton logger.
         self._framework_logger = logger or get_bolt_logger(App)
         self._raise_error_for_unhandled_request = raise_error_for_unhandled_request
 
@@ -384,10 +389,15 @@ class App:
             return
         if ssl_check_enabled is True:
             self._middleware_list.append(
-                SslCheck(verification_token=self._verification_token)
+                SslCheck(
+                    verification_token=self._verification_token,
+                    base_logger=self._base_logger,
+                )
             )
         if request_verification_enabled is True:
-            self._middleware_list.append(RequestVerification(self._signing_secret))
+            self._middleware_list.append(
+                RequestVerification(self._signing_secret, base_logger=self._base_logger)
+            )
 
         # As authorize is required for making a Bolt app function, we don&#39;t offer the flag to disable this
         if self._oauth_flow is None:
@@ -398,24 +408,33 @@ class App:
                         # This API call is for eagerly validating the token
                         auth_test_result = self._client.auth_test(token=self._token)
                     self._middleware_list.append(
-                        SingleTeamAuthorization(auth_test_result=auth_test_result)
+                        SingleTeamAuthorization(
+                            auth_test_result=auth_test_result,
+                            base_logger=self._base_logger,
+                        )
                     )
                 except SlackApiError as err:
                     raise BoltError(error_auth_test_failure(err.response))
             elif self._authorize is not None:
                 self._middleware_list.append(
-                    MultiTeamsAuthorization(authorize=self._authorize)
+                    MultiTeamsAuthorization(
+                        authorize=self._authorize, base_logger=self._base_logger
+                    )
                 )
             else:
                 raise BoltError(error_token_required())
         else:
             self._middleware_list.append(
-                MultiTeamsAuthorization(authorize=self._authorize)
+                MultiTeamsAuthorization(
+                    authorize=self._authorize, base_logger=self._base_logger
+                )
             )
         if ignoring_self_events_enabled is True:
-            self._middleware_list.append(IgnoringSelfEvents())
+            self._middleware_list.append(
+                IgnoringSelfEvents(base_logger=self._base_logger)
+            )
         if url_verification_enabled is True:
-            self._middleware_list.append(UrlVerification())
+            self._middleware_list.append(UrlVerification(base_logger=self._base_logger))
         self._init_middleware_list_done = True
 
     # -------------------------
@@ -644,7 +663,11 @@ class App:
                 self._middleware_list.append(middleware)
             elif isinstance(middleware_or_callable, Callable):
                 self._middleware_list.append(
-                    CustomMiddleware(app_name=self.name, func=middleware_or_callable)
+                    CustomMiddleware(
+                        app_name=self.name,
+                        func=middleware_or_callable,
+                        base_logger=self._base_logger,
+                    )
                 )
                 return middleware_or_callable
             else:
@@ -705,9 +728,10 @@ class App:
                 edit=edit,
                 save=save,
                 execute=execute,
+                base_logger=self._base_logger,
             )
         elif isinstance(step, WorkflowStepBuilder):
-            step = step.build()
+            step = step.build(base_logger=self._base_logger)
         elif not isinstance(step, WorkflowStep):
             raise BoltError(f&#34;Invalid step object ({type(step)})&#34;)
 
@@ -752,7 +776,9 @@ class App:
     def event(
         self,
         event: Union[
-            str, Pattern, Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]]
+            str,
+            Pattern,
+            Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]],
         ],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
@@ -785,7 +811,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.event(event)
+            primary_matcher = builtin_matchers.event(
+                event, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware, True
             )
@@ -840,7 +868,7 @@ class App:
                 ),
             }
             primary_matcher = builtin_matchers.message_event(
-                keyword=keyword, constraints=constraints
+                keyword=keyword, constraints=constraints, base_logger=self._base_logger
             )
             middleware.insert(0, MessageListenerMatches(keyword))
             return self._register_listener(
@@ -885,7 +913,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.command(command)
+            primary_matcher = builtin_matchers.command(
+                command, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -934,7 +964,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.shortcut(constraints)
+            primary_matcher = builtin_matchers.shortcut(
+                constraints, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -951,7 +983,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.global_shortcut(callback_id)
+            primary_matcher = builtin_matchers.global_shortcut(
+                callback_id, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -968,7 +1002,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.message_shortcut(callback_id)
+            primary_matcher = builtin_matchers.message_shortcut(
+                callback_id, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -1010,7 +1046,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.action(constraints)
+            primary_matcher = builtin_matchers.action(
+                constraints, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -1029,7 +1067,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.block_action(constraints)
+            primary_matcher = builtin_matchers.block_action(
+                constraints, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -1047,7 +1087,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.attachment_action(callback_id)
+            primary_matcher = builtin_matchers.attachment_action(
+                callback_id, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -1065,7 +1107,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.dialog_submission(callback_id)
+            primary_matcher = builtin_matchers.dialog_submission(
+                callback_id, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -1083,7 +1127,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.dialog_cancellation(callback_id)
+            primary_matcher = builtin_matchers.dialog_cancellation(
+                callback_id, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -1136,7 +1182,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.view(constraints)
+            primary_matcher = builtin_matchers.view(
+                constraints, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -1154,7 +1202,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.view_submission(constraints)
+            primary_matcher = builtin_matchers.view_submission(
+                constraints, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -1172,7 +1222,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.view_closed(constraints)
+            primary_matcher = builtin_matchers.view_closed(
+                constraints, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -1225,7 +1277,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.options(constraints)
+            primary_matcher = builtin_matchers.options(
+                constraints, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -1242,7 +1296,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.block_suggestion(action_id)
+            primary_matcher = builtin_matchers.block_suggestion(
+                action_id, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -1260,7 +1316,9 @@ class App:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.dialog_suggestion(callback_id)
+            primary_matcher = builtin_matchers.dialog_suggestion(
+                callback_id, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -1291,7 +1349,9 @@ class App:
     # -------------------------
 
     def _init_context(self, req: BoltRequest):
-        req.context[&#34;logger&#34;] = get_bolt_app_logger(self.name)
+        req.context[&#34;logger&#34;] = get_bolt_app_logger(
+            app_name=self.name, base_logger=self._base_logger
+        )
         req.context[&#34;token&#34;] = self._token
         if self._token is not None:
             # This WebClient instance can be safely singleton
@@ -1337,7 +1397,10 @@ class App:
             value_to_return = functions[0]
 
         listener_matchers = [
-            CustomListenerMatcher(app_name=self.name, func=f) for f in (matchers or [])
+            CustomListenerMatcher(
+                app_name=self.name, func=f, base_logger=self._base_logger
+            )
+            for f in (matchers or [])
         ]
         listener_matchers.insert(0, primary_matcher)
         listener_middleware = []
@@ -1345,7 +1408,11 @@ class App:
             if isinstance(m, Middleware):
                 listener_middleware.append(m)
             elif isinstance(m, Callable):
-                listener_middleware.append(CustomMiddleware(app_name=self.name, func=m))
+                listener_middleware.append(
+                    CustomMiddleware(
+                        app_name=self.name, func=m, base_logger=self._base_logger
+                    )
+                )
             else:
                 raise ValueError(error_unexpected_listener_middleware(type(m)))
 
@@ -1357,6 +1424,7 @@ class App:
                 matchers=listener_matchers,
                 middleware=listener_middleware,
                 auto_acknowledgement=auto_acknowledgement,
+                base_logger=self._base_logger,
             )
         )
         return value_to_return
@@ -1685,6 +1753,11 @@ be used.</dd>
         self._verification_token: Optional[str] = verification_token or os.environ.get(
             &#34;SLACK_VERIFICATION_TOKEN&#34;, None
         )
+        # If a logger is explicitly passed when initializing, the logger works as the base logger.
+        # The base logger&#39;s logging settings will be propagated to all the loggers created by bolt-python.
+        self._base_logger = logger
+        # The framework logger is supposed to be used for the internal logging.
+        # Also, it&#39;s accessible via `app.logger` as the app&#39;s singleton logger.
         self._framework_logger = logger or get_bolt_logger(App)
         self._raise_error_for_unhandled_request = raise_error_for_unhandled_request
 
@@ -1852,10 +1925,15 @@ be used.</dd>
             return
         if ssl_check_enabled is True:
             self._middleware_list.append(
-                SslCheck(verification_token=self._verification_token)
+                SslCheck(
+                    verification_token=self._verification_token,
+                    base_logger=self._base_logger,
+                )
             )
         if request_verification_enabled is True:
-            self._middleware_list.append(RequestVerification(self._signing_secret))
+            self._middleware_list.append(
+                RequestVerification(self._signing_secret, base_logger=self._base_logger)
+            )
 
         # As authorize is required for making a Bolt app function, we don&#39;t offer the flag to disable this
         if self._oauth_flow is None:
@@ -1866,24 +1944,33 @@ be used.</dd>
                         # This API call is for eagerly validating the token
                         auth_test_result = self._client.auth_test(token=self._token)
                     self._middleware_list.append(
-                        SingleTeamAuthorization(auth_test_result=auth_test_result)
+                        SingleTeamAuthorization(
+                            auth_test_result=auth_test_result,
+                            base_logger=self._base_logger,
+                        )
                     )
                 except SlackApiError as err:
                     raise BoltError(error_auth_test_failure(err.response))
             elif self._authorize is not None:
                 self._middleware_list.append(
-                    MultiTeamsAuthorization(authorize=self._authorize)
+                    MultiTeamsAuthorization(
+                        authorize=self._authorize, base_logger=self._base_logger
+                    )
                 )
             else:
                 raise BoltError(error_token_required())
         else:
             self._middleware_list.append(
-                MultiTeamsAuthorization(authorize=self._authorize)
+                MultiTeamsAuthorization(
+                    authorize=self._authorize, base_logger=self._base_logger
+                )
             )
         if ignoring_self_events_enabled is True:
-            self._middleware_list.append(IgnoringSelfEvents())
+            self._middleware_list.append(
+                IgnoringSelfEvents(base_logger=self._base_logger)
+            )
         if url_verification_enabled is True:
-            self._middleware_list.append(UrlVerification())
+            self._middleware_list.append(UrlVerification(base_logger=self._base_logger))
         self._init_middleware_list_done = True
 
     # -------------------------
@@ -2112,7 +2199,11 @@ be used.</dd>
                 self._middleware_list.append(middleware)
             elif isinstance(middleware_or_callable, Callable):
                 self._middleware_list.append(
-                    CustomMiddleware(app_name=self.name, func=middleware_or_callable)
+                    CustomMiddleware(
+                        app_name=self.name,
+                        func=middleware_or_callable,
+                        base_logger=self._base_logger,
+                    )
                 )
                 return middleware_or_callable
             else:
@@ -2173,9 +2264,10 @@ be used.</dd>
                 edit=edit,
                 save=save,
                 execute=execute,
+                base_logger=self._base_logger,
             )
         elif isinstance(step, WorkflowStepBuilder):
-            step = step.build()
+            step = step.build(base_logger=self._base_logger)
         elif not isinstance(step, WorkflowStep):
             raise BoltError(f&#34;Invalid step object ({type(step)})&#34;)
 
@@ -2220,7 +2312,9 @@ be used.</dd>
     def event(
         self,
         event: Union[
-            str, Pattern, Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]]
+            str,
+            Pattern,
+            Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]],
         ],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
@@ -2253,7 +2347,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.event(event)
+            primary_matcher = builtin_matchers.event(
+                event, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware, True
             )
@@ -2308,7 +2404,7 @@ be used.</dd>
                 ),
             }
             primary_matcher = builtin_matchers.message_event(
-                keyword=keyword, constraints=constraints
+                keyword=keyword, constraints=constraints, base_logger=self._base_logger
             )
             middleware.insert(0, MessageListenerMatches(keyword))
             return self._register_listener(
@@ -2353,7 +2449,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.command(command)
+            primary_matcher = builtin_matchers.command(
+                command, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -2402,7 +2500,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.shortcut(constraints)
+            primary_matcher = builtin_matchers.shortcut(
+                constraints, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -2419,7 +2519,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.global_shortcut(callback_id)
+            primary_matcher = builtin_matchers.global_shortcut(
+                callback_id, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -2436,7 +2538,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.message_shortcut(callback_id)
+            primary_matcher = builtin_matchers.message_shortcut(
+                callback_id, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -2478,7 +2582,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.action(constraints)
+            primary_matcher = builtin_matchers.action(
+                constraints, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -2497,7 +2603,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.block_action(constraints)
+            primary_matcher = builtin_matchers.block_action(
+                constraints, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -2515,7 +2623,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.attachment_action(callback_id)
+            primary_matcher = builtin_matchers.attachment_action(
+                callback_id, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -2533,7 +2643,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.dialog_submission(callback_id)
+            primary_matcher = builtin_matchers.dialog_submission(
+                callback_id, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -2551,7 +2663,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.dialog_cancellation(callback_id)
+            primary_matcher = builtin_matchers.dialog_cancellation(
+                callback_id, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -2604,7 +2718,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.view(constraints)
+            primary_matcher = builtin_matchers.view(
+                constraints, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -2622,7 +2738,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.view_submission(constraints)
+            primary_matcher = builtin_matchers.view_submission(
+                constraints, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -2640,7 +2758,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.view_closed(constraints)
+            primary_matcher = builtin_matchers.view_closed(
+                constraints, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -2693,7 +2813,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.options(constraints)
+            primary_matcher = builtin_matchers.options(
+                constraints, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -2710,7 +2832,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.block_suggestion(action_id)
+            primary_matcher = builtin_matchers.block_suggestion(
+                action_id, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -2728,7 +2852,9 @@ be used.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.dialog_suggestion(callback_id)
+            primary_matcher = builtin_matchers.dialog_suggestion(
+                callback_id, base_logger=self._base_logger
+            )
             return self._register_listener(
                 list(functions), primary_matcher, matchers, middleware
             )
@@ -2759,7 +2885,9 @@ be used.</dd>
     # -------------------------
 
     def _init_context(self, req: BoltRequest):
-        req.context[&#34;logger&#34;] = get_bolt_app_logger(self.name)
+        req.context[&#34;logger&#34;] = get_bolt_app_logger(
+            app_name=self.name, base_logger=self._base_logger
+        )
         req.context[&#34;token&#34;] = self._token
         if self._token is not None:
             # This WebClient instance can be safely singleton
@@ -2805,7 +2933,10 @@ be used.</dd>
             value_to_return = functions[0]
 
         listener_matchers = [
-            CustomListenerMatcher(app_name=self.name, func=f) for f in (matchers or [])
+            CustomListenerMatcher(
+                app_name=self.name, func=f, base_logger=self._base_logger
+            )
+            for f in (matchers or [])
         ]
         listener_matchers.insert(0, primary_matcher)
         listener_middleware = []
@@ -2813,7 +2944,11 @@ be used.</dd>
             if isinstance(m, Middleware):
                 listener_middleware.append(m)
             elif isinstance(m, Callable):
-                listener_middleware.append(CustomMiddleware(app_name=self.name, func=m))
+                listener_middleware.append(
+                    CustomMiddleware(
+                        app_name=self.name, func=m, base_logger=self._base_logger
+                    )
+                )
             else:
                 raise ValueError(error_unexpected_listener_middleware(type(m)))
 
@@ -2825,6 +2960,7 @@ be used.</dd>
                 matchers=listener_matchers,
                 middleware=listener_middleware,
                 auto_acknowledgement=auto_acknowledgement,
+                base_logger=self._base_logger,
             )
         )
         return value_to_return</code></pre>
@@ -2990,7 +3126,9 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.action(constraints)
+        primary_matcher = builtin_matchers.action(
+            constraints, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware
         )
@@ -3019,7 +3157,9 @@ Refer to <a href="https://api.slack.com/legacy/message-buttons">https://api.slac
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.attachment_action(callback_id)
+        primary_matcher = builtin_matchers.attachment_action(
+            callback_id, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware
         )
@@ -3049,7 +3189,9 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-act
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.block_action(constraints)
+        primary_matcher = builtin_matchers.block_action(
+            constraints, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware
         )
@@ -3076,7 +3218,9 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-act
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.block_suggestion(action_id)
+        primary_matcher = builtin_matchers.block_suggestion(
+            action_id, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware
         )
@@ -3150,7 +3294,9 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.command(command)
+        primary_matcher = builtin_matchers.command(
+            command, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware
         )
@@ -3213,7 +3359,9 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.dialog_cancellation(callback_id)
+        primary_matcher = builtin_matchers.dialog_cancellation(
+            callback_id, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware
         )
@@ -3242,7 +3390,9 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.dialog_submission(callback_id)
+        primary_matcher = builtin_matchers.dialog_submission(
+            callback_id, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware
         )
@@ -3271,7 +3421,9 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.dialog_suggestion(callback_id)
+        primary_matcher = builtin_matchers.dialog_suggestion(
+            callback_id, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware
         )
@@ -3479,7 +3631,7 @@ when getting an unhandled error in Bolt app.</dd>
 </details>
 </dd>
 <dt id="slack_bolt.app.app.App.event"><code class="name flex">
-<span>def <span class="ident">event</span></span>(<span>self, event: Union[str, Pattern, Dict[str, Union[str, Sequence[Union[str, Pattern, ForwardRef(None)]]]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">event</span></span>(<span>self, event: Union[str, Pattern, Dict[str, Union[str, Sequence[Union[str, Pattern, ForwardRef(None)]], ForwardRef(None)]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new event listener. This method can be used as either a decorator or a method.</p>
@@ -3515,7 +3667,9 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 <pre><code class="python">def event(
     self,
     event: Union[
-        str, Pattern, Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]]
+        str,
+        Pattern,
+        Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]],
     ],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
     middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
@@ -3548,7 +3702,9 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.event(event)
+        primary_matcher = builtin_matchers.event(
+            event, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware, True
         )
@@ -3575,7 +3731,9 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.global_shortcut(callback_id)
+        primary_matcher = builtin_matchers.global_shortcut(
+            callback_id, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware
         )
@@ -3663,7 +3821,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
             ),
         }
         primary_matcher = builtin_matchers.message_event(
-            keyword=keyword, constraints=constraints
+            keyword=keyword, constraints=constraints, base_logger=self._base_logger
         )
         middleware.insert(0, MessageListenerMatches(keyword))
         return self._register_listener(
@@ -3692,7 +3850,9 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.message_shortcut(callback_id)
+        primary_matcher = builtin_matchers.message_shortcut(
+            callback_id, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware
         )
@@ -3753,7 +3913,11 @@ app.middleware(middleware_func)
             self._middleware_list.append(middleware)
         elif isinstance(middleware_or_callable, Callable):
             self._middleware_list.append(
-                CustomMiddleware(app_name=self.name, func=middleware_or_callable)
+                CustomMiddleware(
+                    app_name=self.name,
+                    func=middleware_or_callable,
+                    base_logger=self._base_logger,
+                )
             )
             return middleware_or_callable
         else:
@@ -3849,7 +4013,9 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.options(constraints)
+        primary_matcher = builtin_matchers.options(
+            constraints, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware
         )
@@ -3935,7 +4101,9 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.shortcut(constraints)
+        primary_matcher = builtin_matchers.shortcut(
+            constraints, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware
         )
@@ -4084,9 +4252,10 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="../workflows
             edit=edit,
             save=save,
             execute=execute,
+            base_logger=self._base_logger,
         )
     elif isinstance(step, WorkflowStepBuilder):
-        step = step.build()
+        step = step.build(base_logger=self._base_logger)
     elif not isinstance(step, WorkflowStep):
         raise BoltError(f&#34;Invalid step object ({type(step)})&#34;)
 
@@ -4196,7 +4365,9 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.view(constraints)
+        primary_matcher = builtin_matchers.view(
+            constraints, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware
         )
@@ -4225,7 +4396,9 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#vie
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.view_closed(constraints)
+        primary_matcher = builtin_matchers.view_closed(
+            constraints, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware
         )
@@ -4254,7 +4427,9 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#vie
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.view_submission(constraints)
+        primary_matcher = builtin_matchers.view_submission(
+            constraints, base_logger=self._base_logger
+        )
         return self._register_listener(
             list(functions), primary_matcher, matchers, middleware
         )

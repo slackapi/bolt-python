@@ -75,7 +75,7 @@ class AsyncRequestVerification(RequestVerification, AsyncMiddleware):
 <dl>
 <dt id="slack_bolt.middleware.request_verification.async_request_verification.AsyncRequestVerification"><code class="flex name class">
 <span>class <span class="ident">AsyncRequestVerification</span></span>
-<span>(</span><span>signing_secret: str)</span>
+<span>(</span><span>signing_secret: str, base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Verifies an incoming request by checking the validity of
@@ -88,6 +88,8 @@ class AsyncRequestVerification(RequestVerification, AsyncMiddleware):
 <dl>
 <dt><strong><code>signing_secret</code></strong></dt>
 <dd>The signing secret</dd>
+<dt><strong><code>base_logger</code></strong></dt>
+<dd>The base logger</dd>
 </dl></div>
 <details class="source">
 <summary>

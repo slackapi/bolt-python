@@ -26,7 +26,8 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from typing import Callable, Optional, Awaitable
+<pre><code class="python">from logging import Logger
+from typing import Callable, Optional, Awaitable
 
 from slack_sdk.errors import SlackApiError
 from slack_bolt.logger import get_bolt_logger
@@ -42,14 +43,17 @@ from ...authorization.async_authorize import AsyncAuthorize
 class AsyncMultiTeamsAuthorization(AsyncAuthorization):
     authorize: AsyncAuthorize
 
-    def __init__(self, authorize: AsyncAuthorize):
+    def __init__(self, authorize: AsyncAuthorize, base_logger: Optional[Logger] = None):
         &#34;&#34;&#34;Multi-workspace authorization.
 
         Args:
             authorize: The function to authorize incoming requests from Slack.
+            base_logger: The base logger
         &#34;&#34;&#34;
         self.authorize = authorize
-        self.logger = get_bolt_logger(AsyncMultiTeamsAuthorization)
+        self.logger = get_bolt_logger(
+            AsyncMultiTeamsAuthorization, base_logger=base_logger
+        )
 
     async def async_process(
         self,
@@ -115,7 +119,7 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
 <dl>
 <dt id="slack_bolt.middleware.authorization.async_multi_teams_authorization.AsyncMultiTeamsAuthorization"><code class="flex name class">
 <span>class <span class="ident">AsyncMultiTeamsAuthorization</span></span>
-<span>(</span><span>authorize: <a title="slack_bolt.authorization.async_authorize.AsyncAuthorize" href="../../authorization/async_authorize.html#slack_bolt.authorization.async_authorize.AsyncAuthorize">AsyncAuthorize</a>)</span>
+<span>(</span><span>authorize: <a title="slack_bolt.authorization.async_authorize.AsyncAuthorize" href="../../authorization/async_authorize.html#slack_bolt.authorization.async_authorize.AsyncAuthorize">AsyncAuthorize</a>, base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
@@ -124,6 +128,8 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
 <dl>
 <dt><strong><code>authorize</code></strong></dt>
 <dd>The function to authorize incoming requests from Slack.</dd>
+<dt><strong><code>base_logger</code></strong></dt>
+<dd>The base logger</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -132,14 +138,17 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
 <pre><code class="python">class AsyncMultiTeamsAuthorization(AsyncAuthorization):
     authorize: AsyncAuthorize
 
-    def __init__(self, authorize: AsyncAuthorize):
+    def __init__(self, authorize: AsyncAuthorize, base_logger: Optional[Logger] = None):
         &#34;&#34;&#34;Multi-workspace authorization.
 
         Args:
             authorize: The function to authorize incoming requests from Slack.
+            base_logger: The base logger
         &#34;&#34;&#34;
         self.authorize = authorize
-        self.logger = get_bolt_logger(AsyncMultiTeamsAuthorization)
+        self.logger = get_bolt_logger(
+            AsyncMultiTeamsAuthorization, base_logger=base_logger
+        )
 
     async def async_process(
         self,

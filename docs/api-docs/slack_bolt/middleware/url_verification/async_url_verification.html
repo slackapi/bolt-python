@@ -26,7 +26,8 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from typing import Callable, Awaitable
+<pre><code class="python">from logging import Logger
+from typing import Callable, Awaitable, Optional
 
 from slack_bolt.logger import get_bolt_logger
 from .url_verification import UrlVerification
@@ -36,8 +37,8 @@ from slack_bolt.response import BoltResponse
 
 
 class AsyncUrlVerification(UrlVerification, AsyncMiddleware):
-    def __init__(self):
-        self.logger = get_bolt_logger(AsyncUrlVerification)
+    def __init__(self, base_logger: Optional[Logger] = None):
+        self.logger = get_bolt_logger(AsyncUrlVerification, base_logger=base_logger)
 
     async def async_process(
         self,
@@ -63,18 +64,24 @@ class AsyncUrlVerification(UrlVerification, AsyncMiddleware):
 <dl>
 <dt id="slack_bolt.middleware.url_verification.async_url_verification.AsyncUrlVerification"><code class="flex name class">
 <span>class <span class="ident">AsyncUrlVerification</span></span>
+<span>(</span><span>base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
 <p>Handles url_verification requests.</p>
-<p>Refer to <a href="https://api.slack.com/events/url_verification">https://api.slack.com/events/url_verification</a> for details.</p></div>
+<p>Refer to <a href="https://api.slack.com/events/url_verification">https://api.slack.com/events/url_verification</a> for details.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>base_logger</code></strong></dt>
+<dd>The base logger</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncUrlVerification(UrlVerification, AsyncMiddleware):
-    def __init__(self):
-        self.logger = get_bolt_logger(AsyncUrlVerification)
+    def __init__(self, base_logger: Optional[Logger] = None):
+        self.logger = get_bolt_logger(AsyncUrlVerification, base_logger=base_logger)
 
     async def async_process(
         self,

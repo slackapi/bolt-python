@@ -64,7 +64,7 @@ class AsyncSslCheck(SslCheck, AsyncMiddleware):
 <dl>
 <dt id="slack_bolt.middleware.ssl_check.async_ssl_check.AsyncSslCheck"><code class="flex name class">
 <span>class <span class="ident">AsyncSslCheck</span></span>
-<span>(</span><span>verification_token: Optional[str] = None)</span>
+<span>(</span><span>verification_token: Optional[str] = None, base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
@@ -75,6 +75,8 @@ Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://ap
 <dt><strong><code>verification_token</code></strong></dt>
 <dd>The verification token to check
 (optional as it's already deprecated - <a href="https://api.slack.com/authentication/verifying-requests-from-slack#verification_token_deprecation">https://api.slack.com/authentication/verifying-requests-from-slack#verification_token_deprecation</a>)</dd>
+<dt><strong><code>base_logger</code></strong></dt>
+<dd>The base logger</dd>
 </dl></div>
 <details class="source">
 <summary>

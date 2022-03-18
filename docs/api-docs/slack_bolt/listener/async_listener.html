@@ -129,6 +129,7 @@ class AsyncCustomListener(AsyncListener):
         matchers: Sequence[AsyncListenerMatcher],
         middleware: Sequence[AsyncMiddleware],
         auto_acknowledgement: bool = False,
+        base_logger: Optional[Logger] = None,
     ):
         self.app_name = app_name
         self.ack_function = ack_function
@@ -137,7 +138,7 @@ class AsyncCustomListener(AsyncListener):
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
         self.arg_names = inspect.getfullargspec(ack_function).args
-        self.logger = get_bolt_app_logger(app_name, self.ack_function)
+        self.logger = get_bolt_app_logger(app_name, self.ack_function, base_logger)
 
     async def run_ack_function(
         self,
@@ -174,7 +175,7 @@ for cls in builtin_async_listener_classes:
 <dl>
 <dt id="slack_bolt.listener.async_listener.AsyncCustomListener"><code class="flex name class">
 <span>class <span class="ident">AsyncCustomListener</span></span>
-<span>(</span><span>*, app_name: str, ack_function: Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]], lazy_functions: Sequence[Callable[..., Awaitable[None]]], matchers: Sequence[<a title="slack_bolt.listener_matcher.async_listener_matcher.AsyncListenerMatcher" href="../listener_matcher/async_listener_matcher.html#slack_bolt.listener_matcher.async_listener_matcher.AsyncListenerMatcher">AsyncListenerMatcher</a>], middleware: Sequence[<a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="../middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>], auto_acknowledgement: bool = False)</span>
+<span>(</span><span>*, app_name: str, ack_function: Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]], lazy_functions: Sequence[Callable[..., Awaitable[None]]], matchers: Sequence[<a title="slack_bolt.listener_matcher.async_listener_matcher.AsyncListenerMatcher" href="../listener_matcher/async_listener_matcher.html#slack_bolt.listener_matcher.async_listener_matcher.AsyncListenerMatcher">AsyncListenerMatcher</a>], middleware: Sequence[<a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="../middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>], auto_acknowledgement: bool = False, base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -201,6 +202,7 @@ for cls in builtin_async_listener_classes:
         matchers: Sequence[AsyncListenerMatcher],
         middleware: Sequence[AsyncMiddleware],
         auto_acknowledgement: bool = False,
+        base_logger: Optional[Logger] = None,
     ):
         self.app_name = app_name
         self.ack_function = ack_function
@@ -209,7 +211,7 @@ for cls in builtin_async_listener_classes:
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
         self.arg_names = inspect.getfullargspec(ack_function).args
-        self.logger = get_bolt_app_logger(app_name, self.ack_function)
+        self.logger = get_bolt_app_logger(app_name, self.ack_function, base_logger)
 
     async def run_ack_function(
         self,
@@ -307,7 +309,7 @@ for cls in builtin_async_listener_classes:
 </dd>
 <dt id="slack_bolt.listener.async_listener.AsyncCustomListener"><code class="flex name class">
 <span>class <span class="ident">cls</span></span>
-<span>(</span><span>*, app_name: str, ack_function: Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]], lazy_functions: Sequence[Callable[..., Awaitable[None]]], matchers: Sequence[<a title="slack_bolt.listener_matcher.async_listener_matcher.AsyncListenerMatcher" href="../listener_matcher/async_listener_matcher.html#slack_bolt.listener_matcher.async_listener_matcher.AsyncListenerMatcher">AsyncListenerMatcher</a>], middleware: Sequence[<a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="../middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>], auto_acknowledgement: bool = False)</span>
+<span>(</span><span>*, app_name: str, ack_function: Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]], lazy_functions: Sequence[Callable[..., Awaitable[None]]], matchers: Sequence[<a title="slack_bolt.listener_matcher.async_listener_matcher.AsyncListenerMatcher" href="../listener_matcher/async_listener_matcher.html#slack_bolt.listener_matcher.async_listener_matcher.AsyncListenerMatcher">AsyncListenerMatcher</a>], middleware: Sequence[<a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="../middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>], auto_acknowledgement: bool = False, base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -334,6 +336,7 @@ for cls in builtin_async_listener_classes:
         matchers: Sequence[AsyncListenerMatcher],
         middleware: Sequence[AsyncMiddleware],
         auto_acknowledgement: bool = False,
+        base_logger: Optional[Logger] = None,
     ):
         self.app_name = app_name
         self.ack_function = ack_function
@@ -342,7 +345,7 @@ for cls in builtin_async_listener_classes:
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
         self.arg_names = inspect.getfullargspec(ack_function).args
-        self.logger = get_bolt_app_logger(app_name, self.ack_function)
+        self.logger = get_bolt_app_logger(app_name, self.ack_function, base_logger)
 
     async def run_ack_function(
         self,

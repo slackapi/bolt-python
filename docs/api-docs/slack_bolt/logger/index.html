@@ -31,27 +31,48 @@
 
 import logging
 from logging import Logger
-from typing import Any
+from typing import Any, Optional
 
 
-def get_bolt_logger(cls: Any) -&gt; Logger:
+def get_bolt_logger(cls: Any, base_logger: Optional[Logger] = None) -&gt; Logger:
     logger = logging.getLogger(f&#34;slack_bolt.{cls.__name__}&#34;)
-    logger.disabled = logging.root.disabled
-    logger.level = logging.root.level
+    if base_logger is not None:
+        _configure_from_base_logger(logger, base_logger)
+    else:
+        _configure_from_root(logger)
     return logger
 
 
-def get_bolt_app_logger(app_name: str, cls: object = None) -&gt; Logger:
-    if cls and hasattr(cls, &#34;__name__&#34;):
-        logger = logging.getLogger(f&#34;{app_name}:{cls.__name__}&#34;)
-        logger.disabled = logging.root.disabled
-        logger.level = logging.root.level
-        return logger
+def get_bolt_app_logger(
+    app_name: str, cls: object = None, base_logger: Optional[Logger] = None
+) -&gt; Logger:
+    logger: Logger = (
+        logging.getLogger(f&#34;{app_name}:{cls.__name__}&#34;)
+        if cls and hasattr(cls, &#34;__name__&#34;)
+        else logging.getLogger(app_name)
+    )
+
+    if base_logger is not None:
+        _configure_from_base_logger(logger, base_logger)
     else:
-        logger = logging.getLogger(app_name)
-        logger.disabled = logging.root.disabled
-        logger.level = logging.root.level
-        return logger</code></pre>
+        _configure_from_root(logger)
+    return logger
+
+
+def _configure_from_base_logger(new_logger: Logger, base_logger: Logger):
+    new_logger.disabled = base_logger.disabled
+    new_logger.level = base_logger.level
+    if len(new_logger.handlers) == 0:
+        for h in base_logger.handlers:
+            new_logger.addHandler(h)
+    if len(new_logger.filters) == 0:
+        for f in base_logger.filters:
+            new_logger.addFilter(f)
+
+
+def _configure_from_root(new_logger: Logger):
+    new_logger.disabled = logging.root.disabled
+    new_logger.level = logging.root.level</code></pre>
 </details>
 </section>
 <section>
@@ -69,7 +90,7 @@ def get_bolt_app_logger(app_name: str, cls: object = None) -&gt; Logger:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="slack_bolt.logger.get_bolt_app_logger"><code class="name flex">
-<span>def <span class="ident">get_bolt_app_logger</span></span>(<span>app_name: str, cls: object = None) ‑> logging.Logger</span>
+<span>def <span class="ident">get_bolt_app_logger</span></span>(<span>app_name: str, cls: object = None, base_logger: Optional[logging.Logger] = None) ‑> logging.Logger</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -77,21 +98,24 @@ def get_bolt_app_logger(app_name: str, cls: object = None) -&gt; Logger:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_bolt_app_logger(app_name: str, cls: object = None) -&gt; Logger:
-    if cls and hasattr(cls, &#34;__name__&#34;):
-        logger = logging.getLogger(f&#34;{app_name}:{cls.__name__}&#34;)
-        logger.disabled = logging.root.disabled
-        logger.level = logging.root.level
-        return logger
+<pre><code class="python">def get_bolt_app_logger(
+    app_name: str, cls: object = None, base_logger: Optional[Logger] = None
+) -&gt; Logger:
+    logger: Logger = (
+        logging.getLogger(f&#34;{app_name}:{cls.__name__}&#34;)
+        if cls and hasattr(cls, &#34;__name__&#34;)
+        else logging.getLogger(app_name)
+    )
+
+    if base_logger is not None:
+        _configure_from_base_logger(logger, base_logger)
     else:
-        logger = logging.getLogger(app_name)
-        logger.disabled = logging.root.disabled
-        logger.level = logging.root.level
-        return logger</code></pre>
+        _configure_from_root(logger)
+    return logger</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.logger.get_bolt_logger"><code class="name flex">
-<span>def <span class="ident">get_bolt_logger</span></span>(<span>cls: Any) ‑> logging.Logger</span>
+<span>def <span class="ident">get_bolt_logger</span></span>(<span>cls: Any, base_logger: Optional[logging.Logger] = None) ‑> logging.Logger</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -99,10 +123,12 @@ def get_bolt_app_logger(app_name: str, cls: object = None) -&gt; Logger:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_bolt_logger(cls: Any) -&gt; Logger:
+<pre><code class="python">def get_bolt_logger(cls: Any, base_logger: Optional[Logger] = None) -&gt; Logger:
     logger = logging.getLogger(f&#34;slack_bolt.{cls.__name__}&#34;)
-    logger.disabled = logging.root.disabled
-    logger.level = logging.root.level
+    if base_logger is not None:
+        _configure_from_base_logger(logger, base_logger)
+    else:
+        _configure_from_root(logger)
     return logger</code></pre>
 </details>
 </dd>

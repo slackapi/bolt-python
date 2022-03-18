@@ -58,6 +58,7 @@ class CustomListener(Listener):
         matchers: Sequence[ListenerMatcher],
         middleware: Sequence[Middleware],  # type: ignore
         auto_acknowledgement: bool = False,
+        base_logger: Optional[Logger] = None,
     ):
         self.app_name = app_name
         self.ack_function = ack_function
@@ -66,7 +67,7 @@ class CustomListener(Listener):
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
         self.arg_names = inspect.getfullargspec(ack_function).args
-        self.logger = get_bolt_app_logger(app_name, self.ack_function)
+        self.logger = get_bolt_app_logger(app_name, self.ack_function, base_logger)
 
     def run_ack_function(
         self,
@@ -96,7 +97,7 @@ class CustomListener(Listener):
 <dl>
 <dt id="slack_bolt.listener.custom_listener.CustomListener"><code class="flex name class">
 <span>class <span class="ident">CustomListener</span></span>
-<span>(</span><span>*, app_name: str, ack_function: Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], lazy_functions: Sequence[Callable[..., None]], matchers: Sequence[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="../listener_matcher/listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>], middleware: Sequence[<a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>], auto_acknowledgement: bool = False)</span>
+<span>(</span><span>*, app_name: str, ack_function: Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], lazy_functions: Sequence[Callable[..., None]], matchers: Sequence[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="../listener_matcher/listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>], middleware: Sequence[<a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>], auto_acknowledgement: bool = False, base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -123,6 +124,7 @@ class CustomListener(Listener):
         matchers: Sequence[ListenerMatcher],
         middleware: Sequence[Middleware],  # type: ignore
         auto_acknowledgement: bool = False,
+        base_logger: Optional[Logger] = None,
     ):
         self.app_name = app_name
         self.ack_function = ack_function
@@ -131,7 +133,7 @@ class CustomListener(Listener):
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
         self.arg_names = inspect.getfullargspec(ack_function).args
-        self.logger = get_bolt_app_logger(app_name, self.ack_function)
+        self.logger = get_bolt_app_logger(app_name, self.ack_function, base_logger)
 
     def run_ack_function(
         self,

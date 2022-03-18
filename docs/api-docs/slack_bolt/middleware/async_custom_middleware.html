@@ -28,7 +28,7 @@
 </summary>
 <pre><code class="python">import inspect
 from logging import Logger
-from typing import Callable, Awaitable, Any, Sequence
+from typing import Callable, Awaitable, Any, Sequence, Optional
 
 from slack_bolt.kwargs_injection.async_utils import build_async_required_kwargs
 from slack_bolt.logger import get_bolt_app_logger
@@ -44,7 +44,13 @@ class AsyncCustomMiddleware(AsyncMiddleware):
     arg_names: Sequence[str]
     logger: Logger
 
-    def __init__(self, *, app_name: str, func: Callable[..., Awaitable[Any]]):
+    def __init__(
+        self,
+        *,
+        app_name: str,
+        func: Callable[..., Awaitable[Any]],
+        base_logger: Optional[Logger] = None,
+    ):
         self.app_name = app_name
         if inspect.iscoroutinefunction(func):
             self.func = func
@@ -52,7 +58,7 @@ class AsyncCustomMiddleware(AsyncMiddleware):
             raise ValueError(&#34;Async middleware function must be an async function&#34;)
 
         self.arg_names = inspect.getfullargspec(func).args
-        self.logger = get_bolt_app_logger(self.app_name, self.func)
+        self.logger = get_bolt_app_logger(self.app_name, self.func, base_logger)
 
     async def async_process(
         self,
@@ -91,7 +97,7 @@ class AsyncCustomMiddleware(AsyncMiddleware):
 <dl>
 <dt id="slack_bolt.middleware.async_custom_middleware.AsyncCustomMiddleware"><code class="flex name class">
 <span>class <span class="ident">AsyncCustomMiddleware</span></span>
-<span>(</span><span>*, app_name: str, func: Callable[..., Awaitable[Any]])</span>
+<span>(</span><span>*, app_name: str, func: Callable[..., Awaitable[Any]], base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p></div>
@@ -105,7 +111,13 @@ class AsyncCustomMiddleware(AsyncMiddleware):
     arg_names: Sequence[str]
     logger: Logger
 
-    def __init__(self, *, app_name: str, func: Callable[..., Awaitable[Any]]):
+    def __init__(
+        self,
+        *,
+        app_name: str,
+        func: Callable[..., Awaitable[Any]],
+        base_logger: Optional[Logger] = None,
+    ):
         self.app_name = app_name
         if inspect.iscoroutinefunction(func):
             self.func = func
@@ -113,7 +125,7 @@ class AsyncCustomMiddleware(AsyncMiddleware):
             raise ValueError(&#34;Async middleware function must be an async function&#34;)
 
         self.arg_names = inspect.getfullargspec(func).args
-        self.logger = get_bolt_app_logger(self.app_name, self.func)
+        self.logger = get_bolt_app_logger(self.app_name, self.func, base_logger)
 
     async def async_process(
         self,

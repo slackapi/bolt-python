@@ -28,7 +28,7 @@
 </summary>
 <pre><code class="python">import inspect
 from logging import Logger
-from typing import Callable, Sequence
+from typing import Callable, Sequence, Optional
 
 from slack_bolt.kwargs_injection import build_required_kwargs
 from slack_bolt.logger import get_bolt_app_logger
@@ -43,11 +43,17 @@ class CustomListenerMatcher(ListenerMatcher):
     arg_names: Sequence[str]
     logger: Logger
 
-    def __init__(self, *, app_name: str, func: Callable[..., bool]):
+    def __init__(
+        self,
+        *,
+        app_name: str,
+        func: Callable[..., bool],
+        base_logger: Optional[Logger] = None
+    ):
         self.app_name = app_name
         self.func = func
         self.arg_names = inspect.getfullargspec(func).args
-        self.logger = get_bolt_app_logger(self.app_name, self.func)
+        self.logger = get_bolt_app_logger(self.app_name, self.func, base_logger)
 
     def matches(self, req: BoltRequest, resp: BoltResponse) -&gt; bool:
         return self.func(
@@ -72,7 +78,7 @@ class CustomListenerMatcher(ListenerMatcher):
 <dl>
 <dt id="slack_bolt.listener_matcher.custom_listener_matcher.CustomListenerMatcher"><code class="flex name class">
 <span>class <span class="ident">CustomListenerMatcher</span></span>
-<span>(</span><span>*, app_name: str, func: Callable[..., bool])</span>
+<span>(</span><span>*, app_name: str, func: Callable[..., bool], base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -86,11 +92,17 @@ class CustomListenerMatcher(ListenerMatcher):
     arg_names: Sequence[str]
     logger: Logger
 
-    def __init__(self, *, app_name: str, func: Callable[..., bool]):
+    def __init__(
+        self,
+        *,
+        app_name: str,
+        func: Callable[..., bool],
+        base_logger: Optional[Logger] = None
+    ):
         self.app_name = app_name
         self.func = func
         self.arg_names = inspect.getfullargspec(func).args
-        self.logger = get_bolt_app_logger(self.app_name, self.func)
+        self.logger = get_bolt_app_logger(self.app_name, self.func, base_logger)
 
     def matches(self, req: BoltRequest, resp: BoltResponse) -&gt; bool:
         return self.func(

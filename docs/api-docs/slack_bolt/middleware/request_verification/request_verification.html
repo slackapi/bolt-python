@@ -26,7 +26,8 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from typing import Callable, Dict, Any
+<pre><code class="python">from logging import Logger
+from typing import Callable, Dict, Any, Optional
 
 from slack_sdk.signature import SignatureVerifier
 
@@ -37,7 +38,7 @@ from slack_bolt.response import BoltResponse
 
 
 class RequestVerification(Middleware):  # type: ignore
-    def __init__(self, signing_secret: str):
+    def __init__(self, signing_secret: str, base_logger: Optional[Logger] = None):
         &#34;&#34;&#34;Verifies an incoming request by checking the validity of
         `x-slack-signature`, `x-slack-request-timestamp`, and its body data.
 
@@ -45,9 +46,10 @@ class RequestVerification(Middleware):  # type: ignore
 
         Args:
             signing_secret: The signing secret
+            base_logger: The base logger
         &#34;&#34;&#34;
         self.verifier = SignatureVerifier(signing_secret=signing_secret)
-        self.logger = get_bolt_logger(RequestVerification)
+        self.logger = get_bolt_logger(RequestVerification, base_logger=base_logger)
 
     def process(
         self,
@@ -101,7 +103,7 @@ class RequestVerification(Middleware):  # type: ignore
 <dl>
 <dt id="slack_bolt.middleware.request_verification.request_verification.RequestVerification"><code class="flex name class">
 <span>class <span class="ident">RequestVerification</span></span>
-<span>(</span><span>signing_secret: str)</span>
+<span>(</span><span>signing_secret: str, base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
@@ -112,13 +114,15 @@ class RequestVerification(Middleware):  # type: ignore
 <dl>
 <dt><strong><code>signing_secret</code></strong></dt>
 <dd>The signing secret</dd>
+<dt><strong><code>base_logger</code></strong></dt>
+<dd>The base logger</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class RequestVerification(Middleware):  # type: ignore
-    def __init__(self, signing_secret: str):
+    def __init__(self, signing_secret: str, base_logger: Optional[Logger] = None):
         &#34;&#34;&#34;Verifies an incoming request by checking the validity of
         `x-slack-signature`, `x-slack-request-timestamp`, and its body data.
 
@@ -126,9 +130,10 @@ class RequestVerification(Middleware):  # type: ignore
 
         Args:
             signing_secret: The signing secret
+            base_logger: The base logger
         &#34;&#34;&#34;
         self.verifier = SignatureVerifier(signing_secret=signing_secret)
-        self.logger = get_bolt_logger(RequestVerification)
+        self.logger = get_bolt_logger(RequestVerification, base_logger=base_logger)
 
     def process(
         self,

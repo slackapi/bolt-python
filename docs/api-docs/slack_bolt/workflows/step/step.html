@@ -27,6 +27,7 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from functools import wraps
+from logging import Logger
 from typing import Callable, Union, Optional, Sequence, Pattern, List
 
 from slack_bolt.context.context import BoltContext
@@ -54,6 +55,7 @@ class WorkflowStepBuilder:
     &#34;&#34;&#34;
 
     callback_id: Union[str, Pattern]
+    _base_logger: Optional[Logger]
     _edit: Optional[Listener]
     _save: Optional[Listener]
     _execute: Optional[Listener]
@@ -62,6 +64,7 @@ class WorkflowStepBuilder:
         self,
         callback_id: Union[str, Pattern],
         app_name: Optional[str] = None,
+        base_logger: Optional[Logger] = None,
     ):
         &#34;&#34;&#34;This builder is supposed to be used as decorator.
 
@@ -84,9 +87,11 @@ class WorkflowStepBuilder:
         Args:
             callback_id: The callback_id for the workflow
             app_name: The application name mainly for logging
+            base_logger: The base logger
         &#34;&#34;&#34;
         self.callback_id = callback_id
         self.app_name = app_name or __name__
+        self._base_logger = base_logger
         self._edit = None
         self._save = None
         self._execute = None
@@ -235,7 +240,7 @@ class WorkflowStepBuilder:
 
         return _inner
 
-    def build(self) -&gt; &#34;WorkflowStep&#34;:
+    def build(self, base_logger: Optional[Logger] = None) -&gt; &#34;WorkflowStep&#34;:
         &#34;&#34;&#34;Constructs a WorkflowStep object. This method may raise an exception
         if the builder doesn&#39;t have enough configurations to build the object.
 
@@ -255,6 +260,7 @@ class WorkflowStepBuilder:
             save=self._save,
             execute=self._execute,
             app_name=self.app_name,
+            base_logger=base_logger,
         )
 
     # ---------------------------------------
@@ -271,14 +277,20 @@ class WorkflowStepBuilder:
             app_name=self.app_name,
             listener_or_functions=listener_or_functions,
             name=name,
-            matchers=self.to_listener_matchers(self.app_name, matchers),
-            middleware=self.to_listener_middleware(self.app_name, middleware),
+            matchers=self.to_listener_matchers(
+                self.app_name, matchers, self._base_logger
+            ),
+            middleware=self.to_listener_middleware(
+                self.app_name, middleware, self._base_logger
+            ),
+            base_logger=self._base_logger,
         )
 
     @staticmethod
     def to_listener_matchers(
         app_name: str,
         matchers: Optional[List[Union[Callable[..., bool], ListenerMatcher]]],
+        base_logger: Optional[Logger] = None,
     ) -&gt; List[ListenerMatcher]:
         _matchers = []
         if matchers is not None:
@@ -286,14 +298,22 @@ class WorkflowStepBuilder:
                 if isinstance(m, ListenerMatcher):
                     _matchers.append(m)
                 elif isinstance(m, Callable):
-                    _matchers.append(CustomListenerMatcher(app_name=app_name, func=m))
+                    _matchers.append(
+                        CustomListenerMatcher(
+                            app_name=app_name,
+                            func=m,
+                            base_logger=base_logger,
+                        )
+                    )
                 else:
                     raise ValueError(f&#34;Invalid matcher: {type(m)}&#34;)
         return _matchers  # type: ignore
 
     @staticmethod
     def to_listener_middleware(
-        app_name: str, middleware: Optional[List[Union[Callable, Middleware]]]
+        app_name: str,
+        middleware: Optional[List[Union[Callable, Middleware]]],
+        base_logger: Optional[Logger] = None,
     ) -&gt; List[Middleware]:
         _middleware = []
         if middleware is not None:
@@ -301,7 +321,13 @@ class WorkflowStepBuilder:
                 if isinstance(m, Middleware):
                     _middleware.append(m)
                 elif isinstance(m, Callable):
-                    _middleware.append(CustomMiddleware(app_name=app_name, func=m))
+                    _middleware.append(
+                        CustomMiddleware(
+                            app_name=app_name,
+                            func=m,
+                            base_logger=base_logger,
+                        )
+                    )
                 else:
                     raise ValueError(f&#34;Invalid middleware: {type(m)}&#34;)
         return _middleware  # type: ignore
@@ -331,16 +357,40 @@ class WorkflowStep:
             Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]
         ],
         app_name: Optional[str] = None,
+        base_logger: Optional[Logger] = None,
     ):
         self.callback_id = callback_id
         app_name = app_name or __name__
-        self.edit = self.build_listener(callback_id, app_name, edit, &#34;edit&#34;)
-        self.save = self.build_listener(callback_id, app_name, save, &#34;save&#34;)
-        self.execute = self.build_listener(callback_id, app_name, execute, &#34;execute&#34;)
+        self.edit = self.build_listener(
+            callback_id=callback_id,
+            app_name=app_name,
+            listener_or_functions=edit,
+            name=&#34;edit&#34;,
+            base_logger=base_logger,
+        )
+        self.save = self.build_listener(
+            callback_id=callback_id,
+            app_name=app_name,
+            listener_or_functions=save,
+            name=&#34;save&#34;,
+            base_logger=base_logger,
+        )
+        self.execute = self.build_listener(
+            callback_id=callback_id,
+            app_name=app_name,
+            listener_or_functions=execute,
+            name=&#34;execute&#34;,
+            base_logger=base_logger,
+        )
 
     @classmethod
-    def builder(cls, callback_id: Union[str, Pattern]) -&gt; WorkflowStepBuilder:
-        return WorkflowStepBuilder(callback_id)
+    def builder(
+        cls, callback_id: Union[str, Pattern], base_logger: Optional[Logger] = None
+    ) -&gt; WorkflowStepBuilder:
+        return WorkflowStepBuilder(
+            callback_id,
+            base_logger=base_logger,
+        )
 
     @classmethod
     def build_listener(
@@ -351,6 +401,7 @@ class WorkflowStep:
         name: str,
         matchers: Optional[List[ListenerMatcher]] = None,
         middleware: Optional[List[Middleware]] = None,
+        base_logger: Optional[Logger] = None,
     ) -&gt; Listener:
         if listener_or_functions is None:
             raise BoltError(f&#34;{name} listener is required (callback_id: {callback_id})&#34;)
@@ -362,9 +413,23 @@ class WorkflowStep:
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
             matchers = matchers if matchers else []
-            matchers.insert(0, cls._build_primary_matcher(name, callback_id))
+            matchers.insert(
+                0,
+                cls._build_primary_matcher(
+                    name,
+                    callback_id,
+                    base_logger=base_logger,
+                ),
+            )
             middleware = middleware if middleware else []
-            middleware.insert(0, cls._build_single_middleware(name, callback_id))
+            middleware.insert(
+                0,
+                cls._build_single_middleware(
+                    name,
+                    callback_id,
+                    base_logger=base_logger,
+                ),
+            )
             functions = listener_or_functions
             ack_function = functions.pop(0)
             return CustomListener(
@@ -374,6 +439,7 @@ class WorkflowStep:
                 ack_function=ack_function,
                 lazy_functions=functions,
                 auto_acknowledgement=name == &#34;execute&#34;,
+                base_logger=base_logger,
             )
         else:
             raise BoltError(
@@ -381,24 +447,34 @@ class WorkflowStep:
             )
 
     @classmethod
-    def _build_primary_matcher(cls, name, callback_id) -&gt; ListenerMatcher:
+    def _build_primary_matcher(
+        cls,
+        name: str,
+        callback_id: Union[str, Pattern],
+        base_logger: Optional[Logger] = None,
+    ) -&gt; ListenerMatcher:
         if name == &#34;edit&#34;:
-            return workflow_step_edit(callback_id)
+            return workflow_step_edit(callback_id, base_logger=base_logger)
         elif name == &#34;save&#34;:
-            return workflow_step_save(callback_id)
+            return workflow_step_save(callback_id, base_logger=base_logger)
         elif name == &#34;execute&#34;:
-            return workflow_step_execute(callback_id)
+            return workflow_step_execute(callback_id, base_logger=base_logger)
         else:
             raise ValueError(f&#34;Invalid name {name}&#34;)
 
     @classmethod
-    def _build_single_middleware(cls, name, callback_id) -&gt; Middleware:
+    def _build_single_middleware(
+        cls,
+        name: str,
+        callback_id: Union[str, Pattern],
+        base_logger: Optional[Logger] = None,
+    ) -&gt; Middleware:
         if name == &#34;edit&#34;:
-            return _build_edit_listener_middleware(callback_id)
+            return _build_edit_listener_middleware(callback_id, base_logger=base_logger)
         elif name == &#34;save&#34;:
-            return _build_save_listener_middleware()
+            return _build_save_listener_middleware(base_logger=base_logger)
         elif name == &#34;execute&#34;:
-            return _build_execute_listener_middleware()
+            return _build_execute_listener_middleware(base_logger=base_logger)
         else:
             raise ValueError(f&#34;Invalid name {name}&#34;)
 
@@ -408,7 +484,9 @@ class WorkflowStep:
 #######################
 
 
-def _build_edit_listener_middleware(callback_id: str) -&gt; Middleware:
+def _build_edit_listener_middleware(
+    callback_id: str, base_logger: Optional[Logger] = None
+) -&gt; Middleware:
     def edit_listener_middleware(
         context: BoltContext,
         client: WebClient,
@@ -422,7 +500,11 @@ def _build_edit_listener_middleware(callback_id: str) -&gt; Middleware:
         )
         return next()
 
-    return CustomMiddleware(app_name=__name__, func=edit_listener_middleware)
+    return CustomMiddleware(
+        app_name=__name__,
+        func=edit_listener_middleware,
+        base_logger=base_logger,
+    )
 
 
 #######################
@@ -430,7 +512,7 @@ def _build_edit_listener_middleware(callback_id: str) -&gt; Middleware:
 #######################
 
 
-def _build_save_listener_middleware() -&gt; Middleware:
+def _build_save_listener_middleware(base_logger: Optional[Logger] = None) -&gt; Middleware:
     def save_listener_middleware(
         context: BoltContext,
         client: WebClient,
@@ -443,7 +525,11 @@ def _build_save_listener_middleware() -&gt; Middleware:
         )
         return next()
 
-    return CustomMiddleware(app_name=__name__, func=save_listener_middleware)
+    return CustomMiddleware(
+        app_name=__name__,
+        func=save_listener_middleware,
+        base_logger=base_logger,
+    )
 
 
 #######################
@@ -451,7 +537,9 @@ def _build_save_listener_middleware() -&gt; Middleware:
 #######################
 
 
-def _build_execute_listener_middleware() -&gt; Middleware:
+def _build_execute_listener_middleware(
+    base_logger: Optional[Logger] = None,
+) -&gt; Middleware:
     def execute_listener_middleware(
         context: BoltContext,
         client: WebClient,
@@ -468,7 +556,11 @@ def _build_execute_listener_middleware() -&gt; Middleware:
         )
         return next()
 
-    return CustomMiddleware(app_name=__name__, func=execute_listener_middleware)</code></pre>
+    return CustomMiddleware(
+        app_name=__name__,
+        func=execute_listener_middleware,
+        base_logger=base_logger,
+    )</code></pre>
 </details>
 </section>
 <section>
@@ -482,7 +574,7 @@ def _build_execute_listener_middleware() -&gt; Middleware:
 <dl>
 <dt id="slack_bolt.workflows.step.step.WorkflowStep"><code class="flex name class">
 <span>class <span class="ident">WorkflowStep</span></span>
-<span>(</span><span>*, callback_id: Union[str, Pattern], edit: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="../../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable]], save: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="../../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable]], execute: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="../../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable]], app_name: Optional[str] = None)</span>
+<span>(</span><span>*, callback_id: Union[str, Pattern], edit: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="../../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable]], save: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="../../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable]], execute: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="../../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable]], app_name: Optional[str] = None, base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -514,16 +606,40 @@ def _build_execute_listener_middleware() -&gt; Middleware:
             Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]
         ],
         app_name: Optional[str] = None,
+        base_logger: Optional[Logger] = None,
     ):
         self.callback_id = callback_id
         app_name = app_name or __name__
-        self.edit = self.build_listener(callback_id, app_name, edit, &#34;edit&#34;)
-        self.save = self.build_listener(callback_id, app_name, save, &#34;save&#34;)
-        self.execute = self.build_listener(callback_id, app_name, execute, &#34;execute&#34;)
+        self.edit = self.build_listener(
+            callback_id=callback_id,
+            app_name=app_name,
+            listener_or_functions=edit,
+            name=&#34;edit&#34;,
+            base_logger=base_logger,
+        )
+        self.save = self.build_listener(
+            callback_id=callback_id,
+            app_name=app_name,
+            listener_or_functions=save,
+            name=&#34;save&#34;,
+            base_logger=base_logger,
+        )
+        self.execute = self.build_listener(
+            callback_id=callback_id,
+            app_name=app_name,
+            listener_or_functions=execute,
+            name=&#34;execute&#34;,
+            base_logger=base_logger,
+        )
 
     @classmethod
-    def builder(cls, callback_id: Union[str, Pattern]) -&gt; WorkflowStepBuilder:
-        return WorkflowStepBuilder(callback_id)
+    def builder(
+        cls, callback_id: Union[str, Pattern], base_logger: Optional[Logger] = None
+    ) -&gt; WorkflowStepBuilder:
+        return WorkflowStepBuilder(
+            callback_id,
+            base_logger=base_logger,
+        )
 
     @classmethod
     def build_listener(
@@ -534,6 +650,7 @@ def _build_execute_listener_middleware() -&gt; Middleware:
         name: str,
         matchers: Optional[List[ListenerMatcher]] = None,
         middleware: Optional[List[Middleware]] = None,
+        base_logger: Optional[Logger] = None,
     ) -&gt; Listener:
         if listener_or_functions is None:
             raise BoltError(f&#34;{name} listener is required (callback_id: {callback_id})&#34;)
@@ -545,9 +662,23 @@ def _build_execute_listener_middleware() -&gt; Middleware:
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
             matchers = matchers if matchers else []
-            matchers.insert(0, cls._build_primary_matcher(name, callback_id))
+            matchers.insert(
+                0,
+                cls._build_primary_matcher(
+                    name,
+                    callback_id,
+                    base_logger=base_logger,
+                ),
+            )
             middleware = middleware if middleware else []
-            middleware.insert(0, cls._build_single_middleware(name, callback_id))
+            middleware.insert(
+                0,
+                cls._build_single_middleware(
+                    name,
+                    callback_id,
+                    base_logger=base_logger,
+                ),
+            )
             functions = listener_or_functions
             ack_function = functions.pop(0)
             return CustomListener(
@@ -557,6 +688,7 @@ def _build_execute_listener_middleware() -&gt; Middleware:
                 ack_function=ack_function,
                 lazy_functions=functions,
                 auto_acknowledgement=name == &#34;execute&#34;,
+                base_logger=base_logger,
             )
         else:
             raise BoltError(
@@ -564,24 +696,34 @@ def _build_execute_listener_middleware() -&gt; Middleware:
             )
 
     @classmethod
-    def _build_primary_matcher(cls, name, callback_id) -&gt; ListenerMatcher:
+    def _build_primary_matcher(
+        cls,
+        name: str,
+        callback_id: Union[str, Pattern],
+        base_logger: Optional[Logger] = None,
+    ) -&gt; ListenerMatcher:
         if name == &#34;edit&#34;:
-            return workflow_step_edit(callback_id)
+            return workflow_step_edit(callback_id, base_logger=base_logger)
         elif name == &#34;save&#34;:
-            return workflow_step_save(callback_id)
+            return workflow_step_save(callback_id, base_logger=base_logger)
         elif name == &#34;execute&#34;:
-            return workflow_step_execute(callback_id)
+            return workflow_step_execute(callback_id, base_logger=base_logger)
         else:
             raise ValueError(f&#34;Invalid name {name}&#34;)
 
     @classmethod
-    def _build_single_middleware(cls, name, callback_id) -&gt; Middleware:
+    def _build_single_middleware(
+        cls,
+        name: str,
+        callback_id: Union[str, Pattern],
+        base_logger: Optional[Logger] = None,
+    ) -&gt; Middleware:
         if name == &#34;edit&#34;:
-            return _build_edit_listener_middleware(callback_id)
+            return _build_edit_listener_middleware(callback_id, base_logger=base_logger)
         elif name == &#34;save&#34;:
-            return _build_save_listener_middleware()
+            return _build_save_listener_middleware(base_logger=base_logger)
         elif name == &#34;execute&#34;:
-            return _build_execute_listener_middleware()
+            return _build_execute_listener_middleware(base_logger=base_logger)
         else:
             raise ValueError(f&#34;Invalid name {name}&#34;)</code></pre>
 </details>
@@ -607,7 +749,7 @@ def _build_execute_listener_middleware() -&gt; Middleware:
 <h3>Static methods</h3>
 <dl>
 <dt id="slack_bolt.workflows.step.step.WorkflowStep.build_listener"><code class="name flex">
-<span>def <span class="ident">build_listener</span></span>(<span>callback_id: Union[str, Pattern], app_name: str, listener_or_functions: Union[<a title="slack_bolt.listener.listener.Listener" href="../../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Callable, List[Callable]], name: str, matchers: Optional[List[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="../../listener_matcher/listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>]] = None, middleware: Optional[List[<a title="slack_bolt.middleware.middleware.Middleware" href="../../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]] = None) ‑> <a title="slack_bolt.listener.listener.Listener" href="../../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a></span>
+<span>def <span class="ident">build_listener</span></span>(<span>callback_id: Union[str, Pattern], app_name: str, listener_or_functions: Union[<a title="slack_bolt.listener.listener.Listener" href="../../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Callable, List[Callable]], name: str, matchers: Optional[List[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="../../listener_matcher/listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>]] = None, middleware: Optional[List[<a title="slack_bolt.middleware.middleware.Middleware" href="../../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]] = None, base_logger: Optional[logging.Logger] = None) ‑> <a title="slack_bolt.listener.listener.Listener" href="../../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -624,6 +766,7 @@ def build_listener(
     name: str,
     matchers: Optional[List[ListenerMatcher]] = None,
     middleware: Optional[List[Middleware]] = None,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Listener:
     if listener_or_functions is None:
         raise BoltError(f&#34;{name} listener is required (callback_id: {callback_id})&#34;)
@@ -635,9 +778,23 @@ def build_listener(
         return listener_or_functions
     elif isinstance(listener_or_functions, list):
         matchers = matchers if matchers else []
-        matchers.insert(0, cls._build_primary_matcher(name, callback_id))
+        matchers.insert(
+            0,
+            cls._build_primary_matcher(
+                name,
+                callback_id,
+                base_logger=base_logger,
+            ),
+        )
         middleware = middleware if middleware else []
-        middleware.insert(0, cls._build_single_middleware(name, callback_id))
+        middleware.insert(
+            0,
+            cls._build_single_middleware(
+                name,
+                callback_id,
+                base_logger=base_logger,
+            ),
+        )
         functions = listener_or_functions
         ack_function = functions.pop(0)
         return CustomListener(
@@ -647,6 +804,7 @@ def build_listener(
             ack_function=ack_function,
             lazy_functions=functions,
             auto_acknowledgement=name == &#34;execute&#34;,
+            base_logger=base_logger,
         )
     else:
         raise BoltError(
@@ -655,7 +813,7 @@ def build_listener(
 </details>
 </dd>
 <dt id="slack_bolt.workflows.step.step.WorkflowStep.builder"><code class="name flex">
-<span>def <span class="ident">builder</span></span>(<span>callback_id: Union[str, Pattern]) ‑> <a title="slack_bolt.workflows.step.step.WorkflowStepBuilder" href="#slack_bolt.workflows.step.step.WorkflowStepBuilder">WorkflowStepBuilder</a></span>
+<span>def <span class="ident">builder</span></span>(<span>callback_id: Union[str, Pattern], base_logger: Optional[logging.Logger] = None) ‑> <a title="slack_bolt.workflows.step.step.WorkflowStepBuilder" href="#slack_bolt.workflows.step.step.WorkflowStepBuilder">WorkflowStepBuilder</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -664,15 +822,20 @@ def build_listener(
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@classmethod
-def builder(cls, callback_id: Union[str, Pattern]) -&gt; WorkflowStepBuilder:
-    return WorkflowStepBuilder(callback_id)</code></pre>
+def builder(
+    cls, callback_id: Union[str, Pattern], base_logger: Optional[Logger] = None
+) -&gt; WorkflowStepBuilder:
+    return WorkflowStepBuilder(
+        callback_id,
+        base_logger=base_logger,
+    )</code></pre>
 </details>
 </dd>
 </dl>
 </dd>
 <dt id="slack_bolt.workflows.step.step.WorkflowStepBuilder"><code class="flex name class">
 <span>class <span class="ident">WorkflowStepBuilder</span></span>
-<span>(</span><span>callback_id: Union[str, Pattern], app_name: Optional[str] = None)</span>
+<span>(</span><span>callback_id: Union[str, Pattern], app_name: Optional[str] = None, base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Steps from Apps
@@ -699,6 +862,8 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="utilities/in
 <dd>The callback_id for the workflow</dd>
 <dt><strong><code>app_name</code></strong></dt>
 <dd>The application name mainly for logging</dd>
+<dt><strong><code>base_logger</code></strong></dt>
+<dd>The base logger</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -710,6 +875,7 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="utilities/in
     &#34;&#34;&#34;
 
     callback_id: Union[str, Pattern]
+    _base_logger: Optional[Logger]
     _edit: Optional[Listener]
     _save: Optional[Listener]
     _execute: Optional[Listener]
@@ -718,6 +884,7 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="utilities/in
         self,
         callback_id: Union[str, Pattern],
         app_name: Optional[str] = None,
+        base_logger: Optional[Logger] = None,
     ):
         &#34;&#34;&#34;This builder is supposed to be used as decorator.
 
@@ -740,9 +907,11 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="utilities/in
         Args:
             callback_id: The callback_id for the workflow
             app_name: The application name mainly for logging
+            base_logger: The base logger
         &#34;&#34;&#34;
         self.callback_id = callback_id
         self.app_name = app_name or __name__
+        self._base_logger = base_logger
         self._edit = None
         self._save = None
         self._execute = None
@@ -891,7 +1060,7 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="utilities/in
 
         return _inner
 
-    def build(self) -&gt; &#34;WorkflowStep&#34;:
+    def build(self, base_logger: Optional[Logger] = None) -&gt; &#34;WorkflowStep&#34;:
         &#34;&#34;&#34;Constructs a WorkflowStep object. This method may raise an exception
         if the builder doesn&#39;t have enough configurations to build the object.
 
@@ -911,6 +1080,7 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="utilities/in
             save=self._save,
             execute=self._execute,
             app_name=self.app_name,
+            base_logger=base_logger,
         )
 
     # ---------------------------------------
@@ -927,14 +1097,20 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="utilities/in
             app_name=self.app_name,
             listener_or_functions=listener_or_functions,
             name=name,
-            matchers=self.to_listener_matchers(self.app_name, matchers),
-            middleware=self.to_listener_middleware(self.app_name, middleware),
+            matchers=self.to_listener_matchers(
+                self.app_name, matchers, self._base_logger
+            ),
+            middleware=self.to_listener_middleware(
+                self.app_name, middleware, self._base_logger
+            ),
+            base_logger=self._base_logger,
         )
 
     @staticmethod
     def to_listener_matchers(
         app_name: str,
         matchers: Optional[List[Union[Callable[..., bool], ListenerMatcher]]],
+        base_logger: Optional[Logger] = None,
     ) -&gt; List[ListenerMatcher]:
         _matchers = []
         if matchers is not None:
@@ -942,14 +1118,22 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="utilities/in
                 if isinstance(m, ListenerMatcher):
                     _matchers.append(m)
                 elif isinstance(m, Callable):
-                    _matchers.append(CustomListenerMatcher(app_name=app_name, func=m))
+                    _matchers.append(
+                        CustomListenerMatcher(
+                            app_name=app_name,
+                            func=m,
+                            base_logger=base_logger,
+                        )
+                    )
                 else:
                     raise ValueError(f&#34;Invalid matcher: {type(m)}&#34;)
         return _matchers  # type: ignore
 
     @staticmethod
     def to_listener_middleware(
-        app_name: str, middleware: Optional[List[Union[Callable, Middleware]]]
+        app_name: str,
+        middleware: Optional[List[Union[Callable, Middleware]]],
+        base_logger: Optional[Logger] = None,
     ) -&gt; List[Middleware]:
         _middleware = []
         if middleware is not None:
@@ -957,7 +1141,13 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="utilities/in
                 if isinstance(m, Middleware):
                     _middleware.append(m)
                 elif isinstance(m, Callable):
-                    _middleware.append(CustomMiddleware(app_name=app_name, func=m))
+                    _middleware.append(
+                        CustomMiddleware(
+                            app_name=app_name,
+                            func=m,
+                            base_logger=base_logger,
+                        )
+                    )
                 else:
                     raise ValueError(f&#34;Invalid middleware: {type(m)}&#34;)
         return _middleware  # type: ignore</code></pre>
@@ -972,7 +1162,7 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="utilities/in
 <h3>Static methods</h3>
 <dl>
 <dt id="slack_bolt.workflows.step.step.WorkflowStepBuilder.to_listener_matchers"><code class="name flex">
-<span>def <span class="ident">to_listener_matchers</span></span>(<span>app_name: str, matchers: Optional[List[Union[Callable[..., bool], <a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="../../listener_matcher/listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>]]]) ‑> List[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="../../listener_matcher/listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>]</span>
+<span>def <span class="ident">to_listener_matchers</span></span>(<span>app_name: str, matchers: Optional[List[Union[Callable[..., bool], <a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="../../listener_matcher/listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>]]], base_logger: Optional[logging.Logger] = None) ‑> List[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="../../listener_matcher/listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -984,6 +1174,7 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="utilities/in
 def to_listener_matchers(
     app_name: str,
     matchers: Optional[List[Union[Callable[..., bool], ListenerMatcher]]],
+    base_logger: Optional[Logger] = None,
 ) -&gt; List[ListenerMatcher]:
     _matchers = []
     if matchers is not None:
@@ -991,14 +1182,20 @@ def to_listener_matchers(
             if isinstance(m, ListenerMatcher):
                 _matchers.append(m)
             elif isinstance(m, Callable):
-                _matchers.append(CustomListenerMatcher(app_name=app_name, func=m))
+                _matchers.append(
+                    CustomListenerMatcher(
+                        app_name=app_name,
+                        func=m,
+                        base_logger=base_logger,
+                    )
+                )
             else:
                 raise ValueError(f&#34;Invalid matcher: {type(m)}&#34;)
     return _matchers  # type: ignore</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.workflows.step.step.WorkflowStepBuilder.to_listener_middleware"><code class="name flex">
-<span>def <span class="ident">to_listener_middleware</span></span>(<span>app_name: str, middleware: Optional[List[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]]) ‑> List[<a title="slack_bolt.middleware.middleware.Middleware" href="../../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]</span>
+<span>def <span class="ident">to_listener_middleware</span></span>(<span>app_name: str, middleware: Optional[List[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]], base_logger: Optional[logging.Logger] = None) ‑> List[<a title="slack_bolt.middleware.middleware.Middleware" href="../../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1008,7 +1205,9 @@ def to_listener_matchers(
 </summary>
 <pre><code class="python">@staticmethod
 def to_listener_middleware(
-    app_name: str, middleware: Optional[List[Union[Callable, Middleware]]]
+    app_name: str,
+    middleware: Optional[List[Union[Callable, Middleware]]],
+    base_logger: Optional[Logger] = None,
 ) -&gt; List[Middleware]:
     _middleware = []
     if middleware is not None:
@@ -1016,7 +1215,13 @@ def to_listener_middleware(
             if isinstance(m, Middleware):
                 _middleware.append(m)
             elif isinstance(m, Callable):
-                _middleware.append(CustomMiddleware(app_name=app_name, func=m))
+                _middleware.append(
+                    CustomMiddleware(
+                        app_name=app_name,
+                        func=m,
+                        base_logger=base_logger,
+                    )
+                )
             else:
                 raise ValueError(f&#34;Invalid middleware: {type(m)}&#34;)
     return _middleware  # type: ignore</code></pre>
@@ -1026,7 +1231,7 @@ def to_listener_middleware(
 <h3>Methods</h3>
 <dl>
 <dt id="slack_bolt.workflows.step.step.WorkflowStepBuilder.build"><code class="name flex">
-<span>def <span class="ident">build</span></span>(<span>self) ‑> <a title="slack_bolt.workflows.step.step.WorkflowStep" href="#slack_bolt.workflows.step.step.WorkflowStep">WorkflowStep</a></span>
+<span>def <span class="ident">build</span></span>(<span>self, base_logger: Optional[logging.Logger] = None) ‑> <a title="slack_bolt.workflows.step.step.WorkflowStep" href="#slack_bolt.workflows.step.step.WorkflowStep">WorkflowStep</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Constructs a WorkflowStep object. This method may raise an exception
@@ -1037,7 +1242,7 @@ if the builder doesn't have enough configurations to build the object.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def build(self) -&gt; &#34;WorkflowStep&#34;:
+<pre><code class="python">def build(self, base_logger: Optional[Logger] = None) -&gt; &#34;WorkflowStep&#34;:
     &#34;&#34;&#34;Constructs a WorkflowStep object. This method may raise an exception
     if the builder doesn&#39;t have enough configurations to build the object.
 
@@ -1057,6 +1262,7 @@ if the builder doesn't have enough configurations to build the object.</p>
         save=self._save,
         execute=self._execute,
         app_name=self.app_name,
+        base_logger=base_logger,
     )</code></pre>
 </details>
 </dd>

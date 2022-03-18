@@ -30,6 +30,7 @@
 import inspect
 import re
 import sys
+from logging import Logger
 
 from slack_bolt.error import BoltError
 from slack_bolt.request.payload_utils import (
@@ -68,10 +69,15 @@ from slack_bolt.logger import get_bolt_logger
 
 # a.k.a Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]
 class BuiltinListenerMatcher(ListenerMatcher):
-    def __init__(self, *, func: Callable[..., Union[bool, Awaitable[bool]]]):
+    def __init__(
+        self,
+        *,
+        func: Callable[..., Union[bool, Awaitable[bool]]],
+        base_logger: Optional[Logger] = None,
+    ):
         self.func = func
         self.arg_names = inspect.getfullargspec(func).args
-        self.logger = get_bolt_logger(self.func)
+        self.logger = get_bolt_logger(self.func, base_logger)
 
     def matches(self, req: BoltRequest, resp: BoltResponse) -&gt; bool:
         return self.func(
@@ -88,6 +94,7 @@ class BuiltinListenerMatcher(ListenerMatcher):
 def build_listener_matcher(
     func: Callable[..., bool],
     asyncio: bool,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     if asyncio:
         from .async_builtins import AsyncBuiltinListenerMatcher
@@ -95,9 +102,9 @@ def build_listener_matcher(
         async def async_fun(body: Dict[str, Any]) -&gt; bool:
             return func(body)
 
-        return AsyncBuiltinListenerMatcher(func=async_fun)
+        return AsyncBuiltinListenerMatcher(func=async_fun, base_logger=base_logger)
     else:
-        return BuiltinListenerMatcher(func=func)
+        return BuiltinListenerMatcher(func=func, base_logger=base_logger)
 
 
 # -------------
@@ -106,9 +113,12 @@ def build_listener_matcher(
 
 def event(
     constraints: Union[
-        str, Pattern, Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]]
+        str,
+        Pattern,
+        Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]],
     ],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     if isinstance(constraints, (str, Pattern)):
         event_type: Union[str, Pattern] = constraints
@@ -117,7 +127,7 @@ def event(
         def func(body: Dict[str, Any]) -&gt; bool:
             return is_event(body) and _matches(event_type, body[&#34;event&#34;][&#34;type&#34;])
 
-        return build_listener_matcher(func, asyncio)
+        return build_listener_matcher(func, asyncio, base_logger)
 
     elif &#34;type&#34; in constraints:
         _verify_message_event_type(constraints[&#34;type&#34;])
@@ -130,7 +140,7 @@ def event(
                 )
             return False
 
-        return build_listener_matcher(func, asyncio)
+        return build_listener_matcher(func, asyncio, base_logger)
 
     raise BoltError(
         f&#34;event ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;
@@ -138,9 +148,12 @@ def event(
 
 
 def message_event(
-    constraints: Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]],
+    constraints: Dict[
+        str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]
+    ],
     keyword: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     if &#34;type&#34; in constraints and keyword is not None:
         _verify_message_event_type(constraints[&#34;type&#34;])
@@ -159,7 +172,7 @@ def message_event(
                         return True
             return False
 
-        return build_listener_matcher(func, asyncio)
+        return build_listener_matcher(func, asyncio, base_logger)
 
     raise BoltError(f&#34;event ({constraints}: {type(constraints)}) must be dict&#34;)
 
@@ -168,8 +181,8 @@ def _check_event_subtype(event_payload: dict, constraints: dict) -&gt; bool:
     if not _matches(constraints[&#34;type&#34;], event_payload[&#34;type&#34;]):
         return False
     if &#34;subtype&#34; in constraints:
-        expected_subtype: Union[
-            str, Sequence[Optional[Union[str, Pattern]]]
+        expected_subtype: Optional[
+            Union[str, Sequence[Optional[Union[str, Pattern]]]]
         ] = constraints[&#34;subtype&#34;]
         if expected_subtype is None:
             # &#34;subtype&#34; in constraints is intentionally None for this pattern
@@ -205,6 +218,7 @@ def _verify_message_event_type(event_type: str) -&gt; None:
 def workflow_step_execute(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return (
@@ -214,7 +228,7 @@ def workflow_step_execute(
             and _matches(callback_id, body[&#34;event&#34;][&#34;callback_id&#34;])
         )
 
-    return build_listener_matcher(func, asyncio)
+    return build_listener_matcher(func, asyncio, base_logger)
 
 
 # -------------
@@ -224,11 +238,12 @@ def workflow_step_execute(
 def command(
     command: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return is_slash_command(body) and _matches(command, body[&#34;command&#34;])
 
-    return build_listener_matcher(func, asyncio)
+    return build_listener_matcher(func, asyncio, base_logger)
 
 
 # -------------
@@ -238,6 +253,7 @@ def command(
 def shortcut(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     if isinstance(constraints, (str, Pattern)):
         callback_id: Union[str, Pattern] = constraints
@@ -245,7 +261,7 @@ def shortcut(
         def func(body: Dict[str, Any]) -&gt; bool:
             return is_shortcut(body) and _matches(callback_id, body[&#34;callback_id&#34;])
 
-        return build_listener_matcher(func, asyncio)
+        return build_listener_matcher(func, asyncio, base_logger)
 
     elif &#34;type&#34; in constraints and &#34;callback_id&#34; in constraints:
         if constraints[&#34;type&#34;] == &#34;shortcut&#34;:
@@ -261,21 +277,23 @@ def shortcut(
 def global_shortcut(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return is_global_shortcut(body) and _matches(callback_id, body[&#34;callback_id&#34;])
 
-    return build_listener_matcher(func, asyncio)
+    return build_listener_matcher(func, asyncio, base_logger)
 
 
 def message_shortcut(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return is_message_shortcut(body) and _matches(callback_id, body[&#34;callback_id&#34;])
 
-    return build_listener_matcher(func, asyncio)
+    return build_listener_matcher(func, asyncio, base_logger)
 
 
 # -------------
@@ -285,6 +303,7 @@ def message_shortcut(
 def action(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     if isinstance(constraints, (str, Pattern)):
 
@@ -297,7 +316,7 @@ def action(
                 or _workflow_step_edit(constraints, body)
             )
 
-        return build_listener_matcher(func, asyncio)
+        return build_listener_matcher(func, asyncio, base_logger)
 
     elif &#34;type&#34; in constraints:
         action_type = constraints[&#34;type&#34;]
@@ -347,11 +366,12 @@ def _block_action(
 def block_action(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return _block_action(constraints, body)
 
-    return build_listener_matcher(func, asyncio)
+    return build_listener_matcher(func, asyncio, base_logger)
 
 
 def _attachment_action(
@@ -364,11 +384,12 @@ def _attachment_action(
 def attachment_action(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return _attachment_action(callback_id, body)
 
-    return build_listener_matcher(func, asyncio)
+    return build_listener_matcher(func, asyncio, base_logger)
 
 
 def _dialog_submission(
@@ -381,11 +402,12 @@ def _dialog_submission(
 def dialog_submission(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return _dialog_submission(callback_id, body)
 
-    return build_listener_matcher(func, asyncio)
+    return build_listener_matcher(func, asyncio, base_logger)
 
 
 def _dialog_cancellation(
@@ -398,11 +420,12 @@ def _dialog_cancellation(
 def dialog_cancellation(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return _dialog_cancellation(callback_id, body)
 
-    return build_listener_matcher(func, asyncio)
+    return build_listener_matcher(func, asyncio, base_logger)
 
 
 def _workflow_step_edit(
@@ -415,11 +438,12 @@ def _workflow_step_edit(
 def workflow_step_edit(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return _workflow_step_edit(callback_id, body)
 
-    return build_listener_matcher(func, asyncio)
+    return build_listener_matcher(func, asyncio, base_logger)
 
 
 # -------------------------
@@ -429,6 +453,7 @@ def workflow_step_edit(
 def view(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     if isinstance(constraints, (str, Pattern)):
         return view_submission(constraints, asyncio)
@@ -446,37 +471,40 @@ def view(
 def view_submission(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return is_view_submission(body) and _matches(
             callback_id, body[&#34;view&#34;][&#34;callback_id&#34;]
         )
 
-    return build_listener_matcher(func, asyncio)
+    return build_listener_matcher(func, asyncio, base_logger)
 
 
 def view_closed(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return is_view_closed(body) and _matches(
             callback_id, body[&#34;view&#34;][&#34;callback_id&#34;]
         )
 
-    return build_listener_matcher(func, asyncio)
+    return build_listener_matcher(func, asyncio, base_logger)
 
 
 def workflow_step_save(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return is_workflow_step_save(body) and _matches(
             callback_id, body[&#34;view&#34;][&#34;callback_id&#34;]
         )
 
-    return build_listener_matcher(func, asyncio)
+    return build_listener_matcher(func, asyncio, base_logger)
 
 
 # -------------
@@ -486,6 +514,7 @@ def workflow_step_save(
 def options(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     if isinstance(constraints, (str, Pattern)):
 
@@ -494,7 +523,7 @@ def options(
                 constraints, body
             )
 
-        return build_listener_matcher(func, asyncio)
+        return build_listener_matcher(func, asyncio, base_logger)
 
     if &#34;action_id&#34; in constraints:
         return block_suggestion(constraints[&#34;action_id&#34;], asyncio)
@@ -516,11 +545,12 @@ def _block_suggestion(
 def block_suggestion(
     action_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return _block_suggestion(action_id, body)
 
-    return build_listener_matcher(func, asyncio)
+    return build_listener_matcher(func, asyncio, base_logger)
 
 
 def _dialog_suggestion(
@@ -533,11 +563,12 @@ def _dialog_suggestion(
 def dialog_suggestion(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return _dialog_suggestion(callback_id, body)
 
-    return build_listener_matcher(func, asyncio)
+    return build_listener_matcher(func, asyncio, base_logger)
 
 
 # -------------------------
@@ -567,7 +598,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="slack_bolt.listener_matcher.builtins.action"><code class="name flex">
-<span>def <span class="ident">action</span></span>(<span>constraints: Union[str, re.Pattern, Dict[str, Union[str, re.Pattern]]], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">action</span></span>(<span>constraints: Union[str, re.Pattern, Dict[str, Union[str, re.Pattern]]], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -578,6 +609,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def action(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     if isinstance(constraints, (str, Pattern)):
 
@@ -590,7 +622,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
                 or _workflow_step_edit(constraints, body)
             )
 
-        return build_listener_matcher(func, asyncio)
+        return build_listener_matcher(func, asyncio, base_logger)
 
     elif &#34;type&#34; in constraints:
         action_type = constraints[&#34;type&#34;]
@@ -617,7 +649,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.attachment_action"><code class="name flex">
-<span>def <span class="ident">attachment_action</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">attachment_action</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -628,15 +660,16 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def attachment_action(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return _attachment_action(callback_id, body)
 
-    return build_listener_matcher(func, asyncio)</code></pre>
+    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.block_action"><code class="name flex">
-<span>def <span class="ident">block_action</span></span>(<span>constraints: Union[str, re.Pattern, Dict[str, Union[str, re.Pattern]]], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">block_action</span></span>(<span>constraints: Union[str, re.Pattern, Dict[str, Union[str, re.Pattern]]], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -647,15 +680,16 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def block_action(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return _block_action(constraints, body)
 
-    return build_listener_matcher(func, asyncio)</code></pre>
+    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.block_suggestion"><code class="name flex">
-<span>def <span class="ident">block_suggestion</span></span>(<span>action_id: Union[str, re.Pattern], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">block_suggestion</span></span>(<span>action_id: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -666,15 +700,16 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def block_suggestion(
     action_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return _block_suggestion(action_id, body)
 
-    return build_listener_matcher(func, asyncio)</code></pre>
+    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.build_listener_matcher"><code class="name flex">
-<span>def <span class="ident">build_listener_matcher</span></span>(<span>func: Callable[..., bool], asyncio: bool) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">build_listener_matcher</span></span>(<span>func: Callable[..., bool], asyncio: bool, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -685,6 +720,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def build_listener_matcher(
     func: Callable[..., bool],
     asyncio: bool,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     if asyncio:
         from .async_builtins import AsyncBuiltinListenerMatcher
@@ -692,13 +728,13 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
         async def async_fun(body: Dict[str, Any]) -&gt; bool:
             return func(body)
 
-        return AsyncBuiltinListenerMatcher(func=async_fun)
+        return AsyncBuiltinListenerMatcher(func=async_fun, base_logger=base_logger)
     else:
-        return BuiltinListenerMatcher(func=func)</code></pre>
+        return BuiltinListenerMatcher(func=func, base_logger=base_logger)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.command"><code class="name flex">
-<span>def <span class="ident">command</span></span>(<span>command: Union[str, re.Pattern], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">command</span></span>(<span>command: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -709,15 +745,16 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def command(
     command: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return is_slash_command(body) and _matches(command, body[&#34;command&#34;])
 
-    return build_listener_matcher(func, asyncio)</code></pre>
+    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.dialog_cancellation"><code class="name flex">
-<span>def <span class="ident">dialog_cancellation</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">dialog_cancellation</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -728,15 +765,16 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def dialog_cancellation(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return _dialog_cancellation(callback_id, body)
 
-    return build_listener_matcher(func, asyncio)</code></pre>
+    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.dialog_submission"><code class="name flex">
-<span>def <span class="ident">dialog_submission</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">dialog_submission</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -747,15 +785,16 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def dialog_submission(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return _dialog_submission(callback_id, body)
 
-    return build_listener_matcher(func, asyncio)</code></pre>
+    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.dialog_suggestion"><code class="name flex">
-<span>def <span class="ident">dialog_suggestion</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">dialog_suggestion</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -766,15 +805,16 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def dialog_suggestion(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return _dialog_suggestion(callback_id, body)
 
-    return build_listener_matcher(func, asyncio)</code></pre>
+    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.event"><code class="name flex">
-<span>def <span class="ident">event</span></span>(<span>constraints: Union[str, re.Pattern, Dict[str, Union[str, Sequence[Union[str, re.Pattern, ForwardRef(None)]]]]], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">event</span></span>(<span>constraints: Union[str, re.Pattern, Dict[str, Union[str, Sequence[Union[str, re.Pattern, ForwardRef(None)]], ForwardRef(None)]]], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -784,9 +824,12 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 </summary>
 <pre><code class="python">def event(
     constraints: Union[
-        str, Pattern, Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]]
+        str,
+        Pattern,
+        Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]],
     ],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     if isinstance(constraints, (str, Pattern)):
         event_type: Union[str, Pattern] = constraints
@@ -795,7 +838,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
         def func(body: Dict[str, Any]) -&gt; bool:
             return is_event(body) and _matches(event_type, body[&#34;event&#34;][&#34;type&#34;])
 
-        return build_listener_matcher(func, asyncio)
+        return build_listener_matcher(func, asyncio, base_logger)
 
     elif &#34;type&#34; in constraints:
         _verify_message_event_type(constraints[&#34;type&#34;])
@@ -808,7 +851,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
                 )
             return False
 
-        return build_listener_matcher(func, asyncio)
+        return build_listener_matcher(func, asyncio, base_logger)
 
     raise BoltError(
         f&#34;event ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;
@@ -816,7 +859,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.global_shortcut"><code class="name flex">
-<span>def <span class="ident">global_shortcut</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">global_shortcut</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -827,15 +870,16 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def global_shortcut(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return is_global_shortcut(body) and _matches(callback_id, body[&#34;callback_id&#34;])
 
-    return build_listener_matcher(func, asyncio)</code></pre>
+    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.message_event"><code class="name flex">
-<span>def <span class="ident">message_event</span></span>(<span>constraints: Dict[str, Union[str, Sequence[Union[str, re.Pattern, ForwardRef(None)]]]], keyword: Union[str, re.Pattern], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">message_event</span></span>(<span>constraints: Dict[str, Union[str, Sequence[Union[str, re.Pattern, ForwardRef(None)]], ForwardRef(None)]], keyword: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -844,9 +888,12 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def message_event(
-    constraints: Dict[str, Union[str, Sequence[Optional[Union[str, Pattern]]]]],
+    constraints: Dict[
+        str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]
+    ],
     keyword: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     if &#34;type&#34; in constraints and keyword is not None:
         _verify_message_event_type(constraints[&#34;type&#34;])
@@ -865,13 +912,13 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
                         return True
             return False
 
-        return build_listener_matcher(func, asyncio)
+        return build_listener_matcher(func, asyncio, base_logger)
 
     raise BoltError(f&#34;event ({constraints}: {type(constraints)}) must be dict&#34;)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.message_shortcut"><code class="name flex">
-<span>def <span class="ident">message_shortcut</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">message_shortcut</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -882,15 +929,16 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def message_shortcut(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return is_message_shortcut(body) and _matches(callback_id, body[&#34;callback_id&#34;])
 
-    return build_listener_matcher(func, asyncio)</code></pre>
+    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.options"><code class="name flex">
-<span>def <span class="ident">options</span></span>(<span>constraints: Union[str, re.Pattern, Dict[str, Union[str, re.Pattern]]], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">options</span></span>(<span>constraints: Union[str, re.Pattern, Dict[str, Union[str, re.Pattern]]], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -901,6 +949,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def options(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     if isinstance(constraints, (str, Pattern)):
 
@@ -909,7 +958,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
                 constraints, body
             )
 
-        return build_listener_matcher(func, asyncio)
+        return build_listener_matcher(func, asyncio, base_logger)
 
     if &#34;action_id&#34; in constraints:
         return block_suggestion(constraints[&#34;action_id&#34;], asyncio)
@@ -922,7 +971,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.shortcut"><code class="name flex">
-<span>def <span class="ident">shortcut</span></span>(<span>constraints: Union[str, re.Pattern, Dict[str, Union[str, re.Pattern]]], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">shortcut</span></span>(<span>constraints: Union[str, re.Pattern, Dict[str, Union[str, re.Pattern]]], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -933,6 +982,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def shortcut(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     if isinstance(constraints, (str, Pattern)):
         callback_id: Union[str, Pattern] = constraints
@@ -940,7 +990,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
         def func(body: Dict[str, Any]) -&gt; bool:
             return is_shortcut(body) and _matches(callback_id, body[&#34;callback_id&#34;])
 
-        return build_listener_matcher(func, asyncio)
+        return build_listener_matcher(func, asyncio, base_logger)
 
     elif &#34;type&#34; in constraints and &#34;callback_id&#34; in constraints:
         if constraints[&#34;type&#34;] == &#34;shortcut&#34;:
@@ -954,7 +1004,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.view"><code class="name flex">
-<span>def <span class="ident">view</span></span>(<span>constraints: Union[str, re.Pattern, Dict[str, Union[str, re.Pattern]]], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">view</span></span>(<span>constraints: Union[str, re.Pattern, Dict[str, Union[str, re.Pattern]]], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -965,6 +1015,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def view(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     if isinstance(constraints, (str, Pattern)):
         return view_submission(constraints, asyncio)
@@ -980,7 +1031,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.view_closed"><code class="name flex">
-<span>def <span class="ident">view_closed</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">view_closed</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -991,17 +1042,18 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def view_closed(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return is_view_closed(body) and _matches(
             callback_id, body[&#34;view&#34;][&#34;callback_id&#34;]
         )
 
-    return build_listener_matcher(func, asyncio)</code></pre>
+    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.view_submission"><code class="name flex">
-<span>def <span class="ident">view_submission</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">view_submission</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1012,17 +1064,18 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def view_submission(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return is_view_submission(body) and _matches(
             callback_id, body[&#34;view&#34;][&#34;callback_id&#34;]
         )
 
-    return build_listener_matcher(func, asyncio)</code></pre>
+    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.workflow_step_edit"><code class="name flex">
-<span>def <span class="ident">workflow_step_edit</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">workflow_step_edit</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1033,15 +1086,16 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def workflow_step_edit(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return _workflow_step_edit(callback_id, body)
 
-    return build_listener_matcher(func, asyncio)</code></pre>
+    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.workflow_step_execute"><code class="name flex">
-<span>def <span class="ident">workflow_step_execute</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">workflow_step_execute</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1052,6 +1106,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def workflow_step_execute(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return (
@@ -1061,11 +1116,11 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
             and _matches(callback_id, body[&#34;event&#34;][&#34;callback_id&#34;])
         )
 
-    return build_listener_matcher(func, asyncio)</code></pre>
+    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.workflow_step_save"><code class="name flex">
-<span>def <span class="ident">workflow_step_save</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">workflow_step_save</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1076,13 +1131,14 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <pre><code class="python">def workflow_step_save(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
         return is_workflow_step_save(body) and _matches(
             callback_id, body[&#34;view&#34;][&#34;callback_id&#34;]
         )
 
-    return build_listener_matcher(func, asyncio)</code></pre>
+    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
 </dd>
 </dl>
@@ -1092,7 +1148,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <dl>
 <dt id="slack_bolt.listener_matcher.builtins.BuiltinListenerMatcher"><code class="flex name class">
 <span>class <span class="ident">BuiltinListenerMatcher</span></span>
-<span>(</span><span>*, func: Callable[..., Union[bool, Awaitable[bool]]])</span>
+<span>(</span><span>*, func: Callable[..., Union[bool, Awaitable[bool]]], base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1101,10 +1157,15 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class BuiltinListenerMatcher(ListenerMatcher):
-    def __init__(self, *, func: Callable[..., Union[bool, Awaitable[bool]]]):
+    def __init__(
+        self,
+        *,
+        func: Callable[..., Union[bool, Awaitable[bool]]],
+        base_logger: Optional[Logger] = None,
+    ):
         self.func = func
         self.arg_names = inspect.getfullargspec(func).args
-        self.logger = get_bolt_logger(self.func)
+        self.logger = get_bolt_logger(self.func, base_logger)
 
     def matches(self, req: BoltRequest, resp: BoltResponse) -&gt; bool:
         return self.func(

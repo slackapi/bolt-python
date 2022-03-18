@@ -49,7 +49,7 @@ class AsyncListenerMatcher(metaclass=ABCMeta):
 
 import inspect
 from logging import Logger
-from typing import Callable, Awaitable, Sequence
+from typing import Callable, Awaitable, Sequence, Optional
 
 from slack_bolt.kwargs_injection.async_utils import build_async_required_kwargs
 from slack_bolt.logger import get_bolt_app_logger
@@ -63,11 +63,17 @@ class AsyncCustomListenerMatcher(AsyncListenerMatcher):
     arg_names: Sequence[str]
     logger: Logger
 
-    def __init__(self, *, app_name: str, func: Callable[..., Awaitable[bool]]):
+    def __init__(
+        self,
+        *,
+        app_name: str,
+        func: Callable[..., Awaitable[bool]],
+        base_logger: Optional[Logger] = None
+    ):
         self.app_name = app_name
         self.func = func
         self.arg_names = inspect.getfullargspec(func).args
-        self.logger = get_bolt_app_logger(self.app_name, self.func)
+        self.logger = get_bolt_app_logger(self.app_name, self.func, base_logger)
 
     async def async_matches(self, req: AsyncBoltRequest, resp: BoltResponse) -&gt; bool:
         return await self.func(
@@ -99,7 +105,7 @@ for cls in builtin_async_listener_matcher_classes:
 <dl>
 <dt id="slack_bolt.listener_matcher.async_listener_matcher.AsyncCustomListenerMatcher"><code class="flex name class">
 <span>class <span class="ident">AsyncCustomListenerMatcher</span></span>
-<span>(</span><span>*, app_name: str, func: Callable[..., Awaitable[bool]])</span>
+<span>(</span><span>*, app_name: str, func: Callable[..., Awaitable[bool]], base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -113,11 +119,17 @@ for cls in builtin_async_listener_matcher_classes:
     arg_names: Sequence[str]
     logger: Logger
 
-    def __init__(self, *, app_name: str, func: Callable[..., Awaitable[bool]]):
+    def __init__(
+        self,
+        *,
+        app_name: str,
+        func: Callable[..., Awaitable[bool]],
+        base_logger: Optional[Logger] = None
+    ):
         self.app_name = app_name
         self.func = func
         self.arg_names = inspect.getfullargspec(func).args
-        self.logger = get_bolt_app_logger(self.app_name, self.func)
+        self.logger = get_bolt_app_logger(self.app_name, self.func, base_logger)
 
     async def async_matches(self, req: AsyncBoltRequest, resp: BoltResponse) -&gt; bool:
         return await self.func(
@@ -189,7 +201,7 @@ for cls in builtin_async_listener_matcher_classes:
 </dd>
 <dt id="slack_bolt.listener_matcher.async_listener_matcher.AsyncCustomListenerMatcher"><code class="flex name class">
 <span>class <span class="ident">cls</span></span>
-<span>(</span><span>*, app_name: str, func: Callable[..., Awaitable[bool]])</span>
+<span>(</span><span>*, app_name: str, func: Callable[..., Awaitable[bool]], base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -203,11 +215,17 @@ for cls in builtin_async_listener_matcher_classes:
     arg_names: Sequence[str]
     logger: Logger
 
-    def __init__(self, *, app_name: str, func: Callable[..., Awaitable[bool]]):
+    def __init__(
+        self,
+        *,
+        app_name: str,
+        func: Callable[..., Awaitable[bool]],
+        base_logger: Optional[Logger] = None
+    ):
         self.app_name = app_name
         self.func = func
         self.arg_names = inspect.getfullargspec(func).args
-        self.logger = get_bolt_app_logger(self.app_name, self.func)
+        self.logger = get_bolt_app_logger(self.app_name, self.func, base_logger)
 
     async def async_matches(self, req: AsyncBoltRequest, resp: BoltResponse) -&gt; bool:
         return await self.func(

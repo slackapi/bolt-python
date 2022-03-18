@@ -26,7 +26,8 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from typing import Callable, Optional
+<pre><code class="python">from logging import Logger
+from typing import Callable, Optional
 
 from slack_sdk.errors import SlackApiError
 
@@ -50,14 +51,16 @@ class MultiTeamsAuthorization(Authorization):
         self,
         *,
         authorize: Authorize,
+        base_logger: Optional[Logger] = None,
     ):
         &#34;&#34;&#34;Multi-workspace authorization.
 
         Args:
             authorize: The function to authorize incoming requests from Slack.
+            base_logger: The base logger
         &#34;&#34;&#34;
         self.authorize = authorize
-        self.logger = get_bolt_logger(MultiTeamsAuthorization)
+        self.logger = get_bolt_logger(MultiTeamsAuthorization, base_logger=base_logger)
 
     def process(
         self,
@@ -120,7 +123,7 @@ class MultiTeamsAuthorization(Authorization):
 <dl>
 <dt id="slack_bolt.middleware.authorization.multi_teams_authorization.MultiTeamsAuthorization"><code class="flex name class">
 <span>class <span class="ident">MultiTeamsAuthorization</span></span>
-<span>(</span><span>*, authorize: <a title="slack_bolt.authorization.authorize.Authorize" href="../../authorization/authorize.html#slack_bolt.authorization.authorize.Authorize">Authorize</a>)</span>
+<span>(</span><span>*, authorize: <a title="slack_bolt.authorization.authorize.Authorize" href="../../authorization/authorize.html#slack_bolt.authorization.authorize.Authorize">Authorize</a>, base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
@@ -129,6 +132,8 @@ class MultiTeamsAuthorization(Authorization):
 <dl>
 <dt><strong><code>authorize</code></strong></dt>
 <dd>The function to authorize incoming requests from Slack.</dd>
+<dt><strong><code>base_logger</code></strong></dt>
+<dd>The base logger</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -141,14 +146,16 @@ class MultiTeamsAuthorization(Authorization):
         self,
         *,
         authorize: Authorize,
+        base_logger: Optional[Logger] = None,
     ):
         &#34;&#34;&#34;Multi-workspace authorization.
 
         Args:
             authorize: The function to authorize incoming requests from Slack.
+            base_logger: The base logger
         &#34;&#34;&#34;
         self.authorize = authorize
-        self.logger = get_bolt_logger(MultiTeamsAuthorization)
+        self.logger = get_bolt_logger(MultiTeamsAuthorization, base_logger=base_logger)
 
     def process(
         self,
