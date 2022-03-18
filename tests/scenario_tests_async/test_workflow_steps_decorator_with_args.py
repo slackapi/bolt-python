@@ -499,8 +499,7 @@ async def execute(
 # Logger propagation tests
 #
 
-import time
-custom_logger = logging.getLogger(f"{__name__}-{time.time()}-async-logger-test")
+custom_logger = logging.getLogger(f"{__name__}-{time()}-async-logger-test")
 custom_logger.setLevel(logging.INFO)
 added_handler = logging.NullHandler()
 custom_logger.addHandler(added_handler)
