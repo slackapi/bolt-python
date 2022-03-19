@@ -16,21 +16,18 @@ class TestStep:
     def test_build_errors(self):
         with pytest.raises(BoltError):
             step = AsyncWorkflowStep.builder("foo")
-            step.edit(None)
             step.save(just_ack)
             step.execute(just_ack)
             step.build()
         with pytest.raises(BoltError):
             step = AsyncWorkflowStep.builder("foo")
             step.edit(just_ack)
-            step.save(None)
             step.execute(just_ack)
             step.build()
         with pytest.raises(BoltError):
             step = AsyncWorkflowStep.builder("foo")
             step.edit(just_ack)
             step.save(just_ack)
-            step.execute(None)
             step.build()
 
 

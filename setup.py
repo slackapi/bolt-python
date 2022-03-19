@@ -32,7 +32,7 @@ adapter_test_dependencies = [
 ]
 
 async_test_dependencies = test_dependencies + [
-    "pytest-asyncio<1",  # for async
+    "pytest-asyncio>=0.18.2,<1",  # for async
     "aiohttp>=3,<4",  # for async
 ]
 
