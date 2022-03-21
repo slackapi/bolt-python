@@ -120,8 +120,8 @@ Now let's create a policy that will allow the holder of the policy to take actio
                 "s3-object-lambda:*"
             ],
             "Resource": [
-             "<your-first-bucket-arn>/*",   // don't forget the `/*`
-             "<your-second-bucket-arn>/*" 
+                "<your-first-bucket-arn>/*",   // don't forget the `/*`
+                "<your-second-bucket-arn>/*" 
             ]
         }
     ]
