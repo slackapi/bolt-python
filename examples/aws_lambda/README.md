@@ -132,7 +132,6 @@ Now let's create a policy that will allow the holder of the policy to take actio
 6. Review policy
     1. Name your policy something memorable enough that you won’t have forgotten it 5 minutes from now when we’ll need to look it up from a list. (e.g. AmazonS3-FullAccess-SlackBuckets) 
     2. Review the summary, and hit “Create Policy”. Once the policy is created you should be redirected to the Policies page and see your new policy show up as Customer managed policy. 
-    3. :lightbulb: The policy we’ve created enables every S3 action  (see “s3:*”) as a convenience in getting started. If you’d like to limit your policy in future to more specific granular actions you can do so by editing the policy.
 
 ### Setup an AWS IAM Role with Policies for Executing Your Lambda
 Let’s create a user role that will use the custom policy we created as well as other policies to let us execute our lambda, write output logs to CloudWatch.
