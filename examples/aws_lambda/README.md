@@ -153,8 +153,8 @@ Let’s create a user role that will use the custom policy we created as well as
     2. Optionally enter a description for the role, such as "Bolt Python with S3 access role”
     3. “Create Role”
 
-### Create Slack App and Loaded your Lambda to AWS
-Ensure you have created an app on [api.slack.com/apps](https://api.slack.com/apps) as per the Getting Started Guide. You do not need to ensure you have installed it to a workspace, as the OAuth flow will provide your app the ability to be installed by anyone.
+### Create Slack App and Load your Lambda to AWS
+Ensure you have created an app on [api.slack.com/apps](https://api.slack.com/apps) as per the [Getting Started Guide](https://slack.dev/bolt-python/tutorial/getting-started). You do not need to ensure you have installed it to a workspace, as the OAuth flow will provide your app the ability to be installed by anyone.
 
 1. Remember those S3 buckets we made? You will need the names of these buckets again in the next step.
 2. You need many environment variables exported! Specifically the following from api.slack.com/apps
@@ -183,16 +183,16 @@ Your Lambda exists, but it is not accessible to the internet, so Slack cannot ye
 
 Phew, congrats! Your Slack app is now accessible to the public. On the left side of your bolt_py_oauth_function Function Overview you should see a purple API Gateway icon. Click it.
 
-1. Click Details to expand the details section.
+1. Click "Details"
 2. Copy the API Endpoint - this is the URL your Lambda function is accessible at publicly.
 3. We will now inform Slack that this example app can accept Slash Commands.
 4. Back on [api.slack.com/apps](https://api.slack.com/apps), select your app and choose "Slash Commands" from the left menu.
 5. Click "Create New Command"
     1. By default, the `aws_lambda_oauth.py` function has logic for a /hello-bolt-python-lambda command. Enter `/hello-bolt-python-lambda` as the Command.
-    * Under Request URL, paste in the previously-copied API Endpoint from API Gateway.
-    * Click Save
+    * Under **Request URL**, paste in the previously-copied API Endpoint from API Gateway.
+    * Click "Save"
 6. We also need to register the API Endpoint as the OAuth redirect URL:
-    1. Load up the "OAuth & Permissions" page on[api.slack.com/apps](https://api.slack.com/apps)
+    1. Load up the **OAuth & Permissions** page on[api.slack.com/apps](https://api.slack.com/apps)
     2. Scroll down to "Redirect URLs"
     3. Copy the API endpoint in - but remove the path portion. The Redirect URL needs to only partially match where we will send users.
 
