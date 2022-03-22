@@ -151,7 +151,7 @@ Let’s create a user role that will use the custom policy we created as well as
 6. Step 3 - Name, review, create
     1. Enter `bolt_python_s3_storage` as your role name. To use a different name, make sure to update the role name in `aws_lambda_oauth_config.yaml`
     2. Optionally enter a description for the role, such as "Bolt Python with S3 access role”
-    3. “Create Role”
+    3. "Create Role"
 
 ### Create Slack App and Load your Lambda to AWS
 Ensure you have created an app on [api.slack.com/apps](https://api.slack.com/apps) as per the [Getting Started Guide](https://slack.dev/bolt-python/tutorial/getting-started). You do not need to ensure you have installed it to a workspace, as the OAuth flow will provide your app the ability to be installed by anyone.
