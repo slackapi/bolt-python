@@ -52,5 +52,9 @@ if __name__ == "__main__":
         global socket_mode_client
         socket_mode_client = handler.client
 
-    app.web_app().on_startup.append(start_socket_mode)
-    app.start(8080)
+    async def shutdown_socket_mode(_web_app: web.Application):
+        await socket_mode_client.close()
+
+    web_app.on_startup.append(start_socket_mode)
+    web_app.on_shutdown.append(shutdown_socket_mode)
+    web.run_app(app=web_app, port=8080)
