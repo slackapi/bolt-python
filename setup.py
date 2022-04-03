@@ -18,7 +18,9 @@ test_dependencies = [
     "Flask-Sockets>=0.2,<1",  # TODO: This module is not yet Flask 2.x compatible
     "Werkzeug>=1,<2",  # TODO: Flask-Sockets is not yet compatible with Flask 2.x
     "itsdangerous==2.0.1",  # TODO: Flask-Sockets is not yet compatible with Flask 2.x
-    "black==22.1.0",
+    "Jinja2==3.0.3",  # https://github.com/pallets/flask/issues/4494
+    "black==22.3.0",
+    "click<=8.0.4",  # black is affected by https://github.com/pallets/click/issues/2225
 ]
 
 adapter_test_dependencies = [
