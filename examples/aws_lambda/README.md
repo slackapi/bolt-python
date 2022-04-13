@@ -24,7 +24,7 @@ Instructions on how to set up and deploy each example are provided below.
   - Under "Choose a use case", select "Common use cases: Lambda"
   - Click "Next: Permissions"
   - Under "Attach permission policies", enter "lambda" in the Filter input
-  - Check the "AWSLambdaBasicExecutionRole" and "AWSLambdaExecute" policies
+  - Check the "AWSLambdaBasicExecutionRole", "AWSLambdaExecute" and "AWSLambdaRole" policies
   - Click "Next: tags"
   - Click "Next: review"
   - Enter `bolt_python_lambda_invocation` as the Role name. You can change this
@@ -86,17 +86,17 @@ Instructions on how to set up and deploy each example are provided below.
 ## OAuth Lambda Listener Example Bolt App
 
 ### Setup your AWS Account + Credentials
-You need an AWS account and your AWS credentials set up on your machine. 
+You need an AWS account and your AWS credentials set up on your machine.
 
 Once you’ve done that you should have access to AWS Console, which is what we’ll use for the rest of this tutorial.
 
 ### Create S3 Buckets to store Installations and State
 
-1. Start by creating two S3 buckets: 
+1. Start by creating two S3 buckets:
     1. One to store installation credentials for each Slack workspace that installs your app.
     2. One to store state variables during the OAuth flow.
 2. Head over to **Amazon S3** in the AWS Console
-3. Give your bucket a name, region, and set access controls. If you’re doing this for the first time, it’s easiest to keep the defaults and edit them later as necessary. We'll be using the names: 
+3. Give your bucket a name, region, and set access controls. If you’re doing this for the first time, it’s easiest to keep the defaults and edit them later as necessary. We'll be using the names:
     1. slack-installations-s3
     2. slack-state-store-s3
 4. After your buckets are created, in each bucket’s page head over to “Properties” and save the Amazon Resource Name (ARN). It should look something like `arn:aws:s3:::slack-installations-s3`.
@@ -121,7 +121,7 @@ Now let's create a policy that will allow the holder of the policy to take actio
             ],
             "Resource": [
                 "<your-first-bucket-arn>/*",   // don't forget the `/*`
-                "<your-second-bucket-arn>/*" 
+                "<your-second-bucket-arn>/*"
             ]
         }
     ]
@@ -130,8 +130,8 @@ Now let's create a policy that will allow the holder of the policy to take actio
 4. Edit “Resource” to include the ARNs of the two buckets you created in the earlier step. These need to exactly match the ARNS you copied earlier and end with a `/*`
 5. Hit "Next:Tags" and "Next:Review"
 6. Review policy
-    1. Name your policy something memorable enough that you won’t have forgotten it 5 minutes from now when we’ll need to look it up from a list. (e.g. AmazonS3-FullAccess-SlackBuckets) 
-    2. Review the summary, and hit "Create Policy". Once the policy is created you should be redirected to the Policies page and see your new policy show up as Customer managed policy. 
+    1. Name your policy something memorable enough that you won’t have forgotten it 5 minutes from now when we’ll need to look it up from a list. (e.g. AmazonS3-FullAccess-SlackBuckets)
+    2. Review the summary, and hit "Create Policy". Once the policy is created you should be redirected to the Policies page and see your new policy show up as Customer managed policy.
 
 ### Setup an AWS IAM Role with Policies for Executing Your Lambda
 Let’s create a user role that will use the custom policy we created as well as other policies to let us execute our lambda, write output logs to CloudWatch.
@@ -142,12 +142,13 @@ Let’s create a user role that will use the custom policy we created as well as
 4. Step 1 - Select trusted entity
     1. Under "Select type of trusted entity", choose "AWS service"
     2. Under "Choose a use case", select "Common use cases: Lambda"
-    3. Click "Next: Permissions” 
+    3. Click "Next: Permissions"
 5. Step 2 - Add permissions
     1. Add the following policies to the role we’re creating that will allow the user with the role permission to execute Lambda, make changes to their S3 Buckets, log output to CloudWatch
         1. `AWSLambdaExecute`
         2. `AWSLambdaBasicExecutionRole`
-        3. `<NameOfRoleYouCreatedEarlier>`
+        3. `AWSLambdaRole`
+        4. `<NameOfS3PolicyYouCreatedEarlier>`
 6. Step 3 - Name, review, create
     1. Enter `bolt_python_s3_storage` as your role name. To use a different name, make sure to update the role name in `aws_lambda_oauth_config.yaml`
     2. Optionally enter a description for the role, such as "Bolt Python with S3 access role”
@@ -166,12 +167,12 @@ SLACK_CLIENT_SECRET # Client Secret from Basic Information page
 SLACK_SCOPES= "app_mentions:read,chat:write"
 SLACK_INSTALLATION_S3_BUCKET_NAME: # The name of installations bucket
 SLACK_STATE_S3_BUCKET_NAME: # The name of the state store bucket
-export 
+export
 ```
 6. Let's deploy the Lambda! Run `./deploy_oauth.sh`. By default it deploys to the us-east-1 region in AWS - you can customize this in `aws_lambda_oauth_config.yaml`.
 7. Load up AWS Lambda inside the AWS Console - make sure you are in the correct region that you deployed your app to. You should see a `bolt_py_oauth_function` Lambda there.
 
-### Set up AWS API Gateway 
+### Set up AWS API Gateway
 Your Lambda exists, but it is not accessible to the internet, so Slack cannot yet send events happening in your Slack workspace to your Lambda. Let's fix that by adding an AWS API Gateway in front of your Lambda so that your Lambda can accept HTTP requests
 
 1. Click on your `bolt_py_oauth_function` Lambda
@@ -198,7 +199,7 @@ Phew, congrats! Your Slack app is now accessible to the public. On the left side
 
 You can now install the app to any workspace!
 
-### Test it out! 
+### Test it out!
 1. Once installed to a Slack workspace, try typing `/hello-bolt-python-lambda` hello.
 2. If you have issues, here are some debugging options:
     1. _View lambda activity_: Head to the Monitor tab under your Lambda. Did the Lambda get invoked? Did it respond with an error? Investigate the graphs to see how your Lambda is behaving.
