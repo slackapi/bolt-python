@@ -42,6 +42,8 @@ def handler(event, context):
 # AWS IAM Role: bolt_python_s3_storage
 #   - AmazonS3FullAccess
 #   - AWSLambdaBasicExecutionRole
+#   - AWSLambdaExecute
+#   - AWSLambdaRole
 
 # rm -rf latest_slack_bolt && cp -pr ../../src latest_slack_bolt
 # pip install python-lambda
