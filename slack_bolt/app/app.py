@@ -1453,13 +1453,19 @@ class SlackAppDevelopmentServer:
                     request_path, _, query = self.path.partition("?")
                     if request_path == _bolt_oauth_flow.install_path:
                         bolt_req = BoltRequest(
-                            body="", query=query, headers=self.headers
+                            body="",
+                            query=query,
+                            # email.message.Message's mapping interface is dict compatible
+                            headers=self.headers,  # type:ignore
                         )
                         bolt_resp = _bolt_oauth_flow.handle_installation(bolt_req)
                         self._send_bolt_response(bolt_resp)
                     elif request_path == _bolt_oauth_flow.redirect_uri_path:
                         bolt_req = BoltRequest(
-                            body="", query=query, headers=self.headers
+                            body="",
+                            query=query,
+                            # email.message.Message's mapping interface is dict compatible
+                            headers=self.headers,  # type:ignore
                         )
                         bolt_resp = _bolt_oauth_flow.handle_callback(bolt_req)
                         self._send_bolt_response(bolt_resp)
@@ -1477,7 +1483,10 @@ class SlackAppDevelopmentServer:
                 len_header = self.headers.get("Content-Length") or 0
                 request_body = self.rfile.read(int(len_header)).decode("utf-8")
                 bolt_req = BoltRequest(
-                    body=request_body, query=query, headers=self.headers
+                    body=request_body,
+                    query=query,
+                    # email.message.Message's mapping interface is dict compatible
+                    headers=self.headers,  # type:ignore
                 )
                 bolt_resp: BoltResponse = _bolt_app.dispatch(bolt_req)
                 self._send_bolt_response(bolt_resp)
@@ -1503,7 +1512,7 @@ class SlackAppDevelopmentServer:
                 for k, vs in headers.items():
                     for v in vs:
                         self.send_header(k, v)
-                self.send_header("Content-Length", len(body_bytes))
+                self.send_header("Content-Length", str(len(body_bytes)))
                 self.end_headers()
                 self.wfile.write(body_bytes)
 
