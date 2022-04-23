@@ -47,12 +47,6 @@ class TestApp:
     # basic tests
     # --------------------------
 
-    def test_signing_secret_absence(self):
-        with pytest.raises(BoltError):
-            App(signing_secret=None, token="xoxb-xxx")
-        with pytest.raises(BoltError):
-            App(signing_secret="", token="xoxb-xxx")
-
     def simple_listener(self, ack):
         ack()
 
