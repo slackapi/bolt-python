@@ -1,4 +1,4 @@
-name: Run pytype validation
+name: Run flake8 validation
 
 on:
   push:
