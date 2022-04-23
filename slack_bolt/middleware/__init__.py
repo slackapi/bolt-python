@@ -6,13 +6,16 @@ It's also possible to run a middleware only for a particular listener.
 """
 
 # Don't add async module imports here
-from .authorization import SingleTeamAuthorization, MultiTeamsAuthorization
-from .custom_middleware import CustomMiddleware
-from .ignoring_self_events import IgnoringSelfEvents
-from .middleware import Middleware
-from .request_verification import RequestVerification
-from .ssl_check import SslCheck
-from .url_verification import UrlVerification
+from .authorization import (
+    SingleTeamAuthorization,
+    MultiTeamsAuthorization,
+)  # noqa: F401
+from .custom_middleware import CustomMiddleware  # noqa: F401
+from .ignoring_self_events import IgnoringSelfEvents  # noqa: F401
+from .middleware import Middleware  # noqa: F401
+from .request_verification import RequestVerification  # noqa: F401
+from .ssl_check import SslCheck  # noqa: F401
+from .url_verification import UrlVerification  # noqa: F401
 
 builtin_middleware_classes = [
     SslCheck,

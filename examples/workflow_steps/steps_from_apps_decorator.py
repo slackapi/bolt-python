@@ -35,7 +35,7 @@ def edit(ack: Ack, step, configure: Configure):
                 "block_id": "intro-section",
                 "text": {
                     "type": "plain_text",
-                    "text": "Create a task in one of the listed projects. The link to the task and other details will be available as variable data in later steps.",
+                    "text": "Create a task in one of the listed projects. The link to the task and other details will be available as variable data in later steps.",  # noqa: E501
                 },
             },
             {

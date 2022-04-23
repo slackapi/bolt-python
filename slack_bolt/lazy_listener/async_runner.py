@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABCMeta
 from logging import Logger
-from typing import Callable, Awaitable, Any, Coroutine
+from typing import Callable, Awaitable
 
 from slack_bolt.lazy_listener.async_internals import to_runnable_function
 from slack_bolt.request.async_request import AsyncBoltRequest

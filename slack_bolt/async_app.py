@@ -43,7 +43,7 @@ If you want to use another async Web framework (e.g., Sanic, FastAPI, Starlette)
 Apps can be run the same way as the synchronous example above. If you'd prefer another async Web framework (e.g., Sanic, FastAPI, Starlette), take a look at [the built-in adapters](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter) and their corresponding [examples](https://github.com/slackapi/bolt-python/tree/main/examples).
 
 Refer to `slack_bolt.app.async_app` for more details.
-"""
+"""  # noqa: E501
 from .app.async_app import AsyncApp  # noqa
 from .context.ack.async_ack import AsyncAck  # noqa
 from .context.async_context import AsyncBoltContext  # noqa

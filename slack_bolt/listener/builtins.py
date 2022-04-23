@@ -1,5 +1,3 @@
-from slack_sdk.oauth import InstallationStore
-
 from slack_bolt.context.context import BoltContext
 from slack_sdk.oauth.installation_store.installation_store import InstallationStore
 

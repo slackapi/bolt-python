@@ -1,1 +1,1 @@
-from .handler import SlackRequestHandler
+from .handler import SlackRequestHandler  # noqa: F401

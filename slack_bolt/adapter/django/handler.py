@@ -142,8 +142,8 @@ class SlackRequestHandler:
             # it's okay to skip calling the same connection clean-up method at the listener completion.
             message = """As you've already set app.listener_runner.listener_start_handler to your own one,
             Bolt skipped to set it to slack_sdk.adapter.django.DjangoListenerStartHandler.
-            
-            If you go with your own handler here, we highly recommend having the following lines of code 
+
+            If you go with your own handler here, we highly recommend having the following lines of code
             in your handle() method to clean up unmanaged stale/old database connections:
 
             from django.db import close_old_connections
