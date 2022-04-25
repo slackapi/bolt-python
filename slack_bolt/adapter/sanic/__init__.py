@@ -1,1 +1,1 @@
-from .async_handler import AsyncSlackRequestHandler
+from .async_handler import AsyncSlackRequestHandler  # noqa: F401

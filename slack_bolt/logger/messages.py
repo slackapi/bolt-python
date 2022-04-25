@@ -348,4 +348,7 @@ def debug_return_listener_middleware_response(
     listener_name: str, status: int, body: str, starting_time: float
 ) -> str:
     millis = int((time.time() - starting_time) * 1000)
-    return f"Responding with listener middleware's response - listener: {listener_name}, status: {status}, body: {body} ({millis} millis)"
+    return (
+        "Responding with listener middleware's response - "
+        f"listener: {listener_name}, status: {status}, body: {body} ({millis} millis)"
+    )

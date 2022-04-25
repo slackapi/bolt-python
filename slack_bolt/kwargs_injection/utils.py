@@ -1,7 +1,7 @@
 # pytype: skip-file
 import inspect
 import logging
-from typing import Callable, Dict, Optional, Any, Sequence, List
+from typing import Callable, Dict, Optional, Any, Sequence
 
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse

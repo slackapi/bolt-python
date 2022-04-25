@@ -6,4 +6,4 @@ Refer to https://slack.dev/bolt-python/concepts#context for details.
 """
 
 # Don't add async module imports here
-from .context import BoltContext
+from .context import BoltContext  # noqa: F401

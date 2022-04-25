@@ -1,1 +1,1 @@
-from .handler import SlackEventsHandler, SlackOAuthHandler
+from .handler import SlackEventsHandler, SlackOAuthHandler  # noqa: F401

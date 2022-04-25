@@ -4,7 +4,7 @@
 * `slack_bolt.adapter.socket_mode.websocket_client`
 * `slack_bolt.adapter.socket_mode.aiohttp`
 * `slack_bolt.adapter.socket_mode.websockets`
-"""
+"""  # noqa: E501
 
 # Don't add async module imports here
-from .builtin import SocketModeHandler  # noqa
+from .builtin import SocketModeHandler  # noqa: F401

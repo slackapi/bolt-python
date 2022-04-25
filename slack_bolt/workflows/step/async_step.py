@@ -230,11 +230,11 @@ class AsyncWorkflowStepBuilder:
             An `AsyncWorkflowStep` object
         """
         if self._edit is None:
-            raise BoltError(f"edit listener is not registered")
+            raise BoltError("edit listener is not registered")
         if self._save is None:
-            raise BoltError(f"save listener is not registered")
+            raise BoltError("save listener is not registered")
         if self._execute is None:
-            raise BoltError(f"execute listener is not registered")
+            raise BoltError("execute listener is not registered")
 
         return AsyncWorkflowStep(
             callback_id=self.callback_id,

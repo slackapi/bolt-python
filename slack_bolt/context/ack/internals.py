@@ -61,7 +61,7 @@ def _set_response(
                     )
                 else:
                     raise ValueError(
-                        f"errors field is required for response_action: errors"
+                        "errors field is required for response_action: errors"
                     )
             else:
                 body = {"response_action": response_action}

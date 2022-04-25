@@ -26,6 +26,7 @@ from slack_bolt.adapter.flask import SlackRequestHandler
 
 handler = SlackRequestHandler(app)
 
+
 # Cloud Function
 def hello_bolt_app(request):
     """HTTP Cloud Function.

@@ -29,8 +29,7 @@ if sys.version_info.major == 3 and sys.version_info.minor <= 6:
     from re import _pattern_type as Pattern
 else:
     from re import Pattern
-from typing import Callable, Awaitable, Any, Sequence, Optional, Union
-from typing import Union, Optional, Dict
+from typing import Callable, Awaitable, Any, Sequence, Optional, Union, Dict
 
 from slack_bolt.kwargs_injection import build_required_kwargs
 from slack_bolt.request import BoltRequest
