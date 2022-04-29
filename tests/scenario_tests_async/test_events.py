@@ -1,6 +1,5 @@
 import asyncio
 import json
-import logging
 import re
 from random import random
 from time import time
@@ -9,7 +8,6 @@ import pytest
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 
-from slack_bolt import BoltResponse
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.context.say.async_say import AsyncSay
