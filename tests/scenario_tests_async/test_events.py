@@ -9,6 +9,7 @@ from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.app.async_app import AsyncApp
+from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.context.say.async_say import AsyncSay
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
@@ -551,6 +552,54 @@ class TestAsyncEvents:
             app.event({"type": "message.channels"})(handle)
         with pytest.raises(ValueError):
             app.event({"type": re.compile("message\\..*")})(handle)
+
+    @pytest.mark.asyncio
+    async def test_context_generation(self):
+        body = {
+            "token": "verification-token",
+            "enterprise_id": "E222",  # intentionally inconsistent for testing
+            "team_id": "T222",  # intentionally inconsistent for testing
+            "api_app_id": "A111",
+            "event": {
+                "type": "member_left_channel",
+                "user": "W111",
+                "channel": "C111",
+                "channel_type": "C",
+                "team": "T111",
+            },
+            "type": "event_callback",
+            "event_id": "Ev111",
+            "event_time": 1610493715,
+            "authorizations": [
+                {
+                    "enterprise_id": "E333",
+                    "user_id": "W222",
+                    "is_bot": True,
+                    "is_enterprise_install": True,
+                }
+            ],
+            "is_ext_shared_channel": False,
+            "event_context": "1-message-T111-G111",
+        }
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            process_before_response=True,
+        )
+
+        @app.event("member_left_channel")
+        async def handle(context: AsyncBoltContext):
+            assert context.enterprise_id == "E333"
+            assert context.team_id is None
+            assert context.is_enterprise_install is True
+            assert context.user_id == "W111"
+
+        timestamp, json_body = str(int(time())), json.dumps(body)
+        request: AsyncBoltRequest = AsyncBoltRequest(
+            body=json_body, headers=self.build_headers(timestamp, json_body)
+        )
+        response = await app.async_dispatch(request)
+        assert response.status == 200
 
 
 app_mention_body = {

@@ -47,6 +47,10 @@ def parse_body(body: str, content_type: Optional[str]) -> Dict[str, Any]:
 
 
 def extract_is_enterprise_install(payload: Dict[str, Any]) -> Optional[bool]:
+    if payload.get("authorizations") is not None and len(payload["authorizations"]) > 0:
+        # To make Events API handling functioning also for shared channels,
+        # we should use .authorizations[0].is_enterprise_install over .is_enterprise_install
+        return extract_is_enterprise_install(payload["authorizations"][0])
     if "is_enterprise_install" in payload:
         is_enterprise_install = payload.get("is_enterprise_install")
         return is_enterprise_install is not None and (
