@@ -51,7 +51,7 @@ class SslCheck(Middleware):  # type: ignore
             verification_token: The verification token to check
                 (optional as it&#39;s already deprecated - https://api.slack.com/authentication/verifying-requests-from-slack#verification_token_deprecation)
             base_logger: The base logger
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;  # noqa: E501
         self.verification_token = verification_token
         self.logger = get_bolt_logger(SslCheck, base_logger=base_logger)
 
@@ -135,7 +135,7 @@ Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://ap
             verification_token: The verification token to check
                 (optional as it&#39;s already deprecated - https://api.slack.com/authentication/verifying-requests-from-slack#verification_token_deprecation)
             base_logger: The base logger
-        &#34;&#34;&#34;
+        &#34;&#34;&#34;  # noqa: E501
         self.verification_token = verification_token
         self.logger = get_bolt_logger(SslCheck, base_logger=base_logger)
 

@@ -376,7 +376,10 @@ def debug_return_listener_middleware_response(
     listener_name: str, status: int, body: str, starting_time: float
 ) -&gt; str:
     millis = int((time.time() - starting_time) * 1000)
-    return f&#34;Responding with listener middleware&#39;s response - listener: {listener_name}, status: {status}, body: {body} ({millis} millis)&#34;</code></pre>
+    return (
+        &#34;Responding with listener middleware&#39;s response - &#34;
+        f&#34;listener: {listener_name}, status: {status}, body: {body} ({millis} millis)&#34;
+    )</code></pre>
 </details>
 </section>
 <section>
@@ -438,7 +441,10 @@ def debug_return_listener_middleware_response(
     listener_name: str, status: int, body: str, starting_time: float
 ) -&gt; str:
     millis = int((time.time() - starting_time) * 1000)
-    return f&#34;Responding with listener middleware&#39;s response - listener: {listener_name}, status: {status}, body: {body} ({millis} millis)&#34;</code></pre>
+    return (
+        &#34;Responding with listener middleware&#39;s response - &#34;
+        f&#34;listener: {listener_name}, status: {status}, body: {body} ({millis} millis)&#34;
+    )</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.logger.messages.debug_running_lazy_listener"><code class="name flex">

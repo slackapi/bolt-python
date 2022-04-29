@@ -75,6 +75,10 @@ def parse_body(body: str, content_type: Optional[str]) -&gt; Dict[str, Any]:
 
 
 def extract_is_enterprise_install(payload: Dict[str, Any]) -&gt; Optional[bool]:
+    if payload.get(&#34;authorizations&#34;) is not None and len(payload[&#34;authorizations&#34;]) &gt; 0:
+        # To make Events API handling functioning also for shared channels,
+        # we should use .authorizations[0].is_enterprise_install over .is_enterprise_install
+        return extract_is_enterprise_install(payload[&#34;authorizations&#34;][0])
     if &#34;is_enterprise_install&#34; in payload:
         is_enterprise_install = payload.get(&#34;is_enterprise_install&#34;)
         return is_enterprise_install is not None and (
@@ -405,6 +409,10 @@ def debug_multiple_response_urls_detected() -&gt; str:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def extract_is_enterprise_install(payload: Dict[str, Any]) -&gt; Optional[bool]:
+    if payload.get(&#34;authorizations&#34;) is not None and len(payload[&#34;authorizations&#34;]) &gt; 0:
+        # To make Events API handling functioning also for shared channels,
+        # we should use .authorizations[0].is_enterprise_install over .is_enterprise_install
+        return extract_is_enterprise_install(payload[&#34;authorizations&#34;][0])
     if &#34;is_enterprise_install&#34; in payload:
         is_enterprise_install = payload.get(&#34;is_enterprise_install&#34;)
         return is_enterprise_install is not None and (

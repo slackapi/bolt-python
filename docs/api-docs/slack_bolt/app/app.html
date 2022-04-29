@@ -1481,13 +1481,19 @@ class SlackAppDevelopmentServer:
                     request_path, _, query = self.path.partition(&#34;?&#34;)
                     if request_path == _bolt_oauth_flow.install_path:
                         bolt_req = BoltRequest(
-                            body=&#34;&#34;, query=query, headers=self.headers
+                            body=&#34;&#34;,
+                            query=query,
+                            # email.message.Message&#39;s mapping interface is dict compatible
+                            headers=self.headers,  # type:ignore
                         )
                         bolt_resp = _bolt_oauth_flow.handle_installation(bolt_req)
                         self._send_bolt_response(bolt_resp)
                     elif request_path == _bolt_oauth_flow.redirect_uri_path:
                         bolt_req = BoltRequest(
-                            body=&#34;&#34;, query=query, headers=self.headers
+                            body=&#34;&#34;,
+                            query=query,
+                            # email.message.Message&#39;s mapping interface is dict compatible
+                            headers=self.headers,  # type:ignore
                         )
                         bolt_resp = _bolt_oauth_flow.handle_callback(bolt_req)
                         self._send_bolt_response(bolt_resp)
@@ -1505,7 +1511,10 @@ class SlackAppDevelopmentServer:
                 len_header = self.headers.get(&#34;Content-Length&#34;) or 0
                 request_body = self.rfile.read(int(len_header)).decode(&#34;utf-8&#34;)
                 bolt_req = BoltRequest(
-                    body=request_body, query=query, headers=self.headers
+                    body=request_body,
+                    query=query,
+                    # email.message.Message&#39;s mapping interface is dict compatible
+                    headers=self.headers,  # type:ignore
                 )
                 bolt_resp: BoltResponse = _bolt_app.dispatch(bolt_req)
                 self._send_bolt_response(bolt_resp)
@@ -1531,7 +1540,7 @@ class SlackAppDevelopmentServer:
                 for k, vs in headers.items():
                     for v in vs:
                         self.send_header(k, v)
-                self.send_header(&#34;Content-Length&#34;, len(body_bytes))
+                self.send_header(&#34;Content-Length&#34;, str(len(body_bytes)))
                 self.end_headers()
                 self.wfile.write(body_bytes)
 
@@ -4516,13 +4525,19 @@ along with a production-grade server when running the app for end users.
                     request_path, _, query = self.path.partition(&#34;?&#34;)
                     if request_path == _bolt_oauth_flow.install_path:
                         bolt_req = BoltRequest(
-                            body=&#34;&#34;, query=query, headers=self.headers
+                            body=&#34;&#34;,
+                            query=query,
+                            # email.message.Message&#39;s mapping interface is dict compatible
+                            headers=self.headers,  # type:ignore
                         )
                         bolt_resp = _bolt_oauth_flow.handle_installation(bolt_req)
                         self._send_bolt_response(bolt_resp)
                     elif request_path == _bolt_oauth_flow.redirect_uri_path:
                         bolt_req = BoltRequest(
-                            body=&#34;&#34;, query=query, headers=self.headers
+                            body=&#34;&#34;,
+                            query=query,
+                            # email.message.Message&#39;s mapping interface is dict compatible
+                            headers=self.headers,  # type:ignore
                         )
                         bolt_resp = _bolt_oauth_flow.handle_callback(bolt_req)
                         self._send_bolt_response(bolt_resp)
@@ -4540,7 +4555,10 @@ along with a production-grade server when running the app for end users.
                 len_header = self.headers.get(&#34;Content-Length&#34;) or 0
                 request_body = self.rfile.read(int(len_header)).decode(&#34;utf-8&#34;)
                 bolt_req = BoltRequest(
-                    body=request_body, query=query, headers=self.headers
+                    body=request_body,
+                    query=query,
+                    # email.message.Message&#39;s mapping interface is dict compatible
+                    headers=self.headers,  # type:ignore
                 )
                 bolt_resp: BoltResponse = _bolt_app.dispatch(bolt_req)
                 self._send_bolt_response(bolt_resp)
@@ -4566,7 +4584,7 @@ along with a production-grade server when running the app for end users.
                 for k, vs in headers.items():
                     for v in vs:
                         self.send_header(k, v)
-                self.send_header(&#34;Content-Length&#34;, len(body_bytes))
+                self.send_header(&#34;Content-Length&#34;, str(len(body_bytes)))
                 self.end_headers()
                 self.wfile.write(body_bytes)
 
