@@ -865,6 +865,9 @@ class App:
                     # If an end-user posts a message with &#34;Also send to #channel&#34; checked,
                     # the message event comes with this subtype.
                     &#34;thread_broadcast&#34;,
+                    # If an end-user posts a message with attached files,
+                    # the message event comes with this subtype.
+                    &#34;file_share&#34;,
                 ),
             }
             primary_matcher = builtin_matchers.message_event(
@@ -2410,6 +2413,9 @@ be used.</dd>
                     # If an end-user posts a message with &#34;Also send to #channel&#34; checked,
                     # the message event comes with this subtype.
                     &#34;thread_broadcast&#34;,
+                    # If an end-user posts a message with attached files,
+                    # the message event comes with this subtype.
+                    &#34;file_share&#34;,
                 ),
             }
             primary_matcher = builtin_matchers.message_event(
@@ -3827,6 +3833,9 @@ Only when all the middleware call <code>next()</code> method, the listener funct
                 # If an end-user posts a message with &#34;Also send to #channel&#34; checked,
                 # the message event comes with this subtype.
                 &#34;thread_broadcast&#34;,
+                # If an end-user posts a message with attached files,
+                # the message event comes with this subtype.
+                &#34;file_share&#34;,
             ),
         }
         primary_matcher = builtin_matchers.message_event(
