@@ -894,6 +894,9 @@ class AsyncApp:
                     # If an end-user posts a message with "Also send to #channel" checked,
                     # the message event comes with this subtype.
                     "thread_broadcast",
+                    # If an end-user posts a message with attached files,
+                    # the message event comes with this subtype.
+                    "file_share",
                 ),
             }
             primary_matcher = builtin_matchers.message_event(
