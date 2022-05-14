@@ -1,1 +1,6 @@
-from .handler import SlackEventsHandler, SlackOAuthHandler  # noqa: F401
+from .handler import SlackEventsHandler, SlackOAuthHandler
+
+__all__ = [
+    "SlackEventsHandler",
+    "SlackOAuthHandler",
+]

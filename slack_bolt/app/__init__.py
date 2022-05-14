@@ -8,3 +8,7 @@ you can use `slack_bolt.app.async_app` for building async apps.\
 
 # Don't add async module imports here
 from .app import App  # type: ignore
+
+__all__ = [
+    "App",
+]

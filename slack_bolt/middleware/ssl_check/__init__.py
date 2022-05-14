@@ -1,1 +1,5 @@
-from .ssl_check import SslCheck  # noqa
+from .ssl_check import SslCheck
+
+__all__ = [
+    "SslCheck",
+]

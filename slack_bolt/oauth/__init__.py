@@ -4,4 +4,8 @@ Refer to https://slack.dev/bolt-python/concepts#authenticating-oauth for details
 """
 
 # Don't add async module imports here
-from .oauth_flow import OAuthFlow  # noqa
+from .oauth_flow import OAuthFlow
+
+__all__ = [
+    "OAuthFlow",
+]

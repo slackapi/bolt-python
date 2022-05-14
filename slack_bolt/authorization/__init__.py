@@ -3,4 +3,8 @@ while processing an incoming Slack event.
 
 Refer to https://slack.dev/bolt-python/concepts#authorization for details.
 """
-from .authorize_result import AuthorizeResult  # noqa
+from .authorize_result import AuthorizeResult
+
+__all__ = [
+    "AuthorizeResult",
+]

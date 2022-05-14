@@ -1,2 +1,6 @@
 # Don't add async module imports here
-from .resource import SlackAppResource  # noqa: F401
+from .resource import SlackAppResource
+
+__all__ = [
+    "SlackAppResource",
+]

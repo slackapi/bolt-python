@@ -1,1 +1,5 @@
-from .async_handler import AsyncSlackRequestHandler  # noqa: F401
+from .async_handler import AsyncSlackRequestHandler
+
+__all__ = [
+    "AsyncSlackRequestHandler",
+]

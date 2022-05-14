@@ -1,1 +1,5 @@
-from .ignoring_self_events import IgnoringSelfEvents  # noqa
+from .ignoring_self_events import IgnoringSelfEvents
+
+__all__ = [
+    "IgnoringSelfEvents",
+]

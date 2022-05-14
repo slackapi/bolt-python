@@ -11,3 +11,9 @@ builtin_listener_matcher_classes = [
 ]
 for cls in builtin_listener_matcher_classes:
     ListenerMatcher.register(cls)
+
+__all__ = [
+    "CustomListenerMatcher",
+    "ListenerMatcher",
+    "builtin_listener_matcher_classes",
+]
