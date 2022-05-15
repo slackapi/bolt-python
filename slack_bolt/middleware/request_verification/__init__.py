@@ -1,1 +1,5 @@
-from .request_verification import RequestVerification  # noqa
+from .request_verification import RequestVerification
+
+__all__ = [
+    "RequestVerification",
+]

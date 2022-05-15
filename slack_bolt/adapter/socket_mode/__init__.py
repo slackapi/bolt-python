@@ -7,4 +7,8 @@
 """  # noqa: E501
 
 # Don't add async module imports here
-from .builtin import SocketModeHandler  # noqa: F401
+from .builtin import SocketModeHandler
+
+__all__ = [
+    "SocketModeHandler",
+]

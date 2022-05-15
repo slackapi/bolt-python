@@ -1,1 +1,5 @@
-from ..starlette.async_handler import AsyncSlackRequestHandler  # noqa
+from ..starlette.async_handler import AsyncSlackRequestHandler
+
+__all__ = [
+    "AsyncSlackRequestHandler",
+]

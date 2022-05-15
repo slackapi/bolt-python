@@ -44,3 +44,9 @@ def _configure_from_base_logger(new_logger: Logger, base_logger: Logger):
 def _configure_from_root(new_logger: Logger):
     new_logger.disabled = logging.root.disabled
     new_logger.level = logging.root.level
+
+
+__all__ = [
+    "get_bolt_logger",
+    "get_bolt_app_logger",
+]

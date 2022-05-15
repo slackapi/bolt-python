@@ -1,7 +1,7 @@
 from typing import Callable, Optional, Awaitable
 
 from slack_bolt.listener.async_listener import AsyncListener
-from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
+from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner  # type: ignore
 from slack_bolt.middleware.async_middleware import AsyncMiddleware
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse

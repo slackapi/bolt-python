@@ -1,1 +1,5 @@
-from .handler import SlackRequestHandler  # noqa: F401
+from .handler import SlackRequestHandler
+
+__all__ = [
+    "SlackRequestHandler",
+]

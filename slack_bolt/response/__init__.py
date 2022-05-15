@@ -6,4 +6,8 @@ the response data becomes an HTTP response data.
 Refer to https://api.slack.com/apis/connections for the two types of connections.
 """
 
-from .response import BoltResponse  # noqa: F401
+from .response import BoltResponse
+
+__all__ = [
+    "BoltResponse",
+]
