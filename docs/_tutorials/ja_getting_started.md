@@ -145,7 +145,7 @@ Slack ワークスペースで発生するイベント（メッセージが投�
 
 イベントが発生すると、そのイベントをトリガーしたユーザーやイベントが発生したチャンネルなど、イベントに関する情報が Slack からアプリに送信されます。アプリではこれらの情報を処理して、適切な応答を返します。
 
-**Subscribe to Bot Events** まで下にスクロールします。4つのメッセージに関するイベントがあります。
+左側のサイドバーから **Event Subscriptions** にアクセスして、機能を有効にしてください。 **Subscribe to Bot Events** 配下で、ボットが受け取れる　イベントを追加することができます。4つのメッセージに関するイベントがあります。
 - [`message.channels`](https://api.slack.com/events/message.channels) アプリが参加しているパブリックチャンネルのメッセージをリッスン
 - [`message.groups`](https://api.slack.com/events/message.groups) アプリが参加しているプライベートチャンネルのメッセージをリッスン
 - [`message.im`](https://api.slack.com/events/message.im) あなたのアプリとユーザーのダイレクトメッセージをリッスン

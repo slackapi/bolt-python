@@ -143,7 +143,7 @@ Finally, it's time to tell Slack what events we'd like to listen for.
 
 When an event occurs, Slack will send your app some information about the event, like the user that triggered it and the channel it occurred in. Your app will process the details and can respond accordingly.
 
-Scroll down to **Subscribe to Bot Events**. There are four events related to messages:
+Navigate to **Event Subscriptions** on the left sidebar and toggle to enable. Under **Subscribe to Bot Events**, you can add events for your bot to respond to. There are four events related to messages:
 - [`message.channels`](https://api.slack.com/events/message.channels) listens for messages in public channels that your app is added to
 - [`message.groups`](https://api.slack.com/events/message.groups) listens for messages in 🔒 private channels that your app is added to
 - [`message.im`](https://api.slack.com/events/message.im) listens for messages in your app's DMs with users
