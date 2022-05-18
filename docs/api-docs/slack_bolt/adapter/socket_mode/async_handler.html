@@ -28,7 +28,11 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Default implementation is the aiohttp-based one.&#34;&#34;&#34;
-from .aiohttp import AsyncSocketModeHandler  # noqa</code></pre>
+from .aiohttp import AsyncSocketModeHandler
+
+__all__ = [
+    &#34;AsyncSocketModeHandler&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -38,6 +42,81 @@ from .aiohttp import AsyncSocketModeHandler  # noqa</code></pre>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="slack_bolt.adapter.socket_mode.async_handler.AsyncSocketModeHandler"><code class="flex name class">
+<span>class <span class="ident">AsyncSocketModeHandler</span></span>
+<span>(</span><span>app: <a title="slack_bolt.app.async_app.AsyncApp" href="../../app/async_app.html#slack_bolt.app.async_app.AsyncApp">AsyncApp</a>, app_token: Optional[str] = None, logger: Optional[logging.Logger] = None, web_client: Optional[slack_sdk.web.async_client.AsyncWebClient] = None, proxy: Optional[str] = None, ping_interval: float = 10)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AsyncSocketModeHandler(AsyncBaseSocketModeHandler):
+    app: AsyncApp  # type: ignore
+    app_token: str
+    client: SocketModeClient
+
+    def __init__(  # type: ignore
+        self,
+        app: AsyncApp,  # type: ignore
+        app_token: Optional[str] = None,
+        logger: Optional[Logger] = None,
+        web_client: Optional[AsyncWebClient] = None,
+        proxy: Optional[str] = None,
+        ping_interval: float = 10,
+    ):
+        self.app = app
+        self.app_token = app_token or os.environ[&#34;SLACK_APP_TOKEN&#34;]
+        self.client = SocketModeClient(
+            app_token=self.app_token,
+            logger=logger if logger is not None else app.logger,
+            web_client=web_client if web_client is not None else app.client,
+            proxy=proxy,
+            ping_interval=ping_interval,
+        )
+        self.client.socket_mode_request_listeners.append(self.handle)
+
+    async def handle(self, client: SocketModeClient, req: SocketModeRequest) -&gt; None:
+        start = time()
+        bolt_resp: BoltResponse = await run_async_bolt_app(self.app, req)
+        await send_async_response(client, req, bolt_resp, start)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.adapter.socket_mode.async_base_handler.AsyncBaseSocketModeHandler" href="async_base_handler.html#slack_bolt.adapter.socket_mode.async_base_handler.AsyncBaseSocketModeHandler">AsyncBaseSocketModeHandler</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.adapter.socket_mode.async_handler.AsyncSocketModeHandler.app"><code class="name">var <span class="ident">app</span> : <a title="slack_bolt.app.async_app.AsyncApp" href="../../app/async_app.html#slack_bolt.app.async_app.AsyncApp">AsyncApp</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.adapter.socket_mode.async_handler.AsyncSocketModeHandler.app_token"><code class="name">var <span class="ident">app_token</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.adapter.socket_mode.async_handler.AsyncSocketModeHandler.client"><code class="name">var <span class="ident">client</span> : slack_sdk.socket_mode.aiohttp.SocketModeClient</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="slack_bolt.adapter.socket_mode.async_base_handler.AsyncBaseSocketModeHandler" href="async_base_handler.html#slack_bolt.adapter.socket_mode.async_base_handler.AsyncBaseSocketModeHandler">AsyncBaseSocketModeHandler</a></b></code>:
+<ul class="hlist">
+<li><code><a title="slack_bolt.adapter.socket_mode.async_base_handler.AsyncBaseSocketModeHandler.close_async" href="async_base_handler.html#slack_bolt.adapter.socket_mode.async_base_handler.AsyncBaseSocketModeHandler.close_async">close_async</a></code></li>
+<li><code><a title="slack_bolt.adapter.socket_mode.async_base_handler.AsyncBaseSocketModeHandler.connect_async" href="async_base_handler.html#slack_bolt.adapter.socket_mode.async_base_handler.AsyncBaseSocketModeHandler.connect_async">connect_async</a></code></li>
+<li><code><a title="slack_bolt.adapter.socket_mode.async_base_handler.AsyncBaseSocketModeHandler.disconnect_async" href="async_base_handler.html#slack_bolt.adapter.socket_mode.async_base_handler.AsyncBaseSocketModeHandler.disconnect_async">disconnect_async</a></code></li>
+<li><code><a title="slack_bolt.adapter.socket_mode.async_base_handler.AsyncBaseSocketModeHandler.handle" href="async_base_handler.html#slack_bolt.adapter.socket_mode.async_base_handler.AsyncBaseSocketModeHandler.handle">handle</a></code></li>
+<li><code><a title="slack_bolt.adapter.socket_mode.async_base_handler.AsyncBaseSocketModeHandler.start_async" href="async_base_handler.html#slack_bolt.adapter.socket_mode.async_base_handler.AsyncBaseSocketModeHandler.start_async">start_async</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -49,6 +128,18 @@ from .aiohttp import AsyncSocketModeHandler  # noqa</code></pre>
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="slack_bolt.adapter.socket_mode" href="index.html">slack_bolt.adapter.socket_mode</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="slack_bolt.adapter.socket_mode.async_handler.AsyncSocketModeHandler" href="#slack_bolt.adapter.socket_mode.async_handler.AsyncSocketModeHandler">AsyncSocketModeHandler</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.adapter.socket_mode.async_handler.AsyncSocketModeHandler.app" href="#slack_bolt.adapter.socket_mode.async_handler.AsyncSocketModeHandler.app">app</a></code></li>
+<li><code><a title="slack_bolt.adapter.socket_mode.async_handler.AsyncSocketModeHandler.app_token" href="#slack_bolt.adapter.socket_mode.async_handler.AsyncSocketModeHandler.app_token">app_token</a></code></li>
+<li><code><a title="slack_bolt.adapter.socket_mode.async_handler.AsyncSocketModeHandler.client" href="#slack_bolt.adapter.socket_mode.async_handler.AsyncSocketModeHandler.client">client</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

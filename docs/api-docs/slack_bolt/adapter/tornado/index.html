@@ -26,7 +26,12 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from .handler import SlackEventsHandler, SlackOAuthHandler  # noqa: F401</code></pre>
+<pre><code class="python">from .handler import SlackEventsHandler, SlackOAuthHandler
+
+__all__ = [
+    &#34;SlackEventsHandler&#34;,
+    &#34;SlackOAuthHandler&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -43,6 +48,149 @@
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="slack_bolt.adapter.tornado.SlackEventsHandler"><code class="flex name class">
+<span>class <span class="ident">SlackEventsHandler</span></span>
+<span>(</span><span>application: Application, request: tornado.httputil.HTTPServerRequest, **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Base class for HTTP request handlers.</p>
+<p>Subclasses must define at least one of the methods defined in the
+"Entry points" section below.</p>
+<p>Applications should not construct <code>RequestHandler</code> objects
+directly and subclasses should not override <code>__init__</code> (override
+<code>~RequestHandler.initialize</code> instead).</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SlackEventsHandler(RequestHandler):
+    def initialize(self, app: App):  # type: ignore
+        self.app = app
+
+    def post(self):
+        bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(self.request))
+        set_response(self, bolt_resp)
+        return</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>tornado.web.RequestHandler</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="slack_bolt.adapter.tornado.SlackEventsHandler.initialize"><code class="name flex">
+<span>def <span class="ident">initialize</span></span>(<span>self, app: <a title="slack_bolt.app.app.App" href="../../app/app.html#slack_bolt.app.app.App">App</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def initialize(self, app: App):  # type: ignore
+    self.app = app</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.adapter.tornado.SlackEventsHandler.post"><code class="name flex">
+<span>def <span class="ident">post</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def post(self):
+    bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(self.request))
+    set_response(self, bolt_resp)
+    return</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="slack_bolt.adapter.tornado.SlackOAuthHandler"><code class="flex name class">
+<span>class <span class="ident">SlackOAuthHandler</span></span>
+<span>(</span><span>application: Application, request: tornado.httputil.HTTPServerRequest, **kwargs: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Base class for HTTP request handlers.</p>
+<p>Subclasses must define at least one of the methods defined in the
+"Entry points" section below.</p>
+<p>Applications should not construct <code>RequestHandler</code> objects
+directly and subclasses should not override <code>__init__</code> (override
+<code>~RequestHandler.initialize</code> instead).</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SlackOAuthHandler(RequestHandler):
+    def initialize(self, app: App):  # type: ignore
+        self.app = app
+
+    def get(self):
+        if self.app.oauth_flow is not None:  # type: ignore
+            oauth_flow: OAuthFlow = self.app.oauth_flow  # type: ignore
+            if self.request.path == oauth_flow.install_path:
+                bolt_resp = oauth_flow.handle_installation(
+                    to_bolt_request(self.request)
+                )
+                set_response(self, bolt_resp)
+                return
+            elif self.request.path == oauth_flow.redirect_uri_path:
+                bolt_resp = oauth_flow.handle_callback(to_bolt_request(self.request))
+                set_response(self, bolt_resp)
+                return
+        self.set_status(404)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>tornado.web.RequestHandler</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="slack_bolt.adapter.tornado.SlackOAuthHandler.get"><code class="name flex">
+<span>def <span class="ident">get</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get(self):
+    if self.app.oauth_flow is not None:  # type: ignore
+        oauth_flow: OAuthFlow = self.app.oauth_flow  # type: ignore
+        if self.request.path == oauth_flow.install_path:
+            bolt_resp = oauth_flow.handle_installation(
+                to_bolt_request(self.request)
+            )
+            set_response(self, bolt_resp)
+            return
+        elif self.request.path == oauth_flow.redirect_uri_path:
+            bolt_resp = oauth_flow.handle_callback(to_bolt_request(self.request))
+            set_response(self, bolt_resp)
+            return
+    self.set_status(404)</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.adapter.tornado.SlackOAuthHandler.initialize"><code class="name flex">
+<span>def <span class="ident">initialize</span></span>(<span>self, app: <a title="slack_bolt.app.app.App" href="../../app/app.html#slack_bolt.app.app.App">App</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def initialize(self, app: App):  # type: ignore
+    self.app = app</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -59,6 +207,24 @@
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
 <li><code><a title="slack_bolt.adapter.tornado.handler" href="handler.html">slack_bolt.adapter.tornado.handler</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="slack_bolt.adapter.tornado.SlackEventsHandler" href="#slack_bolt.adapter.tornado.SlackEventsHandler">SlackEventsHandler</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.adapter.tornado.SlackEventsHandler.initialize" href="#slack_bolt.adapter.tornado.SlackEventsHandler.initialize">initialize</a></code></li>
+<li><code><a title="slack_bolt.adapter.tornado.SlackEventsHandler.post" href="#slack_bolt.adapter.tornado.SlackEventsHandler.post">post</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="slack_bolt.adapter.tornado.SlackOAuthHandler" href="#slack_bolt.adapter.tornado.SlackOAuthHandler">SlackOAuthHandler</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.adapter.tornado.SlackOAuthHandler.get" href="#slack_bolt.adapter.tornado.SlackOAuthHandler.get">get</a></code></li>
+<li><code><a title="slack_bolt.adapter.tornado.SlackOAuthHandler.initialize" href="#slack_bolt.adapter.tornado.SlackOAuthHandler.initialize">initialize</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

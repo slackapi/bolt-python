@@ -27,7 +27,11 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python"># Don&#39;t add async module imports here
-from .say import Say  # noqa: F401</code></pre>
+from .say import Say
+
+__all__ = [
+    &#34;Say&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -52,6 +56,80 @@ from .say import Say  # noqa: F401</code></pre>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="slack_bolt.context.say.Say"><code class="flex name class">
+<span>class <span class="ident">Say</span></span>
+<span>(</span><span>client: Optional[slack_sdk.web.client.WebClient], channel: Optional[str])</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Say:
+    client: Optional[WebClient]
+    channel: Optional[str]
+
+    def __init__(
+        self,
+        client: Optional[WebClient],
+        channel: Optional[str],
+    ):
+        self.client = client
+        self.channel = channel
+
+    def __call__(
+        self,
+        text: Union[str, dict] = &#34;&#34;,
+        blocks: Optional[Sequence[Union[Dict, Block]]] = None,
+        attachments: Optional[Sequence[Union[Dict, Attachment]]] = None,
+        channel: Optional[str] = None,
+        thread_ts: Optional[str] = None,
+        unfurl_links: Optional[bool] = None,
+        unfurl_media: Optional[bool] = None,
+        **kwargs,
+    ) -&gt; SlackResponse:
+        if _can_say(self, channel):
+            text_or_whole_response: Union[str, dict] = text
+            if isinstance(text_or_whole_response, str):
+                text = text_or_whole_response
+                return self.client.chat_postMessage(
+                    channel=channel or self.channel,
+                    text=text,
+                    blocks=blocks,
+                    attachments=attachments,
+                    thread_ts=thread_ts,
+                    unfurl_links=unfurl_links,
+                    unfurl_media=unfurl_media,
+                    **kwargs,
+                )
+            elif isinstance(text_or_whole_response, dict):
+                message: dict = text_or_whole_response
+                if &#34;channel&#34; not in message:
+                    message[&#34;channel&#34;] = channel or self.channel
+                return self.client.chat_postMessage(**message)
+            else:
+                raise ValueError(
+                    f&#34;The arg is unexpected type ({type(text_or_whole_response)})&#34;
+                )
+        else:
+            raise ValueError(&#34;say without channel_id here is unsupported&#34;)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.context.say.Say.channel"><code class="name">var <span class="ident">channel</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.context.say.Say.client"><code class="name">var <span class="ident">client</span> : Optional[slack_sdk.web.client.WebClient]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -70,6 +148,17 @@ from .say import Say  # noqa: F401</code></pre>
 <li><code><a title="slack_bolt.context.say.async_say" href="async_say.html">slack_bolt.context.say.async_say</a></code></li>
 <li><code><a title="slack_bolt.context.say.internals" href="internals.html">slack_bolt.context.say.internals</a></code></li>
 <li><code><a title="slack_bolt.context.say.say" href="say.html">slack_bolt.context.say.say</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="slack_bolt.context.say.Say" href="#slack_bolt.context.say.Say">Say</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.context.say.Say.channel" href="#slack_bolt.context.say.Say.channel">channel</a></code></li>
+<li><code><a title="slack_bolt.context.say.Say.client" href="#slack_bolt.context.say.Say.client">client</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

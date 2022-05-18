@@ -26,7 +26,11 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from .request_verification import RequestVerification  # noqa</code></pre>
+<pre><code class="python">from .request_verification import RequestVerification
+
+__all__ = [
+    &#34;RequestVerification&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -47,6 +51,101 @@
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="slack_bolt.middleware.request_verification.RequestVerification"><code class="flex name class">
+<span>class <span class="ident">RequestVerification</span></span>
+<span>(</span><span>signing_secret: str, base_logger: Optional[logging.Logger] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
+<p>Verifies an incoming request by checking the validity of
+<code>x-slack-signature</code>, <code>x-slack-request-timestamp</code>, and its body data.</p>
+<p>Refer to <a href="https://api.slack.com/authentication/verifying-requests-from-slack">https://api.slack.com/authentication/verifying-requests-from-slack</a> for details.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>signing_secret</code></strong></dt>
+<dd>The signing secret</dd>
+<dt><strong><code>base_logger</code></strong></dt>
+<dd>The base logger</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RequestVerification(Middleware):  # type: ignore
+    def __init__(self, signing_secret: str, base_logger: Optional[Logger] = None):
+        &#34;&#34;&#34;Verifies an incoming request by checking the validity of
+        `x-slack-signature`, `x-slack-request-timestamp`, and its body data.
+
+        Refer to https://api.slack.com/authentication/verifying-requests-from-slack for details.
+
+        Args:
+            signing_secret: The signing secret
+            base_logger: The base logger
+        &#34;&#34;&#34;
+        self.verifier = SignatureVerifier(signing_secret=signing_secret)
+        self.logger = get_bolt_logger(RequestVerification, base_logger=base_logger)
+
+    def process(
+        self,
+        *,
+        req: BoltRequest,
+        resp: BoltResponse,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
+        next: Callable[[], BoltResponse],
+    ) -&gt; BoltResponse:
+        if self._can_skip(req.mode, req.body):
+            return next()
+
+        body = req.raw_body
+        timestamp = req.headers.get(&#34;x-slack-request-timestamp&#34;, [&#34;0&#34;])[0]
+        signature = req.headers.get(&#34;x-slack-signature&#34;, [&#34;&#34;])[0]
+        if self.verifier.is_valid(body, timestamp, signature):
+            return next()
+        else:
+            self._debug_log_error(signature, timestamp, body)
+            return self._build_error_response()
+
+    # -----------------------------------------
+
+    @staticmethod
+    def _can_skip(mode: str, body: Dict[str, Any]) -&gt; bool:
+        return mode == &#34;socket_mode&#34; or (
+            body is not None and body.get(&#34;ssl_check&#34;) == &#34;1&#34;
+        )
+
+    @staticmethod
+    def _build_error_response() -&gt; BoltResponse:
+        return BoltResponse(status=401, body={&#34;error&#34;: &#34;invalid request&#34;})
+
+    def _debug_log_error(self, signature, timestamp, body) -&gt; None:
+        self.logger.info(
+            &#34;Invalid request signature detected &#34;
+            f&#34;(signature: {signature}, timestamp: {timestamp}, body: {body})&#34;
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.middleware.middleware.Middleware" href="../middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.middleware.request_verification.async_request_verification.AsyncRequestVerification" href="async_request_verification.html#slack_bolt.middleware.request_verification.async_request_verification.AsyncRequestVerification">AsyncRequestVerification</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="slack_bolt.middleware.middleware.Middleware" href="../middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a></b></code>:
+<ul class="hlist">
+<li><code><a title="slack_bolt.middleware.middleware.Middleware.name" href="../middleware.html#slack_bolt.middleware.middleware.Middleware.name">name</a></code></li>
+<li><code><a title="slack_bolt.middleware.middleware.Middleware.process" href="../middleware.html#slack_bolt.middleware.middleware.Middleware.process">process</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -64,6 +163,13 @@
 <ul>
 <li><code><a title="slack_bolt.middleware.request_verification.async_request_verification" href="async_request_verification.html">slack_bolt.middleware.request_verification.async_request_verification</a></code></li>
 <li><code><a title="slack_bolt.middleware.request_verification.request_verification" href="request_verification.html">slack_bolt.middleware.request_verification.request_verification</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="slack_bolt.middleware.request_verification.RequestVerification" href="#slack_bolt.middleware.request_verification.RequestVerification">RequestVerification</a></code></h4>
+</li>
 </ul>
 </li>
 </ul>

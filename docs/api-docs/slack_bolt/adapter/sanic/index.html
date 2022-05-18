@@ -26,7 +26,11 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from .async_handler import AsyncSlackRequestHandler  # noqa: F401</code></pre>
+<pre><code class="python">from .async_handler import AsyncSlackRequestHandler
+
+__all__ = [
+    &#34;AsyncSlackRequestHandler&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -43,6 +47,85 @@
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="slack_bolt.adapter.sanic.AsyncSlackRequestHandler"><code class="flex name class">
+<span>class <span class="ident">AsyncSlackRequestHandler</span></span>
+<span>(</span><span>app: <a title="slack_bolt.app.async_app.AsyncApp" href="../../app/async_app.html#slack_bolt.app.async_app.AsyncApp">AsyncApp</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AsyncSlackRequestHandler:
+    def __init__(self, app: AsyncApp):  # type: ignore
+        self.app = app
+
+    async def handle(self, req: Request) -&gt; HTTPResponse:
+        if req.method == &#34;GET&#34;:
+            if self.app.oauth_flow is not None:
+                oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
+                if req.path == oauth_flow.install_path:
+                    bolt_resp = await oauth_flow.handle_installation(
+                        to_async_bolt_request(req)
+                    )
+                    return to_sanic_response(bolt_resp)
+                elif req.path == oauth_flow.redirect_uri_path:
+                    bolt_resp = await oauth_flow.handle_callback(
+                        to_async_bolt_request(req)
+                    )
+                    return to_sanic_response(bolt_resp)
+
+        elif req.method == &#34;POST&#34;:
+            bolt_resp = await self.app.async_dispatch(to_async_bolt_request(req))
+            return to_sanic_response(bolt_resp)
+
+        return HTTPResponse(
+            status=404,
+            body=&#34;Not found&#34;,
+        )</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="slack_bolt.adapter.sanic.AsyncSlackRequestHandler.handle"><code class="name flex">
+<span>async def <span class="ident">handle</span></span>(<span>self, req: sanic.request.Request) ‑> sanic.response.HTTPResponse</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def handle(self, req: Request) -&gt; HTTPResponse:
+    if req.method == &#34;GET&#34;:
+        if self.app.oauth_flow is not None:
+            oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
+            if req.path == oauth_flow.install_path:
+                bolt_resp = await oauth_flow.handle_installation(
+                    to_async_bolt_request(req)
+                )
+                return to_sanic_response(bolt_resp)
+            elif req.path == oauth_flow.redirect_uri_path:
+                bolt_resp = await oauth_flow.handle_callback(
+                    to_async_bolt_request(req)
+                )
+                return to_sanic_response(bolt_resp)
+
+    elif req.method == &#34;POST&#34;:
+        bolt_resp = await self.app.async_dispatch(to_async_bolt_request(req))
+        return to_sanic_response(bolt_resp)
+
+    return HTTPResponse(
+        status=404,
+        body=&#34;Not found&#34;,
+    )</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -59,6 +142,16 @@
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
 <li><code><a title="slack_bolt.adapter.sanic.async_handler" href="async_handler.html">slack_bolt.adapter.sanic.async_handler</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="slack_bolt.adapter.sanic.AsyncSlackRequestHandler" href="#slack_bolt.adapter.sanic.AsyncSlackRequestHandler">AsyncSlackRequestHandler</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.adapter.sanic.AsyncSlackRequestHandler.handle" href="#slack_bolt.adapter.sanic.AsyncSlackRequestHandler.handle">handle</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

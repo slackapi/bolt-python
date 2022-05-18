@@ -26,7 +26,11 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from .handler import SlackRequestHandler  # noqa: F401</code></pre>
+<pre><code class="python">from .handler import SlackRequestHandler
+
+__all__ = [
+    &#34;SlackRequestHandler&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -67,6 +71,160 @@
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="slack_bolt.adapter.aws_lambda.SlackRequestHandler"><code class="flex name class">
+<span>class <span class="ident">SlackRequestHandler</span></span>
+<span>(</span><span>app: <a title="slack_bolt.app.app.App" href="../../app/app.html#slack_bolt.app.app.App">App</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SlackRequestHandler:
+    def __init__(self, app: App):  # type: ignore
+        self.app = app
+        self.logger = get_bolt_app_logger(app.name, SlackRequestHandler, app.logger)
+        self.app.listener_runner.lazy_listener_runner = LambdaLazyListenerRunner(
+            self.logger
+        )
+        if self.app.oauth_flow is not None:
+            self.app.oauth_flow.settings.redirect_uri_page_renderer.install_path = &#34;?&#34;
+
+    @classmethod
+    def clear_all_log_handlers(cls):
+        # https://stackoverflow.com/questions/37703609/using-python-logging-with-aws-lambda
+        root = logging.getLogger()
+        if root.handlers:
+            for handler in root.handlers:
+                root.removeHandler(handler)
+
+    def handle(self, event, context):
+        self.logger.debug(f&#34;Incoming event: {event}, context: {context}&#34;)
+
+        method = event.get(&#34;requestContext&#34;, {}).get(&#34;http&#34;, {}).get(&#34;method&#34;)
+        if method is None:
+            method = event.get(&#34;requestContext&#34;, {}).get(&#34;httpMethod&#34;)
+
+        if method is None:
+            return not_found()
+        if method == &#34;GET&#34;:
+            if self.app.oauth_flow is not None:
+                oauth_flow: OAuthFlow = self.app.oauth_flow
+                bolt_req: BoltRequest = to_bolt_request(event)
+                query = bolt_req.query
+                is_callback = query is not None and (
+                    (
+                        _first_value(query, &#34;code&#34;) is not None
+                        and _first_value(query, &#34;state&#34;) is not None
+                    )
+                    or _first_value(query, &#34;error&#34;) is not None
+                )
+                if is_callback:
+                    bolt_resp = oauth_flow.handle_callback(bolt_req)
+                    return to_aws_response(bolt_resp)
+                else:
+                    bolt_resp = oauth_flow.handle_installation(bolt_req)
+                    return to_aws_response(bolt_resp)
+        elif method == &#34;POST&#34;:
+            bolt_req = to_bolt_request(event)
+            # https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
+            aws_lambda_function_name = context.function_name
+            bolt_req.context[&#34;aws_lambda_function_name&#34;] = aws_lambda_function_name
+            bolt_req.context[&#34;lambda_request&#34;] = event
+            bolt_resp = self.app.dispatch(bolt_req)
+            aws_response = to_aws_response(bolt_resp)
+            return aws_response
+        elif method == &#34;NONE&#34;:
+            bolt_req = to_bolt_request(event)
+            bolt_resp = self.app.dispatch(bolt_req)
+            aws_response = to_aws_response(bolt_resp)
+            return aws_response
+
+        return not_found()</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="slack_bolt.adapter.aws_lambda.SlackRequestHandler.clear_all_log_handlers"><code class="name flex">
+<span>def <span class="ident">clear_all_log_handlers</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def clear_all_log_handlers(cls):
+    # https://stackoverflow.com/questions/37703609/using-python-logging-with-aws-lambda
+    root = logging.getLogger()
+    if root.handlers:
+        for handler in root.handlers:
+            root.removeHandler(handler)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="slack_bolt.adapter.aws_lambda.SlackRequestHandler.handle"><code class="name flex">
+<span>def <span class="ident">handle</span></span>(<span>self, event, context)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def handle(self, event, context):
+    self.logger.debug(f&#34;Incoming event: {event}, context: {context}&#34;)
+
+    method = event.get(&#34;requestContext&#34;, {}).get(&#34;http&#34;, {}).get(&#34;method&#34;)
+    if method is None:
+        method = event.get(&#34;requestContext&#34;, {}).get(&#34;httpMethod&#34;)
+
+    if method is None:
+        return not_found()
+    if method == &#34;GET&#34;:
+        if self.app.oauth_flow is not None:
+            oauth_flow: OAuthFlow = self.app.oauth_flow
+            bolt_req: BoltRequest = to_bolt_request(event)
+            query = bolt_req.query
+            is_callback = query is not None and (
+                (
+                    _first_value(query, &#34;code&#34;) is not None
+                    and _first_value(query, &#34;state&#34;) is not None
+                )
+                or _first_value(query, &#34;error&#34;) is not None
+            )
+            if is_callback:
+                bolt_resp = oauth_flow.handle_callback(bolt_req)
+                return to_aws_response(bolt_resp)
+            else:
+                bolt_resp = oauth_flow.handle_installation(bolt_req)
+                return to_aws_response(bolt_resp)
+    elif method == &#34;POST&#34;:
+        bolt_req = to_bolt_request(event)
+        # https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
+        aws_lambda_function_name = context.function_name
+        bolt_req.context[&#34;aws_lambda_function_name&#34;] = aws_lambda_function_name
+        bolt_req.context[&#34;lambda_request&#34;] = event
+        bolt_resp = self.app.dispatch(bolt_req)
+        aws_response = to_aws_response(bolt_resp)
+        return aws_response
+    elif method == &#34;NONE&#34;:
+        bolt_req = to_bolt_request(event)
+        bolt_resp = self.app.dispatch(bolt_req)
+        aws_response = to_aws_response(bolt_resp)
+        return aws_response
+
+    return not_found()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -89,6 +247,17 @@
 <li><code><a title="slack_bolt.adapter.aws_lambda.lambda_s3_oauth_flow" href="lambda_s3_oauth_flow.html">slack_bolt.adapter.aws_lambda.lambda_s3_oauth_flow</a></code></li>
 <li><code><a title="slack_bolt.adapter.aws_lambda.lazy_listener_runner" href="lazy_listener_runner.html">slack_bolt.adapter.aws_lambda.lazy_listener_runner</a></code></li>
 <li><code><a title="slack_bolt.adapter.aws_lambda.local_lambda_client" href="local_lambda_client.html">slack_bolt.adapter.aws_lambda.local_lambda_client</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="slack_bolt.adapter.aws_lambda.SlackRequestHandler" href="#slack_bolt.adapter.aws_lambda.SlackRequestHandler">SlackRequestHandler</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.adapter.aws_lambda.SlackRequestHandler.clear_all_log_handlers" href="#slack_bolt.adapter.aws_lambda.SlackRequestHandler.clear_all_log_handlers">clear_all_log_handlers</a></code></li>
+<li><code><a title="slack_bolt.adapter.aws_lambda.SlackRequestHandler.handle" href="#slack_bolt.adapter.aws_lambda.SlackRequestHandler.handle">handle</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

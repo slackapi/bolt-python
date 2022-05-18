@@ -35,7 +35,11 @@ Refer to https://api.slack.com/apis/connections for the two types of connections
 This interface encapsulates the difference between the two.
 &#34;&#34;&#34;
 # Don&#39;t add async module imports here
-from .request import BoltRequest  # noqa: F401</code></pre>
+from .request import BoltRequest
+
+__all__ = [
+    &#34;BoltRequest&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -68,6 +72,166 @@ from .request import BoltRequest  # noqa: F401</code></pre>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="slack_bolt.request.BoltRequest"><code class="flex name class">
+<span>class <span class="ident">BoltRequest</span></span>
+<span>(</span><span>*, body: Union[str, dict], query: Union[str, Dict[str, str], Dict[str, Sequence[str]], ForwardRef(None)] = None, headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None, context: Optional[Dict[str, str]] = None, mode: str = 'http')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Request to a Bolt app.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>body</code></strong></dt>
+<dd>The raw request body (only plain text is supported for "http" mode)</dd>
+<dt><strong><code>query</code></strong></dt>
+<dd>The query string data in any data format.</dd>
+<dt><strong><code>headers</code></strong></dt>
+<dd>The request headers.</dd>
+<dt><strong><code>context</code></strong></dt>
+<dd>The context in this request.</dd>
+<dt><strong><code>mode</code></strong></dt>
+<dd>The mode used for this request. (either "http" or "socket_mode")</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BoltRequest:
+    raw_body: str
+    query: Dict[str, Sequence[str]]
+    headers: Dict[str, Sequence[str]]
+    content_type: Optional[str]
+    body: Dict[str, Any]
+    context: BoltContext
+    lazy_only: bool
+    lazy_function_name: Optional[str]
+    mode: str  # either &#34;http&#34; or &#34;socket_mode&#34;
+
+    def __init__(
+        self,
+        *,
+        body: Union[str, dict],
+        query: Optional[Union[str, Dict[str, str], Dict[str, Sequence[str]]]] = None,
+        headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None,
+        context: Optional[Dict[str, str]] = None,
+        mode: str = &#34;http&#34;,  # either &#34;http&#34; or &#34;socket_mode&#34;
+    ):
+        &#34;&#34;&#34;Request to a Bolt app.
+
+        Args:
+            body: The raw request body (only plain text is supported for &#34;http&#34; mode)
+            query: The query string data in any data format.
+            headers: The request headers.
+            context: The context in this request.
+            mode: The mode used for this request. (either &#34;http&#34; or &#34;socket_mode&#34;)
+        &#34;&#34;&#34;
+        if mode == &#34;http&#34;:
+            # HTTP Mode
+            if body is not None and not isinstance(body, str):
+                raise BoltError(error_message_raw_body_required_in_http_mode())
+            self.raw_body = body if body is not None else &#34;&#34;
+        else:
+            # Socket Mode
+            if body is not None and isinstance(body, str):
+                self.raw_body = body
+            else:
+                # We don&#39;t convert the dict value to str
+                # as doing so does not guarantee to keep the original structure/format.
+                self.raw_body = &#34;&#34;
+
+        self.query = parse_query(query)
+        self.headers = build_normalized_headers(headers)
+        self.content_type = extract_content_type(self.headers)
+
+        if isinstance(body, str):
+            self.body = parse_body(self.raw_body, self.content_type)
+        elif isinstance(body, dict):
+            self.body = body
+        else:
+            self.body = {}
+
+        self.context = build_context(BoltContext(context if context else {}), self.body)
+        self.lazy_only = bool(self.headers.get(&#34;x-slack-bolt-lazy-only&#34;, [False])[0])
+        self.lazy_function_name = self.headers.get(
+            &#34;x-slack-bolt-lazy-function-name&#34;, [None]
+        )[0]
+        self.mode = mode
+
+    def to_copyable(self) -&gt; &#34;BoltRequest&#34;:
+        body: Union[str, dict] = self.raw_body if self.mode == &#34;http&#34; else self.body
+        return BoltRequest(
+            body=body,
+            query=self.query,
+            headers=self.headers,
+            context=self.context.to_copyable(),
+            mode=self.mode,
+        )</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.request.BoltRequest.body"><code class="name">var <span class="ident">body</span> : Dict[str, Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.request.BoltRequest.content_type"><code class="name">var <span class="ident">content_type</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.request.BoltRequest.context"><code class="name">var <span class="ident">context</span> : <a title="slack_bolt.context.context.BoltContext" href="../context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.request.BoltRequest.headers"><code class="name">var <span class="ident">headers</span> : Dict[str, Sequence[str]]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.request.BoltRequest.lazy_function_name"><code class="name">var <span class="ident">lazy_function_name</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.request.BoltRequest.lazy_only"><code class="name">var <span class="ident">lazy_only</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.request.BoltRequest.mode"><code class="name">var <span class="ident">mode</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.request.BoltRequest.query"><code class="name">var <span class="ident">query</span> : Dict[str, Sequence[str]]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.request.BoltRequest.raw_body"><code class="name">var <span class="ident">raw_body</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="slack_bolt.request.BoltRequest.to_copyable"><code class="name flex">
+<span>def <span class="ident">to_copyable</span></span>(<span>self) ‑> <a title="slack_bolt.request.request.BoltRequest" href="request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_copyable(self) -&gt; &#34;BoltRequest&#34;:
+    body: Union[str, dict] = self.raw_body if self.mode == &#34;http&#34; else self.body
+    return BoltRequest(
+        body=body,
+        query=self.query,
+        headers=self.headers,
+        context=self.context.to_copyable(),
+        mode=self.mode,
+    )</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -88,6 +252,25 @@ from .request import BoltRequest  # noqa: F401</code></pre>
 <li><code><a title="slack_bolt.request.internals" href="internals.html">slack_bolt.request.internals</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils" href="payload_utils.html">slack_bolt.request.payload_utils</a></code></li>
 <li><code><a title="slack_bolt.request.request" href="request.html">slack_bolt.request.request</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="slack_bolt.request.BoltRequest" href="#slack_bolt.request.BoltRequest">BoltRequest</a></code></h4>
+<ul class="two-column">
+<li><code><a title="slack_bolt.request.BoltRequest.body" href="#slack_bolt.request.BoltRequest.body">body</a></code></li>
+<li><code><a title="slack_bolt.request.BoltRequest.content_type" href="#slack_bolt.request.BoltRequest.content_type">content_type</a></code></li>
+<li><code><a title="slack_bolt.request.BoltRequest.context" href="#slack_bolt.request.BoltRequest.context">context</a></code></li>
+<li><code><a title="slack_bolt.request.BoltRequest.headers" href="#slack_bolt.request.BoltRequest.headers">headers</a></code></li>
+<li><code><a title="slack_bolt.request.BoltRequest.lazy_function_name" href="#slack_bolt.request.BoltRequest.lazy_function_name">lazy_function_name</a></code></li>
+<li><code><a title="slack_bolt.request.BoltRequest.lazy_only" href="#slack_bolt.request.BoltRequest.lazy_only">lazy_only</a></code></li>
+<li><code><a title="slack_bolt.request.BoltRequest.mode" href="#slack_bolt.request.BoltRequest.mode">mode</a></code></li>
+<li><code><a title="slack_bolt.request.BoltRequest.query" href="#slack_bolt.request.BoltRequest.query">query</a></code></li>
+<li><code><a title="slack_bolt.request.BoltRequest.raw_body" href="#slack_bolt.request.BoltRequest.raw_body">raw_body</a></code></li>
+<li><code><a title="slack_bolt.request.BoltRequest.to_copyable" href="#slack_bolt.request.BoltRequest.to_copyable">to_copyable</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

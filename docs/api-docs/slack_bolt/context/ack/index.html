@@ -27,7 +27,11 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python"># Don&#39;t add async module imports here
-from .ack import Ack  # noqa: F401</code></pre>
+from .ack import Ack
+
+__all__ = [
+    &#34;Ack&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -52,6 +56,63 @@ from .ack import Ack  # noqa: F401</code></pre>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="slack_bolt.context.ack.Ack"><code class="flex name class">
+<span>class <span class="ident">Ack</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Ack:
+    response: Optional[BoltResponse]
+
+    def __init__(self):
+        self.response: Optional[BoltResponse] = None
+
+    def __call__(
+        self,
+        text: Union[str, dict] = &#34;&#34;,  # text: str or whole_response: dict
+        blocks: Optional[Sequence[Union[dict, Block]]] = None,
+        attachments: Optional[Sequence[Union[dict, Attachment]]] = None,
+        unfurl_links: Optional[bool] = None,
+        unfurl_media: Optional[bool] = None,
+        response_type: Optional[str] = None,  # in_channel / ephemeral
+        # block_suggestion / dialog_suggestion
+        options: Optional[Sequence[Union[dict, Option]]] = None,
+        option_groups: Optional[Sequence[Union[dict, OptionGroup]]] = None,
+        # view_submission
+        response_action: Optional[str] = None,  # errors / update / push / clear
+        errors: Optional[Dict[str, str]] = None,
+        view: Optional[Union[dict, View]] = None,
+    ) -&gt; BoltResponse:
+        return _set_response(
+            self,
+            text_or_whole_response=text,
+            blocks=blocks,
+            attachments=attachments,
+            unfurl_links=unfurl_links,
+            unfurl_media=unfurl_media,
+            response_type=response_type,
+            options=options,
+            option_groups=option_groups,
+            response_action=response_action,
+            errors=errors,
+            view=view,
+        )</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.context.ack.Ack.response"><code class="name">var <span class="ident">response</span> : Optional[<a title="slack_bolt.response.response.BoltResponse" href="../../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -70,6 +131,16 @@ from .ack import Ack  # noqa: F401</code></pre>
 <li><code><a title="slack_bolt.context.ack.ack" href="ack.html">slack_bolt.context.ack.ack</a></code></li>
 <li><code><a title="slack_bolt.context.ack.async_ack" href="async_ack.html">slack_bolt.context.ack.async_ack</a></code></li>
 <li><code><a title="slack_bolt.context.ack.internals" href="internals.html">slack_bolt.context.ack.internals</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="slack_bolt.context.ack.Ack" href="#slack_bolt.context.ack.Ack">Ack</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.context.ack.Ack.response" href="#slack_bolt.context.ack.Ack.response">response</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

@@ -26,7 +26,11 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from .handler import SlackRequestHandler  # noqa: F401</code></pre>
+<pre><code class="python">from .handler import SlackRequestHandler
+
+__all__ = [
+    &#34;SlackRequestHandler&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -43,6 +47,77 @@
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="slack_bolt.adapter.bottle.SlackRequestHandler"><code class="flex name class">
+<span>class <span class="ident">SlackRequestHandler</span></span>
+<span>(</span><span>app: <a title="slack_bolt.app.app.App" href="../../app/app.html#slack_bolt.app.app.App">App</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SlackRequestHandler:
+    def __init__(self, app: App):  # type: ignore
+        self.app = app
+
+    def handle(self, req: Request, resp: Response) -&gt; str:
+        if req.method == &#34;GET&#34;:
+            if self.app.oauth_flow is not None:
+                oauth_flow: OAuthFlow = self.app.oauth_flow
+                if req.path == oauth_flow.install_path:
+                    bolt_resp = oauth_flow.handle_installation(to_bolt_request(req))
+                    set_response(bolt_resp, resp)
+                    return bolt_resp.body or &#34;&#34;
+                elif req.path == oauth_flow.redirect_uri_path:
+                    bolt_resp = oauth_flow.handle_callback(to_bolt_request(req))
+                    set_response(bolt_resp, resp)
+                    return bolt_resp.body or &#34;&#34;
+        elif req.method == &#34;POST&#34;:
+            bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(req))
+            set_response(bolt_resp, resp)
+            return bolt_resp.body or &#34;&#34;
+
+        resp.status = 404
+        return &#34;Not Found&#34;</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="slack_bolt.adapter.bottle.SlackRequestHandler.handle"><code class="name flex">
+<span>def <span class="ident">handle</span></span>(<span>self, req: bottle.BaseRequest, resp: bottle.BaseResponse) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def handle(self, req: Request, resp: Response) -&gt; str:
+    if req.method == &#34;GET&#34;:
+        if self.app.oauth_flow is not None:
+            oauth_flow: OAuthFlow = self.app.oauth_flow
+            if req.path == oauth_flow.install_path:
+                bolt_resp = oauth_flow.handle_installation(to_bolt_request(req))
+                set_response(bolt_resp, resp)
+                return bolt_resp.body or &#34;&#34;
+            elif req.path == oauth_flow.redirect_uri_path:
+                bolt_resp = oauth_flow.handle_callback(to_bolt_request(req))
+                set_response(bolt_resp, resp)
+                return bolt_resp.body or &#34;&#34;
+    elif req.method == &#34;POST&#34;:
+        bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(req))
+        set_response(bolt_resp, resp)
+        return bolt_resp.body or &#34;&#34;
+
+    resp.status = 404
+    return &#34;Not Found&#34;</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -59,6 +134,16 @@
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
 <li><code><a title="slack_bolt.adapter.bottle.handler" href="handler.html">slack_bolt.adapter.bottle.handler</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="slack_bolt.adapter.bottle.SlackRequestHandler" href="#slack_bolt.adapter.bottle.SlackRequestHandler">SlackRequestHandler</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.adapter.bottle.SlackRequestHandler.handle" href="#slack_bolt.adapter.bottle.SlackRequestHandler.handle">handle</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

@@ -26,7 +26,11 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from .url_verification import UrlVerification  # noqa</code></pre>
+<pre><code class="python">from .url_verification import UrlVerification
+
+__all__ = [
+    &#34;UrlVerification&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -47,6 +51,80 @@
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="slack_bolt.middleware.url_verification.UrlVerification"><code class="flex name class">
+<span>class <span class="ident">UrlVerification</span></span>
+<span>(</span><span>base_logger: Optional[logging.Logger] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
+<p>Handles url_verification requests.</p>
+<p>Refer to <a href="https://api.slack.com/events/url_verification">https://api.slack.com/events/url_verification</a> for details.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>base_logger</code></strong></dt>
+<dd>The base logger</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class UrlVerification(Middleware):  # type: ignore
+    def __init__(self, base_logger: Optional[Logger] = None):
+        &#34;&#34;&#34;Handles url_verification requests.
+
+        Refer to https://api.slack.com/events/url_verification for details.
+
+        Args:
+            base_logger: The base logger
+        &#34;&#34;&#34;
+        self.logger = get_bolt_logger(UrlVerification, base_logger=base_logger)
+
+    def process(
+        self,
+        *,
+        req: BoltRequest,
+        resp: BoltResponse,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
+        next: Callable[[], BoltResponse],
+    ) -&gt; BoltResponse:
+        if self._is_url_verification_request(req.body):
+            return self._build_success_response(req.body)
+        else:
+            return next()
+
+    # -----------------------------------------
+
+    @staticmethod
+    def _is_url_verification_request(body: dict) -&gt; bool:
+        return body is not None and body.get(&#34;type&#34;) == &#34;url_verification&#34;
+
+    @staticmethod
+    def _build_success_response(body: dict) -&gt; BoltResponse:
+        return BoltResponse(status=200, body={&#34;challenge&#34;: body.get(&#34;challenge&#34;)})</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.middleware.middleware.Middleware" href="../middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.middleware.url_verification.async_url_verification.AsyncUrlVerification" href="async_url_verification.html#slack_bolt.middleware.url_verification.async_url_verification.AsyncUrlVerification">AsyncUrlVerification</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="slack_bolt.middleware.middleware.Middleware" href="../middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a></b></code>:
+<ul class="hlist">
+<li><code><a title="slack_bolt.middleware.middleware.Middleware.name" href="../middleware.html#slack_bolt.middleware.middleware.Middleware.name">name</a></code></li>
+<li><code><a title="slack_bolt.middleware.middleware.Middleware.process" href="../middleware.html#slack_bolt.middleware.middleware.Middleware.process">process</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -64,6 +142,13 @@
 <ul>
 <li><code><a title="slack_bolt.middleware.url_verification.async_url_verification" href="async_url_verification.html">slack_bolt.middleware.url_verification.async_url_verification</a></code></li>
 <li><code><a title="slack_bolt.middleware.url_verification.url_verification" href="url_verification.html">slack_bolt.middleware.url_verification.url_verification</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="slack_bolt.middleware.url_verification.UrlVerification" href="#slack_bolt.middleware.url_verification.UrlVerification">UrlVerification</a></code></h4>
+</li>
 </ul>
 </li>
 </ul>

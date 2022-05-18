@@ -27,7 +27,11 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python"># Don&#39;t add async module imports here
-from .resource import SlackAppResource  # noqa: F401</code></pre>
+from .resource import SlackAppResource
+
+__all__ = [
+    &#34;SlackAppResource&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -48,6 +52,135 @@ from .resource import SlackAppResource  # noqa: F401</code></pre>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="slack_bolt.adapter.falcon.SlackAppResource"><code class="flex name class">
+<span>class <span class="ident">SlackAppResource</span></span>
+<span>(</span><span>app: <a title="slack_bolt.app.app.App" href="../../app/app.html#slack_bolt.app.app.App">App</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>from slack_bolt import App
+app = App()</p>
+<p>import falcon
+api = application = falcon.API()
+api.add_route("/slack/events", SlackAppResource(app))</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SlackAppResource:
+    &#34;&#34;&#34;
+    from slack_bolt import App
+    app = App()
+
+    import falcon
+    api = application = falcon.API()
+    api.add_route(&#34;/slack/events&#34;, SlackAppResource(app))
+    &#34;&#34;&#34;
+
+    def __init__(self, app: App):  # type: ignore
+        self.app = app
+
+    def on_get(self, req: Request, resp: Response):
+        if self.app.oauth_flow is not None:
+            oauth_flow: OAuthFlow = self.app.oauth_flow
+            if req.path == oauth_flow.install_path:
+                bolt_resp = oauth_flow.handle_installation(self._to_bolt_request(req))
+                self._write_response(bolt_resp, resp)
+                return
+            elif req.path == oauth_flow.redirect_uri_path:
+                bolt_resp = oauth_flow.handle_callback(self._to_bolt_request(req))
+                self._write_response(bolt_resp, resp)
+                return
+
+        resp.status = &#34;404&#34;
+        resp.body = &#34;The page is not found...&#34;
+
+    def on_post(self, req: Request, resp: Response):
+        bolt_req = self._to_bolt_request(req)
+        bolt_resp = self.app.dispatch(bolt_req)
+        self._write_response(bolt_resp, resp)
+
+    def _to_bolt_request(self, req: Request) -&gt; BoltRequest:
+        return BoltRequest(
+            body=req.stream.read(req.content_length or 0).decode(&#34;utf-8&#34;),
+            query=req.query_string,
+            headers={k.lower(): v for k, v in req.headers.items()},
+        )
+
+    def _write_response(self, bolt_resp: BoltResponse, resp: Response):
+        if falcon_version.__version__.startswith(&#34;2.&#34;):
+            resp.body = bolt_resp.body
+        else:
+            resp.text = bolt_resp.body
+
+        status = HTTPStatus(bolt_resp.status)
+        resp.status = str(f&#34;{status.value} {status.phrase}&#34;)
+        resp.set_headers(bolt_resp.first_headers_without_set_cookie())
+        for cookie in bolt_resp.cookies():
+            for name, c in cookie.items():
+                expire_value = c.get(&#34;expires&#34;)
+                expire = (
+                    datetime.strptime(expire_value, &#34;%a, %d %b %Y %H:%M:%S %Z&#34;)
+                    if expire_value
+                    else None
+                )
+                resp.set_cookie(
+                    name=name,
+                    value=c.value,
+                    expires=expire,
+                    max_age=c.get(&#34;max-age&#34;),
+                    domain=c.get(&#34;domain&#34;),
+                    path=c.get(&#34;path&#34;),
+                    secure=True,
+                    http_only=True,
+                )</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="slack_bolt.adapter.falcon.SlackAppResource.on_get"><code class="name flex">
+<span>def <span class="ident">on_get</span></span>(<span>self, req: falcon.request.Request, resp: falcon.response.Response)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def on_get(self, req: Request, resp: Response):
+    if self.app.oauth_flow is not None:
+        oauth_flow: OAuthFlow = self.app.oauth_flow
+        if req.path == oauth_flow.install_path:
+            bolt_resp = oauth_flow.handle_installation(self._to_bolt_request(req))
+            self._write_response(bolt_resp, resp)
+            return
+        elif req.path == oauth_flow.redirect_uri_path:
+            bolt_resp = oauth_flow.handle_callback(self._to_bolt_request(req))
+            self._write_response(bolt_resp, resp)
+            return
+
+    resp.status = &#34;404&#34;
+    resp.body = &#34;The page is not found...&#34;</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.adapter.falcon.SlackAppResource.on_post"><code class="name flex">
+<span>def <span class="ident">on_post</span></span>(<span>self, req: falcon.request.Request, resp: falcon.response.Response)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def on_post(self, req: Request, resp: Response):
+    bolt_req = self._to_bolt_request(req)
+    bolt_resp = self.app.dispatch(bolt_req)
+    self._write_response(bolt_resp, resp)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -65,6 +198,17 @@ from .resource import SlackAppResource  # noqa: F401</code></pre>
 <ul>
 <li><code><a title="slack_bolt.adapter.falcon.async_resource" href="async_resource.html">slack_bolt.adapter.falcon.async_resource</a></code></li>
 <li><code><a title="slack_bolt.adapter.falcon.resource" href="resource.html">slack_bolt.adapter.falcon.resource</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="slack_bolt.adapter.falcon.SlackAppResource" href="#slack_bolt.adapter.falcon.SlackAppResource">SlackAppResource</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.adapter.falcon.SlackAppResource.on_get" href="#slack_bolt.adapter.falcon.SlackAppResource.on_get">on_get</a></code></li>
+<li><code><a title="slack_bolt.adapter.falcon.SlackAppResource.on_post" href="#slack_bolt.adapter.falcon.SlackAppResource.on_post">on_post</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

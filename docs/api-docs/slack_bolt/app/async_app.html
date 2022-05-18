@@ -42,7 +42,7 @@ from slack_bolt.listener.async_listener_start_handler import (
 from slack_bolt.listener.async_listener_completion_handler import (
     AsyncDefaultListenerCompletionHandler,
 )
-from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
+from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner  # type: ignore
 from slack_bolt.middleware.async_middleware_error_handler import (
     AsyncCustomMiddlewareErrorHandler,
     AsyncDefaultMiddlewareErrorHandler,

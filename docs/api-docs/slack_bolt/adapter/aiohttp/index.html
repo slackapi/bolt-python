@@ -66,7 +66,13 @@ async def to_aiohttp_response(bolt_resp: BoltResponse) -&gt; web.Response:
                 secure=True,
                 httponly=True,
             )
-    return resp</code></pre>
+    return resp
+
+
+__all__ = [
+    &#34;to_bolt_request&#34;,
+    &#34;to_aiohttp_response&#34;,
+]</code></pre>
 </details>
 </section>
 <section>

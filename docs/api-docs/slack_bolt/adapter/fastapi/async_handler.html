@@ -26,7 +26,11 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from ..starlette.async_handler import AsyncSlackRequestHandler  # noqa</code></pre>
+<pre><code class="python">from ..starlette.async_handler import AsyncSlackRequestHandler
+
+__all__ = [
+    &#34;AsyncSlackRequestHandler&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -36,6 +40,93 @@
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="slack_bolt.adapter.fastapi.async_handler.AsyncSlackRequestHandler"><code class="flex name class">
+<span>class <span class="ident">AsyncSlackRequestHandler</span></span>
+<span>(</span><span>app: <a title="slack_bolt.app.async_app.AsyncApp" href="../../app/async_app.html#slack_bolt.app.async_app.AsyncApp">AsyncApp</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AsyncSlackRequestHandler:
+    def __init__(self, app: AsyncApp):  # type: ignore
+        self.app = app
+
+    async def handle(
+        self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None
+    ) -&gt; Response:
+        body = await req.body()
+        if req.method == &#34;GET&#34;:
+            if self.app.oauth_flow is not None:
+                oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
+                if req.url.path == oauth_flow.install_path:
+                    bolt_resp = await oauth_flow.handle_installation(
+                        to_async_bolt_request(req, body, addition_context_properties)
+                    )
+                    return to_starlette_response(bolt_resp)
+                elif req.url.path == oauth_flow.redirect_uri_path:
+                    bolt_resp = await oauth_flow.handle_callback(
+                        to_async_bolt_request(req, body, addition_context_properties)
+                    )
+                    return to_starlette_response(bolt_resp)
+        elif req.method == &#34;POST&#34;:
+            bolt_resp = await self.app.async_dispatch(
+                to_async_bolt_request(req, body, addition_context_properties)
+            )
+            return to_starlette_response(bolt_resp)
+
+        return Response(
+            status_code=404,
+            content=&#34;Not found&#34;,
+        )</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="slack_bolt.adapter.fastapi.async_handler.AsyncSlackRequestHandler.handle"><code class="name flex">
+<span>async def <span class="ident">handle</span></span>(<span>self, req: starlette.requests.Request, addition_context_properties: Optional[Dict[str, Any]] = None) ‑> starlette.responses.Response</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def handle(
+    self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None
+) -&gt; Response:
+    body = await req.body()
+    if req.method == &#34;GET&#34;:
+        if self.app.oauth_flow is not None:
+            oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
+            if req.url.path == oauth_flow.install_path:
+                bolt_resp = await oauth_flow.handle_installation(
+                    to_async_bolt_request(req, body, addition_context_properties)
+                )
+                return to_starlette_response(bolt_resp)
+            elif req.url.path == oauth_flow.redirect_uri_path:
+                bolt_resp = await oauth_flow.handle_callback(
+                    to_async_bolt_request(req, body, addition_context_properties)
+                )
+                return to_starlette_response(bolt_resp)
+    elif req.method == &#34;POST&#34;:
+        bolt_resp = await self.app.async_dispatch(
+            to_async_bolt_request(req, body, addition_context_properties)
+        )
+        return to_starlette_response(bolt_resp)
+
+    return Response(
+        status_code=404,
+        content=&#34;Not found&#34;,
+    )</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -47,6 +138,16 @@
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="slack_bolt.adapter.fastapi" href="index.html">slack_bolt.adapter.fastapi</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="slack_bolt.adapter.fastapi.async_handler.AsyncSlackRequestHandler" href="#slack_bolt.adapter.fastapi.async_handler.AsyncSlackRequestHandler">AsyncSlackRequestHandler</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.adapter.fastapi.async_handler.AsyncSlackRequestHandler.handle" href="#slack_bolt.adapter.fastapi.async_handler.AsyncSlackRequestHandler.handle">handle</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

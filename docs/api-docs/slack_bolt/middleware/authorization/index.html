@@ -27,9 +27,15 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python"># Don&#39;t add async module imports here
-from .authorization import Authorization  # noqa: F401
-from .multi_teams_authorization import MultiTeamsAuthorization  # noqa: F401
-from .single_team_authorization import SingleTeamAuthorization  # noqa: F401</code></pre>
+from .authorization import Authorization
+from .multi_teams_authorization import MultiTeamsAuthorization
+from .single_team_authorization import SingleTeamAuthorization
+
+__all__ = [
+    &#34;Authorization&#34;,
+    &#34;MultiTeamsAuthorization&#34;,
+    &#34;SingleTeamAuthorization&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -74,6 +80,240 @@ from .single_team_authorization import SingleTeamAuthorization  # noqa: F401</co
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="slack_bolt.middleware.authorization.Authorization"><code class="flex name class">
+<span>class <span class="ident">Authorization</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Authorization(Middleware):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.middleware.middleware.Middleware" href="../middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.middleware.authorization.multi_teams_authorization.MultiTeamsAuthorization" href="multi_teams_authorization.html#slack_bolt.middleware.authorization.multi_teams_authorization.MultiTeamsAuthorization">MultiTeamsAuthorization</a></li>
+<li><a title="slack_bolt.middleware.authorization.single_team_authorization.SingleTeamAuthorization" href="single_team_authorization.html#slack_bolt.middleware.authorization.single_team_authorization.SingleTeamAuthorization">SingleTeamAuthorization</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="slack_bolt.middleware.middleware.Middleware" href="../middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a></b></code>:
+<ul class="hlist">
+<li><code><a title="slack_bolt.middleware.middleware.Middleware.name" href="../middleware.html#slack_bolt.middleware.middleware.Middleware.name">name</a></code></li>
+<li><code><a title="slack_bolt.middleware.middleware.Middleware.process" href="../middleware.html#slack_bolt.middleware.middleware.Middleware.process">process</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="slack_bolt.middleware.authorization.MultiTeamsAuthorization"><code class="flex name class">
+<span>class <span class="ident">MultiTeamsAuthorization</span></span>
+<span>(</span><span>*, authorize: <a title="slack_bolt.authorization.authorize.Authorize" href="../../authorization/authorize.html#slack_bolt.authorization.authorize.Authorize">Authorize</a>, base_logger: Optional[logging.Logger] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
+<p>Multi-workspace authorization.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>authorize</code></strong></dt>
+<dd>The function to authorize incoming requests from Slack.</dd>
+<dt><strong><code>base_logger</code></strong></dt>
+<dd>The base logger</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MultiTeamsAuthorization(Authorization):
+    authorize: Authorize
+
+    def __init__(
+        self,
+        *,
+        authorize: Authorize,
+        base_logger: Optional[Logger] = None,
+    ):
+        &#34;&#34;&#34;Multi-workspace authorization.
+
+        Args:
+            authorize: The function to authorize incoming requests from Slack.
+            base_logger: The base logger
+        &#34;&#34;&#34;
+        self.authorize = authorize
+        self.logger = get_bolt_logger(MultiTeamsAuthorization, base_logger=base_logger)
+
+    def process(
+        self,
+        *,
+        req: BoltRequest,
+        resp: BoltResponse,
+        next: Callable[[], BoltResponse],
+    ) -&gt; BoltResponse:
+        if _is_no_auth_required(req):
+            return next()
+
+        if _is_no_auth_test_call_required(req):
+            req.context.set_authorize_result(
+                AuthorizeResult(
+                    enterprise_id=req.context.enterprise_id,
+                    team_id=req.context.team_id,
+                    user_id=req.context.user_id,
+                )
+            )
+            return next()
+
+        try:
+            auth_result: Optional[AuthorizeResult] = self.authorize(
+                context=req.context,
+                enterprise_id=req.context.enterprise_id,
+                team_id=req.context.team_id,
+                user_id=req.context.user_id,
+            )
+            if auth_result is not None:
+                req.context.set_authorize_result(auth_result)
+                token = auth_result.bot_token or auth_result.user_token
+                req.context[&#34;token&#34;] = token
+                # As App#_init_context() generates a new WebClient for this request,
+                # it&#39;s safe to modify this instance.
+                req.context.client.token = token
+                return next()
+            else:
+                # This situation can arise if:
+                # * A developer installed the app from the &#34;Install to Workspace&#34; button in Slack app config page
+                # * The InstallationStore failed to save or deleted the installation for this workspace
+                self.logger.error(
+                    &#34;Although the app should be installed into this workspace, &#34;
+                    &#34;the AuthorizeResult (returned value from authorize) for it was not found.&#34;
+                )
+                return _build_error_response()
+
+        except SlackApiError as e:
+            self.logger.error(f&#34;Failed to authorize with the given token ({e})&#34;)
+            return _build_error_response()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.middleware.authorization.authorization.Authorization" href="authorization.html#slack_bolt.middleware.authorization.authorization.Authorization">Authorization</a></li>
+<li><a title="slack_bolt.middleware.middleware.Middleware" href="../middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.middleware.authorization.MultiTeamsAuthorization.authorize"><code class="name">var <span class="ident">authorize</span> : <a title="slack_bolt.authorization.authorize.Authorize" href="../../authorization/authorize.html#slack_bolt.authorization.authorize.Authorize">Authorize</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="slack_bolt.middleware.authorization.authorization.Authorization" href="authorization.html#slack_bolt.middleware.authorization.authorization.Authorization">Authorization</a></b></code>:
+<ul class="hlist">
+<li><code><a title="slack_bolt.middleware.authorization.authorization.Authorization.name" href="../middleware.html#slack_bolt.middleware.middleware.Middleware.name">name</a></code></li>
+<li><code><a title="slack_bolt.middleware.authorization.authorization.Authorization.process" href="../middleware.html#slack_bolt.middleware.middleware.Middleware.process">process</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="slack_bolt.middleware.authorization.SingleTeamAuthorization"><code class="flex name class">
+<span>class <span class="ident">SingleTeamAuthorization</span></span>
+<span>(</span><span>*, auth_test_result: Optional[slack_sdk.web.slack_response.SlackResponse] = None, base_logger: Optional[logging.Logger] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
+<p>Single-workspace authorization.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>auth_test_result</code></strong></dt>
+<dd>The initial <code>auth.test</code> API call result.</dd>
+<dt><strong><code>base_logger</code></strong></dt>
+<dd>The base logger</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SingleTeamAuthorization(Authorization):
+    def __init__(
+        self,
+        *,
+        auth_test_result: Optional[SlackResponse] = None,
+        base_logger: Optional[Logger] = None,
+    ):
+        &#34;&#34;&#34;Single-workspace authorization.
+
+        Args:
+            auth_test_result: The initial `auth.test` API call result.
+            base_logger: The base logger
+        &#34;&#34;&#34;
+        self.auth_test_result = auth_test_result
+        self.logger = get_bolt_logger(SingleTeamAuthorization, base_logger=base_logger)
+
+    def process(
+        self,
+        *,
+        req: BoltRequest,
+        resp: BoltResponse,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
+        next: Callable[[], BoltResponse],
+    ) -&gt; BoltResponse:
+        if _is_no_auth_required(req):
+            return next()
+
+        if _is_no_auth_test_call_required(req):
+            req.context.set_authorize_result(
+                AuthorizeResult(
+                    enterprise_id=req.context.enterprise_id,
+                    team_id=req.context.team_id,
+                    user_id=req.context.user_id,
+                )
+            )
+            return next()
+
+        try:
+            if not self.auth_test_result:
+                self.auth_test_result = req.context.client.auth_test()
+
+            if self.auth_test_result:
+                req.context.set_authorize_result(
+                    _to_authorize_result(
+                        auth_test_result=self.auth_test_result,
+                        token=req.context.client.token,
+                        request_user_id=req.context.user_id,
+                    )
+                )
+                return next()
+            else:
+                # Just in case
+                self.logger.error(&#34;auth.test API call result is unexpectedly None&#34;)
+                return _build_error_response()
+        except SlackApiError as e:
+            self.logger.error(f&#34;Failed to authorize with the given token ({e})&#34;)
+            return _build_error_response()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.middleware.authorization.authorization.Authorization" href="authorization.html#slack_bolt.middleware.authorization.authorization.Authorization">Authorization</a></li>
+<li><a title="slack_bolt.middleware.middleware.Middleware" href="../middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="slack_bolt.middleware.authorization.authorization.Authorization" href="authorization.html#slack_bolt.middleware.authorization.authorization.Authorization">Authorization</a></b></code>:
+<ul class="hlist">
+<li><code><a title="slack_bolt.middleware.authorization.authorization.Authorization.name" href="../middleware.html#slack_bolt.middleware.middleware.Middleware.name">name</a></code></li>
+<li><code><a title="slack_bolt.middleware.authorization.authorization.Authorization.process" href="../middleware.html#slack_bolt.middleware.middleware.Middleware.process">process</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -97,6 +337,22 @@ from .single_team_authorization import SingleTeamAuthorization  # noqa: F401</co
 <li><code><a title="slack_bolt.middleware.authorization.internals" href="internals.html">slack_bolt.middleware.authorization.internals</a></code></li>
 <li><code><a title="slack_bolt.middleware.authorization.multi_teams_authorization" href="multi_teams_authorization.html">slack_bolt.middleware.authorization.multi_teams_authorization</a></code></li>
 <li><code><a title="slack_bolt.middleware.authorization.single_team_authorization" href="single_team_authorization.html">slack_bolt.middleware.authorization.single_team_authorization</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="slack_bolt.middleware.authorization.Authorization" href="#slack_bolt.middleware.authorization.Authorization">Authorization</a></code></h4>
+</li>
+<li>
+<h4><code><a title="slack_bolt.middleware.authorization.MultiTeamsAuthorization" href="#slack_bolt.middleware.authorization.MultiTeamsAuthorization">MultiTeamsAuthorization</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.middleware.authorization.MultiTeamsAuthorization.authorize" href="#slack_bolt.middleware.authorization.MultiTeamsAuthorization.authorize">authorize</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="slack_bolt.middleware.authorization.SingleTeamAuthorization" href="#slack_bolt.middleware.authorization.SingleTeamAuthorization">SingleTeamAuthorization</a></code></h4>
+</li>
 </ul>
 </li>
 </ul>

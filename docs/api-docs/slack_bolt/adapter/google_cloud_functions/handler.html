@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>slack_bolt.adapter.flask API documentation</title>
+<title>slack_bolt.adapter.google_cloud_functions.handler API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,28 +19,59 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>slack_bolt.adapter.flask</code></h1>
+<h1 class="title">Module <code>slack_bolt.adapter.google_cloud_functions.handler</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from .handler import SlackRequestHandler
+<pre><code class="python">from typing import Callable
 
-__all__ = [
-    &#34;SlackRequestHandler&#34;,
-]</code></pre>
+from flask import Request, Response, make_response
+
+from slack_bolt.adapter.flask.handler import to_bolt_request, to_flask_response
+from slack_bolt.app import App
+from slack_bolt.error import BoltError
+from slack_bolt.lazy_listener import LazyListenerRunner
+from slack_bolt.request import BoltRequest
+from slack_bolt.response import BoltResponse
+
+
+class NoopLazyListenerRunner(LazyListenerRunner):
+    def start(self, function: Callable[..., None], request: BoltRequest) -&gt; None:
+        raise BoltError(
+            &#34;The google_cloud_functions adapter does not support lazy listeners. &#34;
+            &#34;Please consider either having a queue to pass the request to a different function or &#34;
+            &#34;rewriting your code not to use lazy listeners.&#34;
+        )
+
+
+class SlackRequestHandler:
+    def __init__(self, app: App):  # type: ignore
+        self.app = app
+        # Note that lazy listener is not supported
+        self.app.listener_runner.lazy_listener_runner = NoopLazyListenerRunner()
+        if self.app.oauth_flow is not None:
+            self.app.oauth_flow.settings.redirect_uri_page_renderer.install_path = &#34;?&#34;
+
+    def handle(self, req: Request) -&gt; Response:
+        if req.method == &#34;GET&#34; and self.app.oauth_flow is not None:
+            bolt_req = to_bolt_request(req)
+            if &#34;code&#34; in req.args or &#34;error&#34; in req.args or &#34;state&#34; in req.args:
+                bolt_resp = self.app.oauth_flow.handle_callback(bolt_req)
+                return to_flask_response(bolt_resp)
+            else:
+                bolt_resp = self.app.oauth_flow.handle_installation(bolt_req)
+                return to_flask_response(bolt_resp)
+        elif req.method == &#34;POST&#34;:
+            bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(req))
+            return to_flask_response(bolt_resp)
+
+        return make_response(&#34;Not Found&#34;, 404)</code></pre>
 </details>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
-<dl>
-<dt><code class="name"><a title="slack_bolt.adapter.flask.handler" href="handler.html">slack_bolt.adapter.flask.handler</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
 </section>
 <section>
 </section>
@@ -49,7 +80,45 @@ __all__ = [
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="slack_bolt.adapter.flask.SlackRequestHandler"><code class="flex name class">
+<dt id="slack_bolt.adapter.google_cloud_functions.handler.NoopLazyListenerRunner"><code class="flex name class">
+<span>class <span class="ident">NoopLazyListenerRunner</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NoopLazyListenerRunner(LazyListenerRunner):
+    def start(self, function: Callable[..., None], request: BoltRequest) -&gt; None:
+        raise BoltError(
+            &#34;The google_cloud_functions adapter does not support lazy listeners. &#34;
+            &#34;Please consider either having a queue to pass the request to a different function or &#34;
+            &#34;rewriting your code not to use lazy listeners.&#34;
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.lazy_listener.runner.LazyListenerRunner" href="../../lazy_listener/runner.html#slack_bolt.lazy_listener.runner.LazyListenerRunner">LazyListenerRunner</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.adapter.google_cloud_functions.handler.NoopLazyListenerRunner.logger"><code class="name">var <span class="ident">logger</span> : logging.Logger</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="slack_bolt.lazy_listener.runner.LazyListenerRunner" href="../../lazy_listener/runner.html#slack_bolt.lazy_listener.runner.LazyListenerRunner">LazyListenerRunner</a></b></code>:
+<ul class="hlist">
+<li><code><a title="slack_bolt.lazy_listener.runner.LazyListenerRunner.run" href="../../lazy_listener/runner.html#slack_bolt.lazy_listener.runner.LazyListenerRunner.run">run</a></code></li>
+<li><code><a title="slack_bolt.lazy_listener.runner.LazyListenerRunner.start" href="../../lazy_listener/runner.html#slack_bolt.lazy_listener.runner.LazyListenerRunner.start">start</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="slack_bolt.adapter.google_cloud_functions.handler.SlackRequestHandler"><code class="flex name class">
 <span>class <span class="ident">SlackRequestHandler</span></span>
 <span>(</span><span>app: <a title="slack_bolt.app.app.App" href="../../app/app.html#slack_bolt.app.app.App">App</a>)</span>
 </code></dt>
@@ -62,17 +131,20 @@ __all__ = [
 <pre><code class="python">class SlackRequestHandler:
     def __init__(self, app: App):  # type: ignore
         self.app = app
+        # Note that lazy listener is not supported
+        self.app.listener_runner.lazy_listener_runner = NoopLazyListenerRunner()
+        if self.app.oauth_flow is not None:
+            self.app.oauth_flow.settings.redirect_uri_page_renderer.install_path = &#34;?&#34;
 
     def handle(self, req: Request) -&gt; Response:
-        if req.method == &#34;GET&#34;:
-            if self.app.oauth_flow is not None:
-                oauth_flow: OAuthFlow = self.app.oauth_flow
-                if req.path == oauth_flow.install_path:
-                    bolt_resp = oauth_flow.handle_installation(to_bolt_request(req))
-                    return to_flask_response(bolt_resp)
-                elif req.path == oauth_flow.redirect_uri_path:
-                    bolt_resp = oauth_flow.handle_callback(to_bolt_request(req))
-                    return to_flask_response(bolt_resp)
+        if req.method == &#34;GET&#34; and self.app.oauth_flow is not None:
+            bolt_req = to_bolt_request(req)
+            if &#34;code&#34; in req.args or &#34;error&#34; in req.args or &#34;state&#34; in req.args:
+                bolt_resp = self.app.oauth_flow.handle_callback(bolt_req)
+                return to_flask_response(bolt_resp)
+            else:
+                bolt_resp = self.app.oauth_flow.handle_installation(bolt_req)
+                return to_flask_response(bolt_resp)
         elif req.method == &#34;POST&#34;:
             bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(req))
             return to_flask_response(bolt_resp)
@@ -81,7 +153,7 @@ __all__ = [
 </details>
 <h3>Methods</h3>
 <dl>
-<dt id="slack_bolt.adapter.flask.SlackRequestHandler.handle"><code class="name flex">
+<dt id="slack_bolt.adapter.google_cloud_functions.handler.SlackRequestHandler.handle"><code class="name flex">
 <span>def <span class="ident">handle</span></span>(<span>self, req: flask.wrappers.Request) ‑> flask.wrappers.Response</span>
 </code></dt>
 <dd>
@@ -91,15 +163,14 @@ __all__ = [
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def handle(self, req: Request) -&gt; Response:
-    if req.method == &#34;GET&#34;:
-        if self.app.oauth_flow is not None:
-            oauth_flow: OAuthFlow = self.app.oauth_flow
-            if req.path == oauth_flow.install_path:
-                bolt_resp = oauth_flow.handle_installation(to_bolt_request(req))
-                return to_flask_response(bolt_resp)
-            elif req.path == oauth_flow.redirect_uri_path:
-                bolt_resp = oauth_flow.handle_callback(to_bolt_request(req))
-                return to_flask_response(bolt_resp)
+    if req.method == &#34;GET&#34; and self.app.oauth_flow is not None:
+        bolt_req = to_bolt_request(req)
+        if &#34;code&#34; in req.args or &#34;error&#34; in req.args or &#34;state&#34; in req.args:
+            bolt_resp = self.app.oauth_flow.handle_callback(bolt_req)
+            return to_flask_response(bolt_resp)
+        else:
+            bolt_resp = self.app.oauth_flow.handle_installation(bolt_req)
+            return to_flask_response(bolt_resp)
     elif req.method == &#34;POST&#34;:
         bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(req))
         return to_flask_response(bolt_resp)
@@ -120,20 +191,21 @@ __all__ = [
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="slack_bolt.adapter" href="../index.html">slack_bolt.adapter</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
-<ul>
-<li><code><a title="slack_bolt.adapter.flask.handler" href="handler.html">slack_bolt.adapter.flask.handler</a></code></li>
+<li><code><a title="slack_bolt.adapter.google_cloud_functions" href="index.html">slack_bolt.adapter.google_cloud_functions</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="slack_bolt.adapter.flask.SlackRequestHandler" href="#slack_bolt.adapter.flask.SlackRequestHandler">SlackRequestHandler</a></code></h4>
+<h4><code><a title="slack_bolt.adapter.google_cloud_functions.handler.NoopLazyListenerRunner" href="#slack_bolt.adapter.google_cloud_functions.handler.NoopLazyListenerRunner">NoopLazyListenerRunner</a></code></h4>
 <ul class="">
-<li><code><a title="slack_bolt.adapter.flask.SlackRequestHandler.handle" href="#slack_bolt.adapter.flask.SlackRequestHandler.handle">handle</a></code></li>
+<li><code><a title="slack_bolt.adapter.google_cloud_functions.handler.NoopLazyListenerRunner.logger" href="#slack_bolt.adapter.google_cloud_functions.handler.NoopLazyListenerRunner.logger">logger</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="slack_bolt.adapter.google_cloud_functions.handler.SlackRequestHandler" href="#slack_bolt.adapter.google_cloud_functions.handler.SlackRequestHandler">SlackRequestHandler</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.adapter.google_cloud_functions.handler.SlackRequestHandler.handle" href="#slack_bolt.adapter.google_cloud_functions.handler.SlackRequestHandler.handle">handle</a></code></li>
 </ul>
 </li>
 </ul>
