@@ -22,9 +22,7 @@ def event_test(body, say, logger):
 
 
 # Flask adapter
-# TODO: Once this once a new version newer than 1.13.2, delete handler and enable the slack_bolt.adapter import instead
-# from slack_bolt.adapter.google_cloud_functions import SlackRequestHandler
-from handler import SlackRequestHandler
+from slack_bolt.adapter.google_cloud_functions import SlackRequestHandler
 from flask import Request
 
 
