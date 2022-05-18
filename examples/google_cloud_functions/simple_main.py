@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
 
 # Step1: Create a new Slack App: https://api.slack.com/apps
-# Bot Token Scopes: chat:write, commands, app_mentions:read
+# Bot Token Scopes: app_mentions:read,chat:write,commands
 
 # Step2: Set env variables
 # cp .env.yaml.sample .env.yaml
