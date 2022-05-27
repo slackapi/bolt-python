@@ -4,8 +4,8 @@ This directory contains two example apps. Both respond to the Slash Command
 `/hello-bolt-python-lambda` and both respond to app at-mentions.
 
 The "Lazy Lambda Listener" example is the simpler application and it leverages
-AWS Lambda and AWS API Gateway to execute the Bolt app logic in Lambda and
-expose the application HTTP routes to the internet via API Gateway. The "OAuth
+AWS Lambda and AWS Lambda Function URL to execute the Bolt app logic in Lambda and
+expose the application HTTP routes to the internet via Lambda URL. The "OAuth
 Lambda Listener" example additionally includes OAuth flow handling routes and uses
 AWS S3 to store workspace installation credentials and OAuth flow state
 variables, enabling your app to be installed by anyone.
