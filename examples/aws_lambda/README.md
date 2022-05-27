@@ -49,33 +49,28 @@ Instructions on how to set up and deploy each example are provided below.
    Lambda there.
 8. While your Lambda exists, it is not accessible to the internet, so Slack
    cannot send events happening in your Slack workspace to your Lambda. Let's
-   fix that by adding an AWS API Gateway in front of your Lambda so that your
+   fix that by adding an AWS Lambda Function URL to your Lambda so that your
    Lambda can accept HTTP requests:
   - Click on your `bolt_py_function` Lambda
-  - In the Function Overview, on the left side, click "+ Add Trigger"
-  - Select API Gateway from the trigger list
-  - Make sure "Create an API" is selected in the dropdown, and choose "HTTP API"
-      as the API Type
-  - Under Security, select "Open"
-  - Click "Add"
-9. Congrats! Your Slack app is now accessible to the public. On the left side of
-   your `bolt_py_function` Function Overview you should see a purple API Gateway
-   icon. Click it.
-10. Click Details to expand the details section.
-11. Copy the API Endpoint - this is the URL your Lambda function is accessible
-    at publicly.
-12. We will now inform Slack that this example app can accept Slash Commands.
+  - In the Function Overview click "Configuration"
+  - On the left side, click "Function URL"
+  - Click "Create function URL"
+  - Choose auth type "NONE"
+  - Click "Save"
+9. Congrats! Your Slack app is now accessible to the public. On the right side of
+   your `bolt_py_function` Function Overview you should see your Lambda Function URL.
+10. Copy this URL to your clipboard.
+11. We will now inform Slack that this example app can accept Slash Commands.
   - Back on api.slack.com/apps, select your app and choose Slash Commands from the left menu.
   - Click Create New Command
   - By default, the `lazy_aws_lambda.py` function has logic for a
       `/hello-bolt-python-lambda` command. Enter `/hello-bolt-python-lambda` as
       the Command.
-  - Under Request URL, paste in the previously-copied API Endpoint from API
-      Gateway.
+  - Under Request URL, paste in the previously-copied Lambda Function URL.
   - Click Save
-13. Test it out! Back in your Slack workspace, try typing
+12. Test it out! Back in your Slack workspace, try typing
     `/hello-bolt-python-lambda hello`.
-14. If you have issues, here are some debugging options:
+13. If you have issues, here are some debugging options:
   - Check the Monitor tab under your Lambda. Did the Lambda get invoked? Did it
       respond with an error? Investigate the graphs to see how your Lambda is
       behaving.
@@ -172,30 +167,29 @@ export
 6. Let's deploy the Lambda! Run `./deploy_oauth.sh`. By default it deploys to the us-east-1 region in AWS - you can customize this in `aws_lambda_oauth_config.yaml`.
 7. Load up AWS Lambda inside the AWS Console - make sure you are in the correct region that you deployed your app to. You should see a `bolt_py_oauth_function` Lambda there.
 
-### Set up AWS API Gateway
-Your Lambda exists, but it is not accessible to the internet, so Slack cannot yet send events happening in your Slack workspace to your Lambda. Let's fix that by adding an AWS API Gateway in front of your Lambda so that your Lambda can accept HTTP requests
+### Set up AWS Lambda Function URL
+Your Lambda exists, but it is not accessible to the internet, so Slack cannot yet send events happening in your Slack workspace to your Lambda. Let's fix that by adding an AWS Lambda Function URL to your Lambda so that your Lambda can accept HTTP requests
 
 1. Click on your `bolt_py_oauth_function` Lambda
-2. In the **Function Overview**, on the left side, click "+ Add Trigger"
-3. Select "API Gateway" from the trigger list
-4. Make sure "Create an API" is selected in the dropdown, and choose "HTTP API" as the API Type
-5. Under Security, select "Open"
-6. Click "Add"
+2. In the **Function Overview**, on the left side, click "Configuration
+3. On the left side, click "Function URL"
+4. Click "Create function URL"
+5. Choose auth type "NONE"
+6. Click "Save"
 
-Phew, congrats! Your Slack app is now accessible to the public. On the left side of your bolt_py_oauth_function Function Overview you should see a purple API Gateway icon. Click it.
+Phew, congrats! Your Slack app is now accessible to the public. On the right side of your bolt_py_oauth_function Function Overview you should see a your Lambda Function URL.
 
-1. Click "Details"
-2. Copy the API Endpoint - this is the URL your Lambda function is accessible at publicly.
-3. We will now inform Slack that this example app can accept Slash Commands.
-4. Back on [api.slack.com/apps](https://api.slack.com/apps), select your app and choose "Slash Commands" from the left menu.
-5. Click "Create New Command"
+1. Copy it - this is the URL your Lambda function is accessible at publicly.
+2. We will now inform Slack that this example app can accept Slash Commands.
+3. Back on [api.slack.com/apps](https://api.slack.com/apps), select your app and choose "Slash Commands" from the left menu.
+4. Click "Create New Command"
     1. By default, the `aws_lambda_oauth.py` function has logic for a /hello-bolt-python-lambda command. Enter `/hello-bolt-python-lambda` as the Command.
-    * Under **Request URL**, paste in the previously-copied API Endpoint from API Gateway.
+    * Under **Request URL**, paste in the previously-copied Lambda Function URL.
     * Click "Save"
-6. We also need to register the API Endpoint as the OAuth redirect URL:
+5. We also need to register the API Endpoint as the OAuth redirect URL:
     1. Load up the **OAuth & Permissions** page on[api.slack.com/apps](https://api.slack.com/apps)
     2. Scroll down to "Redirect URLs"
-    3. Copy the API endpoint in - but remove the path portion. The Redirect URL needs to only partially match where we will send users.
+    3. Copy the URL endpoint in - but remove the path portion. The Redirect URL needs to only partially match where we will send users.
 
 You can now install the app to any workspace!
 
