@@ -15,9 +15,7 @@ class AsyncBaseSocketModeHandler:
     app: Union[App, AsyncApp]  # type: ignore
     client: AsyncBaseSocketModeClient
 
-    async def handle(
-        self, client: AsyncBaseSocketModeClient, req: SocketModeRequest
-    ) -> None:
+    async def handle(self, client: AsyncBaseSocketModeClient, req: SocketModeRequest) -> None:
         """Handles Socket Mode envelope requests through a WebSocket connection.
 
         Args:

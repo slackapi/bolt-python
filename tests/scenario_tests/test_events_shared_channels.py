@@ -104,9 +104,7 @@ class TestEventsSharedChannels:
             say("What's up?")
 
         timestamp, body = str(int(time())), json.dumps(self.valid_event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
@@ -131,9 +129,7 @@ class TestEventsSharedChannels:
             logger.info(payload)
 
         timestamp, body = str(int(time())), json.dumps(self.valid_event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
@@ -180,9 +176,7 @@ class TestEventsSharedChannels:
             say("What's up?")
 
         timestamp, body = str(int(time())), json.dumps(self.valid_reaction_added_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
@@ -205,9 +199,7 @@ class TestEventsSharedChannels:
                 str(int(time())),
                 json.dumps(self.valid_reaction_added_body),
             )
-            request: BoltRequest = BoltRequest(
-                body=body, headers=self.build_headers(timestamp, body)
-            )
+            request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
             response = app.dispatch(request)
             assert response.status == 200
 
@@ -254,9 +246,7 @@ class TestEventsSharedChannels:
             say("What's up?")
 
         timestamp, body = str(int(time())), json.dumps(event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
@@ -333,17 +323,13 @@ class TestEventsSharedChannels:
             say("What's up?")
 
         timestamp, body = str(int(time())), json.dumps(join_event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
 
         timestamp, body = str(int(time())), json.dumps(left_event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
 
@@ -419,17 +405,13 @@ class TestEventsSharedChannels:
             say("What's up?")
 
         timestamp, body = str(int(time())), json.dumps(join_event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
 
         timestamp, body = str(int(time())), json.dumps(left_event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
 
@@ -443,9 +425,7 @@ class TestEventsSharedChannels:
             signing_secret=self.signing_secret,
             authorize=authorize,
         )
-        app._client = WebClient(
-            token="uninstalled-revoked", base_url=self.mock_api_server_base_url
-        )
+        app._client = WebClient(token="uninstalled-revoked", base_url=self.mock_api_server_base_url)
 
         @app.event("app_uninstalled")
         def handler1(say: Say):
@@ -476,9 +456,7 @@ class TestEventsSharedChannels:
         }
 
         timestamp, body = str(int(time())), json.dumps(app_uninstalled_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
 
@@ -506,9 +484,7 @@ class TestEventsSharedChannels:
         }
 
         timestamp, body = str(int(time())), json.dumps(tokens_revoked_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
 

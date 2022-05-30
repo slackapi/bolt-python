@@ -200,9 +200,7 @@ class WorkflowStepBuilder:
 
         def _inner(func):
             functions = [func] + (lazy if lazy is not None else [])
-            self._execute = self._to_listener(
-                "execute", functions, matchers, middleware
-            )
+            self._execute = self._to_listener("execute", functions, matchers, middleware)
 
             @wraps(func)
             def _wrapper(*args, **kwargs):
@@ -249,12 +247,8 @@ class WorkflowStepBuilder:
             app_name=self.app_name,
             listener_or_functions=listener_or_functions,
             name=name,
-            matchers=self.to_listener_matchers(
-                self.app_name, matchers, self._base_logger
-            ),
-            middleware=self.to_listener_middleware(
-                self.app_name, middleware, self._base_logger
-            ),
+            matchers=self.to_listener_matchers(self.app_name, matchers, self._base_logger),
+            middleware=self.to_listener_middleware(self.app_name, middleware, self._base_logger),
             base_logger=self._base_logger,
         )
 
@@ -319,15 +313,9 @@ class WorkflowStep:
         self,
         *,
         callback_id: Union[str, Pattern],
-        edit: Union[
-            Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]
-        ],
-        save: Union[
-            Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]
-        ],
-        execute: Union[
-            Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]
-        ],
+        edit: Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]],
+        save: Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]],
+        execute: Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]],
         app_name: Optional[str] = None,
         base_logger: Optional[Logger] = None,
     ):
@@ -356,9 +344,7 @@ class WorkflowStep:
         )
 
     @classmethod
-    def builder(
-        cls, callback_id: Union[str, Pattern], base_logger: Optional[Logger] = None
-    ) -> WorkflowStepBuilder:
+    def builder(cls, callback_id: Union[str, Pattern], base_logger: Optional[Logger] = None) -> WorkflowStepBuilder:
         return WorkflowStepBuilder(
             callback_id,
             base_logger=base_logger,
@@ -414,9 +400,7 @@ class WorkflowStep:
                 base_logger=base_logger,
             )
         else:
-            raise BoltError(
-                f"Invalid {name} listener: {type(listener_or_functions)} detected (callback_id: {callback_id})"
-            )
+            raise BoltError(f"Invalid {name} listener: {type(listener_or_functions)} detected (callback_id: {callback_id})")
 
     @classmethod
     def _build_primary_matcher(
@@ -456,9 +440,7 @@ class WorkflowStep:
 #######################
 
 
-def _build_edit_listener_middleware(
-    callback_id: str, base_logger: Optional[Logger] = None
-) -> Middleware:
+def _build_edit_listener_middleware(callback_id: str, base_logger: Optional[Logger] = None) -> Middleware:
     def edit_listener_middleware(
         context: BoltContext,
         client: WebClient,

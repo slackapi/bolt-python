@@ -59,9 +59,7 @@ class TestAsyncAsyncAck:
     @pytest.mark.asyncio
     async def test_attachments(self):
         ack = AsyncAck()
-        response: BoltResponse = await ack(
-            text="foo", attachments=self.sample_attachments
-        )
+        response: BoltResponse = await ack(text="foo", attachments=self.sample_attachments)
         assert (response.status, response.body) == (
             200,
             '{"text": "foo", '
@@ -76,10 +74,7 @@ class TestAsyncAsyncAck:
         ack = AsyncAck()
         response: BoltResponse = await ack(text="foo", options=self.sample_options)
         assert response.status == 200
-        assert (
-            response.body
-            == '{"options": [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]}'
-        )
+        assert response.body == '{"options": [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]}'
 
     sample_option_groups = [
         {
@@ -100,9 +95,7 @@ class TestAsyncAsyncAck:
     @pytest.mark.asyncio
     async def test_option_groups(self):
         ack = AsyncAck()
-        response: BoltResponse = await ack(
-            text="foo", option_groups=self.sample_option_groups
-        )
+        response: BoltResponse = await ack(text="foo", option_groups=self.sample_option_groups)
         assert response.status == 200
         assert response.body.startswith('{"option_groups":')
 

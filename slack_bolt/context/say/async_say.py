@@ -50,8 +50,6 @@ class AsyncSay:
                     message["channel"] = channel or self.channel
                 return await self.client.chat_postMessage(**message)
             else:
-                raise ValueError(
-                    f"The arg is unexpected type ({type(text_or_whole_response)})"
-                )
+                raise ValueError(f"The arg is unexpected type ({type(text_or_whole_response)})")
         else:
             raise ValueError("say without channel_id here is unsupported")

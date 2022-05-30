@@ -93,9 +93,7 @@ class TestMessage:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.message(re.compile("We've received ([0-9]+) messages from (.+)!"))(
-            verify_matches
-        )
+        app.message(re.compile("We've received ([0-9]+) messages from (.+)!"))(verify_matches)
 
         request = self.build_request2()
         response = app.dispatch(request)

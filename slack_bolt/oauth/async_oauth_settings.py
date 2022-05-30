@@ -110,9 +110,7 @@ class AsyncOAuthSettings:
         """
         # OAuth flow parameters/credentials
         client_id: Optional[str] = client_id or os.environ.get("SLACK_CLIENT_ID")
-        client_secret: Optional[str] = client_secret or os.environ.get(
-            "SLACK_CLIENT_SECRET"
-        )
+        client_secret: Optional[str] = client_secret or os.environ.get("SLACK_CLIENT_SECRET")
         if client_id is None or client_secret is None:
             raise BoltError("Both client_id and client_secret are required")
         self.client_id = client_id
@@ -129,32 +127,22 @@ class AsyncOAuthSettings:
         if isinstance(self.scopes, str):
             self.scopes = self.scopes.split(",")
         self.user_scopes = (  # type: ignore
-            user_scopes
-            if user_scopes is not None
-            else os.environ.get("SLACK_USER_SCOPES", "").split(",")  # type: ignore
+            user_scopes if user_scopes is not None else os.environ.get("SLACK_USER_SCOPES", "").split(",")  # type: ignore
         )  # type: ignore
         if isinstance(self.user_scopes, str):
             self.user_scopes = self.user_scopes.split(",")
 
         self.redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI")
         # Handler configuration
-        self.install_path = install_path or os.environ.get(
-            "SLACK_INSTALL_PATH", "/slack/install"
-        )
+        self.install_path = install_path or os.environ.get("SLACK_INSTALL_PATH", "/slack/install")
         self.install_page_rendering_enabled = install_page_rendering_enabled
-        self.redirect_uri_path = redirect_uri_path or os.environ.get(
-            "SLACK_REDIRECT_URI_PATH", "/slack/oauth_redirect"
-        )
+        self.redirect_uri_path = redirect_uri_path or os.environ.get("SLACK_REDIRECT_URI_PATH", "/slack/oauth_redirect")
         self.callback_options = callback_options
         self.success_url = success_url
         self.failure_url = failure_url
-        self.authorization_url = (
-            authorization_url or "https://slack.com/oauth/v2/authorize"
-        )
+        self.authorization_url = authorization_url or "https://slack.com/oauth/v2/authorize"
         # Installation Management
-        self.installation_store = (
-            installation_store or get_or_create_default_installation_store(client_id)
-        )
+        self.installation_store = installation_store or get_or_create_default_installation_store(client_id)
         self.installation_store_bot_only = installation_store_bot_only
         self.token_rotation_expiration_minutes = token_rotation_expiration_minutes
         self.authorize = AsyncInstallationStoreAuthorize(

@@ -62,9 +62,7 @@ class ThreadListenerRunner:
                         request=request,
                         response=response,
                     )
-                    returned_value = listener.run_ack_function(
-                        request=request, response=response
-                    )
+                    returned_value = listener.run_ack_function(request=request, response=response)
                     if isinstance(returned_value, BoltResponse):
                         response = returned_value
                     if ack.response is None and listener.auto_acknowledgement:
@@ -91,9 +89,7 @@ class ThreadListenerRunner:
                 if request.lazy_function_name:
                     func_name = get_name_for_callable(lazy_func)
                     if func_name == request.lazy_function_name:
-                        self.lazy_listener_runner.run(
-                            function=lazy_func, request=request
-                        )
+                        self.lazy_listener_runner.run(function=lazy_func, request=request)
                         # This HTTP response won't be sent to Slack API servers.
                         return BoltResponse(status=200)
                     else:
@@ -155,9 +151,7 @@ class ThreadListenerRunner:
                 if request.lazy_function_name:
                     func_name = get_name_for_callable(lazy_func)
                     if func_name == request.lazy_function_name:
-                        self.lazy_listener_runner.run(
-                            function=lazy_func, request=request
-                        )
+                        self.lazy_listener_runner.run(function=lazy_func, request=request)
                         # This HTTP response won't be sent to Slack API servers.
                         return BoltResponse(status=200)
                     else:
@@ -184,9 +178,7 @@ class ThreadListenerRunner:
         # None for both means no ack() in the listener
         return None
 
-    def _start_lazy_function(
-        self, lazy_func: Callable[..., None], request: BoltRequest
-    ) -> None:
+    def _start_lazy_function(self, lazy_func: Callable[..., None], request: BoltRequest) -> None:
         # Start a lazy function asynchronously
         func_name: str = get_name_for_callable(lazy_func)
         self.logger.debug(debug_running_lazy_listener(func_name))
@@ -201,8 +193,6 @@ class ThreadListenerRunner:
         copied_request.lazy_function_name = lazy_func_name
         return copied_request
 
-    def _debug_log_completion(
-        self, starting_time: float, response: BoltResponse
-    ) -> None:
+    def _debug_log_completion(self, starting_time: float, response: BoltResponse) -> None:
         millis = int((time.time() - starting_time) * 1000)
         self.logger.debug(debug_responding(response.status, response.body, millis))

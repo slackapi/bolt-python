@@ -20,9 +20,7 @@ class LambdaLazyListenerRunner(LazyListenerRunner):
         event: dict = request.context["lambda_request"]
         headers = event["headers"]
         headers["x-slack-bolt-lazy-only"] = "1"  # not an array
-        headers[
-            "x-slack-bolt-lazy-function-name"
-        ] = request.lazy_function_name  # not an array
+        headers["x-slack-bolt-lazy-function-name"] = request.lazy_function_name  # not an array
         event["method"] = "NONE"
         invocation = self.lambda_client.invoke(
             FunctionName=request.context["aws_lambda_function_name"],

@@ -91,9 +91,7 @@ class CallableAuthorize(Authorize):
             if isinstance(auth_result, AuthorizeResult):
                 return auth_result
             else:
-                raise ValueError(
-                    f"Unexpected returned value from authorize function (type: {type(auth_result)})"
-                )
+                raise ValueError(f"Unexpected returned value from authorize function (type: {type(auth_result)})")
         except SlackApiError as err:
             self.logger.debug(
                 f"The stored bot token for enterprise_id: {enterprise_id} team_id: {team_id} "
@@ -114,9 +112,7 @@ class InstallationStoreAuthorize(Authorize):
     find_bot_available: bool
     token_rotator: Optional[TokenRotator]
 
-    _config_error_message: str = (
-        "InstallationStore with client_id/client_secret are required for token rotation"
-    )
+    _config_error_message: str = "InstallationStore with client_id/client_secret are required for token rotation"
 
     def __init__(
         self,
@@ -137,9 +133,7 @@ class InstallationStoreAuthorize(Authorize):
         self.bot_only = bot_only
         self.cache_enabled = cache_enabled
         self.authorize_result_cache = {}
-        self.find_installation_available = hasattr(
-            installation_store, "find_installation"
-        )
+        self.find_installation_available = hasattr(installation_store, "find_installation")
         self.find_bot_available = hasattr(installation_store, "find_bot")
         if client_id is not None and client_secret is not None:
             self.token_rotator = TokenRotator(
@@ -149,9 +143,7 @@ class InstallationStoreAuthorize(Authorize):
             )
         else:
             self.token_rotator = None
-        self.token_rotation_expiration_minutes = (
-            token_rotation_expiration_minutes or 120
-        )
+        self.token_rotation_expiration_minutes = token_rotation_expiration_minutes or 120
 
     def __call__(
         self,
@@ -171,9 +163,7 @@ class InstallationStoreAuthorize(Authorize):
             try:
                 # Note that this is the latest information for the org/workspace.
                 # The installer may not be the user associated with this incoming request.
-                latest_installation: Optional[
-                    Installation
-                ] = self.installation_store.find_installation(
+                latest_installation: Optional[Installation] = self.installation_store.find_installation(
                     enterprise_id=enterprise_id,
                     team_id=team_id,
                     is_enterprise_install=context.is_enterprise_install,
@@ -188,9 +178,7 @@ class InstallationStoreAuthorize(Authorize):
                 if latest_installation is not None:
                     # Save the latest bot token
                     bot_token = latest_installation.bot_token  # this still can be None
-                    user_token = (
-                        latest_installation.user_token
-                    )  # this still can be None
+                    user_token = latest_installation.user_token  # this still can be None
 
                     if latest_installation.user_id != user_id:
                         # First off, remove the user token as the installer is a different user
@@ -202,13 +190,11 @@ class InstallationStoreAuthorize(Authorize):
 
                         # try to fetch the request user's installation
                         # to reflect the user's access token if exists
-                        this_user_installation = (
-                            self.installation_store.find_installation(
-                                enterprise_id=enterprise_id,
-                                team_id=team_id,
-                                user_id=user_id,
-                                is_enterprise_install=context.is_enterprise_install,
-                            )
+                        this_user_installation = self.installation_store.find_installation(
+                            enterprise_id=enterprise_id,
+                            team_id=team_id,
+                            user_id=user_id,
+                            is_enterprise_install=context.is_enterprise_install,
                         )
                         if this_user_installation is not None:
                             user_token = this_user_installation.user_token
@@ -217,9 +203,7 @@ class InstallationStoreAuthorize(Authorize):
                                 bot_token = this_user_installation.bot_token
 
                             # If token rotation is enabled, running rotation may be needed here
-                            refreshed = self._rotate_and_save_tokens_if_necessary(
-                                this_user_installation
-                            )
+                            refreshed = self._rotate_and_save_tokens_if_necessary(this_user_installation)
                             if refreshed is not None:
                                 user_token = refreshed.user_token
                                 if latest_installation.bot_token is None:
@@ -227,9 +211,7 @@ class InstallationStoreAuthorize(Authorize):
                                     bot_token = refreshed.bot_token
 
                     # If token rotation is enabled, running rotation may be needed here
-                    refreshed = self._rotate_and_save_tokens_if_necessary(
-                        latest_installation
-                    )
+                    refreshed = self._rotate_and_save_tokens_if_necessary(latest_installation)
                     if refreshed is not None:
                         bot_token = refreshed.bot_token
                         if this_user_installation is None:
@@ -246,11 +228,7 @@ class InstallationStoreAuthorize(Authorize):
             # If the `find_installation` method is not available,
             or not self.find_installation_available
             # If the `find_installation` method did not return data and find_bot method is available,
-            or (
-                self.find_bot_available is True
-                and bot_token is None
-                and user_token is None
-            )
+            or (self.find_bot_available is True and bot_token is None and user_token is None)
         ):
             try:
                 bot: Optional[Bot] = self.installation_store.find_bot(
@@ -306,21 +284,11 @@ class InstallationStoreAuthorize(Authorize):
 
     # ------------------------------------------------
 
-    def _debug_log_for_not_found(
-        self, enterprise_id: Optional[str], team_id: Optional[str]
-    ):
-        self.logger.debug(
-            "No installation data found "
-            f"for enterprise_id: {enterprise_id} team_id: {team_id}"
-        )
+    def _debug_log_for_not_found(self, enterprise_id: Optional[str], team_id: Optional[str]):
+        self.logger.debug("No installation data found " f"for enterprise_id: {enterprise_id} team_id: {team_id}")
 
-    def _rotate_and_save_tokens_if_necessary(
-        self, installation: Optional[Installation]
-    ) -> Optional[Installation]:
-        if installation is None or (
-            installation.user_refresh_token is None
-            and installation.bot_refresh_token is None
-        ):
+    def _rotate_and_save_tokens_if_necessary(self, installation: Optional[Installation]) -> Optional[Installation]:
+        if installation is None or (installation.user_refresh_token is None and installation.bot_refresh_token is None):
             # No need to rotate tokens
             return None
 

@@ -91,18 +91,14 @@ def build_async_required_kwargs(
                 # We are sure that we should skip manipulating this arg
                 required_arg_names.pop(0)
 
-    kwargs: Dict[str, Any] = {
-        k: v for k, v in all_available_args.items() if k in required_arg_names
-    }
+    kwargs: Dict[str, Any] = {k: v for k, v in all_available_args.items() if k in required_arg_names}
     found_arg_names = kwargs.keys()
     for name in required_arg_names:
         if name == "args":
             if isinstance(request, AsyncBoltRequest):
                 kwargs[name] = AsyncArgs(**all_available_args)
             else:
-                logger.warning(
-                    f"Unknown Request object type detected ({type(request)})"
-                )
+                logger.warning(f"Unknown Request object type detected ({type(request)})")
 
         if name not in found_arg_names:
             logger.warning(f"{name} is not a valid argument")

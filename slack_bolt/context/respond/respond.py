@@ -59,8 +59,6 @@ class Respond:
                 message = _build_message(**text_or_whole_response)
                 return client.send_dict(message)
             else:
-                raise ValueError(
-                    f"The arg is unexpected type ({type(text_or_whole_response)})"
-                )
+                raise ValueError(f"The arg is unexpected type ({type(text_or_whole_response)})")
         else:
             raise ValueError("respond is unsupported here as there is no response_url")

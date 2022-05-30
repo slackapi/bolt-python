@@ -49,9 +49,7 @@ class AsyncSlackRequestHandler:
     def __init__(self, app: AsyncApp):  # type: ignore
         self.app = app
 
-    async def handle(
-        self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None
-    ) -> Response:
+    async def handle(self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None) -> Response:
         body = await req.body()
         if req.method == "GET":
             if self.app.oauth_flow is not None:
@@ -67,9 +65,7 @@ class AsyncSlackRequestHandler:
                     )
                     return to_starlette_response(bolt_resp)
         elif req.method == "POST":
-            bolt_resp = await self.app.async_dispatch(
-                to_async_bolt_request(req, body, addition_context_properties)
-            )
+            bolt_resp = await self.app.async_dispatch(to_async_bolt_request(req, body, addition_context_properties))
             return to_starlette_response(bolt_resp)
 
         return Response(

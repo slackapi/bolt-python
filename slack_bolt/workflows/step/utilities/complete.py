@@ -31,8 +31,6 @@ class Complete:
 
     def __call__(self, **kwargs) -> None:
         self.client.workflows_stepCompleted(
-            workflow_step_execute_id=self.body["event"]["workflow_step"][
-                "workflow_step_execute_id"
-            ],
+            workflow_step_execute_id=self.body["event"]["workflow_step"]["workflow_step_execute_id"],
             **kwargs,
         )

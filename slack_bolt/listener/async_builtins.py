@@ -12,9 +12,7 @@ class AsyncTokenRevocationListeners:
     def __init__(self, installation_store: AsyncInstallationStore):
         self.installation_store = installation_store
 
-    async def handle_tokens_revoked_events(
-        self, event: dict, context: AsyncBoltContext
-    ) -> None:
+    async def handle_tokens_revoked_events(self, event: dict, context: AsyncBoltContext) -> None:
         user_ids = event.get("tokens", {}).get("oauth", [])
         if len(user_ids) > 0:
             for user_id in user_ids:

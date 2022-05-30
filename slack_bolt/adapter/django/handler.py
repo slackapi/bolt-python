@@ -100,15 +100,11 @@ class DjangoThreadLazyListenerRunner(ThreadLazyListenerRunner):
         )
 
         def wrapped_func():
-            release_thread_local_connections(
-                request.context.logger, "before-lazy-listener"
-            )
+            release_thread_local_connections(request.context.logger, "before-lazy-listener")
             try:
                 func()
             finally:
-                release_thread_local_connections(
-                    request.context.logger, "lazy-listener-completion"
-                )
+                release_thread_local_connections(request.context.logger, "lazy-listener-completion")
 
         self.executor.submit(wrapped_func)
 
@@ -124,9 +120,7 @@ class SlackRequestHandler:
         )
 
         if not isinstance(listener_runner, ThreadListenerRunner):
-            raise BoltError(
-                "Custom listener_runners are not compatible with this Django adapter."
-            )
+            raise BoltError("Custom listener_runners are not compatible with this Django adapter.")
 
         if app.process_before_response is True:
             # As long as the app access Django models in the same thread,
@@ -135,9 +129,7 @@ class SlackRequestHandler:
             return
 
         current_start_handler = listener_runner.listener_start_handler
-        if current_start_handler is not None and not isinstance(
-            current_start_handler, DefaultListenerStartHandler
-        ):
+        if current_start_handler is not None and not isinstance(current_start_handler, DefaultListenerStartHandler):
             # As we run release_thread_local_connections() before listener executions,
             # it's okay to skip calling the same connection clean-up method at the listener completion.
             message = """As you've already set app.listener_runner.listener_start_handler to your own one,
@@ -152,9 +144,7 @@ class SlackRequestHandler:
             self.app.logger.info(message)
         else:
             # for proper management of thread-local Django DB connections
-            self.app.listener_runner.listener_start_handler = (
-                DjangoListenerStartHandler()
-            )
+            self.app.listener_runner.listener_start_handler = DjangoListenerStartHandler()
             self.app.logger.debug("DjangoListenerStartHandler has been enabled")
 
         current_completion_handler = listener_runner.listener_completion_handler
@@ -169,9 +159,7 @@ class SlackRequestHandler:
             self.app.logger.info(message)
             return
         # for proper management of thread-local Django DB connections
-        self.app.listener_runner.listener_completion_handler = (
-            DjangoListenerCompletionHandler()
-        )
+        self.app.listener_runner.listener_completion_handler = DjangoListenerCompletionHandler()
         self.app.logger.debug("DjangoListenerCompletionHandler has been enabled")
 
     def handle(self, req: HttpRequest) -> HttpResponse:

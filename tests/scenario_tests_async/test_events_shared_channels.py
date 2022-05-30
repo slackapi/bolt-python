@@ -216,9 +216,7 @@ class TestAsyncEventsSharedChannels:
             ],
         }
         timestamp, body = str(int(time())), json.dumps(self_event)
-        request = AsyncBoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
@@ -297,17 +295,13 @@ class TestAsyncEventsSharedChannels:
             await say("What's up?")
 
         timestamp, body = str(int(time())), json.dumps(join_event_body)
-        request = AsyncBoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
 
         timestamp, body = str(int(time())), json.dumps(left_event_body)
-        request = AsyncBoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = await app.async_dispatch(request)
         assert response.status == 200
 
@@ -386,17 +380,13 @@ class TestAsyncEventsSharedChannels:
             await say("What's up?")
 
         timestamp, body = str(int(time())), json.dumps(join_event_body)
-        request = AsyncBoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
 
         timestamp, body = str(int(time())), json.dumps(left_event_body)
-        request = AsyncBoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = await app.async_dispatch(request)
         assert response.status == 200
 
@@ -411,9 +401,7 @@ class TestAsyncEventsSharedChannels:
             signing_secret=self.signing_secret,
             authorize=authorize,
         )
-        app._client = AsyncWebClient(
-            token="uninstalled-revoked", base_url=self.mock_api_server_base_url
-        )
+        app._client = AsyncWebClient(token="uninstalled-revoked", base_url=self.mock_api_server_base_url)
 
         @app.event("app_uninstalled")
         async def handler1(say: AsyncSay):
@@ -444,9 +432,7 @@ class TestAsyncEventsSharedChannels:
         }
 
         timestamp, body = str(int(time())), json.dumps(app_uninstalled_body)
-        request: AsyncBoltRequest = AsyncBoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: AsyncBoltRequest = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = await app.async_dispatch(request)
         assert response.status == 200
 
@@ -474,9 +460,7 @@ class TestAsyncEventsSharedChannels:
         }
 
         timestamp, body = str(int(time())), json.dumps(tokens_revoked_body)
-        request: AsyncBoltRequest = AsyncBoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: AsyncBoltRequest = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = await app.async_dispatch(request)
         assert response.status == 200
 

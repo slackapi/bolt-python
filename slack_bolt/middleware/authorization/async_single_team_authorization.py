@@ -16,9 +16,7 @@ class AsyncSingleTeamAuthorization(AsyncAuthorization):
     def __init__(self, base_logger: Optional[Logger] = None):
         """Single-workspace authorization."""
         self.auth_test_result: Optional[AsyncSlackResponse] = None
-        self.logger = get_bolt_logger(
-            AsyncSingleTeamAuthorization, base_logger=base_logger
-        )
+        self.logger = get_bolt_logger(AsyncSingleTeamAuthorization, base_logger=base_logger)
 
     async def async_process(
         self,

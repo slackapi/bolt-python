@@ -80,9 +80,7 @@ class TestAuthorize:
 
     def build_valid_request(self) -> BoltRequest:
         timestamp = str(int(time()))
-        return BoltRequest(
-            body=raw_body, headers=self.build_headers(timestamp, raw_body)
-        )
+        return BoltRequest(body=raw_body, headers=self.build_headers(timestamp, raw_body))
 
     def test_success(self):
         app = App(

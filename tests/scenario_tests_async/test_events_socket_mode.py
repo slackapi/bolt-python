@@ -288,9 +288,7 @@ class TestAsyncEvents:
     @pytest.mark.asyncio
     async def test_uninstallation_and_revokes(self):
         app = AsyncApp(client=self.web_client)
-        app._client = AsyncWebClient(
-            token="uninstalled-revoked", base_url=self.mock_api_server_base_url
-        )
+        app._client = AsyncWebClient(token="uninstalled-revoked", base_url=self.mock_api_server_base_url)
 
         @app.event("app_uninstalled")
         async def handler1(say: AsyncSay):
@@ -311,9 +309,7 @@ class TestAsyncEvents:
             "event_time": 1599616881,
         }
 
-        request: AsyncBoltRequest = AsyncBoltRequest(
-            body=app_uninstalled_body, mode="socket_mode"
-        )
+        request: AsyncBoltRequest = AsyncBoltRequest(body=app_uninstalled_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
 
@@ -331,9 +327,7 @@ class TestAsyncEvents:
             "event_time": 1599616881,
         }
 
-        request: AsyncBoltRequest = AsyncBoltRequest(
-            body=tokens_revoked_body, mode="socket_mode"
-        )
+        request: AsyncBoltRequest = AsyncBoltRequest(body=tokens_revoked_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
 

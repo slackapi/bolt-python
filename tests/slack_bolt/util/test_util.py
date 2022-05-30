@@ -46,10 +46,7 @@ class TestUtil:
 
     def test_get_boot_message(self):
         assert get_boot_message() == "⚡️ Bolt app is running!"
-        assert (
-            get_boot_message(development_server=True)
-            == "⚡️ Bolt app is running! (development server)"
-        )
+        assert get_boot_message(development_server=True) == "⚡️ Bolt app is running! (development server)"
 
     def test_get_boot_message_win32(self):
         sys_platform_backup = sys.platform

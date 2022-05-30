@@ -84,9 +84,7 @@ class TestAsyncErrorHandler:
         }
         raw_body = f"payload={quote(json.dumps(body))}"
         timestamp = str(int(time()))
-        return AsyncBoltRequest(
-            body=raw_body, headers=self.build_headers(timestamp, raw_body)
-        )
+        return AsyncBoltRequest(body=raw_body, headers=self.build_headers(timestamp, raw_body))
 
     # ----------------
     #  tests

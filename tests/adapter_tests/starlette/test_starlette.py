@@ -45,11 +45,7 @@ class TestStarlette:
         )
 
     def build_headers(self, timestamp: str, body: str):
-        content_type = (
-            "application/json"
-            if body.startswith("{")
-            else "application/x-www-form-urlencoded"
-        )
+        content_type = "application/json" if body.startswith("{") else "application/x-www-form-urlencoded"
         return {
             "content-type": content_type,
             "x-slack-signature": self.generate_signature(body, timestamp),

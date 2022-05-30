@@ -106,9 +106,7 @@ class TestShortcut:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.shortcut({"type": "message_action", "callback_id": "test-shortcut"})(
-            simple_listener
-        )
+        app.shortcut({"type": "message_action", "callback_id": "test-shortcut"})(simple_listener)
 
         request = self.build_valid_request(message_shortcut_raw_body)
         response = app.dispatch(request)

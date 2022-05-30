@@ -32,9 +32,7 @@ class TestRequestVerification:
         middleware = RequestVerification(signing_secret=self.signing_secret)
         timestamp = str(int(time()))
         raw_body = "payload={}"
-        req = BoltRequest(
-            body=raw_body, headers=self.build_headers(timestamp, raw_body)
-        )
+        req = BoltRequest(body=raw_body, headers=self.build_headers(timestamp, raw_body))
         resp = BoltResponse(status=404, body="default")
         resp = middleware.process(req=req, resp=resp, next=next)
         assert resp.status == 200

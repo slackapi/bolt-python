@@ -194,9 +194,7 @@ class TestAsyncOAuthFlow:
         signature_verifier = SignatureVerifier("signing_secret")
         headers = {
             "content-type": ["application/x-www-form-urlencoded"],
-            "x-slack-signature": [
-                signature_verifier.generate_signature(body=body, timestamp=timestamp)
-            ],
+            "x-slack-signature": [signature_verifier.generate_signature(body=body, timestamp=timestamp)],
             "x-slack-request-timestamp": [timestamp],
         }
         request = AsyncBoltRequest(body=body, headers=headers)

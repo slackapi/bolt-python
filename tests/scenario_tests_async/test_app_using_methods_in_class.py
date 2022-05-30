@@ -196,28 +196,20 @@ class AwesomeClass:
         await next()
 
     @classmethod
-    async def class_method(
-        cls, context: AsyncBoltContext, say: AsyncSay, ack: AsyncAck
-    ):
+    async def class_method(cls, context: AsyncBoltContext, say: AsyncSay, ack: AsyncAck):
         await ack()
         await say(f"Hello <@{context.user_id}>!")
 
     @classmethod
-    async def class_method2(
-        xyz, context: AsyncBoltContext, say: AsyncSay, ack: AsyncAck
-    ):
+    async def class_method2(xyz, context: AsyncBoltContext, say: AsyncSay, ack: AsyncAck):
         await ack()
         await say(f"Hello <@{context.user_id}>!")
 
-    async def instance_method(
-        self, context: AsyncBoltContext, say: AsyncSay, ack: AsyncAck
-    ):
+    async def instance_method(self, context: AsyncBoltContext, say: AsyncSay, ack: AsyncAck):
         await ack()
         await say(f"Hello <@{context.user_id}>! My name is {self.name}")
 
-    async def instance_method2(
-        whatever, context: AsyncBoltContext, say: AsyncSay, ack: AsyncAck
-    ):
+    async def instance_method2(whatever, context: AsyncBoltContext, say: AsyncSay, ack: AsyncAck):
         await ack()
         await say(f"Hello <@{context.user_id}>! My name is {whatever.name}")
 

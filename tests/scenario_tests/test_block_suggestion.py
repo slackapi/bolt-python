@@ -49,15 +49,11 @@ class TestBlockSuggestion:
 
     def build_valid_request(self) -> BoltRequest:
         timestamp = str(int(time()))
-        return BoltRequest(
-            body=raw_body, headers=self.build_headers(timestamp, raw_body)
-        )
+        return BoltRequest(body=raw_body, headers=self.build_headers(timestamp, raw_body))
 
     def build_valid_multi_request(self) -> BoltRequest:
         timestamp = str(int(time()))
-        return BoltRequest(
-            body=raw_multi_body, headers=self.build_headers(timestamp, raw_multi_body)
-        )
+        return BoltRequest(body=raw_multi_body, headers=self.build_headers(timestamp, raw_multi_body))
 
     def test_mock_server_is_running(self):
         resp = self.web_client.api_test()
@@ -289,9 +285,7 @@ multi_body["block_id"] = "mes_b"
 multi_body["action_id"] = "mes_a"
 raw_multi_body = f"payload={quote(json.dumps(multi_body))}"
 
-response = {
-    "options": [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]
-}
+response = {"options": [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]}
 expected_response_body = json.dumps(response)
 
 multi_response = {

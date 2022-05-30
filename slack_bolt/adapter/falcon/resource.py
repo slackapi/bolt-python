@@ -61,11 +61,7 @@ class SlackAppResource:
         for cookie in bolt_resp.cookies():
             for name, c in cookie.items():
                 expire_value = c.get("expires")
-                expire = (
-                    datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z")
-                    if expire_value
-                    else None
-                )
+                expire = datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z") if expire_value else None
                 resp.set_cookie(
                     name=name,
                     value=c.value,

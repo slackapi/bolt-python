@@ -14,13 +14,9 @@ def get_bolt_logger(cls: Any, base_logger: Optional[Logger] = None) -> Logger:
     return logger
 
 
-def get_bolt_app_logger(
-    app_name: str, cls: object = None, base_logger: Optional[Logger] = None
-) -> Logger:
+def get_bolt_app_logger(app_name: str, cls: object = None, base_logger: Optional[Logger] = None) -> Logger:
     logger: Logger = (
-        logging.getLogger(f"{app_name}:{cls.__name__}")
-        if cls and hasattr(cls, "__name__")
-        else logging.getLogger(app_name)
+        logging.getLogger(f"{app_name}:{cls.__name__}") if cls and hasattr(cls, "__name__") else logging.getLogger(app_name)
     )
 
     if base_logger is not None:

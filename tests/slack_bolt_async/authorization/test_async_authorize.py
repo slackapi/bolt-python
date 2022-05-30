@@ -57,24 +57,18 @@ class TestAsyncAuthorize:
     @pytest.mark.asyncio
     async def test_installation_store_legacy(self):
         installation_store = LegacyMemoryInstallationStore()
-        authorize = AsyncInstallationStoreAuthorize(
-            logger=installation_store.logger, installation_store=installation_store
-        )
+        authorize = AsyncInstallationStoreAuthorize(logger=installation_store.logger, installation_store=installation_store)
         assert authorize.find_installation_available is None
         context = AsyncBoltContext()
         context["client"] = self.client
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert authorize.find_installation_available is False
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
         await assert_auth_test_count_async(self, 1)
 
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
@@ -91,18 +85,14 @@ class TestAsyncAuthorize:
         assert authorize.find_installation_available is None
         context = AsyncBoltContext()
         context["client"] = self.client
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert authorize.find_installation_available is False
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
         await assert_auth_test_count_async(self, 1)
 
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
@@ -120,18 +110,14 @@ class TestAsyncAuthorize:
         assert authorize.bot_only is True
         context = AsyncBoltContext()
         context["client"] = self.client
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert authorize.find_installation_available is True
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
         await assert_auth_test_count_async(self, 1)
 
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
@@ -150,18 +136,14 @@ class TestAsyncAuthorize:
         assert authorize.bot_only is True
         context = AsyncBoltContext()
         context["client"] = self.client
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert authorize.find_installation_available is True
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
         await assert_auth_test_count_async(self, 1)
 
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
@@ -170,24 +152,18 @@ class TestAsyncAuthorize:
     @pytest.mark.asyncio
     async def test_installation_store(self):
         installation_store = MemoryInstallationStore()
-        authorize = AsyncInstallationStoreAuthorize(
-            logger=installation_store.logger, installation_store=installation_store
-        )
+        authorize = AsyncInstallationStoreAuthorize(logger=installation_store.logger, installation_store=installation_store)
         assert authorize.find_installation_available is None
         context = AsyncBoltContext()
         context["client"] = self.client
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert authorize.find_installation_available is True
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
         await assert_auth_test_count_async(self, 1)
 
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
@@ -204,18 +180,14 @@ class TestAsyncAuthorize:
         assert authorize.find_installation_available is None
         context = AsyncBoltContext()
         context["client"] = self.client
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert authorize.find_installation_available is True
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
         await assert_auth_test_count_async(self, 1)
 
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
@@ -224,14 +196,10 @@ class TestAsyncAuthorize:
     @pytest.mark.asyncio
     async def test_fetch_different_user_token(self):
         installation_store = ValidUserTokenInstallationStore()
-        authorize = AsyncInstallationStoreAuthorize(
-            logger=installation_store.logger, installation_store=installation_store
-        )
+        authorize = AsyncInstallationStoreAuthorize(logger=installation_store.logger, installation_store=installation_store)
         context = AsyncBoltContext()
         context["client"] = AsyncWebClient(base_url=self.mock_api_server_base_url)
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W222"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W222")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.bot_token == "xoxb-valid"
@@ -263,9 +231,7 @@ class TestAsyncAuthorize:
             logger=installation_store.logger,
             installation_store=installation_store,
         )
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W222"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W222")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.bot_token == "xoxb-valid-refreshed"
@@ -275,14 +241,10 @@ class TestAsyncAuthorize:
     @pytest.mark.asyncio
     async def test_remove_latest_user_token_if_it_is_not_relevant(self):
         installation_store = ValidUserTokenInstallationStore()
-        authorize = AsyncInstallationStoreAuthorize(
-            logger=installation_store.logger, installation_store=installation_store
-        )
+        authorize = AsyncInstallationStoreAuthorize(logger=installation_store.logger, installation_store=installation_store)
         context = AsyncBoltContext()
         context["client"] = AsyncWebClient(base_url=self.mock_api_server_base_url)
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W333"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W333")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.bot_token == "xoxb-valid"
@@ -314,9 +276,7 @@ class TestAsyncAuthorize:
             logger=installation_store.logger,
             installation_store=installation_store,
         )
-        result = await authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W333"
-        )
+        result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W333")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.bot_token == "xoxb-valid-refreshed"

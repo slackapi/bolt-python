@@ -10,9 +10,7 @@ from slack_bolt.error import BoltError
 from slack_bolt.version import __version__ as bolt_version
 
 
-def create_web_client(
-    token: Optional[str] = None, logger: Optional[Logger] = None
-) -> WebClient:
+def create_web_client(token: Optional[str] = None, logger: Optional[Logger] = None) -> WebClient:
     return WebClient(
         token=token,
         logger=logger,

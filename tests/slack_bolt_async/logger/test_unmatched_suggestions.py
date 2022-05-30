@@ -10,9 +10,7 @@ class TestUnmatchedPatternSuggestions:
         pass
 
     def test_unknown_patterns(self):
-        req: AsyncBoltRequest = AsyncBoltRequest(
-            body={"type": "foo"}, mode="socket_mode"
-        )
+        req: AsyncBoltRequest = AsyncBoltRequest(body={"type": "foo"}, mode="socket_mode")
         message = warning_unhandled_request(req)
         assert f"Unhandled request ({req.body})" == message
 
@@ -38,9 +36,7 @@ async def handle_some_action(ack, body, logger):
         )
 
     def test_attachment_actions(self):
-        req: AsyncBoltRequest = AsyncBoltRequest(
-            body=attachment_actions, mode="socket_mode"
-        )
+        req: AsyncBoltRequest = AsyncBoltRequest(body=attachment_actions, mode="socket_mode")
         message = warning_unhandled_request(req)
         filtered_body = {
             "type": "interactive_message",
@@ -67,9 +63,7 @@ async def handle_some_action(ack, body, logger):
         )
 
     def test_app_mention_event(self):
-        req: AsyncBoltRequest = AsyncBoltRequest(
-            body=app_mention_event, mode="socket_mode"
-        )
+        req: AsyncBoltRequest = AsyncBoltRequest(body=app_mention_event, mode="socket_mode")
         filtered_body = {
             "type": "event_callback",
             "event": {"type": "app_mention"},
@@ -108,9 +102,7 @@ async def handle_some_command(ack, body, logger):
         )
 
     def test_shortcut(self):
-        req: AsyncBoltRequest = AsyncBoltRequest(
-            body=global_shortcut, mode="socket_mode"
-        )
+        req: AsyncBoltRequest = AsyncBoltRequest(body=global_shortcut, mode="socket_mode")
         message = warning_unhandled_request(req)
         filtered_body = {
             "type": "shortcut",
@@ -129,9 +121,7 @@ async def handle_shortcuts(ack, body, logger):
             == message
         )
 
-        req: AsyncBoltRequest = AsyncBoltRequest(
-            body=message_shortcut, mode="socket_mode"
-        )
+        req: AsyncBoltRequest = AsyncBoltRequest(body=message_shortcut, mode="socket_mode")
         message = warning_unhandled_request(req)
         filtered_body = {
             "type": "message_action",
@@ -151,9 +141,7 @@ async def handle_shortcuts(ack, body, logger):
         )
 
     def test_view(self):
-        req: AsyncBoltRequest = AsyncBoltRequest(
-            body=view_submission, mode="socket_mode"
-        )
+        req: AsyncBoltRequest = AsyncBoltRequest(body=view_submission, mode="socket_mode")
         message = warning_unhandled_request(req)
         filtered_body = {
             "type": "view_submission",
@@ -192,9 +180,7 @@ async def handle_view_events(ack, body, logger):
         )
 
     def test_block_suggestion(self):
-        req: AsyncBoltRequest = AsyncBoltRequest(
-            body=block_suggestion, mode="socket_mode"
-        )
+        req: AsyncBoltRequest = AsyncBoltRequest(body=block_suggestion, mode="socket_mode")
         message = warning_unhandled_request(req)
         filtered_body = {
             "type": "block_suggestion",
@@ -216,9 +202,7 @@ async def handle_some_options(ack):
         )
 
     def test_dialog_suggestion(self):
-        req: AsyncBoltRequest = AsyncBoltRequest(
-            body=dialog_suggestion, mode="socket_mode"
-        )
+        req: AsyncBoltRequest = AsyncBoltRequest(body=dialog_suggestion, mode="socket_mode")
         message = warning_unhandled_request(req)
         filtered_body = {
             "type": "dialog_suggestion",
@@ -238,9 +222,7 @@ async def handle_some_options(ack):
         )
 
     def test_step(self):
-        req: AsyncBoltRequest = AsyncBoltRequest(
-            body=step_edit_payload, mode="socket_mode"
-        )
+        req: AsyncBoltRequest = AsyncBoltRequest(body=step_edit_payload, mode="socket_mode")
         message = warning_unhandled_request(req)
         filtered_body = {
             "type": "workflow_step_edit",
@@ -263,9 +245,7 @@ app.step(ws)
 """
             == message
         )
-        req: AsyncBoltRequest = AsyncBoltRequest(
-            body=step_save_payload, mode="socket_mode"
-        )
+        req: AsyncBoltRequest = AsyncBoltRequest(body=step_save_payload, mode="socket_mode")
         message = warning_unhandled_request(req)
         filtered_body = {
             "type": "view_submission",
@@ -288,9 +268,7 @@ app.step(ws)
 """
             == message
         )
-        req: AsyncBoltRequest = AsyncBoltRequest(
-            body=step_execute_payload, mode="socket_mode"
-        )
+        req: AsyncBoltRequest = AsyncBoltRequest(body=step_execute_payload, mode="socket_mode")
         message = warning_unhandled_request(req)
         filtered_body = {
             "type": "event_callback",
@@ -700,9 +678,7 @@ view_submission = {
         ],
         "private_metadata": "This is for you!",
         "callback_id": "view-id",
-        "state": {
-            "values": {"hspI": {"maBWU": {"type": "plain_text_input", "value": "test"}}}
-        },
+        "state": {"values": {"hspI": {"maBWU": {"type": "plain_text_input", "value": "test"}}}},
         "hash": "1596530361.3wRYuk3R",
         "title": {
             "type": "plain_text",

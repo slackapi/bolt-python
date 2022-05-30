@@ -43,9 +43,7 @@ class TestAsyncRequestVerification:
         middleware = AsyncRequestVerification(signing_secret="secret")
         timestamp = str(int(time()))
         raw_body = "payload={}"
-        req = AsyncBoltRequest(
-            body=raw_body, headers=self.build_headers(timestamp, raw_body)
-        )
+        req = AsyncBoltRequest(body=raw_body, headers=self.build_headers(timestamp, raw_body))
         resp = BoltResponse(status=404)
         resp = await middleware.async_process(req=req, resp=resp, next=next)
         assert resp.status == 200

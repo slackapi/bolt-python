@@ -17,9 +17,7 @@ class TestAsyncSay:
         setup_mock_web_api_server(self)
         valid_token = "xoxb-valid"
         mock_api_server_base_url = "http://localhost:8888"
-        self.web_client = AsyncWebClient(
-            token=valid_token, base_url=mock_api_server_base_url
-        )
+        self.web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url)
 
         loop = asyncio.get_event_loop()
         yield loop
@@ -35,9 +33,7 @@ class TestAsyncSay:
     @pytest.mark.asyncio
     async def test_say_unfurl_options(self):
         say = AsyncSay(client=self.web_client, channel="C111")
-        response: AsyncSlackResponse = await say(
-            text="Hi there!", unfurl_links=True, unfurl_media=True
-        )
+        response: AsyncSlackResponse = await say(text="Hi there!", unfurl_links=True, unfurl_media=True)
         assert response.status_code == 200
 
     @pytest.mark.asyncio

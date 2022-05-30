@@ -8,21 +8,15 @@ class TestOAuthInternals:
 
     def test_build_detailed_error_invalid_state(self):
         result = build_detailed_error("invalid_state")
-        assert result.startswith(
-            "invalid_state: The state parameter is no longer valid."
-        )
+        assert result.startswith("invalid_state: The state parameter is no longer valid.")
 
     def test_build_detailed_error_missing_code(self):
         result = build_detailed_error("missing_code")
-        assert result.startswith(
-            "missing_code: The code parameter is missing in this redirection."
-        )
+        assert result.startswith("missing_code: The code parameter is missing in this redirection.")
 
     def test_build_detailed_error_storage_error(self):
         result = build_detailed_error("storage_error")
-        assert result.startswith(
-            "storage_error: The app's server encountered an issue. Contact the app developer."
-        )
+        assert result.startswith("storage_error: The app's server encountered an issue. Contact the app developer.")
 
     def test_build_detailed_error_others(self):
         result = build_detailed_error("access_denied")

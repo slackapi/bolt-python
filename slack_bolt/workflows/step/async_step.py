@@ -76,9 +76,7 @@ class AsyncWorkflowStepBuilder:
     def edit(
         self,
         *args,
-        matchers: Optional[
-            Union[Callable[..., Awaitable[bool]], AsyncListenerMatcher]
-        ] = None,
+        matchers: Optional[Union[Callable[..., Awaitable[bool]], AsyncListenerMatcher]] = None,
         middleware: Optional[Union[Callable, AsyncMiddleware]] = None,
         lazy: Optional[List[Callable[..., Awaitable[None]]]] = None,
     ):
@@ -125,9 +123,7 @@ class AsyncWorkflowStepBuilder:
     def save(
         self,
         *args,
-        matchers: Optional[
-            Union[Callable[..., Awaitable[bool]], AsyncListenerMatcher]
-        ] = None,
+        matchers: Optional[Union[Callable[..., Awaitable[bool]], AsyncListenerMatcher]] = None,
         middleware: Optional[Union[Callable, AsyncMiddleware]] = None,
         lazy: Optional[List[Callable[..., Awaitable[None]]]] = None,
     ):
@@ -174,9 +170,7 @@ class AsyncWorkflowStepBuilder:
     def execute(
         self,
         *args,
-        matchers: Optional[
-            Union[Callable[..., Awaitable[bool]], AsyncListenerMatcher]
-        ] = None,
+        matchers: Optional[Union[Callable[..., Awaitable[bool]], AsyncListenerMatcher]] = None,
         middleware: Optional[Union[Callable, AsyncMiddleware]] = None,
         lazy: Optional[List[Callable[..., Awaitable[None]]]] = None,
     ):
@@ -210,9 +204,7 @@ class AsyncWorkflowStepBuilder:
 
         def _inner(func):
             functions = [func] + (lazy if lazy is not None else [])
-            self._execute = self._to_listener(
-                "execute", functions, matchers, middleware
-            )
+            self._execute = self._to_listener("execute", functions, matchers, middleware)
 
             @wraps(func)
             async def _wrapper(*args, **kwargs):
@@ -251,9 +243,7 @@ class AsyncWorkflowStepBuilder:
         self,
         name: str,
         listener_or_functions: Union[AsyncListener, Callable, List[Callable]],
-        matchers: Optional[
-            Union[Callable[..., Awaitable[bool]], AsyncListenerMatcher]
-        ] = None,
+        matchers: Optional[Union[Callable[..., Awaitable[bool]], AsyncListenerMatcher]] = None,
         middleware: Optional[Union[Callable, AsyncMiddleware]] = None,
     ) -> AsyncListener:
         return AsyncWorkflowStep.build_listener(
@@ -269,9 +259,7 @@ class AsyncWorkflowStepBuilder:
     @staticmethod
     def to_listener_matchers(
         app_name: str,
-        matchers: Optional[
-            List[Union[Callable[..., Awaitable[bool]], AsyncListenerMatcher]]
-        ],
+        matchers: Optional[List[Union[Callable[..., Awaitable[bool]], AsyncListenerMatcher]]],
     ) -> List[AsyncListenerMatcher]:
         _matchers = []
         if matchers is not None:
@@ -279,9 +267,7 @@ class AsyncWorkflowStepBuilder:
                 if isinstance(m, AsyncListenerMatcher):
                     _matchers.append(m)
                 elif isinstance(m, Callable):
-                    _matchers.append(
-                        AsyncCustomListenerMatcher(app_name=app_name, func=m)
-                    )
+                    _matchers.append(AsyncCustomListenerMatcher(app_name=app_name, func=m))
                 else:
                     raise ValueError(f"Invalid matcher: {type(m)}")
         return _matchers  # type: ignore
@@ -316,15 +302,9 @@ class AsyncWorkflowStep:
         self,
         *,
         callback_id: Union[str, Pattern],
-        edit: Union[
-            Callable[..., Awaitable[BoltResponse]], AsyncListener, Sequence[Callable]
-        ],
-        save: Union[
-            Callable[..., Awaitable[BoltResponse]], AsyncListener, Sequence[Callable]
-        ],
-        execute: Union[
-            Callable[..., Awaitable[BoltResponse]], AsyncListener, Sequence[Callable]
-        ],
+        edit: Union[Callable[..., Awaitable[BoltResponse]], AsyncListener, Sequence[Callable]],
+        save: Union[Callable[..., Awaitable[BoltResponse]], AsyncListener, Sequence[Callable]],
+        execute: Union[Callable[..., Awaitable[BoltResponse]], AsyncListener, Sequence[Callable]],
         app_name: Optional[str] = None,
         base_logger: Optional[Logger] = None,
     ):
@@ -381,13 +361,9 @@ class AsyncWorkflowStep:
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
             matchers = matchers if matchers else []
-            matchers.insert(
-                0, cls._build_primary_matcher(name, callback_id, base_logger)
-            )
+            matchers.insert(0, cls._build_primary_matcher(name, callback_id, base_logger))
             middleware = middleware if middleware else []
-            middleware.insert(
-                0, cls._build_single_middleware(name, callback_id, base_logger)
-            )
+            middleware.insert(0, cls._build_single_middleware(name, callback_id, base_logger))
             functions = listener_or_functions
             ack_function = functions.pop(0)
             return AsyncCustomListener(
@@ -400,9 +376,7 @@ class AsyncWorkflowStep:
                 base_logger=base_logger,
             )
         else:
-            raise BoltError(
-                f"Invalid {name} listener: {type(listener_or_functions)} detected (callback_id: {callback_id})"
-            )
+            raise BoltError(f"Invalid {name} listener: {type(listener_or_functions)} detected (callback_id: {callback_id})")
 
     @classmethod
     def _build_primary_matcher(
@@ -412,17 +386,11 @@ class AsyncWorkflowStep:
         base_logger: Optional[Logger] = None,
     ) -> AsyncListenerMatcher:
         if name == "edit":
-            return workflow_step_edit(
-                callback_id, asyncio=True, base_logger=base_logger
-            )
+            return workflow_step_edit(callback_id, asyncio=True, base_logger=base_logger)
         elif name == "save":
-            return workflow_step_save(
-                callback_id, asyncio=True, base_logger=base_logger
-            )
+            return workflow_step_save(callback_id, asyncio=True, base_logger=base_logger)
         elif name == "execute":
-            return workflow_step_execute(
-                callback_id, asyncio=True, base_logger=base_logger
-            )
+            return workflow_step_execute(callback_id, asyncio=True, base_logger=base_logger)
         else:
             raise ValueError(f"Invalid name {name}")
 

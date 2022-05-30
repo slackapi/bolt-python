@@ -166,9 +166,7 @@ class AsyncOAuthFlow:
         if self.settings.state_validation_enabled is True:
             state = await self.issue_new_state(request)
             url = await self.build_authorize_url(state, request)
-            set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(
-                state
-            )
+            set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(state)
         if self.settings.install_page_rendering_enabled:
             html = await self.build_install_page_html(url, request)
             return BoltResponse(
@@ -201,9 +199,7 @@ class AsyncOAuthFlow:
     async def build_install_page_html(self, url: str, request: AsyncBoltRequest) -> str:
         return _build_default_install_page_html(url)
 
-    async def append_set_cookie_headers(
-        self, headers: dict, set_cookie_value: Optional[str]
-    ):
+    async def append_set_cookie_headers(self, headers: dict, set_cookie_value: Optional[str]):
         if set_cookie_value is not None:
             headers["Set-Cookie"] = [set_cookie_value]
         return headers
@@ -315,17 +311,11 @@ class AsyncOAuthFlow:
                 client_secret=self.settings.client_secret,
                 redirect_uri=self.settings.redirect_uri,  # can be None
             )
-            installed_enterprise: Dict[str, str] = (
-                oauth_response.get("enterprise") or {}
-            )
-            is_enterprise_install: bool = (
-                oauth_response.get("is_enterprise_install") or False
-            )
+            installed_enterprise: Dict[str, str] = oauth_response.get("enterprise") or {}
+            is_enterprise_install: bool = oauth_response.get("is_enterprise_install") or False
             installed_team: Dict[str, str] = oauth_response.get("team") or {}
             installer: Dict[str, str] = oauth_response.get("authed_user") or {}
-            incoming_webhook: Dict[str, str] = (
-                oauth_response.get("incoming_webhook") or {}
-            )
+            incoming_webhook: Dict[str, str] = oauth_response.get("incoming_webhook") or {}
 
             bot_token: Optional[str] = oauth_response.get("access_token")
             # NOTE: oauth.v2.access doesn't include bot_id in response
@@ -358,22 +348,16 @@ class AsyncOAuthFlow:
                 incoming_webhook_url=incoming_webhook.get("url"),
                 incoming_webhook_channel=incoming_webhook.get("channel"),
                 incoming_webhook_channel_id=incoming_webhook.get("channel_id"),
-                incoming_webhook_configuration_url=incoming_webhook.get(
-                    "configuration_url"
-                ),
+                incoming_webhook_configuration_url=incoming_webhook.get("configuration_url"),
                 is_enterprise_install=is_enterprise_install,
                 token_type=oauth_response.get("token_type"),
             )
 
         except SlackApiError as e:
-            message = (
-                f"Failed to fetch oauth.v2.access result with code: {code} - error: {e}"
-            )
+            message = f"Failed to fetch oauth.v2.access result with code: {code} - error: {e}"
             self.logger.warning(message)
             return None
 
-    async def store_installation(
-        self, request: AsyncBoltRequest, installation: Installation
-    ):
+    async def store_installation(self, request: AsyncBoltRequest, installation: Installation):
         # may raise BoltError
         await self.settings.installation_store.async_save(installation)

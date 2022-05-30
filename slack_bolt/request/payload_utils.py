@@ -21,20 +21,11 @@ def to_message(body: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 
 
 def is_event(body: Dict[str, Any]) -> bool:
-    return (
-        body is not None
-        and _is_expected_type(body, "event_callback")
-        and "event" in body
-        and "type" in body["event"]
-    )
+    return body is not None and _is_expected_type(body, "event_callback") and "event" in body and "type" in body["event"]
 
 
 def is_workflow_step_execute(body: Dict[str, Any]) -> bool:
-    return (
-        is_event(body)
-        and body["event"]["type"] == "workflow_step_execute"
-        and "workflow_step" in body["event"]
-    )
+    return is_event(body) and body["event"]["type"] == "workflow_step_execute" and "workflow_step" in body["event"]
 
 
 # -------------------
@@ -75,43 +66,23 @@ def is_action(body: Dict[str, Any]) -> bool:
 
 
 def is_attachment_action(body: Dict[str, Any]) -> bool:
-    return (
-        body is not None
-        and _is_expected_type(body, "interactive_message")
-        and "callback_id" in body
-    )
+    return body is not None and _is_expected_type(body, "interactive_message") and "callback_id" in body
 
 
 def is_block_actions(body: Dict[str, Any]) -> bool:
-    return (
-        body is not None
-        and _is_expected_type(body, "block_actions")
-        and "actions" in body
-    )
+    return body is not None and _is_expected_type(body, "block_actions") and "actions" in body
 
 
 def is_dialog_submission(body: Dict[str, Any]) -> bool:
-    return (
-        body is not None
-        and _is_expected_type(body, "dialog_submission")
-        and "callback_id" in body
-    )
+    return body is not None and _is_expected_type(body, "dialog_submission") and "callback_id" in body
 
 
 def is_dialog_cancellation(body: Dict[str, Any]) -> bool:
-    return (
-        body is not None
-        and _is_expected_type(body, "dialog_cancellation")
-        and "callback_id" in body
-    )
+    return body is not None and _is_expected_type(body, "dialog_cancellation") and "callback_id" in body
 
 
 def is_workflow_step_edit(body: Dict[str, Any]) -> bool:
-    return (
-        body is not None
-        and _is_expected_type(body, "workflow_step_edit")
-        and "callback_id" in body
-    )
+    return body is not None and _is_expected_type(body, "workflow_step_edit") and "callback_id" in body
 
 
 # -------------------
@@ -130,19 +101,11 @@ def is_options(body: Dict[str, Any]) -> bool:
 
 
 def is_block_suggestion(body: Dict[str, Any]) -> bool:
-    return (
-        body is not None
-        and _is_expected_type(body, "block_suggestion")
-        and "action_id" in body
-    )
+    return body is not None and _is_expected_type(body, "block_suggestion") and "action_id" in body
 
 
 def is_dialog_suggestion(body: Dict[str, Any]) -> bool:
-    return (
-        body is not None
-        and _is_expected_type(body, "dialog_suggestion")
-        and "callback_id" in body
-    )
+    return body is not None and _is_expected_type(body, "dialog_suggestion") and "callback_id" in body
 
 
 # -------------------
@@ -161,19 +124,11 @@ def is_shortcut(body: Dict[str, Any]) -> bool:
 
 
 def is_global_shortcut(body: Dict[str, Any]) -> bool:
-    return (
-        body is not None
-        and _is_expected_type(body, "shortcut")
-        and "callback_id" in body
-    )
+    return body is not None and _is_expected_type(body, "shortcut") and "callback_id" in body
 
 
 def is_message_shortcut(body: Dict[str, Any]) -> bool:
-    return (
-        body is not None
-        and _is_expected_type(body, "message_action")
-        and "callback_id" in body
-    )
+    return body is not None and _is_expected_type(body, "message_action") and "callback_id" in body
 
 
 # -------------------
@@ -193,20 +148,12 @@ def is_view(body: Dict[str, Any]) -> bool:
 
 def is_view_submission(body: Dict[str, Any]) -> bool:
     return (
-        body is not None
-        and _is_expected_type(body, "view_submission")
-        and "view" in body
-        and "callback_id" in body["view"]
+        body is not None and _is_expected_type(body, "view_submission") and "view" in body and "callback_id" in body["view"]
     )
 
 
 def is_view_closed(body: Dict[str, Any]) -> bool:
-    return (
-        body is not None
-        and _is_expected_type(body, "view_closed")
-        and "view" in body
-        and "callback_id" in body["view"]
-    )
+    return body is not None and _is_expected_type(body, "view_closed") and "view" in body and "callback_id" in body["view"]
 
 
 def is_workflow_step_save(body: Dict[str, Any]) -> bool:

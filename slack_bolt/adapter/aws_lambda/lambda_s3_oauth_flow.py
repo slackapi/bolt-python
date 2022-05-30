@@ -30,16 +30,10 @@ class LambdaS3OAuthFlow(OAuthFlow):
             client_id=os.environ["SLACK_CLIENT_ID"],
             client_secret=os.environ["SLACK_CLIENT_SECRET"],
         )
-        oauth_state_bucket_name = (
-            oauth_state_bucket_name or os.environ["SLACK_STATE_S3_BUCKET_NAME"]
-        )
-        installation_bucket_name = (
-            installation_bucket_name or os.environ["SLACK_INSTALLATION_S3_BUCKET_NAME"]
-        )
+        oauth_state_bucket_name = oauth_state_bucket_name or os.environ["SLACK_STATE_S3_BUCKET_NAME"]
+        installation_bucket_name = installation_bucket_name or os.environ["SLACK_INSTALLATION_S3_BUCKET_NAME"]
         self.s3_client = boto3.client("s3")
-        if settings.state_store is None or not isinstance(
-            settings.state_store, AmazonS3OAuthStateStore
-        ):
+        if settings.state_store is None or not isinstance(settings.state_store, AmazonS3OAuthStateStore):
             settings.state_store = AmazonS3OAuthStateStore(
                 logger=logger,
                 s3_client=self.s3_client,
@@ -47,9 +41,7 @@ class LambdaS3OAuthFlow(OAuthFlow):
                 expiration_seconds=settings.state_expiration_seconds,
             )
 
-        if settings.installation_store is None or not isinstance(
-            settings.installation_store, AmazonS3InstallationStore
-        ):
+        if settings.installation_store is None or not isinstance(settings.installation_store, AmazonS3InstallationStore):
             settings.installation_store = AmazonS3InstallationStore(
                 logger=logger,
                 s3_client=self.s3_client,

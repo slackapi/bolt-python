@@ -45,9 +45,7 @@ class AsyncWorkflowStepMiddleware(AsyncMiddleware):  # type:ignore
         req: AsyncBoltRequest,
         resp: BoltResponse,
     ) -> Optional[BoltResponse]:
-        resp, next_was_not_called = await listener.run_async_middleware(
-            req=req, resp=resp
-        )
+        resp, next_was_not_called = await listener.run_async_middleware(req=req, resp=resp)
         if next_was_not_called:
             return None
 

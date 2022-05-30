@@ -86,15 +86,9 @@ class TestAttachmentActions:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-id"})(
-            handle_suggestion
-        )
-        app.action({"type": "dialog_submission", "callback_id": "dialog-callback-id"})(
-            handle_submission
-        )
-        app.action(
-            {"type": "dialog_cancellation", "callback_id": "dialog-callback-id"}
-        )(handle_cancellation)
+        app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-id"})(handle_suggestion)
+        app.action({"type": "dialog_submission", "callback_id": "dialog-callback-id"})(handle_submission)
+        app.action({"type": "dialog_cancellation", "callback_id": "dialog-callback-id"})(handle_cancellation)
 
         request = self.build_valid_request(suggestion_raw_body)
         response = app.dispatch(request)
@@ -149,15 +143,9 @@ class TestAttachmentActions:
             signing_secret=self.signing_secret,
             process_before_response=True,
         )
-        app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-id"})(
-            handle_suggestion
-        )
-        app.action({"type": "dialog_submission", "callback_id": "dialog-callback-id"})(
-            handle_submission
-        )
-        app.action(
-            {"type": "dialog_cancellation", "callback_id": "dialog-callback-id"}
-        )(handle_cancellation)
+        app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-id"})(handle_suggestion)
+        app.action({"type": "dialog_submission", "callback_id": "dialog-callback-id"})(handle_submission)
+        app.action({"type": "dialog_cancellation", "callback_id": "dialog-callback-id"})(handle_cancellation)
 
         request = self.build_valid_request(suggestion_raw_body)
         response = app.dispatch(request)
@@ -247,9 +235,7 @@ class TestAttachmentActions:
         assert response.status == 404
         assert_auth_test_count(self, 1)
 
-        app.options(
-            {"type": "dialog_suggestion", "callback_id": "dialog-callback-iddddd"}
-        )(handle_suggestion)
+        app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-iddddd"})(handle_suggestion)
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
@@ -294,9 +280,7 @@ class TestAttachmentActions:
         assert response.status == 404
         assert_auth_test_count(self, 1)
 
-        app.action(
-            {"type": "dialog_submission", "callback_id": "dialog-callback-iddddd"}
-        )(handle_submission)
+        app.action({"type": "dialog_submission", "callback_id": "dialog-callback-iddddd"})(handle_submission)
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
@@ -341,9 +325,7 @@ class TestAttachmentActions:
         assert response.status == 404
         assert_auth_test_count(self, 1)
 
-        app.action(
-            {"type": "dialog_cancellation", "callback_id": "dialog-callback-iddddd"}
-        )(handle_cancellation)
+        app.action({"type": "dialog_cancellation", "callback_id": "dialog-callback-iddddd"})(handle_cancellation)
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
