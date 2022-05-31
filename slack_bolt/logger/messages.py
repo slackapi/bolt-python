@@ -42,10 +42,7 @@ def error_auth_test_failure(error_response: SlackResponse) -> str:
 
 
 def error_token_required() -> str:
-    return (
-        "Either an env variable `SLACK_BOT_TOKEN` "
-        "or `token` argument in the constructor is required."
-    )
+    return "Either an env variable `SLACK_BOT_TOKEN` " "or `token` argument in the constructor is required."
 
 
 def error_unexpected_listener_middleware(middleware_type) -> str:
@@ -86,8 +83,7 @@ def warning_client_prioritized_and_token_skipped() -> str:
 
 def warning_token_skipped() -> str:
     return (
-        "As `installation_store` or `authorize` has been used, "
-        "`token` (or SLACK_BOT_TOKEN env variable) will be ignored."
+        "As `installation_store` or `authorize` has been used, " "`token` (or SLACK_BOT_TOKEN env variable) will be ignored."
     )
 
 
@@ -183,11 +179,7 @@ def warning_unhandled_request(  # type: ignore
     filtered_body = _build_filtered_body(req.body)
     default_message = f"Unhandled request ({filtered_body})"
     is_async = type(req) != BoltRequest
-    if (
-        is_workflow_step_edit(req.body)
-        or is_workflow_step_save(req.body)
-        or is_workflow_step_execute(req.body)
-    ):
+    if is_workflow_step_edit(req.body) or is_workflow_step_save(req.body) or is_workflow_step_execute(req.body):
         # @app.step
         callback_id = (
             filtered_body.get("callback_id")
@@ -344,9 +336,7 @@ def debug_responding(status: int, body: str, millis: int) -> str:
     return f'Responding with status: {status} body: "{body}" ({millis} millis)'
 
 
-def debug_return_listener_middleware_response(
-    listener_name: str, status: int, body: str, starting_time: float
-) -> str:
+def debug_return_listener_middleware_response(listener_name: str, status: int, body: str, starting_time: float) -> str:
     millis = int((time.time() - starting_time) * 1000)
     return (
         "Responding with listener middleware's response - "

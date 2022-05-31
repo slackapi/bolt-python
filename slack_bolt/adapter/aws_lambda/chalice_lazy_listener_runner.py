@@ -20,9 +20,7 @@ class ChaliceLazyListenerRunner(LazyListenerRunner):
 
         chalice_request: dict = request.context["chalice_request"]
         request.headers["x-slack-bolt-lazy-only"] = ["1"]
-        request.headers["x-slack-bolt-lazy-function-name"] = [
-            request.lazy_function_name
-        ]
+        request.headers["x-slack-bolt-lazy-function-name"] = [request.lazy_function_name]
         payload = {
             "method": "NONE",
             "headers": {k: v[0] for k, v in request.headers.items()},

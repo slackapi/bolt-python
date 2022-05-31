@@ -110,9 +110,7 @@ class TestAsyncOrgApps:
             result.called = True
 
         timestamp, body = str(int(time())), json.dumps(event_payload)
-        request: AsyncBoltRequest = AsyncBoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: AsyncBoltRequest = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = await app.async_dispatch(request)
         assert response.status == 200
         # auth.test API call must be skipped
@@ -150,9 +148,7 @@ class TestAsyncOrgApps:
             result.called = True
 
         timestamp, body = str(int(time())), json.dumps(event_payload)
-        request: AsyncBoltRequest = AsyncBoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: AsyncBoltRequest = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = await app.async_dispatch(request)
         assert response.status == 200
         # auth.test API call must be skipped
@@ -203,9 +199,7 @@ class TestAsyncOrgApps:
             result.called = True
 
         timestamp, body = str(int(time())), json.dumps(event_payload)
-        request: AsyncBoltRequest = AsyncBoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: AsyncBoltRequest = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = await app.async_dispatch(request)
         assert response.status == 200
         # auth.test API call must be skipped
@@ -262,9 +256,7 @@ class TestAsyncOrgApps:
             result.called = True
 
         timestamp, body = str(int(time())), json.dumps(event_payload)
-        request: AsyncBoltRequest = AsyncBoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: AsyncBoltRequest = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = await app.async_dispatch(request)
         assert response.status == 200
         # auth.test API call must be skipped

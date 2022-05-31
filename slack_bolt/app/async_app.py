@@ -191,9 +191,7 @@ class AsyncApp:
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret: str = signing_secret
-        self._verification_token: Optional[str] = verification_token or os.environ.get(
-            "SLACK_VERIFICATION_TOKEN", None
-        )
+        self._verification_token: Optional[str] = verification_token or os.environ.get("SLACK_VERIFICATION_TOKEN", None)
         # If a logger is explicitly passed when initializing, the logger works as the base logger.
         # The base logger's logging settings will be propagated to all the loggers created by bolt-python.
         self._base_logger = logger
@@ -210,9 +208,7 @@ class AsyncApp:
             self._async_client = client
             self._token = client.token
             if token is not None:
-                self._framework_logger.warning(
-                    warning_client_prioritized_and_token_skipped()
-                )
+                self._framework_logger.warning(warning_client_prioritized_and_token_skipped())
         else:
             self._async_client = create_async_web_client(
                 # NOTE: the token here can be None
@@ -229,13 +225,9 @@ class AsyncApp:
             if oauth_settings is not None or oauth_flow is not None:
                 raise BoltError(error_authorize_conflicts())
 
-            self._async_authorize = AsyncCallableAuthorize(
-                logger=self._framework_logger, func=authorize
-            )
+            self._async_authorize = AsyncCallableAuthorize(logger=self._framework_logger, func=authorize)
 
-        self._async_installation_store: Optional[
-            AsyncInstallationStore
-        ] = installation_store
+        self._async_installation_store: Optional[AsyncInstallationStore] = installation_store
         if self._async_installation_store is not None and self._async_authorize is None:
             settings = oauth_flow.settings if oauth_flow is not None else oauth_settings
             self._async_authorize = AsyncInstallationStoreAuthorize(
@@ -292,45 +284,27 @@ class AsyncApp:
             self._async_installation_store = installation_store
             oauth_settings.installation_store = installation_store
 
-            self._async_oauth_flow = AsyncOAuthFlow(
-                client=self._async_client, logger=self.logger, settings=oauth_settings
-            )
+            self._async_oauth_flow = AsyncOAuthFlow(client=self._async_client, logger=self.logger, settings=oauth_settings)
             if self._async_authorize is None:
                 self._async_authorize = self._async_oauth_flow.settings.authorize
-            self._async_authorize.token_rotation_expiration_minutes = (
-                oauth_settings.token_rotation_expiration_minutes
-            )
+            self._async_authorize.token_rotation_expiration_minutes = oauth_settings.token_rotation_expiration_minutes
 
-        if (
-            self._async_installation_store is not None
-            or self._async_authorize is not None
-        ) and self._token is not None:
+        if (self._async_installation_store is not None or self._async_authorize is not None) and self._token is not None:
             self._token = None
             self._framework_logger.warning(warning_token_skipped())
 
         # after setting bot_only here, __init__ cannot replace authorize function
-        if (
-            installation_store_bot_only is not None
-            and self._async_oauth_flow is not None
-        ):
+        if installation_store_bot_only is not None and self._async_oauth_flow is not None:
             app_bot_only = installation_store_bot_only or False
-            oauth_flow_bot_only = (
-                self._async_oauth_flow.settings.installation_store_bot_only
-            )
+            oauth_flow_bot_only = self._async_oauth_flow.settings.installation_store_bot_only
             if app_bot_only != oauth_flow_bot_only:
                 self.logger.warning(warning_bot_only_conflicts())
-                self._async_oauth_flow.settings.installation_store_bot_only = (
-                    app_bot_only
-                )
+                self._async_oauth_flow.settings.installation_store_bot_only = app_bot_only
                 self._async_authorize.bot_only = app_bot_only
 
-        self._async_tokens_revocation_listeners: Optional[
-            AsyncTokenRevocationListeners
-        ] = None
+        self._async_tokens_revocation_listeners: Optional[AsyncTokenRevocationListeners] = None
         if self._async_installation_store is not None:
-            self._async_tokens_revocation_listeners = AsyncTokenRevocationListeners(
-                self._async_installation_store
-            )
+            self._async_tokens_revocation_listeners = AsyncTokenRevocationListeners(self._async_installation_store)
 
         # --------------------------------------
         # Middleware Initialization
@@ -343,15 +317,9 @@ class AsyncApp:
         self._async_listener_runner = AsyncioListenerRunner(
             logger=self._framework_logger,
             process_before_response=process_before_response,
-            listener_error_handler=AsyncDefaultListenerErrorHandler(
-                logger=self._framework_logger
-            ),
-            listener_start_handler=AsyncDefaultListenerStartHandler(
-                logger=self._framework_logger
-            ),
-            listener_completion_handler=AsyncDefaultListenerCompletionHandler(
-                logger=self._framework_logger
-            ),
+            listener_error_handler=AsyncDefaultListenerErrorHandler(logger=self._framework_logger),
+            listener_start_handler=AsyncDefaultListenerStartHandler(logger=self._framework_logger),
+            listener_completion_handler=AsyncDefaultListenerCompletionHandler(logger=self._framework_logger),
             lazy_listener_runner=AsyncioLazyListenerRunner(
                 logger=self._framework_logger,
             ),
@@ -387,40 +355,26 @@ class AsyncApp:
                 )
             )
         if request_verification_enabled is True:
-            self._async_middleware_list.append(
-                AsyncRequestVerification(
-                    self._signing_secret, base_logger=self._base_logger
-                )
-            )
+            self._async_middleware_list.append(AsyncRequestVerification(self._signing_secret, base_logger=self._base_logger))
         # As authorize is required for making a Bolt app function, we don't offer the flag to disable this
         if self._async_oauth_flow is None:
             if self._token:
-                self._async_middleware_list.append(
-                    AsyncSingleTeamAuthorization(base_logger=self._base_logger)
-                )
+                self._async_middleware_list.append(AsyncSingleTeamAuthorization(base_logger=self._base_logger))
             elif self._async_authorize is not None:
                 self._async_middleware_list.append(
-                    AsyncMultiTeamsAuthorization(
-                        authorize=self._async_authorize, base_logger=self._base_logger
-                    )
+                    AsyncMultiTeamsAuthorization(authorize=self._async_authorize, base_logger=self._base_logger)
                 )
             else:
                 raise BoltError(error_token_required())
         else:
             self._async_middleware_list.append(
-                AsyncMultiTeamsAuthorization(
-                    authorize=self._async_authorize, base_logger=self._base_logger
-                )
+                AsyncMultiTeamsAuthorization(authorize=self._async_authorize, base_logger=self._base_logger)
             )
 
         if ignoring_self_events_enabled is True:
-            self._async_middleware_list.append(
-                AsyncIgnoringSelfEvents(base_logger=self._base_logger)
-            )
+            self._async_middleware_list.append(AsyncIgnoringSelfEvents(base_logger=self._base_logger))
         if url_verification_enabled is True:
-            self._async_middleware_list.append(
-                AsyncUrlVerification(base_logger=self._base_logger)
-            )
+            self._async_middleware_list.append(AsyncUrlVerification(base_logger=self._base_logger))
         self._init_middleware_list_done = True
 
     # -------------------------
@@ -479,11 +433,7 @@ class AsyncApp:
             path: The path to handle request from Slack (Default: `/slack/events`)
             host: The hostname to serve the web endpoints. (Default: 0.0.0.0)
         """
-        if (
-            self._server is None
-            or self._server.port != port
-            or self._server.path != path
-        ):
+        if self._server is None or self._server.port != port or self._server.path != path:
             self._server = AsyncSlackAppServer(
                 port=port,
                 path=path,
@@ -513,9 +463,7 @@ class AsyncApp:
         """
         return self.server(path=path).web_app
 
-    def start(
-        self, port: int = 3000, path: str = "/slack/events", host: Optional[str] = None
-    ) -> None:
+    def start(self, port: int = 3000, path: str = "/slack/events", host: Optional[str] = None) -> None:
         """Start a web server using AIOHTTP.
         Refer to https://docs.aiohttp.org/ for more details about AIOHTTP.
 
@@ -552,16 +500,12 @@ class AsyncApp:
                 middleware_state["next_called"] = False
                 if self._framework_logger.level <= logging.DEBUG:
                     self._framework_logger.debug(f"Applying {middleware.name}")
-                resp = await middleware.async_process(
-                    req=req, resp=resp, next=async_middleware_next
-                )
+                resp = await middleware.async_process(req=req, resp=resp, next=async_middleware_next)
                 if not middleware_state["next_called"]:
                     if resp is None:
                         # next() method was not called without providing the response to return to Slack
                         # This should not be an intentional handling in usual use cases.
-                        resp = BoltResponse(
-                            status=404, body={"error": "no next() calls in middleware"}
-                        )
+                        resp = BoltResponse(status=404, body={"error": "no next() calls in middleware"})
                         if self._raise_error_for_unhandled_request is True:
                             await self._async_listener_runner.listener_error_handler.handle(
                                 error=BoltUnhandledRequestError(
@@ -573,9 +517,7 @@ class AsyncApp:
                                 response=resp,
                             )
                             return resp
-                        self._framework_logger.warning(
-                            warning_unhandled_by_global_middleware(middleware.name, req)
-                        )
+                        self._framework_logger.warning(warning_unhandled_by_global_middleware(middleware.name, req))
                         return resp
                     return resp
 
@@ -591,13 +533,11 @@ class AsyncApp:
                     if next_was_not_called:
                         if middleware_resp is not None:
                             if self._framework_logger.level <= logging.DEBUG:
-                                debug_message = (
-                                    debug_return_listener_middleware_response(
-                                        listener_name,
-                                        middleware_resp.status,
-                                        middleware_resp.body,
-                                        starting_time,
-                                    )
+                                debug_message = debug_return_listener_middleware_response(
+                                    listener_name,
+                                    middleware_resp.status,
+                                    middleware_resp.body,
+                                    starting_time,
                                 )
                                 self._framework_logger.debug(debug_message)
                             return middleware_resp
@@ -609,9 +549,7 @@ class AsyncApp:
                         resp = middleware_resp
 
                     self._framework_logger.debug(debug_running_listener(listener_name))
-                    listener_response: Optional[
-                        BoltResponse
-                    ] = await self._async_listener_runner.run(
+                    listener_response: Optional[BoltResponse] = await self._async_listener_runner.run(
                         request=req,
                         response=resp,
                         listener_name=listener_name,
@@ -643,9 +581,7 @@ class AsyncApp:
             )
             return resp
 
-    def _handle_unmatched_requests(
-        self, req: AsyncBoltRequest, resp: BoltResponse
-    ) -> BoltResponse:
+    def _handle_unmatched_requests(self, req: AsyncBoltRequest, resp: BoltResponse) -> BoltResponse:
         self._framework_logger.warning(warning_unhandled_request(req))
         return resp
 
@@ -689,9 +625,7 @@ class AsyncApp:
                 )
                 return middleware_or_callable
             else:
-                raise BoltError(
-                    f"Unexpected type for a middleware ({type(middleware_or_callable)})"
-                )
+                raise BoltError(f"Unexpected type for a middleware ({type(middleware_or_callable)})")
         return None
 
     # -------------------------
@@ -700,21 +634,9 @@ class AsyncApp:
     def step(
         self,
         callback_id: Union[str, Pattern, AsyncWorkflowStep, AsyncWorkflowStepBuilder],
-        edit: Optional[
-            Union[
-                Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]
-            ]
-        ] = None,
-        save: Optional[
-            Union[
-                Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]
-            ]
-        ] = None,
-        execute: Optional[
-            Union[
-                Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]
-            ]
-        ] = None,
+        edit: Optional[Union[Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]]] = None,
+        save: Optional[Union[Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]]] = None,
+        execute: Optional[Union[Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]]] = None,
     ):
         """
         Registers a new Workflow Step listener.
@@ -787,11 +709,9 @@ class AsyncApp:
         if not inspect.iscoroutinefunction(func):
             name = get_name_for_callable(func)
             raise BoltError(error_listener_function_must_be_coro_func(name))
-        self._async_listener_runner.listener_error_handler = (
-            AsyncCustomListenerErrorHandler(
-                logger=self._framework_logger,
-                func=func,
-            )
+        self._async_listener_runner.listener_error_handler = AsyncCustomListenerErrorHandler(
+            logger=self._framework_logger,
+            func=func,
         )
         self._async_middleware_error_handler = AsyncCustomMiddlewareErrorHandler(
             logger=self._framework_logger,
@@ -840,12 +760,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.event(
-                event, True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware, True
-            )
+            primary_matcher = builtin_matchers.event(event, True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
         return __call__
 
@@ -906,9 +822,7 @@ class AsyncApp:
                 base_logger=self._base_logger,
             )
             middleware.insert(0, AsyncMessageListenerMatches(keyword))
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware, True
-            )
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
         return __call__
 
@@ -948,12 +862,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.command(
-                command, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.command(command, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -999,12 +909,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.shortcut(
-                constraints, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.shortcut(constraints, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1018,12 +924,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.global_shortcut(
-                callback_id, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.global_shortcut(callback_id, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1037,12 +939,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.message_shortcut(
-                callback_id, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.message_shortcut(callback_id, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1081,12 +979,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.action(
-                constraints, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.action(constraints, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1102,12 +996,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.block_action(
-                constraints, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.block_action(constraints, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1122,12 +1012,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.attachment_action(
-                callback_id, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.attachment_action(callback_id, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1142,12 +1028,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.dialog_submission(
-                callback_id, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.dialog_submission(callback_id, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1162,12 +1044,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.dialog_cancellation(
-                callback_id, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.dialog_cancellation(callback_id, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1217,12 +1095,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.view(
-                constraints, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.view(constraints, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1237,12 +1111,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.view_submission(
-                constraints, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.view_submission(constraints, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1257,12 +1127,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.view_closed(
-                constraints, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.view_closed(constraints, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1312,12 +1178,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.options(
-                constraints, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.options(constraints, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1331,12 +1193,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.block_suggestion(
-                action_id, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.block_suggestion(action_id, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1351,12 +1209,8 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.dialog_suggestion(
-                callback_id, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.dialog_suggestion(callback_id, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1384,9 +1238,7 @@ class AsyncApp:
     # -------------------------
 
     def _init_context(self, req: AsyncBoltRequest):
-        req.context["logger"] = get_bolt_app_logger(
-            app_name=self.name, base_logger=self._base_logger
-        )
+        req.context["logger"] = get_bolt_app_logger(app_name=self.name, base_logger=self._base_logger)
         req.context["token"] = self._token
         if self._token is not None:
             # This AsyncWebClient instance can be safely singleton
@@ -1439,10 +1291,7 @@ class AsyncApp:
                 raise BoltError(error_listener_function_must_be_coro_func(name))
 
         listener_matchers = [
-            AsyncCustomListenerMatcher(
-                app_name=self.name, func=f, base_logger=self._base_logger
-            )
-            for f in (matchers or [])
+            AsyncCustomListenerMatcher(app_name=self.name, func=f, base_logger=self._base_logger) for f in (matchers or [])
         ]
         listener_matchers.insert(0, primary_matcher)
         listener_middleware = []
@@ -1450,11 +1299,7 @@ class AsyncApp:
             if isinstance(m, AsyncMiddleware):
                 listener_middleware.append(m)
             elif isinstance(m, Callable) and inspect.iscoroutinefunction(m):
-                listener_middleware.append(
-                    AsyncCustomMiddleware(
-                        app_name=self.name, func=m, base_logger=self._base_logger
-                    )
-                )
+                listener_middleware.append(AsyncCustomMiddleware(app_name=self.name, func=m, base_logger=self._base_logger))
             else:
                 raise ValueError(error_unexpected_listener_middleware(type(m)))
 

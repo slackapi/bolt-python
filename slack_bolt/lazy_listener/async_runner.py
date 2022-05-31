@@ -10,9 +10,7 @@ class AsyncLazyListenerRunner(metaclass=ABCMeta):
     logger: Logger
 
     @abstractmethod
-    def start(
-        self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest
-    ) -> None:
+    def start(self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest) -> None:
         """Starts a new lazy listener execution.
 
         Args:
@@ -21,9 +19,7 @@ class AsyncLazyListenerRunner(metaclass=ABCMeta):
         """
         raise NotImplementedError()
 
-    async def run(
-        self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest
-    ) -> None:
+    async def run(self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest) -> None:
         """Synchronously run the function with a given request data.
 
         Args:

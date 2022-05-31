@@ -67,13 +67,9 @@ class AsyncBoltRequest:
         else:
             self.body = {}
 
-        self.context = build_async_context(
-            AsyncBoltContext(context if context else {}), self.body
-        )
+        self.context = build_async_context(AsyncBoltContext(context if context else {}), self.body)
         self.lazy_only = bool(self.headers.get("x-slack-bolt-lazy-only", [False])[0])
-        self.lazy_function_name = self.headers.get(
-            "x-slack-bolt-lazy-function-name", [None]
-        )[0]
+        self.lazy_function_name = self.headers.get("x-slack-bolt-lazy-function-name", [None])[0]
         self.mode = mode
 
     def to_copyable(self) -> "AsyncBoltRequest":

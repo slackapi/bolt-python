@@ -76,9 +76,7 @@ class TestErrorHandler:
         }
         raw_body = f"payload={quote(json.dumps(body))}"
         timestamp = str(int(time.time()))
-        return BoltRequest(
-            body=raw_body, headers=self.build_headers(timestamp, raw_body)
-        )
+        return BoltRequest(body=raw_body, headers=self.build_headers(timestamp, raw_body))
 
     # ----------------
     #  tests

@@ -24,9 +24,7 @@ class AsyncSlackAppResource:
 
     def __init__(self, app: AsyncApp):  # type: ignore
         if falcon_version.__version__.startswith("2."):
-            raise BoltError(
-                "This ASGI compatible adapter requires Falcon version >= 3.0"
-            )
+            raise BoltError("This ASGI compatible adapter requires Falcon version >= 3.0")
 
         self.app = app
 
@@ -34,15 +32,11 @@ class AsyncSlackAppResource:
         if self.app.oauth_flow is not None:
             oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
             if req.path == oauth_flow.install_path:
-                bolt_resp = await oauth_flow.handle_installation(
-                    await self._to_bolt_request(req)
-                )
+                bolt_resp = await oauth_flow.handle_installation(await self._to_bolt_request(req))
                 await self._write_response(bolt_resp, resp)
                 return
             elif req.path == oauth_flow.redirect_uri_path:
-                bolt_resp = await oauth_flow.handle_callback(
-                    await self._to_bolt_request(req)
-                )
+                bolt_resp = await oauth_flow.handle_callback(await self._to_bolt_request(req))
                 await self._write_response(bolt_resp, resp)
                 return
 
@@ -69,11 +63,7 @@ class AsyncSlackAppResource:
         for cookie in bolt_resp.cookies():
             for name, c in cookie.items():
                 expire_value = c.get("expires")
-                expire = (
-                    datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z")
-                    if expire_value
-                    else None
-                )
+                expire = datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z") if expire_value else None
                 resp.set_cookie(
                     name=name,
                     value=c.value,

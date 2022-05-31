@@ -19,9 +19,7 @@ class LocalLambdaClient(BaseClient):
         Payload: str = "{}",
     ) -> InvokeResponse:
         scoped = self._config.scope(self._config.chalice_stage, FunctionName)
-        lambda_context = LambdaContext(
-            FunctionName, memory_size=scoped.lambda_memory_size
-        )
+        lambda_context = LambdaContext(FunctionName, memory_size=scoped.lambda_memory_size)
 
         with self._patched_env_vars(scoped.environment_variables):
             response = self._app(json.loads(Payload), lambda_context)

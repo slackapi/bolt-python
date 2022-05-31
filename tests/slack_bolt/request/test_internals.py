@@ -124,9 +124,7 @@ class TestRequestInternals:
         assert extract_is_enterprise_install({"is_enterprise_install": True}) is True
         assert extract_is_enterprise_install({"is_enterprise_install": False}) is False
         assert extract_is_enterprise_install({"is_enterprise_install": "true"}) is True
-        assert (
-            extract_is_enterprise_install({"is_enterprise_install": "false"}) is False
-        )
+        assert extract_is_enterprise_install({"is_enterprise_install": "false"}) is False
 
     def test_parse_query(self):
         expected = {"foo": ["bar"], "baz": ["123"]}

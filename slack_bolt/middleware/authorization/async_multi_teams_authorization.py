@@ -23,9 +23,7 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
             base_logger: The base logger
         """
         self.authorize = authorize
-        self.logger = get_bolt_logger(
-            AsyncMultiTeamsAuthorization, base_logger=base_logger
-        )
+        self.logger = get_bolt_logger(AsyncMultiTeamsAuthorization, base_logger=base_logger)
 
     async def async_process(
         self,

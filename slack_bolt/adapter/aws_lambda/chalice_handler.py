@@ -21,9 +21,7 @@ class ChaliceSlackRequestHandler:
     def __init__(self, app: App, chalice: Chalice, lambda_client: Optional[BaseClient] = None):  # type: ignore
         self.app = app
         self.chalice = chalice
-        self.logger = get_bolt_app_logger(
-            app.name, ChaliceSlackRequestHandler, app.logger
-        )
+        self.logger = get_bolt_app_logger(app.name, ChaliceSlackRequestHandler, app.logger)
 
         if getenv("AWS_CHALICE_CLI_MODE") == "true" and lambda_client is None:
             try:
@@ -64,10 +62,7 @@ class ChaliceSlackRequestHandler:
                 bolt_req: BoltRequest = to_bolt_request(request, body)
                 query = bolt_req.query
                 is_callback = query is not None and (
-                    (
-                        _first_value(query, "code") is not None
-                        and _first_value(query, "state") is not None
-                    )
+                    (_first_value(query, "code") is not None and _first_value(query, "state") is not None)
                     or _first_value(query, "error") is not None
                 )
                 if is_callback:

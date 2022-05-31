@@ -23,14 +23,10 @@ class MockHandler(SimpleHTTPRequestHandler):
     received_requests = {}
 
     def is_valid_token(self):
-        return "Authorization" in self.headers and str(
-            self.headers["Authorization"]
-        ).startswith("Bearer xoxb-")
+        return "Authorization" in self.headers and str(self.headers["Authorization"]).startswith("Bearer xoxb-")
 
     def is_valid_user_token(self):
-        return "Authorization" in self.headers and str(
-            self.headers["Authorization"]
-        ).startswith("Bearer xoxp-")
+        return "Authorization" in self.headers and str(self.headers["Authorization"]).startswith("Bearer xoxp-")
 
     def set_common_headers(self):
         self.send_header("content-type", "application/json;charset=utf-8")
@@ -262,9 +258,7 @@ class MockServerProcessTarget:
 
 
 class MonitorThread(threading.Thread):
-    def __init__(
-        self, test: TestCase, handler: Type[SimpleHTTPRequestHandler] = MockHandler
-    ):
+    def __init__(self, test: TestCase, handler: Type[SimpleHTTPRequestHandler] = MockHandler):
         threading.Thread.__init__(self, daemon=True)
         self.handler = handler
         self.test = test
@@ -276,9 +270,7 @@ class MonitorThread(threading.Thread):
             try:
                 req = Request(f"{self.test.server_url}/received_requests.json")
                 resp = urlopen(req, timeout=1)
-                self.test.mock_received_requests = json.loads(
-                    resp.read().decode("utf-8")
-                )
+                self.test.mock_received_requests = json.loads(resp.read().decode("utf-8"))
             except Exception as e:
                 # skip logging for the initial request
                 if self.test.mock_received_requests is not None:
@@ -296,9 +288,7 @@ class MonitorThread(threading.Thread):
 
 
 class MockServerThread(threading.Thread):
-    def __init__(
-        self, test: TestCase, handler: Type[SimpleHTTPRequestHandler] = MockHandler
-    ):
+    def __init__(self, test: TestCase, handler: Type[SimpleHTTPRequestHandler] = MockHandler):
         threading.Thread.__init__(self)
         self.handler = handler
         self.test = test

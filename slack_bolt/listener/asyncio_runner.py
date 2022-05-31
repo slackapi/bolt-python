@@ -61,12 +61,8 @@ class AsyncioListenerRunner:
         if self.process_before_response:
             if not request.lazy_only:
                 try:
-                    await self.listener_start_handler.handle(
-                        request=request, response=response
-                    )
-                    returned_value = await listener.run_ack_function(
-                        request=request, response=response
-                    )
+                    await self.listener_start_handler.handle(request=request, response=response)
+                    returned_value = await listener.run_ack_function(request=request, response=response)
                     if isinstance(returned_value, BoltResponse):
                         response = returned_value
                     if ack.response is None and listener.auto_acknowledgement:
@@ -84,17 +80,13 @@ class AsyncioListenerRunner:
                     )
                     ack.response = response
                 finally:
-                    await self.listener_completion_handler.handle(
-                        request=request, response=response
-                    )
+                    await self.listener_completion_handler.handle(request=request, response=response)
 
             for lazy_func in listener.lazy_functions:
                 if request.lazy_function_name:
                     func_name = get_name_for_callable(lazy_func)
                     if func_name == request.lazy_function_name:
-                        await self.lazy_listener_runner.run(
-                            function=lazy_func, request=request
-                        )
+                        await self.lazy_listener_runner.run(function=lazy_func, request=request)
                         # This HTTP response won't be sent to Slack API servers.
                         return BoltResponse(status=200)
                     else:
@@ -122,12 +114,8 @@ class AsyncioListenerRunner:
                     response: BoltResponse,
                 ):
                     try:
-                        await self.listener_start_handler.handle(
-                            request=request, response=response
-                        )
-                        await listener.run_ack_function(
-                            request=request, response=response
-                        )
+                        await self.listener_start_handler.handle(request=request, response=response)
+                        await listener.run_ack_function(request=request, response=response)
                     except Exception as e:
                         # The default response status code is 500 in this case.
                         # You can customize this by passing your own error handler.
@@ -144,21 +132,15 @@ class AsyncioListenerRunner:
                         )
                         ack.response = response
                     finally:
-                        await self.listener_completion_handler.handle(
-                            request=request, response=response
-                        )
+                        await self.listener_completion_handler.handle(request=request, response=response)
 
-                _f: Future = asyncio.ensure_future(
-                    run_ack_function_asynchronously(ack, request, response)
-                )
+                _f: Future = asyncio.ensure_future(run_ack_function_asynchronously(ack, request, response))
 
             for lazy_func in listener.lazy_functions:
                 if request.lazy_function_name:
                     func_name = get_name_for_callable(lazy_func)
                     if func_name == request.lazy_function_name:
-                        await self.lazy_listener_runner.run(
-                            function=lazy_func, request=request
-                        )
+                        await self.lazy_listener_runner.run(function=lazy_func, request=request)
                         # This HTTP response won't be sent to Slack API servers.
                         return BoltResponse(status=200)
                     else:
@@ -185,9 +167,7 @@ class AsyncioListenerRunner:
         # None for both means no ack() in the listener
         return None
 
-    def _start_lazy_function(
-        self, lazy_func: Callable[..., Awaitable[None]], request: AsyncBoltRequest
-    ) -> None:
+    def _start_lazy_function(self, lazy_func: Callable[..., Awaitable[None]], request: AsyncBoltRequest) -> None:
         # Start a lazy function asynchronously
         func_name: str = get_name_for_callable(lazy_func)
         self.logger.debug(debug_running_lazy_listener(func_name))
@@ -195,17 +175,13 @@ class AsyncioListenerRunner:
         self.lazy_listener_runner.start(function=lazy_func, request=copied_request)
 
     @staticmethod
-    def _build_lazy_request(
-        request: AsyncBoltRequest, lazy_func_name: str
-    ) -> AsyncBoltRequest:
+    def _build_lazy_request(request: AsyncBoltRequest, lazy_func_name: str) -> AsyncBoltRequest:
         copied_request = create_copy(request.to_copyable())
         copied_request.method = "NONE"
         copied_request.lazy_only = True
         copied_request.lazy_function_name = lazy_func_name
         return copied_request
 
-    def _debug_log_completion(
-        self, starting_time: float, response: BoltResponse
-    ) -> None:
+    def _debug_log_completion(self, starting_time: float, response: BoltResponse) -> None:
         millis = int((time.time() - starting_time) * 1000)
         self.logger.debug(debug_responding(response.status, response.body, millis))

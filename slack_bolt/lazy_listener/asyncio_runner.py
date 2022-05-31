@@ -16,9 +16,7 @@ class AsyncioLazyListenerRunner(AsyncLazyListenerRunner):
     ):
         self.logger = logger
 
-    def start(
-        self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest
-    ) -> None:
+    def start(self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest) -> None:
         asyncio.ensure_future(
             to_runnable_function(
                 internal_func=function,

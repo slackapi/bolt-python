@@ -49,9 +49,7 @@ class RequestVerification(Middleware):  # type: ignore
 
     @staticmethod
     def _can_skip(mode: str, body: Dict[str, Any]) -> bool:
-        return mode == "socket_mode" or (
-            body is not None and body.get("ssl_check") == "1"
-        )
+        return mode == "socket_mode" or (body is not None and body.get("ssl_check") == "1")
 
     @staticmethod
     def _build_error_response() -> BoltResponse:
@@ -59,6 +57,5 @@ class RequestVerification(Middleware):  # type: ignore
 
     def _debug_log_error(self, signature, timestamp, body) -> None:
         self.logger.info(
-            "Invalid request signature detected "
-            f"(signature: {signature}, timestamp: {timestamp}, body: {body})"
+            "Invalid request signature detected " f"(signature: {signature}, timestamp: {timestamp}, body: {body})"
         )

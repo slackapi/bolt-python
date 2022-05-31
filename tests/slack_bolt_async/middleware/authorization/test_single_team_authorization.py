@@ -38,9 +38,7 @@ class TestSingleTeamAuthorization:
     async def test_success_pattern(self):
         authorization = AsyncSingleTeamAuthorization()
         req = AsyncBoltRequest(body="payload={}", headers={})
-        req.context["client"] = AsyncWebClient(
-            base_url=self.mock_api_server_base_url, token="xoxb-valid"
-        )
+        req.context["client"] = AsyncWebClient(base_url=self.mock_api_server_base_url, token="xoxb-valid")
         resp = BoltResponse(status=404)
 
         resp = await authorization.async_process(req=req, resp=resp, next=next)
@@ -52,9 +50,7 @@ class TestSingleTeamAuthorization:
     async def test_failure_pattern(self):
         authorization = AsyncSingleTeamAuthorization()
         req = AsyncBoltRequest(body="payload={}", headers={})
-        req.context["client"] = AsyncWebClient(
-            base_url=self.mock_api_server_base_url, token="dummy"
-        )
+        req.context["client"] = AsyncWebClient(base_url=self.mock_api_server_base_url, token="dummy")
         resp = BoltResponse(status=404)
 
         resp = await authorization.async_process(req=req, resp=resp, next=next)

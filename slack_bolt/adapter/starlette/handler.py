@@ -48,27 +48,19 @@ class SlackRequestHandler:
     def __init__(self, app: App):  # type: ignore
         self.app = app
 
-    async def handle(
-        self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None
-    ) -> Response:
+    async def handle(self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None) -> Response:
         body = await req.body()
         if req.method == "GET":
             if self.app.oauth_flow is not None:
                 oauth_flow: OAuthFlow = self.app.oauth_flow
                 if req.url.path == oauth_flow.install_path:
-                    bolt_resp = oauth_flow.handle_installation(
-                        to_bolt_request(req, body, addition_context_properties)
-                    )
+                    bolt_resp = oauth_flow.handle_installation(to_bolt_request(req, body, addition_context_properties))
                     return to_starlette_response(bolt_resp)
                 elif req.url.path == oauth_flow.redirect_uri_path:
-                    bolt_resp = oauth_flow.handle_callback(
-                        to_bolt_request(req, body, addition_context_properties)
-                    )
+                    bolt_resp = oauth_flow.handle_callback(to_bolt_request(req, body, addition_context_properties))
                     return to_starlette_response(bolt_resp)
         elif req.method == "POST":
-            bolt_resp = self.app.dispatch(
-                to_bolt_request(req, body, addition_context_properties)
-            )
+            bolt_resp = self.app.dispatch(to_bolt_request(req, body, addition_context_properties))
             return to_starlette_response(bolt_resp)
 
         return Response(

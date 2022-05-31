@@ -27,9 +27,7 @@ class AsyncMiddlewareErrorHandler(metaclass=ABCMeta):
 
 
 class AsyncCustomMiddlewareErrorHandler(AsyncMiddlewareErrorHandler):
-    def __init__(
-        self, logger: Logger, func: Callable[..., Awaitable[Optional[BoltResponse]]]
-    ):
+    def __init__(self, logger: Logger, func: Callable[..., Awaitable[Optional[BoltResponse]]]):
         self.func = func
         self.logger = logger
         self.arg_names = inspect.getfullargspec(func).args
@@ -49,9 +47,7 @@ class AsyncCustomMiddlewareErrorHandler(AsyncMiddlewareErrorHandler):
             next_keys_required=False,
         )
         returned_response = await self.func(**kwargs)
-        if returned_response is not None and isinstance(
-            returned_response, BoltResponse
-        ):
+        if returned_response is not None and isinstance(returned_response, BoltResponse):
             response.status = returned_response.status
             response.headers = returned_response.headers
             response.body = returned_response.body

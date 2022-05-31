@@ -50,78 +50,23 @@ class TestBuiltins:
         assert action({"action_id": "valid_action_id"}).matches(req, resp) is True
         assert action({"action_id": "invalid_action_id"}).matches(req, resp) is False
         assert action({"action_id": re.compile("valid_.+")}).matches(req, resp) is True
-        assert (
-            action({"action_id": re.compile("invalid_.+")}).matches(req, resp) is False
-        )
+        assert action({"action_id": re.compile("invalid_.+")}).matches(req, resp) is False
 
         # block_id + action_id
-        assert (
-            action({"action_id": "valid_action_id", "block_id": "b"}).matches(req, resp)
-            is True
-        )
-        assert (
-            action({"action_id": "invalid_action_id", "block_id": "b"}).matches(
-                req, resp
-            )
-            is False
-        )
-        assert (
-            action({"action_id": re.compile("valid_.+"), "block_id": "b"}).matches(
-                req, resp
-            )
-            is True
-        )
-        assert (
-            action({"action_id": re.compile("invalid_.+"), "block_id": "b"}).matches(
-                req, resp
-            )
-            is False
-        )
+        assert action({"action_id": "valid_action_id", "block_id": "b"}).matches(req, resp) is True
+        assert action({"action_id": "invalid_action_id", "block_id": "b"}).matches(req, resp) is False
+        assert action({"action_id": re.compile("valid_.+"), "block_id": "b"}).matches(req, resp) is True
+        assert action({"action_id": re.compile("invalid_.+"), "block_id": "b"}).matches(req, resp) is False
 
-        assert (
-            action({"action_id": "valid_action_id", "block_id": "bbb"}).matches(
-                req, resp
-            )
-            is False
-        )
-        assert (
-            action({"action_id": "invalid_action_id", "block_id": "bbb"}).matches(
-                req, resp
-            )
-            is False
-        )
-        assert (
-            action({"action_id": re.compile("valid_.+"), "block_id": "bbb"}).matches(
-                req, resp
-            )
-            is False
-        )
-        assert (
-            action({"action_id": re.compile("invalid_.+"), "block_id": "bbb"}).matches(
-                req, resp
-            )
-            is False
-        )
+        assert action({"action_id": "valid_action_id", "block_id": "bbb"}).matches(req, resp) is False
+        assert action({"action_id": "invalid_action_id", "block_id": "bbb"}).matches(req, resp) is False
+        assert action({"action_id": re.compile("valid_.+"), "block_id": "bbb"}).matches(req, resp) is False
+        assert action({"action_id": re.compile("invalid_.+"), "block_id": "bbb"}).matches(req, resp) is False
 
         # with type
-        assert (
-            action({"action_id": "valid_action_id", "type": "block_actions"}).matches(
-                req, resp
-            )
-            is True
-        )
-        assert (
-            action(
-                {"callback_id": "valid_action_id", "type": "interactive_message"}
-            ).matches(req, resp)
-            is False
-        )
-        assert (
-            action(
-                {"callback_id": "valid_action_id", "type": "workflow_step_edit"}
-            ).matches(req, resp)
-            is False
-        )
+        assert action({"action_id": "valid_action_id", "type": "block_actions"}).matches(req, resp) is True
+        assert action({"callback_id": "valid_action_id", "type": "interactive_message"}).matches(req, resp) is False
+        assert action({"callback_id": "valid_action_id", "type": "workflow_step_edit"}).matches(req, resp) is False
 
     def test_workflow_step_execute(self):
         payload = {
@@ -137,9 +82,7 @@ class TestBuiltins:
                     "workflow_instance_id": "11111",
                     "step_id": "111-222-333-444-555",
                     "inputs": {"taskName": {"value": "a"}},
-                    "outputs": [
-                        {"name": "taskName", "type": "text", "label": "Task Name"}
-                    ],
+                    "outputs": [{"name": "taskName", "type": "text", "label": "Task Name"}],
                 },
                 "event_ts": "1601541373.225894",
             },
@@ -194,9 +137,7 @@ class TestBuiltins:
         assert not m.matches(request, None)
 
     def test_message_shortcuts(self):
-        request = BoltRequest(
-            body=f"payload={quote(json.dumps(message_shortcut_payload))}"
-        )
+        request = BoltRequest(body=f"payload={quote(json.dumps(message_shortcut_payload))}")
 
         m = shortcut("test-shortcut")
         assert m.matches(request, None)

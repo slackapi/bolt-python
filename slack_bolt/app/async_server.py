@@ -40,9 +40,7 @@ class AsyncSlackAppServer:
         if self._bolt_oauth_flow:
             self.web_app.add_routes(
                 [
-                    web.get(
-                        self._bolt_oauth_flow.install_path, self.handle_get_requests
-                    ),
+                    web.get(self._bolt_oauth_flow.install_path, self.handle_get_requests),
                     web.get(
                         self._bolt_oauth_flow.redirect_uri_path,
                         self.handle_get_requests,

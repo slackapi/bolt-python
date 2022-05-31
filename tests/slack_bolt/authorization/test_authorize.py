@@ -39,24 +39,18 @@ class TestAuthorize:
 
     def test_installation_store_legacy(self):
         installation_store = LegacyMemoryInstallationStore()
-        authorize = InstallationStoreAuthorize(
-            logger=installation_store.logger, installation_store=installation_store
-        )
+        authorize = InstallationStoreAuthorize(logger=installation_store.logger, installation_store=installation_store)
         assert authorize.find_installation_available is True
         context = BoltContext()
         context["client"] = WebClient(base_url=self.mock_api_server_base_url)
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert authorize.find_installation_available is False
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
         assert_auth_test_count(self, 1)
 
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
@@ -72,18 +66,14 @@ class TestAuthorize:
         assert authorize.find_installation_available is True
         context = BoltContext()
         context["client"] = WebClient(base_url=self.mock_api_server_base_url)
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert authorize.find_installation_available is False
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
         assert_auth_test_count(self, 1)
 
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
@@ -100,18 +90,14 @@ class TestAuthorize:
         assert authorize.bot_only is True
         context = BoltContext()
         context["client"] = WebClient(base_url=self.mock_api_server_base_url)
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert authorize.find_installation_available is True
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
         assert_auth_test_count(self, 1)
 
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
@@ -129,18 +115,14 @@ class TestAuthorize:
         assert authorize.bot_only is True
         context = BoltContext()
         context["client"] = WebClient(base_url=self.mock_api_server_base_url)
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert authorize.find_installation_available is True
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
         assert_auth_test_count(self, 1)
 
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token is None
@@ -148,23 +130,17 @@ class TestAuthorize:
 
     def test_installation_store(self):
         installation_store = MemoryInstallationStore()
-        authorize = InstallationStoreAuthorize(
-            logger=installation_store.logger, installation_store=installation_store
-        )
+        authorize = InstallationStoreAuthorize(logger=installation_store.logger, installation_store=installation_store)
         assert authorize.find_installation_available is True
         context = BoltContext()
         context["client"] = WebClient(base_url=self.mock_api_server_base_url)
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
         assert_auth_test_count(self, 1)
 
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
@@ -180,17 +156,13 @@ class TestAuthorize:
         assert authorize.find_installation_available is True
         context = BoltContext()
         context["client"] = WebClient(base_url=self.mock_api_server_base_url)
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
         assert_auth_test_count(self, 1)
 
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
@@ -198,14 +170,10 @@ class TestAuthorize:
 
     def test_fetch_different_user_token(self):
         installation_store = ValidUserTokenInstallationStore()
-        authorize = InstallationStoreAuthorize(
-            logger=installation_store.logger, installation_store=installation_store
-        )
+        authorize = InstallationStoreAuthorize(logger=installation_store.logger, installation_store=installation_store)
         context = BoltContext()
         context["client"] = WebClient(base_url=self.mock_api_server_base_url)
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W222"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W222")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.bot_token == "xoxb-valid"
@@ -236,9 +204,7 @@ class TestAuthorize:
             logger=installation_store.logger,
             installation_store=installation_store,
         )
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W222"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W222")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.bot_token == "xoxb-valid-refreshed"
@@ -247,14 +213,10 @@ class TestAuthorize:
 
     def test_remove_latest_user_token_if_it_is_not_relevant(self):
         installation_store = ValidUserTokenInstallationStore()
-        authorize = InstallationStoreAuthorize(
-            logger=installation_store.logger, installation_store=installation_store
-        )
+        authorize = InstallationStoreAuthorize(logger=installation_store.logger, installation_store=installation_store)
         context = BoltContext()
         context["client"] = WebClient(base_url=self.mock_api_server_base_url)
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W333"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W333")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.bot_token == "xoxb-valid"
@@ -285,9 +247,7 @@ class TestAuthorize:
             logger=installation_store.logger,
             installation_store=installation_store,
         )
-        result = authorize(
-            context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W333"
-        )
+        result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W333")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.bot_token == "xoxb-valid-refreshed"

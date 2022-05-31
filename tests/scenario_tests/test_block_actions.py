@@ -48,9 +48,7 @@ class TestBlockActions:
 
     def build_valid_request(self) -> BoltRequest:
         timestamp = str(int(time()))
-        return BoltRequest(
-            body=raw_body, headers=self.build_headers(timestamp, raw_body)
-        )
+        return BoltRequest(body=raw_body, headers=self.build_headers(timestamp, raw_body))
 
     def test_mock_server_is_running(self):
         resp = self.web_client.api_test()

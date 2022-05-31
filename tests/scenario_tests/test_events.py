@@ -82,9 +82,7 @@ class TestEvents:
             say("What's up?")
 
         timestamp, body = str(int(time())), json.dumps(self.valid_event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
@@ -105,9 +103,7 @@ class TestEvents:
             logger.info(payload)
 
         timestamp, body = str(int(time())), json.dumps(self.valid_event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
@@ -142,9 +138,7 @@ class TestEvents:
             say("What's up?")
 
         timestamp, body = str(int(time())), json.dumps(self.valid_reaction_added_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
@@ -163,9 +157,7 @@ class TestEvents:
                 str(int(time())),
                 json.dumps(self.valid_reaction_added_body),
             )
-            request: BoltRequest = BoltRequest(
-                body=body, headers=self.build_headers(timestamp, body)
-            )
+            request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
             response = app.dispatch(request)
             assert response.status == 200
 
@@ -218,17 +210,13 @@ class TestEvents:
             say("What's up?")
 
         timestamp, body = str(int(time())), json.dumps(join_event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
 
         timestamp, body = str(int(time())), json.dumps(left_event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
 
@@ -284,17 +272,13 @@ class TestEvents:
             say("What's up?")
 
         timestamp, body = str(int(time())), json.dumps(join_event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
 
         timestamp, body = str(int(time())), json.dumps(left_event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
 
@@ -304,9 +288,7 @@ class TestEvents:
 
     def test_uninstallation_and_revokes(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
-        app._client = WebClient(
-            token="uninstalled-revoked", base_url=self.mock_api_server_base_url
-        )
+        app._client = WebClient(token="uninstalled-revoked", base_url=self.mock_api_server_base_url)
 
         @app.event("app_uninstalled")
         def handler1(say: Say):
@@ -328,9 +310,7 @@ class TestEvents:
         }
 
         timestamp, body = str(int(time())), json.dumps(app_uninstalled_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
 
@@ -349,9 +329,7 @@ class TestEvents:
         }
 
         timestamp, body = str(int(time())), json.dumps(tokens_revoked_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
 
@@ -416,9 +394,7 @@ class TestEvents:
                     "elements": [
                         {
                             "type": "rich_text_section",
-                            "elements": [
-                                {"type": "text", "text": "Here is your file!"}
-                            ],
+                            "elements": [{"type": "text", "text": "Here is your file!"}],
                         }
                     ],
                 }
@@ -449,69 +425,53 @@ class TestEvents:
 
     def test_message_subtypes_0(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
-        app._client = WebClient(
-            token="uninstalled-revoked", base_url=self.mock_api_server_base_url
-        )
+        app._client = WebClient(token="uninstalled-revoked", base_url=self.mock_api_server_base_url)
 
         @app.event({"type": "message", "subtype": "file_share"})
         def handler1(event):
             assert event["subtype"] == "file_share"
 
         timestamp, body = str(int(time())), json.dumps(self.message_file_share_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
 
     def test_message_subtypes_1(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
-        app._client = WebClient(
-            token="uninstalled-revoked", base_url=self.mock_api_server_base_url
-        )
+        app._client = WebClient(token="uninstalled-revoked", base_url=self.mock_api_server_base_url)
 
         @app.event({"type": "message", "subtype": re.compile("file_.+")})
         def handler1(event):
             assert event["subtype"] == "file_share"
 
         timestamp, body = str(int(time())), json.dumps(self.message_file_share_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
 
     def test_message_subtypes_2(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
-        app._client = WebClient(
-            token="uninstalled-revoked", base_url=self.mock_api_server_base_url
-        )
+        app._client = WebClient(token="uninstalled-revoked", base_url=self.mock_api_server_base_url)
 
         @app.event({"type": "message", "subtype": ["file_share"]})
         def handler1(event):
             assert event["subtype"] == "file_share"
 
         timestamp, body = str(int(time())), json.dumps(self.message_file_share_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
 
     def test_message_subtypes_3(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
-        app._client = WebClient(
-            token="uninstalled-revoked", base_url=self.mock_api_server_base_url
-        )
+        app._client = WebClient(token="uninstalled-revoked", base_url=self.mock_api_server_base_url)
 
         @app.event("message")
         def handler1(event):
             assert event["subtype"] == "file_share"
 
         timestamp, body = str(int(time())), json.dumps(self.message_file_share_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
 
@@ -583,8 +543,6 @@ class TestEvents:
             assert context.user_id == "W111"
 
         timestamp, json_body = str(int(time())), json.dumps(body)
-        request: BoltRequest = BoltRequest(
-            body=json_body, headers=self.build_headers(timestamp, json_body)
-        )
+        request: BoltRequest = BoltRequest(body=json_body, headers=self.build_headers(timestamp, json_body))
         response = app.dispatch(request)
         assert response.status == 200

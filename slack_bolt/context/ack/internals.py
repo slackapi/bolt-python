@@ -35,9 +35,7 @@ def _set_response(
         if unfurl_media is not None:
             body["unfurl_media"] = unfurl_media
         if attachments and len(attachments) > 0:
-            body.update(
-                {"text": text, "attachments": convert_to_dict_list(attachments)}
-            )
+            body.update({"text": text, "attachments": convert_to_dict_list(attachments)})
             self.response = BoltResponse(status=200, body=body)
         elif blocks and len(blocks) > 0:
             body.update({"text": text, "blocks": convert_to_dict_list(blocks)})
@@ -60,9 +58,7 @@ def _set_response(
                         },
                     )
                 else:
-                    raise ValueError(
-                        "errors field is required for response_action: errors"
-                    )
+                    raise ValueError("errors field is required for response_action: errors")
             else:
                 body = {"response_action": response_action}
                 if view:
@@ -102,6 +98,4 @@ def _set_response(
         self.response = BoltResponse(status=200, body=body)
         return self.response
     else:
-        raise BoltError(
-            f"{text_or_whole_response} (type: {type(text_or_whole_response)}) is unsupported"
-        )
+        raise BoltError(f"{text_or_whole_response} (type: {type(text_or_whole_response)}) is unsupported")

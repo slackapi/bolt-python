@@ -55,9 +55,7 @@ class Listener(metaclass=ABCMeta):
         return (resp, False)
 
     @abstractmethod
-    def run_ack_function(
-        self, *, request: BoltRequest, response: BoltResponse
-    ) -> BoltResponse:
+    def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -> BoltResponse:
         """Runs all the registered middleware and then run the listener function.
 
         Args:

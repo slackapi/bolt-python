@@ -78,16 +78,12 @@ def start_process_socket_mode_server(port: int):
 
 def start_socket_mode_server(test, port: int):
     if get_mock_server_mode() == "threading":
-        test.sm_thread = threading.Thread(
-            target=start_thread_socket_mode_server(test, port)
-        )
+        test.sm_thread = threading.Thread(target=start_thread_socket_mode_server(test, port))
         test.sm_thread.daemon = True
         test.sm_thread.start()
         time.sleep(2)  # wait for the server
     else:
-        test.sm_process = Process(
-            target=start_process_socket_mode_server, kwargs={"port": port}
-        )
+        test.sm_process = Process(target=start_process_socket_mode_server, kwargs={"port": port})
         test.sm_process.start()
 
 

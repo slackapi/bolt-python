@@ -5,9 +5,7 @@ from urllib.parse import parse_qsl, parse_qs
 from slack_bolt.context import BoltContext
 
 
-def parse_query(
-    query: Optional[Union[str, Dict[str, str], Dict[str, Sequence[str]]]]
-) -> Dict[str, Sequence[str]]:
+def parse_query(query: Optional[Union[str, Dict[str, str], Dict[str, Sequence[str]]]]) -> Dict[str, Sequence[str]]:
     if query is None:
         return {}
     elif isinstance(query, str):
@@ -20,9 +18,7 @@ def parse_query(
             elif isinstance(value, str):
                 result[name] = [value]
             else:
-                raise ValueError(
-                    f"Unsupported type ({type(value)}) of element in headers ({query})"
-                )
+                raise ValueError(f"Unsupported type ({type(value)}) of element in headers ({query})")
         return result  # type: ignore
     else:
         raise ValueError(f"Unsupported type of query detected ({type(query)})")
@@ -31,9 +27,7 @@ def parse_query(
 def parse_body(body: str, content_type: Optional[str]) -> Dict[str, Any]:
     if not body:
         return {}
-    if (
-        content_type is not None and content_type == "application/json"
-    ) or body.startswith("{"):
+    if (content_type is not None and content_type == "application/json") or body.startswith("{"):
         return json.loads(body)
     else:
         if "payload" in body:  # This is not JSON format yet
@@ -53,9 +47,7 @@ def extract_is_enterprise_install(payload: Dict[str, Any]) -> Optional[bool]:
         return extract_is_enterprise_install(payload["authorizations"][0])
     if "is_enterprise_install" in payload:
         is_enterprise_install = payload.get("is_enterprise_install")
-        return is_enterprise_install is not None and (
-            is_enterprise_install is True or is_enterprise_install == "true"
-        )
+        return is_enterprise_install is not None and (is_enterprise_install is True or is_enterprise_install == "true")
     return False
 
 
@@ -169,9 +161,7 @@ def extract_content_type(headers: Dict[str, Sequence[str]]) -> Optional[str]:
     return None
 
 
-def build_normalized_headers(
-    headers: Optional[Dict[str, Union[str, Sequence[str]]]]
-) -> Dict[str, Sequence[str]]:
+def build_normalized_headers(headers: Optional[Dict[str, Union[str, Sequence[str]]]]) -> Dict[str, Sequence[str]]:
     normalized_headers: Dict[str, Sequence[str]] = {}
     if headers is not None:
         for key, value in headers.items():
@@ -181,9 +171,7 @@ def build_normalized_headers(
             elif isinstance(value, str):
                 normalized_headers[normalized_name] = [value]
             else:
-                raise ValueError(
-                    f"Unsupported type ({type(value)}) of element in headers ({headers})"
-                )
+                raise ValueError(f"Unsupported type ({type(value)}) of element in headers ({headers})")
     return normalized_headers  # type: ignore
 
 

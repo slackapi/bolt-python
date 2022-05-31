@@ -102,9 +102,7 @@ class TestEventsOrgApps:
             result.called = True
 
         timestamp, body = str(int(time())), json.dumps(event_payload)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
         # auth.test API call must be skipped
@@ -141,9 +139,7 @@ class TestEventsOrgApps:
             result.called = True
 
         timestamp, body = str(int(time())), json.dumps(event_payload)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
         # auth.test API call must be skipped
@@ -193,9 +189,7 @@ class TestEventsOrgApps:
             result.called = True
 
         timestamp, body = str(int(time())), json.dumps(event_payload)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
         # auth.test API call must be skipped
@@ -251,9 +245,7 @@ class TestEventsOrgApps:
             result.called = True
 
         timestamp, body = str(int(time())), json.dumps(event_payload)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
         # auth.test API call must be skipped

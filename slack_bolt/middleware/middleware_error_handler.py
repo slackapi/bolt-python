@@ -47,9 +47,7 @@ class CustomMiddlewareErrorHandler(MiddlewareErrorHandler):
             next_keys_required=False,
         )
         returned_response = self.func(**kwargs)
-        if returned_response is not None and isinstance(
-            returned_response, BoltResponse
-        ):
+        if returned_response is not None and isinstance(returned_response, BoltResponse):
             response.status = returned_response.status
             response.headers = returned_response.headers
             response.body = returned_response.body

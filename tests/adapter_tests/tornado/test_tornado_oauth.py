@@ -33,9 +33,7 @@ class TestTornado(AsyncHTTPTestCase):
 
     @gen_test
     async def test_oauth(self):
-        request = HTTPRequest(
-            url=self.get_url("/slack/install"), method="GET", follow_redirects=False
-        )
+        request = HTTPRequest(url=self.get_url("/slack/install"), method="GET", follow_redirects=False)
         try:
             response: HTTPResponse = await self.http_client.fetch(request)
             assert response.code == 200

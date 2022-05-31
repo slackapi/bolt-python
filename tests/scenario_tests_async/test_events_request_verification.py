@@ -57,9 +57,7 @@ class TestAsyncEventsRequestVerification:
         app.event("app_mention")(whats_up)
 
         timestamp, body = str(int(time())), json.dumps(app_mention_body)
-        request = AsyncBoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
@@ -78,9 +76,7 @@ class TestAsyncEventsRequestVerification:
         # request including invalid headers
         expired = int(time()) - 3600
         timestamp, body = str(expired), json.dumps(app_mention_body)
-        request = AsyncBoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)

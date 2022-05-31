@@ -27,9 +27,7 @@ class SlackOAuthHandler(RequestHandler):
         if self.app.oauth_flow is not None:  # type: ignore
             oauth_flow: OAuthFlow = self.app.oauth_flow  # type: ignore
             if self.request.path == oauth_flow.install_path:
-                bolt_resp = oauth_flow.handle_installation(
-                    to_bolt_request(self.request)
-                )
+                bolt_resp = oauth_flow.handle_installation(to_bolt_request(self.request))
                 set_response(self, bolt_resp)
                 return
             elif self.request.path == oauth_flow.redirect_uri_path:
@@ -55,11 +53,7 @@ def set_response(self, bolt_resp) -> None:
     for cookie in bolt_resp.cookies():
         for name, c in cookie.items():
             expire_value = c.get("expires")
-            expire = (
-                datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z")
-                if expire_value
-                else None
-            )
+            expire = datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z") if expire_value else None
             self.set_cookie(
                 name=name,
                 value=c.value,

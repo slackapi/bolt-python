@@ -29,9 +29,7 @@ class TestDjango(TestCase):
         base_url=mock_api_server_base_url,
     )
 
-    os.environ[
-        "DJANGO_SETTINGS_MODULE"
-    ] = "tests.adapter_tests.django.test_django_settings"
+    os.environ["DJANGO_SETTINGS_MODULE"] = "tests.adapter_tests.django.test_django_settings"
     rf = RequestFactory()
 
     def setUp(self):
@@ -87,9 +85,7 @@ class TestDjango(TestCase):
         }
         timestamp, body = str(int(time())), json.dumps(input)
 
-        request = self.rf.post(
-            "/slack/events", data=body, content_type="application/json"
-        )
+        request = self.rf.post("/slack/events", data=body, content_type="application/json")
         request.headers = self.build_headers(timestamp, body)
 
         response = SlackRequestHandler(app).handle(request)
@@ -270,6 +266,4 @@ class TestDjango(TestCase):
         response = SlackRequestHandler(app).handle(request)
         assert response.status_code == 200
         assert response.get("content-type") == "text/html; charset=utf-8"
-        assert "https://slack.com/oauth/v2/authorize?state=" in response.content.decode(
-            "utf-8"
-        )
+        assert "https://slack.com/oauth/v2/authorize?state=" in response.content.decode("utf-8")

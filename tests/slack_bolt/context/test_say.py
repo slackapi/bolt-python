@@ -14,9 +14,7 @@ class TestSay:
         setup_mock_web_api_server(self)
         valid_token = "xoxb-valid"
         mock_api_server_base_url = "http://localhost:8888"
-        self.web_client = WebClient(
-            token=valid_token, base_url=mock_api_server_base_url
-        )
+        self.web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url)
 
     def teardown_method(self):
         cleanup_mock_web_api_server(self)
@@ -28,9 +26,7 @@ class TestSay:
 
     def test_say_unfurl_options(self):
         say = Say(client=self.web_client, channel="C111")
-        response: SlackResponse = say(
-            text="Hi there!", unfurl_media=True, unfurl_links=True
-        )
+        response: SlackResponse = say(text="Hi there!", unfurl_media=True, unfurl_links=True)
         assert response.status_code == 200
 
     def test_say_dict(self):

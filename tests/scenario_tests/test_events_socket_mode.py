@@ -68,9 +68,7 @@ class TestEventsSocketMode:
             assert payload == event
             say("What's up?")
 
-        request: BoltRequest = BoltRequest(
-            body=self.valid_event_body, mode="socket_mode"
-        )
+        request: BoltRequest = BoltRequest(body=self.valid_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
@@ -90,9 +88,7 @@ class TestEventsSocketMode:
             assert payload == event
             logger.info(payload)
 
-        request: BoltRequest = BoltRequest(
-            body=self.valid_event_body, mode="socket_mode"
-        )
+        request: BoltRequest = BoltRequest(body=self.valid_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
@@ -126,9 +122,7 @@ class TestEventsSocketMode:
             assert payload == event
             say("What's up?")
 
-        request: BoltRequest = BoltRequest(
-            body=self.valid_reaction_added_body, mode="socket_mode"
-        )
+        request: BoltRequest = BoltRequest(body=self.valid_reaction_added_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
@@ -143,9 +137,7 @@ class TestEventsSocketMode:
             raise Exception("Something wrong!")
 
         for _ in range(10):
-            request: BoltRequest = BoltRequest(
-                body=self.valid_reaction_added_body, mode="socket_mode"
-            )
+            request: BoltRequest = BoltRequest(body=self.valid_reaction_added_body, mode="socket_mode")
             response = app.dispatch(request)
             assert response.status == 200
 
@@ -310,9 +302,7 @@ class TestEventsSocketMode:
 
     def test_uninstallation_and_revokes(self):
         app = App(client=self.web_client)
-        app._client = WebClient(
-            token="uninstalled-revoked", base_url=self.mock_api_server_base_url
-        )
+        app._client = WebClient(token="uninstalled-revoked", base_url=self.mock_api_server_base_url)
 
         @app.event("app_uninstalled")
         def handler1(say: Say):
@@ -333,9 +323,7 @@ class TestEventsSocketMode:
             "event_time": 1599616881,
         }
 
-        request: BoltRequest = BoltRequest(
-            body=app_uninstalled_body, mode="socket_mode"
-        )
+        request: BoltRequest = BoltRequest(body=app_uninstalled_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
 

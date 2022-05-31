@@ -39,9 +39,7 @@ class AsyncCallableAuthorize(AsyncAuthorize):
     This authorize implementation will be used.
     """
 
-    def __init__(
-        self, *, logger: Logger, func: Callable[..., Awaitable[AuthorizeResult]]
-    ):
+    def __init__(self, *, logger: Logger, func: Callable[..., Awaitable[AuthorizeResult]]):
         self.logger = logger
         self.func = func
         self.arg_names = inspect.getfullargspec(func).args
@@ -89,9 +87,7 @@ class AsyncCallableAuthorize(AsyncAuthorize):
             if isinstance(auth_result, AuthorizeResult):
                 return auth_result
             else:
-                raise ValueError(
-                    f"Unexpected returned value from authorize function (type: {type(auth_result)})"
-                )
+                raise ValueError(f"Unexpected returned value from authorize function (type: {type(auth_result)})")
         except SlackApiError as err:
             self.logger.debug(
                 f"The stored bot token for enterprise_id: {enterprise_id} team_id: {team_id} "
@@ -142,9 +138,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
             )
         else:
             self.token_rotator = None
-        self.token_rotation_expiration_minutes = (
-            token_rotation_expiration_minutes or 120
-        )
+        self.token_rotation_expiration_minutes = token_rotation_expiration_minutes or 120
 
     async def __call__(
         self,
@@ -156,9 +150,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
     ) -> Optional[AuthorizeResult]:
 
         if self.find_installation_available is None:
-            self.find_installation_available = hasattr(
-                self.installation_store, "async_find_installation"
-            )
+            self.find_installation_available = hasattr(self.installation_store, "async_find_installation")
         if self.find_bot_available is None:
             self.find_bot_available = hasattr(self.installation_store, "async_find_bot")
 
@@ -171,9 +163,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
             try:
                 # Note that this is the latest information for the org/workspace.
                 # The installer may not be the user associated with this incoming request.
-                latest_installation: Optional[
-                    Installation
-                ] = await self.installation_store.async_find_installation(
+                latest_installation: Optional[Installation] = await self.installation_store.async_find_installation(
                     enterprise_id=enterprise_id,
                     team_id=team_id,
                     is_enterprise_install=context.is_enterprise_install,
@@ -188,9 +178,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                 if latest_installation is not None:
                     # Save the latest bot token
                     bot_token = latest_installation.bot_token  # this still can be None
-                    user_token = (
-                        latest_installation.user_token
-                    )  # this still can be None
+                    user_token = latest_installation.user_token  # this still can be None
 
                     if latest_installation.user_id != user_id:
                         # First off, remove the user token as the installer is a different user
@@ -202,13 +190,11 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
 
                         # try to fetch the request user's installation
                         # to reflect the user's access token if exists
-                        this_user_installation = (
-                            await self.installation_store.async_find_installation(
-                                enterprise_id=enterprise_id,
-                                team_id=team_id,
-                                user_id=user_id,
-                                is_enterprise_install=context.is_enterprise_install,
-                            )
+                        this_user_installation = await self.installation_store.async_find_installation(
+                            enterprise_id=enterprise_id,
+                            team_id=team_id,
+                            user_id=user_id,
+                            is_enterprise_install=context.is_enterprise_install,
                         )
                         if this_user_installation is not None:
                             user_token = this_user_installation.user_token
@@ -217,9 +203,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                                 bot_token = this_user_installation.bot_token
 
                             # If token rotation is enabled, running rotation may be needed here
-                            refreshed = await self._rotate_and_save_tokens_if_necessary(
-                                this_user_installation
-                            )
+                            refreshed = await self._rotate_and_save_tokens_if_necessary(this_user_installation)
                             if refreshed is not None:
                                 user_token = refreshed.user_token
                                 if latest_installation.bot_token is None:
@@ -227,9 +211,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                                     bot_token = refreshed.bot_token
 
                     # If token rotation is enabled, running rotation may be needed here
-                    refreshed = await self._rotate_and_save_tokens_if_necessary(
-                        latest_installation
-                    )
+                    refreshed = await self._rotate_and_save_tokens_if_necessary(latest_installation)
                     if refreshed is not None:
                         bot_token = refreshed.bot_token
                         if this_user_installation is None:
@@ -246,11 +228,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
             # If the `find_installation` method is not available,
             or not self.find_installation_available
             # If the `find_installation` method did not return data and find_bot method is available,
-            or (
-                self.find_bot_available is True
-                and bot_token is None
-                and user_token is None
-            )
+            or (self.find_bot_available is True and bot_token is None and user_token is None)
         ):
             try:
                 bot: Optional[Bot] = await self.installation_store.async_find_bot(
@@ -306,21 +284,11 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
 
     # ------------------------------------------------
 
-    def _debug_log_for_not_found(
-        self, enterprise_id: Optional[str], team_id: Optional[str]
-    ):
-        self.logger.debug(
-            "No installation data found "
-            f"for enterprise_id: {enterprise_id} team_id: {team_id}"
-        )
+    def _debug_log_for_not_found(self, enterprise_id: Optional[str], team_id: Optional[str]):
+        self.logger.debug("No installation data found " f"for enterprise_id: {enterprise_id} team_id: {team_id}")
 
-    async def _rotate_and_save_tokens_if_necessary(
-        self, installation: Optional[Installation]
-    ) -> Optional[Installation]:
-        if installation is None or (
-            installation.user_refresh_token is None
-            and installation.bot_refresh_token is None
-        ):
+    async def _rotate_and_save_tokens_if_necessary(self, installation: Optional[Installation]) -> Optional[Installation]:
+        if installation is None or (installation.user_refresh_token is None and installation.bot_refresh_token is None):
             # No need to rotate tokens
             return None
 
@@ -328,9 +296,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
             # Token rotation is required but this Bolt app is not properly configured
             raise BoltError(self._config_error_message)
 
-        refreshed: Optional[
-            Installation
-        ] = await self.token_rotator.perform_token_rotation(
+        refreshed: Optional[Installation] = await self.token_rotator.perform_token_rotation(
             installation=installation,
             minutes_before_expiration=self.token_rotation_expiration_minutes,
         )

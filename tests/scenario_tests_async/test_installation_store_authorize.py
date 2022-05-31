@@ -91,9 +91,7 @@ class TestAsyncInstallationStoreAuthorize:
 
     def build_valid_request(self) -> AsyncBoltRequest:
         timestamp = str(int(time()))
-        return AsyncBoltRequest(
-            body=raw_body, headers=self.build_headers(timestamp, raw_body)
-        )
+        return AsyncBoltRequest(body=raw_body, headers=self.build_headers(timestamp, raw_body))
 
     @pytest.mark.asyncio
     async def test_success(self):

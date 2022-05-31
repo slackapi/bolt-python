@@ -73,10 +73,7 @@ class TestAck:
         ack = Ack()
         response: BoltResponse = ack(text="foo", options=self.sample_options)
         assert response.status == 200
-        assert (
-            response.body
-            == '{"options": [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]}'
-        )
+        assert response.body == '{"options": [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]}'
 
     sample_option_groups = [
         {
@@ -96,9 +93,7 @@ class TestAck:
 
     def test_option_groups(self):
         ack = Ack()
-        response: BoltResponse = ack(
-            text="foo", option_groups=self.sample_option_groups
-        )
+        response: BoltResponse = ack(text="foo", option_groups=self.sample_option_groups)
         assert response.status == 200
         assert response.body.startswith('{"option_groups":')
 

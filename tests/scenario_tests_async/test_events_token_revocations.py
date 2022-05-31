@@ -29,27 +29,17 @@ class MyInstallationStore(AsyncInstallationStore):
         self.delete_installation_called = False
         self.delete_all_called = False
 
-    async def async_delete_bot(
-        self, *, enterprise_id: Optional[str], team_id: Optional[str]
-    ) -> None:
+    async def async_delete_bot(self, *, enterprise_id: Optional[str], team_id: Optional[str]) -> None:
         self.delete_bot_called = True
 
     async def async_delete_installation(
-        self,
-        *,
-        enterprise_id: Optional[str],
-        team_id: Optional[str],
-        user_id: Optional[str] = None
+        self, *, enterprise_id: Optional[str], team_id: Optional[str], user_id: Optional[str] = None
     ) -> None:
         self.delete_installation_called = True
 
-    async def async_delete_all(
-        self, *, enterprise_id: Optional[str], team_id: Optional[str]
-    ):
+    async def async_delete_all(self, *, enterprise_id: Optional[str], team_id: Optional[str]):
         self.delete_all_called = True
-        return await super().async_delete_all(
-            enterprise_id=enterprise_id, team_id=team_id
-        )
+        return await super().async_delete_all(enterprise_id=enterprise_id, team_id=team_id)
 
 
 class TestEventsTokenRevocations:
@@ -120,9 +110,7 @@ class TestEventsTokenRevocations:
         }
 
         timestamp, body = str(int(time())), json.dumps(event_payload)
-        request: AsyncBoltRequest = AsyncBoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: AsyncBoltRequest = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = await app.async_dispatch(request)
         assert response.status == 404
 
@@ -156,9 +144,7 @@ class TestEventsTokenRevocations:
         }
 
         timestamp, body = str(int(time())), json.dumps(event_payload)
-        request: AsyncBoltRequest = AsyncBoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: AsyncBoltRequest = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = await app.async_dispatch(request)
         assert response.status == 404
 

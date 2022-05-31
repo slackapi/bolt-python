@@ -52,9 +52,7 @@ body = {
         ],
         "private_metadata": "This is for you!",
         "callback_id": "view-id",
-        "state": {
-            "values": {"hspI": {"maBWU": {"type": "plain_text_input", "value": "test"}}}
-        },
+        "state": {"values": {"hspI": {"maBWU": {"type": "plain_text_input", "value": "test"}}}},
         "hash": "1596530361.3wRYuk3R",
         "title": {
             "type": "plain_text",

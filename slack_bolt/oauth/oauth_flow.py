@@ -163,9 +163,7 @@ class OAuthFlow:
         if self.settings.state_validation_enabled is True:
             state = self.issue_new_state(request)
             url = self.build_authorize_url(state, request)
-            set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(
-                state
-            )
+            set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(state)
 
         if self.settings.install_page_rendering_enabled:
             html = self.build_install_page_html(url, request)
@@ -311,17 +309,11 @@ class OAuthFlow:
                 client_secret=self.settings.client_secret,
                 redirect_uri=self.settings.redirect_uri,  # can be None
             )
-            installed_enterprise: Dict[str, str] = (
-                oauth_response.get("enterprise") or {}
-            )
-            is_enterprise_install: bool = (
-                oauth_response.get("is_enterprise_install") or False
-            )
+            installed_enterprise: Dict[str, str] = oauth_response.get("enterprise") or {}
+            is_enterprise_install: bool = oauth_response.get("is_enterprise_install") or False
             installed_team: Dict[str, str] = oauth_response.get("team") or {}
             installer: Dict[str, str] = oauth_response.get("authed_user") or {}
-            incoming_webhook: Dict[str, str] = (
-                oauth_response.get("incoming_webhook") or {}
-            )
+            incoming_webhook: Dict[str, str] = oauth_response.get("incoming_webhook") or {}
 
             bot_token: Optional[str] = oauth_response.get("access_token")
             # NOTE: oauth.v2.access doesn't include bot_id in response
@@ -354,17 +346,13 @@ class OAuthFlow:
                 incoming_webhook_url=incoming_webhook.get("url"),
                 incoming_webhook_channel=incoming_webhook.get("channel"),
                 incoming_webhook_channel_id=incoming_webhook.get("channel_id"),
-                incoming_webhook_configuration_url=incoming_webhook.get(
-                    "configuration_url"
-                ),
+                incoming_webhook_configuration_url=incoming_webhook.get("configuration_url"),
                 is_enterprise_install=is_enterprise_install,
                 token_type=oauth_response.get("token_type"),
             )
 
         except SlackApiError as e:
-            message = (
-                f"Failed to fetch oauth.v2.access result with code: {code} - error: {e}"
-            )
+            message = f"Failed to fetch oauth.v2.access result with code: {code} - error: {e}"
             self.logger.warning(message)
             return None
 

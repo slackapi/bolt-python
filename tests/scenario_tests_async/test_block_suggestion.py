@@ -55,15 +55,11 @@ class TestAsyncBlockSuggestion:
 
     def build_valid_request(self) -> AsyncBoltRequest:
         timestamp = str(int(time()))
-        return AsyncBoltRequest(
-            body=raw_body, headers=self.build_headers(timestamp, raw_body)
-        )
+        return AsyncBoltRequest(body=raw_body, headers=self.build_headers(timestamp, raw_body))
 
     def build_valid_multi_request(self) -> AsyncBoltRequest:
         timestamp = str(int(time()))
-        return AsyncBoltRequest(
-            body=raw_multi_body, headers=self.build_headers(timestamp, raw_multi_body)
-        )
+        return AsyncBoltRequest(body=raw_multi_body, headers=self.build_headers(timestamp, raw_multi_body))
 
     @pytest.mark.asyncio
     async def test_mock_server_is_running(self):
@@ -306,9 +302,7 @@ multi_body["block_id"] = "mes_b"
 multi_body["action_id"] = "mes_a"
 raw_multi_body = f"payload={quote(json.dumps(multi_body))}"
 
-response = {
-    "options": [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]
-}
+response = {"options": [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]}
 expected_response_body = json.dumps(response)
 
 multi_response = {

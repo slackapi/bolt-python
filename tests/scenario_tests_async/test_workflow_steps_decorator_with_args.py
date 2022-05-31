@@ -39,9 +39,7 @@ class TestAsyncWorkflowStepsDecorator:
         old_os_env = remove_os_env_temporarily()
         try:
             setup_mock_web_api_server(self)
-            self.app = AsyncApp(
-                client=self.web_client, signing_secret=self.signing_secret
-            )
+            self.app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
             self.app.step(copy_review_step)
 
             loop = asyncio.get_event_loop()
@@ -71,9 +69,7 @@ class TestAsyncWorkflowStepsDecorator:
         assert self.mock_received_requests["/auth.test"] == 1
 
         self.app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
-        self.app.step(
-            callback_id="copy_review___", edit=edit, save=save, execute=execute
-        )
+        self.app.step(callback_id="copy_review___", edit=edit, save=save, execute=execute)
         response = await self.app.async_dispatch(request)
         assert response.status == 404
 
@@ -91,9 +87,7 @@ class TestAsyncWorkflowStepsDecorator:
         assert self.mock_received_requests["/auth.test"] == 1
 
         self.app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
-        self.app.step(
-            callback_id="copy_review___", edit=edit, save=save, execute=execute
-        )
+        self.app.step(callback_id="copy_review___", edit=edit, save=save, execute=execute)
         response = await self.app.async_dispatch(request)
         assert response.status == 404
 
@@ -113,9 +107,7 @@ class TestAsyncWorkflowStepsDecorator:
         assert self.mock_received_requests["/workflows.stepCompleted"] == 1
 
         self.app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
-        self.app.step(
-            callback_id="copy_review___", edit=edit, save=save, execute=execute
-        )
+        self.app.step(callback_id="copy_review___", edit=edit, save=save, execute=execute)
         response = await self.app.async_dispatch(request)
         assert response.status == 404
 
@@ -415,9 +407,7 @@ async def save(ack: AsyncAck, step: dict, view: dict, update: AsyncUpdate):
                 "value": state_values["task_name_input"]["task_name"]["value"],
             },
             "taskDescription": {
-                "value": state_values["task_description_input"]["task_description"][
-                    "value"
-                ],
+                "value": state_values["task_description_input"]["task_description"]["value"],
             },
             "taskAuthorEmail": {
                 "value": state_values["task_author_input"]["task_author"]["value"],
@@ -448,9 +438,7 @@ pseudo_database = {}
 
 
 @copy_review_step.execute(middleware=[noop_middleware])
-async def execute(
-    step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail
-):
+async def execute(step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail):
     assert step is not None
     try:
         await complete(
@@ -461,9 +449,7 @@ async def execute(
             }
         )
 
-        user: SlackResponse = await client.users_lookupByEmail(
-            email=step["inputs"]["taskAuthorEmail"]["value"]
-        )
+        user: SlackResponse = await client.users_lookupByEmail(email=step["inputs"]["taskAuthorEmail"]["value"])
         user_id = user["user"]["id"]
         new_task = {
             "task_name": step["inputs"]["taskName"]["value"],

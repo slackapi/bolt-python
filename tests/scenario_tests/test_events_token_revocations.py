@@ -26,17 +26,11 @@ class MyInstallationStore(InstallationStore):
         self.delete_installation_called = False
         self.delete_all_called = False
 
-    def delete_bot(
-        self, *, enterprise_id: Optional[str], team_id: Optional[str]
-    ) -> None:
+    def delete_bot(self, *, enterprise_id: Optional[str], team_id: Optional[str]) -> None:
         self.delete_bot_called = True
 
     def delete_installation(
-        self,
-        *,
-        enterprise_id: Optional[str],
-        team_id: Optional[str],
-        user_id: Optional[str] = None
+        self, *, enterprise_id: Optional[str], team_id: Optional[str], user_id: Optional[str] = None
     ) -> None:
         self.delete_installation_called = True
 
@@ -127,9 +121,7 @@ class TestEventsTokenRevocations:
         }
 
         timestamp, body = str(int(time())), json.dumps(event_payload)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 404
 
@@ -163,9 +155,7 @@ class TestEventsTokenRevocations:
         }
 
         timestamp, body = str(int(time())), json.dumps(event_payload)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 404
 

@@ -88,9 +88,7 @@ class TestAsyncApp:
     def test_valid_multi_auth(self):
         app = AsyncApp(
             signing_secret="valid",
-            oauth_settings=AsyncOAuthSettings(
-                client_id="111.222", client_secret="valid"
-            ),
+            oauth_settings=AsyncOAuthSettings(client_id="111.222", client_secret="valid"),
         )
         assert app != None
 
@@ -110,18 +108,14 @@ class TestAsyncApp:
         with pytest.raises(BoltError):
             AsyncApp(
                 signing_secret="valid",
-                oauth_settings=AsyncOAuthSettings(
-                    client_id=None, client_secret="valid"
-                ),
+                oauth_settings=AsyncOAuthSettings(client_id=None, client_secret="valid"),
             )
 
     def test_valid_multi_auth_secret_absence(self):
         with pytest.raises(BoltError):
             AsyncApp(
                 signing_secret="valid",
-                oauth_settings=AsyncOAuthSettings(
-                    client_id="111.222", client_secret=None
-                ),
+                oauth_settings=AsyncOAuthSettings(client_id="111.222", client_secret=None),
             )
 
     def test_authorize_conflicts(self):
@@ -215,9 +209,7 @@ class TestAsyncApp:
             assert respond.ssl == ssl
             result["called"] = True
 
-        req = AsyncBoltRequest(
-            body=app_mention_event_body, headers={}, mode="socket_mode"
-        )
+        req = AsyncBoltRequest(body=app_mention_event_body, headers={}, mode="socket_mode")
         response = await app.async_dispatch(req)
         assert response.status == 200
         await asyncio.sleep(0.5)  # wait a bit after auto ack()
@@ -279,9 +271,7 @@ class TestAsyncApp:
             _verify_logger(logger)
             result["called"] = True
 
-        req = AsyncBoltRequest(
-            body=app_mention_event_body, headers={}, mode="socket_mode"
-        )
+        req = AsyncBoltRequest(body=app_mention_event_body, headers={}, mode="socket_mode")
         response = await app.async_dispatch(req)
         assert response.status == 200
         await asyncio.sleep(0.5)  # wait a bit after auto ack()

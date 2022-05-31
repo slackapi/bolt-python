@@ -47,11 +47,7 @@ class TestPyramid(TestCase):
         )
 
     def build_headers(self, timestamp: str, body: str):
-        content_type = (
-            "application/json"
-            if body.startswith("{")
-            else "application/x-www-form-urlencoded"
-        )
+        content_type = "application/json" if body.startswith("{") else "application/x-www-form-urlencoded"
         return {
             "content-type": [content_type],
             "x-slack-signature": [self.generate_signature(body, timestamp)],
@@ -190,6 +186,4 @@ class TestPyramid(TestCase):
         request.method = "GET"
         response: Response = SlackRequestHandler(app).handle(request)
         assert response.status_code == 200
-        assert "https://slack.com/oauth/v2/authorize?state=" in response.body.decode(
-            "utf-8"
-        )
+        assert "https://slack.com/oauth/v2/authorize?state=" in response.body.decode("utf-8")

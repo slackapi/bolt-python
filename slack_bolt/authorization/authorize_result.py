@@ -56,14 +56,10 @@ class AuthorizeResult(dict):
         auth_test_response: SlackResponse,
     ) -> "AuthorizeResult":
         bot_user_id: Optional[str] = (  # type:ignore
-            auth_test_response.get("user_id")
-            if auth_test_response.get("bot_id") is not None
-            else None
+            auth_test_response.get("user_id") if auth_test_response.get("bot_id") is not None else None
         )
         user_id: Optional[str] = (  # type:ignore
-            auth_test_response.get("user_id")
-            if auth_test_response.get("bot_id") is None
-            else None
+            auth_test_response.get("user_id") if auth_test_response.get("bot_id") is None else None
         )
         return AuthorizeResult(
             enterprise_id=auth_test_response.get("enterprise_id"),

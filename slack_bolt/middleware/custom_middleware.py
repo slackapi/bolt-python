@@ -16,9 +16,7 @@ class CustomMiddleware(Middleware):
     arg_names: Sequence[str]
     logger: Logger
 
-    def __init__(
-        self, *, app_name: str, func: Callable, base_logger: Optional[Logger] = None
-    ):
+    def __init__(self, *, app_name: str, func: Callable, base_logger: Optional[Logger] = None):
         self.app_name = app_name
         self.func = func
         self.arg_names = inspect.getfullargspec(func).args

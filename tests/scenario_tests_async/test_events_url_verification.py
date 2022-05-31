@@ -61,10 +61,7 @@ class TestAsyncEventsUrlVerification:
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert (
-            response.body
-            == """{"challenge": "3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P"}"""
-        )
+        assert response.body == """{"challenge": "3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P"}"""
         await assert_auth_test_count_async(self, 0)
 
     @pytest.mark.asyncio

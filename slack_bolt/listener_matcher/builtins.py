@@ -113,15 +113,11 @@ def event(
 
         return build_listener_matcher(func, asyncio, base_logger)
 
-    raise BoltError(
-        f"event ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
-    )
+    raise BoltError(f"event ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict")
 
 
 def message_event(
-    constraints: Dict[
-        str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]
-    ],
+    constraints: Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]],
     keyword: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
@@ -152,16 +148,12 @@ def _check_event_subtype(event_payload: dict, constraints: dict) -> bool:
     if not _matches(constraints["type"], event_payload["type"]):
         return False
     if "subtype" in constraints:
-        expected_subtype: Optional[
-            Union[str, Sequence[Optional[Union[str, Pattern]]]]
-        ] = constraints["subtype"]
+        expected_subtype: Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]] = constraints["subtype"]
         if expected_subtype is None:
             # "subtype" in constraints is intentionally None for this pattern
             return "subtype" not in event_payload
         elif isinstance(expected_subtype, (str, Pattern)):
-            return "subtype" in event_payload and _matches(
-                expected_subtype, event_payload["subtype"]
-            )
+            return "subtype" in event_payload and _matches(expected_subtype, event_payload["subtype"])
         elif isinstance(expected_subtype, Sequence):
             subtypes: Sequence[Optional[Union[str, Pattern]]] = expected_subtype
             for expected in subtypes:
@@ -173,9 +165,7 @@ def _check_event_subtype(event_payload: dict, constraints: dict) -> bool:
                     return True
             return False
         else:
-            return "subtype" in event_payload and _matches(
-                expected_subtype, event_payload["subtype"]
-            )
+            return "subtype" in event_payload and _matches(expected_subtype, event_payload["subtype"])
     return True
 
 
@@ -240,9 +230,7 @@ def shortcut(
         if constraints["type"] == "message_action":
             return message_shortcut(constraints["callback_id"], asyncio)
 
-    raise BoltError(
-        f"shortcut ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
-    )
+    raise BoltError(f"shortcut ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict")
 
 
 def global_shortcut(
@@ -308,9 +296,7 @@ def action(
         # The default value is "block_actions"
         return block_action(constraints, asyncio)
 
-    raise BoltError(
-        f"action ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
-    )
+    raise BoltError(f"action ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict")
 
 
 def _block_action(
@@ -327,9 +313,7 @@ def _block_action(
     elif isinstance(constraints, dict):
         # block_id matching is optional
         block_id: Optional[Union[str, Pattern]] = constraints.get("block_id")
-        block_id_matched = block_id is None or _matches(
-            block_id, action.get("block_id")
-        )
+        block_id_matched = block_id is None or _matches(block_id, action.get("block_id"))
         action_id_matched = _matches(constraints["action_id"], action["action_id"])
         return block_id_matched and action_id_matched
 
@@ -434,9 +418,7 @@ def view(
         if constraints["type"] == "view_closed":
             return view_closed(constraints["callback_id"], asyncio)
 
-    raise BoltError(
-        f"view ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
-    )
+    raise BoltError(f"view ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict")
 
 
 def view_submission(
@@ -445,9 +427,7 @@ def view_submission(
     base_logger: Optional[Logger] = None,
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(body: Dict[str, Any]) -> bool:
-        return is_view_submission(body) and _matches(
-            callback_id, body["view"]["callback_id"]
-        )
+        return is_view_submission(body) and _matches(callback_id, body["view"]["callback_id"])
 
     return build_listener_matcher(func, asyncio, base_logger)
 
@@ -458,9 +438,7 @@ def view_closed(
     base_logger: Optional[Logger] = None,
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(body: Dict[str, Any]) -> bool:
-        return is_view_closed(body) and _matches(
-            callback_id, body["view"]["callback_id"]
-        )
+        return is_view_closed(body) and _matches(callback_id, body["view"]["callback_id"])
 
     return build_listener_matcher(func, asyncio, base_logger)
 
@@ -471,9 +449,7 @@ def workflow_step_save(
     base_logger: Optional[Logger] = None,
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(body: Dict[str, Any]) -> bool:
-        return is_workflow_step_save(body) and _matches(
-            callback_id, body["view"]["callback_id"]
-        )
+        return is_workflow_step_save(body) and _matches(callback_id, body["view"]["callback_id"])
 
     return build_listener_matcher(func, asyncio, base_logger)
 
@@ -490,9 +466,7 @@ def options(
     if isinstance(constraints, (str, Pattern)):
 
         def func(body: Dict[str, Any]) -> bool:
-            return _block_suggestion(constraints, body) or _dialog_suggestion(
-                constraints, body
-            )
+            return _block_suggestion(constraints, body) or _dialog_suggestion(constraints, body)
 
         return build_listener_matcher(func, asyncio, base_logger)
 
@@ -501,9 +475,7 @@ def options(
     if "callback_id" in constraints:
         return dialog_suggestion(constraints["callback_id"], asyncio)
     else:
-        raise BoltError(
-            f"options ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict"
-        )
+        raise BoltError(f"options ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict")
 
 
 def _block_suggestion(
@@ -556,6 +528,4 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -> bool:
         pattern: Pattern = str_or_pattern
         return pattern.search(input) is not None
     else:
-        raise BoltError(
-            f"{str_or_pattern} ({type(str_or_pattern)}) must be either str or Pattern"
-        )
+        raise BoltError(f"{str_or_pattern} ({type(str_or_pattern)}) must be either str or Pattern")

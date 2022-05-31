@@ -35,9 +35,7 @@ class IgnoringSelfEvents(Middleware):
     events_that_should_be_kept = ["member_joined_channel", "member_left_channel"]
 
     @classmethod
-    def _is_self_event(
-        cls, auth_result: AuthorizeResult, user_id: str, body: Dict[str, Any]
-    ):
+    def _is_self_event(cls, auth_result: AuthorizeResult, user_id: str, body: Dict[str, Any]):
         return (
             auth_result is not None
             and user_id is not None

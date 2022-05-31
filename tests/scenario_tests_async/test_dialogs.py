@@ -95,15 +95,9 @@ class TestAsyncAttachmentActions:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-id"})(
-            handle_suggestion
-        )
-        app.action({"type": "dialog_submission", "callback_id": "dialog-callback-id"})(
-            handle_submission
-        )
-        app.action(
-            {"type": "dialog_cancellation", "callback_id": "dialog-callback-id"}
-        )(handle_cancellation)
+        app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-id"})(handle_suggestion)
+        app.action({"type": "dialog_submission", "callback_id": "dialog-callback-id"})(handle_submission)
+        app.action({"type": "dialog_cancellation", "callback_id": "dialog-callback-id"})(handle_cancellation)
 
         request = self.build_valid_request(suggestion_raw_body)
         response = await app.async_dispatch(request)
@@ -160,15 +154,9 @@ class TestAsyncAttachmentActions:
             signing_secret=self.signing_secret,
             process_before_response=True,
         )
-        app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-id"})(
-            handle_suggestion
-        )
-        app.action({"type": "dialog_submission", "callback_id": "dialog-callback-id"})(
-            handle_submission
-        )
-        app.action(
-            {"type": "dialog_cancellation", "callback_id": "dialog-callback-id"}
-        )(handle_cancellation)
+        app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-id"})(handle_suggestion)
+        app.action({"type": "dialog_submission", "callback_id": "dialog-callback-id"})(handle_submission)
+        app.action({"type": "dialog_cancellation", "callback_id": "dialog-callback-id"})(handle_cancellation)
 
         request = self.build_valid_request(suggestion_raw_body)
         response = await app.async_dispatch(request)
@@ -262,9 +250,7 @@ class TestAsyncAttachmentActions:
         assert response.status == 404
         await assert_auth_test_count_async(self, 1)
 
-        app.options(
-            {"type": "dialog_suggestion", "callback_id": "dialog-callback-iddddd"}
-        )(handle_suggestion)
+        app.options({"type": "dialog_suggestion", "callback_id": "dialog-callback-iddddd"})(handle_suggestion)
         response = await app.async_dispatch(request)
         assert response.status == 404
         await assert_auth_test_count_async(self, 1)
@@ -312,9 +298,7 @@ class TestAsyncAttachmentActions:
         assert response.status == 404
         await assert_auth_test_count_async(self, 1)
 
-        app.action(
-            {"type": "dialog_submission", "callback_id": "dialog-callback-iddddd"}
-        )(handle_submission)
+        app.action({"type": "dialog_submission", "callback_id": "dialog-callback-iddddd"})(handle_submission)
         response = await app.async_dispatch(request)
         assert response.status == 404
         await assert_auth_test_count_async(self, 1)
@@ -362,9 +346,7 @@ class TestAsyncAttachmentActions:
         assert response.status == 404
         await assert_auth_test_count_async(self, 1)
 
-        app.action(
-            {"type": "dialog_cancellation", "callback_id": "dialog-callback-iddddd"}
-        )(handle_cancellation)
+        app.action({"type": "dialog_cancellation", "callback_id": "dialog-callback-iddddd"})(handle_cancellation)
         response = await app.async_dispatch(request)
         assert response.status == 404
         await assert_auth_test_count_async(self, 1)

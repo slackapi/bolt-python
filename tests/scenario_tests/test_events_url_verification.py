@@ -49,15 +49,10 @@ class TestEventsUrlVerification:
         app = App(client=self.web_client, signing_secret=self.signing_secret)
 
         timestamp, body = str(int(time())), json.dumps(event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
-        assert (
-            response.body
-            == """{"challenge": "3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P"}"""
-        )
+        assert response.body == """{"challenge": "3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P"}"""
         assert_auth_test_count(self, 0)
 
     def test_disabled(self):
@@ -68,9 +63,7 @@ class TestEventsUrlVerification:
         )
 
         timestamp, body = str(int(time())), json.dumps(event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 404
         assert response.body == """{"error": "unhandled request"}"""

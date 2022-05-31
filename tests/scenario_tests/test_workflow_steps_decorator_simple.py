@@ -51,9 +51,7 @@ class TestWorkflowStepsDecorator:
         assert self.mock_received_requests["/auth.test"] == 1
 
         self.app = App(client=self.web_client, signing_secret=self.signing_secret)
-        self.app.step(
-            callback_id="copy_review___", edit=edit, save=save, execute=execute
-        )
+        self.app.step(callback_id="copy_review___", edit=edit, save=save, execute=execute)
         response = self.app.dispatch(request)
         assert response.status == 404
 
@@ -70,9 +68,7 @@ class TestWorkflowStepsDecorator:
         assert self.mock_received_requests["/auth.test"] == 1
 
         self.app = App(client=self.web_client, signing_secret=self.signing_secret)
-        self.app.step(
-            callback_id="copy_review___", edit=edit, save=save, execute=execute
-        )
+        self.app.step(callback_id="copy_review___", edit=edit, save=save, execute=execute)
         response = self.app.dispatch(request)
         assert response.status == 404
 
@@ -91,9 +87,7 @@ class TestWorkflowStepsDecorator:
         assert self.mock_received_requests["/workflows.stepCompleted"] == 1
 
         self.app = App(client=self.web_client, signing_secret=self.signing_secret)
-        self.app.step(
-            callback_id="copy_review___", edit=edit, save=save, execute=execute
-        )
+        self.app.step(callback_id="copy_review___", edit=edit, save=save, execute=execute)
         response = self.app.dispatch(request)
         assert response.status == 404
 
@@ -347,9 +341,7 @@ def save(ack: Ack, step: dict, view: dict, update: Update):
                 "value": state_values["task_name_input"]["task_name"]["value"],
             },
             "taskDescription": {
-                "value": state_values["task_description_input"]["task_description"][
-                    "value"
-                ],
+                "value": state_values["task_description_input"]["task_description"]["value"],
             },
             "taskAuthorEmail": {
                 "value": state_values["task_author_input"]["task_author"]["value"],
@@ -391,9 +383,7 @@ def execute(step: dict, client: WebClient, complete: Complete, fail: Fail):
             }
         )
 
-        user: SlackResponse = client.users_lookupByEmail(
-            email=step["inputs"]["taskAuthorEmail"]["value"]
-        )
+        user: SlackResponse = client.users_lookupByEmail(email=step["inputs"]["taskAuthorEmail"]["value"])
         user_id = user["user"]["id"]
         new_task = {
             "task_name": step["inputs"]["taskName"]["value"],

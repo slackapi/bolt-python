@@ -204,9 +204,7 @@ class TestAsyncWorkflowSteps:
             logger=custom_logger,
         )
 
-        async def verify_logger_is_properly_passed(
-            ack: AsyncAck, logger: logging.Logger
-        ):
+        async def verify_logger_is_properly_passed(ack: AsyncAck, logger: logging.Logger):
             assert logger.level == custom_logger.level
             assert len(logger.handlers) == len(custom_logger.handlers)
             assert logger.handlers[-1] == custom_logger.handlers[-1]
@@ -496,9 +494,7 @@ async def save(ack: AsyncAck, step: dict, view: dict, update: AsyncUpdate):
                 "value": state_values["task_name_input"]["task_name"]["value"],
             },
             "taskDescription": {
-                "value": state_values["task_description_input"]["task_description"][
-                    "value"
-                ],
+                "value": state_values["task_description_input"]["task_description"]["value"],
             },
             "taskAuthorEmail": {
                 "value": state_values["task_author_input"]["task_author"]["value"],
@@ -528,9 +524,7 @@ async def save(ack: AsyncAck, step: dict, view: dict, update: AsyncUpdate):
 pseudo_database = {}
 
 
-async def execute(
-    step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail
-):
+async def execute(step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail):
     assert step is not None
     try:
         await complete(
@@ -541,9 +535,7 @@ async def execute(
             }
         )
 
-        user: SlackResponse = await client.users_lookupByEmail(
-            email=step["inputs"]["taskAuthorEmail"]["value"]
-        )
+        user: SlackResponse = await client.users_lookupByEmail(email=step["inputs"]["taskAuthorEmail"]["value"])
         user_id = user["user"]["id"]
         new_task = {
             "task_name": step["inputs"]["taskName"]["value"],

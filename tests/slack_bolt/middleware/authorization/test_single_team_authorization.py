@@ -25,9 +25,7 @@ class TestSingleTeamAuthorization:
     def test_success_pattern(self):
         authorization = SingleTeamAuthorization(auth_test_result={})
         req = BoltRequest(body="payload={}", headers={})
-        req.context["client"] = WebClient(
-            base_url=self.mock_api_server_base_url, token="xoxb-valid"
-        )
+        req.context["client"] = WebClient(base_url=self.mock_api_server_base_url, token="xoxb-valid")
         resp = BoltResponse(status=404)
 
         resp = authorization.process(req=req, resp=resp, next=next)
@@ -38,9 +36,7 @@ class TestSingleTeamAuthorization:
     def test_failure_pattern(self):
         authorization = SingleTeamAuthorization(auth_test_result={})
         req = BoltRequest(body="payload={}", headers={})
-        req.context["client"] = WebClient(
-            base_url=self.mock_api_server_base_url, token="dummy"
-        )
+        req.context["client"] = WebClient(base_url=self.mock_api_server_base_url, token="dummy")
         resp = BoltResponse(status=404)
 
         resp = authorization.process(req=req, resp=resp, next=next)

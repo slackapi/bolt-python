@@ -53,9 +53,7 @@ class TestEventsRequestVerification:
             say("What's up?")
 
         timestamp, body = str(int(time())), json.dumps(event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
@@ -76,9 +74,7 @@ class TestEventsRequestVerification:
         # request including invalid headers
         expired = int(time()) - 3600
         timestamp, body = str(expired), json.dumps(event_body)
-        request: BoltRequest = BoltRequest(
-            body=body, headers=self.build_headers(timestamp, body)
-        )
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
