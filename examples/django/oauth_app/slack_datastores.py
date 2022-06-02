@@ -33,13 +33,9 @@ class DjangoInstallationStore(InstallationStore):
         i = installation.to_dict()
         if is_naive(i["installed_at"]):
             i["installed_at"] = make_aware(i["installed_at"])
-        if i.get("bot_token_expires_at") is not None and is_naive(
-            i["bot_token_expires_at"]
-        ):
+        if i.get("bot_token_expires_at") is not None and is_naive(i["bot_token_expires_at"]):
             i["bot_token_expires_at"] = make_aware(i["bot_token_expires_at"])
-        if i.get("user_token_expires_at") is not None and is_naive(
-            i["user_token_expires_at"]
-        ):
+        if i.get("user_token_expires_at") is not None and is_naive(i["user_token_expires_at"]):
             i["user_token_expires_at"] = make_aware(i["user_token_expires_at"])
         i["client_id"] = self.client_id
         row_to_update = (
@@ -62,9 +58,7 @@ class DjangoInstallationStore(InstallationStore):
         b = bot.to_dict()
         if is_naive(b["installed_at"]):
             b["installed_at"] = make_aware(b["installed_at"])
-        if b.get("bot_token_expires_at") is not None and is_naive(
-            b["bot_token_expires_at"]
-        ):
+        if b.get("bot_token_expires_at") is not None and is_naive(b["bot_token_expires_at"]):
             b["bot_token_expires_at"] = make_aware(b["bot_token_expires_at"])
         b["client_id"] = self.client_id
 
@@ -145,6 +139,24 @@ class DjangoInstallationStore(InstallationStore):
 
         if len(rows) > 0:
             i = rows[0]
+            if user_id is not None:
+                # Fetch the latest bot token
+                latest_bot_rows = (
+                    SlackInstallation.objects.filter(client_id=self.client_id)
+                    .exclude(bot_token__isnull=True)
+                    .filter(enterprise_id=e_id)
+                    .filter(team_id=t_id)
+                    .order_by(F("installed_at").desc())[:1]
+                )
+                if len(latest_bot_rows) > 0:
+                    b = latest_bot_rows[0]
+                    i.bot_id = b.bot_id
+                    i.bot_user_id = b.bot_user_id
+                    i.bot_scopes = b.bot_scopes
+                    i.bot_token = b.bot_token
+                    i.bot_refresh_token = b.bot_refresh_token
+                    i.bot_token_expires_at = b.bot_token_expires_at
+
             return Installation(
                 app_id=i.app_id,
                 enterprise_id=i.enterprise_id,
@@ -191,9 +203,7 @@ class DjangoOAuthStateStore(OAuthStateStore):
         return state
 
     def consume(self, state: str) -> bool:
-        rows = SlackOAuthState.objects.filter(state=state).filter(
-            expire_at__gte=timezone.now()
-        )
+        rows = SlackOAuthState.objects.filter(state=state).filter(expire_at__gte=timezone.now())
         if len(rows) > 0:
             for row in rows:
                 row.delete()

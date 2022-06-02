@@ -13,11 +13,12 @@ from django.db.models import F
 from .slack_datastores import DjangoInstallationStore, DjangoOAuthStateStore
 
 logger = logging.getLogger(__name__)
-client_id, client_secret, signing_secret, scopes = (
+client_id, client_secret, signing_secret, scopes, user_scopes = (
     os.environ["SLACK_CLIENT_ID"],
     os.environ["SLACK_CLIENT_SECRET"],
     os.environ["SLACK_SIGNING_SECRET"],
     os.environ.get("SLACK_SCOPES", "commands").split(","),
+    os.environ.get("SLACK_USER_SCOPES", "search:read").split(","),
 )
 
 app = App(
@@ -26,6 +27,7 @@ app = App(
         client_id=client_id,
         client_secret=client_secret,
         scopes=scopes,
+        user_scopes=user_scopes,
         # If you want to test token rotation, enabling the following line will make it easy
         # token_rotation_expiration_minutes=1000000,
         installation_store=DjangoInstallationStore(
