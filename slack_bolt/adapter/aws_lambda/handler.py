@@ -56,6 +56,7 @@ class SlackRequestHandler:
             # https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
             aws_lambda_function_name = context.function_name
             bolt_req.context["aws_lambda_function_name"] = aws_lambda_function_name
+            bolt_req.context["aws_lambda_invoked_function_arn"] = context.invoked_function_arn
             bolt_req.context["lambda_request"] = event
             bolt_resp = self.app.dispatch(bolt_req)
             aws_response = to_aws_response(bolt_resp)
