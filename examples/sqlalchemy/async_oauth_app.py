@@ -63,9 +63,7 @@ class AsyncSQLAlchemyInstallationStore(AsyncInstallationStore):
                 b["client_id"] = self.client_id
                 await database.execute(self.bots.insert(), b)
 
-    async def async_find_bot(
-        self, *, enterprise_id: Optional[str], team_id: Optional[str]
-    ) -> Optional[Bot]:
+    async def async_find_bot(self, *, enterprise_id: Optional[str], team_id: Optional[str]) -> Optional[Bot]:
         c = self.bots.c
         query = (
             self.bots.select()
@@ -120,9 +118,7 @@ class AsyncSQLAlchemyOAuthStateStore(AsyncOAuthStateStore):
         state: str = str(uuid4())
         now = datetime.utcfromtimestamp(time.time() + self.expiration_seconds)
         async with Database(self.database_url) as database:
-            await database.execute(
-                self.oauth_states.insert(), {"state": state, "expire_at": now}
-            )
+            await database.execute(self.oauth_states.insert(), {"state": state, "expire_at": now})
             return state
 
     async def async_consume(self, state: str) -> bool:
@@ -130,14 +126,10 @@ class AsyncSQLAlchemyOAuthStateStore(AsyncOAuthStateStore):
             async with Database(self.database_url) as database:
                 async with database.transaction():
                     c = self.oauth_states.c
-                    query = self.oauth_states.select().where(
-                        and_(c.state == state, c.expire_at > datetime.utcnow())
-                    )
+                    query = self.oauth_states.select().where(and_(c.state == state, c.expire_at > datetime.utcnow()))
                     row = await database.fetch_one(query)
                     self.logger.debug(f"consume's query result: {row}")
-                    await database.execute(
-                        self.oauth_states.delete().where(c.id == row["id"])
-                    )
+                    await database.execute(self.oauth_states.delete().where(c.id == row["id"]))
                     return True
             return False
         except Exception as e:

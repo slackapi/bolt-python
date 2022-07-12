@@ -86,9 +86,7 @@ async def save(ack: AsyncAck, client: AsyncWebClient, body: dict):
                     "value": state_values["task_name_input"]["task_name"]["value"],
                 },
                 "taskDescription": {
-                    "value": state_values["task_description_input"]["task_description"][
-                        "value"
-                    ],
+                    "value": state_values["task_description_input"]["task_description"]["value"],
                 },
                 "taskAuthorEmail": {
                     "value": state_values["task_author_input"]["task_author"]["value"],
@@ -133,9 +131,7 @@ async def execute(body: dict, client: AsyncWebClient):
             },
         },
     )
-    user: AsyncSlackResponse = await client.users_lookupByEmail(
-        email=step["inputs"]["taskAuthorEmail"]["value"]
-    )
+    user: AsyncSlackResponse = await client.users_lookupByEmail(email=step["inputs"]["taskAuthorEmail"]["value"])
     user_id = user["user"]["id"]
     new_task = {
         "task_name": step["inputs"]["taskName"]["value"],

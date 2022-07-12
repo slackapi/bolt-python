@@ -31,10 +31,7 @@ flask_app = Flask(__name__)
 
 @flask_app.route("/health", methods=["GET"])
 def slack_events():
-    if (
-        socket_mode_handler.client is not None
-        and socket_mode_handler.client.is_connected()
-    ):
+    if socket_mode_handler.client is not None and socket_mode_handler.client.is_connected():
         return make_response("OK", 200)
     return make_response("The Socket Mode client is inactive", 503)
 

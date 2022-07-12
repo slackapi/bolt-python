@@ -48,11 +48,7 @@ class GoogleDatastoreInstallationStore(InstallationStore):
     ):
         enterprise_id = enterprise_id or "none"
         team_id = "none" if is_enterprise_install else team_id or "none"
-        name = (
-            f"{enterprise_id}-{team_id}-{user_id}"
-            if user_id
-            else f"{enterprise_id}-{team_id}"
-        )
+        name = f"{enterprise_id}-{team_id}-{user_id}" if user_id else f"{enterprise_id}-{team_id}"
         if suffix is not None:
             name += "-" + suffix
         return self.datastore_client.key("installations", name)
@@ -208,9 +204,7 @@ class GoogleDatastoreInstallationStore(InstallationStore):
         team_id: Optional[str],
     ):
         self.delete_bot(enterprise_id=enterprise_id, team_id=team_id)
-        self.delete_installation(
-            enterprise_id=enterprise_id, team_id=team_id, user_id=None
-        )
+        self.delete_installation(enterprise_id=enterprise_id, team_id=team_id, user_id=None)
 
 
 class GoogleDatastoreOAuthStateStore(OAuthStateStore):
@@ -244,9 +238,7 @@ class GoogleDatastoreOAuthStateStore(OAuthStateStore):
 
     def issue(self, *args, **kwargs) -> str:
         state_value = str(uuid4())
-        entity: Entity = datastore.Entity(
-            key=self.datastore_client.key(self.collection_id, state_value)
-        )
+        entity: Entity = datastore.Entity(key=self.datastore_client.key(self.collection_id, state_value))
         entity.update(value=state_value)
         self.datastore_client.put(entity)
         return state_value

@@ -23,9 +23,7 @@ class SlackBot(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(
-                fields=["client_id", "enterprise_id", "team_id", "installed_at"]
-            ),
+            models.Index(fields=["client_id", "enterprise_id", "team_id", "installed_at"]),
         ]
 
 

@@ -103,9 +103,7 @@ app.command("/hello-bolt-python")(
 
 @app.options("es_a")
 def show_options(ack):
-    ack(
-        {"options": [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]}
-    )
+    ack({"options": [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]})
 
 
 @app.options("mes_a")

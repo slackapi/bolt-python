@@ -25,7 +25,7 @@ class LambdaContext:
 
     def __init__(self, function_name: str):
         self.function_name = function_name
-        self.invoked_function_arn = f'arn:aws:lambda:us-east-1:account-id:function:{self.function_name}'
+        self.invoked_function_arn = f"arn:aws:lambda:us-east-1:account-id:function:{self.function_name}"
 
 
 class TestAWSLambda:

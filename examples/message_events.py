@@ -61,9 +61,7 @@ def detect_deletion(say: Say, body: dict):
     event={"type": "message", "subtype": re.compile("(me_message)|(file_share)")},
     middleware=[extract_subtype],
 )
-def add_reaction(
-    body: dict, client: WebClient, context: BoltContext, logger: logging.Logger
-):
+def add_reaction(body: dict, client: WebClient, context: BoltContext, logger: logging.Logger):
     subtype = context["subtype"]  # by extract_subtype
     logger.info(f"subtype: {subtype}")
     message_ts = body["event"]["ts"]

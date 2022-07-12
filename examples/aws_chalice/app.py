@@ -25,9 +25,7 @@ def say_it(say):
     say("Done!")
 
 
-bolt_app.command("/hello-bolt-python-chalice")(
-    ack=respond_to_slack_within_3_seconds, lazy=[say_it]
-)
+bolt_app.command("/hello-bolt-python-chalice")(ack=respond_to_slack_within_3_seconds, lazy=[say_it])
 
 ChaliceSlackRequestHandler.clear_all_log_handlers()
 logging.basicConfig(format="%(asctime)s %(message)s", level=logging.DEBUG)

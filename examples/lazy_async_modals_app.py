@@ -102,9 +102,7 @@ app.command("/hello-bolt-python")(
 
 @app.options("es_a")
 async def show_options(ack):
-    await ack(
-        {"options": [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]}
-    )
+    await ack({"options": [{"text": {"type": "plain_text", "text": "Maru"}, "value": "maru"}]})
 
 
 @app.options("mes_a")

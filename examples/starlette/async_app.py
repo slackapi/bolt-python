@@ -21,9 +21,7 @@ async def endpoint(req: Request):
     return await app_handler.handle(req)
 
 
-api = Starlette(
-    debug=True, routes=[Route("/slack/events", endpoint=endpoint, methods=["POST"])]
-)
+api = Starlette(debug=True, routes=[Route("/slack/events", endpoint=endpoint, methods=["POST"])])
 
 # pip install -r requirements.txt
 # export SLACK_SIGNING_SECRET=***

@@ -82,9 +82,7 @@ async def save(ack: AsyncAck, view: dict, update: AsyncUpdate):
                 "value": state_values["task_name_input"]["task_name"]["value"],
             },
             "taskDescription": {
-                "value": state_values["task_description_input"]["task_description"][
-                    "value"
-                ],
+                "value": state_values["task_description_input"]["task_description"]["value"],
             },
             "taskAuthorEmail": {
                 "value": state_values["task_author_input"]["task_author"]["value"],
@@ -114,9 +112,7 @@ async def save(ack: AsyncAck, view: dict, update: AsyncUpdate):
 pseudo_database = {}
 
 
-async def execute(
-    step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail
-):
+async def execute(step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail):
     try:
         await complete(
             outputs={
@@ -125,9 +121,7 @@ async def execute(
                 "taskAuthorEmail": step["inputs"]["taskAuthorEmail"]["value"],
             }
         )
-        user: AsyncSlackResponse = await client.users_lookupByEmail(
-            email=step["inputs"]["taskAuthorEmail"]["value"]
-        )
+        user: AsyncSlackResponse = await client.users_lookupByEmail(email=step["inputs"]["taskAuthorEmail"]["value"])
         user_id = user["user"]["id"]
         new_task = {
             "task_name": step["inputs"]["taskName"]["value"],

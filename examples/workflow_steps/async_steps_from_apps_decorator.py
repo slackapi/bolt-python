@@ -88,9 +88,7 @@ async def save(ack: AsyncAck, view: dict, update: AsyncUpdate):
                 "value": state_values["task_name_input"]["task_name"]["value"],
             },
             "taskDescription": {
-                "value": state_values["task_description_input"]["task_description"][
-                    "value"
-                ],
+                "value": state_values["task_description_input"]["task_description"]["value"],
             },
             "taskAuthorEmail": {
                 "value": state_values["task_author_input"]["task_author"]["value"],
@@ -133,9 +131,7 @@ async def noop_middleware(next):
 
 async def notify_execution(client: AsyncWebClient, step: dict):
     await asyncio.sleep(5)
-    await client.chat_postMessage(
-        channel="#random", text=f"Step execution: ```{step}```"
-    )
+    await client.chat_postMessage(channel="#random", text=f"Step execution: ```{step}```")
 
 
 @copy_review_step.execute(
@@ -143,9 +139,7 @@ async def notify_execution(client: AsyncWebClient, step: dict):
     middleware=[noop_middleware],
     lazy=[notify_execution],
 )
-async def execute(
-    step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail
-):
+async def execute(step: dict, client: AsyncWebClient, complete: AsyncComplete, fail: AsyncFail):
     try:
         await complete(
             outputs={
@@ -154,9 +148,7 @@ async def execute(
                 "taskAuthorEmail": step["inputs"]["taskAuthorEmail"]["value"],
             }
         )
-        user_lookup: AsyncSlackResponse = await client.users_lookupByEmail(
-            email=step["inputs"]["taskAuthorEmail"]["value"]
-        )
+        user_lookup: AsyncSlackResponse = await client.users_lookupByEmail(email=step["inputs"]["taskAuthorEmail"]["value"])
         user_id = user_lookup["user"]["id"]
         new_task = {
             "task_name": step["inputs"]["taskName"]["value"],

@@ -23,17 +23,13 @@ app = App()
 
 
 @app.middleware  # or app.use(log_request)
-def log_request(
-    logger: Logger, body: dict, next: Callable[[], BoltResponse]
-) -> BoltResponse:
+def log_request(logger: Logger, body: dict, next: Callable[[], BoltResponse]) -> BoltResponse:
     logger.debug(body)
     return next()
 
 
 @app.command("/hello-bolt-python")
-def handle_command(
-    body: dict, ack: Ack, respond: Respond, client: WebClient, logger: Logger
-) -> None:
+def handle_command(body: dict, ack: Ack, respond: Respond, client: WebClient, logger: Logger) -> None:
     logger.info(body)
     ack(
         text="Accepted!",
@@ -49,9 +45,7 @@ def handle_command(
         blocks=[
             SectionBlock(
                 block_id="b",
-                text=MarkdownTextObject(
-                    text="You can add a button alongside text in your message. "
-                ),
+                text=MarkdownTextObject(text="You can add a button alongside text in your message. "),
                 accessory=ButtonElement(
                     action_id="a",
                     text=PlainTextObject(text="Button"),

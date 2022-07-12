@@ -11,21 +11,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            "SlackBot", "bot_refresh_token", models.TextField(null=True)
-        ),
-        migrations.AddField(
-            "SlackBot", "bot_token_expires_at", models.DateTimeField(null=True)
-        ),
-        migrations.AddField(
-            "SlackInstallation", "bot_refresh_token", models.TextField(null=True)
-        ),
-        migrations.AddField(
-            "SlackInstallation", "bot_token_expires_at", models.DateTimeField(null=True)
-        ),
-        migrations.AddField(
-            "SlackInstallation", "user_refresh_token", models.TextField(null=True)
-        ),
+        migrations.AddField("SlackBot", "bot_refresh_token", models.TextField(null=True)),
+        migrations.AddField("SlackBot", "bot_token_expires_at", models.DateTimeField(null=True)),
+        migrations.AddField("SlackInstallation", "bot_refresh_token", models.TextField(null=True)),
+        migrations.AddField("SlackInstallation", "bot_token_expires_at", models.DateTimeField(null=True)),
+        migrations.AddField("SlackInstallation", "user_refresh_token", models.TextField(null=True)),
         migrations.AddField(
             "SlackInstallation",
             "user_token_expires_at",

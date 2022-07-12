@@ -90,9 +90,7 @@ def save(ack: Ack, step: dict, view: dict, update: Update):
                 "value": state_values["task_name_input"]["task_name"]["value"],
             },
             "taskDescription": {
-                "value": state_values["task_description_input"]["task_description"][
-                    "value"
-                ],
+                "value": state_values["task_description_input"]["task_description"]["value"],
             },
             "taskAuthorEmail": {
                 "value": state_values["task_author_input"]["task_author"]["value"],
@@ -153,9 +151,7 @@ def execute(step: dict, client: WebClient, complete: Complete, fail: Fail):
             }
         )
 
-        user_lookup: SlackResponse = client.users_lookupByEmail(
-            email=step["inputs"]["taskAuthorEmail"]["value"]
-        )
+        user_lookup: SlackResponse = client.users_lookupByEmail(email=step["inputs"]["taskAuthorEmail"]["value"])
         user_id = user_lookup["user"]["id"]
         new_task = {
             "task_name": step["inputs"]["taskName"]["value"],
