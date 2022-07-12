@@ -30,11 +30,7 @@
 
 
 def _can_say(self: Any, channel: Optional[str]) -&gt; bool:
-    return (
-        hasattr(self, &#34;client&#34;)
-        and self.client is not None
-        and (channel or self.channel) is not None
-    )</code></pre>
+    return hasattr(self, &#34;client&#34;) and self.client is not None and (channel or self.channel) is not None</code></pre>
 </details>
 </section>
 <section>

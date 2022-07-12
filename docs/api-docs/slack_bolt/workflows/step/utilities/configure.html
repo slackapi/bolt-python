@@ -68,9 +68,7 @@ class Configure:
         self.client = client
         self.body = body
 
-    def __call__(
-        self, *, blocks: Optional[Sequence[Union[dict, Block]]] = None, **kwargs
-    ) -&gt; None:
+    def __call__(self, *, blocks: Optional[Sequence[Union[dict, Block]]] = None, **kwargs) -&gt; None:
         self.client.views_open(
             trigger_id=self.body[&#34;trigger_id&#34;],
             view={
@@ -163,9 +161,7 @@ app.step(ws)
         self.client = client
         self.body = body
 
-    def __call__(
-        self, *, blocks: Optional[Sequence[Union[dict, Block]]] = None, **kwargs
-    ) -&gt; None:
+    def __call__(self, *, blocks: Optional[Sequence[Union[dict, Block]]] = None, **kwargs) -&gt; None:
         self.client.views_open(
             trigger_id=self.body[&#34;trigger_id&#34;],
             view={

@@ -38,9 +38,7 @@ class AsyncLazyListenerRunner(metaclass=ABCMeta):
     logger: Logger
 
     @abstractmethod
-    def start(
-        self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest
-    ) -&gt; None:
+    def start(self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest) -&gt; None:
         &#34;&#34;&#34;Starts a new lazy listener execution.
 
         Args:
@@ -49,9 +47,7 @@ class AsyncLazyListenerRunner(metaclass=ABCMeta):
         &#34;&#34;&#34;
         raise NotImplementedError()
 
-    async def run(
-        self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest
-    ) -&gt; None:
+    async def run(self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest) -&gt; None:
         &#34;&#34;&#34;Synchronously run the function with a given request data.
 
         Args:
@@ -88,9 +84,7 @@ class AsyncLazyListenerRunner(metaclass=ABCMeta):
     logger: Logger
 
     @abstractmethod
-    def start(
-        self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest
-    ) -&gt; None:
+    def start(self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest) -&gt; None:
         &#34;&#34;&#34;Starts a new lazy listener execution.
 
         Args:
@@ -99,9 +93,7 @@ class AsyncLazyListenerRunner(metaclass=ABCMeta):
         &#34;&#34;&#34;
         raise NotImplementedError()
 
-    async def run(
-        self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest
-    ) -&gt; None:
+    async def run(self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest) -&gt; None:
         &#34;&#34;&#34;Synchronously run the function with a given request data.
 
         Args:
@@ -144,9 +136,7 @@ class AsyncLazyListenerRunner(metaclass=ABCMeta):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">async def run(
-    self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest
-) -&gt; None:
+<pre><code class="python">async def run(self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest) -&gt; None:
     &#34;&#34;&#34;Synchronously run the function with a given request data.
 
     Args:
@@ -178,9 +168,7 @@ class AsyncLazyListenerRunner(metaclass=ABCMeta):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
-def start(
-    self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest
-) -&gt; None:
+def start(self, function: Callable[..., Awaitable[None]], request: AsyncBoltRequest) -&gt; None:
     &#34;&#34;&#34;Starts a new lazy listener execution.
 
     Args:

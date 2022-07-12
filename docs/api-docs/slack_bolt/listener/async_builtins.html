@@ -40,9 +40,7 @@ class AsyncTokenRevocationListeners:
     def __init__(self, installation_store: AsyncInstallationStore):
         self.installation_store = installation_store
 
-    async def handle_tokens_revoked_events(
-        self, event: dict, context: AsyncBoltContext
-    ) -&gt; None:
+    async def handle_tokens_revoked_events(self, event: dict, context: AsyncBoltContext) -&gt; None:
         user_ids = event.get(&#34;tokens&#34;, {}).get(&#34;oauth&#34;, [])
         if len(user_ids) &gt; 0:
             for user_id in user_ids:
@@ -92,9 +90,7 @@ class AsyncTokenRevocationListeners:
     def __init__(self, installation_store: AsyncInstallationStore):
         self.installation_store = installation_store
 
-    async def handle_tokens_revoked_events(
-        self, event: dict, context: AsyncBoltContext
-    ) -&gt; None:
+    async def handle_tokens_revoked_events(self, event: dict, context: AsyncBoltContext) -&gt; None:
         user_ids = event.get(&#34;tokens&#34;, {}).get(&#34;oauth&#34;, [])
         if len(user_ids) &gt; 0:
             for user_id in user_ids:
@@ -150,9 +146,7 @@ class AsyncTokenRevocationListeners:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">async def handle_tokens_revoked_events(
-    self, event: dict, context: AsyncBoltContext
-) -&gt; None:
+<pre><code class="python">async def handle_tokens_revoked_events(self, event: dict, context: AsyncBoltContext) -&gt; None:
     user_ids = event.get(&#34;tokens&#34;, {}).get(&#34;oauth&#34;, [])
     if len(user_ids) &gt; 0:
         for user_id in user_ids:

@@ -43,9 +43,7 @@ class SlackRequestHandler:
     def __init__(self, app: App):  # type: ignore
         self.app = app
         self.logger = get_bolt_app_logger(app.name, SlackRequestHandler, app.logger)
-        self.app.listener_runner.lazy_listener_runner = LambdaLazyListenerRunner(
-            self.logger
-        )
+        self.app.listener_runner.lazy_listener_runner = LambdaLazyListenerRunner(self.logger)
         if self.app.oauth_flow is not None:
             self.app.oauth_flow.settings.redirect_uri_page_renderer.install_path = &#34;?&#34;
 
@@ -72,10 +70,7 @@ class SlackRequestHandler:
                 bolt_req: BoltRequest = to_bolt_request(event)
                 query = bolt_req.query
                 is_callback = query is not None and (
-                    (
-                        _first_value(query, &#34;code&#34;) is not None
-                        and _first_value(query, &#34;state&#34;) is not None
-                    )
+                    (_first_value(query, &#34;code&#34;) is not None and _first_value(query, &#34;state&#34;) is not None)
                     or _first_value(query, &#34;error&#34;) is not None
                 )
                 if is_callback:
@@ -89,6 +84,7 @@ class SlackRequestHandler:
             # https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
             aws_lambda_function_name = context.function_name
             bolt_req.context[&#34;aws_lambda_function_name&#34;] = aws_lambda_function_name
+            bolt_req.context[&#34;aws_lambda_invoked_function_arn&#34;] = context.invoked_function_arn
             bolt_req.context[&#34;lambda_request&#34;] = event
             bolt_resp = self.app.dispatch(bolt_req)
             aws_response = to_aws_response(bolt_resp)
@@ -229,9 +225,7 @@ def not_found() -&gt; Dict[str, Any]:
     def __init__(self, app: App):  # type: ignore
         self.app = app
         self.logger = get_bolt_app_logger(app.name, SlackRequestHandler, app.logger)
-        self.app.listener_runner.lazy_listener_runner = LambdaLazyListenerRunner(
-            self.logger
-        )
+        self.app.listener_runner.lazy_listener_runner = LambdaLazyListenerRunner(self.logger)
         if self.app.oauth_flow is not None:
             self.app.oauth_flow.settings.redirect_uri_page_renderer.install_path = &#34;?&#34;
 
@@ -258,10 +252,7 @@ def not_found() -&gt; Dict[str, Any]:
                 bolt_req: BoltRequest = to_bolt_request(event)
                 query = bolt_req.query
                 is_callback = query is not None and (
-                    (
-                        _first_value(query, &#34;code&#34;) is not None
-                        and _first_value(query, &#34;state&#34;) is not None
-                    )
+                    (_first_value(query, &#34;code&#34;) is not None and _first_value(query, &#34;state&#34;) is not None)
                     or _first_value(query, &#34;error&#34;) is not None
                 )
                 if is_callback:
@@ -275,6 +266,7 @@ def not_found() -&gt; Dict[str, Any]:
             # https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
             aws_lambda_function_name = context.function_name
             bolt_req.context[&#34;aws_lambda_function_name&#34;] = aws_lambda_function_name
+            bolt_req.context[&#34;aws_lambda_invoked_function_arn&#34;] = context.invoked_function_arn
             bolt_req.context[&#34;lambda_request&#34;] = event
             bolt_resp = self.app.dispatch(bolt_req)
             aws_response = to_aws_response(bolt_resp)
@@ -334,10 +326,7 @@ def clear_all_log_handlers(cls):
             bolt_req: BoltRequest = to_bolt_request(event)
             query = bolt_req.query
             is_callback = query is not None and (
-                (
-                    _first_value(query, &#34;code&#34;) is not None
-                    and _first_value(query, &#34;state&#34;) is not None
-                )
+                (_first_value(query, &#34;code&#34;) is not None and _first_value(query, &#34;state&#34;) is not None)
                 or _first_value(query, &#34;error&#34;) is not None
             )
             if is_callback:
@@ -351,6 +340,7 @@ def clear_all_log_handlers(cls):
         # https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
         aws_lambda_function_name = context.function_name
         bolt_req.context[&#34;aws_lambda_function_name&#34;] = aws_lambda_function_name
+        bolt_req.context[&#34;aws_lambda_invoked_function_arn&#34;] = context.invoked_function_arn
         bolt_req.context[&#34;lambda_request&#34;] = event
         bolt_resp = self.app.dispatch(bolt_req)
         aws_response = to_aws_response(bolt_resp)

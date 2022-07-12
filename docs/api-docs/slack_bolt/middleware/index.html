@@ -154,9 +154,7 @@ __all__ = [
     arg_names: Sequence[str]
     logger: Logger
 
-    def __init__(
-        self, *, app_name: str, func: Callable, base_logger: Optional[Logger] = None
-    ):
+    def __init__(self, *, app_name: str, func: Callable, base_logger: Optional[Logger] = None):
         self.app_name = app_name
         self.func = func
         self.arg_names = inspect.getfullargspec(func).args
@@ -258,9 +256,7 @@ __all__ = [
     events_that_should_be_kept = [&#34;member_joined_channel&#34;, &#34;member_left_channel&#34;]
 
     @classmethod
-    def _is_self_event(
-        cls, auth_result: AuthorizeResult, user_id: str, body: Dict[str, Any]
-    ):
+    def _is_self_event(cls, auth_result: AuthorizeResult, user_id: str, body: Dict[str, Any]):
         return (
             auth_result is not None
             and user_id is not None
@@ -622,9 +618,7 @@ def process(
 
     @staticmethod
     def _can_skip(mode: str, body: Dict[str, Any]) -&gt; bool:
-        return mode == &#34;socket_mode&#34; or (
-            body is not None and body.get(&#34;ssl_check&#34;) == &#34;1&#34;
-        )
+        return mode == &#34;socket_mode&#34; or (body is not None and body.get(&#34;ssl_check&#34;) == &#34;1&#34;)
 
     @staticmethod
     def _build_error_response() -&gt; BoltResponse:
@@ -632,8 +626,7 @@ def process(
 
     def _debug_log_error(self, signature, timestamp, body) -&gt; None:
         self.logger.info(
-            &#34;Invalid request signature detected &#34;
-            f&#34;(signature: {signature}, timestamp: {timestamp}, body: {body})&#34;
+            &#34;Invalid request signature detected &#34; f&#34;(signature: {signature}, timestamp: {timestamp}, body: {body})&#34;
         )</code></pre>
 </details>
 <h3>Ancestors</h3>

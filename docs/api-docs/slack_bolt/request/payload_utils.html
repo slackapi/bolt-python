@@ -49,20 +49,11 @@ def to_message(body: Dict[str, Any]) -&gt; Optional[Dict[str, Any]]:
 
 
 def is_event(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;event_callback&#34;)
-        and &#34;event&#34; in body
-        and &#34;type&#34; in body[&#34;event&#34;]
-    )
+    return body is not None and _is_expected_type(body, &#34;event_callback&#34;) and &#34;event&#34; in body and &#34;type&#34; in body[&#34;event&#34;]
 
 
 def is_workflow_step_execute(body: Dict[str, Any]) -&gt; bool:
-    return (
-        is_event(body)
-        and body[&#34;event&#34;][&#34;type&#34;] == &#34;workflow_step_execute&#34;
-        and &#34;workflow_step&#34; in body[&#34;event&#34;]
-    )
+    return is_event(body) and body[&#34;event&#34;][&#34;type&#34;] == &#34;workflow_step_execute&#34; and &#34;workflow_step&#34; in body[&#34;event&#34;]
 
 
 # -------------------
@@ -103,43 +94,23 @@ def is_action(body: Dict[str, Any]) -&gt; bool:
 
 
 def is_attachment_action(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;interactive_message&#34;)
-        and &#34;callback_id&#34; in body
-    )
+    return body is not None and _is_expected_type(body, &#34;interactive_message&#34;) and &#34;callback_id&#34; in body
 
 
 def is_block_actions(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;block_actions&#34;)
-        and &#34;actions&#34; in body
-    )
+    return body is not None and _is_expected_type(body, &#34;block_actions&#34;) and &#34;actions&#34; in body
 
 
 def is_dialog_submission(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;dialog_submission&#34;)
-        and &#34;callback_id&#34; in body
-    )
+    return body is not None and _is_expected_type(body, &#34;dialog_submission&#34;) and &#34;callback_id&#34; in body
 
 
 def is_dialog_cancellation(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;dialog_cancellation&#34;)
-        and &#34;callback_id&#34; in body
-    )
+    return body is not None and _is_expected_type(body, &#34;dialog_cancellation&#34;) and &#34;callback_id&#34; in body
 
 
 def is_workflow_step_edit(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;workflow_step_edit&#34;)
-        and &#34;callback_id&#34; in body
-    )
+    return body is not None and _is_expected_type(body, &#34;workflow_step_edit&#34;) and &#34;callback_id&#34; in body
 
 
 # -------------------
@@ -158,19 +129,11 @@ def is_options(body: Dict[str, Any]) -&gt; bool:
 
 
 def is_block_suggestion(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;block_suggestion&#34;)
-        and &#34;action_id&#34; in body
-    )
+    return body is not None and _is_expected_type(body, &#34;block_suggestion&#34;) and &#34;action_id&#34; in body
 
 
 def is_dialog_suggestion(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;dialog_suggestion&#34;)
-        and &#34;callback_id&#34; in body
-    )
+    return body is not None and _is_expected_type(body, &#34;dialog_suggestion&#34;) and &#34;callback_id&#34; in body
 
 
 # -------------------
@@ -189,19 +152,11 @@ def is_shortcut(body: Dict[str, Any]) -&gt; bool:
 
 
 def is_global_shortcut(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;shortcut&#34;)
-        and &#34;callback_id&#34; in body
-    )
+    return body is not None and _is_expected_type(body, &#34;shortcut&#34;) and &#34;callback_id&#34; in body
 
 
 def is_message_shortcut(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;message_action&#34;)
-        and &#34;callback_id&#34; in body
-    )
+    return body is not None and _is_expected_type(body, &#34;message_action&#34;) and &#34;callback_id&#34; in body
 
 
 # -------------------
@@ -221,20 +176,12 @@ def is_view(body: Dict[str, Any]) -&gt; bool:
 
 def is_view_submission(body: Dict[str, Any]) -&gt; bool:
     return (
-        body is not None
-        and _is_expected_type(body, &#34;view_submission&#34;)
-        and &#34;view&#34; in body
-        and &#34;callback_id&#34; in body[&#34;view&#34;]
+        body is not None and _is_expected_type(body, &#34;view_submission&#34;) and &#34;view&#34; in body and &#34;callback_id&#34; in body[&#34;view&#34;]
     )
 
 
 def is_view_closed(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;view_closed&#34;)
-        and &#34;view&#34; in body
-        and &#34;callback_id&#34; in body[&#34;view&#34;]
-    )
+    return body is not None and _is_expected_type(body, &#34;view_closed&#34;) and &#34;view&#34; in body and &#34;callback_id&#34; in body[&#34;view&#34;]
 
 
 def is_workflow_step_save(body: Dict[str, Any]) -&gt; bool:
@@ -304,11 +251,7 @@ def _is_expected_type(body: dict, expected: str) -&gt; bool:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_attachment_action(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;interactive_message&#34;)
-        and &#34;callback_id&#34; in body
-    )</code></pre>
+    return body is not None and _is_expected_type(body, &#34;interactive_message&#34;) and &#34;callback_id&#34; in body</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.payload_utils.is_block_actions"><code class="name flex">
@@ -321,11 +264,7 @@ def _is_expected_type(body: dict, expected: str) -&gt; bool:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_block_actions(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;block_actions&#34;)
-        and &#34;actions&#34; in body
-    )</code></pre>
+    return body is not None and _is_expected_type(body, &#34;block_actions&#34;) and &#34;actions&#34; in body</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.payload_utils.is_block_suggestion"><code class="name flex">
@@ -338,11 +277,7 @@ def _is_expected_type(body: dict, expected: str) -&gt; bool:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_block_suggestion(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;block_suggestion&#34;)
-        and &#34;action_id&#34; in body
-    )</code></pre>
+    return body is not None and _is_expected_type(body, &#34;block_suggestion&#34;) and &#34;action_id&#34; in body</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.payload_utils.is_dialog_cancellation"><code class="name flex">
@@ -355,11 +290,7 @@ def _is_expected_type(body: dict, expected: str) -&gt; bool:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_dialog_cancellation(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;dialog_cancellation&#34;)
-        and &#34;callback_id&#34; in body
-    )</code></pre>
+    return body is not None and _is_expected_type(body, &#34;dialog_cancellation&#34;) and &#34;callback_id&#34; in body</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.payload_utils.is_dialog_submission"><code class="name flex">
@@ -372,11 +303,7 @@ def _is_expected_type(body: dict, expected: str) -&gt; bool:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_dialog_submission(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;dialog_submission&#34;)
-        and &#34;callback_id&#34; in body
-    )</code></pre>
+    return body is not None and _is_expected_type(body, &#34;dialog_submission&#34;) and &#34;callback_id&#34; in body</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.payload_utils.is_dialog_suggestion"><code class="name flex">
@@ -389,11 +316,7 @@ def _is_expected_type(body: dict, expected: str) -&gt; bool:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_dialog_suggestion(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;dialog_suggestion&#34;)
-        and &#34;callback_id&#34; in body
-    )</code></pre>
+    return body is not None and _is_expected_type(body, &#34;dialog_suggestion&#34;) and &#34;callback_id&#34; in body</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.payload_utils.is_event"><code class="name flex">
@@ -406,12 +329,7 @@ def _is_expected_type(body: dict, expected: str) -&gt; bool:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_event(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;event_callback&#34;)
-        and &#34;event&#34; in body
-        and &#34;type&#34; in body[&#34;event&#34;]
-    )</code></pre>
+    return body is not None and _is_expected_type(body, &#34;event_callback&#34;) and &#34;event&#34; in body and &#34;type&#34; in body[&#34;event&#34;]</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.payload_utils.is_global_shortcut"><code class="name flex">
@@ -424,11 +342,7 @@ def _is_expected_type(body: dict, expected: str) -&gt; bool:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_global_shortcut(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;shortcut&#34;)
-        and &#34;callback_id&#34; in body
-    )</code></pre>
+    return body is not None and _is_expected_type(body, &#34;shortcut&#34;) and &#34;callback_id&#34; in body</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.payload_utils.is_message_shortcut"><code class="name flex">
@@ -441,11 +355,7 @@ def _is_expected_type(body: dict, expected: str) -&gt; bool:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_message_shortcut(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;message_action&#34;)
-        and &#34;callback_id&#34; in body
-    )</code></pre>
+    return body is not None and _is_expected_type(body, &#34;message_action&#34;) and &#34;callback_id&#34; in body</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.payload_utils.is_options"><code class="name flex">
@@ -510,12 +420,7 @@ def _is_expected_type(body: dict, expected: str) -&gt; bool:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_view_closed(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;view_closed&#34;)
-        and &#34;view&#34; in body
-        and &#34;callback_id&#34; in body[&#34;view&#34;]
-    )</code></pre>
+    return body is not None and _is_expected_type(body, &#34;view_closed&#34;) and &#34;view&#34; in body and &#34;callback_id&#34; in body[&#34;view&#34;]</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.payload_utils.is_view_submission"><code class="name flex">
@@ -529,10 +434,7 @@ def _is_expected_type(body: dict, expected: str) -&gt; bool:
 </summary>
 <pre><code class="python">def is_view_submission(body: Dict[str, Any]) -&gt; bool:
     return (
-        body is not None
-        and _is_expected_type(body, &#34;view_submission&#34;)
-        and &#34;view&#34; in body
-        and &#34;callback_id&#34; in body[&#34;view&#34;]
+        body is not None and _is_expected_type(body, &#34;view_submission&#34;) and &#34;view&#34; in body and &#34;callback_id&#34; in body[&#34;view&#34;]
     )</code></pre>
 </details>
 </dd>
@@ -546,11 +448,7 @@ def _is_expected_type(body: dict, expected: str) -&gt; bool:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_workflow_step_edit(body: Dict[str, Any]) -&gt; bool:
-    return (
-        body is not None
-        and _is_expected_type(body, &#34;workflow_step_edit&#34;)
-        and &#34;callback_id&#34; in body
-    )</code></pre>
+    return body is not None and _is_expected_type(body, &#34;workflow_step_edit&#34;) and &#34;callback_id&#34; in body</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.payload_utils.is_workflow_step_execute"><code class="name flex">
@@ -563,11 +461,7 @@ def _is_expected_type(body: dict, expected: str) -&gt; bool:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_workflow_step_execute(body: Dict[str, Any]) -&gt; bool:
-    return (
-        is_event(body)
-        and body[&#34;event&#34;][&#34;type&#34;] == &#34;workflow_step_execute&#34;
-        and &#34;workflow_step&#34; in body[&#34;event&#34;]
-    )</code></pre>
+    return is_event(body) and body[&#34;event&#34;][&#34;type&#34;] == &#34;workflow_step_execute&#34; and &#34;workflow_step&#34; in body[&#34;event&#34;]</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.payload_utils.is_workflow_step_save"><code class="name flex">

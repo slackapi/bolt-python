@@ -242,9 +242,7 @@ __all__ = [
         if self.settings.state_validation_enabled is True:
             state = self.issue_new_state(request)
             url = self.build_authorize_url(state, request)
-            set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(
-                state
-            )
+            set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(state)
 
         if self.settings.install_page_rendering_enabled:
             html = self.build_install_page_html(url, request)
@@ -390,17 +388,11 @@ __all__ = [
                 client_secret=self.settings.client_secret,
                 redirect_uri=self.settings.redirect_uri,  # can be None
             )
-            installed_enterprise: Dict[str, str] = (
-                oauth_response.get(&#34;enterprise&#34;) or {}
-            )
-            is_enterprise_install: bool = (
-                oauth_response.get(&#34;is_enterprise_install&#34;) or False
-            )
+            installed_enterprise: Dict[str, str] = oauth_response.get(&#34;enterprise&#34;) or {}
+            is_enterprise_install: bool = oauth_response.get(&#34;is_enterprise_install&#34;) or False
             installed_team: Dict[str, str] = oauth_response.get(&#34;team&#34;) or {}
             installer: Dict[str, str] = oauth_response.get(&#34;authed_user&#34;) or {}
-            incoming_webhook: Dict[str, str] = (
-                oauth_response.get(&#34;incoming_webhook&#34;) or {}
-            )
+            incoming_webhook: Dict[str, str] = oauth_response.get(&#34;incoming_webhook&#34;) or {}
 
             bot_token: Optional[str] = oauth_response.get(&#34;access_token&#34;)
             # NOTE: oauth.v2.access doesn&#39;t include bot_id in response
@@ -433,17 +425,13 @@ __all__ = [
                 incoming_webhook_url=incoming_webhook.get(&#34;url&#34;),
                 incoming_webhook_channel=incoming_webhook.get(&#34;channel&#34;),
                 incoming_webhook_channel_id=incoming_webhook.get(&#34;channel_id&#34;),
-                incoming_webhook_configuration_url=incoming_webhook.get(
-                    &#34;configuration_url&#34;
-                ),
+                incoming_webhook_configuration_url=incoming_webhook.get(&#34;configuration_url&#34;),
                 is_enterprise_install=is_enterprise_install,
                 token_type=oauth_response.get(&#34;token_type&#34;),
             )
 
         except SlackApiError as e:
-            message = (
-                f&#34;Failed to fetch oauth.v2.access result with code: {code} - error: {e}&#34;
-            )
+            message = f&#34;Failed to fetch oauth.v2.access result with code: {code} - error: {e}&#34;
             self.logger.warning(message)
             return None
 
@@ -758,9 +746,7 @@ def logger(self) -&gt; Logger:
     if self.settings.state_validation_enabled is True:
         state = self.issue_new_state(request)
         url = self.build_authorize_url(state, request)
-        set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(
-            state
-        )
+        set_cookie_value = self.settings.state_utils.build_set_cookie_for_new_state(state)
 
     if self.settings.install_page_rendering_enabled:
         html = self.build_install_page_html(url, request)
@@ -813,17 +799,11 @@ def logger(self) -&gt; Logger:
             client_secret=self.settings.client_secret,
             redirect_uri=self.settings.redirect_uri,  # can be None
         )
-        installed_enterprise: Dict[str, str] = (
-            oauth_response.get(&#34;enterprise&#34;) or {}
-        )
-        is_enterprise_install: bool = (
-            oauth_response.get(&#34;is_enterprise_install&#34;) or False
-        )
+        installed_enterprise: Dict[str, str] = oauth_response.get(&#34;enterprise&#34;) or {}
+        is_enterprise_install: bool = oauth_response.get(&#34;is_enterprise_install&#34;) or False
         installed_team: Dict[str, str] = oauth_response.get(&#34;team&#34;) or {}
         installer: Dict[str, str] = oauth_response.get(&#34;authed_user&#34;) or {}
-        incoming_webhook: Dict[str, str] = (
-            oauth_response.get(&#34;incoming_webhook&#34;) or {}
-        )
+        incoming_webhook: Dict[str, str] = oauth_response.get(&#34;incoming_webhook&#34;) or {}
 
         bot_token: Optional[str] = oauth_response.get(&#34;access_token&#34;)
         # NOTE: oauth.v2.access doesn&#39;t include bot_id in response
@@ -856,17 +836,13 @@ def logger(self) -&gt; Logger:
             incoming_webhook_url=incoming_webhook.get(&#34;url&#34;),
             incoming_webhook_channel=incoming_webhook.get(&#34;channel&#34;),
             incoming_webhook_channel_id=incoming_webhook.get(&#34;channel_id&#34;),
-            incoming_webhook_configuration_url=incoming_webhook.get(
-                &#34;configuration_url&#34;
-            ),
+            incoming_webhook_configuration_url=incoming_webhook.get(&#34;configuration_url&#34;),
             is_enterprise_install=is_enterprise_install,
             token_type=oauth_response.get(&#34;token_type&#34;),
         )
 
     except SlackApiError as e:
-        message = (
-            f&#34;Failed to fetch oauth.v2.access result with code: {code} - error: {e}&#34;
-        )
+        message = f&#34;Failed to fetch oauth.v2.access result with code: {code} - error: {e}&#34;
         self.logger.warning(message)
         return None</code></pre>
 </details>

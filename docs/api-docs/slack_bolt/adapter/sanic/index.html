@@ -68,14 +68,10 @@ __all__ = [
             if self.app.oauth_flow is not None:
                 oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
                 if req.path == oauth_flow.install_path:
-                    bolt_resp = await oauth_flow.handle_installation(
-                        to_async_bolt_request(req)
-                    )
+                    bolt_resp = await oauth_flow.handle_installation(to_async_bolt_request(req))
                     return to_sanic_response(bolt_resp)
                 elif req.path == oauth_flow.redirect_uri_path:
-                    bolt_resp = await oauth_flow.handle_callback(
-                        to_async_bolt_request(req)
-                    )
+                    bolt_resp = await oauth_flow.handle_callback(to_async_bolt_request(req))
                     return to_sanic_response(bolt_resp)
 
         elif req.method == &#34;POST&#34;:
@@ -103,14 +99,10 @@ __all__ = [
         if self.app.oauth_flow is not None:
             oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
             if req.path == oauth_flow.install_path:
-                bolt_resp = await oauth_flow.handle_installation(
-                    to_async_bolt_request(req)
-                )
+                bolt_resp = await oauth_flow.handle_installation(to_async_bolt_request(req))
                 return to_sanic_response(bolt_resp)
             elif req.path == oauth_flow.redirect_uri_path:
-                bolt_resp = await oauth_flow.handle_callback(
-                    to_async_bolt_request(req)
-                )
+                bolt_resp = await oauth_flow.handle_callback(to_async_bolt_request(req))
                 return to_sanic_response(bolt_resp)
 
     elif req.method == &#34;POST&#34;:

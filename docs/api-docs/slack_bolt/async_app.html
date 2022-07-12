@@ -372,9 +372,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
         self._signing_secret: str = signing_secret
-        self._verification_token: Optional[str] = verification_token or os.environ.get(
-            &#34;SLACK_VERIFICATION_TOKEN&#34;, None
-        )
+        self._verification_token: Optional[str] = verification_token or os.environ.get(&#34;SLACK_VERIFICATION_TOKEN&#34;, None)
         # If a logger is explicitly passed when initializing, the logger works as the base logger.
         # The base logger&#39;s logging settings will be propagated to all the loggers created by bolt-python.
         self._base_logger = logger
@@ -391,9 +389,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             self._async_client = client
             self._token = client.token
             if token is not None:
-                self._framework_logger.warning(
-                    warning_client_prioritized_and_token_skipped()
-                )
+                self._framework_logger.warning(warning_client_prioritized_and_token_skipped())
         else:
             self._async_client = create_async_web_client(
                 # NOTE: the token here can be None
@@ -410,13 +406,9 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             if oauth_settings is not None or oauth_flow is not None:
                 raise BoltError(error_authorize_conflicts())
 
-            self._async_authorize = AsyncCallableAuthorize(
-                logger=self._framework_logger, func=authorize
-            )
+            self._async_authorize = AsyncCallableAuthorize(logger=self._framework_logger, func=authorize)
 
-        self._async_installation_store: Optional[
-            AsyncInstallationStore
-        ] = installation_store
+        self._async_installation_store: Optional[AsyncInstallationStore] = installation_store
         if self._async_installation_store is not None and self._async_authorize is None:
             settings = oauth_flow.settings if oauth_flow is not None else oauth_settings
             self._async_authorize = AsyncInstallationStoreAuthorize(
@@ -473,45 +465,27 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             self._async_installation_store = installation_store
             oauth_settings.installation_store = installation_store
 
-            self._async_oauth_flow = AsyncOAuthFlow(
-                client=self._async_client, logger=self.logger, settings=oauth_settings
-            )
+            self._async_oauth_flow = AsyncOAuthFlow(client=self._async_client, logger=self.logger, settings=oauth_settings)
             if self._async_authorize is None:
                 self._async_authorize = self._async_oauth_flow.settings.authorize
-            self._async_authorize.token_rotation_expiration_minutes = (
-                oauth_settings.token_rotation_expiration_minutes
-            )
+            self._async_authorize.token_rotation_expiration_minutes = oauth_settings.token_rotation_expiration_minutes
 
-        if (
-            self._async_installation_store is not None
-            or self._async_authorize is not None
-        ) and self._token is not None:
+        if (self._async_installation_store is not None or self._async_authorize is not None) and self._token is not None:
             self._token = None
             self._framework_logger.warning(warning_token_skipped())
 
         # after setting bot_only here, __init__ cannot replace authorize function
-        if (
-            installation_store_bot_only is not None
-            and self._async_oauth_flow is not None
-        ):
+        if installation_store_bot_only is not None and self._async_oauth_flow is not None:
             app_bot_only = installation_store_bot_only or False
-            oauth_flow_bot_only = (
-                self._async_oauth_flow.settings.installation_store_bot_only
-            )
+            oauth_flow_bot_only = self._async_oauth_flow.settings.installation_store_bot_only
             if app_bot_only != oauth_flow_bot_only:
                 self.logger.warning(warning_bot_only_conflicts())
-                self._async_oauth_flow.settings.installation_store_bot_only = (
-                    app_bot_only
-                )
+                self._async_oauth_flow.settings.installation_store_bot_only = app_bot_only
                 self._async_authorize.bot_only = app_bot_only
 
-        self._async_tokens_revocation_listeners: Optional[
-            AsyncTokenRevocationListeners
-        ] = None
+        self._async_tokens_revocation_listeners: Optional[AsyncTokenRevocationListeners] = None
         if self._async_installation_store is not None:
-            self._async_tokens_revocation_listeners = AsyncTokenRevocationListeners(
-                self._async_installation_store
-            )
+            self._async_tokens_revocation_listeners = AsyncTokenRevocationListeners(self._async_installation_store)
 
         # --------------------------------------
         # Middleware Initialization
@@ -524,15 +498,9 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         self._async_listener_runner = AsyncioListenerRunner(
             logger=self._framework_logger,
             process_before_response=process_before_response,
-            listener_error_handler=AsyncDefaultListenerErrorHandler(
-                logger=self._framework_logger
-            ),
-            listener_start_handler=AsyncDefaultListenerStartHandler(
-                logger=self._framework_logger
-            ),
-            listener_completion_handler=AsyncDefaultListenerCompletionHandler(
-                logger=self._framework_logger
-            ),
+            listener_error_handler=AsyncDefaultListenerErrorHandler(logger=self._framework_logger),
+            listener_start_handler=AsyncDefaultListenerStartHandler(logger=self._framework_logger),
+            listener_completion_handler=AsyncDefaultListenerCompletionHandler(logger=self._framework_logger),
             lazy_listener_runner=AsyncioLazyListenerRunner(
                 logger=self._framework_logger,
             ),
@@ -568,40 +536,26 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                 )
             )
         if request_verification_enabled is True:
-            self._async_middleware_list.append(
-                AsyncRequestVerification(
-                    self._signing_secret, base_logger=self._base_logger
-                )
-            )
+            self._async_middleware_list.append(AsyncRequestVerification(self._signing_secret, base_logger=self._base_logger))
         # As authorize is required for making a Bolt app function, we don&#39;t offer the flag to disable this
         if self._async_oauth_flow is None:
             if self._token:
-                self._async_middleware_list.append(
-                    AsyncSingleTeamAuthorization(base_logger=self._base_logger)
-                )
+                self._async_middleware_list.append(AsyncSingleTeamAuthorization(base_logger=self._base_logger))
             elif self._async_authorize is not None:
                 self._async_middleware_list.append(
-                    AsyncMultiTeamsAuthorization(
-                        authorize=self._async_authorize, base_logger=self._base_logger
-                    )
+                    AsyncMultiTeamsAuthorization(authorize=self._async_authorize, base_logger=self._base_logger)
                 )
             else:
                 raise BoltError(error_token_required())
         else:
             self._async_middleware_list.append(
-                AsyncMultiTeamsAuthorization(
-                    authorize=self._async_authorize, base_logger=self._base_logger
-                )
+                AsyncMultiTeamsAuthorization(authorize=self._async_authorize, base_logger=self._base_logger)
             )
 
         if ignoring_self_events_enabled is True:
-            self._async_middleware_list.append(
-                AsyncIgnoringSelfEvents(base_logger=self._base_logger)
-            )
+            self._async_middleware_list.append(AsyncIgnoringSelfEvents(base_logger=self._base_logger))
         if url_verification_enabled is True:
-            self._async_middleware_list.append(
-                AsyncUrlVerification(base_logger=self._base_logger)
-            )
+            self._async_middleware_list.append(AsyncUrlVerification(base_logger=self._base_logger))
         self._init_middleware_list_done = True
 
     # -------------------------
@@ -660,11 +614,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             path: The path to handle request from Slack (Default: `/slack/events`)
             host: The hostname to serve the web endpoints. (Default: 0.0.0.0)
         &#34;&#34;&#34;
-        if (
-            self._server is None
-            or self._server.port != port
-            or self._server.path != path
-        ):
+        if self._server is None or self._server.port != port or self._server.path != path:
             self._server = AsyncSlackAppServer(
                 port=port,
                 path=path,
@@ -694,9 +644,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         &#34;&#34;&#34;
         return self.server(path=path).web_app
 
-    def start(
-        self, port: int = 3000, path: str = &#34;/slack/events&#34;, host: Optional[str] = None
-    ) -&gt; None:
+    def start(self, port: int = 3000, path: str = &#34;/slack/events&#34;, host: Optional[str] = None) -&gt; None:
         &#34;&#34;&#34;Start a web server using AIOHTTP.
         Refer to https://docs.aiohttp.org/ for more details about AIOHTTP.
 
@@ -733,16 +681,12 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                 middleware_state[&#34;next_called&#34;] = False
                 if self._framework_logger.level &lt;= logging.DEBUG:
                     self._framework_logger.debug(f&#34;Applying {middleware.name}&#34;)
-                resp = await middleware.async_process(
-                    req=req, resp=resp, next=async_middleware_next
-                )
+                resp = await middleware.async_process(req=req, resp=resp, next=async_middleware_next)
                 if not middleware_state[&#34;next_called&#34;]:
                     if resp is None:
                         # next() method was not called without providing the response to return to Slack
                         # This should not be an intentional handling in usual use cases.
-                        resp = BoltResponse(
-                            status=404, body={&#34;error&#34;: &#34;no next() calls in middleware&#34;}
-                        )
+                        resp = BoltResponse(status=404, body={&#34;error&#34;: &#34;no next() calls in middleware&#34;})
                         if self._raise_error_for_unhandled_request is True:
                             await self._async_listener_runner.listener_error_handler.handle(
                                 error=BoltUnhandledRequestError(
@@ -754,9 +698,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                                 response=resp,
                             )
                             return resp
-                        self._framework_logger.warning(
-                            warning_unhandled_by_global_middleware(middleware.name, req)
-                        )
+                        self._framework_logger.warning(warning_unhandled_by_global_middleware(middleware.name, req))
                         return resp
                     return resp
 
@@ -772,13 +714,11 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                     if next_was_not_called:
                         if middleware_resp is not None:
                             if self._framework_logger.level &lt;= logging.DEBUG:
-                                debug_message = (
-                                    debug_return_listener_middleware_response(
-                                        listener_name,
-                                        middleware_resp.status,
-                                        middleware_resp.body,
-                                        starting_time,
-                                    )
+                                debug_message = debug_return_listener_middleware_response(
+                                    listener_name,
+                                    middleware_resp.status,
+                                    middleware_resp.body,
+                                    starting_time,
                                 )
                                 self._framework_logger.debug(debug_message)
                             return middleware_resp
@@ -790,9 +730,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                         resp = middleware_resp
 
                     self._framework_logger.debug(debug_running_listener(listener_name))
-                    listener_response: Optional[
-                        BoltResponse
-                    ] = await self._async_listener_runner.run(
+                    listener_response: Optional[BoltResponse] = await self._async_listener_runner.run(
                         request=req,
                         response=resp,
                         listener_name=listener_name,
@@ -824,9 +762,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             )
             return resp
 
-    def _handle_unmatched_requests(
-        self, req: AsyncBoltRequest, resp: BoltResponse
-    ) -&gt; BoltResponse:
+    def _handle_unmatched_requests(self, req: AsyncBoltRequest, resp: BoltResponse) -&gt; BoltResponse:
         self._framework_logger.warning(warning_unhandled_request(req))
         return resp
 
@@ -870,9 +806,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                 )
                 return middleware_or_callable
             else:
-                raise BoltError(
-                    f&#34;Unexpected type for a middleware ({type(middleware_or_callable)})&#34;
-                )
+                raise BoltError(f&#34;Unexpected type for a middleware ({type(middleware_or_callable)})&#34;)
         return None
 
     # -------------------------
@@ -881,21 +815,9 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
     def step(
         self,
         callback_id: Union[str, Pattern, AsyncWorkflowStep, AsyncWorkflowStepBuilder],
-        edit: Optional[
-            Union[
-                Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]
-            ]
-        ] = None,
-        save: Optional[
-            Union[
-                Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]
-            ]
-        ] = None,
-        execute: Optional[
-            Union[
-                Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]
-            ]
-        ] = None,
+        edit: Optional[Union[Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]]] = None,
+        save: Optional[Union[Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]]] = None,
+        execute: Optional[Union[Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]]] = None,
     ):
         &#34;&#34;&#34;
         Registers a new Workflow Step listener.
@@ -968,11 +890,9 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         if not inspect.iscoroutinefunction(func):
             name = get_name_for_callable(func)
             raise BoltError(error_listener_function_must_be_coro_func(name))
-        self._async_listener_runner.listener_error_handler = (
-            AsyncCustomListenerErrorHandler(
-                logger=self._framework_logger,
-                func=func,
-            )
+        self._async_listener_runner.listener_error_handler = AsyncCustomListenerErrorHandler(
+            logger=self._framework_logger,
+            func=func,
         )
         self._async_middleware_error_handler = AsyncCustomMiddlewareErrorHandler(
             logger=self._framework_logger,
@@ -1021,12 +941,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.event(
-                event, True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware, True
-            )
+            primary_matcher = builtin_matchers.event(event, True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
         return __call__
 
@@ -1087,9 +1003,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                 base_logger=self._base_logger,
             )
             middleware.insert(0, AsyncMessageListenerMatches(keyword))
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware, True
-            )
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
         return __call__
 
@@ -1129,12 +1043,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.command(
-                command, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.command(command, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1180,12 +1090,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.shortcut(
-                constraints, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.shortcut(constraints, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1199,12 +1105,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.global_shortcut(
-                callback_id, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.global_shortcut(callback_id, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1218,12 +1120,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.message_shortcut(
-                callback_id, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.message_shortcut(callback_id, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1262,12 +1160,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.action(
-                constraints, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.action(constraints, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1283,12 +1177,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.block_action(
-                constraints, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.block_action(constraints, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1303,12 +1193,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.attachment_action(
-                callback_id, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.attachment_action(callback_id, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1323,12 +1209,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.dialog_submission(
-                callback_id, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.dialog_submission(callback_id, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1343,12 +1225,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.dialog_cancellation(
-                callback_id, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.dialog_cancellation(callback_id, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1398,12 +1276,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.view(
-                constraints, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.view(constraints, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1418,12 +1292,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.view_submission(
-                constraints, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.view_submission(constraints, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1438,12 +1308,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.view_closed(
-                constraints, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.view_closed(constraints, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1493,12 +1359,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.options(
-                constraints, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.options(constraints, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1512,12 +1374,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.block_suggestion(
-                action_id, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.block_suggestion(action_id, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1532,12 +1390,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.dialog_suggestion(
-                callback_id, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(
-                list(functions), primary_matcher, matchers, middleware
-            )
+            primary_matcher = builtin_matchers.dialog_suggestion(callback_id, asyncio=True, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
@@ -1565,9 +1419,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
     # -------------------------
 
     def _init_context(self, req: AsyncBoltRequest):
-        req.context[&#34;logger&#34;] = get_bolt_app_logger(
-            app_name=self.name, base_logger=self._base_logger
-        )
+        req.context[&#34;logger&#34;] = get_bolt_app_logger(app_name=self.name, base_logger=self._base_logger)
         req.context[&#34;token&#34;] = self._token
         if self._token is not None:
             # This AsyncWebClient instance can be safely singleton
@@ -1620,10 +1472,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                 raise BoltError(error_listener_function_must_be_coro_func(name))
 
         listener_matchers = [
-            AsyncCustomListenerMatcher(
-                app_name=self.name, func=f, base_logger=self._base_logger
-            )
-            for f in (matchers or [])
+            AsyncCustomListenerMatcher(app_name=self.name, func=f, base_logger=self._base_logger) for f in (matchers or [])
         ]
         listener_matchers.insert(0, primary_matcher)
         listener_middleware = []
@@ -1631,11 +1480,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             if isinstance(m, AsyncMiddleware):
                 listener_middleware.append(m)
             elif isinstance(m, Callable) and inspect.iscoroutinefunction(m):
-                listener_middleware.append(
-                    AsyncCustomMiddleware(
-                        app_name=self.name, func=m, base_logger=self._base_logger
-                    )
-                )
+                listener_middleware.append(AsyncCustomMiddleware(app_name=self.name, func=m, base_logger=self._base_logger))
             else:
                 raise ValueError(error_unexpected_listener_middleware(type(m)))
 
@@ -1821,12 +1666,8 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.action(
-            constraints, asyncio=True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware
-        )
+        primary_matcher = builtin_matchers.action(constraints, asyncio=True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
     return __call__</code></pre>
 </details>
@@ -1870,16 +1711,12 @@ Only when all the middleware call <code>next()</code> method, the listener funct
             middleware_state[&#34;next_called&#34;] = False
             if self._framework_logger.level &lt;= logging.DEBUG:
                 self._framework_logger.debug(f&#34;Applying {middleware.name}&#34;)
-            resp = await middleware.async_process(
-                req=req, resp=resp, next=async_middleware_next
-            )
+            resp = await middleware.async_process(req=req, resp=resp, next=async_middleware_next)
             if not middleware_state[&#34;next_called&#34;]:
                 if resp is None:
                     # next() method was not called without providing the response to return to Slack
                     # This should not be an intentional handling in usual use cases.
-                    resp = BoltResponse(
-                        status=404, body={&#34;error&#34;: &#34;no next() calls in middleware&#34;}
-                    )
+                    resp = BoltResponse(status=404, body={&#34;error&#34;: &#34;no next() calls in middleware&#34;})
                     if self._raise_error_for_unhandled_request is True:
                         await self._async_listener_runner.listener_error_handler.handle(
                             error=BoltUnhandledRequestError(
@@ -1891,9 +1728,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
                             response=resp,
                         )
                         return resp
-                    self._framework_logger.warning(
-                        warning_unhandled_by_global_middleware(middleware.name, req)
-                    )
+                    self._framework_logger.warning(warning_unhandled_by_global_middleware(middleware.name, req))
                     return resp
                 return resp
 
@@ -1909,13 +1744,11 @@ Only when all the middleware call <code>next()</code> method, the listener funct
                 if next_was_not_called:
                     if middleware_resp is not None:
                         if self._framework_logger.level &lt;= logging.DEBUG:
-                            debug_message = (
-                                debug_return_listener_middleware_response(
-                                    listener_name,
-                                    middleware_resp.status,
-                                    middleware_resp.body,
-                                    starting_time,
-                                )
+                            debug_message = debug_return_listener_middleware_response(
+                                listener_name,
+                                middleware_resp.status,
+                                middleware_resp.body,
+                                starting_time,
                             )
                             self._framework_logger.debug(debug_message)
                         return middleware_resp
@@ -1927,9 +1760,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
                     resp = middleware_resp
 
                 self._framework_logger.debug(debug_running_listener(listener_name))
-                listener_response: Optional[
-                    BoltResponse
-                ] = await self._async_listener_runner.run(
+                listener_response: Optional[BoltResponse] = await self._async_listener_runner.run(
                     request=req,
                     response=resp,
                     listener_name=listener_name,
@@ -1983,12 +1814,8 @@ Refer to <a href="https://api.slack.com/legacy/message-buttons">https://api.slac
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.attachment_action(
-            callback_id, asyncio=True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware
-        )
+        primary_matcher = builtin_matchers.attachment_action(callback_id, asyncio=True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
     return __call__</code></pre>
 </details>
@@ -2015,12 +1842,8 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-act
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.block_action(
-            constraints, asyncio=True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware
-        )
+        primary_matcher = builtin_matchers.block_action(constraints, asyncio=True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
     return __call__</code></pre>
 </details>
@@ -2044,12 +1867,8 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-act
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.block_suggestion(
-            action_id, asyncio=True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware
-        )
+        primary_matcher = builtin_matchers.block_suggestion(action_id, asyncio=True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
     return __call__</code></pre>
 </details>
@@ -2120,12 +1939,8 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.command(
-            command, asyncio=True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware
-        )
+        primary_matcher = builtin_matchers.command(command, asyncio=True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
     return __call__</code></pre>
 </details>
@@ -2185,12 +2000,8 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.dialog_cancellation(
-            callback_id, asyncio=True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware
-        )
+        primary_matcher = builtin_matchers.dialog_cancellation(callback_id, asyncio=True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
     return __call__</code></pre>
 </details>
@@ -2216,12 +2027,8 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.dialog_submission(
-            callback_id, asyncio=True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware
-        )
+        primary_matcher = builtin_matchers.dialog_submission(callback_id, asyncio=True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
     return __call__</code></pre>
 </details>
@@ -2247,12 +2054,8 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.dialog_suggestion(
-            callback_id, asyncio=True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware
-        )
+        primary_matcher = builtin_matchers.dialog_suggestion(callback_id, asyncio=True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
     return __call__</code></pre>
 </details>
@@ -2319,11 +2122,9 @@ when getting an unhandled error in Bolt app.</dd>
     if not inspect.iscoroutinefunction(func):
         name = get_name_for_callable(func)
         raise BoltError(error_listener_function_must_be_coro_func(name))
-    self._async_listener_runner.listener_error_handler = (
-        AsyncCustomListenerErrorHandler(
-            logger=self._framework_logger,
-            func=func,
-        )
+    self._async_listener_runner.listener_error_handler = AsyncCustomListenerErrorHandler(
+        logger=self._framework_logger,
+        func=func,
     )
     self._async_middleware_error_handler = AsyncCustomMiddlewareErrorHandler(
         logger=self._framework_logger,
@@ -2404,12 +2205,8 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.event(
-            event, True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware, True
-        )
+        primary_matcher = builtin_matchers.event(event, True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
     return __call__</code></pre>
 </details>
@@ -2433,12 +2230,8 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.global_shortcut(
-            callback_id, asyncio=True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware
-        )
+        primary_matcher = builtin_matchers.global_shortcut(callback_id, asyncio=True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
     return __call__</code></pre>
 </details>
@@ -2532,9 +2325,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
             base_logger=self._base_logger,
         )
         middleware.insert(0, AsyncMessageListenerMatches(keyword))
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware, True
-        )
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
     return __call__</code></pre>
 </details>
@@ -2558,12 +2349,8 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.message_shortcut(
-            callback_id, asyncio=True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware
-        )
+        primary_matcher = builtin_matchers.message_shortcut(callback_id, asyncio=True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
     return __call__</code></pre>
 </details>
@@ -2626,9 +2413,7 @@ app.middleware(middleware_func)
             )
             return middleware_or_callable
         else:
-            raise BoltError(
-                f&#34;Unexpected type for a middleware ({type(middleware_or_callable)})&#34;
-            )
+            raise BoltError(f&#34;Unexpected type for a middleware ({type(middleware_or_callable)})&#34;)
     return None</code></pre>
 </details>
 </dd>
@@ -2718,12 +2503,8 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.options(
-            constraints, asyncio=True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware
-        )
+        primary_matcher = builtin_matchers.options(constraints, asyncio=True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
     return __call__</code></pre>
 </details>
@@ -2761,11 +2542,7 @@ Refer to <a href="https://docs.aiohttp.org/">https://docs.aiohttp.org/</a> for m
         path: The path to handle request from Slack (Default: `/slack/events`)
         host: The hostname to serve the web endpoints. (Default: 0.0.0.0)
     &#34;&#34;&#34;
-    if (
-        self._server is None
-        or self._server.port != port
-        or self._server.path != path
-    ):
+    if self._server is None or self._server.port != port or self._server.path != path:
         self._server = AsyncSlackAppServer(
             port=port,
             path=path,
@@ -2853,12 +2630,8 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.shortcut(
-            constraints, asyncio=True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware
-        )
+        primary_matcher = builtin_matchers.shortcut(constraints, asyncio=True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
     return __call__</code></pre>
 </details>
@@ -2882,9 +2655,7 @@ Refer to <a href="https://docs.aiohttp.org/">https://docs.aiohttp.org/</a> for m
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def start(
-    self, port: int = 3000, path: str = &#34;/slack/events&#34;, host: Optional[str] = None
-) -&gt; None:
+<pre><code class="python">def start(self, port: int = 3000, path: str = &#34;/slack/events&#34;, host: Optional[str] = None) -&gt; None:
     &#34;&#34;&#34;Start a web server using AIOHTTP.
     Refer to https://docs.aiohttp.org/ for more details about AIOHTTP.
 
@@ -2937,21 +2708,9 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
 <pre><code class="python">def step(
     self,
     callback_id: Union[str, Pattern, AsyncWorkflowStep, AsyncWorkflowStepBuilder],
-    edit: Optional[
-        Union[
-            Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]
-        ]
-    ] = None,
-    save: Optional[
-        Union[
-            Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]
-        ]
-    ] = None,
-    execute: Optional[
-        Union[
-            Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]
-        ]
-    ] = None,
+    edit: Optional[Union[Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]]] = None,
+    save: Optional[Union[Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]]] = None,
+    execute: Optional[Union[Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]]] = None,
 ):
     &#34;&#34;&#34;
     Registers a new Workflow Step listener.
@@ -3099,12 +2858,8 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.view(
-            constraints, asyncio=True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware
-        )
+        primary_matcher = builtin_matchers.view(constraints, asyncio=True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
     return __call__</code></pre>
 </details>
@@ -3130,12 +2885,8 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#vie
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.view_closed(
-            constraints, asyncio=True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware
-        )
+        primary_matcher = builtin_matchers.view_closed(constraints, asyncio=True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
     return __call__</code></pre>
 </details>
@@ -3161,12 +2912,8 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#vie
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-        primary_matcher = builtin_matchers.view_submission(
-            constraints, asyncio=True, base_logger=self._base_logger
-        )
-        return self._register_listener(
-            list(functions), primary_matcher, matchers, middleware
-        )
+        primary_matcher = builtin_matchers.view_submission(constraints, asyncio=True, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
     return __call__</code></pre>
 </details>
@@ -3664,13 +3411,9 @@ def say(self) -&gt; AsyncSay:
         else:
             self.body = {}
 
-        self.context = build_async_context(
-            AsyncBoltContext(context if context else {}), self.body
-        )
+        self.context = build_async_context(AsyncBoltContext(context if context else {}), self.body)
         self.lazy_only = bool(self.headers.get(&#34;x-slack-bolt-lazy-only&#34;, [False])[0])
-        self.lazy_function_name = self.headers.get(
-            &#34;x-slack-bolt-lazy-function-name&#34;, [None]
-        )[0]
+        self.lazy_function_name = self.headers.get(&#34;x-slack-bolt-lazy-function-name&#34;, [None])[0]
         self.mode = mode
 
     def to_copyable(self) -&gt; &#34;AsyncBoltRequest&#34;:
@@ -3762,13 +3505,7 @@ def say(self) -&gt; AsyncSay:
     arg_names: Sequence[str]
     logger: Logger
 
-    def __init__(
-        self,
-        *,
-        app_name: str,
-        func: Callable[..., Awaitable[bool]],
-        base_logger: Optional[Logger] = None
-    ):
+    def __init__(self, *, app_name: str, func: Callable[..., Awaitable[bool]], base_logger: Optional[Logger] = None):
         self.app_name = app_name
         self.func = func
         self.arg_names = inspect.getfullargspec(func).args
@@ -3874,9 +3611,7 @@ def say(self) -&gt; AsyncSay:
         return (resp, False)
 
     @abstractmethod
-    async def run_ack_function(
-        self, *, request: AsyncBoltRequest, response: BoltResponse
-    ) -&gt; BoltResponse:
+    async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltResponse) -&gt; BoltResponse:
         &#34;&#34;&#34;Runs all the registered middleware and then run the listener function.
 
         Args:
@@ -3959,9 +3694,7 @@ def say(self) -&gt; AsyncSay:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
-async def run_ack_function(
-    self, *, request: AsyncBoltRequest, response: BoltResponse
-) -&gt; BoltResponse:
+async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltResponse) -&gt; BoltResponse:
     &#34;&#34;&#34;Runs all the registered middleware and then run the listener function.
 
     Args:
@@ -4156,9 +3889,7 @@ async def run_ack_function(
                     message[&#34;channel&#34;] = channel or self.channel
                 return await self.client.chat_postMessage(**message)
             else:
-                raise ValueError(
-                    f&#34;The arg is unexpected type ({type(text_or_whole_response)})&#34;
-                )
+                raise ValueError(f&#34;The arg is unexpected type ({type(text_or_whole_response)})&#34;)
         else:
             raise ValueError(&#34;say without channel_id here is unsupported&#34;)</code></pre>
 </details>

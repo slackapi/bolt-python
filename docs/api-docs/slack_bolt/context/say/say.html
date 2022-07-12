@@ -79,9 +79,7 @@ class Say:
                     message[&#34;channel&#34;] = channel or self.channel
                 return self.client.chat_postMessage(**message)
             else:
-                raise ValueError(
-                    f&#34;The arg is unexpected type ({type(text_or_whole_response)})&#34;
-                )
+                raise ValueError(f&#34;The arg is unexpected type ({type(text_or_whole_response)})&#34;)
         else:
             raise ValueError(&#34;say without channel_id here is unsupported&#34;)</code></pre>
 </details>
@@ -148,9 +146,7 @@ class Say:
                     message[&#34;channel&#34;] = channel or self.channel
                 return self.client.chat_postMessage(**message)
             else:
-                raise ValueError(
-                    f&#34;The arg is unexpected type ({type(text_or_whole_response)})&#34;
-                )
+                raise ValueError(f&#34;The arg is unexpected type ({type(text_or_whole_response)})&#34;)
         else:
             raise ValueError(&#34;say without channel_id here is unsupported&#34;)</code></pre>
 </details>

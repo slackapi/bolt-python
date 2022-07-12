@@ -89,11 +89,7 @@ class SlackAppResource:
         for cookie in bolt_resp.cookies():
             for name, c in cookie.items():
                 expire_value = c.get(&#34;expires&#34;)
-                expire = (
-                    datetime.strptime(expire_value, &#34;%a, %d %b %Y %H:%M:%S %Z&#34;)
-                    if expire_value
-                    else None
-                )
+                expire = datetime.strptime(expire_value, &#34;%a, %d %b %Y %H:%M:%S %Z&#34;) if expire_value else None
                 resp.set_cookie(
                     name=name,
                     value=c.value,
@@ -181,11 +177,7 @@ api.add_route("/slack/events", SlackAppResource(app))</p></div>
         for cookie in bolt_resp.cookies():
             for name, c in cookie.items():
                 expire_value = c.get(&#34;expires&#34;)
-                expire = (
-                    datetime.strptime(expire_value, &#34;%a, %d %b %Y %H:%M:%S %Z&#34;)
-                    if expire_value
-                    else None
-                )
+                expire = datetime.strptime(expire_value, &#34;%a, %d %b %Y %H:%M:%S %Z&#34;) if expire_value else None
                 resp.set_cookie(
                     name=name,
                     value=c.value,

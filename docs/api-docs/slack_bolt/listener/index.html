@@ -278,9 +278,7 @@ __all__ = [
         return (resp, False)
 
     @abstractmethod
-    def run_ack_function(
-        self, *, request: BoltRequest, response: BoltResponse
-    ) -&gt; BoltResponse:
+    def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt; BoltResponse:
         &#34;&#34;&#34;Runs all the registered middleware and then run the listener function.
 
         Args:
@@ -363,9 +361,7 @@ __all__ = [
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
-def run_ack_function(
-    self, *, request: BoltRequest, response: BoltResponse
-) -&gt; BoltResponse:
+def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt; BoltResponse:
     &#34;&#34;&#34;Runs all the registered middleware and then run the listener function.
 
     Args:

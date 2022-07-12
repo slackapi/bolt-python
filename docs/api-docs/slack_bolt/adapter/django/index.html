@@ -70,9 +70,7 @@ __all__ = [
         )
 
         if not isinstance(listener_runner, ThreadListenerRunner):
-            raise BoltError(
-                &#34;Custom listener_runners are not compatible with this Django adapter.&#34;
-            )
+            raise BoltError(&#34;Custom listener_runners are not compatible with this Django adapter.&#34;)
 
         if app.process_before_response is True:
             # As long as the app access Django models in the same thread,
@@ -81,9 +79,7 @@ __all__ = [
             return
 
         current_start_handler = listener_runner.listener_start_handler
-        if current_start_handler is not None and not isinstance(
-            current_start_handler, DefaultListenerStartHandler
-        ):
+        if current_start_handler is not None and not isinstance(current_start_handler, DefaultListenerStartHandler):
             # As we run release_thread_local_connections() before listener executions,
             # it&#39;s okay to skip calling the same connection clean-up method at the listener completion.
             message = &#34;&#34;&#34;As you&#39;ve already set app.listener_runner.listener_start_handler to your own one,
@@ -98,9 +94,7 @@ __all__ = [
             self.app.logger.info(message)
         else:
             # for proper management of thread-local Django DB connections
-            self.app.listener_runner.listener_start_handler = (
-                DjangoListenerStartHandler()
-            )
+            self.app.listener_runner.listener_start_handler = DjangoListenerStartHandler()
             self.app.logger.debug(&#34;DjangoListenerStartHandler has been enabled&#34;)
 
         current_completion_handler = listener_runner.listener_completion_handler
@@ -115,9 +109,7 @@ __all__ = [
             self.app.logger.info(message)
             return
         # for proper management of thread-local Django DB connections
-        self.app.listener_runner.listener_completion_handler = (
-            DjangoListenerCompletionHandler()
-        )
+        self.app.listener_runner.listener_completion_handler = DjangoListenerCompletionHandler()
         self.app.logger.debug(&#34;DjangoListenerCompletionHandler has been enabled&#34;)
 
     def handle(self, req: HttpRequest) -&gt; HttpResponse:

@@ -84,14 +84,10 @@ class AuthorizeResult(dict):
         auth_test_response: SlackResponse,
     ) -&gt; &#34;AuthorizeResult&#34;:
         bot_user_id: Optional[str] = (  # type:ignore
-            auth_test_response.get(&#34;user_id&#34;)
-            if auth_test_response.get(&#34;bot_id&#34;) is not None
-            else None
+            auth_test_response.get(&#34;user_id&#34;) if auth_test_response.get(&#34;bot_id&#34;) is not None else None
         )
         user_id: Optional[str] = (  # type:ignore
-            auth_test_response.get(&#34;user_id&#34;)
-            if auth_test_response.get(&#34;bot_id&#34;) is None
-            else None
+            auth_test_response.get(&#34;user_id&#34;) if auth_test_response.get(&#34;bot_id&#34;) is None else None
         )
         return AuthorizeResult(
             enterprise_id=auth_test_response.get(&#34;enterprise_id&#34;),
@@ -193,14 +189,10 @@ class AuthorizeResult(dict):
         auth_test_response: SlackResponse,
     ) -&gt; &#34;AuthorizeResult&#34;:
         bot_user_id: Optional[str] = (  # type:ignore
-            auth_test_response.get(&#34;user_id&#34;)
-            if auth_test_response.get(&#34;bot_id&#34;) is not None
-            else None
+            auth_test_response.get(&#34;user_id&#34;) if auth_test_response.get(&#34;bot_id&#34;) is not None else None
         )
         user_id: Optional[str] = (  # type:ignore
-            auth_test_response.get(&#34;user_id&#34;)
-            if auth_test_response.get(&#34;bot_id&#34;) is None
-            else None
+            auth_test_response.get(&#34;user_id&#34;) if auth_test_response.get(&#34;bot_id&#34;) is None else None
         )
         return AuthorizeResult(
             enterprise_id=auth_test_response.get(&#34;enterprise_id&#34;),
@@ -267,14 +259,10 @@ def from_auth_test_response(
     auth_test_response: SlackResponse,
 ) -&gt; &#34;AuthorizeResult&#34;:
     bot_user_id: Optional[str] = (  # type:ignore
-        auth_test_response.get(&#34;user_id&#34;)
-        if auth_test_response.get(&#34;bot_id&#34;) is not None
-        else None
+        auth_test_response.get(&#34;user_id&#34;) if auth_test_response.get(&#34;bot_id&#34;) is not None else None
     )
     user_id: Optional[str] = (  # type:ignore
-        auth_test_response.get(&#34;user_id&#34;)
-        if auth_test_response.get(&#34;bot_id&#34;) is None
-        else None
+        auth_test_response.get(&#34;user_id&#34;) if auth_test_response.get(&#34;bot_id&#34;) is None else None
     )
     return AuthorizeResult(
         enterprise_id=auth_test_response.get(&#34;enterprise_id&#34;),

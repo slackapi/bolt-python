@@ -44,9 +44,7 @@ class AsyncBaseSocketModeHandler:
     app: Union[App, AsyncApp]  # type: ignore
     client: AsyncBaseSocketModeClient
 
-    async def handle(
-        self, client: AsyncBaseSocketModeClient, req: SocketModeRequest
-    ) -&gt; None:
+    async def handle(self, client: AsyncBaseSocketModeClient, req: SocketModeRequest) -&gt; None:
         &#34;&#34;&#34;Handles Socket Mode envelope requests through a WebSocket connection.
 
         Args:
@@ -102,9 +100,7 @@ class AsyncBaseSocketModeHandler:
     app: Union[App, AsyncApp]  # type: ignore
     client: AsyncBaseSocketModeClient
 
-    async def handle(
-        self, client: AsyncBaseSocketModeClient, req: SocketModeRequest
-    ) -&gt; None:
+    async def handle(self, client: AsyncBaseSocketModeClient, req: SocketModeRequest) -&gt; None:
         &#34;&#34;&#34;Handles Socket Mode envelope requests through a WebSocket connection.
 
         Args:
@@ -215,9 +211,7 @@ class AsyncBaseSocketModeHandler:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">async def handle(
-    self, client: AsyncBaseSocketModeClient, req: SocketModeRequest
-) -&gt; None:
+<pre><code class="python">async def handle(self, client: AsyncBaseSocketModeClient, req: SocketModeRequest) -&gt; None:
     &#34;&#34;&#34;Handles Socket Mode envelope requests through a WebSocket connection.
 
     Args:

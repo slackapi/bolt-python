@@ -84,9 +84,7 @@ class AsyncListener(metaclass=ABCMeta):
         return (resp, False)
 
     @abstractmethod
-    async def run_ack_function(
-        self, *, request: AsyncBoltRequest, response: BoltResponse
-    ) -&gt; BoltResponse:
+    async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltResponse) -&gt; BoltResponse:
         &#34;&#34;&#34;Runs all the registered middleware and then run the listener function.
 
         Args:
@@ -469,9 +467,7 @@ for cls in builtin_async_listener_classes:
         return (resp, False)
 
     @abstractmethod
-    async def run_ack_function(
-        self, *, request: AsyncBoltRequest, response: BoltResponse
-    ) -&gt; BoltResponse:
+    async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltResponse) -&gt; BoltResponse:
         &#34;&#34;&#34;Runs all the registered middleware and then run the listener function.
 
         Args:
@@ -554,9 +550,7 @@ for cls in builtin_async_listener_classes:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
-async def run_ack_function(
-    self, *, request: AsyncBoltRequest, response: BoltResponse
-) -&gt; BoltResponse:
+async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltResponse) -&gt; BoltResponse:
     &#34;&#34;&#34;Runs all the registered middleware and then run the listener function.
 
     Args:

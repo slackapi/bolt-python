@@ -70,10 +70,7 @@ def error_auth_test_failure(error_response: SlackResponse) -&gt; str:
 
 
 def error_token_required() -&gt; str:
-    return (
-        &#34;Either an env variable `SLACK_BOT_TOKEN` &#34;
-        &#34;or `token` argument in the constructor is required.&#34;
-    )
+    return &#34;Either an env variable `SLACK_BOT_TOKEN` &#34; &#34;or `token` argument in the constructor is required.&#34;
 
 
 def error_unexpected_listener_middleware(middleware_type) -&gt; str:
@@ -114,8 +111,7 @@ def warning_client_prioritized_and_token_skipped() -&gt; str:
 
 def warning_token_skipped() -&gt; str:
     return (
-        &#34;As `installation_store` or `authorize` has been used, &#34;
-        &#34;`token` (or SLACK_BOT_TOKEN env variable) will be ignored.&#34;
+        &#34;As `installation_store` or `authorize` has been used, &#34; &#34;`token` (or SLACK_BOT_TOKEN env variable) will be ignored.&#34;
     )
 
 
@@ -211,11 +207,7 @@ def warning_unhandled_request(  # type: ignore
     filtered_body = _build_filtered_body(req.body)
     default_message = f&#34;Unhandled request ({filtered_body})&#34;
     is_async = type(req) != BoltRequest
-    if (
-        is_workflow_step_edit(req.body)
-        or is_workflow_step_save(req.body)
-        or is_workflow_step_execute(req.body)
-    ):
+    if is_workflow_step_edit(req.body) or is_workflow_step_save(req.body) or is_workflow_step_execute(req.body):
         # @app.step
         callback_id = (
             filtered_body.get(&#34;callback_id&#34;)
@@ -372,9 +364,7 @@ def debug_responding(status: int, body: str, millis: int) -&gt; str:
     return f&#39;Responding with status: {status} body: &#34;{body}&#34; ({millis} millis)&#39;
 
 
-def debug_return_listener_middleware_response(
-    listener_name: str, status: int, body: str, starting_time: float
-) -&gt; str:
+def debug_return_listener_middleware_response(listener_name: str, status: int, body: str, starting_time: float) -&gt; str:
     millis = int((time.time() - starting_time) * 1000)
     return (
         &#34;Responding with listener middleware&#39;s response - &#34;
@@ -437,9 +427,7 @@ def debug_return_listener_middleware_response(
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def debug_return_listener_middleware_response(
-    listener_name: str, status: int, body: str, starting_time: float
-) -&gt; str:
+<pre><code class="python">def debug_return_listener_middleware_response(listener_name: str, status: int, body: str, starting_time: float) -&gt; str:
     millis = int((time.time() - starting_time) * 1000)
     return (
         &#34;Responding with listener middleware&#39;s response - &#34;
@@ -607,10 +595,7 @@ def debug_return_listener_middleware_response(
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def error_token_required() -&gt; str:
-    return (
-        &#34;Either an env variable `SLACK_BOT_TOKEN` &#34;
-        &#34;or `token` argument in the constructor is required.&#34;
-    )</code></pre>
+    return &#34;Either an env variable `SLACK_BOT_TOKEN` &#34; &#34;or `token` argument in the constructor is required.&#34;</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.logger.messages.error_unexpected_listener_middleware"><code class="name flex">
@@ -727,8 +712,7 @@ def debug_return_listener_middleware_response(
 </summary>
 <pre><code class="python">def warning_token_skipped() -&gt; str:
     return (
-        &#34;As `installation_store` or `authorize` has been used, &#34;
-        &#34;`token` (or SLACK_BOT_TOKEN env variable) will be ignored.&#34;
+        &#34;As `installation_store` or `authorize` has been used, &#34; &#34;`token` (or SLACK_BOT_TOKEN env variable) will be ignored.&#34;
     )</code></pre>
 </details>
 </dd>
@@ -765,11 +749,7 @@ def debug_return_listener_middleware_response(
     filtered_body = _build_filtered_body(req.body)
     default_message = f&#34;Unhandled request ({filtered_body})&#34;
     is_async = type(req) != BoltRequest
-    if (
-        is_workflow_step_edit(req.body)
-        or is_workflow_step_save(req.body)
-        or is_workflow_step_execute(req.body)
-    ):
+    if is_workflow_step_edit(req.body) or is_workflow_step_save(req.body) or is_workflow_step_execute(req.body):
         # @app.step
         callback_id = (
             filtered_body.get(&#34;callback_id&#34;)

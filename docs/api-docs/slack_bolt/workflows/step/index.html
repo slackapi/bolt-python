@@ -138,9 +138,7 @@ Refer to <a href="https://api.slack.com/methods/workflows.stepCompleted">https:/
 
     def __call__(self, **kwargs) -&gt; None:
         self.client.workflows_stepCompleted(
-            workflow_step_execute_id=self.body[&#34;event&#34;][&#34;workflow_step&#34;][
-                &#34;workflow_step_execute_id&#34;
-            ],
+            workflow_step_execute_id=self.body[&#34;event&#34;][&#34;workflow_step&#34;][&#34;workflow_step_execute_id&#34;],
             **kwargs,
         )</code></pre>
 </details>
@@ -217,9 +215,7 @@ app.step(ws)
         self.client = client
         self.body = body
 
-    def __call__(
-        self, *, blocks: Optional[Sequence[Union[dict, Block]]] = None, **kwargs
-    ) -&gt; None:
+    def __call__(self, *, blocks: Optional[Sequence[Union[dict, Block]]] = None, **kwargs) -&gt; None:
         self.client.views_open(
             trigger_id=self.body[&#34;trigger_id&#34;],
             view={
@@ -288,9 +284,7 @@ Refer to <a href="https://api.slack.com/methods/workflows.stepFailed">https://ap
         error: dict,
     ) -&gt; None:
         self.client.workflows_stepFailed(
-            workflow_step_execute_id=self.body[&#34;event&#34;][&#34;workflow_step&#34;][
-                &#34;workflow_step_execute_id&#34;
-            ],
+            workflow_step_execute_id=self.body[&#34;event&#34;][&#34;workflow_step&#34;][&#34;workflow_step_execute_id&#34;],
             error=error,
         )</code></pre>
 </details>
@@ -415,15 +409,9 @@ Refer to <a href="https://api.slack.com/methods/workflows.updateStep">https://ap
         self,
         *,
         callback_id: Union[str, Pattern],
-        edit: Union[
-            Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]
-        ],
-        save: Union[
-            Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]
-        ],
-        execute: Union[
-            Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]
-        ],
+        edit: Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]],
+        save: Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]],
+        execute: Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]],
         app_name: Optional[str] = None,
         base_logger: Optional[Logger] = None,
     ):
@@ -452,9 +440,7 @@ Refer to <a href="https://api.slack.com/methods/workflows.updateStep">https://ap
         )
 
     @classmethod
-    def builder(
-        cls, callback_id: Union[str, Pattern], base_logger: Optional[Logger] = None
-    ) -&gt; WorkflowStepBuilder:
+    def builder(cls, callback_id: Union[str, Pattern], base_logger: Optional[Logger] = None) -&gt; WorkflowStepBuilder:
         return WorkflowStepBuilder(
             callback_id,
             base_logger=base_logger,
@@ -510,9 +496,7 @@ Refer to <a href="https://api.slack.com/methods/workflows.updateStep">https://ap
                 base_logger=base_logger,
             )
         else:
-            raise BoltError(
-                f&#34;Invalid {name} listener: {type(listener_or_functions)} detected (callback_id: {callback_id})&#34;
-            )
+            raise BoltError(f&#34;Invalid {name} listener: {type(listener_or_functions)} detected (callback_id: {callback_id})&#34;)
 
     @classmethod
     def _build_primary_matcher(
@@ -626,9 +610,7 @@ def build_listener(
             base_logger=base_logger,
         )
     else:
-        raise BoltError(
-            f&#34;Invalid {name} listener: {type(listener_or_functions)} detected (callback_id: {callback_id})&#34;
-        )</code></pre>
+        raise BoltError(f&#34;Invalid {name} listener: {type(listener_or_functions)} detected (callback_id: {callback_id})&#34;)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.workflows.step.WorkflowStep.builder"><code class="name flex">
@@ -641,9 +623,7 @@ def build_listener(
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@classmethod
-def builder(
-    cls, callback_id: Union[str, Pattern], base_logger: Optional[Logger] = None
-) -&gt; WorkflowStepBuilder:
+def builder(cls, callback_id: Union[str, Pattern], base_logger: Optional[Logger] = None) -&gt; WorkflowStepBuilder:
     return WorkflowStepBuilder(
         callback_id,
         base_logger=base_logger,

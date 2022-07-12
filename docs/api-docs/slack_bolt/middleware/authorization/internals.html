@@ -44,17 +44,11 @@ from slack_bolt.response import BoltResponse
 
 
 def _is_url_verification(req: Union[BoltRequest, &#34;AsyncBoltRequest&#34;]) -&gt; bool:  # type: ignore
-    return (
-        req is not None
-        and req.body is not None
-        and req.body.get(&#34;type&#34;) == &#34;url_verification&#34;
-    )
+    return req is not None and req.body is not None and req.body.get(&#34;type&#34;) == &#34;url_verification&#34;
 
 
 def _is_ssl_check(req: Union[BoltRequest, &#34;AsyncBoltRequest&#34;]) -&gt; bool:  # type: ignore
-    return (
-        req is not None and req.body is not None and req.body.get(&#34;type&#34;) == &#34;ssl_check&#34;
-    )
+    return req is not None and req.body is not None and req.body.get(&#34;type&#34;) == &#34;ssl_check&#34;
 
 
 no_auth_test_events = [&#34;app_uninstalled&#34;, &#34;tokens_revoked&#34;, &#34;team_access_revoked&#34;]

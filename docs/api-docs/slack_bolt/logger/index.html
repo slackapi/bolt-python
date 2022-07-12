@@ -43,13 +43,9 @@ def get_bolt_logger(cls: Any, base_logger: Optional[Logger] = None) -&gt; Logger
     return logger
 
 
-def get_bolt_app_logger(
-    app_name: str, cls: object = None, base_logger: Optional[Logger] = None
-) -&gt; Logger:
+def get_bolt_app_logger(app_name: str, cls: object = None, base_logger: Optional[Logger] = None) -&gt; Logger:
     logger: Logger = (
-        logging.getLogger(f&#34;{app_name}:{cls.__name__}&#34;)
-        if cls and hasattr(cls, &#34;__name__&#34;)
-        else logging.getLogger(app_name)
+        logging.getLogger(f&#34;{app_name}:{cls.__name__}&#34;) if cls and hasattr(cls, &#34;__name__&#34;) else logging.getLogger(app_name)
     )
 
     if base_logger is not None:
@@ -104,13 +100,9 @@ __all__ = [
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_bolt_app_logger(
-    app_name: str, cls: object = None, base_logger: Optional[Logger] = None
-) -&gt; Logger:
+<pre><code class="python">def get_bolt_app_logger(app_name: str, cls: object = None, base_logger: Optional[Logger] = None) -&gt; Logger:
     logger: Logger = (
-        logging.getLogger(f&#34;{app_name}:{cls.__name__}&#34;)
-        if cls and hasattr(cls, &#34;__name__&#34;)
-        else logging.getLogger(app_name)
+        logging.getLogger(f&#34;{app_name}:{cls.__name__}&#34;) if cls and hasattr(cls, &#34;__name__&#34;) else logging.getLogger(app_name)
     )
 
     if base_logger is not None:

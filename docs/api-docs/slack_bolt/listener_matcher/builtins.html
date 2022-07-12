@@ -141,15 +141,11 @@ def event(
 
         return build_listener_matcher(func, asyncio, base_logger)
 
-    raise BoltError(
-        f&#34;event ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;
-    )
+    raise BoltError(f&#34;event ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;)
 
 
 def message_event(
-    constraints: Dict[
-        str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]
-    ],
+    constraints: Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]],
     keyword: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
@@ -180,16 +176,12 @@ def _check_event_subtype(event_payload: dict, constraints: dict) -&gt; bool:
     if not _matches(constraints[&#34;type&#34;], event_payload[&#34;type&#34;]):
         return False
     if &#34;subtype&#34; in constraints:
-        expected_subtype: Optional[
-            Union[str, Sequence[Optional[Union[str, Pattern]]]]
-        ] = constraints[&#34;subtype&#34;]
+        expected_subtype: Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]] = constraints[&#34;subtype&#34;]
         if expected_subtype is None:
             # &#34;subtype&#34; in constraints is intentionally None for this pattern
             return &#34;subtype&#34; not in event_payload
         elif isinstance(expected_subtype, (str, Pattern)):
-            return &#34;subtype&#34; in event_payload and _matches(
-                expected_subtype, event_payload[&#34;subtype&#34;]
-            )
+            return &#34;subtype&#34; in event_payload and _matches(expected_subtype, event_payload[&#34;subtype&#34;])
         elif isinstance(expected_subtype, Sequence):
             subtypes: Sequence[Optional[Union[str, Pattern]]] = expected_subtype
             for expected in subtypes:
@@ -201,9 +193,7 @@ def _check_event_subtype(event_payload: dict, constraints: dict) -&gt; bool:
                     return True
             return False
         else:
-            return &#34;subtype&#34; in event_payload and _matches(
-                expected_subtype, event_payload[&#34;subtype&#34;]
-            )
+            return &#34;subtype&#34; in event_payload and _matches(expected_subtype, event_payload[&#34;subtype&#34;])
     return True
 
 
@@ -268,9 +258,7 @@ def shortcut(
         if constraints[&#34;type&#34;] == &#34;message_action&#34;:
             return message_shortcut(constraints[&#34;callback_id&#34;], asyncio)
 
-    raise BoltError(
-        f&#34;shortcut ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;
-    )
+    raise BoltError(f&#34;shortcut ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;)
 
 
 def global_shortcut(
@@ -336,9 +324,7 @@ def action(
         # The default value is &#34;block_actions&#34;
         return block_action(constraints, asyncio)
 
-    raise BoltError(
-        f&#34;action ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;
-    )
+    raise BoltError(f&#34;action ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;)
 
 
 def _block_action(
@@ -355,9 +341,7 @@ def _block_action(
     elif isinstance(constraints, dict):
         # block_id matching is optional
         block_id: Optional[Union[str, Pattern]] = constraints.get(&#34;block_id&#34;)
-        block_id_matched = block_id is None or _matches(
-            block_id, action.get(&#34;block_id&#34;)
-        )
+        block_id_matched = block_id is None or _matches(block_id, action.get(&#34;block_id&#34;))
         action_id_matched = _matches(constraints[&#34;action_id&#34;], action[&#34;action_id&#34;])
         return block_id_matched and action_id_matched
 
@@ -462,9 +446,7 @@ def view(
         if constraints[&#34;type&#34;] == &#34;view_closed&#34;:
             return view_closed(constraints[&#34;callback_id&#34;], asyncio)
 
-    raise BoltError(
-        f&#34;view ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;
-    )
+    raise BoltError(f&#34;view ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;)
 
 
 def view_submission(
@@ -473,9 +455,7 @@ def view_submission(
     base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
-        return is_view_submission(body) and _matches(
-            callback_id, body[&#34;view&#34;][&#34;callback_id&#34;]
-        )
+        return is_view_submission(body) and _matches(callback_id, body[&#34;view&#34;][&#34;callback_id&#34;])
 
     return build_listener_matcher(func, asyncio, base_logger)
 
@@ -486,9 +466,7 @@ def view_closed(
     base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
-        return is_view_closed(body) and _matches(
-            callback_id, body[&#34;view&#34;][&#34;callback_id&#34;]
-        )
+        return is_view_closed(body) and _matches(callback_id, body[&#34;view&#34;][&#34;callback_id&#34;])
 
     return build_listener_matcher(func, asyncio, base_logger)
 
@@ -499,9 +477,7 @@ def workflow_step_save(
     base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
-        return is_workflow_step_save(body) and _matches(
-            callback_id, body[&#34;view&#34;][&#34;callback_id&#34;]
-        )
+        return is_workflow_step_save(body) and _matches(callback_id, body[&#34;view&#34;][&#34;callback_id&#34;])
 
     return build_listener_matcher(func, asyncio, base_logger)
 
@@ -518,9 +494,7 @@ def options(
     if isinstance(constraints, (str, Pattern)):
 
         def func(body: Dict[str, Any]) -&gt; bool:
-            return _block_suggestion(constraints, body) or _dialog_suggestion(
-                constraints, body
-            )
+            return _block_suggestion(constraints, body) or _dialog_suggestion(constraints, body)
 
         return build_listener_matcher(func, asyncio, base_logger)
 
@@ -529,9 +503,7 @@ def options(
     if &#34;callback_id&#34; in constraints:
         return dialog_suggestion(constraints[&#34;callback_id&#34;], asyncio)
     else:
-        raise BoltError(
-            f&#34;options ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;
-        )
+        raise BoltError(f&#34;options ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;)
 
 
 def _block_suggestion(
@@ -584,9 +556,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
         pattern: Pattern = str_or_pattern
         return pattern.search(input) is not None
     else:
-        raise BoltError(
-            f&#34;{str_or_pattern} ({type(str_or_pattern)}) must be either str or Pattern&#34;
-        )</code></pre>
+        raise BoltError(f&#34;{str_or_pattern} ({type(str_or_pattern)}) must be either str or Pattern&#34;)</code></pre>
 </details>
 </section>
 <section>
@@ -642,9 +612,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
         # The default value is &#34;block_actions&#34;
         return block_action(constraints, asyncio)
 
-    raise BoltError(
-        f&#34;action ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;
-    )</code></pre>
+    raise BoltError(f&#34;action ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.attachment_action"><code class="name flex">
@@ -852,9 +820,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 
         return build_listener_matcher(func, asyncio, base_logger)
 
-    raise BoltError(
-        f&#34;event ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;
-    )</code></pre>
+    raise BoltError(f&#34;event ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.global_shortcut"><code class="name flex">
@@ -887,9 +853,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def message_event(
-    constraints: Dict[
-        str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]
-    ],
+    constraints: Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]],
     keyword: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
@@ -953,9 +917,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
     if isinstance(constraints, (str, Pattern)):
 
         def func(body: Dict[str, Any]) -&gt; bool:
-            return _block_suggestion(constraints, body) or _dialog_suggestion(
-                constraints, body
-            )
+            return _block_suggestion(constraints, body) or _dialog_suggestion(constraints, body)
 
         return build_listener_matcher(func, asyncio, base_logger)
 
@@ -964,9 +926,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
     if &#34;callback_id&#34; in constraints:
         return dialog_suggestion(constraints[&#34;callback_id&#34;], asyncio)
     else:
-        raise BoltError(
-            f&#34;options ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;
-        )</code></pre>
+        raise BoltError(f&#34;options ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.shortcut"><code class="name flex">
@@ -997,9 +957,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
         if constraints[&#34;type&#34;] == &#34;message_action&#34;:
             return message_shortcut(constraints[&#34;callback_id&#34;], asyncio)
 
-    raise BoltError(
-        f&#34;shortcut ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;
-    )</code></pre>
+    raise BoltError(f&#34;shortcut ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.view"><code class="name flex">
@@ -1024,9 +982,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
         if constraints[&#34;type&#34;] == &#34;view_closed&#34;:
             return view_closed(constraints[&#34;callback_id&#34;], asyncio)
 
-    raise BoltError(
-        f&#34;view ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;
-    )</code></pre>
+    raise BoltError(f&#34;view ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.view_closed"><code class="name flex">
@@ -1044,9 +1000,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
     base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
-        return is_view_closed(body) and _matches(
-            callback_id, body[&#34;view&#34;][&#34;callback_id&#34;]
-        )
+        return is_view_closed(body) and _matches(callback_id, body[&#34;view&#34;][&#34;callback_id&#34;])
 
     return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
@@ -1066,9 +1020,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
     base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
-        return is_view_submission(body) and _matches(
-            callback_id, body[&#34;view&#34;][&#34;callback_id&#34;]
-        )
+        return is_view_submission(body) and _matches(callback_id, body[&#34;view&#34;][&#34;callback_id&#34;])
 
     return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>
@@ -1133,9 +1085,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
     base_logger: Optional[Logger] = None,
 ) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
     def func(body: Dict[str, Any]) -&gt; bool:
-        return is_workflow_step_save(body) and _matches(
-            callback_id, body[&#34;view&#34;][&#34;callback_id&#34;]
-        )
+        return is_workflow_step_save(body) and _matches(callback_id, body[&#34;view&#34;][&#34;callback_id&#34;])
 
     return build_listener_matcher(func, asyncio, base_logger)</code></pre>
 </details>

@@ -113,9 +113,7 @@ __all__ = [
 
     @staticmethod
     def _can_skip(mode: str, body: Dict[str, Any]) -&gt; bool:
-        return mode == &#34;socket_mode&#34; or (
-            body is not None and body.get(&#34;ssl_check&#34;) == &#34;1&#34;
-        )
+        return mode == &#34;socket_mode&#34; or (body is not None and body.get(&#34;ssl_check&#34;) == &#34;1&#34;)
 
     @staticmethod
     def _build_error_response() -&gt; BoltResponse:
@@ -123,8 +121,7 @@ __all__ = [
 
     def _debug_log_error(self, signature, timestamp, body) -&gt; None:
         self.logger.info(
-            &#34;Invalid request signature detected &#34;
-            f&#34;(signature: {signature}, timestamp: {timestamp}, body: {body})&#34;
+            &#34;Invalid request signature detected &#34; f&#34;(signature: {signature}, timestamp: {timestamp}, body: {body})&#34;
         )</code></pre>
 </details>
 <h3>Ancestors</h3>

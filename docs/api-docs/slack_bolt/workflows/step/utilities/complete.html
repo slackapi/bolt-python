@@ -59,9 +59,7 @@ class Complete:
 
     def __call__(self, **kwargs) -&gt; None:
         self.client.workflows_stepCompleted(
-            workflow_step_execute_id=self.body[&#34;event&#34;][&#34;workflow_step&#34;][
-                &#34;workflow_step_execute_id&#34;
-            ],
+            workflow_step_execute_id=self.body[&#34;event&#34;][&#34;workflow_step&#34;][&#34;workflow_step_execute_id&#34;],
             **kwargs,
         )</code></pre>
 </details>
@@ -134,9 +132,7 @@ Refer to <a href="https://api.slack.com/methods/workflows.stepCompleted">https:/
 
     def __call__(self, **kwargs) -&gt; None:
         self.client.workflows_stepCompleted(
-            workflow_step_execute_id=self.body[&#34;event&#34;][&#34;workflow_step&#34;][
-                &#34;workflow_step_execute_id&#34;
-            ],
+            workflow_step_execute_id=self.body[&#34;event&#34;][&#34;workflow_step&#34;][&#34;workflow_step_execute_id&#34;],
             **kwargs,
         )</code></pre>
 </details>

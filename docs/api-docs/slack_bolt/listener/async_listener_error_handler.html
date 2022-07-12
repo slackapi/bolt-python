@@ -55,9 +55,7 @@ class AsyncListenerErrorHandler(metaclass=ABCMeta):
 
 
 class AsyncCustomListenerErrorHandler(AsyncListenerErrorHandler):
-    def __init__(
-        self, logger: Logger, func: Callable[..., Awaitable[Optional[BoltResponse]]]
-    ):
+    def __init__(self, logger: Logger, func: Callable[..., Awaitable[Optional[BoltResponse]]]):
         self.func = func
         self.logger = logger
         self.arg_names = inspect.getfullargspec(func).args
@@ -77,9 +75,7 @@ class AsyncCustomListenerErrorHandler(AsyncListenerErrorHandler):
             next_keys_required=False,
         )
         returned_response = await self.func(**kwargs)
-        if returned_response is not None and isinstance(
-            returned_response, BoltResponse
-        ):
+        if returned_response is not None and isinstance(returned_response, BoltResponse):
             response.status = returned_response.status
             response.headers = returned_response.headers
             response.body = returned_response.body
@@ -119,9 +115,7 @@ class AsyncDefaultListenerErrorHandler(AsyncListenerErrorHandler):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncCustomListenerErrorHandler(AsyncListenerErrorHandler):
-    def __init__(
-        self, logger: Logger, func: Callable[..., Awaitable[Optional[BoltResponse]]]
-    ):
+    def __init__(self, logger: Logger, func: Callable[..., Awaitable[Optional[BoltResponse]]]):
         self.func = func
         self.logger = logger
         self.arg_names = inspect.getfullargspec(func).args
@@ -141,9 +135,7 @@ class AsyncDefaultListenerErrorHandler(AsyncListenerErrorHandler):
             next_keys_required=False,
         )
         returned_response = await self.func(**kwargs)
-        if returned_response is not None and isinstance(
-            returned_response, BoltResponse
-        ):
+        if returned_response is not None and isinstance(returned_response, BoltResponse):
             response.status = returned_response.status
             response.headers = returned_response.headers
             response.body = returned_response.body</code></pre>

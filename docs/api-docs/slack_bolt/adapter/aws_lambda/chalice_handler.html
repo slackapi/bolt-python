@@ -49,9 +49,7 @@ class ChaliceSlackRequestHandler:
     def __init__(self, app: App, chalice: Chalice, lambda_client: Optional[BaseClient] = None):  # type: ignore
         self.app = app
         self.chalice = chalice
-        self.logger = get_bolt_app_logger(
-            app.name, ChaliceSlackRequestHandler, app.logger
-        )
+        self.logger = get_bolt_app_logger(app.name, ChaliceSlackRequestHandler, app.logger)
 
         if getenv(&#34;AWS_CHALICE_CLI_MODE&#34;) == &#34;true&#34; and lambda_client is None:
             try:
@@ -92,10 +90,7 @@ class ChaliceSlackRequestHandler:
                 bolt_req: BoltRequest = to_bolt_request(request, body)
                 query = bolt_req.query
                 is_callback = query is not None and (
-                    (
-                        _first_value(query, &#34;code&#34;) is not None
-                        and _first_value(query, &#34;state&#34;) is not None
-                    )
+                    (_first_value(query, &#34;code&#34;) is not None and _first_value(query, &#34;state&#34;) is not None)
                     or _first_value(query, &#34;error&#34;) is not None
                 )
                 if is_callback:
@@ -223,9 +218,7 @@ def not_found() -&gt; Response:
     def __init__(self, app: App, chalice: Chalice, lambda_client: Optional[BaseClient] = None):  # type: ignore
         self.app = app
         self.chalice = chalice
-        self.logger = get_bolt_app_logger(
-            app.name, ChaliceSlackRequestHandler, app.logger
-        )
+        self.logger = get_bolt_app_logger(app.name, ChaliceSlackRequestHandler, app.logger)
 
         if getenv(&#34;AWS_CHALICE_CLI_MODE&#34;) == &#34;true&#34; and lambda_client is None:
             try:
@@ -266,10 +259,7 @@ def not_found() -&gt; Response:
                 bolt_req: BoltRequest = to_bolt_request(request, body)
                 query = bolt_req.query
                 is_callback = query is not None and (
-                    (
-                        _first_value(query, &#34;code&#34;) is not None
-                        and _first_value(query, &#34;state&#34;) is not None
-                    )
+                    (_first_value(query, &#34;code&#34;) is not None and _first_value(query, &#34;state&#34;) is not None)
                     or _first_value(query, &#34;error&#34;) is not None
                 )
                 if is_callback:
@@ -340,10 +330,7 @@ def clear_all_log_handlers(cls):
             bolt_req: BoltRequest = to_bolt_request(request, body)
             query = bolt_req.query
             is_callback = query is not None and (
-                (
-                    _first_value(query, &#34;code&#34;) is not None
-                    and _first_value(query, &#34;state&#34;) is not None
-                )
+                (_first_value(query, &#34;code&#34;) is not None and _first_value(query, &#34;state&#34;) is not None)
                 or _first_value(query, &#34;error&#34;) is not None
             )
             if is_callback:

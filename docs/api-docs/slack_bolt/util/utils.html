@@ -38,9 +38,7 @@ from slack_bolt.error import BoltError
 from slack_bolt.version import __version__ as bolt_version
 
 
-def create_web_client(
-    token: Optional[str] = None, logger: Optional[Logger] = None
-) -&gt; WebClient:
+def create_web_client(token: Optional[str] = None, logger: Optional[Logger] = None) -&gt; WebClient:
     return WebClient(
         token=token,
         logger=logger,
@@ -186,9 +184,7 @@ def get_name_for_callable(func: Callable) -&gt; str:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def create_web_client(
-    token: Optional[str] = None, logger: Optional[Logger] = None
-) -&gt; WebClient:
+<pre><code class="python">def create_web_client(token: Optional[str] = None, logger: Optional[Logger] = None) -&gt; WebClient:
     return WebClient(
         token=token,
         logger=logger,

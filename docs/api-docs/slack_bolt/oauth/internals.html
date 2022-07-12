@@ -82,10 +82,7 @@ class CallbackResponseBuilder:
         status: int = 500,
         error: Optional[Exception] = None,
     ) -&gt; BoltResponse:
-        debug_message = (
-            &#34;Handling an OAuth callback failure &#34;
-            f&#34;(reason: {reason}, error: {error}, request: {request.query})&#34;
-        )
+        debug_message = &#34;Handling an OAuth callback failure &#34; f&#34;(reason: {reason}, error: {error}, request: {request.query})&#34;
         self._logger.debug(debug_message)
 
         # Adding a bit more details to the error code to help installers understand what&#39;s happening.
@@ -317,10 +314,7 @@ def build_detailed_error(reason: str) -&gt; str:
         status: int = 500,
         error: Optional[Exception] = None,
     ) -&gt; BoltResponse:
-        debug_message = (
-            &#34;Handling an OAuth callback failure &#34;
-            f&#34;(reason: {reason}, error: {error}, request: {request.query})&#34;
-        )
+        debug_message = &#34;Handling an OAuth callback failure &#34; f&#34;(reason: {reason}, error: {error}, request: {request.query})&#34;
         self._logger.debug(debug_message)
 
         # Adding a bit more details to the error code to help installers understand what&#39;s happening.

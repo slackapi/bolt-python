@@ -31,17 +31,11 @@ from slack_bolt.response import BoltResponse
 
 
 def _is_url_verification(req: AsyncBoltRequest) -&gt; bool:
-    return (
-        req is not None
-        and req.body is not None
-        and req.body.get(&#34;type&#34;) == &#34;url_verification&#34;
-    )
+    return req is not None and req.body is not None and req.body.get(&#34;type&#34;) == &#34;url_verification&#34;
 
 
 def _is_ssl_check(req: AsyncBoltRequest) -&gt; bool:
-    return (
-        req is not None and req.body is not None and req.body.get(&#34;type&#34;) == &#34;ssl_check&#34;
-    )
+    return req is not None and req.body is not None and req.body.get(&#34;type&#34;) == &#34;ssl_check&#34;
 
 
 def _is_no_auth_required(req: AsyncBoltRequest) -&gt; bool:

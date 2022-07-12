@@ -56,28 +56,20 @@ def send_response(
     if bolt_resp.status == 200:
         content_type = bolt_resp.headers.get(&#34;content-type&#34;, [&#34;&#34;])[0]
         if bolt_resp.body is None or len(bolt_resp.body) == 0:
-            client.send_socket_mode_response(
-                SocketModeResponse(envelope_id=req.envelope_id)
-            )
+            client.send_socket_mode_response(SocketModeResponse(envelope_id=req.envelope_id))
         elif content_type.startswith(&#34;application/json&#34;):
             dict_body = json.loads(bolt_resp.body)
-            client.send_socket_mode_response(
-                SocketModeResponse(envelope_id=req.envelope_id, payload=dict_body)
-            )
+            client.send_socket_mode_response(SocketModeResponse(envelope_id=req.envelope_id, payload=dict_body))
         else:
             client.send_socket_mode_response(
-                SocketModeResponse(
-                    envelope_id=req.envelope_id, payload={&#34;text&#34;: bolt_resp.body}
-                )
+                SocketModeResponse(envelope_id=req.envelope_id, payload={&#34;text&#34;: bolt_resp.body})
             )
 
         if client.logger.level &lt;= logging.DEBUG:
             spent_time = int((time() - start_time) * 1000)
             client.logger.debug(f&#34;Response time: {spent_time} milliseconds&#34;)
     else:
-        client.logger.info(
-            f&#34;Unsuccessful Bolt execution result (status: {bolt_resp.status}, body: {bolt_resp.body})&#34;
-        )</code></pre>
+        client.logger.info(f&#34;Unsuccessful Bolt execution result (status: {bolt_resp.status}, body: {bolt_resp.body})&#34;)</code></pre>
 </details>
 </section>
 <section>
@@ -120,28 +112,20 @@ def send_response(
     if bolt_resp.status == 200:
         content_type = bolt_resp.headers.get(&#34;content-type&#34;, [&#34;&#34;])[0]
         if bolt_resp.body is None or len(bolt_resp.body) == 0:
-            client.send_socket_mode_response(
-                SocketModeResponse(envelope_id=req.envelope_id)
-            )
+            client.send_socket_mode_response(SocketModeResponse(envelope_id=req.envelope_id))
         elif content_type.startswith(&#34;application/json&#34;):
             dict_body = json.loads(bolt_resp.body)
-            client.send_socket_mode_response(
-                SocketModeResponse(envelope_id=req.envelope_id, payload=dict_body)
-            )
+            client.send_socket_mode_response(SocketModeResponse(envelope_id=req.envelope_id, payload=dict_body))
         else:
             client.send_socket_mode_response(
-                SocketModeResponse(
-                    envelope_id=req.envelope_id, payload={&#34;text&#34;: bolt_resp.body}
-                )
+                SocketModeResponse(envelope_id=req.envelope_id, payload={&#34;text&#34;: bolt_resp.body})
             )
 
         if client.logger.level &lt;= logging.DEBUG:
             spent_time = int((time() - start_time) * 1000)
             client.logger.debug(f&#34;Response time: {spent_time} milliseconds&#34;)
     else:
-        client.logger.info(
-            f&#34;Unsuccessful Bolt execution result (status: {bolt_resp.status}, body: {bolt_resp.body})&#34;
-        )</code></pre>
+        client.logger.info(f&#34;Unsuccessful Bolt execution result (status: {bolt_resp.status}, body: {bolt_resp.body})&#34;)</code></pre>
 </details>
 </dd>
 </dl>

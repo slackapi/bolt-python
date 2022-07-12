@@ -34,9 +34,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 from slack_bolt.version import __version__ as bolt_version
 
 
-def create_async_web_client(
-    token: Optional[str] = None, logger: Optional[Logger] = None
-) -&gt; AsyncWebClient:
+def create_async_web_client(token: Optional[str] = None, logger: Optional[Logger] = None) -&gt; AsyncWebClient:
     return AsyncWebClient(
         token=token,
         logger=logger,
@@ -60,9 +58,7 @@ def create_async_web_client(
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def create_async_web_client(
-    token: Optional[str] = None, logger: Optional[Logger] = None
-) -&gt; AsyncWebClient:
+<pre><code class="python">def create_async_web_client(token: Optional[str] = None, logger: Optional[Logger] = None) -&gt; AsyncWebClient:
     return AsyncWebClient(
         token=token,
         logger=logger,

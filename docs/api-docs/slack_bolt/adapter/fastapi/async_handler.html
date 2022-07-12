@@ -56,9 +56,7 @@ __all__ = [
     def __init__(self, app: AsyncApp):  # type: ignore
         self.app = app
 
-    async def handle(
-        self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None
-    ) -&gt; Response:
+    async def handle(self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None) -&gt; Response:
         body = await req.body()
         if req.method == &#34;GET&#34;:
             if self.app.oauth_flow is not None:
@@ -74,9 +72,7 @@ __all__ = [
                     )
                     return to_starlette_response(bolt_resp)
         elif req.method == &#34;POST&#34;:
-            bolt_resp = await self.app.async_dispatch(
-                to_async_bolt_request(req, body, addition_context_properties)
-            )
+            bolt_resp = await self.app.async_dispatch(to_async_bolt_request(req, body, addition_context_properties))
             return to_starlette_response(bolt_resp)
 
         return Response(
@@ -95,9 +91,7 @@ __all__ = [
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">async def handle(
-    self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None
-) -&gt; Response:
+<pre><code class="python">async def handle(self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None) -&gt; Response:
     body = await req.body()
     if req.method == &#34;GET&#34;:
         if self.app.oauth_flow is not None:
@@ -113,9 +107,7 @@ __all__ = [
                 )
                 return to_starlette_response(bolt_resp)
     elif req.method == &#34;POST&#34;:
-        bolt_resp = await self.app.async_dispatch(
-            to_async_bolt_request(req, body, addition_context_properties)
-        )
+        bolt_resp = await self.app.async_dispatch(to_async_bolt_request(req, body, addition_context_properties))
         return to_starlette_response(bolt_resp)
 
     return Response(
