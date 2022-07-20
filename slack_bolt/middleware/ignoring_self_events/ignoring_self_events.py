@@ -48,7 +48,7 @@ class IgnoringSelfEvents(Middleware):
             auth_result is not None
             and (
                 (user_id is not None and user_id == auth_result.bot_user_id)
-                or (bot_id is not None and auth_result.bot_id == bot_id)
+                or (bot_id is not None and bot_id == auth_result.bot_id)  # for bot_message events
             )
             and body.get("event") is not None
             and body.get("event", {}).get("type") not in cls.events_that_should_be_kept
