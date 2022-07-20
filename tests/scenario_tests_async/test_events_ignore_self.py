@@ -46,6 +46,18 @@ class TestAsyncEventsIgnoreSelf:
         assert self.mock_received_requests.get("/chat.postMessage") is None
 
     @pytest.mark.asyncio
+    async def test_self_events_response_url(self):
+        app = AsyncApp(client=self.web_client)
+        app.event("message")(whats_up)
+        request = AsyncBoltRequest(body=response_url_message_event, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_auth_test_count_async(self, 1)
+        await asyncio.sleep(1)  # wait a bit after auto ack()
+        # The listener should not be executed
+        assert self.mock_received_requests.get("/chat.postMessage") is None
+
+    @pytest.mark.asyncio
     async def test_self_events_disabled(self):
         app = AsyncApp(client=self.web_client, ignoring_self_events_enabled=False)
         app.event("reaction_added")(whats_up)
@@ -74,6 +86,28 @@ self_event = {
         "reaction": "heart_eyes",
         "item_user": "W111",
         "event_ts": "1599616881.000800",
+    },
+    "type": "event_callback",
+    "event_id": "Ev111",
+    "event_time": 1599616881,
+    "authed_users": ["W111"],
+}
+
+
+response_url_message_event = {
+    "token": "verification_token",
+    "team_id": "T111",
+    "enterprise_id": "E111",
+    "api_app_id": "A111",
+    "event": {
+        "type": "message",
+        "subtype": "bot_message",
+        "text": "Hi there! This is a reply using response_url.",
+        "ts": "1658282075.825129",
+        "bot_id": "B111",
+        "channel": "C111",
+        "event_ts": "1658282075.825129",
+        "channel_type": "channel",
     },
     "type": "event_callback",
     "event_id": "Ev111",
