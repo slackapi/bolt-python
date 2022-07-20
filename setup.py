@@ -114,4 +114,11 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
+    entry_points={
+        'console_scripts': [
+            'get-hooks=slack_bolt.cli.get_hooks:main',
+            'get-manifest=slack_bolt.cli.get_manifest:main',
+            'start=slack_bolt.cli.start:main',
+        ],
+    },
 )
