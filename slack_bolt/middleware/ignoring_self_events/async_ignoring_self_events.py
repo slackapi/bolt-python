@@ -15,8 +15,9 @@ class AsyncIgnoringSelfEvents(IgnoringSelfEvents, AsyncMiddleware):
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> BoltResponse:
         auth_result = req.context.authorize_result
-        user_id = req.context.user_id if req.context.user_id is not None else req.context.bot_user_id
-        if self._is_self_event(auth_result, user_id, req.body):
+        # message events can have $.event.bot_id while it does not have its user_id
+        bot_id = req.body.get("event", {}).get("bot_id")
+        if self._is_self_event(auth_result, req.context.user_id, bot_id, req.body):
             self._debug_log(req.body)
             return await req.context.ack()
         else:
