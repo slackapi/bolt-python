@@ -21,7 +21,9 @@ class IgnoringSelfEvents(Middleware):
         next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         auth_result = req.context.authorize_result
-        if self._is_self_event(auth_result, req.context.user_id, req.body):
+        # message events can have $.event.bot_id while it does not have its user_id
+        bot_id = req.body.get("event", {}).get("bot_id")
+        if self._is_self_event(auth_result, req.context.user_id, bot_id, req.body):
             self._debug_log(req.body)
             return req.context.ack()
         else:
@@ -29,17 +31,25 @@ class IgnoringSelfEvents(Middleware):
 
     # -----------------------------------------
 
-    # Its an Events API event that isn't of type message,
+    # It's an Events API event that isn't of type message,
     # but the user ID might match our own app. Filter these out.
     # However, some events still must be fired, because they can make sense.
     events_that_should_be_kept = ["member_joined_channel", "member_left_channel"]
 
     @classmethod
-    def _is_self_event(cls, auth_result: AuthorizeResult, user_id: str, body: Dict[str, Any]):
+    def _is_self_event(
+        cls,
+        auth_result: AuthorizeResult,
+        user_id: Optional[str],
+        bot_id: Optional[str],
+        body: Dict[str, Any],
+    ):
         return (
             auth_result is not None
-            and user_id is not None
-            and user_id == auth_result.bot_user_id
+            and (
+                (user_id is not None and user_id == auth_result.bot_user_id)
+                or (bot_id is not None and bot_id == auth_result.bot_id)  # for bot_message events
+            )
             and body.get("event") is not None
             and body.get("event", {}).get("type") not in cls.events_that_should_be_kept
         )
