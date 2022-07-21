@@ -40,7 +40,7 @@ t:
     steps: ワークフローステップ
     advanced: 応用コンセプト
     start: Bolt 入門ガイド
-#    contribute: 貢献
+    contribute: 貢献
 
 # Metadata
 repo_name: bolt-python
