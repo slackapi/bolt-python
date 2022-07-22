@@ -9,6 +9,7 @@ from slack_bolt.response import BoltResponse
 from .listener import Listener
 from ..logger import get_bolt_app_logger
 from ..middleware import Middleware
+from ..util.utils import get_arg_names_of_callable
 
 
 class CustomListener(Listener):
@@ -38,7 +39,7 @@ class CustomListener(Listener):
         self.matchers = matchers
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
-        self.arg_names = inspect.getfullargspec(ack_function).args
+        self.arg_names = get_arg_names_of_callable(ack_function)
         self.logger = get_bolt_app_logger(app_name, self.ack_function, base_logger)
 
     def run_ack_function(

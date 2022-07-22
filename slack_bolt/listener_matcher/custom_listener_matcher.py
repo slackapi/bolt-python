@@ -7,6 +7,7 @@ from slack_bolt.logger import get_bolt_app_logger
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from .listener_matcher import ListenerMatcher
+from ..util.utils import get_arg_names_of_callable
 
 
 class CustomListenerMatcher(ListenerMatcher):
@@ -18,7 +19,7 @@ class CustomListenerMatcher(ListenerMatcher):
     def __init__(self, *, app_name: str, func: Callable[..., bool], base_logger: Optional[Logger] = None):
         self.app_name = app_name
         self.func = func
-        self.arg_names = inspect.getfullargspec(func).args
+        self.arg_names = get_arg_names_of_callable(func)
         self.logger = get_bolt_app_logger(self.app_name, self.func, base_logger)
 
     def matches(self, req: BoltRequest, resp: BoltResponse) -> bool:

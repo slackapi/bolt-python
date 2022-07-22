@@ -24,6 +24,7 @@ from slack_bolt.request.payload_utils import (
     is_workflow_step_save,
 )
 from ..logger.messages import error_message_event_type
+from ..util.utils import get_arg_names_of_callable
 
 if sys.version_info.major == 3 and sys.version_info.minor <= 6:
     from re import _pattern_type as Pattern
@@ -47,7 +48,7 @@ class BuiltinListenerMatcher(ListenerMatcher):
         base_logger: Optional[Logger] = None,
     ):
         self.func = func
-        self.arg_names = inspect.getfullargspec(func).args
+        self.arg_names = get_arg_names_of_callable(func)
         self.logger = get_bolt_logger(self.func, base_logger)
 
     def matches(self, req: BoltRequest, resp: BoltResponse) -> bool:

@@ -1,5 +1,6 @@
 import json
 import re
+from functools import wraps
 from time import time, sleep
 
 import pytest
@@ -546,3 +547,49 @@ class TestEvents:
         request: BoltRequest = BoltRequest(body=json_body, headers=self.build_headers(timestamp, json_body))
         response = app.dispatch(request)
         assert response.status == 200
+
+    def test_additional_decorators_1(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+
+        @my_decorator
+        @app.event("app_mention")
+        def handle_app_mention(body, say, payload, event):
+            assert body == self.valid_event_body
+            assert body["event"] == payload
+            assert payload == event
+            say("What's up?")
+
+        timestamp, body = str(int(time())), json.dumps(self.valid_event_body)
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+        sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
+    def test_additional_decorators_2(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+
+        @app.event("app_mention")
+        @my_decorator
+        def handle_app_mention(body, say, payload, event):
+            assert body == self.valid_event_body
+            assert body["event"] == payload
+            assert payload == event
+            say("What's up?")
+
+        timestamp, body = str(int(time())), json.dumps(self.valid_event_body)
+        request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+        sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
+
+def my_decorator(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        f(*args, **kwargs)
+
+    return wrap

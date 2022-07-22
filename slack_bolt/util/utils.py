@@ -1,7 +1,8 @@
 import copy
+import inspect
 import sys
 from logging import Logger
-from typing import Optional, Union, Dict, Any, Sequence, Callable
+from typing import Optional, Union, Dict, Any, Sequence, Callable, List
 
 from slack_sdk import WebClient
 from slack_sdk.models import JsonObject
@@ -83,3 +84,7 @@ def get_name_for_callable(func: Callable) -> str:
         return func.__name__
     else:
         return f"{func.__class__.__module__}.{func.__class__.__name__}"
+
+
+def get_arg_names_of_callable(func: Callable) -> List[str]:
+    return inspect.getfullargspec(inspect.unwrap(func)).args
