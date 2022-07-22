@@ -1,4 +1,3 @@
-import inspect
 from functools import wraps
 from logging import Logger
 from typing import Callable, Awaitable

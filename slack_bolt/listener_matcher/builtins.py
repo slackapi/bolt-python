@@ -1,5 +1,4 @@
 # pytype: skip-file
-import inspect
 import re
 import sys
 from logging import Logger

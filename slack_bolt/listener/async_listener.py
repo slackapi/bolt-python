@@ -70,7 +70,6 @@ class AsyncListener(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-import inspect
 from logging import Logger
 from typing import Callable, Awaitable
 
