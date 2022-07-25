@@ -51,6 +51,6 @@ def start(working_directory):
         print(stdout, end="")
 
 
-def main():
+if __name__ == "__main__":
     current_wd = os.getcwd()
     start(current_wd)
