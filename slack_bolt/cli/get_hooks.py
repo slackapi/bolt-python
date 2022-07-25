@@ -4,8 +4,8 @@ import json
 
 hook_payload = {
     "hooks": {
-        "get-manifest": "get-manifest",
-        "start": "start",
+        "get-manifest": "python -m slack_bolt.cli.get_manifest",
+        "start": "python -m slack_bolt.cli.start",
     },
     "config": {
         "watch": {
@@ -18,6 +18,5 @@ hook_payload = {
     }
 }
 
-
-def main():
-  print(json.dumps(hook_payload))
+if __name__ == "__main__":
+    print(json.dumps(hook_payload))
