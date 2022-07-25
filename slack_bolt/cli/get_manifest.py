@@ -19,6 +19,6 @@ def get_manifest(working_directory):
         return manifest.read()
 
 
-def main():
+if __name__ == "__main__":
     current_wd = os.getcwd()
     print(get_manifest(current_wd))
