@@ -792,6 +792,27 @@ class App:
 
         return __call__
 
+    def function(
+        self,
+        callback_id: Union[str, Pattern],
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+        """
+        """
+        matchers = list(matchers) if matchers else []
+        middleware = list(middleware) if middleware else []
+
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            constraints = "function_executed"
+            primary_matcher = builtin_matchers.function_event(
+                callback_id=callback_id, constraints=constraints, base_logger=self._base_logger
+            )
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
+
+        return __call__
+
     # -------------------------
     # slash commands
 
