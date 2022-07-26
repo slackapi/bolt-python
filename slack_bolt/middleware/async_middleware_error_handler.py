@@ -1,4 +1,3 @@
-import inspect
 from abc import ABCMeta, abstractmethod
 from logging import Logger
 from typing import Callable, Dict, Any, Awaitable, Optional
@@ -6,6 +5,7 @@ from typing import Callable, Dict, Any, Awaitable, Optional
 from slack_bolt.kwargs_injection.async_utils import build_async_required_kwargs
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
+from slack_bolt.util.utils import get_arg_names_of_callable
 
 
 class AsyncMiddlewareErrorHandler(metaclass=ABCMeta):
@@ -30,7 +30,7 @@ class AsyncCustomMiddlewareErrorHandler(AsyncMiddlewareErrorHandler):
     def __init__(self, logger: Logger, func: Callable[..., Awaitable[Optional[BoltResponse]]]):
         self.func = func
         self.logger = logger
-        self.arg_names = inspect.getfullargspec(func).args
+        self.arg_names = get_arg_names_of_callable(func)
 
     async def handle(
         self,

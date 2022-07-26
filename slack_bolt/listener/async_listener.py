@@ -6,6 +6,7 @@ from slack_bolt.middleware.async_middleware import AsyncMiddleware
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from ..kwargs_injection.async_utils import build_async_required_kwargs
+from ..util.utils import get_arg_names_of_callable
 
 
 class AsyncListener(metaclass=ABCMeta):
@@ -69,7 +70,6 @@ class AsyncListener(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-import inspect
 from logging import Logger
 from typing import Callable, Awaitable
 
@@ -107,7 +107,7 @@ class AsyncCustomListener(AsyncListener):
         self.matchers = matchers
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
-        self.arg_names = inspect.getfullargspec(ack_function).args
+        self.arg_names = get_arg_names_of_callable(ack_function)
         self.logger = get_bolt_app_logger(app_name, self.ack_function, base_logger)
 
     async def run_ack_function(

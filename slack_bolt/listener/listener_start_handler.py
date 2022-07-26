@@ -1,4 +1,3 @@
-import inspect
 from abc import ABCMeta, abstractmethod
 from logging import Logger
 from typing import Callable, Dict, Any, Optional
@@ -6,6 +5,7 @@ from typing import Callable, Dict, Any, Optional
 from slack_bolt.kwargs_injection import build_required_kwargs
 from slack_bolt.request.request import BoltRequest
 from slack_bolt.response.response import BoltResponse
+from slack_bolt.util.utils import get_arg_names_of_callable
 
 
 class ListenerStartHandler(metaclass=ABCMeta):
@@ -32,7 +32,7 @@ class CustomListenerStartHandler(ListenerStartHandler):
     def __init__(self, logger: Logger, func: Callable[..., None]):
         self.func = func
         self.logger = logger
-        self.arg_names = inspect.getfullargspec(func).args
+        self.arg_names = get_arg_names_of_callable(func)
 
     def handle(
         self,

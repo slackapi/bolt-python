@@ -1,6 +1,7 @@
 import asyncio
 import json
 import re
+from functools import wraps
 from random import random
 from time import time
 
@@ -566,6 +567,48 @@ class TestAsyncEvents:
         request: AsyncBoltRequest = AsyncBoltRequest(body=json_body, headers=self.build_headers(timestamp, json_body))
         response = await app.async_dispatch(request)
         assert response.status == 200
+
+    @pytest.mark.asyncio
+    async def test_additional_decorators_1(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
+
+        @my_decorator
+        @app.event("app_mention")
+        async def handle_app_mention(say):
+            await say("What's up?")
+
+        timestamp, body = str(int(time())), json.dumps(app_mention_body)
+        request: AsyncBoltRequest = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_auth_test_count_async(self, 1)
+        await asyncio.sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
+    @pytest.mark.asyncio
+    async def test_additional_decorators_2(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
+
+        @app.event("app_mention")
+        @my_decorator
+        async def handle_app_mention(say):
+            await say("What's up?")
+
+        timestamp, body = str(int(time())), json.dumps(app_mention_body)
+        request: AsyncBoltRequest = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_auth_test_count_async(self, 1)
+        await asyncio.sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
+
+def my_decorator(f):
+    @wraps(f)
+    async def wrap(*args, **kwargs):
+        await f(*args, **kwargs)
+
+    return wrap
 
 
 app_mention_body = {

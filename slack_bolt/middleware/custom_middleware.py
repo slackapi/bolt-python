@@ -1,4 +1,3 @@
-import inspect
 from logging import Logger
 from typing import Callable, Any, Sequence, Optional
 
@@ -7,7 +6,7 @@ from slack_bolt.logger import get_bolt_app_logger
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from .middleware import Middleware
-from slack_bolt.util.utils import get_name_for_callable
+from slack_bolt.util.utils import get_name_for_callable, get_arg_names_of_callable
 
 
 class CustomMiddleware(Middleware):
@@ -19,7 +18,7 @@ class CustomMiddleware(Middleware):
     def __init__(self, *, app_name: str, func: Callable, base_logger: Optional[Logger] = None):
         self.app_name = app_name
         self.func = func
-        self.arg_names = inspect.getfullargspec(func).args
+        self.arg_names = get_arg_names_of_callable(func)
         self.logger = get_bolt_app_logger(self.app_name, self.func, base_logger)
 
     def process(

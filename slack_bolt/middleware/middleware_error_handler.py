@@ -1,4 +1,3 @@
-import inspect
 from abc import ABCMeta, abstractmethod
 from logging import Logger
 from typing import Callable, Optional, Any, Dict
@@ -6,6 +5,7 @@ from typing import Callable, Optional, Any, Dict
 from slack_bolt.kwargs_injection.utils import build_required_kwargs
 from slack_bolt.request.request import BoltRequest
 from slack_bolt.response.response import BoltResponse
+from slack_bolt.util.utils import get_arg_names_of_callable
 
 
 class MiddlewareErrorHandler(metaclass=ABCMeta):
@@ -30,7 +30,7 @@ class CustomMiddlewareErrorHandler(MiddlewareErrorHandler):
     def __init__(self, logger: Logger, func: Callable[..., Optional[BoltResponse]]):
         self.func = func
         self.logger = logger
-        self.arg_names = inspect.getfullargspec(func).args
+        self.arg_names = get_arg_names_of_callable(func)
 
     def handle(
         self,

@@ -1,4 +1,3 @@
-import inspect
 from logging import Logger
 from typing import Optional, Callable, Awaitable, Dict, Any
 
@@ -14,6 +13,7 @@ from slack_bolt.authorization.async_authorize_args import AsyncAuthorizeArgs
 from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.error import BoltError
+from slack_bolt.util.utils import get_arg_names_of_callable
 
 
 class AsyncAuthorize:
@@ -42,7 +42,7 @@ class AsyncCallableAuthorize(AsyncAuthorize):
     def __init__(self, *, logger: Logger, func: Callable[..., Awaitable[AuthorizeResult]]):
         self.logger = logger
         self.func = func
-        self.arg_names = inspect.getfullargspec(func).args
+        self.arg_names = get_arg_names_of_callable(func)
 
     async def __call__(
         self,

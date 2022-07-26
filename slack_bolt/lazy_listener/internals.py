@@ -1,10 +1,10 @@
-import inspect
 from functools import wraps
 from logging import Logger
 from typing import Callable
 
 from slack_bolt.kwargs_injection import build_required_kwargs
 from slack_bolt.request import BoltRequest
+from slack_bolt.util.utils import get_arg_names_of_callable
 
 
 def build_runnable_function(
@@ -12,7 +12,7 @@ def build_runnable_function(
     logger: Logger,
     request: BoltRequest,
 ) -> Callable[[], None]:
-    arg_names = inspect.getfullargspec(func).args
+    arg_names = get_arg_names_of_callable(func)
 
     @wraps(func)
     def request_wired_func_wrapper() -> None:

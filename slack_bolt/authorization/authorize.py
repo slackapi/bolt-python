@@ -1,4 +1,3 @@
-import inspect
 from logging import Logger
 from typing import Optional, Callable, Dict, Any
 
@@ -13,6 +12,7 @@ from slack_bolt.authorization.authorize_args import AuthorizeArgs
 from slack_bolt.authorization.authorize_result import AuthorizeResult
 from slack_bolt.context.context import BoltContext
 from slack_bolt.error import BoltError
+from slack_bolt.util.utils import get_arg_names_of_callable
 
 
 class Authorize:
@@ -46,7 +46,7 @@ class CallableAuthorize(Authorize):
     ):
         self.logger = logger
         self.func = func
-        self.arg_names = inspect.getfullargspec(func).args
+        self.arg_names = get_arg_names_of_callable(func)
 
     def __call__(
         self,
