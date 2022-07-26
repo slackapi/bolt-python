@@ -153,7 +153,7 @@ __all__ = [
         self.matchers = matchers
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
-        self.arg_names = inspect.getfullargspec(ack_function).args
+        self.arg_names = get_arg_names_of_callable(ack_function)
         self.logger = get_bolt_app_logger(app_name, self.ack_function, base_logger)
 
     def run_ack_function(

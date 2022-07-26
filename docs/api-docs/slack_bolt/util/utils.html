@@ -27,9 +27,10 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">import copy
+import inspect
 import sys
 from logging import Logger
-from typing import Optional, Union, Dict, Any, Sequence, Callable
+from typing import Optional, Union, Dict, Any, Sequence, Callable, List
 
 from slack_sdk import WebClient
 from slack_sdk.models import JsonObject
@@ -110,7 +111,11 @@ def get_name_for_callable(func: Callable) -&gt; str:
     if hasattr(func, &#34;__name__&#34;):
         return func.__name__
     else:
-        return f&#34;{func.__class__.__module__}.{func.__class__.__name__}&#34;</code></pre>
+        return f&#34;{func.__class__.__module__}.{func.__class__.__name__}&#34;
+
+
+def get_arg_names_of_callable(func: Callable) -&gt; List[str]:
+    return inspect.getfullargspec(inspect.unwrap(func)).args</code></pre>
 </details>
 </section>
 <section>
@@ -190,6 +195,19 @@ def get_name_for_callable(func: Callable) -&gt; str:
         logger=logger,
         user_agent_prefix=f&#34;Bolt/{bolt_version}&#34;,
     )</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.util.utils.get_arg_names_of_callable"><code class="name flex">
+<span>def <span class="ident">get_arg_names_of_callable</span></span>(<span>func: Callable) ‑> List[str]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_arg_names_of_callable(func: Callable) -&gt; List[str]:
+    return inspect.getfullargspec(inspect.unwrap(func)).args</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.util.utils.get_boot_message"><code class="name flex">
@@ -278,6 +296,7 @@ def get_name_for_callable(func: Callable) -&gt; str:
 <li><code><a title="slack_bolt.util.utils.convert_to_dict_list" href="#slack_bolt.util.utils.convert_to_dict_list">convert_to_dict_list</a></code></li>
 <li><code><a title="slack_bolt.util.utils.create_copy" href="#slack_bolt.util.utils.create_copy">create_copy</a></code></li>
 <li><code><a title="slack_bolt.util.utils.create_web_client" href="#slack_bolt.util.utils.create_web_client">create_web_client</a></code></li>
+<li><code><a title="slack_bolt.util.utils.get_arg_names_of_callable" href="#slack_bolt.util.utils.get_arg_names_of_callable">get_arg_names_of_callable</a></code></li>
 <li><code><a title="slack_bolt.util.utils.get_boot_message" href="#slack_bolt.util.utils.get_boot_message">get_boot_message</a></code></li>
 <li><code><a title="slack_bolt.util.utils.get_name_for_callable" href="#slack_bolt.util.utils.get_name_for_callable">get_name_for_callable</a></code></li>
 </ul>

@@ -26,8 +26,7 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">import inspect
-from logging import Logger
+<pre><code class="python">from logging import Logger
 from typing import Callable, Optional, Sequence
 
 from slack_bolt.kwargs_injection import build_required_kwargs
@@ -37,6 +36,7 @@ from slack_bolt.response import BoltResponse
 from .listener import Listener
 from ..logger import get_bolt_app_logger
 from ..middleware import Middleware
+from ..util.utils import get_arg_names_of_callable
 
 
 class CustomListener(Listener):
@@ -66,7 +66,7 @@ class CustomListener(Listener):
         self.matchers = matchers
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
-        self.arg_names = inspect.getfullargspec(ack_function).args
+        self.arg_names = get_arg_names_of_callable(ack_function)
         self.logger = get_bolt_app_logger(app_name, self.ack_function, base_logger)
 
     def run_ack_function(
@@ -132,7 +132,7 @@ class CustomListener(Listener):
         self.matchers = matchers
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
-        self.arg_names = inspect.getfullargspec(ack_function).args
+        self.arg_names = get_arg_names_of_callable(ack_function)
         self.logger = get_bolt_app_logger(app_name, self.ack_function, base_logger)
 
     def run_ack_function(
