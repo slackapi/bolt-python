@@ -18,5 +18,5 @@ hook_payload = {
     }
 }
 
-if __name__ == "__main__":
+def main():
     print(json.dumps(hook_payload))
