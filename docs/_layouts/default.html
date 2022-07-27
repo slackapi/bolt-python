@@ -49,7 +49,7 @@ sidebar_style: main
         <div class="section-wrapper">
           <h3 id="{{section.slug}}">{{ section.title }}</h3>
 
-          {{ section.content | markdownify }}
+          {{ section.content | replace: "&amp;", "&" | replace: "&lt;", "<" | replace: "&gt;", ">" | markdownify }}
 
           <hr>
         </div>
