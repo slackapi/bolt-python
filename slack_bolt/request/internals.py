@@ -127,6 +127,13 @@ def extract_channel_id(payload: Dict[str, Any]) -> Optional[str]:
     return None
 
 
+def extract_function_execution_id(payload: Dict[str, Any]) -> Optional[str]:
+    if "function_execution_id" in payload:
+        return payload.get("function_execution_id")
+    if "event" in payload:
+        return extract_function_execution_id(payload["event"])
+    return None
+
 def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
     context["is_enterprise_install"] = extract_is_enterprise_install(body)
     enterprise_id = extract_enterprise_id(body)
@@ -151,6 +158,9 @@ def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
                 context.logger.debug(debug_multiple_response_urls_detected())
             response_url = response_urls[0].get("response_url")
             context["response_url"] = response_url
+    function_execution_id = extract_function_execution_id(body)
+    if function_execution_id:
+        context["function_execution_id"] = function_execution_id
     return context
 
 

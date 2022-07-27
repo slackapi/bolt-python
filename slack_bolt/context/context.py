@@ -1,5 +1,6 @@
 # pytype: skip-file
 from typing import Optional
+from slack_bolt.context.success.success import Success
 
 from slack_sdk import WebClient
 
@@ -124,3 +125,20 @@ class BoltContext(BaseContext):
                 ssl=self.client.ssl,
             )
         return self["respond"]
+
+    @property
+    def success(self) -> Optional[Success]:
+        """`success()` function for this request.
+
+            @app.function("reverse")
+            def handle_button_clicks(context):
+                context.success({"stringReverse":"olleh"})
+
+        Returns:
+            Callable `success()` function
+        """
+        if "success" not in self:
+            self["success"] = Success(
+                client=self.client,
+                function_execution_id=self.function_execution_id)
+        return self["success"]

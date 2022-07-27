@@ -52,6 +52,7 @@ def build_required_kwargs(
         "ack": request.context.ack,
         "say": request.context.say,
         "respond": request.context.respond,
+        "success": request.context.success,
         # middleware
         "next": next_func,
         "next_": next_func,  # for the middleware using Python's built-in `next()` function
