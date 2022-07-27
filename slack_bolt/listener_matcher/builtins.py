@@ -177,21 +177,20 @@ def _verify_message_event_type(event_type: str) -> None:
 
 
 def function_event(
-    constraints: Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]],
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
-    if isinstance(constraints, (str, Pattern)):
-        event_type: Union[str, Pattern] = constraints
-        _verify_message_event_type(event_type)
 
-        def func(body: Dict[str, Any]) -> bool:
-            return is_event(body) and _matches(callback_id, body.get("function", {}).get("callback_id", ""))
+    def func(body: Dict[str, Any]) -> bool:
+        return (
+            is_event(body)
+            and _matches("function_executed", body.get("event", {}).get("type", ""))
+            and "function_execution_id" in body.get("event", {})
+            and _matches(callback_id, body.get("event", {}).get("function", {}).get("callback_id", ""))
+        )
 
-        return build_listener_matcher(func, asyncio, base_logger)
-
-    raise BoltError(f"event ({constraints}: {type(constraints)}) must be any of str and Pattern")
+    return build_listener_matcher(func, asyncio, base_logger)
 
 
 def workflow_step_execute(
