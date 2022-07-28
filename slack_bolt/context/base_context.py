@@ -25,11 +25,13 @@ class BaseContext(dict):
         "bot_id",
         "bot_user_id",
         "user_token",
-        "function_execution_id" "client",
+        "function_execution_id",
+        "client",
         "ack",
         "say",
         "respond",
-        "complete_success",
+        "success",
+        "error",
     ]
 
     @property
