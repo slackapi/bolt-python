@@ -1,4 +1,3 @@
-
 class CliError(Exception):
     pass
 
@@ -12,4 +11,5 @@ def handle_exception(func):
         except Exception as e:
             print(e)
             exit()
+
     return wrapper

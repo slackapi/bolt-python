@@ -181,7 +181,6 @@ def function_event(
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
-
     def func(body: Dict[str, Any]) -> bool:
         return (
             is_event(body)

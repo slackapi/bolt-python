@@ -26,6 +26,8 @@ class TestArgs:
             "ack",
             "say",
             "respond",
+            "success",
+            "err",
             "next",
         ]
         arg_params: dict = build_required_kwargs(

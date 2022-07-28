@@ -798,16 +798,39 @@ class App:
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
-        """
+        """Registers a new Function listener.
+        This method can be used as either a decorator or a method.
+
+            # Use this method as a decorator
+            @app.function("reverse")
+            def reverse_string(event, success: Success, err: Error):
+                try:
+                    string_to_reverse = event["inputs"]["stringToReverse"]
+                    success({
+                        "reverseString": string_to_reverse[::-1]
+                    })
+                except Exception as e:
+                    err("Cannot reverse string")
+                    raise e
+
+            # Pass a function to this method
+            app.function("reverse")(reverse_string)
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
+
+        Args:
+            callback_id: The callback id to identify the function
+            matchers: A list of listener matcher functions.
+                Only when all the matchers return True, the listener function can be invoked.
+            middleware: A list of lister middleware functions.
+                Only when all the middleware call `next()` method, the listener function can be invoked.
         """
         matchers = list(matchers) if matchers else []
         middleware = list(middleware) if middleware else []
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.function_event(
-                callback_id=callback_id, base_logger=self._base_logger
-            )
+            primary_matcher = builtin_matchers.function_event(callback_id=callback_id, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
         return __call__

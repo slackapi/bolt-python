@@ -1,6 +1,5 @@
 # pytype: skip-file
 from typing import Optional
-from slack_bolt.context.success.success import Success
 
 from slack_sdk import WebClient
 
@@ -8,7 +7,16 @@ from slack_bolt.context.ack import Ack
 from slack_bolt.context.base_context import BaseContext
 from slack_bolt.context.respond import Respond
 from slack_bolt.context.say import Say
+from slack_bolt.context.success import Success
+from slack_bolt.context.error import Error
 from slack_bolt.util.utils import create_copy
+
+CLIENT: str = "client"
+ACK: str = "ack"
+SAY: str = "say"
+RESPOND: str = "respond"
+ERROR: str = "error"
+SUCCESS: str = "success"
 
 
 class BoltContext(BaseContext):
@@ -34,19 +42,19 @@ class BoltContext(BaseContext):
 
     @property
     def client(self) -> Optional[WebClient]:
-        """The `WebClient` instance available for this request.
+        f"""The `WebClient` instance available for this request.
 
-            @app.event("app_mention")
+            @app.{CLIENT}("app_mention")
             def handle_events(context):
-                context.client.chat_postMessage(
+                context.{CLIENT}.chat_postMessage(
                     channel=context.channel_id,
                     text="Thanks!",
                 )
 
-            # You can access "client" this way too.
+            # You can access "{CLIENT}" this way too.
             @app.event("app_mention")
-            def handle_events(client, context):
-                client.chat_postMessage(
+            def handle_events({CLIENT}, context):
+                {CLIENT}.chat_postMessage(
                     channel=context.channel_id,
                     text="Thanks!",
                 )
@@ -54,91 +62,112 @@ class BoltContext(BaseContext):
         Returns:
             `WebClient` instance
         """
-        if "client" not in self:
-            self["client"] = WebClient(token=None)
-        return self["client"]
+        if CLIENT not in self:
+            self[CLIENT] = WebClient(token=None)
+        return self[CLIENT]
 
     @property
     def ack(self) -> Ack:
-        """`ack()` function for this request.
+        f"""`{ACK}()` function for this request.
 
             @app.action("button")
             def handle_button_clicks(context):
-                context.ack()
+                context.{ACK}()
 
-            # You can access "ack" this way too.
+            # You can access "{ACK}" this way too.
             @app.action("button")
-            def handle_button_clicks(ack):
-                ack()
+            def handle_button_clicks({ACK}):
+                {ACK}()
 
         Returns:
-            Callable `ack()` function
+            Callable `{ACK}()` function
         """
-        if "ack" not in self:
-            self["ack"] = Ack()
-        return self["ack"]
+        if ACK not in self:
+            self[ACK] = Ack()
+        return self[ACK]
 
     @property
     def say(self) -> Say:
-        """`say()` function for this request.
+        f"""`{SAY}()` function for this request.
 
             @app.action("button")
             def handle_button_clicks(context):
                 context.ack()
-                context.say("Hi!")
+                context.{SAY}("Hi!")
 
             # You can access "ack" this way too.
             @app.action("button")
-            def handle_button_clicks(ack, say):
+            def handle_button_clicks(ack, {SAY}):
                 ack()
-                say("Hi!")
+                {SAY}("Hi!")
 
         Returns:
-            Callable `say()` function
+            Callable `{SAY}()` function
         """
-        if "say" not in self:
-            self["say"] = Say(client=self.client, channel=self.channel_id)
-        return self["say"]
+        if SAY not in self:
+            self[SAY] = Say(client=self.client, channel=self.channel_id)
+        return self[SAY]
 
     @property
     def respond(self) -> Optional[Respond]:
-        """`respond()` function for this request.
+        f"""`{RESPOND}()` function for this request.
 
             @app.action("button")
             def handle_button_clicks(context):
                 context.ack()
-                context.respond("Hi!")
+                context.{RESPOND}("Hi!")
 
             # You can access "ack" this way too.
             @app.action("button")
-            def handle_button_clicks(ack, respond):
+            def handle_button_clicks(ack, {RESPOND}):
                 ack()
-                respond("Hi!")
+                {RESPOND}("Hi!")
 
         Returns:
-            Callable `respond()` function
+            Callable `{RESPOND}()` function
         """
-        if "respond" not in self:
-            self["respond"] = Respond(
+        if RESPOND not in self:
+            self[RESPOND] = Respond(
                 response_url=self.response_url,
                 proxy=self.client.proxy,
                 ssl=self.client.ssl,
             )
-        return self["respond"]
+        return self[RESPOND]
 
     @property
-    def success(self) -> Optional[Success]:
-        """`success()` function for this request.
+    def success(self) -> Success:
+        f"""`{SUCCESS}()` function for this request.
 
             @app.function("reverse")
             def handle_button_clicks(context):
-                context.success({"stringReverse":"olleh"})
+                context.{SUCCESS}({{"stringReverse":"olleh"}})
+
+            @app.function("reverse")
+            def handle_button_clicks({SUCCESS}):
+                {SUCCESS}({{"stringReverse":"olleh"}})
 
         Returns:
-            Callable `success()` function
+            Callable `{SUCCESS}()` function
         """
-        if "success" not in self:
-            self["success"] = Success(
-                client=self.client,
-                function_execution_id=self.function_execution_id)
-        return self["success"]
+        if SUCCESS not in self:
+            self[SUCCESS] = Success(client=self.client, function_execution_id=self.function_execution_id)
+        return self[SUCCESS]
+
+    @property
+    def error(self) -> Error:
+        f"""`{ERROR}()` function for this request.
+
+            @app.function("reverse")
+            def handle_button_clicks(context):
+                context.{ERROR}("an error spawned")
+
+            @app.function("reverse")
+            def handle_button_clicks({ERROR}):
+                {ERROR}("an error spawned")
+
+        Returns:
+            Callable `{ERROR}()` function
+        """
+        if ERROR not in self:
+            self[ERROR] = Error(client=self.client, function_execution_id=self.function_execution_id)
+        return self[ERROR]

@@ -25,8 +25,7 @@ def get_entrypoint_path(working_directory):
 
 
 def execute_process(command, env):
-    with subprocess.Popen(command, env=env, stdout=subprocess.PIPE,
-                          universal_newlines=True, bufsize=1) as app_process:
+    with subprocess.Popen(command, env=env, stdout=subprocess.PIPE, universal_newlines=True, bufsize=1) as app_process:
         for line in app_process.stdout:
             yield line
 
