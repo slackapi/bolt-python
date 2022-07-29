@@ -22,7 +22,7 @@ from slack_bolt.request.payload_utils import (
     to_action,
     is_workflow_step_save,
 )
-from ..logger.messages import error_message_event_type, error_function_event_type
+from ..logger.messages import error_message_event_type
 from ..util.utils import get_arg_names_of_callable
 
 if sys.version_info.major == 3 and sys.version_info.minor <= 6:
@@ -94,7 +94,6 @@ def event(
     if isinstance(constraints, (str, Pattern)):
         event_type: Union[str, Pattern] = constraints
         _verify_message_event_type(event_type)
-        _verify_function_event_type(event_type)
 
         def func(body: Dict[str, Any]) -> bool:
             return is_event(body) and _matches(event_type, body["event"]["type"])
@@ -103,7 +102,6 @@ def event(
 
     elif "type" in constraints:
         _verify_message_event_type(constraints["type"])
-        _verify_function_event_type(constraints["type"])
 
         def func(body: Dict[str, Any]) -> bool:
             if is_event(body):
@@ -126,7 +124,6 @@ def message_event(
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     if "type" in constraints and keyword is not None:
         _verify_message_event_type(constraints["type"])
-        _verify_function_event_type(constraints["type"])
 
         def func(body: Dict[str, Any]) -> bool:
             if is_event(body):
@@ -179,13 +176,6 @@ def _verify_message_event_type(event_type: str) -> None:
         raise ValueError(error_message_event_type(event_type))
 
 
-def _verify_function_event_type(event_type: str) -> None:
-    if isinstance(event_type, str) and event_type.startswith("function_execution_id"):
-        raise ValueError(error_function_event_type(event_type))
-    if isinstance(event_type, Pattern) and "function_execution_id" in event_type.pattern:
-        raise ValueError(error_function_event_type(event_type))
-
-
 def function_event(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
@@ -193,7 +183,6 @@ def function_event(
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(body: Dict[str, Any]) -> bool:
         _verify_message_event_type(callback_id)
-        _verify_function_event_type(callback_id)
 
         return (
             is_event(body)

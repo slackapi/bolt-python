@@ -7,16 +7,16 @@ from slack_bolt.context.ack import Ack
 from slack_bolt.context.base_context import BaseContext
 from slack_bolt.context.respond import Respond
 from slack_bolt.context.say import Say
-from slack_bolt.context.success import Success
-from slack_bolt.context.error import Error
+from slack_bolt.context.complete_success import CompleteSuccess
+from slack_bolt.context.complete_error import CompleteError
 from slack_bolt.util.utils import create_copy
 
 CLIENT: str = "client"
 ACK: str = "ack"
 SAY: str = "say"
 RESPOND: str = "respond"
-ERROR: str = "error"
-SUCCESS: str = "success"
+COMPLETE_ERROR: str = "complete_error"
+COMPLETE_SUCCESS: str = "complete_success"
 
 
 class BoltContext(BaseContext):
@@ -135,39 +135,39 @@ class BoltContext(BaseContext):
         return self[RESPOND]
 
     @property
-    def success(self) -> Success:
-        f"""`{SUCCESS}()` function for this request.
+    def complete_success(self) -> CompleteSuccess:
+        f"""`{COMPLETE_SUCCESS}()` function for this request.
 
             @app.function("reverse")
             def handle_button_clicks(context):
-                context.{SUCCESS}({{"stringReverse":"olleh"}})
+                context.{COMPLETE_SUCCESS}({{"stringReverse":"olleh"}})
 
             @app.function("reverse")
-            def handle_button_clicks({SUCCESS}):
-                {SUCCESS}({{"stringReverse":"olleh"}})
+            def handle_button_clicks({COMPLETE_SUCCESS}):
+                {COMPLETE_SUCCESS}({{"stringReverse":"olleh"}})
 
         Returns:
-            Callable `{SUCCESS}()` function
+            Callable `{COMPLETE_SUCCESS}()` function
         """
-        if SUCCESS not in self:
-            self[SUCCESS] = Success(client=self.client, function_execution_id=self.function_execution_id)
-        return self[SUCCESS]
+        if COMPLETE_SUCCESS not in self:
+            self[COMPLETE_SUCCESS] = CompleteSuccess(client=self.client, function_execution_id=self.function_execution_id)
+        return self[COMPLETE_SUCCESS]
 
     @property
-    def error(self) -> Error:
-        f"""`{ERROR}()` function for this request.
+    def complete_error(self) -> CompleteError:
+        f"""`{COMPLETE_ERROR}()` function for this request.
 
             @app.function("reverse")
             def handle_button_clicks(context):
-                context.{ERROR}("an error spawned")
+                context.{COMPLETE_ERROR}("an error spawned")
 
             @app.function("reverse")
-            def handle_button_clicks({ERROR}):
-                {ERROR}("an error spawned")
+            def handle_button_clicks({COMPLETE_ERROR}):
+                {COMPLETE_ERROR}("an error spawned")
 
         Returns:
-            Callable `{ERROR}()` function
+            Callable `{COMPLETE_ERROR}()` function
         """
-        if ERROR not in self:
-            self[ERROR] = Error(client=self.client, function_execution_id=self.function_execution_id)
-        return self[ERROR]
+        if COMPLETE_ERROR not in self:
+            self[COMPLETE_ERROR] = CompleteError(client=self.client, function_execution_id=self.function_execution_id)
+        return self[COMPLETE_ERROR]

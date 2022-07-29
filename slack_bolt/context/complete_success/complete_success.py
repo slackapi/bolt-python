@@ -4,7 +4,7 @@ from slack_sdk import WebClient
 from slack_sdk.web import SlackResponse
 
 
-class Success:
+class CompleteSuccess:
     client: Optional[WebClient]
     function_execution_id: Optional[str]
 

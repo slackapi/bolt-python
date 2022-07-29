@@ -65,13 +65,6 @@ def error_message_event_type(event_type: str) -> str:
     )
 
 
-def error_function_event_type(event_type: str) -> str:
-    return (
-        f'Although the document mentions "{event_type}", '
-        'it is not a valid event type. Use "function" instead. '
-    )
-
-
 def error_installation_store_required_for_builtin_listeners() -> str:
     return (
         "To use the event listeners for token revocation handling, "
