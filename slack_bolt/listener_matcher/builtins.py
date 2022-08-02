@@ -6,6 +6,7 @@ from logging import Logger
 from slack_bolt.error import BoltError
 from slack_bolt.request.payload_utils import (
     is_block_actions,
+    is_function,
     is_global_shortcut,
     is_message_shortcut,
     is_attachment_action,
@@ -134,12 +135,7 @@ def message_event(
                 if is_valid_subtype is True:
                     # Check keyword matching
                     text = body.get("event", {}).get("text", "")
-                    print(body)
-                    print(f"keyword: {keyword}")
-                    print(f"text: {text}")
-                    print(f"text type: {type(text)}")
                     match_result = re.findall(keyword, text)
-                    print(f"match_result: {match_result}")
                     if match_result is not None and match_result != []:
                         return True
             return False
@@ -189,12 +185,7 @@ def function_event(
     def func(body: Dict[str, Any]) -> bool:
         _verify_message_event_type(callback_id)
 
-        return (
-            is_event(body)
-            and _matches("function_executed", body.get("event", {}).get("type", ""))
-            and "function_execution_id" in body.get("event", {})
-            and _matches(callback_id, body.get("event", {}).get("function", {}).get("callback_id", ""))
-        )
+        return is_function(body) and _matches(callback_id, body.get("event", {}).get("function", {}).get("callback_id", ""))
 
     return build_listener_matcher(func, asyncio, base_logger)
 
