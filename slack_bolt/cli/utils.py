@@ -1,7 +1,3 @@
-class CliError(Exception):
-    pass
-
-
 def handle_exception(func):
     def wrapper(*args, **kwargs):
         try:

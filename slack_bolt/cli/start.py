@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import os
 import subprocess
-from .hook_utils.errors import handle_exception, CliError
+from .error import CliError
+from .utils import handle_exception
 
 
 DEFAULT_ENTRYPOINT_FILE = "app.py"
