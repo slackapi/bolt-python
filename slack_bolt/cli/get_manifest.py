@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 import os
-from .hook_utils.errors import handle_exception, CliError
+from .error import CliError
+from .utils import handle_exception
 
 
 file_name = "manifest"
 json_file_name = f"{file_name}.json"
-# py_file_name = "{file_name}.py"
 
 
 @handle_exception
