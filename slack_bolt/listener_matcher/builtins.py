@@ -134,7 +134,12 @@ def message_event(
                 if is_valid_subtype is True:
                     # Check keyword matching
                     text = body.get("event", {}).get("text", "")
+                    print(body)
+                    print(f"keyword: {keyword}")
+                    print(f"text: {text}")
+                    print(f"text type: {type(text)}")
                     match_result = re.findall(keyword, text)
+                    print(f"match_result: {match_result}")
                     if match_result is not None and match_result != []:
                         return True
             return False
