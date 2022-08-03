@@ -13,7 +13,7 @@ class TestGetHooks:
         out, err = capsys.readouterr()
         json_response = json.loads(out)
         # then
-        assert err is None
+        assert err is ""
         assert "hooks" in json_response
         assert get_manifest_module in json_response["hooks"]["get-manifest"]
 
@@ -26,6 +26,6 @@ class TestGetHooks:
         out, err = capsys.readouterr()
         json_response = json.loads(out)
         # then
-        assert err is None
+        assert err is ""
         assert "hooks" in json_response
         assert start_module in json_response["hooks"]["start"]

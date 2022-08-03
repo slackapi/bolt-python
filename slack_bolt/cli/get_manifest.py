@@ -4,8 +4,7 @@ from .error import CliError
 from .utils import handle_exception
 
 
-file_name = "manifest"
-json_file_name = f"{file_name}.json"
+json_file_name = "manifest.json"
 
 
 @handle_exception
