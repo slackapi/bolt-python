@@ -183,8 +183,6 @@ def function_event(
     base_logger: Optional[Logger] = None,
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(body: Dict[str, Any]) -> bool:
-        _verify_message_event_type(callback_id)
-
         return is_function(body) and _matches(callback_id, body.get("event", {}).get("function", {}).get("callback_id", ""))
 
     return build_listener_matcher(func, asyncio, base_logger)

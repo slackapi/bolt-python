@@ -18,12 +18,15 @@ class CompleteError:
 
     def __call__(
         self,
-        message: Union[str, dict],
+        message: str,
     ) -> SlackResponse:
         if self._can_complete():
-            return self.client.api_call(
-                "functions.completeError", json={"error": message, "function_execution_id": self.function_execution_id}
-            )
+            if isinstance(message, str):
+                # TODO add this new api call to the sdk and use it here
+                return self.client.api_call(
+                    "functions.completeError", json={"error": message, "function_execution_id": self.function_execution_id}
+                )
+            raise ValueError(f"The message arg is unexpected type ({type(message)})")
         else:
             raise ValueError("error is unsupported here as there is no function_execution_id")
 

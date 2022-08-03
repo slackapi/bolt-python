@@ -21,9 +21,13 @@ class CompleteSuccess:
         outputs: Union[str, dict],
     ) -> SlackResponse:
         if self._can_complete():
-            return self.client.api_call(
-                "functions.completeSuccess", json={"outputs": outputs, "function_execution_id": self.function_execution_id}
-            )
+            if isinstance(outputs, dict) or isinstance(outputs, str):
+                # TODO add this new api call to the sdk and use it here
+                return self.client.api_call(
+                    "functions.completeSuccess",
+                    json={"outputs": outputs, "function_execution_id": self.function_execution_id},
+                )
+            raise ValueError(f"The outputs arg is unexpected type ({type(outputs)})")
         else:
             raise ValueError("success is unsupported here as there is no function_execution_id")
 

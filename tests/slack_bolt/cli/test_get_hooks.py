@@ -7,27 +7,25 @@ class TestGetHooks:
     def test_get_manifest(self, capsys):
         # given
         get_manifest_module = get_manifest.__name__
-
         # when
         get_hooks.main()
 
-        # then
         out, err = capsys.readouterr()
-        json_payload = json.loads(out)
-
-        assert "hooks" in json_payload
-        assert get_manifest_module in json_payload["hooks"]["get-manifest"]
+        json_response = json.loads(out)
+        # then
+        assert err is None
+        assert "hooks" in json_response
+        assert get_manifest_module in json_response["hooks"]["get-manifest"]
 
     def test_start(self, capsys):
         # given
         start_module = start.__name__
-
         # when
         get_hooks.main()
 
-        # then
         out, err = capsys.readouterr()
-        json_payload = json.loads(out)
-
-        assert "hooks" in json_payload
-        assert start_module in json_payload["hooks"]["start"]
+        json_response = json.loads(out)
+        # then
+        assert err is None
+        assert "hooks" in json_response
+        assert start_module in json_response["hooks"]["start"]
