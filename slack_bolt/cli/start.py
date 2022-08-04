@@ -13,9 +13,9 @@ SLACK_CLI_XAPP = "SLACK_CLI_XAPP"
 
 def validate_env():
     if not os.environ[SLACK_CLI_XOXB]:
-        raise CliError("Missing local run bot token. Please see slack-cli maintainers to troubleshoot.")
+        raise CliError(f"Missing local run bot token ({SLACK_CLI_XOXB}). Please see slack-cli maintainers to troubleshoot.")
     if not os.environ[SLACK_CLI_XAPP]:
-        raise CliError("Missing local run app token. Please see slack-cli maintainers to troubleshoot.")
+        raise CliError(f"Missing local run app token ({SLACK_CLI_XAPP}). Please see slack-cli maintainers to troubleshoot.")
 
 
 def get_entrypoint_path(working_directory):
