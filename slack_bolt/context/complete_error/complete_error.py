@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional
 
 from slack_sdk import WebClient
 from slack_sdk.web import SlackResponse
