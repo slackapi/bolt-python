@@ -19,25 +19,20 @@ class TestCompleteSuccess:
         cleanup_mock_web_api_server(self)
 
     def test_complete_success(self):
-        # given
         complete_success = CompleteSuccess(client=self.web_client, function_execution_id="fn1111")
-        # when
+
         response = complete_success(outputs={"key": "value"})
-        # then
+
         assert response.status_code == 200
 
     def test_complete_success_invalid_outputs(self):
-        # given
         complete_success = CompleteSuccess(client=self.web_client, function_execution_id="fn1111")
-        # then
+
         with pytest.raises(ValueError):
-            # when
             complete_success([])
 
     def test_complete_success_invalid_id(self):
-        # given
         complete_success = CompleteSuccess(client=self.web_client, function_execution_id=None)
-        # then
+
         with pytest.raises(ValueError):
-            # when
             complete_success(outputs={"key": "value"})

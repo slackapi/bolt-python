@@ -20,25 +20,20 @@ class TestCompleteError:
         cleanup_mock_web_api_server(self)
 
     def test_complete_error(self):
-        # given
         complete_error = CompleteError(client=self.web_client, function_execution_id="fn1111")
-        # when
+
         response = complete_error(message="something went wrong")
-        # then
+
         assert response.status_code == 200
 
     def test_complete_error_invalid_args(self):
-        # given
         complete_error = CompleteError(client=self.web_client, function_execution_id="fn1111")
-        # then
+
         with pytest.raises(ValueError):
-            # when
             complete_error([])
 
     def test_complete_error_invalid_id(self):
-        # given
         complete_error = CompleteError(client=self.web_client, function_execution_id=None)
-        # then
+
         with pytest.raises(ValueError):
-            # when
             complete_error(message="something went wrong")

@@ -58,10 +58,8 @@ class TestFunction:
 
         request = self.build_request_from_body(function_body)
         response = app.dispatch(request)
-        print(response.body)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/functions.completeSuccess"] == 1
 
     def test_valid_callback_id_error(self):
@@ -75,7 +73,6 @@ class TestFunction:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/functions.completeError"] == 1
 
     def test_invalid_callback_id(self):
