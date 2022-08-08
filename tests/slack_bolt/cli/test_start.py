@@ -5,6 +5,9 @@ from slack_bolt.cli.start import start
 
 
 class TestStart:
+
+    working_directory = "tests/slack_bolt/cli/test_app"
+
     def setup_method(self, method):
         os.environ["SLACK_CLI_XOXB"] = "xoxb-xxx"
         os.environ["SLACK_CLI_XAPP"] = "xapp-xxx"
@@ -15,19 +18,16 @@ class TestStart:
         os.environ.pop("SLACK_CLI_CUSTOM_FILE_PATH", None)
 
     def test_start(self, capsys):
-        working_directory = "tests/slack_bolt/cli/test_directory"
-
-        start(working_directory)
+        start(self.working_directory)
 
         out, err = capsys.readouterr()
         assert err is ""
         assert "app.py ran" in out
 
     def test_start_with_entrypoint(self, capsys):
-        working_directory = "tests/slack_bolt/cli/test_directory"
         os.environ["SLACK_CLI_CUSTOM_FILE_PATH"] = "my_app.py"
 
-        start(working_directory)
+        start(self.working_directory)
 
         out, err = capsys.readouterr()
         assert err is ""

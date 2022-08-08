@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-from .error import CliError
+from ..error import CliError
 from .utils import handle_exception
 
 

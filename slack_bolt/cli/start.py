@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 import subprocess
-from .error import CliError
+from ..error import CliError
 from .utils import handle_exception
 
 
