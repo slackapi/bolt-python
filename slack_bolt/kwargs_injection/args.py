@@ -72,9 +72,9 @@ class Args:
     respond: Respond
     """`respond()` utility function, which utilizes the associated `response_url`"""
     complete_success: CompleteSuccess
-    """`complete_success()` utility function, which returns a successful function response to the Slack servers, utilizes the associated `function_execution_id`"""
+    """`complete_success()` utility function, which returns a successful function response to the Slack servers"""
     complete_error: CompleteError
-    """`complete_error()` utility function, which returns a function error response to the Slack servers, utilizes the associated `function_execution_id`"""
+    """`complete_error()` utility function, which returns a function error response to the Slack servers"""
     # middleware
     next: Callable[[], None]
     """`next()` utility function, which tells the middleware chain that it can continue with the next one"""
