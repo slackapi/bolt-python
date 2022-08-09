@@ -27,9 +27,9 @@ class CompleteSuccess:
                     "functions.completeSuccess",
                     json={"outputs": outputs, "function_execution_id": self.function_execution_id},
                 )
-            raise ValueError(f"The outputs arg is unexpected type ({type(outputs)})")
+            raise ValueError(f"The outputs arg is unexpected type ({type(outputs)}) expecting dict or str")
         else:
-            raise ValueError("success is unsupported here as there is no function_execution_id")
+            raise ValueError("complete_success is unsupported here as there is no function_execution_id")
 
     def _can_complete(self) -> bool:
         return hasattr(self, "client") and self.client is not None and self.function_execution_id is not None

@@ -26,9 +26,9 @@ class CompleteError:
                 return self.client.api_call(
                     "functions.completeError", json={"error": message, "function_execution_id": self.function_execution_id}
                 )
-            raise ValueError(f"The message arg is unexpected type ({type(message)})")
+            raise ValueError(f"The message arg is unexpected type ({type(message)}) expecting str")
         else:
-            raise ValueError("error is unsupported here as there is no function_execution_id")
+            raise ValueError("complete_error is unsupported here as there is no function_execution_id")
 
     def _can_complete(self) -> bool:
         return hasattr(self, "client") and self.client is not None and self.function_execution_id is not None
