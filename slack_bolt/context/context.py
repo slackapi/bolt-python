@@ -44,7 +44,7 @@ class BoltContext(BaseContext):
     def client(self) -> Optional[WebClient]:
         f"""The `WebClient` instance available for this request.
 
-            @app.{CLIENT}("app_mention")
+            @app.event("app_mention")
             def handle_events(context):
                 context.{CLIENT}.chat_postMessage(
                     channel=context.channel_id,
