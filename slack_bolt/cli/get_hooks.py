@@ -14,5 +14,5 @@ hook_payload = {
 }
 
 
-def main():
+def main() -> None:
     print(json.dumps(hook_payload))
