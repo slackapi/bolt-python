@@ -1,20 +1,47 @@
 #!/usr/bin/env python
 import os
-from .hook_utils.errors import handle_exception, CliError
+import re
+from ..error import CliError
+from .utils import handle_exception
+from typing import List
+
+FILE = "manifest"
+
+EXPLICIT_EXCLUDED_DIRECTORIES = [
+    "lib",
+    "bin",
+    "include",
+    "node_modules",
+    "packages",
+    "logs",
+    "build",
+    "coverage",
+    "target",
+    "tmp",
+    "test",
+    "tests",
+]
+
+DIRECTORY_IGNORE_REGEX = re.compile(r"(^\.|^\_|^{}$)".format("$|^".join(EXPLICIT_EXCLUDED_DIRECTORIES)), re.IGNORECASE)
 
 
-file_name = "manifest"
-json_file_name = f"{file_name}.json"
-# py_file_name = "{file_name}.py"
+def filter_directories(directories: List[str]) -> List[str]:
+    return [directory for directory in directories if not DIRECTORY_IGNORE_REGEX.match(directory)]
 
 
-@handle_exception
-def get_manifest(working_directory):
-    file_path = f"{working_directory}/{json_file_name}"
+def find_file_path(path: str, file: str) -> str:
+    for root, dirs, files in os.walk(path, topdown=True, followlinks=False):
+        dirs[:] = filter_directories(dirs)
+        if file in files:
+            return os.path.join(root, file)
+    raise CliError(f"Manifest file not found!\nPath: {path}\nFile: {file}")
 
-    if not os.path.exists(file_path):
-        raise CliError(f"Manifest file not found!\nPath: {file_path}")
 
+@handle_exception()
+def get_manifest(working_directory: str) -> str:
+    file_path = find_file_path(working_directory, f"{FILE}.json")
+
+    print(file_path)
     with open(file_path, "r") as manifest:
         return manifest.read()
 

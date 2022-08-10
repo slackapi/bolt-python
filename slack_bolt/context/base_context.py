@@ -25,10 +25,13 @@ class BaseContext(dict):
         "bot_id",
         "bot_user_id",
         "user_token",
+        "function_execution_id",
         "client",
         "ack",
         "say",
         "respond",
+        "complete_success",
+        "complete_error",
     ]
 
     @property
@@ -70,6 +73,11 @@ class BaseContext(dict):
     def response_url(self) -> Optional[str]:
         """The `response_url` associated with this request."""
         return self.get("response_url")
+
+    @property
+    def function_execution_id(self) -> Optional[str]:
+        """The `function_execution_id` associated with this request."""
+        return self.get("function_execution_id")
 
     @property
     def matches(self) -> Optional[Tuple]:
