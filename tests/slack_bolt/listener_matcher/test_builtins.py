@@ -8,6 +8,7 @@ from slack_bolt.listener_matcher.builtins import (
     action,
     workflow_step_execute,
     event,
+    function_event,
     shortcut,
 )
 

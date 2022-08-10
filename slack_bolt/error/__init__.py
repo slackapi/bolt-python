@@ -23,3 +23,7 @@ class BoltUnhandledRequestError(BoltError):
         self.body = request.body if request is not None else {}
         self.current_response = current_response
         self.last_global_middleware_name = last_global_middleware_name
+
+
+class CliError(Exception):
+    """General class for cli error"""
