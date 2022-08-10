@@ -8,15 +8,11 @@ hook_payload = {
         "start": "python -m slack_bolt.cli.start",
     },
     "config": {
-        "watch": {
-            "filter-regex": "^manifest\\.(ts|js|json)$",
-            "paths": [
-                "."
-            ]
-        },
+        "watch": {"filter-regex": "^manifest\\.(json)$", "paths": ["."]},
         "sdk-managed-connection-enabled": True,
-    }
+    },
 }
 
-if __name__ == "__main__":
+
+def main() -> None:
     print(json.dumps(hook_payload))
