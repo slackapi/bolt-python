@@ -7,6 +7,7 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.request.payload_utils import (
     is_action,
     is_event,
+    is_function,
     is_options,
     is_shortcut,
     is_slash_command,
@@ -14,6 +15,16 @@ from slack_bolt.request.payload_utils import (
     is_workflow_step_edit,
     is_workflow_step_save,
     is_workflow_step_execute,
+)
+from .warning_utils import (
+    get_event_code_snippet,
+    get_function_code_snippet,
+    get_shortcut_code_snippet,
+    get_slash_command_code_snippet,
+    get_workflow_step_code_snippet,
+    get_action_code_snippet,
+    get_options_code_snippet,
+    get_view_code_snippet,
 )
 
 # -------------------------------
@@ -186,33 +197,14 @@ def warning_unhandled_request(  # type: ignore
             or filtered_body.get("view", {}).get("callback_id")  # type: ignore
             or "your-callback-id"
         )
-        return _build_unhandled_request_suggestion(
-            default_message,
-            f"""
-from slack_bolt.workflows.step{'.async_step' if is_async else ''} import {'Async' if is_async else ''}WorkflowStep
-ws = {'Async' if is_async else ''}WorkflowStep(
-    callback_id="{callback_id}",
-    edit=edit,
-    save=save,
-    execute=execute,
-)
-# Pass Step to set up listeners
-app.step(ws)
-""",
-        )
+        return _build_unhandled_request_suggestion(default_message, get_workflow_step_code_snippet(is_async, callback_id))
     if is_action(req.body):
         # @app.action
         action_id_or_callback_id = req.body.get("callback_id")
         if req.body.get("type") == "block_actions":
             action_id_or_callback_id = req.body.get("actions")[0].get("action_id")
         return _build_unhandled_request_suggestion(
-            default_message,
-            f"""
-@app.action("{action_id_or_callback_id}")
-{'async ' if is_async else ''}def handle_some_action(ack, body, logger):
-    {'await ' if is_async else ''}ack()
-    logger.info(body)
-""",
+            default_message, get_action_code_snippet(is_async, action_id_or_callback_id)
         )
     if is_options(req.body):
         # @app.options
@@ -221,59 +213,31 @@ app.step(ws)
             constraints = '"' + req.body.get("action_id") + '"'
         elif req.body.get("type") == "dialog_suggestion":
             constraints = f"""{{"type": "dialog_suggestion", "callback_id": "{req.body.get('callback_id')}"}}"""
-        return _build_unhandled_request_suggestion(
-            default_message,
-            f"""
-@app.options({constraints})
-{'async ' if is_async else ''}def handle_some_options(ack):
-    {'await ' if is_async else ''}ack(options=[ ... ])
-""",
-        )
+        return _build_unhandled_request_suggestion(default_message, get_options_code_snippet(is_async, constraints))
     if is_shortcut(req.body):
         # @app.shortcut
         id = req.body.get("action_id") or req.body.get("callback_id")
-        return _build_unhandled_request_suggestion(
-            default_message,
-            f"""
-@app.shortcut("{id}")
-{'async ' if is_async else ''}def handle_shortcuts(ack, body, logger):
-    {'await ' if is_async else ''}ack()
-    logger.info(body)
-""",
-        )
+        return _build_unhandled_request_suggestion(default_message, get_shortcut_code_snippet(is_async, id))
     if is_view(req.body):
         # @app.view
         return _build_unhandled_request_suggestion(
-            default_message,
-            f"""
-@app.view("{req.body.get('view', {}).get('callback_id', 'modal-view-id')}")
-{'async ' if is_async else ''}def handle_view_events(ack, body, logger):
-    {'await ' if is_async else ''}ack()
-    logger.info(body)
-""",
+            default_message, get_view_code_snippet(is_async, req.body.get("view", {}).get("callback_id", "modal-view-id"))
         )
     if is_event(req.body):
         # @app.event
-        event_type = req.body.get("event", {}).get("type")
-        return _build_unhandled_request_suggestion(
-            default_message,
-            f"""
-@app.event("{event_type}")
-{'async ' if is_async else ''}def handle_{event_type}_events(body, logger):
-    logger.info(body)
-""",
-        )
+        event = req.body.get("event", {})
+        event_type = event.get("type")
+        if is_function(req.body):
+            # @app.function
+            callback_id = event.get("function", {}).get("callback_id", "function_id")
+            return _build_unhandled_request_suggestion(default_message, get_function_code_snippet(is_async, callback_id))
+        return _build_unhandled_request_suggestion(default_message, get_event_code_snippet(is_async, event_type))
     if is_slash_command(req.body):
         # @app.command
         command = req.body.get("command", "/your-command")
         return _build_unhandled_request_suggestion(
             default_message,
-            f"""
-@app.command("{command}")
-{'async ' if is_async else ''}def handle_some_command(ack, body, logger):
-    {'await ' if is_async else ''}ack()
-    logger.info(body)
-""",
+            get_slash_command_code_snippet(is_async, command),
         )
     return default_message
 

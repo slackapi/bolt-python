@@ -127,6 +127,14 @@ def extract_channel_id(payload: Dict[str, Any]) -> Optional[str]:
     return None
 
 
+def extract_function_execution_id(payload: Dict[str, Any]) -> Optional[str]:
+    if payload.get("function_execution_id") is not None:
+        return payload.get("function_execution_id")
+    if payload.get("event") is not None:
+        return extract_function_execution_id(payload["event"])
+    return None
+
+
 def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
     context["is_enterprise_install"] = extract_is_enterprise_install(body)
     enterprise_id = extract_enterprise_id(body)
@@ -141,6 +149,9 @@ def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
     channel_id = extract_channel_id(body)
     if channel_id:
         context["channel_id"] = channel_id
+    function_execution_id = extract_function_execution_id(body)
+    if function_execution_id:
+        context["function_execution_id"] = function_execution_id
     if "response_url" in body:
         context["response_url"] = body["response_url"]
     elif "response_urls" in body:
