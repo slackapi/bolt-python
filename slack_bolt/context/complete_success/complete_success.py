@@ -2,6 +2,7 @@ from typing import Optional, Union
 
 from slack_sdk import WebClient
 from slack_sdk.web import SlackResponse
+from slack_bolt.context.complete_success.internals import _can_complete
 
 
 class CompleteSuccess:
@@ -20,7 +21,7 @@ class CompleteSuccess:
         self,
         outputs: Union[str, dict],
     ) -> SlackResponse:
-        if self._can_complete():
+        if _can_complete(self):
             if isinstance(outputs, dict) or isinstance(outputs, str):
                 # TODO add this new api call to the sdk and use it here
                 return self.client.api_call(
@@ -30,6 +31,3 @@ class CompleteSuccess:
             raise ValueError(f"The outputs arg is unexpected type ({type(outputs)}) expecting dict or str")
         else:
             raise ValueError("complete_success is unsupported here as there is no function_execution_id")
-
-    def _can_complete(self) -> bool:
-        return hasattr(self, "client") and self.client is not None and self.function_execution_id is not None
