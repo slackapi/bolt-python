@@ -30,6 +30,3 @@ class CompleteError:
             raise ValueError(f"The message arg is unexpected type ({type(message)}) expecting str")
         else:
             raise ValueError("complete_error is unsupported here as there is no function_execution_id")
-
-    def _can_complete(self) -> bool:
-        return hasattr(self, "client") and self.client is not None and self.function_execution_id is not None

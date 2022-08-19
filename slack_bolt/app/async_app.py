@@ -837,7 +837,7 @@ class AsyncApp:
 
             # Use this method as a decorator
             @app.function("reverse")
-            async def reverse_string(event, complete_success: CompleteSuccess, complete_error: CompleteError):
+            async def reverse_string(event, complete_success: AsyncCompleteSuccess, complete_error: AsyncCompleteError):
                 try:
                     string_to_reverse = event["inputs"]["stringToReverse"]
                     await complete_success({
