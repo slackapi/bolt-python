@@ -24,6 +24,11 @@ def event_test(body, say, logger):
 def say_something_to_reaction(say):
     say("OK!")
 
+    
+@app.event("message")
+def log_message_event(logger, body)
+    logger.info(body)
+
 
 @app.message("test")
 def test_message(logger, body):
