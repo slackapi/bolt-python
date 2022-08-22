@@ -36,7 +36,7 @@ def mention_bug(logger, body):
 
 
 @app.event("message")
-def ack_the_rest_of_message_events(logger, body)
+def ack_the_rest_of_message_events(logger, body):
     logger.info(body)
 
 
