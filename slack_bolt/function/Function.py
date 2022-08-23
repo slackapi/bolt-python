@@ -56,13 +56,10 @@ class _Function:
         *args,
         **kwargs,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
-
-        print("register function")
         functions = _to_listener_functions(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.function_event(
-            callback_id=self.callback_id, base_logger=None)  # TDOD logger is None
+            callback_id=self.callback_id, base_logger=None)  # TODO logger is None
         self.function_listener = Listener(list(functions), primary_matcher, self.matchers, self.middleware, True)
-        print(self.function_listener)
         return self
 
     def action(
