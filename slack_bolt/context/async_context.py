@@ -6,7 +6,16 @@ from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.context.base_context import BaseContext
 from slack_bolt.context.respond.async_respond import AsyncRespond
 from slack_bolt.context.say.async_say import AsyncSay
+from slack_bolt.context.complete_error.async_complete_error import AsyncCompleteError
+from slack_bolt.context.complete_success.async_complete_success import AsyncCompleteSuccess
 from slack_bolt.util.utils import create_copy
+
+CLIENT: str = "client"
+ACK: str = "ack"
+SAY: str = "say"
+RESPOND: str = "respond"
+COMPLETE_ERROR: str = "complete_error"
+COMPLETE_SUCCESS: str = "complete_success"
 
 
 class AsyncBoltContext(BaseContext):
@@ -31,19 +40,19 @@ class AsyncBoltContext(BaseContext):
 
     @property
     def client(self) -> Optional[AsyncWebClient]:
-        """The `AsyncWebClient` instance available for this request.
+        f"""The `AsyncWebClient` instance available for this request.
 
             @app.event("app_mention")
             async def handle_events(context):
-                await context.client.chat_postMessage(
+                await context.{CLIENT}.chat_postMessage(
                     channel=context.channel_id,
                     text="Thanks!",
                 )
 
-            # You can access "client" this way too.
+            # You can access "{CLIENT}" this way too.
             @app.event("app_mention")
-            async def handle_events(client, context):
-                await client.chat_postMessage(
+            async def handle_events({CLIENT}, context):
+                await {CLIENT}.chat_postMessage(
                     channel=context.channel_id,
                     text="Thanks!",
                 )
@@ -51,74 +60,114 @@ class AsyncBoltContext(BaseContext):
         Returns:
             `AsyncWebClient` instance
         """
-        if "client" not in self:
-            self["client"] = AsyncWebClient(token=None)
-        return self["client"]
+        if CLIENT not in self:
+            self[CLIENT] = AsyncWebClient(token=None)
+        return self[CLIENT]
 
     @property
     def ack(self) -> AsyncAck:
-        """`ack()` function for this request.
+        f"""`{ACK}()` function for this request.
 
             @app.action("button")
             async def handle_button_clicks(context):
-                await context.ack()
+                await context.{ACK}()
 
-            # You can access "ack" this way too.
+            # You can access "{ACK}" this way too.
             @app.action("button")
-            async def handle_button_clicks(ack):
-                await ack()
+            async def handle_button_clicks({ACK}):
+                await {ACK}()
 
         Returns:
-            Callable `ack()` function
+            Callable `{ACK}()` function
         """
-        if "ack" not in self:
-            self["ack"] = AsyncAck()
-        return self["ack"]
+        if ACK not in self:
+            self[ACK] = AsyncAck()
+        return self[ACK]
 
     @property
     def say(self) -> AsyncSay:
-        """`say()` function for this request.
+        f"""`{SAY}()` function for this request.
 
             @app.action("button")
             async def handle_button_clicks(context):
-                await context.ack()
-                await context.say("Hi!")
+                await context.{ACK}()
+                await context.{SAY}("Hi!")
 
-            # You can access "ack" this way too.
+            # You can access "{ACK}" this way too.
             @app.action("button")
-            async def handle_button_clicks(ack, say):
-                await ack()
-                await say("Hi!")
+            async def handle_button_clicks({ACK}, {SAY}):
+                await {ACK}()
+                await {SAY}("Hi!")
 
         Returns:
-            Callable `say()` function
+            Callable `{SAY}()` function
         """
-        if "say" not in self:
-            self["say"] = AsyncSay(client=self.client, channel=self.channel_id)
-        return self["say"]
+        if SAY not in self:
+            self[SAY] = AsyncSay(client=self.client, channel=self.channel_id)
+        return self[SAY]
 
     @property
     def respond(self) -> Optional[AsyncRespond]:
-        """`respond()` function for this request.
+        f"""`{RESPOND}()` function for this request.
 
             @app.action("button")
             async def handle_button_clicks(context):
-                await context.ack()
-                await context.respond("Hi!")
+                await context.{ACK}()
+                await context.{RESPOND}("Hi!")
 
-            # You can access "ack" this way too.
+            # You can access "{ACK}" this way too.
             @app.action("button")
-            async def handle_button_clicks(ack, respond):
-                await ack()
-                await respond("Hi!")
+            async def handle_button_clicks({ACK}, {RESPOND}):
+                await {ACK}()
+                await {RESPOND}("Hi!")
 
         Returns:
-            Callable `respond()` function
+            Callable `{RESPOND}()` function
         """
-        if "respond" not in self:
-            self["respond"] = AsyncRespond(
+        if RESPOND not in self:
+            self[RESPOND] = AsyncRespond(
                 response_url=self.response_url,
                 proxy=self.client.proxy,
                 ssl=self.client.ssl,
             )
-        return self["respond"]
+        return self[RESPOND]
+
+    @property
+    def complete_success(self) -> AsyncCompleteSuccess:
+        f"""`{COMPLETE_SUCCESS}()` function for this request.
+
+            @app.function("reverse")
+            async def handle_button_clicks(context):
+                await context.{COMPLETE_SUCCESS}({{"stringReverse":"olleh"}})
+
+            @app.function("reverse")
+            async def handle_button_clicks({COMPLETE_SUCCESS}):
+                await {COMPLETE_SUCCESS}({{"stringReverse":"olleh"}})
+
+        Returns:
+            Callable `{COMPLETE_SUCCESS}()` function
+        """
+        if COMPLETE_SUCCESS not in self:
+            self[COMPLETE_SUCCESS] = AsyncCompleteSuccess(
+                client=self.client, function_execution_id=self.function_execution_id
+            )
+        return self[COMPLETE_SUCCESS]
+
+    @property
+    def complete_error(self) -> AsyncCompleteError:
+        f"""`{COMPLETE_ERROR}()` function for this request.
+
+            @app.function("reverse")
+            async def handle_button_clicks(context):
+                await context.{COMPLETE_ERROR}("an error spawned")
+
+            @app.function("reverse")
+            async def handle_button_clicks({COMPLETE_ERROR}):
+                await {COMPLETE_ERROR}("an error spawned")
+
+        Returns:
+            Callable `{COMPLETE_ERROR}()` function
+        """
+        if COMPLETE_ERROR not in self:
+            self[COMPLETE_ERROR] = AsyncCompleteError(client=self.client, function_execution_id=self.function_execution_id)
+        return self[COMPLETE_ERROR]
