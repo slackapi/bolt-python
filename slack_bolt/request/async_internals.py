@@ -7,6 +7,7 @@ from slack_bolt.request.internals import (
     extract_team_id,
     extract_user_id,
     extract_channel_id,
+    extract_function_execution_id,
     debug_multiple_response_urls_detected,
 )
 
@@ -28,6 +29,9 @@ def build_async_context(
     channel_id = extract_channel_id(body)
     if channel_id:
         context["channel_id"] = channel_id
+    function_execution_id = extract_function_execution_id(body)
+    if function_execution_id:
+        context["function_execution_id"] = function_execution_id
     if "response_url" in body:
         context["response_url"] = body["response_url"]
     elif "response_urls" in body:
