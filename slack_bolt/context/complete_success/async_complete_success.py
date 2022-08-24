@@ -1,30 +1,30 @@
 from typing import Optional, Union
 
-from slack_sdk import WebClient
-from slack_sdk.web import SlackResponse
+from slack_sdk.web.async_client import AsyncWebClient
+from slack_sdk.web.async_slack_response import AsyncSlackResponse
 from slack_bolt.context.complete_success.internals import _can_complete
 
 
-class CompleteSuccess:
-    client: Optional[WebClient]
+class AsyncCompleteSuccess:
+    client: Optional[AsyncWebClient]
     function_execution_id: Optional[str]
 
     def __init__(
         self,
-        client: Optional[WebClient],
+        client: Optional[AsyncWebClient],
         function_execution_id: Optional[str],
     ):
         self.client = client
         self.function_execution_id = function_execution_id
 
-    def __call__(
+    async def __call__(
         self,
         outputs: Union[str, dict],
-    ) -> SlackResponse:
+    ) -> AsyncSlackResponse:
         if _can_complete(self):
             if isinstance(outputs, dict) or isinstance(outputs, str):
                 # TODO add this new api call to the sdk and use it here
-                return self.client.api_call(
+                return await self.client.api_call(
                     "functions.completeSuccess",
                     json={"outputs": outputs, "function_execution_id": self.function_execution_id},
                 )
