@@ -19,7 +19,6 @@ from slack_bolt.authorization.authorize import (
     CallableAuthorize,
 )
 from slack_bolt.error import BoltError, BoltUnhandledRequestError
-from ..function.Function import _Function
 from slack_bolt.lazy_listener.thread_runner import ThreadLazyListenerRunner
 from slack_bolt.listener.builtins import TokenRevocationListeners
 from slack_bolt.listener.custom_listener import CustomListener
@@ -83,7 +82,6 @@ from slack_bolt.util.utils import (
 from slack_bolt.workflows.step import WorkflowStep, WorkflowStepMiddleware
 from slack_bolt.workflows.step.step import WorkflowStepBuilder
 
-from functools import singledispatchmethod
 
 class App:
     def __init__(
@@ -794,28 +792,9 @@ class App:
 
         return __call__
 
-    # TODO not ideal because cant display the preview
-    @singledispatchmethod
-    def function(self, arg) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
-        raise NotImplementedError("Type not accepted for this function")
-
-    @function.register
-    def _(
+    def function(
         self,
-        function: _Function
-    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
-        return self._register_listener(
-            function.function_listener.functions,
-            function.function_listener.primary_matcher,
-            function.function_listener.matchers,
-            function.function_listener.middleware,
-            function.function_listener.auto_acknowledgement
-        )
-
-    @function.register
-    def _(
-        self,
-        callback_id: str,
+        callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
