@@ -2,6 +2,7 @@ import inspect
 import logging
 import os
 import time
+import warnings
 from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable, Sequence
 
 from aiohttp import web
@@ -24,6 +25,7 @@ from slack_bolt.middleware.message_listener_matches.async_message_listener_match
 )
 from slack_bolt.oauth.async_internals import select_consistent_installation_store
 from slack_bolt.util.utils import get_name_for_callable
+from slack_bolt.warning import BoltCodeWarning
 from slack_bolt.workflows.step.async_step import (
     AsyncWorkflowStep,
     AsyncWorkflowStepBuilder,
@@ -517,7 +519,9 @@ class AsyncApp:
                                 response=resp,
                             )
                             return resp
-                        self._framework_logger.warning(warning_unhandled_by_global_middleware(middleware.name, req))
+                        # In most cases, this could be a coding error, but it can be intentional for some reason
+                        # So we use BoltCodeWarning for it
+                        warnings.warn(warning_unhandled_by_global_middleware(middleware.name, req), BoltCodeWarning)
                         return resp
                     return resp
 
@@ -582,7 +586,8 @@ class AsyncApp:
             return resp
 
     def _handle_unmatched_requests(self, req: AsyncBoltRequest, resp: BoltResponse) -> BoltResponse:
-        self._framework_logger.warning(warning_unhandled_request(req))
+        # This warning is helpful in coding phase, but for production operations
+        warnings.warn(warning_unhandled_request(req), BoltCodeWarning)
         return resp
 
     # -------------------------

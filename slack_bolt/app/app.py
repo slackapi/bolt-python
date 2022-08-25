@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import time
+import warnings
 from concurrent.futures import Executor
 from concurrent.futures.thread import ThreadPoolExecutor
 from http.server import SimpleHTTPRequestHandler, HTTPServer
@@ -79,6 +80,7 @@ from slack_bolt.util.utils import (
     get_boot_message,
     get_name_for_callable,
 )
+from slack_bolt.warning import BoltCodeWarning
 from slack_bolt.workflows.step import WorkflowStep, WorkflowStepMiddleware
 from slack_bolt.workflows.step.step import WorkflowStepBuilder
 
@@ -491,7 +493,9 @@ class App:
                                 response=resp,
                             )
                             return resp
-                        self._framework_logger.warning(warning_unhandled_by_global_middleware(middleware.name, req))
+                        # In most cases, this could be a coding error, but it can be intentional for some reason
+                        # So we use BoltCodeWarning for it
+                        warnings.warn(warning_unhandled_by_global_middleware(middleware.name, req), BoltCodeWarning)
                         return resp
                     return resp
 
@@ -552,7 +556,8 @@ class App:
             return resp
 
     def _handle_unmatched_requests(self, req: BoltRequest, resp: BoltResponse) -> BoltResponse:
-        self._framework_logger.warning(warning_unhandled_request(req))
+        # This warning is helpful in coding phase, but for production operations
+        warnings.warn(warning_unhandled_request(req), BoltCodeWarning)
         return resp
 
     # -------------------------

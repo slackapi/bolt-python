@@ -1,3 +1,4 @@
+import warnings
 from logging import Logger
 from typing import Optional, Callable, Dict, Any
 
@@ -13,6 +14,7 @@ from slack_bolt.authorization.authorize_result import AuthorizeResult
 from slack_bolt.context.context import BoltContext
 from slack_bolt.error import BoltError
 from slack_bolt.util.utils import get_arg_names_of_callable
+from slack_bolt.warning import BoltCodeWarning
 
 
 class Authorize:
@@ -81,8 +83,9 @@ class CallableAuthorize(Authorize):
             found_arg_names = kwargs.keys()
             for name in self.arg_names:
                 if name not in found_arg_names:
-                    self.logger.warning(f"{name} is not a valid argument")
-                    kwargs[name] = None
+                    warnings.warn(
+                        f"{name} may not be a valid argument name, which bolt-python cannot handle", BoltCodeWarning
+                    )
 
             auth_result = self.func(**kwargs)
             if auth_result is None:

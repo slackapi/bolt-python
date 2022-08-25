@@ -1,6 +1,7 @@
 # pytype: skip-file
 import inspect
 import logging
+import warnings
 from typing import Callable, Dict, Optional, Any, Sequence
 
 from slack_bolt.request.async_request import AsyncBoltRequest
@@ -17,6 +18,7 @@ from slack_bolt.request.payload_utils import (
     to_step,
 )
 from ..logger.messages import warning_skip_uncommon_arg_name
+from ..warning import BoltCodeWarning
 
 
 def build_async_required_kwargs(
@@ -85,7 +87,8 @@ def build_async_required_kwargs(
             required_arg_names.pop(0)
         elif first_arg_name not in all_available_args.keys():
             if this_func is None:
-                logger.warning(warning_skip_uncommon_arg_name(first_arg_name))
+                # Actually, it's rare to see this warning
+                warnings.warn(warning_skip_uncommon_arg_name(first_arg_name), BoltCodeWarning)
                 required_arg_names.pop(0)
             elif inspect.ismethod(this_func):
                 # We are sure that we should skip manipulating this arg
@@ -98,9 +101,9 @@ def build_async_required_kwargs(
             if isinstance(request, AsyncBoltRequest):
                 kwargs[name] = AsyncArgs(**all_available_args)
             else:
+                # We don't use BolCodeWarning here because something unexpected (e.g., bolt-python bug) may be the cause
                 logger.warning(f"Unknown Request object type detected ({type(request)})")
 
         if name not in found_arg_names:
-            logger.warning(f"{name} is not a valid argument")
-            kwargs[name] = None
+            warnings.warn(f"{name} may not be a valid argument name, which bolt-python cannot handle", BoltCodeWarning)
     return kwargs
