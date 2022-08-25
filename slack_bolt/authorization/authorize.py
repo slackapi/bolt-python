@@ -77,9 +77,7 @@ class CallableAuthorize(Authorize):
                 if k not in all_available_args:
                     all_available_args[k] = v
 
-            kwargs: Dict[str, Any] = {  # type: ignore
-                k: v for k, v in all_available_args.items() if k in self.arg_names  # type: ignore
-            }
+            kwargs: Dict[str, Any] = all_available_args
             found_arg_names = kwargs.keys()
             for name in self.arg_names:
                 if name not in found_arg_names:
