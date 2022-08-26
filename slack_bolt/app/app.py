@@ -76,12 +76,7 @@ from slack_bolt.oauth.internals import select_consistent_installation_store
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
-from slack_bolt.util.utils import (
-    create_web_client,
-    get_boot_message,
-    get_name_for_callable,
-    create_copy
-)
+from slack_bolt.util.utils import create_web_client, get_boot_message, get_name_for_callable
 from slack_bolt.workflows.step import WorkflowStep, WorkflowStepMiddleware
 from slack_bolt.workflows.step.step import WorkflowStepBuilder
 
@@ -830,6 +825,7 @@ class App:
         """
         middleware = list(middleware) if middleware else []
         middleware.insert(0, FunctionListenerToken())
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             return Function(self._register_listener, self._base_logger, list(functions), callback_id, matchers, middleware)
@@ -1250,21 +1246,16 @@ class App:
     def _init_context(self, req: BoltRequest):
         req.context["logger"] = get_bolt_app_logger(app_name=self.name, base_logger=self._base_logger)
         req.context["token"] = self._token
-        if self._token is not None:
-            # This WebClient instance can be safely singleton
-            req.context["client"] = create_copy(self._client)
-        else:
-            # Set a new dedicated instance for this request
-            client_per_request: WebClient = WebClient(
-                token=None,  # the token will be set later
-                base_url=self._client.base_url,
-                timeout=self._client.timeout,
-                ssl=self._client.ssl,
-                proxy=self._client.proxy,
-                headers=self._client.headers,
-                team_id=req.context.team_id,
-            )
-            req.context["client"] = client_per_request
+        client_per_request: WebClient = WebClient(
+            token=self._token,  # this can be None
+            base_url=self._client.base_url,
+            timeout=self._client.timeout,
+            ssl=self._client.ssl,
+            proxy=self._client.proxy,
+            headers=self._client.headers,
+            team_id=req.context.team_id,
+        )
+        req.context["client"] = client_per_request
 
     @staticmethod
     def _to_listener_functions(

@@ -1,4 +1,4 @@
-from typing import List, Union, Pattern, Callable, Dict, Optional, Sequence, Any
+from typing import List, Union, Pattern, Callable, Dict, Optional, Sequence
 from logging import Logger
 
 from slack_bolt.listener_matcher import builtins as builtin_matchers
@@ -20,7 +20,6 @@ def _to_listener_functions(
 
 
 class Function:
-
     def __init__(
         self,
         _register_listener: Callable[..., Optional[Callable[..., Optional[BoltResponse]]]],
@@ -28,7 +27,7 @@ class Function:
         functions: List[Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]],
         callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
-        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ):
         self._register_listener = _register_listener
         self._base_logger = _base_logger
@@ -46,9 +45,7 @@ class Function:
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
-        """Registers a new action listener. This method can be used as either a decorator or a method.
-
-        """
+        """Registers a new action listener. This method can be used as either a decorator or a method."""
 
         def __call__(*args, **kwargs):
             print("action reistered")
@@ -57,4 +54,4 @@ class Function:
 
     @property
     def __isabstractmethod__(self):
-        return getattr(self.function, '__isabstractmethod__', False)
+        return getattr(self.function, "__isabstractmethod__", False)

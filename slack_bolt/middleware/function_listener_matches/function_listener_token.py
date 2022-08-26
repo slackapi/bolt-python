@@ -1,5 +1,4 @@
-import re
-from typing import Callable, Pattern, Union
+from typing import Callable
 
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
@@ -7,7 +6,6 @@ from slack_bolt.middleware.middleware import Middleware
 
 
 class FunctionListenerToken(Middleware):  # type: ignore
-
     def process(
         self,
         *,
