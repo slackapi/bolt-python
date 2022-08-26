@@ -19,6 +19,7 @@ from slack_bolt.authorization.authorize import (
     CallableAuthorize,
 )
 from slack_bolt.error import BoltError, BoltUnhandledRequestError
+from slack_bolt.function import Function
 from slack_bolt.lazy_listener.thread_runner import ThreadLazyListenerRunner
 from slack_bolt.listener.builtins import TokenRevocationListeners
 from slack_bolt.listener.custom_listener import CustomListener
@@ -63,6 +64,7 @@ from slack_bolt.middleware import (
     IgnoringSelfEvents,
     CustomMiddleware,
 )
+from slack_bolt.middleware.function_listener_matches import FunctionListenerToken
 from slack_bolt.middleware.message_listener_matches import MessageListenerMatches
 from slack_bolt.middleware.middleware_error_handler import (
     DefaultMiddlewareErrorHandler,
@@ -78,6 +80,7 @@ from slack_bolt.util.utils import (
     create_web_client,
     get_boot_message,
     get_name_for_callable,
+    create_copy
 )
 from slack_bolt.workflows.step import WorkflowStep, WorkflowStepMiddleware
 from slack_bolt.workflows.step.step import WorkflowStepBuilder
@@ -794,7 +797,7 @@ class App:
 
     def function(
         self,
-        callback_id: Union[str, Pattern],
+        callback_id: Union[str, Function],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
@@ -825,11 +828,11 @@ class App:
             middleware: A list of lister middleware functions.
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         """
-
+        middleware = list(middleware) if middleware else []
+        middleware.insert(0, FunctionListenerToken())
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.function_event(callback_id=callback_id, base_logger=self._base_logger)
-            return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
+            return Function(self._register_listener, self._base_logger, list(functions), callback_id, matchers, middleware)
 
         return __call__
 
@@ -1249,7 +1252,7 @@ class App:
         req.context["token"] = self._token
         if self._token is not None:
             # This WebClient instance can be safely singleton
-            req.context["client"] = self._client
+            req.context["client"] = create_copy(self._client)
         else:
             # Set a new dedicated instance for this request
             client_per_request: WebClient = WebClient(
