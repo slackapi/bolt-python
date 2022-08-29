@@ -20,24 +20,33 @@ def _to_listener_functions(
 
 
 class Function:
+
+    function: Optional[Callable[..., Optional[BoltResponse]]] = None
+
     def __init__(
         self,
-        _register_listener: Callable[..., Optional[Callable[..., Optional[BoltResponse]]]],
-        _base_logger: Logger,
-        functions: List[Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]],
+        register_listener: Callable[..., Optional[Callable[..., Optional[BoltResponse]]]],
+        base_logger: Logger,
         callback_id: Union[str, Pattern],
-        matchers: Optional[Sequence[Callable[..., bool]]] = None,
-        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ):
-        self._register_listener = _register_listener
-        self._base_logger = _base_logger
+        self._register_listener = register_listener
+        self._base_logger = base_logger
         self.callback_id = callback_id
 
-        primary_matcher = builtin_matchers.function_event(callback_id=self.callback_id, base_logger=_base_logger)
+    def register_listener(
+        self,
+        functions: List[Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]],
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+        primary_matcher = builtin_matchers.function_event(callback_id=self.callback_id, base_logger=self._base_logger)
         self.function = self._register_listener(functions, primary_matcher, matchers, middleware, True)
+        return self
 
     def __call__(self, *args, **kwargs) -> Optional[Callable[..., Optional[BoltResponse]]]:
-        return self.function(*args, **kwargs)
+        if self.function is not None:
+            return self.function(*args, **kwargs)
+        return None
 
     def action(
         self,

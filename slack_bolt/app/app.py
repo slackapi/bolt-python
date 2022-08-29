@@ -64,7 +64,7 @@ from slack_bolt.middleware import (
     IgnoringSelfEvents,
     CustomMiddleware,
 )
-from slack_bolt.middleware.function_listener_matches import FunctionListenerToken
+from slack_bolt.middleware.function_token import FunctionToken
 from slack_bolt.middleware.message_listener_matches import MessageListenerMatches
 from slack_bolt.middleware.middleware_error_handler import (
     DefaultMiddlewareErrorHandler,
@@ -824,11 +824,12 @@ class App:
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         """
         middleware = list(middleware) if middleware else []
-        middleware.insert(0, FunctionListenerToken())
+        middleware.insert(0, FunctionToken())
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            return Function(self._register_listener, self._base_logger, list(functions), callback_id, matchers, middleware)
+            slack_function = Function(self._register_listener, self._base_logger, callback_id)
+            return slack_function.register_listener(list(functions), matchers, middleware)
 
         return __call__
 

@@ -5,7 +5,7 @@ from slack_bolt.response import BoltResponse
 from slack_bolt.middleware.middleware import Middleware
 
 
-class FunctionListenerToken(Middleware):  # type: ignore
+class FunctionToken(Middleware):  # type: ignore
     def process(
         self,
         *,
@@ -20,5 +20,5 @@ class FunctionListenerToken(Middleware):  # type: ignore
             req.context.client.token = req.context.bot_access_token
             return next()
 
-        # As the text doesn't match, skip running the listener
+        # As the token was not found for this function call, skip running the listener
         return resp
