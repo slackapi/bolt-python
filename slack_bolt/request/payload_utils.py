@@ -181,6 +181,7 @@ def to_step(body: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         return body["event"]["workflow_step"]
     return None
 
+
 # -------------------
 # Function
 # -------------------
@@ -190,6 +191,7 @@ def is_function_interactivity(body: Dict[str, Any]) -> bool:
     if "function_data" in body:
         return True
     return False
+
 
 # ------------------------------------------
 # Internal Utilities

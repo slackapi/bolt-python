@@ -25,9 +25,7 @@ def function_action(
     if isinstance(constraints, (str, Pattern)):
 
         def func(body: Dict[str, Any]) -> bool:
-            return (
-                _function_block_action(callback_id, constraints, body)
-            )
+            return _function_block_action(callback_id, constraints, body)
 
         return build_listener_matcher(func, asyncio, base_logger)
 
@@ -49,8 +47,7 @@ def _function_block_action(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     body: Dict[str, Any],
 ) -> bool:
-    if (is_function_interactivity(body) is False
-            and is_block_actions(body) is False):
+    if is_function_interactivity(body) is False and is_block_actions(body) is False:
         return False
 
     if _matches(callback_id, body.get("function_data", {}).get("function", {}).get("callback_id", "")) is False:
