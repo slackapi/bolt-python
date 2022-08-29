@@ -5,23 +5,14 @@ from slack_bolt.listener_matcher import builtins as builtin_matchers
 
 from slack_bolt.response import BoltResponse
 from slack_bolt.middleware import Middleware
+from slack_bolt.middleware.function_token import FunctionToken
 
-
-# TDOD this is a duplicate function in App
-def _to_listener_functions(
-    kwargs: dict,
-) -> Optional[Sequence[Callable[..., Optional[BoltResponse]]]]:
-    if kwargs:
-        functions = [kwargs["ack"]]
-        for sub in kwargs["lazy"]:
-            functions.append(sub)
-        return functions
-    return None
+from slack_bolt.util.utils import to_listener_functions
 
 
 class Function:
 
-    function: Optional[Callable[..., Optional[BoltResponse]]] = None
+    func: Optional[Callable[..., Optional[BoltResponse]]] = None
 
     def __init__(
         self,
@@ -40,12 +31,12 @@ class Function:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         primary_matcher = builtin_matchers.function_event(callback_id=self.callback_id, base_logger=self._base_logger)
-        self.function = self._register_listener(functions, primary_matcher, matchers, middleware, True)
+        self.func = self._register_listener(functions, primary_matcher, matchers, middleware, True)
         return self
 
-    def __call__(self, *args, **kwargs) -> Optional[Callable[..., Optional[BoltResponse]]]:
-        if self.function is not None:
-            return self.function(*args, **kwargs)
+    def __call__(self, *args, **kwargs) -> Optional[BoltResponse]:
+        if self.func is not None:
+            return self.func(*args, **kwargs)
         return None
 
     def action(
@@ -54,10 +45,37 @@ class Function:
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
-        """Registers a new action listener. This method can be used as either a decorator or a method."""
+        """Registers a new action listener to your function. This method can be used as either a decorator or a method.
+
+            @app.function("reverse")
+            def reverse_string(event, complete_success: CompleteSuccess, complete_error: CompleteError):
+                complete_error("There is no error")
+
+            # Use this method as a decorator
+            @reverse_string.action("approve_button")
+            def update_message(ack):
+                ack()
+
+            # Pass a function to this method
+            reverse_string.action("approve_button")(update_message)
+
+        * Refer to https://api.slack.com/reference/interaction-payloads/block-actions for actions in `blocks`.
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
+
+        Args:
+            constraints: The conditions that match a request payload
+            matchers: A list of listener matcher functions.
+                Only when all the matchers return True, the listener function can be invoked.
+            middleware: A list of lister middleware functions.
+                Only when all the middleware call `next()` method, the listener function can be invoked.
+        """
+
+        middleware = list(middleware) if middleware else []
+        middleware.insert(0, FunctionToken())
 
         def __call__(*args, **kwargs):
-            functions = _to_listener_functions(kwargs) if kwargs else list(args)
+            functions = to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.function_action(self.callback_id, constraints, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -65,4 +83,4 @@ class Function:
 
     @property
     def __isabstractmethod__(self):
-        return getattr(self.function, "__isabstractmethod__", False)
+        return getattr(self.func, "__isabstractmethod__", False)

@@ -1,3 +1,4 @@
+# pytype: skip-file
 from logging import Logger
 
 from ...util.utils import get_arg_names_of_callable
