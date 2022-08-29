@@ -70,6 +70,13 @@ def _block_action(
     if is_block_actions(body) is False:
         return False
 
+    return is_block_id_match(constraints, body)
+
+
+def is_block_id_match(
+    constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
+    body: Dict[str, Any]
+) -> bool:
     action = to_action(body)
     if isinstance(constraints, (str, Pattern)):
         action_id = constraints

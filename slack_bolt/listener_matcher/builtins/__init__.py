@@ -12,6 +12,7 @@ from .action import (
 from .command import command
 from .view import view, view_submission, view_closed, workflow_step_save
 from .options import options, block_suggestion, dialog_suggestion
+from .function import function_action
 
 __all__ = [
     "BuiltinListenerMatcher",
@@ -42,4 +43,6 @@ __all__ = [
     "options",
     "block_suggestion",
     "dialog_suggestion",
+    # function
+    "function_action",
 ]

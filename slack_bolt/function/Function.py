@@ -57,7 +57,9 @@ class Function:
         """Registers a new action listener. This method can be used as either a decorator or a method."""
 
         def __call__(*args, **kwargs):
-            print("action reistered")
+            functions = _to_listener_functions(kwargs) if kwargs else list(args)
+            primary_matcher = builtin_matchers.function_action(self.callback_id, constraints, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
 
