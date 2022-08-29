@@ -1245,7 +1245,7 @@ class AsyncApp:
         # in the interest of runtime performance/memory footprint optimization.
         # However, developers may want to replace the token held by req.context.client in some situations.
         # In this case, this behavior can result in thread-unsafe data modification on `self._client`.
-        # (`self._client` a.k.a. `app.clint` is a singleton object per an App instance)
+        # (`self._client` a.k.a. `app.client` is a singleton object per an App instance)
         # Thus, we've changed the behavior to create a new instance per request regardless of token argument
         # in the App initialization starting v1.15.
         # The overhead brought by this change is slight so that we believe that it is ignorable in any cases.
