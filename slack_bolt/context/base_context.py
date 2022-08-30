@@ -31,8 +31,7 @@ class BaseContext(dict):
         "ack",
         "say",
         "respond",
-        "complete_success",
-        "complete_error",
+        "complete",
     ]
 
     @property

@@ -62,6 +62,19 @@ class TestFunction:
         assert_auth_test_count(self, 1)
         assert self.mock_received_requests["/functions.completeSuccess"] == 1
 
+    def test_valid_callback_id_complete(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.function("reverse")(complete_it)
+
+        request = self.build_request_from_body(function_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+        assert self.mock_received_requests["/functions.completeSuccess"] == 1
+
     def test_valid_callback_id_error(self):
         app = App(
             client=self.web_client,
@@ -179,17 +192,23 @@ wrong_id_function_body = {
 }
 
 
-def reverse(body, event, complete_success):
+def reverse(body, event, complete):
     assert body == function_body
     assert event == function_body["event"]
-    complete_success(
-        {
+    complete(
+        outputs={
             "reverseString": "olleh",
         }
     )
 
 
-def reverse_error(body, event, complete_error):
+def reverse_error(body, event, complete):
     assert body == function_body
     assert event == function_body["event"]
-    complete_error("there was an error")
+    complete(error="there was an error")
+
+
+def complete_it(body, event, complete):
+    assert body == function_body
+    assert event == function_body["event"]
+    complete()
