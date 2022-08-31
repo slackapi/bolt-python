@@ -20,7 +20,6 @@ from tests.utils import remove_os_env_temporarily, restore_os_env
 class TestFunctionBlockActions:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
-    bot_access_token = "xwfp-valid"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
     web_client = WebClient(
