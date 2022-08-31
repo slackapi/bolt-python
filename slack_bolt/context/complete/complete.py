@@ -27,7 +27,8 @@ class Complete:
 
         if outputs is not None and error is not None:
             raise TypeError(
-                f"{get_name_for_logging(self)} expects 1 keyword-only argument but 2 were given, provide: {get_kwargs_for_logging(self)}"
+                f"{get_name_for_logging(self)} expects 1 keyword-only argument but 2 were given, "
+                f"provide: {get_kwargs_for_logging(self)}"
             )
 
         if can_not_complete(self):
