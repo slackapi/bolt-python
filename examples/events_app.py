@@ -35,6 +35,11 @@ def mention_bug(logger, body):
     logger.info(body)
 
 
+@app.event("message")
+def ack_the_rest_of_message_events(logger, body):
+    logger.info(body)
+
+
 if __name__ == "__main__":
     app.start(3000)
 

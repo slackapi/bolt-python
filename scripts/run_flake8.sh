@@ -3,5 +3,5 @@
 
 script_dir=$(dirname $0)
 cd ${script_dir}/.. && \
-  pip install "flake8==5.0.3" && \
+  pip install "flake8==5.0.4" && \
   flake8 slack_bolt/ && flake8 examples/

@@ -1247,8 +1247,17 @@ class App:
     def _init_context(self, req: BoltRequest):
         req.context["logger"] = get_bolt_app_logger(app_name=self.name, base_logger=self._base_logger)
         req.context["token"] = self._token
+        # Prior to version 1.15, when the token is static, self._client was passed to `req.context`.
+        # The intention was to avoid creating a new instance per request
+        # in the interest of runtime performance/memory footprint optimization.
+        # However, developers may want to replace the token held by req.context.client in some situations.
+        # In this case, this behavior can result in thread-unsafe data modification on `self._client`.
+        # (`self._client` a.k.a. `app.client` is a singleton object per an App instance)
+        # Thus, we've changed the behavior to create a new instance per request regardless of token argument
+        # in the App initialization starting v1.15.
+        # The overhead brought by this change is slight so that we believe that it is ignorable in any cases.
         client_per_request: WebClient = WebClient(
-            token=self._token,  # this can be None
+            token=self._token,  # this can be None, and it can be set later on
             base_url=self._client.base_url,
             timeout=self._client.timeout,
             ssl=self._client.ssl,

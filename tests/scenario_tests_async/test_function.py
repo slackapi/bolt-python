@@ -89,6 +89,7 @@ class TestAsyncFunction:
         assert self.mock_received_requests["/functions.completeSuccess"] == 1
 
     @pytest.mark.asyncio
+
     async def test_valid_callback_id_error(self):
         app = AsyncApp(
             client=self.web_client,
