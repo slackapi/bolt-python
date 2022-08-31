@@ -192,9 +192,12 @@ wrong_id_function_body = {
 }
 
 
-def reverse(body, event, complete):
+def reverse(body, event, complete, context, client):
     assert body == function_body
     assert event == function_body["event"]
+    assert context.bot_access_token == "xwfp-abc"
+    assert context.client.token == "xwfp-abc"
+    assert client.token == "xwfp-abc"
     complete(
         outputs={
             "reverseString": "olleh",
