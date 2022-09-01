@@ -29,7 +29,7 @@ class MockHandler(SimpleHTTPRequestHandler):
     def is_valid_user_token(self):
         return "Authorization" in self.headers and str(self.headers["Authorization"]).startswith("Bearer xoxp-")
 
-    def is_valid_bot_access_token(self):
+    def is_valid_slack_function_bot_access_token(self):
         return "Authorization" in self.headers and str(self.headers["Authorization"]).startswith("Bearer xwfp-")
 
     def set_common_headers(self):
@@ -182,7 +182,7 @@ class MockHandler(SimpleHTTPRequestHandler):
                     self.wfile.write(self.user_auth_test_response.encode("utf-8"))
                     return
 
-            if self.is_valid_token() or self.is_valid_bot_access_token():
+            if self.is_valid_token() or self.is_valid_slack_function_bot_access_token():
                 if path == "/auth.test":
                     self.send_response(200)
                     self.set_common_headers()

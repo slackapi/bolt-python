@@ -5,9 +5,9 @@ from slack_bolt.listener_matcher import builtins as builtin_matchers
 
 from slack_bolt.response import BoltResponse
 from slack_bolt.middleware import Middleware
-from slack_bolt.middleware.function_token import FunctionToken
+from slack_bolt.middleware.attaching_function_token import AttachingFunctionToken
 
-from slack_bolt.util.utils import to_listener_functions
+from slack_bolt.util.utils import get_callables_from_kwargs
 
 
 class Function:
@@ -47,17 +47,18 @@ class Function:
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new action listener to your function. This method can be used as either a decorator or a method.
 
-            @app.function("reverse")
-            def reverse_string(event, complete_success: CompleteSuccess, complete_error: CompleteError):
-                complete_error("There is no error")
-
             # Use this method as a decorator
-            @reverse_string.action("approve_button")
-            def update_message(ack):
+            @app.function("request-approval")
+            def request_approval(event, complete: Complete):
+                complete(outputs={})
+
+            @request_approval.action("approve_button")
+            def handle_request_approval_events(ack):
                 ack()
 
             # Pass a function to this method
-            reverse_string.action("approve_button")(update_message)
+            request_approval_func = app.function("request-approval")(request_approval)
+            request_approval.action("approve_button")(handle_request_approval_events)
 
         * Refer to https://api.slack.com/reference/interaction-payloads/block-actions for actions in `blocks`.
 
@@ -72,14 +73,16 @@ class Function:
         """
 
         middleware = list(middleware) if middleware else []
-        middleware.insert(0, FunctionToken())
+        middleware.insert(0, AttachingFunctionToken())
 
         def __call__(*args, **kwargs):
-            functions = to_listener_functions(kwargs) if kwargs else list(args)
+            functions = get_callables_from_kwargs(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.function_action(self.callback_id, constraints, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
         return __call__
+
+    # TODO add view listener
 
     @property
     def __isabstractmethod__(self):

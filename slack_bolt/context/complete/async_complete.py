@@ -2,16 +2,16 @@ from typing import Optional, Union
 
 from slack_sdk.web.async_client import AsyncWebClient
 from slack_sdk.web.async_slack_response import AsyncSlackResponse
-from slack_bolt.context.complete.internals import can_not_complete, get_kwargs_for_logging, get_name_for_logging
+from slack_bolt.context.complete.internals import get_kwargs_for_logging, get_name_for_logging
 
 
 class AsyncComplete:
-    client: Optional[AsyncWebClient]
+    client: AsyncWebClient
     function_execution_id: Optional[str]
 
     def __init__(
         self,
-        client: Optional[AsyncWebClient],
+        client: AsyncWebClient,
         function_execution_id: Optional[str],
     ):
         self.client = client
@@ -33,7 +33,7 @@ class AsyncComplete:
                 f"provide: {get_kwargs_for_logging(self)}"
             )
 
-        if can_not_complete(self):
+        if self.function_execution_id is None:
             raise ValueError(f"{get_name_for_logging(self)} is unsupported here as there is no function_execution_id")
 
         if isinstance(error, str):

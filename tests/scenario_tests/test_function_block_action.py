@@ -206,7 +206,7 @@ def simple_listener(ack, complete, body, payload, action, client: WebClient, con
     assert context.token == "xoxb-valid"
     assert context.user_id == "U111"
     assert context.user_token is None
-    assert context.bot_access_token == "xwfp-valid"
+    assert context.slack_function_bot_access_token == "xwfp-valid"
     assert context.client.token == "xwfp-valid"
     assert client.token == "xwfp-valid"
     ack()

@@ -195,7 +195,7 @@ wrong_id_function_body = {
 def reverse(body, event, complete, context, client):
     assert body == function_body
     assert event == function_body["event"]
-    assert context.bot_access_token == "xwfp-valid"
+    assert context.slack_function_bot_access_token == "xwfp-valid"
     assert context.client.token == "xwfp-valid"
     assert client.token == "xwfp-valid"
     complete(
