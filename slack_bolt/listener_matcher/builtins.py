@@ -235,19 +235,6 @@ def function_action(
     raise BoltError(f"action ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict")
 
 
-def _is_block_id_match(constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], body: Dict[str, Any]) -> bool:
-    action = to_action(body)
-    if isinstance(constraints, (str, Pattern)):
-        action_id = constraints
-        return _matches(action_id, action["action_id"])
-    elif isinstance(constraints, dict):
-        # block_id matching is optional
-        block_id: Optional[Union[str, Pattern]] = constraints.get("block_id")
-        block_id_matched = block_id is None or _matches(block_id, action.get("block_id"))
-        action_id_matched = _matches(constraints["action_id"], action["action_id"])
-        return block_id_matched and action_id_matched
-
-
 def _function_block_action(
     callback_id: Union[str, Pattern],
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
@@ -259,7 +246,7 @@ def _function_block_action(
     if _matches(callback_id, body.get("function_data", {}).get("function", {}).get("callback_id", "")) is False:
         return False
 
-    return _is_block_id_match(constraints, body)
+    return _does_block_id_match(constraints, body)
 
 
 def function_block_action(
@@ -388,7 +375,7 @@ def _block_action(
     if is_block_actions(body) is False:
         return False
 
-    return _is_block_id_match(constraints, body)
+    return _does_block_id_match(constraints, body)
 
 
 def block_action(
@@ -602,3 +589,16 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -> bool:
         return pattern.search(input) is not None
     else:
         raise BoltError(f"{str_or_pattern} ({type(str_or_pattern)}) must be either str or Pattern")
+
+
+def _does_block_id_match(constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], body: Dict[str, Any]) -> bool:
+    action = to_action(body)
+    if isinstance(constraints, (str, Pattern)):
+        action_id = constraints
+        return _matches(action_id, action["action_id"])
+    elif isinstance(constraints, dict):
+        # block_id matching is optional
+        block_id: Optional[Union[str, Pattern]] = constraints.get("block_id")
+        block_id_matched = block_id is None or _matches(block_id, action.get("block_id"))
+        action_id_matched = _matches(constraints["action_id"], action["action_id"])
+        return block_id_matched and action_id_matched
