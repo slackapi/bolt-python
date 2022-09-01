@@ -66,7 +66,7 @@ class TestAsyncFunction:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.slack_function("reverse")(reverse)
+        app.function("reverse")(reverse)
 
         request = self.build_request_from_body(function_body)
         response = await app.async_dispatch(request)
@@ -80,7 +80,7 @@ class TestAsyncFunction:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.slack_function("reverse")(complete_it)
+        app.function("reverse")(complete_it)
 
         request = self.build_request_from_body(function_body)
         response = await app.async_dispatch(request)
@@ -94,7 +94,7 @@ class TestAsyncFunction:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.slack_function("reverse")(reverse_error)
+        app.function("reverse")(reverse_error)
 
         request = self.build_request_from_body(function_body)
         response = await app.async_dispatch(request)
@@ -108,7 +108,7 @@ class TestAsyncFunction:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.slack_function("reverse")(reverse)
+        app.function("reverse")(reverse)
 
         request = self.build_request_from_body(wrong_id_function_body)
         response = await app.async_dispatch(request)

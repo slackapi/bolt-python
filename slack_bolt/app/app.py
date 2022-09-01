@@ -790,7 +790,7 @@ class App:
 
         return __call__
 
-    def slack_function(
+    def function(
         self,
         callback_id: str,
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
@@ -800,7 +800,7 @@ class App:
         This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
-            @app.slack_function("reverse")
+            @app.function("reverse")
             def reverse_string(event, complete_success: CompleteSuccess, complete_error: CompleteError):
                 try:
                     string_to_reverse = event["inputs"]["stringToReverse"]
@@ -812,7 +812,7 @@ class App:
                     raise e
 
             # Pass a function to this method
-            app.slack_function("reverse")(reverse_string)
+            app.function("reverse")(reverse_string)
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 

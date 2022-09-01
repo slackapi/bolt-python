@@ -134,11 +134,11 @@ class AsyncBoltContext(BaseContext):
     def complete(self) -> AsyncComplete:
         f"""`{COMPLETE}()` function for this request.
 
-            @app.slack_function("reverse")
+            @app.function("reverse")
             async def handle_button_clicks(context):
                 await context.{COMPLETE}({{"stringReverse":"olleh"}})
 
-            @app.slack_function("reverse")
+            @app.function("reverse")
             async def handle_button_clicks({COMPLETE}):
                 await {COMPLETE}({{"stringReverse":"olleh"}})
 

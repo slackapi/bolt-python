@@ -49,7 +49,7 @@ def get_view_code_snippet(is_async: bool, callback_id: str) -> str:
 
 def get_function_code_snippet(is_async: bool, callback_id: str) -> str:
     return f"""
-@app.slack_function("{callback_id}")
+@app.function("{callback_id}")
 {'async ' if is_async else ''}def handle_{callback_id}_function(body, complete_success, complete_error, logger):
     logger.info(body)
     complete_error("Function not implemented")

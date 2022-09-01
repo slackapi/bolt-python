@@ -57,7 +57,7 @@ class TestFunctionBlockActions:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        func: SlackFunction = app.slack_function("c")(func_listener)
+        func: SlackFunction = app.function("c")(func_listener)
         func.action("a")(simple_listener)
 
         request = self.build_request_from_body(function_action_body)
@@ -72,7 +72,7 @@ class TestFunctionBlockActions:
             signing_secret=self.signing_secret,
             process_before_response=True,
         )
-        func: SlackFunction = app.slack_function("c")(func_listener)
+        func: SlackFunction = app.function("c")(func_listener)
         func.action("a")(simple_listener)
 
         request = self.build_request_from_body(function_action_body)
@@ -83,7 +83,7 @@ class TestFunctionBlockActions:
 
     def test_default_type(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
-        func: SlackFunction = app.slack_function("c")(func_listener)
+        func: SlackFunction = app.function("c")(func_listener)
         func.action({"action_id": "a", "block_id": "b"})(simple_listener)
 
         request = self.build_request_from_body(function_action_body)
@@ -94,7 +94,7 @@ class TestFunctionBlockActions:
 
     def test_default_type_no_block_id(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
-        func: SlackFunction = app.slack_function("c")(func_listener)
+        func: SlackFunction = app.function("c")(func_listener)
         func.action({"action_id": "a"})(simple_listener)
 
         request = self.build_request_from_body(function_action_body)
@@ -105,7 +105,7 @@ class TestFunctionBlockActions:
 
     def test_default_type_and_unmatched_block_id(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
-        func: SlackFunction = app.slack_function("c")(func_listener)
+        func: SlackFunction = app.function("c")(func_listener)
         func.action({"action_id": "a", "block_id": "bbb"})(simple_listener)
 
         request = self.build_request_from_body(function_action_body)

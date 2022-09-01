@@ -826,7 +826,7 @@ class AsyncApp:
 
         return __call__
 
-    def slack_function(
+    def function(
         self,
         callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
@@ -836,7 +836,7 @@ class AsyncApp:
         This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
-            @app.slack_function("reverse")
+            @app.function("reverse")
             async def reverse_string(event, complete_success: AsyncCompleteSuccess, complete_error: AsyncCompleteError):
                 try:
                     string_to_reverse = event["inputs"]["stringToReverse"]
@@ -848,7 +848,7 @@ class AsyncApp:
                     raise e
 
             # Pass a function to this method
-            app.slack_function("reverse")(reverse_string)
+            app.function("reverse")(reverse_string)
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
 
