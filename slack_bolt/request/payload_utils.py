@@ -188,7 +188,11 @@ def to_step(body: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 
 
 def is_function_interactivity(body: Dict[str, Any]) -> bool:
-    return "function_data" in body
+    return "function_data" in body and (
+        _is_expected_type(body, "block_actions")
+        or _is_expected_type(body, "view_submission")
+        or _is_expected_type(body, "view_closed")
+    )
 
 
 # ------------------------------------------

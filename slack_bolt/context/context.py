@@ -134,9 +134,9 @@ class BoltContext(BaseContext):
 
     @property
     def complete(self) -> Complete:
-        f"""`{COMPLETE}()` function for this request. Once a function's state is set to complete, 
-        any outputs the function returns will be passed along to the next step of its housing workflow, 
-        or complete the workflow if the function is the last step in a workflow. Additionally, 
+        f"""`{COMPLETE}()` function for this request. Once a function's state is set to complete,
+        any outputs the function returns will be passed along to the next step of its housing workflow,
+        or complete the workflow if the function is the last step in a workflow. Additionally,
         any interactivity handlers associated to a function invocation will no longer be invocable.
 
             @app.function("reverse")
@@ -154,7 +154,7 @@ class BoltContext(BaseContext):
             ** THIS FUNCTION ONLY ACCEPTS ONE OF THE KWARGS BELOW **
             outputs: Dict containing the output values
             error: Error message to return to slack
-        
+
         Returns:
             Callable `{COMPLETE}()` function
         """
