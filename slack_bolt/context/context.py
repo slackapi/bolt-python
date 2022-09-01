@@ -134,16 +134,27 @@ class BoltContext(BaseContext):
 
     @property
     def complete(self) -> Complete:
-        f"""`{COMPLETE}()` function for this request.
+        f"""`{COMPLETE}()` function for this request. Once a function's state is set to complete, 
+        any outputs the function returns will be passed along to the next step of its housing workflow, 
+        or complete the workflow if the function is the last step in a workflow. Additionally, 
+        any interactivity handlers associated to a function invocation will no longer be invocable.
 
             @app.function("reverse")
-            def handle_button_clicks(context):
-                context.{COMPLETE}({{"stringReverse":"olleh"}})
+            async def handle_button_clicks(context):
+                context.{COMPLETE}(outputs={{"stringReverse":"olleh"}})
 
             @app.function("reverse")
-            def handle_button_clicks({COMPLETE}):
-                {COMPLETE}({{"stringReverse":"olleh"}})
+            async def handle_button_clicks({COMPLETE}):
+                {COMPLETE}(outputs={{"stringReverse":"olleh"}})
 
+        Args:
+            ** THIS FUNCTION DOES NOT ACCEPT POSITIONAL ARGUMENTS **
+
+        Kwargs:
+            ** THIS FUNCTION ONLY ACCEPTS ONE OF THE KWARGS BELOW **
+            outputs: Dict containing the output values
+            error: Error message to return to slack
+        
         Returns:
             Callable `{COMPLETE}()` function
         """
