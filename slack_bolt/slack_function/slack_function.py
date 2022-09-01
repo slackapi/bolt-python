@@ -10,7 +10,7 @@ from slack_bolt.middleware.attaching_function_token import AttachingFunctionToke
 from slack_bolt.util.utils import get_callables_from_kwargs
 
 
-class Function:
+class SlackFunction:
 
     func: Optional[Callable[..., Optional[BoltResponse]]] = None
 
@@ -48,7 +48,7 @@ class Function:
         """Registers a new action listener to your function. This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
-            @app.function("request-approval")
+            @app.slack_function("request-approval")
             def request_approval(event, complete: Complete):
                 complete(outputs={})
 
@@ -57,7 +57,7 @@ class Function:
                 ack()
 
             # Pass a function to this method
-            request_approval_func = app.function("request-approval")(request_approval)
+            request_approval_func = app.slack_function("request-approval")(request_approval)
             request_approval.action("approve_button")(handle_request_approval_events)
 
         * Refer to https://api.slack.com/reference/interaction-payloads/block-actions for actions in `blocks`.

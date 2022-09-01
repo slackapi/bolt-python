@@ -54,7 +54,7 @@ class TestFunction:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.function("reverse")(reverse)
+        app.slack_function("reverse")(reverse)
 
         request = self.build_request_from_body(function_body)
         response = app.dispatch(request)
@@ -67,7 +67,7 @@ class TestFunction:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.function("reverse")(complete_it)
+        app.slack_function("reverse")(complete_it)
 
         request = self.build_request_from_body(function_body)
         response = app.dispatch(request)
@@ -80,7 +80,7 @@ class TestFunction:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.function("reverse")(reverse_error)
+        app.slack_function("reverse")(reverse_error)
 
         request = self.build_request_from_body(function_body)
         response = app.dispatch(request)
@@ -93,7 +93,7 @@ class TestFunction:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.function("reverse")(reverse)
+        app.slack_function("reverse")(reverse)
 
         request = self.build_request_from_body(wrong_id_function_body)
         response = app.dispatch(request)

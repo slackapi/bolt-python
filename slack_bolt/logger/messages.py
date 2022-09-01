@@ -228,7 +228,7 @@ def warning_unhandled_request(  # type: ignore
         event = req.body.get("event", {})
         event_type = event.get("type")
         if is_function(req.body):
-            # @app.function
+            # @app.slack_function
             callback_id = event.get("function", {}).get("callback_id", "function_id")
             return _build_unhandled_request_suggestion(default_message, get_function_code_snippet(is_async, callback_id))
         return _build_unhandled_request_suggestion(default_message, get_event_code_snippet(is_async, event_type))

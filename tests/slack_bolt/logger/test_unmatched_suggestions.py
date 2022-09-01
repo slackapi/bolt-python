@@ -93,7 +93,7 @@ def handle_app_mention_events(body, logger):
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
-@app.function("reverse")
+@app.slack_function("reverse")
 def handle_reverse_function(body, complete_success, complete_error, logger):
     logger.info(body)
     complete_error("Function not implemented")

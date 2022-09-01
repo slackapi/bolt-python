@@ -136,11 +136,11 @@ class BoltContext(BaseContext):
     def complete(self) -> Complete:
         f"""`{COMPLETE}()` function for this request.
 
-            @app.function("reverse")
+            @app.slack_function("reverse")
             def handle_button_clicks(context):
                 context.{COMPLETE}({{"stringReverse":"olleh"}})
 
-            @app.function("reverse")
+            @app.slack_function("reverse")
             def handle_button_clicks({COMPLETE}):
                 {COMPLETE}({{"stringReverse":"olleh"}})
 
