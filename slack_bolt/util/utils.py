@@ -91,7 +91,7 @@ def get_arg_names_of_callable(func: Callable) -> List[str]:
     return inspect.getfullargspec(inspect.unwrap(func)).args
 
 
-def get_callables_from_kwargs(
+def extract_callables(
     kwargs: dict,
 ) -> Optional[Sequence[Callable[..., Optional[BoltResponse]]]]:
     if kwargs:
