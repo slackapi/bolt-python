@@ -43,5 +43,5 @@ class Complete:
         # TODO add this new api call to the sdk and use it here
         return self.client.api_call(
             "functions.completeSuccess",
-            json={"outputs": outputs, "function_execution_id": self.function_execution_id},
+            json={"outputs": outputs if outputs else {}, "function_execution_id": self.function_execution_id},
         )
