@@ -173,14 +173,6 @@ class AsyncBoltContext(BaseContext):
             async def handle_button_clicks({COMPLETE}):
                 await {COMPLETE}(outputs={{&#34;stringReverse&#34;:&#34;olleh&#34;}})
 
-        Args:
-            ** THIS FUNCTION DOES NOT ACCEPT POSITIONAL ARGUMENTS **
-
-        Kwargs:
-            ** THIS FUNCTION ONLY ACCEPTS ONE OF THE KWARGS BELOW **
-            outputs: Dict containing the output values
-            error: Error message to return to slack
-
         Returns:
             Callable `{COMPLETE}()` function
         &#34;&#34;&#34;
@@ -337,14 +329,6 @@ class AsyncBoltContext(BaseContext):
             async def handle_button_clicks({COMPLETE}):
                 await {COMPLETE}(outputs={{&#34;stringReverse&#34;:&#34;olleh&#34;}})
 
-        Args:
-            ** THIS FUNCTION DOES NOT ACCEPT POSITIONAL ARGUMENTS **
-
-        Kwargs:
-            ** THIS FUNCTION ONLY ACCEPTS ONE OF THE KWARGS BELOW **
-            outputs: Dict containing the output values
-            error: Error message to return to slack
-
         Returns:
             Callable `{COMPLETE}()` function
         &#34;&#34;&#34;
@@ -442,14 +426,6 @@ def complete(self) -&gt; AsyncComplete:
         @app.function(&#34;reverse&#34;)
         async def handle_button_clicks({COMPLETE}):
             await {COMPLETE}(outputs={{&#34;stringReverse&#34;:&#34;olleh&#34;}})
-
-    Args:
-        ** THIS FUNCTION DOES NOT ACCEPT POSITIONAL ARGUMENTS **
-
-    Kwargs:
-        ** THIS FUNCTION ONLY ACCEPTS ONE OF THE KWARGS BELOW **
-        outputs: Dict containing the output values
-        error: Error message to return to slack
 
     Returns:
         Callable `{COMPLETE}()` function

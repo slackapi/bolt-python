@@ -3227,14 +3227,6 @@ def app_factory():
             async def handle_button_clicks({COMPLETE}):
                 await {COMPLETE}(outputs={{&#34;stringReverse&#34;:&#34;olleh&#34;}})
 
-        Args:
-            ** THIS FUNCTION DOES NOT ACCEPT POSITIONAL ARGUMENTS **
-
-        Kwargs:
-            ** THIS FUNCTION ONLY ACCEPTS ONE OF THE KWARGS BELOW **
-            outputs: Dict containing the output values
-            error: Error message to return to slack
-
         Returns:
             Callable `{COMPLETE}()` function
         &#34;&#34;&#34;
@@ -3332,14 +3324,6 @@ def complete(self) -&gt; AsyncComplete:
         @app.function(&#34;reverse&#34;)
         async def handle_button_clicks({COMPLETE}):
             await {COMPLETE}(outputs={{&#34;stringReverse&#34;:&#34;olleh&#34;}})
-
-    Args:
-        ** THIS FUNCTION DOES NOT ACCEPT POSITIONAL ARGUMENTS **
-
-    Kwargs:
-        ** THIS FUNCTION ONLY ACCEPTS ONE OF THE KWARGS BELOW **
-        outputs: Dict containing the output values
-        error: Error message to return to slack
 
     Returns:
         Callable `{COMPLETE}()` function
@@ -3649,6 +3633,24 @@ def say(self) -&gt; AsyncSay:
     async def __call__(
         self, *args, outputs: Optional[Union[str, dict]] = None, error: Optional[str] = None
     ) -&gt; AsyncSlackResponse:
+        &#34;&#34;&#34;Complete function for this request.
+
+        Note: This function does NOT accept any positional arguments, 
+        it only ACCEPTS ONE KEYWORD ARGUMENT! A TypeError will be raised
+        if this is not respected.
+
+        Kwargs:
+            outputs: Json serializable containing the output values
+            error: Error message to return to slack
+
+        Returns:
+            SlackResponse: the response object returned from slack
+
+        Raises:
+            TypeError: If positional arguments are provided or more then 1
+                keyword argument is provided.
+        &#34;&#34;&#34;
+
         if args:
             raise TypeError(
                 f&#34;{get_name_for_logging(self)} takes 0 positional arguments but &#34;
