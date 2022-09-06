@@ -22,7 +22,7 @@ class AsyncComplete:
     ) -> AsyncSlackResponse:
         """Complete function for this request.
 
-        Note: This function does NOT accept any positional arguments, 
+        Note: This function does NOT accept any positional arguments,
         it only ACCEPTS ONE KEYWORD ARGUMENT! A TypeError will be raised
         if this is not respected.
 

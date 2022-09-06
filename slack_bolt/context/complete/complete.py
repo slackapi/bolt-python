@@ -21,7 +21,7 @@ class Complete:
     def __call__(self, *args, outputs: Optional[Union[str, dict]] = None, error: Optional[str] = None) -> SlackResponse:
         """Complete function for this request.
 
-        Note: This function does NOT accept any positional arguments, 
+        Note: This function does NOT accept any positional arguments,
         it only ACCEPTS ONE KEYWORD ARGUMENT! A TypeError will be raised
         if this is not respected.
 

@@ -801,14 +801,14 @@ class App:
 
             # Use this method as a decorator
             @app.function("reverse")
-            def reverse_string(event, complete_success: CompleteSuccess, complete_error: CompleteError):
+            def reverse_string(event, complete: Complete):
                 try:
                     string_to_reverse = event["inputs"]["stringToReverse"]
-                    complete_success({
+                    complete(outputs={
                         "reverseString": string_to_reverse[::-1]
                     })
                 except Exception as e:
-                    complete_error("Cannot reverse string")
+                    complete(error="Cannot reverse string")
                     raise e
 
             # Pass a function to this method
