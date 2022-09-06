@@ -36,6 +36,7 @@ from slack_sdk import WebClient
 from slack_sdk.models import JsonObject
 
 from slack_bolt.error import BoltError
+from slack_bolt.response import BoltResponse
 from slack_bolt.version import __version__ as bolt_version
 
 
@@ -115,7 +116,18 @@ def get_name_for_callable(func: Callable) -&gt; str:
 
 
 def get_arg_names_of_callable(func: Callable) -&gt; List[str]:
-    return inspect.getfullargspec(inspect.unwrap(func)).args</code></pre>
+    return inspect.getfullargspec(inspect.unwrap(func)).args
+
+
+def extract_listener_callables(
+    kwargs: dict,
+) -&gt; Optional[Sequence[Callable[..., Optional[BoltResponse]]]]:
+    if kwargs:
+        functions = [kwargs[&#34;ack&#34;]]
+        for sub in kwargs[&#34;lazy&#34;]:
+            functions.append(sub)
+        return functions
+    return None</code></pre>
 </details>
 </section>
 <section>
@@ -126,7 +138,7 @@ def get_arg_names_of_callable(func: Callable) -&gt; List[str]:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="slack_bolt.util.utils.convert_to_dict"><code class="name flex">
-<span>def <span class="ident">convert_to_dict</span></span>(<span>obj: Union[Dict, slack_sdk.models.basic_objects.JsonObject]) ‑> Dict</span>
+<span>def <span class="ident">convert_to_dict</span></span>(<span>obj: Union[Dict[~KT, ~VT], slack_sdk.models.basic_objects.JsonObject]) ‑> Dict[~KT, ~VT]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -143,7 +155,7 @@ def get_arg_names_of_callable(func: Callable) -&gt; List[str]:
 </details>
 </dd>
 <dt id="slack_bolt.util.utils.convert_to_dict_list"><code class="name flex">
-<span>def <span class="ident">convert_to_dict_list</span></span>(<span>objects: Sequence[Union[Dict, slack_sdk.models.basic_objects.JsonObject]]) ‑> Sequence[Dict]</span>
+<span>def <span class="ident">convert_to_dict_list</span></span>(<span>objects: Sequence[Union[Dict[~KT, ~VT], slack_sdk.models.basic_objects.JsonObject]]) ‑> Sequence[Dict[~KT, ~VT]]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -195,6 +207,26 @@ def get_arg_names_of_callable(func: Callable) -&gt; List[str]:
         logger=logger,
         user_agent_prefix=f&#34;Bolt/{bolt_version}&#34;,
     )</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.util.utils.extract_listener_callables"><code class="name flex">
+<span>def <span class="ident">extract_listener_callables</span></span>(<span>kwargs: dict) ‑> Optional[Sequence[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_listener_callables(
+    kwargs: dict,
+) -&gt; Optional[Sequence[Callable[..., Optional[BoltResponse]]]]:
+    if kwargs:
+        functions = [kwargs[&#34;ack&#34;]]
+        for sub in kwargs[&#34;lazy&#34;]:
+            functions.append(sub)
+        return functions
+    return None</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.util.utils.get_arg_names_of_callable"><code class="name flex">
@@ -296,6 +328,7 @@ def get_arg_names_of_callable(func: Callable) -&gt; List[str]:
 <li><code><a title="slack_bolt.util.utils.convert_to_dict_list" href="#slack_bolt.util.utils.convert_to_dict_list">convert_to_dict_list</a></code></li>
 <li><code><a title="slack_bolt.util.utils.create_copy" href="#slack_bolt.util.utils.create_copy">create_copy</a></code></li>
 <li><code><a title="slack_bolt.util.utils.create_web_client" href="#slack_bolt.util.utils.create_web_client">create_web_client</a></code></li>
+<li><code><a title="slack_bolt.util.utils.extract_listener_callables" href="#slack_bolt.util.utils.extract_listener_callables">extract_listener_callables</a></code></li>
 <li><code><a title="slack_bolt.util.utils.get_arg_names_of_callable" href="#slack_bolt.util.utils.get_arg_names_of_callable">get_arg_names_of_callable</a></code></li>
 <li><code><a title="slack_bolt.util.utils.get_boot_message" href="#slack_bolt.util.utils.get_boot_message">get_boot_message</a></code></li>
 <li><code><a title="slack_bolt.util.utils.get_name_for_callable" href="#slack_bolt.util.utils.get_name_for_callable">get_name_for_callable</a></code></li>

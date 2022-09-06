@@ -145,14 +145,6 @@ class AsyncBoltContext(BaseContext):
             async def handle_button_clicks({COMPLETE}):
                 await {COMPLETE}(outputs={{"stringReverse":"olleh"}})
 
-        Args:
-            ** THIS FUNCTION DOES NOT ACCEPT POSITIONAL ARGUMENTS **
-
-        Kwargs:
-            ** THIS FUNCTION ONLY ACCEPTS ONE OF THE KWARGS BELOW **
-            outputs: Dict containing the output values
-            error: Error message to return to slack
-
         Returns:
             Callable `{COMPLETE}()` function
         """

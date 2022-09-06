@@ -33,6 +33,7 @@ from typing import Callable, Dict, Any, Optional
 
 from slack_bolt.context import BoltContext
 from slack_bolt.context.ack import Ack
+from slack_bolt.context.complete import Complete
 from slack_bolt.context.respond import Respond
 from slack_bolt.context.say import Say
 from slack_bolt.request import BoltRequest
@@ -97,6 +98,8 @@ class Args:
     &#34;&#34;&#34;`say()` utility function, which calls `chat.postMessage` API with the associated channel ID&#34;&#34;&#34;
     respond: Respond
     &#34;&#34;&#34;`respond()` utility function, which utilizes the associated `response_url`&#34;&#34;&#34;
+    complete: Complete
+    &#34;&#34;&#34;`complete()` utility function, which returns a completion function response to the Slack servers&#34;&#34;&#34;
     # middleware
     next: Callable[[], None]
     &#34;&#34;&#34;`next()` utility function, which tells the middleware chain that it can continue with the next one&#34;&#34;&#34;
@@ -123,6 +126,7 @@ class Args:
         ack: Ack,
         say: Say,
         respond: Respond,
+        complete: Complete,
         # As this method is not supposed to be invoked by bolt-python users,
         # the naming conflict with the built-in one affects
         # only the internals of this method
@@ -148,6 +152,7 @@ class Args:
         self.ack: Ack = ack
         self.say: Say = say
         self.respond: Respond = respond
+        self.complete: Complete = complete
         self.next: Callable[[], None] = next
         self.next_: Callable[[], None] = next</code></pre>
 </details>
@@ -163,7 +168,7 @@ class Args:
 <dl>
 <dt id="slack_bolt.kwargs_injection.args.Args"><code class="flex name class">
 <span>class <span class="ident">Args</span></span>
-<span>(</span><span>*, logger: logging.Logger, client: slack_sdk.web.client.WebClient, req: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>, resp: <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>, context: <a title="slack_bolt.context.context.BoltContext" href="../context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a>, body: Dict[str, Any], payload: Dict[str, Any], options: Optional[Dict[str, Any]] = None, shortcut: Optional[Dict[str, Any]] = None, action: Optional[Dict[str, Any]] = None, view: Optional[Dict[str, Any]] = None, command: Optional[Dict[str, Any]] = None, event: Optional[Dict[str, Any]] = None, message: Optional[Dict[str, Any]] = None, ack: <a title="slack_bolt.context.ack.ack.Ack" href="../context/ack/ack.html#slack_bolt.context.ack.ack.Ack">Ack</a>, say: <a title="slack_bolt.context.say.say.Say" href="../context/say/say.html#slack_bolt.context.say.say.Say">Say</a>, respond: <a title="slack_bolt.context.respond.respond.Respond" href="../context/respond/respond.html#slack_bolt.context.respond.respond.Respond">Respond</a>, next: Callable[[], None], **kwargs)</span>
+<span>(</span><span>*, logger: logging.Logger, client: slack_sdk.web.client.WebClient, req: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>, resp: <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>, context: <a title="slack_bolt.context.context.BoltContext" href="../context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a>, body: Dict[str, Any], payload: Dict[str, Any], options: Optional[Dict[str, Any]] = None, shortcut: Optional[Dict[str, Any]] = None, action: Optional[Dict[str, Any]] = None, view: Optional[Dict[str, Any]] = None, command: Optional[Dict[str, Any]] = None, event: Optional[Dict[str, Any]] = None, message: Optional[Dict[str, Any]] = None, ack: <a title="slack_bolt.context.ack.ack.Ack" href="../context/ack/ack.html#slack_bolt.context.ack.ack.Ack">Ack</a>, say: <a title="slack_bolt.context.say.say.Say" href="../context/say/say.html#slack_bolt.context.say.say.Say">Say</a>, respond: <a title="slack_bolt.context.respond.respond.Respond" href="../context/respond/respond.html#slack_bolt.context.respond.respond.Respond">Respond</a>, complete: <a title="slack_bolt.context.complete.complete.Complete" href="../context/complete/complete.html#slack_bolt.context.complete.complete.Complete">Complete</a>, next: Callable[[], None], **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>All the arguments in this class are available in any middleware / listeners.
@@ -240,6 +245,8 @@ def handle_buttons(ack, respond, logger, context, body, client):
     &#34;&#34;&#34;`say()` utility function, which calls `chat.postMessage` API with the associated channel ID&#34;&#34;&#34;
     respond: Respond
     &#34;&#34;&#34;`respond()` utility function, which utilizes the associated `response_url`&#34;&#34;&#34;
+    complete: Complete
+    &#34;&#34;&#34;`complete()` utility function, which returns a completion function response to the Slack servers&#34;&#34;&#34;
     # middleware
     next: Callable[[], None]
     &#34;&#34;&#34;`next()` utility function, which tells the middleware chain that it can continue with the next one&#34;&#34;&#34;
@@ -266,6 +273,7 @@ def handle_buttons(ack, respond, logger, context, body, client):
         ack: Ack,
         say: Say,
         respond: Respond,
+        complete: Complete,
         # As this method is not supposed to be invoked by bolt-python users,
         # the naming conflict with the built-in one affects
         # only the internals of this method
@@ -291,6 +299,7 @@ def handle_buttons(ack, respond, logger, context, body, client):
         self.ack: Ack = ack
         self.say: Say = say
         self.respond: Respond = respond
+        self.complete: Complete = complete
         self.next: Callable[[], None] = next
         self.next_: Callable[[], None] = next</code></pre>
 </details>
@@ -315,6 +324,10 @@ def handle_buttons(ack, respond, logger, context, body, client):
 <dt id="slack_bolt.kwargs_injection.args.Args.command"><code class="name">var <span class="ident">command</span> : Optional[Dict[str, Any]]</code></dt>
 <dd>
 <div class="desc"><p>An alias for payload in an <code>@app.command</code> listener</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.args.Args.complete"><code class="name">var <span class="ident">complete</span> : <a title="slack_bolt.context.complete.complete.Complete" href="../context/complete/complete.html#slack_bolt.context.complete.complete.Complete">Complete</a></code></dt>
+<dd>
+<div class="desc"><p><code>complete()</code> utility function, which returns a completion function response to the Slack servers</p></div>
 </dd>
 <dt id="slack_bolt.kwargs_injection.args.Args.context"><code class="name">var <span class="ident">context</span> : <a title="slack_bolt.context.context.BoltContext" href="../context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a></code></dt>
 <dd>
@@ -406,6 +419,7 @@ def handle_buttons(ack, respond, logger, context, body, client):
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.body" href="#slack_bolt.kwargs_injection.args.Args.body">body</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.client" href="#slack_bolt.kwargs_injection.args.Args.client">client</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.command" href="#slack_bolt.kwargs_injection.args.Args.command">command</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.args.Args.complete" href="#slack_bolt.kwargs_injection.args.Args.complete">complete</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.context" href="#slack_bolt.kwargs_injection.args.Args.context">context</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.event" href="#slack_bolt.kwargs_injection.args.Args.event">event</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.logger" href="#slack_bolt.kwargs_injection.args.Args.logger">logger</a></code></li>

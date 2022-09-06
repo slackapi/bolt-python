@@ -140,20 +140,12 @@ class BoltContext(BaseContext):
         any interactivity handlers associated to a function invocation will no longer be invocable.
 
             @app.function("reverse")
-            async def handle_button_clicks(context):
+            def handle_button_clicks(context):
                 context.{COMPLETE}(outputs={{"stringReverse":"olleh"}})
 
             @app.function("reverse")
-            async def handle_button_clicks({COMPLETE}):
+            def handle_button_clicks({COMPLETE}):
                 {COMPLETE}(outputs={{"stringReverse":"olleh"}})
-
-        Args:
-            ** THIS FUNCTION DOES NOT ACCEPT POSITIONAL ARGUMENTS **
-
-        Kwargs:
-            ** THIS FUNCTION ONLY ACCEPTS ONE OF THE KWARGS BELOW **
-            outputs: Dict containing the output values
-            error: Error message to return to slack
 
         Returns:
             Callable `{COMPLETE}()` function

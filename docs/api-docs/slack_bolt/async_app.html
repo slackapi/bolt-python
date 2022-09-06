@@ -114,6 +114,7 @@ from .context.ack.async_ack import AsyncAck
 from .context.async_context import AsyncBoltContext
 from .context.respond.async_respond import AsyncRespond
 from .context.say.async_say import AsyncSay
+from .context.complete.async_complete import AsyncComplete
 from .listener.async_listener import AsyncListener
 from .listener_matcher.async_listener_matcher import AsyncCustomListenerMatcher
 from .request.async_request import AsyncBoltRequest
@@ -124,6 +125,7 @@ __all__ = [
     &#34;AsyncBoltContext&#34;,
     &#34;AsyncRespond&#34;,
     &#34;AsyncSay&#34;,
+    &#34;AsyncComplete&#34;,
     &#34;AsyncListener&#34;,
     &#34;AsyncCustomListenerMatcher&#34;,
     &#34;AsyncBoltRequest&#34;,
@@ -940,7 +942,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.event(event, True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
@@ -979,7 +981,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         middleware = list(middleware) if middleware else []
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             constraints = {
                 &#34;type&#34;: &#34;message&#34;,
                 &#34;subtype&#34;: (
@@ -1003,6 +1005,49 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                 base_logger=self._base_logger,
             )
             middleware.insert(0, AsyncMessageListenerMatches(keyword))
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
+
+        return __call__
+
+    def function(
+        self,
+        callback_id: Union[str, Pattern],
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
+    ) -&gt; Callable[..., Optional[Callable[..., Awaitable[BoltResponse]]]]:
+        &#34;&#34;&#34;Registers a new Function listener.
+        This method can be used as either a decorator or a method.
+
+            # Use this method as a decorator
+            @app.function(&#34;reverse&#34;)
+            async def reverse_string(event, complete_success: AsyncCompleteSuccess, complete_error: AsyncCompleteError):
+                try:
+                    string_to_reverse = event[&#34;inputs&#34;][&#34;stringToReverse&#34;]
+                    await complete_success({
+                        &#34;reverseString&#34;: string_to_reverse[::-1]
+                    })
+                except Exception as e:
+                    await complete_error(&#34;Cannot reverse string&#34;)
+                    raise e
+
+            # Pass a function to this method
+            app.function(&#34;reverse&#34;)(reverse_string)
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
+
+        Args:
+            callback_id: The callback id to identify the function
+            matchers: A list of listener matcher functions.
+                Only when all the matchers return True, the listener function can be invoked.
+            middleware: A list of lister middleware functions.
+                Only when all the middleware call `next()` method, the listener function can be invoked.
+        &#34;&#34;&#34;
+
+        def __call__(*args, **kwargs):
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
+            primary_matcher = builtin_matchers.function_event(
+                callback_id=callback_id, asyncio=True, base_logger=self._base_logger
+            )
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
         return __call__
@@ -1042,7 +1087,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.command(command, asyncio=True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1089,7 +1134,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.shortcut(constraints, asyncio=True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1104,7 +1149,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         &#34;&#34;&#34;Registers a new global shortcut listener.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.global_shortcut(callback_id, asyncio=True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1119,7 +1164,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         &#34;&#34;&#34;Registers a new message shortcut listener.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.message_shortcut(callback_id, asyncio=True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1159,7 +1204,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.action(constraints, asyncio=True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1176,7 +1221,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.block_action(constraints, asyncio=True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1192,7 +1237,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         Refer to https://api.slack.com/legacy/message-buttons for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.attachment_action(callback_id, asyncio=True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1208,7 +1253,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.dialog_submission(callback_id, asyncio=True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1224,7 +1269,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.dialog_cancellation(callback_id, asyncio=True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1275,7 +1320,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.view(constraints, asyncio=True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1291,7 +1336,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         Refer to https://api.slack.com/reference/interaction-payloads/views#view_submission for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.view_submission(constraints, asyncio=True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1307,7 +1352,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         Refer to https://api.slack.com/reference/interaction-payloads/views#view_closed for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.view_closed(constraints, asyncio=True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1358,7 +1403,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.options(constraints, asyncio=True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1373,7 +1418,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         &#34;&#34;&#34;Registers a new `block_suggestion` listener.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.block_suggestion(action_id, asyncio=True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1389,7 +1434,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.dialog_suggestion(callback_id, asyncio=True, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1421,34 +1466,27 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
     def _init_context(self, req: AsyncBoltRequest):
         req.context[&#34;logger&#34;] = get_bolt_app_logger(app_name=self.name, base_logger=self._base_logger)
         req.context[&#34;token&#34;] = self._token
-        if self._token is not None:
-            # This AsyncWebClient instance can be safely singleton
-            req.context[&#34;client&#34;] = self._async_client
-        else:
-            # Set a new dedicated instance for this request
-            client_per_request: AsyncWebClient = AsyncWebClient(
-                token=None,  # the token will be set later
-                base_url=self._async_client.base_url,
-                timeout=self._async_client.timeout,
-                ssl=self._async_client.ssl,
-                proxy=self._async_client.proxy,
-                session=self._async_client.session,
-                trust_env_in_session=self._async_client.trust_env_in_session,
-                headers=self._async_client.headers,
-                team_id=req.context.team_id,
-            )
-            req.context[&#34;client&#34;] = client_per_request
-
-    @staticmethod
-    def _to_listener_functions(
-        kwargs: dict,
-    ) -&gt; Optional[Sequence[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
-        if kwargs:
-            functions = [kwargs[&#34;ack&#34;]]
-            for sub in kwargs[&#34;lazy&#34;]:
-                functions.append(sub)
-            return functions
-        return None
+        # Prior to version 1.15, when the token is static, self._client was passed to `req.context`.
+        # The intention was to avoid creating a new instance per request
+        # in the interest of runtime performance/memory footprint optimization.
+        # However, developers may want to replace the token held by req.context.client in some situations.
+        # In this case, this behavior can result in thread-unsafe data modification on `self._client`.
+        # (`self._client` a.k.a. `app.client` is a singleton object per an App instance)
+        # Thus, we&#39;ve changed the behavior to create a new instance per request regardless of token argument
+        # in the App initialization starting v1.15.
+        # The overhead brought by this change is slight so that we believe that it is ignorable in any cases.
+        client_per_request: AsyncWebClient = AsyncWebClient(
+            token=self._token,  # this can be None, and it can be set later on
+            base_url=self._async_client.base_url,
+            timeout=self._async_client.timeout,
+            ssl=self._async_client.ssl,
+            proxy=self._async_client.proxy,
+            session=self._async_client.session,
+            trust_env_in_session=self._async_client.trust_env_in_session,
+            headers=self._async_client.headers,
+            team_id=req.context.team_id,
+        )
+        req.context[&#34;client&#34;] = client_per_request
 
     def _register_listener(
         self,
@@ -1601,7 +1639,7 @@ def process_before_response(self) -&gt; bool:
 <h3>Methods</h3>
 <dl>
 <dt id="slack_bolt.async_app.AsyncApp.action"><code class="name flex">
-<span>def <span class="ident">action</span></span>(<span>self, constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">action</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Pattern[~AnyStr]]]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new action listener. This method can be used as either a decorator or a method.</p>
@@ -1665,7 +1703,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.action(constraints, asyncio=True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1794,7 +1832,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.attachment_action"><code class="name flex">
-<span>def <span class="ident">attachment_action</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">attachment_action</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>interactive_message</code> action listener.
@@ -1813,7 +1851,7 @@ Refer to <a href="https://api.slack.com/legacy/message-buttons">https://api.slac
     Refer to https://api.slack.com/legacy/message-buttons for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.attachment_action(callback_id, asyncio=True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1821,7 +1859,7 @@ Refer to <a href="https://api.slack.com/legacy/message-buttons">https://api.slac
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.block_action"><code class="name flex">
-<span>def <span class="ident">block_action</span></span>(<span>self, constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">block_action</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Pattern[~AnyStr]]]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>block_actions</code> action listener.
@@ -1841,7 +1879,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-act
     &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.block_action(constraints, asyncio=True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1849,7 +1887,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-act
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.block_suggestion"><code class="name flex">
-<span>def <span class="ident">block_suggestion</span></span>(<span>self, action_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">block_suggestion</span></span>(<span>self, action_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>block_suggestion</code> listener.</p></div>
@@ -1866,7 +1904,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-act
     &#34;&#34;&#34;Registers a new `block_suggestion` listener.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.block_suggestion(action_id, asyncio=True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1874,7 +1912,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-act
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.command"><code class="name flex">
-<span>def <span class="ident">command</span></span>(<span>self, command: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">command</span></span>(<span>self, command: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new slash command listener.
@@ -1938,7 +1976,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.command(command, asyncio=True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1980,7 +2018,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.dialog_cancellation"><code class="name flex">
-<span>def <span class="ident">dialog_cancellation</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">dialog_cancellation</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>dialog_submission</code> listener.
@@ -1999,7 +2037,7 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
     Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.dialog_cancellation(callback_id, asyncio=True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2007,7 +2045,7 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.dialog_submission"><code class="name flex">
-<span>def <span class="ident">dialog_submission</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">dialog_submission</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>dialog_submission</code> listener.
@@ -2026,7 +2064,7 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
     Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.dialog_submission(callback_id, asyncio=True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2034,7 +2072,7 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.dialog_suggestion"><code class="name flex">
-<span>def <span class="ident">dialog_suggestion</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">dialog_suggestion</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>dialog_suggestion</code> listener.
@@ -2053,7 +2091,7 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
     Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.dialog_suggestion(callback_id, asyncio=True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2134,7 +2172,7 @@ when getting an unhandled error in Bolt app.</dd>
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.event"><code class="name flex">
-<span>def <span class="ident">event</span></span>(<span>self, event: Union[str, Pattern, Dict[str, Union[str, Sequence[Union[str, Pattern, ForwardRef(None)]], ForwardRef(None)]]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">event</span></span>(<span>self, event: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Sequence[Union[str, Pattern[~AnyStr], None]], None]]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new event listener. This method can be used as either a decorator or a method.</p>
@@ -2204,15 +2242,96 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.event(event, True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
     return __call__</code></pre>
 </details>
 </dd>
+<dt id="slack_bolt.async_app.AsyncApp.function"><code class="name flex">
+<span>def <span class="ident">function</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Registers a new Function listener.
+This method can be used as either a decorator or a method.</p>
+<pre><code># Use this method as a decorator
+@app.function("reverse")
+async def reverse_string(event, complete_success: AsyncCompleteSuccess, complete_error: AsyncCompleteError):
+    try:
+        string_to_reverse = event["inputs"]["stringToReverse"]
+        await complete_success({
+            "reverseString": string_to_reverse[::-1]
+        })
+    except Exception as e:
+        await complete_error("Cannot reverse string")
+        raise e
+
+# Pass a function to this method
+app.function("reverse")(reverse_string)
+</code></pre>
+<p>To learn available arguments for middleware/listeners, see <code><a title="slack_bolt.kwargs_injection.async_args" href="kwargs_injection/async_args.html">slack_bolt.kwargs_injection.async_args</a></code>'s API document.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>callback_id</code></strong></dt>
+<dd>The callback id to identify the function</dd>
+<dt><strong><code>matchers</code></strong></dt>
+<dd>A list of listener matcher functions.
+Only when all the matchers return True, the listener function can be invoked.</dd>
+<dt><strong><code>middleware</code></strong></dt>
+<dd>A list of lister middleware functions.
+Only when all the middleware call <code>next()</code> method, the listener function can be invoked.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def function(
+    self,
+    callback_id: Union[str, Pattern],
+    matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+    middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Awaitable[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new Function listener.
+    This method can be used as either a decorator or a method.
+
+        # Use this method as a decorator
+        @app.function(&#34;reverse&#34;)
+        async def reverse_string(event, complete_success: AsyncCompleteSuccess, complete_error: AsyncCompleteError):
+            try:
+                string_to_reverse = event[&#34;inputs&#34;][&#34;stringToReverse&#34;]
+                await complete_success({
+                    &#34;reverseString&#34;: string_to_reverse[::-1]
+                })
+            except Exception as e:
+                await complete_error(&#34;Cannot reverse string&#34;)
+                raise e
+
+        # Pass a function to this method
+        app.function(&#34;reverse&#34;)(reverse_string)
+
+    To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
+
+    Args:
+        callback_id: The callback id to identify the function
+        matchers: A list of listener matcher functions.
+            Only when all the matchers return True, the listener function can be invoked.
+        middleware: A list of lister middleware functions.
+            Only when all the middleware call `next()` method, the listener function can be invoked.
+    &#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.function_event(
+            callback_id=callback_id, asyncio=True, base_logger=self._base_logger
+        )
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
+
+    return __call__</code></pre>
+</details>
+</dd>
 <dt id="slack_bolt.async_app.AsyncApp.global_shortcut"><code class="name flex">
-<span>def <span class="ident">global_shortcut</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">global_shortcut</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new global shortcut listener.</p></div>
@@ -2229,7 +2348,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;Registers a new global shortcut listener.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.global_shortcut(callback_id, asyncio=True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2237,7 +2356,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.message"><code class="name flex">
-<span>def <span class="ident">message</span></span>(<span>self, keyword: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">message</span></span>(<span>self, keyword: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new message event listener. This method can be used as either a decorator or a method.
@@ -2301,7 +2420,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     middleware = list(middleware) if middleware else []
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         constraints = {
             &#34;type&#34;: &#34;message&#34;,
             &#34;subtype&#34;: (
@@ -2331,7 +2450,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.message_shortcut"><code class="name flex">
-<span>def <span class="ident">message_shortcut</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">message_shortcut</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new message shortcut listener.</p></div>
@@ -2348,7 +2467,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;Registers a new message shortcut listener.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.message_shortcut(callback_id, asyncio=True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2418,7 +2537,7 @@ app.middleware(middleware_func)
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.options"><code class="name flex">
-<span>def <span class="ident">options</span></span>(<span>self, constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">options</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Pattern[~AnyStr]]]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new options listener.
@@ -2502,7 +2621,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.options(constraints, asyncio=True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2553,7 +2672,7 @@ Refer to <a href="https://docs.aiohttp.org/">https://docs.aiohttp.org/</a> for m
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.shortcut"><code class="name flex">
-<span>def <span class="ident">shortcut</span></span>(<span>self, constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">shortcut</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Pattern[~AnyStr]]]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new shortcut listener.
@@ -2629,7 +2748,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.shortcut(constraints, asyncio=True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2668,7 +2787,7 @@ Refer to <a href="https://docs.aiohttp.org/">https://docs.aiohttp.org/</a> for m
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.step"><code class="name flex">
-<span>def <span class="ident">step</span></span>(<span>self, callback_id: Union[str, Pattern, <a title="slack_bolt.workflows.step.async_step.AsyncWorkflowStep" href="workflows/step/async_step.html#slack_bolt.workflows.step.async_step.AsyncWorkflowStep">AsyncWorkflowStep</a>, <a title="slack_bolt.workflows.step.async_step.AsyncWorkflowStepBuilder" href="workflows/step/async_step.html#slack_bolt.workflows.step.async_step.AsyncWorkflowStepBuilder">AsyncWorkflowStepBuilder</a>], edit: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable], ForwardRef(None)] = None, save: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable], ForwardRef(None)] = None, execute: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable], ForwardRef(None)] = None)</span>
+<span>def <span class="ident">step</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr], <a title="slack_bolt.workflows.step.async_step.AsyncWorkflowStep" href="workflows/step/async_step.html#slack_bolt.workflows.step.async_step.AsyncWorkflowStep">AsyncWorkflowStep</a>, <a title="slack_bolt.workflows.step.async_step.AsyncWorkflowStepBuilder" href="workflows/step/async_step.html#slack_bolt.workflows.step.async_step.AsyncWorkflowStepBuilder">AsyncWorkflowStepBuilder</a>], edit: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable], None] = None, save: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable], None] = None, execute: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable], None] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new Workflow Step listener.
@@ -2773,7 +2892,7 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.view"><code class="name flex">
-<span>def <span class="ident">view</span></span>(<span>self, constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">view</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Pattern[~AnyStr]]]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>view_submission</code>/<code>view_closed</code> event listener.
@@ -2857,7 +2976,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.view(constraints, asyncio=True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2865,7 +2984,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.view_closed"><code class="name flex">
-<span>def <span class="ident">view_closed</span></span>(<span>self, constraints: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">view_closed</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>view_closed</code> listener.
@@ -2884,7 +3003,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#vie
     Refer to https://api.slack.com/reference/interaction-payloads/views#view_closed for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.view_closed(constraints, asyncio=True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2892,7 +3011,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#vie
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.view_submission"><code class="name flex">
-<span>def <span class="ident">view_submission</span></span>(<span>self, constraints: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
+<span>def <span class="ident">view_submission</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>view_submission</code> listener.
@@ -2911,7 +3030,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#vie
     Refer to https://api.slack.com/reference/interaction-payloads/views#view_submission for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.view_submission(constraints, asyncio=True, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -3001,19 +3120,19 @@ def app_factory():
 
     @property
     def client(self) -&gt; Optional[AsyncWebClient]:
-        &#34;&#34;&#34;The `AsyncWebClient` instance available for this request.
+        f&#34;&#34;&#34;The `AsyncWebClient` instance available for this request.
 
             @app.event(&#34;app_mention&#34;)
             async def handle_events(context):
-                await context.client.chat_postMessage(
+                await context.{CLIENT}.chat_postMessage(
                     channel=context.channel_id,
                     text=&#34;Thanks!&#34;,
                 )
 
-            # You can access &#34;client&#34; this way too.
+            # You can access &#34;{CLIENT}&#34; this way too.
             @app.event(&#34;app_mention&#34;)
-            async def handle_events(client, context):
-                await client.chat_postMessage(
+            async def handle_events({CLIENT}, context):
+                await {CLIENT}.chat_postMessage(
                     channel=context.channel_id,
                     text=&#34;Thanks!&#34;,
                 )
@@ -3021,77 +3140,107 @@ def app_factory():
         Returns:
             `AsyncWebClient` instance
         &#34;&#34;&#34;
-        if &#34;client&#34; not in self:
-            self[&#34;client&#34;] = AsyncWebClient(token=None)
-        return self[&#34;client&#34;]
+        if CLIENT not in self:
+            self[CLIENT] = AsyncWebClient(token=None)
+        return self[CLIENT]
 
     @property
     def ack(self) -&gt; AsyncAck:
-        &#34;&#34;&#34;`ack()` function for this request.
+        f&#34;&#34;&#34;`{ACK}()` function for this request.
 
             @app.action(&#34;button&#34;)
             async def handle_button_clicks(context):
-                await context.ack()
+                await context.{ACK}()
 
-            # You can access &#34;ack&#34; this way too.
+            # You can access &#34;{ACK}&#34; this way too.
             @app.action(&#34;button&#34;)
-            async def handle_button_clicks(ack):
-                await ack()
+            async def handle_button_clicks({ACK}):
+                await {ACK}()
 
         Returns:
-            Callable `ack()` function
+            Callable `{ACK}()` function
         &#34;&#34;&#34;
-        if &#34;ack&#34; not in self:
-            self[&#34;ack&#34;] = AsyncAck()
-        return self[&#34;ack&#34;]
+        if ACK not in self:
+            self[ACK] = AsyncAck()
+        return self[ACK]
 
     @property
     def say(self) -&gt; AsyncSay:
-        &#34;&#34;&#34;`say()` function for this request.
+        f&#34;&#34;&#34;`{SAY}()` function for this request.
 
             @app.action(&#34;button&#34;)
             async def handle_button_clicks(context):
-                await context.ack()
-                await context.say(&#34;Hi!&#34;)
+                await context.{ACK}()
+                await context.{SAY}(&#34;Hi!&#34;)
 
-            # You can access &#34;ack&#34; this way too.
+            # You can access &#34;{ACK}&#34; this way too.
             @app.action(&#34;button&#34;)
-            async def handle_button_clicks(ack, say):
-                await ack()
-                await say(&#34;Hi!&#34;)
+            async def handle_button_clicks({ACK}, {SAY}):
+                await {ACK}()
+                await {SAY}(&#34;Hi!&#34;)
 
         Returns:
-            Callable `say()` function
+            Callable `{SAY}()` function
         &#34;&#34;&#34;
-        if &#34;say&#34; not in self:
-            self[&#34;say&#34;] = AsyncSay(client=self.client, channel=self.channel_id)
-        return self[&#34;say&#34;]
+        if SAY not in self:
+            self[SAY] = AsyncSay(client=self.client, channel=self.channel_id)
+        return self[SAY]
 
     @property
     def respond(self) -&gt; Optional[AsyncRespond]:
-        &#34;&#34;&#34;`respond()` function for this request.
+        f&#34;&#34;&#34;`{RESPOND}()` function for this request.
 
             @app.action(&#34;button&#34;)
             async def handle_button_clicks(context):
-                await context.ack()
-                await context.respond(&#34;Hi!&#34;)
+                await context.{ACK}()
+                await context.{RESPOND}(&#34;Hi!&#34;)
 
-            # You can access &#34;ack&#34; this way too.
+            # You can access &#34;{ACK}&#34; this way too.
             @app.action(&#34;button&#34;)
-            async def handle_button_clicks(ack, respond):
-                await ack()
-                await respond(&#34;Hi!&#34;)
+            async def handle_button_clicks({ACK}, {RESPOND}):
+                await {ACK}()
+                await {RESPOND}(&#34;Hi!&#34;)
 
         Returns:
-            Callable `respond()` function
+            Callable `{RESPOND}()` function
         &#34;&#34;&#34;
-        if &#34;respond&#34; not in self:
-            self[&#34;respond&#34;] = AsyncRespond(
+        if RESPOND not in self:
+            self[RESPOND] = AsyncRespond(
                 response_url=self.response_url,
                 proxy=self.client.proxy,
                 ssl=self.client.ssl,
             )
-        return self[&#34;respond&#34;]</code></pre>
+        return self[RESPOND]
+
+    @property
+    def complete(self) -&gt; AsyncComplete:
+        f&#34;&#34;&#34;`{COMPLETE}()` function for this request. Once a function&#39;s state is set to complete,
+        any outputs the function returns will be passed along to the next step of its housing workflow,
+        or complete the workflow if the function is the last step in a workflow. Additionally,
+        any interactivity handlers associated to a function invocation will no longer be invocable.
+
+            @app.function(&#34;reverse&#34;)
+            async def handle_button_clicks(context):
+                await context.{COMPLETE}(outputs={{&#34;stringReverse&#34;:&#34;olleh&#34;}})
+
+            @app.function(&#34;reverse&#34;)
+            async def handle_button_clicks({COMPLETE}):
+                await {COMPLETE}(outputs={{&#34;stringReverse&#34;:&#34;olleh&#34;}})
+
+        Args:
+            ** THIS FUNCTION DOES NOT ACCEPT POSITIONAL ARGUMENTS **
+
+        Kwargs:
+            ** THIS FUNCTION ONLY ACCEPTS ONE OF THE KWARGS BELOW **
+            outputs: Dict containing the output values
+            error: Error message to return to slack
+
+        Returns:
+            Callable `{COMPLETE}()` function
+        &#34;&#34;&#34;
+        if COMPLETE not in self:
+            self[COMPLETE] = AsyncComplete(client=self.client, function_execution_id=self.function_execution_id)
+        return self[COMPLETE]</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -3102,82 +3251,54 @@ def app_factory():
 <dl>
 <dt id="slack_bolt.async_app.AsyncBoltContext.ack"><code class="name">var <span class="ident">ack</span> : <a title="slack_bolt.context.ack.async_ack.AsyncAck" href="context/ack/async_ack.html#slack_bolt.context.ack.async_ack.AsyncAck">AsyncAck</a></code></dt>
 <dd>
-<div class="desc"><p><code>ack()</code> function for this request.</p>
-<pre><code>@app.action("button")
-async def handle_button_clicks(context):
-    await context.ack()
-
-# You can access "ack" this way too.
-@app.action("button")
-async def handle_button_clicks(ack):
-    await ack()
-</code></pre>
-<h2 id="returns">Returns</h2>
-<p>Callable <code>ack()</code> function</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
 def ack(self) -&gt; AsyncAck:
-    &#34;&#34;&#34;`ack()` function for this request.
+    f&#34;&#34;&#34;`{ACK}()` function for this request.
 
         @app.action(&#34;button&#34;)
         async def handle_button_clicks(context):
-            await context.ack()
+            await context.{ACK}()
 
-        # You can access &#34;ack&#34; this way too.
+        # You can access &#34;{ACK}&#34; this way too.
         @app.action(&#34;button&#34;)
-        async def handle_button_clicks(ack):
-            await ack()
+        async def handle_button_clicks({ACK}):
+            await {ACK}()
 
     Returns:
-        Callable `ack()` function
+        Callable `{ACK}()` function
     &#34;&#34;&#34;
-    if &#34;ack&#34; not in self:
-        self[&#34;ack&#34;] = AsyncAck()
-    return self[&#34;ack&#34;]</code></pre>
+    if ACK not in self:
+        self[ACK] = AsyncAck()
+    return self[ACK]</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncBoltContext.client"><code class="name">var <span class="ident">client</span> : Optional[slack_sdk.web.async_client.AsyncWebClient]</code></dt>
 <dd>
-<div class="desc"><p>The <code>AsyncWebClient</code> instance available for this request.</p>
-<pre><code>@app.event("app_mention")
-async def handle_events(context):
-    await context.client.chat_postMessage(
-        channel=context.channel_id,
-        text="Thanks!",
-    )
-
-# You can access "client" this way too.
-@app.event("app_mention")
-async def handle_events(client, context):
-    await client.chat_postMessage(
-        channel=context.channel_id,
-        text="Thanks!",
-    )
-</code></pre>
-<h2 id="returns">Returns</h2>
-<p><code>AsyncWebClient</code> instance</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
 def client(self) -&gt; Optional[AsyncWebClient]:
-    &#34;&#34;&#34;The `AsyncWebClient` instance available for this request.
+    f&#34;&#34;&#34;The `AsyncWebClient` instance available for this request.
 
         @app.event(&#34;app_mention&#34;)
         async def handle_events(context):
-            await context.client.chat_postMessage(
+            await context.{CLIENT}.chat_postMessage(
                 channel=context.channel_id,
                 text=&#34;Thanks!&#34;,
             )
 
-        # You can access &#34;client&#34; this way too.
+        # You can access &#34;{CLIENT}&#34; this way too.
         @app.event(&#34;app_mention&#34;)
-        async def handle_events(client, context):
-            await client.chat_postMessage(
+        async def handle_events({CLIENT}, context):
+            await {CLIENT}.chat_postMessage(
                 channel=context.channel_id,
                 text=&#34;Thanks!&#34;,
             )
@@ -3185,99 +3306,111 @@ def client(self) -&gt; Optional[AsyncWebClient]:
     Returns:
         `AsyncWebClient` instance
     &#34;&#34;&#34;
-    if &#34;client&#34; not in self:
-        self[&#34;client&#34;] = AsyncWebClient(token=None)
-    return self[&#34;client&#34;]</code></pre>
+    if CLIENT not in self:
+        self[CLIENT] = AsyncWebClient(token=None)
+    return self[CLIENT]</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.async_app.AsyncBoltContext.complete"><code class="name">var <span class="ident">complete</span> : <a title="slack_bolt.context.complete.async_complete.AsyncComplete" href="context/complete/async_complete.html#slack_bolt.context.complete.async_complete.AsyncComplete">AsyncComplete</a></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def complete(self) -&gt; AsyncComplete:
+    f&#34;&#34;&#34;`{COMPLETE}()` function for this request. Once a function&#39;s state is set to complete,
+    any outputs the function returns will be passed along to the next step of its housing workflow,
+    or complete the workflow if the function is the last step in a workflow. Additionally,
+    any interactivity handlers associated to a function invocation will no longer be invocable.
+
+        @app.function(&#34;reverse&#34;)
+        async def handle_button_clicks(context):
+            await context.{COMPLETE}(outputs={{&#34;stringReverse&#34;:&#34;olleh&#34;}})
+
+        @app.function(&#34;reverse&#34;)
+        async def handle_button_clicks({COMPLETE}):
+            await {COMPLETE}(outputs={{&#34;stringReverse&#34;:&#34;olleh&#34;}})
+
+    Args:
+        ** THIS FUNCTION DOES NOT ACCEPT POSITIONAL ARGUMENTS **
+
+    Kwargs:
+        ** THIS FUNCTION ONLY ACCEPTS ONE OF THE KWARGS BELOW **
+        outputs: Dict containing the output values
+        error: Error message to return to slack
+
+    Returns:
+        Callable `{COMPLETE}()` function
+    &#34;&#34;&#34;
+    if COMPLETE not in self:
+        self[COMPLETE] = AsyncComplete(client=self.client, function_execution_id=self.function_execution_id)
+    return self[COMPLETE]</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncBoltContext.respond"><code class="name">var <span class="ident">respond</span> : Optional[<a title="slack_bolt.context.respond.async_respond.AsyncRespond" href="context/respond/async_respond.html#slack_bolt.context.respond.async_respond.AsyncRespond">AsyncRespond</a>]</code></dt>
 <dd>
-<div class="desc"><p><code>respond()</code> function for this request.</p>
-<pre><code>@app.action("button")
-async def handle_button_clicks(context):
-    await context.ack()
-    await context.respond("Hi!")
-
-# You can access "ack" this way too.
-@app.action("button")
-async def handle_button_clicks(ack, respond):
-    await ack()
-    await respond("Hi!")
-</code></pre>
-<h2 id="returns">Returns</h2>
-<p>Callable <code>respond()</code> function</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
 def respond(self) -&gt; Optional[AsyncRespond]:
-    &#34;&#34;&#34;`respond()` function for this request.
+    f&#34;&#34;&#34;`{RESPOND}()` function for this request.
 
         @app.action(&#34;button&#34;)
         async def handle_button_clicks(context):
-            await context.ack()
-            await context.respond(&#34;Hi!&#34;)
+            await context.{ACK}()
+            await context.{RESPOND}(&#34;Hi!&#34;)
 
-        # You can access &#34;ack&#34; this way too.
+        # You can access &#34;{ACK}&#34; this way too.
         @app.action(&#34;button&#34;)
-        async def handle_button_clicks(ack, respond):
-            await ack()
-            await respond(&#34;Hi!&#34;)
+        async def handle_button_clicks({ACK}, {RESPOND}):
+            await {ACK}()
+            await {RESPOND}(&#34;Hi!&#34;)
 
     Returns:
-        Callable `respond()` function
+        Callable `{RESPOND}()` function
     &#34;&#34;&#34;
-    if &#34;respond&#34; not in self:
-        self[&#34;respond&#34;] = AsyncRespond(
+    if RESPOND not in self:
+        self[RESPOND] = AsyncRespond(
             response_url=self.response_url,
             proxy=self.client.proxy,
             ssl=self.client.ssl,
         )
-    return self[&#34;respond&#34;]</code></pre>
+    return self[RESPOND]</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncBoltContext.say"><code class="name">var <span class="ident">say</span> : <a title="slack_bolt.context.say.async_say.AsyncSay" href="context/say/async_say.html#slack_bolt.context.say.async_say.AsyncSay">AsyncSay</a></code></dt>
 <dd>
-<div class="desc"><p><code>say()</code> function for this request.</p>
-<pre><code>@app.action("button")
-async def handle_button_clicks(context):
-    await context.ack()
-    await context.say("Hi!")
-
-# You can access "ack" this way too.
-@app.action("button")
-async def handle_button_clicks(ack, say):
-    await ack()
-    await say("Hi!")
-</code></pre>
-<h2 id="returns">Returns</h2>
-<p>Callable <code>say()</code> function</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
 def say(self) -&gt; AsyncSay:
-    &#34;&#34;&#34;`say()` function for this request.
+    f&#34;&#34;&#34;`{SAY}()` function for this request.
 
         @app.action(&#34;button&#34;)
         async def handle_button_clicks(context):
-            await context.ack()
-            await context.say(&#34;Hi!&#34;)
+            await context.{ACK}()
+            await context.{SAY}(&#34;Hi!&#34;)
 
-        # You can access &#34;ack&#34; this way too.
+        # You can access &#34;{ACK}&#34; this way too.
         @app.action(&#34;button&#34;)
-        async def handle_button_clicks(ack, say):
-            await ack()
-            await say(&#34;Hi!&#34;)
+        async def handle_button_clicks({ACK}, {SAY}):
+            await {ACK}()
+            await {SAY}(&#34;Hi!&#34;)
 
     Returns:
-        Callable `say()` function
+        Callable `{SAY}()` function
     &#34;&#34;&#34;
-    if &#34;say&#34; not in self:
-        self[&#34;say&#34;] = AsyncSay(client=self.client, channel=self.channel_id)
-    return self[&#34;say&#34;]</code></pre>
+    if SAY not in self:
+        self[SAY] = AsyncSay(client=self.client, channel=self.channel_id)
+    return self[SAY]</code></pre>
 </details>
 </dd>
 </dl>
@@ -3321,10 +3454,12 @@ def say(self) -&gt; AsyncSay:
 <li><code><a title="slack_bolt.context.base_context.BaseContext.bot_user_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.bot_user_id">bot_user_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.channel_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.channel_id">channel_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.enterprise_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.enterprise_id">enterprise_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.function_execution_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.function_execution_id">function_execution_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.is_enterprise_install" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.is_enterprise_install">is_enterprise_install</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.logger" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.logger">logger</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.matches" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.matches">matches</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.response_url" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.response_url">response_url</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.slack_function_bot_access_token" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.slack_function_bot_access_token">slack_function_bot_access_token</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.team_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.team_id">team_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.token" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.token">token</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.user_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.user_id">user_id</a></code></li>
@@ -3335,7 +3470,7 @@ def say(self) -&gt; AsyncSay:
 </dd>
 <dt id="slack_bolt.async_app.AsyncBoltRequest"><code class="flex name class">
 <span>class <span class="ident">AsyncBoltRequest</span></span>
-<span>(</span><span>*, body: Union[str, dict], query: Union[str, Dict[str, str], Dict[str, Sequence[str]], ForwardRef(None)] = None, headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None, context: Optional[Dict[str, str]] = None, mode: str = 'http')</span>
+<span>(</span><span>*, body: Union[str, dict], query: Union[str, Dict[str, str], Dict[str, Sequence[str]], None] = None, headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None, context: Optional[Dict[str, str]] = None, mode: str = 'http')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Request to a Bolt app.</p>
@@ -3486,6 +3621,71 @@ def say(self) -&gt; AsyncSay:
         mode=self.mode,
     )</code></pre>
 </details>
+</dd>
+</dl>
+</dd>
+<dt id="slack_bolt.async_app.AsyncComplete"><code class="flex name class">
+<span>class <span class="ident">AsyncComplete</span></span>
+<span>(</span><span>client: slack_sdk.web.async_client.AsyncWebClient, function_execution_id: Optional[str])</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AsyncComplete:
+    client: AsyncWebClient
+    function_execution_id: Optional[str]
+
+    def __init__(
+        self,
+        client: AsyncWebClient,
+        function_execution_id: Optional[str],
+    ):
+        self.client = client
+        self.function_execution_id = function_execution_id
+
+    async def __call__(
+        self, *args, outputs: Optional[Union[str, dict]] = None, error: Optional[str] = None
+    ) -&gt; AsyncSlackResponse:
+        if args:
+            raise TypeError(
+                f&#34;{get_name_for_logging(self)} takes 0 positional arguments but &#34;
+                f&#34;{len(args)} {&#39;were&#39; if len(args) &gt; 1 else &#39;was&#39;} given, &#34;
+                f&#34;missing 1 keyword-only argument: {get_kwargs_for_logging(self)}&#34;
+            )
+
+        if outputs is not None and error is not None:
+            raise TypeError(
+                f&#34;{get_name_for_logging(self)} expects 1 keyword-only argument but 2 were given, &#34;
+                f&#34;provide: {get_kwargs_for_logging(self)}&#34;
+            )
+
+        if self.function_execution_id is None:
+            raise ValueError(f&#34;{get_name_for_logging(self)} is unsupported here as there is no function_execution_id&#34;)
+
+        if isinstance(error, str):
+            # TODO add this new api call to the sdk and use it here
+            return await self.client.api_call(
+                &#34;functions.completeError&#34;, json={&#34;error&#34;: error, &#34;function_execution_id&#34;: self.function_execution_id}
+            )
+
+        # TODO add this new api call to the sdk and use it here
+        return await self.client.api_call(
+            &#34;functions.completeSuccess&#34;,
+            json={&#34;outputs&#34;: outputs if outputs else {}, &#34;function_execution_id&#34;: self.function_execution_id},
+        )</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.async_app.AsyncComplete.client"><code class="name">var <span class="ident">client</span> : slack_sdk.web.async_client.AsyncWebClient</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.async_app.AsyncComplete.function_execution_id"><code class="name">var <span class="ident">function_execution_id</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
 </dd>
 </dl>
 </dd>
@@ -3948,6 +4148,7 @@ async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltRes
 <li><code><a title="slack_bolt.async_app.AsyncApp.enable_token_revocation_listeners" href="#slack_bolt.async_app.AsyncApp.enable_token_revocation_listeners">enable_token_revocation_listeners</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncApp.error" href="#slack_bolt.async_app.AsyncApp.error">error</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncApp.event" href="#slack_bolt.async_app.AsyncApp.event">event</a></code></li>
+<li><code><a title="slack_bolt.async_app.AsyncApp.function" href="#slack_bolt.async_app.AsyncApp.function">function</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncApp.global_shortcut" href="#slack_bolt.async_app.AsyncApp.global_shortcut">global_shortcut</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncApp.installation_store" href="#slack_bolt.async_app.AsyncApp.installation_store">installation_store</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncApp.listener_runner" href="#slack_bolt.async_app.AsyncApp.listener_runner">listener_runner</a></code></li>
@@ -3972,9 +4173,10 @@ async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltRes
 </li>
 <li>
 <h4><code><a title="slack_bolt.async_app.AsyncBoltContext" href="#slack_bolt.async_app.AsyncBoltContext">AsyncBoltContext</a></code></h4>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.ack" href="#slack_bolt.async_app.AsyncBoltContext.ack">ack</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.client" href="#slack_bolt.async_app.AsyncBoltContext.client">client</a></code></li>
+<li><code><a title="slack_bolt.async_app.AsyncBoltContext.complete" href="#slack_bolt.async_app.AsyncBoltContext.complete">complete</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.respond" href="#slack_bolt.async_app.AsyncBoltContext.respond">respond</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.say" href="#slack_bolt.async_app.AsyncBoltContext.say">say</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.to_copyable" href="#slack_bolt.async_app.AsyncBoltContext.to_copyable">to_copyable</a></code></li>
@@ -3993,6 +4195,13 @@ async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltRes
 <li><code><a title="slack_bolt.async_app.AsyncBoltRequest.query" href="#slack_bolt.async_app.AsyncBoltRequest.query">query</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncBoltRequest.raw_body" href="#slack_bolt.async_app.AsyncBoltRequest.raw_body">raw_body</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncBoltRequest.to_copyable" href="#slack_bolt.async_app.AsyncBoltRequest.to_copyable">to_copyable</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="slack_bolt.async_app.AsyncComplete" href="#slack_bolt.async_app.AsyncComplete">AsyncComplete</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.async_app.AsyncComplete.client" href="#slack_bolt.async_app.AsyncComplete.client">client</a></code></li>
+<li><code><a title="slack_bolt.async_app.AsyncComplete.function_execution_id" href="#slack_bolt.async_app.AsyncComplete.function_execution_id">function_execution_id</a></code></li>
 </ul>
 </li>
 <li>

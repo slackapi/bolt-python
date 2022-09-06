@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>slack_bolt.logger API documentation</title>
-<meta name="description" content="Bolt for Python relies on the standard `logging` module." />
+<title>slack_bolt.cli.start API documentation</title>
+<meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -19,84 +19,81 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>slack_bolt.logger</code></h1>
+<h1 class="title">Module <code>slack_bolt.cli.start</code></h1>
 </header>
 <section id="section-intro">
-<p>Bolt for Python relies on the standard <code>logging</code> module.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34;Bolt for Python relies on the standard `logging` module.&#34;&#34;&#34;
-
-import logging
-from logging import Logger
-from typing import Any, Optional
-
-
-def get_bolt_logger(cls: Any, base_logger: Optional[Logger] = None) -&gt; Logger:
-    logger = logging.getLogger(f&#34;slack_bolt.{cls.__name__}&#34;)
-    if base_logger is not None:
-        _configure_from_base_logger(logger, base_logger)
-    else:
-        _configure_from_root(logger)
-    return logger
+<pre><code class="python">#!/usr/bin/env python
+import os
+import subprocess
+from typing import List, Generator
+from ..error import CliError
+from .utils import handle_exception
 
 
-def get_bolt_app_logger(app_name: str, cls: object = None, base_logger: Optional[Logger] = None) -&gt; Logger:
-    logger: Logger = (
-        logging.getLogger(f&#34;{app_name}:{cls.__name__}&#34;) if cls and hasattr(cls, &#34;__name__&#34;) else logging.getLogger(app_name)
-    )
+DEFAULT_ENTRYPOINT_FILE = &#34;app.py&#34;
 
-    if base_logger is not None:
-        _configure_from_base_logger(logger, base_logger)
-    else:
-        _configure_from_root(logger)
-    return logger
+SLACK_CLI_XOXB = &#34;SLACK_CLI_XOXB&#34;
+SLACK_CLI_XAPP = &#34;SLACK_CLI_XAPP&#34;
 
 
-def _configure_from_base_logger(new_logger: Logger, base_logger: Logger):
-    new_logger.disabled = base_logger.disabled
-    new_logger.level = base_logger.level
-    if len(new_logger.handlers) == 0:
-        for h in base_logger.handlers:
-            new_logger.addHandler(h)
-    if len(new_logger.filters) == 0:
-        for f in base_logger.filters:
-            new_logger.addFilter(f)
+def validate_env() -&gt; None:
+    if not os.environ[SLACK_CLI_XOXB]:
+        raise CliError(f&#34;Missing local run bot token ({SLACK_CLI_XOXB}). Please see slack-cli maintainers to troubleshoot.&#34;)
+    if not os.environ[SLACK_CLI_XAPP]:
+        raise CliError(f&#34;Missing local run app token ({SLACK_CLI_XAPP}). Please see slack-cli maintainers to troubleshoot.&#34;)
 
 
-def _configure_from_root(new_logger: Logger):
-    new_logger.disabled = logging.root.disabled
-    new_logger.level = logging.root.level
+def get_entrypoint_path(working_directory: str) -&gt; str:
+    custom_path = os.environ.get(&#34;SLACK_CLI_CUSTOM_FILE_PATH&#34;, None)
+    if custom_path:
+        return f&#34;{working_directory}/{custom_path}&#34;
+    return f&#34;{working_directory}/{DEFAULT_ENTRYPOINT_FILE}&#34;
 
 
-__all__ = [
-    &#34;get_bolt_logger&#34;,
-    &#34;get_bolt_app_logger&#34;,
-]</code></pre>
+def execute_process(command: List[str], env: dict) -&gt; Generator[str, None, None]:
+    with subprocess.Popen(command, env=env, stdout=subprocess.PIPE, universal_newlines=True, bufsize=1) as app_process:
+        for line in app_process.stdout:
+            yield line
+
+
+@handle_exception()
+def start(working_directory: str) -&gt; None:
+    validate_env()
+
+    entrypoint_path = get_entrypoint_path(working_directory)
+    print(f&#34;Entrypoint path:\n{entrypoint_path}&#34;)
+
+    if not os.path.exists(entrypoint_path):
+        raise CliError(f&#34;Entrypoint not found!\nLooking for: {entrypoint_path}&#34;)
+
+    local_env = dict(os.environ)
+    local_env[&#34;SLACK_BOT_TOKEN&#34;] = os.environ[SLACK_CLI_XOXB]
+    local_env[&#34;SLACK_APP_TOKEN&#34;] = os.environ[SLACK_CLI_XAPP]
+
+    command = [&#34;python&#34;, &#34;-u&#34;, entrypoint_path]
+
+    for stdout in execute_process(command, local_env):
+        print(stdout, end=&#34;&#34;)
+
+
+if __name__ == &#34;__main__&#34;:
+    current_wd = os.getcwd()
+    start(current_wd)</code></pre>
 </details>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
-<dl>
-<dt><code class="name"><a title="slack_bolt.logger.messages" href="messages.html">slack_bolt.logger.messages</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="slack_bolt.logger.warning_utils" href="warning_utils.html">slack_bolt.logger.warning_utils</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
 </section>
 <section>
 </section>
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="slack_bolt.logger.get_bolt_app_logger"><code class="name flex">
-<span>def <span class="ident">get_bolt_app_logger</span></span>(<span>app_name: str, cls: object = None, base_logger: Optional[logging.Logger] = None) ‑> logging.Logger</span>
+<dt id="slack_bolt.cli.start.execute_process"><code class="name flex">
+<span>def <span class="ident">execute_process</span></span>(<span>command: List[str], env: dict) ‑> Generator[str, None, None]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -104,20 +101,14 @@ __all__ = [
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_bolt_app_logger(app_name: str, cls: object = None, base_logger: Optional[Logger] = None) -&gt; Logger:
-    logger: Logger = (
-        logging.getLogger(f&#34;{app_name}:{cls.__name__}&#34;) if cls and hasattr(cls, &#34;__name__&#34;) else logging.getLogger(app_name)
-    )
-
-    if base_logger is not None:
-        _configure_from_base_logger(logger, base_logger)
-    else:
-        _configure_from_root(logger)
-    return logger</code></pre>
+<pre><code class="python">def execute_process(command: List[str], env: dict) -&gt; Generator[str, None, None]:
+    with subprocess.Popen(command, env=env, stdout=subprocess.PIPE, universal_newlines=True, bufsize=1) as app_process:
+        for line in app_process.stdout:
+            yield line</code></pre>
 </details>
 </dd>
-<dt id="slack_bolt.logger.get_bolt_logger"><code class="name flex">
-<span>def <span class="ident">get_bolt_logger</span></span>(<span>cls: Any, base_logger: Optional[logging.Logger] = None) ‑> logging.Logger</span>
+<dt id="slack_bolt.cli.start.get_entrypoint_path"><code class="name flex">
+<span>def <span class="ident">get_entrypoint_path</span></span>(<span>working_directory: str) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -125,13 +116,27 @@ __all__ = [
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_bolt_logger(cls: Any, base_logger: Optional[Logger] = None) -&gt; Logger:
-    logger = logging.getLogger(f&#34;slack_bolt.{cls.__name__}&#34;)
-    if base_logger is not None:
-        _configure_from_base_logger(logger, base_logger)
-    else:
-        _configure_from_root(logger)
-    return logger</code></pre>
+<pre><code class="python">def get_entrypoint_path(working_directory: str) -&gt; str:
+    custom_path = os.environ.get(&#34;SLACK_CLI_CUSTOM_FILE_PATH&#34;, None)
+    if custom_path:
+        return f&#34;{working_directory}/{custom_path}&#34;
+    return f&#34;{working_directory}/{DEFAULT_ENTRYPOINT_FILE}&#34;</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.cli.start.validate_env"><code class="name flex">
+<span>def <span class="ident">validate_env</span></span>(<span>) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_env() -&gt; None:
+    if not os.environ[SLACK_CLI_XOXB]:
+        raise CliError(f&#34;Missing local run bot token ({SLACK_CLI_XOXB}). Please see slack-cli maintainers to troubleshoot.&#34;)
+    if not os.environ[SLACK_CLI_XAPP]:
+        raise CliError(f&#34;Missing local run app token ({SLACK_CLI_XAPP}). Please see slack-cli maintainers to troubleshoot.&#34;)</code></pre>
 </details>
 </dd>
 </dl>
@@ -147,19 +152,14 @@ __all__ = [
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="slack_bolt" href="../index.html">slack_bolt</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
-<ul>
-<li><code><a title="slack_bolt.logger.messages" href="messages.html">slack_bolt.logger.messages</a></code></li>
-<li><code><a title="slack_bolt.logger.warning_utils" href="warning_utils.html">slack_bolt.logger.warning_utils</a></code></li>
+<li><code><a title="slack_bolt.cli" href="index.html">slack_bolt.cli</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="slack_bolt.logger.get_bolt_app_logger" href="#slack_bolt.logger.get_bolt_app_logger">get_bolt_app_logger</a></code></li>
-<li><code><a title="slack_bolt.logger.get_bolt_logger" href="#slack_bolt.logger.get_bolt_logger">get_bolt_logger</a></code></li>
+<li><code><a title="slack_bolt.cli.start.execute_process" href="#slack_bolt.cli.start.execute_process">execute_process</a></code></li>
+<li><code><a title="slack_bolt.cli.start.get_entrypoint_path" href="#slack_bolt.cli.start.get_entrypoint_path">get_entrypoint_path</a></code></li>
+<li><code><a title="slack_bolt.cli.start.validate_env" href="#slack_bolt.cli.start.validate_env">validate_env</a></code></li>
 </ul>
 </li>
 </ul>

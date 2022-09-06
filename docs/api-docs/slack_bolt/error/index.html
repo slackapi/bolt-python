@@ -51,7 +51,11 @@ class BoltUnhandledRequestError(BoltError):
         self.request = request
         self.body = request.body if request is not None else {}
         self.current_response = current_response
-        self.last_global_middleware_name = last_global_middleware_name</code></pre>
+        self.last_global_middleware_name = last_global_middleware_name
+
+
+class CliError(Exception):
+    &#34;&#34;&#34;General class for cli error&#34;&#34;&#34;</code></pre>
 </details>
 </section>
 <section>
@@ -140,6 +144,25 @@ class BoltUnhandledRequestError(BoltError):
 </dd>
 </dl>
 </dd>
+<dt id="slack_bolt.error.CliError"><code class="flex name class">
+<span>class <span class="ident">CliError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>General class for cli error</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CliError(Exception):
+    &#34;&#34;&#34;General class for cli error&#34;&#34;&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
 </dl>
 </section>
 </article>
@@ -167,6 +190,9 @@ class BoltUnhandledRequestError(BoltError):
 <li><code><a title="slack_bolt.error.BoltUnhandledRequestError.last_global_middleware_name" href="#slack_bolt.error.BoltUnhandledRequestError.last_global_middleware_name">last_global_middleware_name</a></code></li>
 <li><code><a title="slack_bolt.error.BoltUnhandledRequestError.request" href="#slack_bolt.error.BoltUnhandledRequestError.request">request</a></code></li>
 </ul>
+</li>
+<li>
+<h4><code><a title="slack_bolt.error.CliError" href="#slack_bolt.error.CliError">CliError</a></code></h4>
 </li>
 </ul>
 </li>

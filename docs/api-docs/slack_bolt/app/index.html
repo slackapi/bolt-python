@@ -803,7 +803,7 @@ be used.</dd>
         &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.event(event, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
@@ -842,7 +842,7 @@ be used.</dd>
         middleware = list(middleware) if middleware else []
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             constraints = {
                 &#34;type&#34;: &#34;message&#34;,
                 &#34;subtype&#34;: (
@@ -864,6 +864,49 @@ be used.</dd>
             )
             middleware.insert(0, MessageListenerMatches(keyword))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
+
+        return __call__
+
+    def function(
+        self,
+        callback_id: str,
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+    ) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+        &#34;&#34;&#34;Registers a new Function listener.
+        This method can be used as either a decorator or a method.
+
+            # Use this method as a decorator
+            @app.function(&#34;reverse&#34;)
+            def reverse_string(event, complete_success: CompleteSuccess, complete_error: CompleteError):
+                try:
+                    string_to_reverse = event[&#34;inputs&#34;][&#34;stringToReverse&#34;]
+                    complete_success({
+                        &#34;reverseString&#34;: string_to_reverse[::-1]
+                    })
+                except Exception as e:
+                    complete_error(&#34;Cannot reverse string&#34;)
+                    raise e
+
+            # Pass a function to this method
+            app.function(&#34;reverse&#34;)(reverse_string)
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#39;s API document.
+
+        Args:
+            callback_id: The callback id to identify the function
+            matchers: A list of listener matcher functions.
+                Only when all the matchers return True, the listener function can be invoked.
+            middleware: A list of lister middleware functions.
+                Only when all the middleware call `next()` method, the listener function can be invoked.
+        &#34;&#34;&#34;
+        middleware = list(middleware) if middleware else []
+        middleware.insert(0, AttachingFunctionToken())
+
+        def __call__(*args, **kwargs):
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
+            slack_function = SlackFunction(self._register_listener, self._base_logger, callback_id)
+            return slack_function.register_listener(list(functions), matchers, middleware)
 
         return __call__
 
@@ -902,7 +945,7 @@ be used.</dd>
         &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.command(command, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -949,7 +992,7 @@ be used.</dd>
         &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.shortcut(constraints, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -964,7 +1007,7 @@ be used.</dd>
         &#34;&#34;&#34;Registers a new global shortcut listener.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.global_shortcut(callback_id, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -979,7 +1022,7 @@ be used.</dd>
         &#34;&#34;&#34;Registers a new message shortcut listener.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.message_shortcut(callback_id, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1019,7 +1062,7 @@ be used.</dd>
         &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.action(constraints, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1036,7 +1079,7 @@ be used.</dd>
         &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.block_action(constraints, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1052,7 +1095,7 @@ be used.</dd>
         Refer to https://api.slack.com/legacy/message-buttons for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.attachment_action(callback_id, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1068,7 +1111,7 @@ be used.</dd>
         Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.dialog_submission(callback_id, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1084,7 +1127,7 @@ be used.</dd>
         Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.dialog_cancellation(callback_id, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1135,7 +1178,7 @@ be used.</dd>
         &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.view(constraints, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1151,7 +1194,7 @@ be used.</dd>
         Refer to https://api.slack.com/reference/interaction-payloads/views#view_submission for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.view_submission(constraints, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1167,7 +1210,7 @@ be used.</dd>
         Refer to https://api.slack.com/reference/interaction-payloads/views#view_closed for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.view_closed(constraints, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1218,7 +1261,7 @@ be used.</dd>
         &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.options(constraints, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1233,7 +1276,7 @@ be used.</dd>
         &#34;&#34;&#34;Registers a new `block_suggestion` listener.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.block_suggestion(action_id, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1249,7 +1292,7 @@ be used.</dd>
         Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
-            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.dialog_suggestion(callback_id, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1281,32 +1324,25 @@ be used.</dd>
     def _init_context(self, req: BoltRequest):
         req.context[&#34;logger&#34;] = get_bolt_app_logger(app_name=self.name, base_logger=self._base_logger)
         req.context[&#34;token&#34;] = self._token
-        if self._token is not None:
-            # This WebClient instance can be safely singleton
-            req.context[&#34;client&#34;] = self._client
-        else:
-            # Set a new dedicated instance for this request
-            client_per_request: WebClient = WebClient(
-                token=None,  # the token will be set later
-                base_url=self._client.base_url,
-                timeout=self._client.timeout,
-                ssl=self._client.ssl,
-                proxy=self._client.proxy,
-                headers=self._client.headers,
-                team_id=req.context.team_id,
-            )
-            req.context[&#34;client&#34;] = client_per_request
-
-    @staticmethod
-    def _to_listener_functions(
-        kwargs: dict,
-    ) -&gt; Optional[Sequence[Callable[..., Optional[BoltResponse]]]]:
-        if kwargs:
-            functions = [kwargs[&#34;ack&#34;]]
-            for sub in kwargs[&#34;lazy&#34;]:
-                functions.append(sub)
-            return functions
-        return None
+        # Prior to version 1.15, when the token is static, self._client was passed to `req.context`.
+        # The intention was to avoid creating a new instance per request
+        # in the interest of runtime performance/memory footprint optimization.
+        # However, developers may want to replace the token held by req.context.client in some situations.
+        # In this case, this behavior can result in thread-unsafe data modification on `self._client`.
+        # (`self._client` a.k.a. `app.client` is a singleton object per an App instance)
+        # Thus, we&#39;ve changed the behavior to create a new instance per request regardless of token argument
+        # in the App initialization starting v1.15.
+        # The overhead brought by this change is slight so that we believe that it is ignorable in any cases.
+        client_per_request: WebClient = WebClient(
+            token=self._token,  # this can be None, and it can be set later on
+            base_url=self._client.base_url,
+            timeout=self._client.timeout,
+            ssl=self._client.ssl,
+            proxy=self._client.proxy,
+            headers=self._client.headers,
+            team_id=req.context.team_id,
+        )
+        req.context[&#34;client&#34;] = client_per_request
 
     def _register_listener(
         self,
@@ -1446,7 +1482,7 @@ def process_before_response(self) -&gt; bool:
 <h3>Methods</h3>
 <dl>
 <dt id="slack_bolt.app.App.action"><code class="name flex">
-<span>def <span class="ident">action</span></span>(<span>self, constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">action</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Pattern[~AnyStr]]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new action listener. This method can be used as either a decorator or a method.</p>
@@ -1510,7 +1546,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.action(constraints, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1518,7 +1554,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.app.App.attachment_action"><code class="name flex">
-<span>def <span class="ident">attachment_action</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">attachment_action</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>interactive_message</code> action listener.
@@ -1537,7 +1573,7 @@ Refer to <a href="https://api.slack.com/legacy/message-buttons">https://api.slac
     Refer to https://api.slack.com/legacy/message-buttons for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.attachment_action(callback_id, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1545,7 +1581,7 @@ Refer to <a href="https://api.slack.com/legacy/message-buttons">https://api.slac
 </details>
 </dd>
 <dt id="slack_bolt.app.App.block_action"><code class="name flex">
-<span>def <span class="ident">block_action</span></span>(<span>self, constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">block_action</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Pattern[~AnyStr]]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>block_actions</code> action listener.
@@ -1565,7 +1601,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-act
     &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.block_action(constraints, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1573,7 +1609,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-act
 </details>
 </dd>
 <dt id="slack_bolt.app.App.block_suggestion"><code class="name flex">
-<span>def <span class="ident">block_suggestion</span></span>(<span>self, action_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">block_suggestion</span></span>(<span>self, action_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>block_suggestion</code> listener.</p></div>
@@ -1590,7 +1626,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-act
     &#34;&#34;&#34;Registers a new `block_suggestion` listener.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.block_suggestion(action_id, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1598,7 +1634,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-act
 </details>
 </dd>
 <dt id="slack_bolt.app.App.command"><code class="name flex">
-<span>def <span class="ident">command</span></span>(<span>self, command: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">command</span></span>(<span>self, command: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new slash command listener.
@@ -1662,7 +1698,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.command(command, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1704,7 +1740,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.app.App.dialog_cancellation"><code class="name flex">
-<span>def <span class="ident">dialog_cancellation</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">dialog_cancellation</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>dialog_cancellation</code> listener.
@@ -1723,7 +1759,7 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
     Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.dialog_cancellation(callback_id, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1731,7 +1767,7 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 </details>
 </dd>
 <dt id="slack_bolt.app.App.dialog_submission"><code class="name flex">
-<span>def <span class="ident">dialog_submission</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">dialog_submission</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>dialog_submission</code> listener.
@@ -1750,7 +1786,7 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
     Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.dialog_submission(callback_id, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1758,7 +1794,7 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 </details>
 </dd>
 <dt id="slack_bolt.app.App.dialog_suggestion"><code class="name flex">
-<span>def <span class="ident">dialog_suggestion</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">dialog_suggestion</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>dialog_suggestion</code> listener.
@@ -1777,7 +1813,7 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
     Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.dialog_suggestion(callback_id, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -1970,7 +2006,7 @@ when getting an unhandled error in Bolt app.</dd>
 </details>
 </dd>
 <dt id="slack_bolt.app.App.event"><code class="name flex">
-<span>def <span class="ident">event</span></span>(<span>self, event: Union[str, Pattern, Dict[str, Union[str, Sequence[Union[str, Pattern, ForwardRef(None)]], ForwardRef(None)]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">event</span></span>(<span>self, event: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Sequence[Union[str, Pattern[~AnyStr], None]], None]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new event listener. This method can be used as either a decorator or a method.</p>
@@ -2040,15 +2076,96 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.event(event, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
     return __call__</code></pre>
 </details>
 </dd>
+<dt id="slack_bolt.app.App.function"><code class="name flex">
+<span>def <span class="ident">function</span></span>(<span>self, callback_id: str, matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Registers a new Function listener.
+This method can be used as either a decorator or a method.</p>
+<pre><code># Use this method as a decorator
+@app.function("reverse")
+def reverse_string(event, complete_success: CompleteSuccess, complete_error: CompleteError):
+    try:
+        string_to_reverse = event["inputs"]["stringToReverse"]
+        complete_success({
+            "reverseString": string_to_reverse[::-1]
+        })
+    except Exception as e:
+        complete_error("Cannot reverse string")
+        raise e
+
+# Pass a function to this method
+app.function("reverse")(reverse_string)
+</code></pre>
+<p>To learn available arguments for middleware/listeners, see <code><a title="slack_bolt.kwargs_injection.args" href="../kwargs_injection/args.html">slack_bolt.kwargs_injection.args</a></code>'s API document.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>callback_id</code></strong></dt>
+<dd>The callback id to identify the function</dd>
+<dt><strong><code>matchers</code></strong></dt>
+<dd>A list of listener matcher functions.
+Only when all the matchers return True, the listener function can be invoked.</dd>
+<dt><strong><code>middleware</code></strong></dt>
+<dd>A list of lister middleware functions.
+Only when all the middleware call <code>next()</code> method, the listener function can be invoked.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def function(
+    self,
+    callback_id: str,
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new Function listener.
+    This method can be used as either a decorator or a method.
+
+        # Use this method as a decorator
+        @app.function(&#34;reverse&#34;)
+        def reverse_string(event, complete_success: CompleteSuccess, complete_error: CompleteError):
+            try:
+                string_to_reverse = event[&#34;inputs&#34;][&#34;stringToReverse&#34;]
+                complete_success({
+                    &#34;reverseString&#34;: string_to_reverse[::-1]
+                })
+            except Exception as e:
+                complete_error(&#34;Cannot reverse string&#34;)
+                raise e
+
+        # Pass a function to this method
+        app.function(&#34;reverse&#34;)(reverse_string)
+
+    To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#39;s API document.
+
+    Args:
+        callback_id: The callback id to identify the function
+        matchers: A list of listener matcher functions.
+            Only when all the matchers return True, the listener function can be invoked.
+        middleware: A list of lister middleware functions.
+            Only when all the middleware call `next()` method, the listener function can be invoked.
+    &#34;&#34;&#34;
+    middleware = list(middleware) if middleware else []
+    middleware.insert(0, AttachingFunctionToken())
+
+    def __call__(*args, **kwargs):
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
+        slack_function = SlackFunction(self._register_listener, self._base_logger, callback_id)
+        return slack_function.register_listener(list(functions), matchers, middleware)
+
+    return __call__</code></pre>
+</details>
+</dd>
 <dt id="slack_bolt.app.App.global_shortcut"><code class="name flex">
-<span>def <span class="ident">global_shortcut</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">global_shortcut</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new global shortcut listener.</p></div>
@@ -2065,7 +2182,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;Registers a new global shortcut listener.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.global_shortcut(callback_id, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2073,7 +2190,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.app.App.message"><code class="name flex">
-<span>def <span class="ident">message</span></span>(<span>self, keyword: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">message</span></span>(<span>self, keyword: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new message event listener. This method can be used as either a decorator or a method.
@@ -2137,7 +2254,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     middleware = list(middleware) if middleware else []
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         constraints = {
             &#34;type&#34;: &#34;message&#34;,
             &#34;subtype&#34;: (
@@ -2164,7 +2281,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.app.App.message_shortcut"><code class="name flex">
-<span>def <span class="ident">message_shortcut</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">message_shortcut</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new message shortcut listener.</p></div>
@@ -2181,7 +2298,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;Registers a new message shortcut listener.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.message_shortcut(callback_id, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2254,7 +2371,7 @@ app.middleware(middleware_func)
 </details>
 </dd>
 <dt id="slack_bolt.app.App.options"><code class="name flex">
-<span>def <span class="ident">options</span></span>(<span>self, constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">options</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Pattern[~AnyStr]]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new options listener.
@@ -2338,7 +2455,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.options(constraints, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2346,7 +2463,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.app.App.shortcut"><code class="name flex">
-<span>def <span class="ident">shortcut</span></span>(<span>self, constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">shortcut</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Pattern[~AnyStr]]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new shortcut listener.
@@ -2422,7 +2539,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.shortcut(constraints, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2484,7 +2601,7 @@ For production, consider using a production-ready WSGI server such as Gunicorn.<
 </details>
 </dd>
 <dt id="slack_bolt.app.App.step"><code class="name flex">
-<span>def <span class="ident">step</span></span>(<span>self, callback_id: Union[str, Pattern, <a title="slack_bolt.workflows.step.step.WorkflowStep" href="../workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStep">WorkflowStep</a>, <a title="slack_bolt.workflows.step.step.WorkflowStepBuilder" href="../workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder">WorkflowStepBuilder</a>], edit: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable], ForwardRef(None)] = None, save: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable], ForwardRef(None)] = None, execute: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable], ForwardRef(None)] = None)</span>
+<span>def <span class="ident">step</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr], <a title="slack_bolt.workflows.step.step.WorkflowStep" href="../workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStep">WorkflowStep</a>, <a title="slack_bolt.workflows.step.step.WorkflowStepBuilder" href="../workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder">WorkflowStepBuilder</a>], edit: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable], None] = None, save: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable], None] = None, execute: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable], None] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new Workflow Step listener.
@@ -2592,7 +2709,7 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="../workflows
 </details>
 </dd>
 <dt id="slack_bolt.app.App.view"><code class="name flex">
-<span>def <span class="ident">view</span></span>(<span>self, constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">view</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Pattern[~AnyStr]]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>view_submission</code>/<code>view_closed</code> event listener.
@@ -2676,7 +2793,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.view(constraints, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2684,7 +2801,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.app.App.view_closed"><code class="name flex">
-<span>def <span class="ident">view_closed</span></span>(<span>self, constraints: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">view_closed</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>view_closed</code> listener.
@@ -2703,7 +2820,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#vie
     Refer to https://api.slack.com/reference/interaction-payloads/views#view_closed for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.view_closed(constraints, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2711,7 +2828,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#vie
 </details>
 </dd>
 <dt id="slack_bolt.app.App.view_submission"><code class="name flex">
-<span>def <span class="ident">view_submission</span></span>(<span>self, constraints: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">view_submission</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="../middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>view_submission</code> listener.
@@ -2730,7 +2847,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#vie
     Refer to https://api.slack.com/reference/interaction-payloads/views#view_submission for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
-        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.view_submission(constraints, base_logger=self._base_logger)
         return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
@@ -2780,6 +2897,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#vie
 <li><code><a title="slack_bolt.app.App.enable_token_revocation_listeners" href="#slack_bolt.app.App.enable_token_revocation_listeners">enable_token_revocation_listeners</a></code></li>
 <li><code><a title="slack_bolt.app.App.error" href="#slack_bolt.app.App.error">error</a></code></li>
 <li><code><a title="slack_bolt.app.App.event" href="#slack_bolt.app.App.event">event</a></code></li>
+<li><code><a title="slack_bolt.app.App.function" href="#slack_bolt.app.App.function">function</a></code></li>
 <li><code><a title="slack_bolt.app.App.global_shortcut" href="#slack_bolt.app.App.global_shortcut">global_shortcut</a></code></li>
 <li><code><a title="slack_bolt.app.App.installation_store" href="#slack_bolt.app.App.installation_store">installation_store</a></code></li>
 <li><code><a title="slack_bolt.app.App.listener_runner" href="#slack_bolt.app.App.listener_runner">listener_runner</a></code></li>

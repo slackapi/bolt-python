@@ -6,6 +6,7 @@ from slack_bolt.context.complete.internals import get_kwargs_for_logging, get_na
 
 
 class Complete:
+
     client: WebClient
     function_execution_id: Optional[str]
 
@@ -18,6 +19,24 @@ class Complete:
         self.function_execution_id = function_execution_id
 
     def __call__(self, *args, outputs: Optional[Union[str, dict]] = None, error: Optional[str] = None) -> SlackResponse:
+        """Complete function for this request.
+
+        Note: This function does NOT accept any positional arguments, 
+        it only ACCEPTS ONE KEYWORD ARGUMENT! A TypeError will be raised
+        if this is not respected.
+
+        Kwargs:
+            outputs: Json serializable containing the output values
+            error: Error message to return to slack
+
+        Returns:
+            SlackResponse: the response object returned from slack
+
+        Raises:
+            TypeError: If positional arguments are provided or more then 1
+                keyword argument is provided.
+        """
+
         if args:
             raise TypeError(
                 f"{get_name_for_logging(self)} takes 0 positional arguments but "

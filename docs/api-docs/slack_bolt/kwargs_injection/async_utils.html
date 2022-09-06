@@ -80,6 +80,7 @@ def build_async_required_kwargs(
         &#34;ack&#34;: request.context.ack,
         &#34;say&#34;: request.context.say,
         &#34;respond&#34;: request.context.respond,
+        &#34;complete&#34;: request.context.complete,
         # middleware
         &#34;next&#34;: next_func,
         &#34;next_&#34;: next_func,  # for the middleware using Python&#39;s built-in `next()` function
@@ -183,6 +184,7 @@ def build_async_required_kwargs(
         &#34;ack&#34;: request.context.ack,
         &#34;say&#34;: request.context.say,
         &#34;respond&#34;: request.context.respond,
+        &#34;complete&#34;: request.context.complete,
         # middleware
         &#34;next&#34;: next_func,
         &#34;next_&#34;: next_func,  # for the middleware using Python&#39;s built-in `next()` function

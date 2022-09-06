@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>slack_bolt.logger API documentation</title>
-<meta name="description" content="Bolt for Python relies on the standard `logging` module." />
+<title>slack_bolt.context.complete.async_complete API documentation</title>
+<meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -19,84 +19,76 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>slack_bolt.logger</code></h1>
+<h1 class="title">Module <code>slack_bolt.context.complete.async_complete</code></h1>
 </header>
 <section id="section-intro">
-<p>Bolt for Python relies on the standard <code>logging</code> module.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34;Bolt for Python relies on the standard `logging` module.&#34;&#34;&#34;
+<pre><code class="python">from typing import Optional, Union
 
-import logging
-from logging import Logger
-from typing import Any, Optional
-
-
-def get_bolt_logger(cls: Any, base_logger: Optional[Logger] = None) -&gt; Logger:
-    logger = logging.getLogger(f&#34;slack_bolt.{cls.__name__}&#34;)
-    if base_logger is not None:
-        _configure_from_base_logger(logger, base_logger)
-    else:
-        _configure_from_root(logger)
-    return logger
+from slack_sdk.web.async_client import AsyncWebClient
+from slack_sdk.web.async_slack_response import AsyncSlackResponse
+from slack_bolt.context.complete.internals import get_kwargs_for_logging, get_name_for_logging
 
 
-def get_bolt_app_logger(app_name: str, cls: object = None, base_logger: Optional[Logger] = None) -&gt; Logger:
-    logger: Logger = (
-        logging.getLogger(f&#34;{app_name}:{cls.__name__}&#34;) if cls and hasattr(cls, &#34;__name__&#34;) else logging.getLogger(app_name)
-    )
+class AsyncComplete:
+    client: AsyncWebClient
+    function_execution_id: Optional[str]
 
-    if base_logger is not None:
-        _configure_from_base_logger(logger, base_logger)
-    else:
-        _configure_from_root(logger)
-    return logger
+    def __init__(
+        self,
+        client: AsyncWebClient,
+        function_execution_id: Optional[str],
+    ):
+        self.client = client
+        self.function_execution_id = function_execution_id
 
+    async def __call__(
+        self, *args, outputs: Optional[Union[str, dict]] = None, error: Optional[str] = None
+    ) -&gt; AsyncSlackResponse:
+        if args:
+            raise TypeError(
+                f&#34;{get_name_for_logging(self)} takes 0 positional arguments but &#34;
+                f&#34;{len(args)} {&#39;were&#39; if len(args) &gt; 1 else &#39;was&#39;} given, &#34;
+                f&#34;missing 1 keyword-only argument: {get_kwargs_for_logging(self)}&#34;
+            )
 
-def _configure_from_base_logger(new_logger: Logger, base_logger: Logger):
-    new_logger.disabled = base_logger.disabled
-    new_logger.level = base_logger.level
-    if len(new_logger.handlers) == 0:
-        for h in base_logger.handlers:
-            new_logger.addHandler(h)
-    if len(new_logger.filters) == 0:
-        for f in base_logger.filters:
-            new_logger.addFilter(f)
+        if outputs is not None and error is not None:
+            raise TypeError(
+                f&#34;{get_name_for_logging(self)} expects 1 keyword-only argument but 2 were given, &#34;
+                f&#34;provide: {get_kwargs_for_logging(self)}&#34;
+            )
 
+        if self.function_execution_id is None:
+            raise ValueError(f&#34;{get_name_for_logging(self)} is unsupported here as there is no function_execution_id&#34;)
 
-def _configure_from_root(new_logger: Logger):
-    new_logger.disabled = logging.root.disabled
-    new_logger.level = logging.root.level
+        if isinstance(error, str):
+            # TODO add this new api call to the sdk and use it here
+            return await self.client.api_call(
+                &#34;functions.completeError&#34;, json={&#34;error&#34;: error, &#34;function_execution_id&#34;: self.function_execution_id}
+            )
 
-
-__all__ = [
-    &#34;get_bolt_logger&#34;,
-    &#34;get_bolt_app_logger&#34;,
-]</code></pre>
+        # TODO add this new api call to the sdk and use it here
+        return await self.client.api_call(
+            &#34;functions.completeSuccess&#34;,
+            json={&#34;outputs&#34;: outputs if outputs else {}, &#34;function_execution_id&#34;: self.function_execution_id},
+        )</code></pre>
 </details>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
-<dl>
-<dt><code class="name"><a title="slack_bolt.logger.messages" href="messages.html">slack_bolt.logger.messages</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="slack_bolt.logger.warning_utils" href="warning_utils.html">slack_bolt.logger.warning_utils</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
 </section>
 <section>
 </section>
 <section>
-<h2 class="section-title" id="header-functions">Functions</h2>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="slack_bolt.logger.get_bolt_app_logger"><code class="name flex">
-<span>def <span class="ident">get_bolt_app_logger</span></span>(<span>app_name: str, cls: object = None, base_logger: Optional[logging.Logger] = None) ‑> logging.Logger</span>
+<dt id="slack_bolt.context.complete.async_complete.AsyncComplete"><code class="flex name class">
+<span>class <span class="ident">AsyncComplete</span></span>
+<span>(</span><span>client: slack_sdk.web.async_client.AsyncWebClient, function_execution_id: Optional[str])</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -104,39 +96,62 @@ __all__ = [
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_bolt_app_logger(app_name: str, cls: object = None, base_logger: Optional[Logger] = None) -&gt; Logger:
-    logger: Logger = (
-        logging.getLogger(f&#34;{app_name}:{cls.__name__}&#34;) if cls and hasattr(cls, &#34;__name__&#34;) else logging.getLogger(app_name)
-    )
+<pre><code class="python">class AsyncComplete:
+    client: AsyncWebClient
+    function_execution_id: Optional[str]
 
-    if base_logger is not None:
-        _configure_from_base_logger(logger, base_logger)
-    else:
-        _configure_from_root(logger)
-    return logger</code></pre>
+    def __init__(
+        self,
+        client: AsyncWebClient,
+        function_execution_id: Optional[str],
+    ):
+        self.client = client
+        self.function_execution_id = function_execution_id
+
+    async def __call__(
+        self, *args, outputs: Optional[Union[str, dict]] = None, error: Optional[str] = None
+    ) -&gt; AsyncSlackResponse:
+        if args:
+            raise TypeError(
+                f&#34;{get_name_for_logging(self)} takes 0 positional arguments but &#34;
+                f&#34;{len(args)} {&#39;were&#39; if len(args) &gt; 1 else &#39;was&#39;} given, &#34;
+                f&#34;missing 1 keyword-only argument: {get_kwargs_for_logging(self)}&#34;
+            )
+
+        if outputs is not None and error is not None:
+            raise TypeError(
+                f&#34;{get_name_for_logging(self)} expects 1 keyword-only argument but 2 were given, &#34;
+                f&#34;provide: {get_kwargs_for_logging(self)}&#34;
+            )
+
+        if self.function_execution_id is None:
+            raise ValueError(f&#34;{get_name_for_logging(self)} is unsupported here as there is no function_execution_id&#34;)
+
+        if isinstance(error, str):
+            # TODO add this new api call to the sdk and use it here
+            return await self.client.api_call(
+                &#34;functions.completeError&#34;, json={&#34;error&#34;: error, &#34;function_execution_id&#34;: self.function_execution_id}
+            )
+
+        # TODO add this new api call to the sdk and use it here
+        return await self.client.api_call(
+            &#34;functions.completeSuccess&#34;,
+            json={&#34;outputs&#34;: outputs if outputs else {}, &#34;function_execution_id&#34;: self.function_execution_id},
+        )</code></pre>
 </details>
-</dd>
-<dt id="slack_bolt.logger.get_bolt_logger"><code class="name flex">
-<span>def <span class="ident">get_bolt_logger</span></span>(<span>cls: Any, base_logger: Optional[logging.Logger] = None) ‑> logging.Logger</span>
-</code></dt>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.context.complete.async_complete.AsyncComplete.client"><code class="name">var <span class="ident">client</span> : slack_sdk.web.async_client.AsyncWebClient</code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_bolt_logger(cls: Any, base_logger: Optional[Logger] = None) -&gt; Logger:
-    logger = logging.getLogger(f&#34;slack_bolt.{cls.__name__}&#34;)
-    if base_logger is not None:
-        _configure_from_base_logger(logger, base_logger)
-    else:
-        _configure_from_root(logger)
-    return logger</code></pre>
-</details>
+</dd>
+<dt id="slack_bolt.context.complete.async_complete.AsyncComplete.function_execution_id"><code class="name">var <span class="ident">function_execution_id</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
 </dd>
 </dl>
-</section>
-<section>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -147,19 +162,18 @@ __all__ = [
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="slack_bolt" href="../index.html">slack_bolt</a></code></li>
+<li><code><a title="slack_bolt.context.complete" href="index.html">slack_bolt.context.complete</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
-<li><code><a title="slack_bolt.logger.messages" href="messages.html">slack_bolt.logger.messages</a></code></li>
-<li><code><a title="slack_bolt.logger.warning_utils" href="warning_utils.html">slack_bolt.logger.warning_utils</a></code></li>
+<li>
+<h4><code><a title="slack_bolt.context.complete.async_complete.AsyncComplete" href="#slack_bolt.context.complete.async_complete.AsyncComplete">AsyncComplete</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.context.complete.async_complete.AsyncComplete.client" href="#slack_bolt.context.complete.async_complete.AsyncComplete.client">client</a></code></li>
+<li><code><a title="slack_bolt.context.complete.async_complete.AsyncComplete.function_execution_id" href="#slack_bolt.context.complete.async_complete.AsyncComplete.function_execution_id">function_execution_id</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
-<li><code><a title="slack_bolt.logger.get_bolt_app_logger" href="#slack_bolt.logger.get_bolt_app_logger">get_bolt_app_logger</a></code></li>
-<li><code><a title="slack_bolt.logger.get_bolt_logger" href="#slack_bolt.logger.get_bolt_logger">get_bolt_logger</a></code></li>
 </ul>
 </li>
 </ul>

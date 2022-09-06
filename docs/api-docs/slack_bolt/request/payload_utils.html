@@ -48,6 +48,10 @@ def to_message(body: Dict[str, Any]) -&gt; Optional[Dict[str, Any]]:
     return None
 
 
+def is_function(body: Dict[str, Any]) -&gt; bool:
+    return is_event(body) and &#34;function_executed&#34; == body[&#34;event&#34;][&#34;type&#34;] and &#34;function_execution_id&#34; in body[&#34;event&#34;]
+
+
 def is_event(body: Dict[str, Any]) -&gt; bool:
     return body is not None and _is_expected_type(body, &#34;event_callback&#34;) and &#34;event&#34; in body and &#34;type&#34; in body[&#34;event&#34;]
 
@@ -206,6 +210,19 @@ def to_step(body: Dict[str, Any]) -&gt; Optional[Dict[str, Any]]:
     return None
 
 
+# -------------------
+# Function
+# -------------------
+
+
+def is_function_interactivity(body: Dict[str, Any]) -&gt; bool:
+    return &#34;function_data&#34; in body and (
+        _is_expected_type(body, &#34;block_actions&#34;)
+        or _is_expected_type(body, &#34;view_submission&#34;)
+        or _is_expected_type(body, &#34;view_closed&#34;)
+    )
+
+
 # ------------------------------------------
 # Internal Utilities
 # ------------------------------------------
@@ -330,6 +347,36 @@ def _is_expected_type(body: dict, expected: str) -&gt; bool:
 </summary>
 <pre><code class="python">def is_event(body: Dict[str, Any]) -&gt; bool:
     return body is not None and _is_expected_type(body, &#34;event_callback&#34;) and &#34;event&#34; in body and &#34;type&#34; in body[&#34;event&#34;]</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.request.payload_utils.is_function"><code class="name flex">
+<span>def <span class="ident">is_function</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_function(body: Dict[str, Any]) -&gt; bool:
+    return is_event(body) and &#34;function_executed&#34; == body[&#34;event&#34;][&#34;type&#34;] and &#34;function_execution_id&#34; in body[&#34;event&#34;]</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.request.payload_utils.is_function_interactivity"><code class="name flex">
+<span>def <span class="ident">is_function_interactivity</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_function_interactivity(body: Dict[str, Any]) -&gt; bool:
+    return &#34;function_data&#34; in body and (
+        _is_expected_type(body, &#34;block_actions&#34;)
+        or _is_expected_type(body, &#34;view_submission&#34;)
+        or _is_expected_type(body, &#34;view_closed&#34;)
+    )</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.payload_utils.is_global_shortcut"><code class="name flex">
@@ -629,6 +676,8 @@ def _is_expected_type(body: dict, expected: str) -&gt; bool:
 <li><code><a title="slack_bolt.request.payload_utils.is_dialog_submission" href="#slack_bolt.request.payload_utils.is_dialog_submission">is_dialog_submission</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_dialog_suggestion" href="#slack_bolt.request.payload_utils.is_dialog_suggestion">is_dialog_suggestion</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_event" href="#slack_bolt.request.payload_utils.is_event">is_event</a></code></li>
+<li><code><a title="slack_bolt.request.payload_utils.is_function" href="#slack_bolt.request.payload_utils.is_function">is_function</a></code></li>
+<li><code><a title="slack_bolt.request.payload_utils.is_function_interactivity" href="#slack_bolt.request.payload_utils.is_function_interactivity">is_function_interactivity</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_global_shortcut" href="#slack_bolt.request.payload_utils.is_global_shortcut">is_global_shortcut</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_message_shortcut" href="#slack_bolt.request.payload_utils.is_message_shortcut">is_message_shortcut</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_options" href="#slack_bolt.request.payload_utils.is_options">is_options</a></code></li>

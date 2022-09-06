@@ -7,7 +7,7 @@ from slack_bolt.response import BoltResponse
 from slack_bolt.middleware import Middleware
 from slack_bolt.middleware.attaching_function_token import AttachingFunctionToken
 
-from slack_bolt.util.utils import extract_callables
+from slack_bolt.util.utils import extract_listener_callables
 
 
 class SlackFunction:
@@ -76,7 +76,7 @@ class SlackFunction:
         middleware.insert(0, AttachingFunctionToken())
 
         def __call__(*args, **kwargs):
-            functions = extract_callables(kwargs) if kwargs else list(args)
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.function_action(self.callback_id, constraints, base_logger=self._base_logger)
             return self._register_listener(list(functions), primary_matcher, matchers, middleware)
 
