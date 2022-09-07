@@ -34,7 +34,6 @@ from logging import Logger
 from slack_bolt.error import BoltError
 from slack_bolt.request.payload_utils import (
     is_block_actions,
-    is_function,
     is_global_shortcut,
     is_message_shortcut,
     is_attachment_action,
@@ -50,7 +49,6 @@ from slack_bolt.request.payload_utils import (
     is_shortcut,
     to_action,
     is_workflow_step_save,
-    is_function_interactivity,
 )
 from ..logger.messages import error_message_event_type
 from ..util.utils import get_arg_names_of_callable
@@ -222,73 +220,6 @@ def workflow_step_execute(
     return build_listener_matcher(func, asyncio, base_logger)
 
 
-def function_event(
-    callback_id: Union[str, Pattern],
-    asyncio: bool = False,
-    base_logger: Optional[Logger] = None,
-) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
-    def func(body: Dict[str, Any]) -&gt; bool:
-        return is_function(body) and _matches(callback_id, body.get(&#34;event&#34;, {}).get(&#34;function&#34;, {}).get(&#34;callback_id&#34;, &#34;&#34;))
-
-    return build_listener_matcher(func, asyncio, base_logger)
-
-
-# -------------
-# functions
-
-
-def function_action(
-    callback_id: Union[str, Pattern],
-    constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-    asyncio: bool = False,
-    base_logger: Optional[Logger] = None,
-) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
-    if isinstance(constraints, (str, Pattern)):
-
-        def func(body: Dict[str, Any]) -&gt; bool:
-            return _function_block_action(callback_id, constraints, body)
-
-        return build_listener_matcher(func, asyncio, base_logger)
-
-    elif &#34;type&#34; in constraints:
-        action_type = constraints[&#34;type&#34;]
-        if action_type == &#34;block_actions&#34;:
-            return function_block_action(callback_id, constraints, asyncio)
-
-        raise BoltError(f&#34;type: {action_type} is unsupported&#34;)
-    elif &#34;action_id&#34; in constraints:
-        # The default value is &#34;block_actions&#34;
-        return function_block_action(callback_id, constraints, asyncio)
-
-    raise BoltError(f&#34;action ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;)
-
-
-def _function_block_action(
-    callback_id: Union[str, Pattern],
-    constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-    body: Dict[str, Any],
-) -&gt; bool:
-    if is_function_interactivity(body) is False and is_block_actions(body) is False:
-        return False
-
-    if _matches(callback_id, body.get(&#34;function_data&#34;, {}).get(&#34;function&#34;, {}).get(&#34;callback_id&#34;, &#34;&#34;)) is False:
-        return False
-
-    return _does_block_id_match(constraints, body)
-
-
-def function_block_action(
-    callback_id: Union[str, Pattern],
-    constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-    asyncio: bool = False,
-    base_logger: Optional[Logger] = None,
-) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
-    def func(body: Dict[str, Any]) -&gt; bool:
-        return _function_block_action(callback_id, constraints, body)
-
-    return build_listener_matcher(func, asyncio, base_logger)
-
-
 # -------------
 # slash commands
 
@@ -403,7 +334,16 @@ def _block_action(
     if is_block_actions(body) is False:
         return False
 
-    return _does_block_id_match(constraints, body)
+    action = to_action(body)
+    if isinstance(constraints, (str, Pattern)):
+        action_id = constraints
+        return _matches(action_id, action[&#34;action_id&#34;])
+    elif isinstance(constraints, dict):
+        # block_id matching is optional
+        block_id: Optional[Union[str, Pattern]] = constraints.get(&#34;block_id&#34;)
+        block_id_matched = block_id is None or _matches(block_id, action.get(&#34;block_id&#34;))
+        action_id_matched = _matches(constraints[&#34;action_id&#34;], action[&#34;action_id&#34;])
+        return block_id_matched and action_id_matched
 
 
 def block_action(
@@ -616,20 +556,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
         pattern: Pattern = str_or_pattern
         return pattern.search(input) is not None
     else:
-        raise BoltError(f&#34;{str_or_pattern} ({type(str_or_pattern)}) must be either str or Pattern&#34;)
-
-
-def _does_block_id_match(constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], body: Dict[str, Any]) -&gt; bool:
-    action = to_action(body)
-    if isinstance(constraints, (str, Pattern)):
-        action_id = constraints
-        return _matches(action_id, action[&#34;action_id&#34;])
-    elif isinstance(constraints, dict):
-        # block_id matching is optional
-        block_id: Optional[Union[str, Pattern]] = constraints.get(&#34;block_id&#34;)
-        block_id_matched = block_id is None or _matches(block_id, action.get(&#34;block_id&#34;))
-        action_id_matched = _matches(constraints[&#34;action_id&#34;], action[&#34;action_id&#34;])
-        return block_id_matched and action_id_matched</code></pre>
+        raise BoltError(f&#34;{str_or_pattern} ({type(str_or_pattern)}) must be either str or Pattern&#34;)</code></pre>
 </details>
 </section>
 <section>
@@ -854,7 +781,7 @@ def _does_block_id_match(constraints: Union[str, Pattern, Dict[str, Union[str, P
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.event"><code class="name flex">
-<span>def <span class="ident">event</span></span>(<span>constraints: Union[str, re.Pattern, Dict[str, Union[str, Sequence[Union[str, re.Pattern, None]], None]]], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">event</span></span>(<span>constraints: Union[str, re.Pattern, Dict[str, Union[str, Sequence[Union[str, re.Pattern, ForwardRef(None)]], ForwardRef(None)]]], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -896,82 +823,6 @@ def _does_block_id_match(constraints: Union[str, Pattern, Dict[str, Union[str, P
     raise BoltError(f&#34;event ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;)</code></pre>
 </details>
 </dd>
-<dt id="slack_bolt.listener_matcher.builtins.function_action"><code class="name flex">
-<span>def <span class="ident">function_action</span></span>(<span>callback_id: Union[str, re.Pattern], constraints: Union[str, re.Pattern, Dict[str, Union[str, re.Pattern]]], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def function_action(
-    callback_id: Union[str, Pattern],
-    constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-    asyncio: bool = False,
-    base_logger: Optional[Logger] = None,
-) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
-    if isinstance(constraints, (str, Pattern)):
-
-        def func(body: Dict[str, Any]) -&gt; bool:
-            return _function_block_action(callback_id, constraints, body)
-
-        return build_listener_matcher(func, asyncio, base_logger)
-
-    elif &#34;type&#34; in constraints:
-        action_type = constraints[&#34;type&#34;]
-        if action_type == &#34;block_actions&#34;:
-            return function_block_action(callback_id, constraints, asyncio)
-
-        raise BoltError(f&#34;type: {action_type} is unsupported&#34;)
-    elif &#34;action_id&#34; in constraints:
-        # The default value is &#34;block_actions&#34;
-        return function_block_action(callback_id, constraints, asyncio)
-
-    raise BoltError(f&#34;action ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict&#34;)</code></pre>
-</details>
-</dd>
-<dt id="slack_bolt.listener_matcher.builtins.function_block_action"><code class="name flex">
-<span>def <span class="ident">function_block_action</span></span>(<span>callback_id: Union[str, re.Pattern], constraints: Union[str, re.Pattern, Dict[str, Union[str, re.Pattern]]], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def function_block_action(
-    callback_id: Union[str, Pattern],
-    constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-    asyncio: bool = False,
-    base_logger: Optional[Logger] = None,
-) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
-    def func(body: Dict[str, Any]) -&gt; bool:
-        return _function_block_action(callback_id, constraints, body)
-
-    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
-</details>
-</dd>
-<dt id="slack_bolt.listener_matcher.builtins.function_event"><code class="name flex">
-<span>def <span class="ident">function_event</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def function_event(
-    callback_id: Union[str, Pattern],
-    asyncio: bool = False,
-    base_logger: Optional[Logger] = None,
-) -&gt; Union[ListenerMatcher, &#34;AsyncListenerMatcher&#34;]:
-    def func(body: Dict[str, Any]) -&gt; bool:
-        return is_function(body) and _matches(callback_id, body.get(&#34;event&#34;, {}).get(&#34;function&#34;, {}).get(&#34;callback_id&#34;, &#34;&#34;))
-
-    return build_listener_matcher(func, asyncio, base_logger)</code></pre>
-</details>
-</dd>
 <dt id="slack_bolt.listener_matcher.builtins.global_shortcut"><code class="name flex">
 <span>def <span class="ident">global_shortcut</span></span>(<span>callback_id: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
@@ -993,7 +844,7 @@ def _does_block_id_match(constraints: Union[str, Pattern, Dict[str, Union[str, P
 </details>
 </dd>
 <dt id="slack_bolt.listener_matcher.builtins.message_event"><code class="name flex">
-<span>def <span class="ident">message_event</span></span>(<span>constraints: Dict[str, Union[str, Sequence[Union[str, re.Pattern, None]], None]], keyword: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
+<span>def <span class="ident">message_event</span></span>(<span>constraints: Dict[str, Union[str, Sequence[Union[str, re.Pattern, ForwardRef(None)]], ForwardRef(None)]], keyword: Union[str, re.Pattern], asyncio: bool = False, base_logger: Optional[logging.Logger] = None) ‑> Union[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>, AsyncListenerMatcher]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1319,9 +1170,6 @@ def _does_block_id_match(constraints: Union[str, Pattern, Dict[str, Union[str, P
 <li><code><a title="slack_bolt.listener_matcher.builtins.dialog_submission" href="#slack_bolt.listener_matcher.builtins.dialog_submission">dialog_submission</a></code></li>
 <li><code><a title="slack_bolt.listener_matcher.builtins.dialog_suggestion" href="#slack_bolt.listener_matcher.builtins.dialog_suggestion">dialog_suggestion</a></code></li>
 <li><code><a title="slack_bolt.listener_matcher.builtins.event" href="#slack_bolt.listener_matcher.builtins.event">event</a></code></li>
-<li><code><a title="slack_bolt.listener_matcher.builtins.function_action" href="#slack_bolt.listener_matcher.builtins.function_action">function_action</a></code></li>
-<li><code><a title="slack_bolt.listener_matcher.builtins.function_block_action" href="#slack_bolt.listener_matcher.builtins.function_block_action">function_block_action</a></code></li>
-<li><code><a title="slack_bolt.listener_matcher.builtins.function_event" href="#slack_bolt.listener_matcher.builtins.function_event">function_event</a></code></li>
 <li><code><a title="slack_bolt.listener_matcher.builtins.global_shortcut" href="#slack_bolt.listener_matcher.builtins.global_shortcut">global_shortcut</a></code></li>
 <li><code><a title="slack_bolt.listener_matcher.builtins.message_event" href="#slack_bolt.listener_matcher.builtins.message_event">message_event</a></code></li>
 <li><code><a title="slack_bolt.listener_matcher.builtins.message_shortcut" href="#slack_bolt.listener_matcher.builtins.message_shortcut">message_shortcut</a></code></li>

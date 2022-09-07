@@ -155,26 +155,6 @@ def extract_channel_id(payload: Dict[str, Any]) -&gt; Optional[str]:
     return None
 
 
-def extract_function_execution_id(payload: Dict[str, Any]) -&gt; Optional[str]:
-    if payload.get(&#34;function_execution_id&#34;) is not None:
-        return payload.get(&#34;function_execution_id&#34;)
-    if payload.get(&#34;event&#34;) is not None:
-        return extract_function_execution_id(payload[&#34;event&#34;])
-    if payload.get(&#34;function_data&#34;) is not None:
-        return extract_function_execution_id(payload[&#34;function_data&#34;])
-    if payload.get(&#34;execution_id&#34;) is not None:
-        return payload.get(&#34;execution_id&#34;)
-    return None
-
-
-def extract_slack_function_bot_access_token(payload: Dict[str, Any]) -&gt; Optional[str]:
-    if payload.get(&#34;bot_access_token&#34;) is not None:
-        return payload.get(&#34;bot_access_token&#34;)
-    if payload.get(&#34;event&#34;) is not None:
-        return extract_slack_function_bot_access_token(payload[&#34;event&#34;])
-    return None
-
-
 def build_context(context: BoltContext, body: Dict[str, Any]) -&gt; BoltContext:
     context[&#34;is_enterprise_install&#34;] = extract_is_enterprise_install(body)
     enterprise_id = extract_enterprise_id(body)
@@ -189,12 +169,6 @@ def build_context(context: BoltContext, body: Dict[str, Any]) -&gt; BoltContext:
     channel_id = extract_channel_id(body)
     if channel_id:
         context[&#34;channel_id&#34;] = channel_id
-    function_execution_id = extract_function_execution_id(body)
-    if function_execution_id:
-        context[&#34;function_execution_id&#34;] = function_execution_id
-    slack_function_bot_access_token = extract_slack_function_bot_access_token(body)
-    if slack_function_bot_access_token:
-        context[&#34;slack_function_bot_access_token&#34;] = slack_function_bot_access_token
     if &#34;response_url&#34; in body:
         context[&#34;response_url&#34;] = body[&#34;response_url&#34;]
     elif &#34;response_urls&#34; in body:
@@ -271,12 +245,6 @@ def debug_multiple_response_urls_detected() -&gt; str:
     channel_id = extract_channel_id(body)
     if channel_id:
         context[&#34;channel_id&#34;] = channel_id
-    function_execution_id = extract_function_execution_id(body)
-    if function_execution_id:
-        context[&#34;function_execution_id&#34;] = function_execution_id
-    slack_function_bot_access_token = extract_slack_function_bot_access_token(body)
-    if slack_function_bot_access_token:
-        context[&#34;slack_function_bot_access_token&#34;] = slack_function_bot_access_token
     if &#34;response_url&#34; in body:
         context[&#34;response_url&#34;] = body[&#34;response_url&#34;]
     elif &#34;response_urls&#34; in body:
@@ -415,27 +383,6 @@ def debug_multiple_response_urls_detected() -&gt; str:
     return None</code></pre>
 </details>
 </dd>
-<dt id="slack_bolt.request.internals.extract_function_execution_id"><code class="name flex">
-<span>def <span class="ident">extract_function_execution_id</span></span>(<span>payload: Dict[str, Any]) ‑> Optional[str]</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_function_execution_id(payload: Dict[str, Any]) -&gt; Optional[str]:
-    if payload.get(&#34;function_execution_id&#34;) is not None:
-        return payload.get(&#34;function_execution_id&#34;)
-    if payload.get(&#34;event&#34;) is not None:
-        return extract_function_execution_id(payload[&#34;event&#34;])
-    if payload.get(&#34;function_data&#34;) is not None:
-        return extract_function_execution_id(payload[&#34;function_data&#34;])
-    if payload.get(&#34;execution_id&#34;) is not None:
-        return payload.get(&#34;execution_id&#34;)
-    return None</code></pre>
-</details>
-</dd>
 <dt id="slack_bolt.request.internals.extract_is_enterprise_install"><code class="name flex">
 <span>def <span class="ident">extract_is_enterprise_install</span></span>(<span>payload: Dict[str, Any]) ‑> Optional[bool]</span>
 </code></dt>
@@ -454,23 +401,6 @@ def debug_multiple_response_urls_detected() -&gt; str:
         is_enterprise_install = payload.get(&#34;is_enterprise_install&#34;)
         return is_enterprise_install is not None and (is_enterprise_install is True or is_enterprise_install == &#34;true&#34;)
     return False</code></pre>
-</details>
-</dd>
-<dt id="slack_bolt.request.internals.extract_slack_function_bot_access_token"><code class="name flex">
-<span>def <span class="ident">extract_slack_function_bot_access_token</span></span>(<span>payload: Dict[str, Any]) ‑> Optional[str]</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_slack_function_bot_access_token(payload: Dict[str, Any]) -&gt; Optional[str]:
-    if payload.get(&#34;bot_access_token&#34;) is not None:
-        return payload.get(&#34;bot_access_token&#34;)
-    if payload.get(&#34;event&#34;) is not None:
-        return extract_slack_function_bot_access_token(payload[&#34;event&#34;])
-    return None</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.request.internals.extract_team_id"><code class="name flex">
@@ -555,7 +485,7 @@ def debug_multiple_response_urls_detected() -&gt; str:
 </details>
 </dd>
 <dt id="slack_bolt.request.internals.parse_query"><code class="name flex">
-<span>def <span class="ident">parse_query</span></span>(<span>query: Union[str, Dict[str, str], Dict[str, Sequence[str]], None]) ‑> Dict[str, Sequence[str]]</span>
+<span>def <span class="ident">parse_query</span></span>(<span>query: Union[str, Dict[str, str], Dict[str, Sequence[str]], ForwardRef(None)]) ‑> Dict[str, Sequence[str]]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -607,9 +537,7 @@ def debug_multiple_response_urls_detected() -&gt; str:
 <li><code><a title="slack_bolt.request.internals.extract_channel_id" href="#slack_bolt.request.internals.extract_channel_id">extract_channel_id</a></code></li>
 <li><code><a title="slack_bolt.request.internals.extract_content_type" href="#slack_bolt.request.internals.extract_content_type">extract_content_type</a></code></li>
 <li><code><a title="slack_bolt.request.internals.extract_enterprise_id" href="#slack_bolt.request.internals.extract_enterprise_id">extract_enterprise_id</a></code></li>
-<li><code><a title="slack_bolt.request.internals.extract_function_execution_id" href="#slack_bolt.request.internals.extract_function_execution_id">extract_function_execution_id</a></code></li>
 <li><code><a title="slack_bolt.request.internals.extract_is_enterprise_install" href="#slack_bolt.request.internals.extract_is_enterprise_install">extract_is_enterprise_install</a></code></li>
-<li><code><a title="slack_bolt.request.internals.extract_slack_function_bot_access_token" href="#slack_bolt.request.internals.extract_slack_function_bot_access_token">extract_slack_function_bot_access_token</a></code></li>
 <li><code><a title="slack_bolt.request.internals.extract_team_id" href="#slack_bolt.request.internals.extract_team_id">extract_team_id</a></code></li>
 <li><code><a title="slack_bolt.request.internals.extract_user_id" href="#slack_bolt.request.internals.extract_user_id">extract_user_id</a></code></li>
 <li><code><a title="slack_bolt.request.internals.parse_body" href="#slack_bolt.request.internals.parse_body">parse_body</a></code></li>

@@ -35,7 +35,6 @@ from slack_bolt.request.internals import (
     extract_team_id,
     extract_user_id,
     extract_channel_id,
-    extract_function_execution_id,
     debug_multiple_response_urls_detected,
 )
 
@@ -57,9 +56,6 @@ def build_async_context(
     channel_id = extract_channel_id(body)
     if channel_id:
         context[&#34;channel_id&#34;] = channel_id
-    function_execution_id = extract_function_execution_id(body)
-    if function_execution_id:
-        context[&#34;function_execution_id&#34;] = function_execution_id
     if &#34;response_url&#34; in body:
         context[&#34;response_url&#34;] = body[&#34;response_url&#34;]
     elif &#34;response_urls&#34; in body:
@@ -106,9 +102,6 @@ def build_async_context(
     channel_id = extract_channel_id(body)
     if channel_id:
         context[&#34;channel_id&#34;] = channel_id
-    function_execution_id = extract_function_execution_id(body)
-    if function_execution_id:
-        context[&#34;function_execution_id&#34;] = function_execution_id
     if &#34;response_url&#34; in body:
         context[&#34;response_url&#34;] = body[&#34;response_url&#34;]
     elif &#34;response_urls&#34; in body:

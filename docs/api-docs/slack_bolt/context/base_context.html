@@ -49,17 +49,14 @@ class BaseContext(dict):
         &#34;response_url&#34;,
         &#34;matches&#34;,
         &#34;authorize_result&#34;,
-        &#34;slack_function_bot_access_token&#34;,
         &#34;bot_token&#34;,
         &#34;bot_id&#34;,
         &#34;bot_user_id&#34;,
         &#34;user_token&#34;,
-        &#34;function_execution_id&#34;,
         &#34;client&#34;,
         &#34;ack&#34;,
         &#34;say&#34;,
         &#34;respond&#34;,
-        &#34;complete&#34;,
     ]
 
     @property
@@ -103,11 +100,6 @@ class BaseContext(dict):
         return self.get(&#34;response_url&#34;)
 
     @property
-    def function_execution_id(self) -&gt; Optional[str]:
-        &#34;&#34;&#34;The `function_execution_id` associated with this request.&#34;&#34;&#34;
-        return self.get(&#34;function_execution_id&#34;)
-
-    @property
     def matches(self) -&gt; Optional[Tuple]:
         &#34;&#34;&#34;Returns all the matched parts in message listener&#39;s regexp&#34;&#34;&#34;
         return self.get(&#34;matches&#34;)
@@ -118,11 +110,6 @@ class BaseContext(dict):
     def authorize_result(self) -&gt; Optional[AuthorizeResult]:
         &#34;&#34;&#34;The authorize result resolved for this request.&#34;&#34;&#34;
         return self.get(&#34;authorize_result&#34;)
-
-    @property
-    def slack_function_bot_access_token(self) -&gt; Optional[str]:
-        &#34;&#34;&#34;The bot token resolved for this function request.&#34;&#34;&#34;
-        return self.get(&#34;slack_function_bot_access_token&#34;)
 
     @property
     def bot_token(self) -&gt; Optional[str]:
@@ -191,17 +178,14 @@ class BaseContext(dict):
         &#34;response_url&#34;,
         &#34;matches&#34;,
         &#34;authorize_result&#34;,
-        &#34;slack_function_bot_access_token&#34;,
         &#34;bot_token&#34;,
         &#34;bot_id&#34;,
         &#34;bot_user_id&#34;,
         &#34;user_token&#34;,
-        &#34;function_execution_id&#34;,
         &#34;client&#34;,
         &#34;ack&#34;,
         &#34;say&#34;,
         &#34;respond&#34;,
-        &#34;complete&#34;,
     ]
 
     @property
@@ -245,11 +229,6 @@ class BaseContext(dict):
         return self.get(&#34;response_url&#34;)
 
     @property
-    def function_execution_id(self) -&gt; Optional[str]:
-        &#34;&#34;&#34;The `function_execution_id` associated with this request.&#34;&#34;&#34;
-        return self.get(&#34;function_execution_id&#34;)
-
-    @property
     def matches(self) -&gt; Optional[Tuple]:
         &#34;&#34;&#34;Returns all the matched parts in message listener&#39;s regexp&#34;&#34;&#34;
         return self.get(&#34;matches&#34;)
@@ -260,11 +239,6 @@ class BaseContext(dict):
     def authorize_result(self) -&gt; Optional[AuthorizeResult]:
         &#34;&#34;&#34;The authorize result resolved for this request.&#34;&#34;&#34;
         return self.get(&#34;authorize_result&#34;)
-
-    @property
-    def slack_function_bot_access_token(self) -&gt; Optional[str]:
-        &#34;&#34;&#34;The bot token resolved for this function request.&#34;&#34;&#34;
-        return self.get(&#34;slack_function_bot_access_token&#34;)
 
     @property
     def bot_token(self) -&gt; Optional[str]:
@@ -395,19 +369,6 @@ def enterprise_id(self) -&gt; Optional[str]:
     return self.get(&#34;enterprise_id&#34;)</code></pre>
 </details>
 </dd>
-<dt id="slack_bolt.context.base_context.BaseContext.function_execution_id"><code class="name">var <span class="ident">function_execution_id</span> : Optional[str]</code></dt>
-<dd>
-<div class="desc"><p>The <code>function_execution_id</code> associated with this request.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@property
-def function_execution_id(self) -&gt; Optional[str]:
-    &#34;&#34;&#34;The `function_execution_id` associated with this request.&#34;&#34;&#34;
-    return self.get(&#34;function_execution_id&#34;)</code></pre>
-</details>
-</dd>
 <dt id="slack_bolt.context.base_context.BaseContext.is_enterprise_install"><code class="name">var <span class="ident">is_enterprise_install</span> : Optional[bool]</code></dt>
 <dd>
 <div class="desc"><p>True if the request is associated with an Org-wide installation.</p></div>
@@ -434,7 +395,7 @@ def logger(self) -&gt; Logger:
     return self[&#34;logger&#34;]</code></pre>
 </details>
 </dd>
-<dt id="slack_bolt.context.base_context.BaseContext.matches"><code class="name">var <span class="ident">matches</span> : Optional[Tuple[]]</code></dt>
+<dt id="slack_bolt.context.base_context.BaseContext.matches"><code class="name">var <span class="ident">matches</span> : Optional[Tuple]</code></dt>
 <dd>
 <div class="desc"><p>Returns all the matched parts in message listener's regexp</p></div>
 <details class="source">
@@ -458,19 +419,6 @@ def matches(self) -&gt; Optional[Tuple]:
 def response_url(self) -&gt; Optional[str]:
     &#34;&#34;&#34;The `response_url` associated with this request.&#34;&#34;&#34;
     return self.get(&#34;response_url&#34;)</code></pre>
-</details>
-</dd>
-<dt id="slack_bolt.context.base_context.BaseContext.slack_function_bot_access_token"><code class="name">var <span class="ident">slack_function_bot_access_token</span> : Optional[str]</code></dt>
-<dd>
-<div class="desc"><p>The bot token resolved for this function request.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@property
-def slack_function_bot_access_token(self) -&gt; Optional[str]:
-    &#34;&#34;&#34;The bot token resolved for this function request.&#34;&#34;&#34;
-    return self.get(&#34;slack_function_bot_access_token&#34;)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.context.base_context.BaseContext.team_id"><code class="name">var <span class="ident">team_id</span> : Optional[str]</code></dt>
@@ -578,13 +526,11 @@ def user_token(self) -&gt; Optional[str]:
 <li><code><a title="slack_bolt.context.base_context.BaseContext.bot_user_id" href="#slack_bolt.context.base_context.BaseContext.bot_user_id">bot_user_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.channel_id" href="#slack_bolt.context.base_context.BaseContext.channel_id">channel_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.enterprise_id" href="#slack_bolt.context.base_context.BaseContext.enterprise_id">enterprise_id</a></code></li>
-<li><code><a title="slack_bolt.context.base_context.BaseContext.function_execution_id" href="#slack_bolt.context.base_context.BaseContext.function_execution_id">function_execution_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.is_enterprise_install" href="#slack_bolt.context.base_context.BaseContext.is_enterprise_install">is_enterprise_install</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.logger" href="#slack_bolt.context.base_context.BaseContext.logger">logger</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.matches" href="#slack_bolt.context.base_context.BaseContext.matches">matches</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.response_url" href="#slack_bolt.context.base_context.BaseContext.response_url">response_url</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.set_authorize_result" href="#slack_bolt.context.base_context.BaseContext.set_authorize_result">set_authorize_result</a></code></li>
-<li><code><a title="slack_bolt.context.base_context.BaseContext.slack_function_bot_access_token" href="#slack_bolt.context.base_context.BaseContext.slack_function_bot_access_token">slack_function_bot_access_token</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.standard_property_names" href="#slack_bolt.context.base_context.BaseContext.standard_property_names">standard_property_names</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.team_id" href="#slack_bolt.context.base_context.BaseContext.team_id">team_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.token" href="#slack_bolt.context.base_context.BaseContext.token">token</a></code></li>
