@@ -108,6 +108,7 @@ class App:
         ignoring_self_events_enabled: bool = True,
         ssl_check_enabled: bool = True,
         url_verification_enabled: bool = True,
+        attaching_function_token_enabled: bool = True,
         # for the OAuth flow
         oauth_settings: Optional[OAuthSettings] = None,
         oauth_flow: Optional[OAuthFlow] = None,
@@ -172,6 +173,8 @@ class App:
                 that verify the endpoint for Events API in HTTP Mode requests.
             ssl_check_enabled: bool = False if you would like to disable the built-in middleware (Default: True).
                 `SslCheck` is a built-in middleware that handles ssl_check requests from Slack.
+            attaching_function_token_enabled: False if you would like to disable the built-in middleware (Default: True).
+                `AttachingFunctionToken` is a built-in middleware that handles tokens with function requests from Slack.
             oauth_settings: The settings related to Slack app installation flow (OAuth flow)
             oauth_flow: Instantiated `slack_bolt.oauth.OAuthFlow`. This is always prioritized over oauth_settings.
             verification_token: Deprecated verification mechanism. This can used only for ssl_check requests.
@@ -325,6 +328,7 @@ class App:
             ignoring_self_events_enabled=ignoring_self_events_enabled,
             ssl_check_enabled=ssl_check_enabled,
             url_verification_enabled=url_verification_enabled,
+            attaching_function_token_enabled=attaching_function_token_enabled,
         )
 
     def _init_middleware_list(
@@ -334,6 +338,7 @@ class App:
         ignoring_self_events_enabled: bool = True,
         ssl_check_enabled: bool = True,
         url_verification_enabled: bool = True,
+        attaching_function_token_enabled: bool = True,
     ):
         if self._init_middleware_list_done:
             return
@@ -375,6 +380,8 @@ class App:
             self._middleware_list.append(IgnoringSelfEvents(base_logger=self._base_logger))
         if url_verification_enabled is True:
             self._middleware_list.append(UrlVerification(base_logger=self._base_logger))
+        if attaching_function_token_enabled is True:
+            self._middleware_list.append(AttachingFunctionToken())
         self._init_middleware_list_done = True
 
     # -------------------------
@@ -823,8 +830,6 @@ class App:
             middleware: A list of lister middleware functions.
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         """
-        middleware = list(middleware) if middleware else []
-        middleware.insert(0, AttachingFunctionToken())
 
         def __call__(*args, **kwargs):
             functions = extract_listener_callables(kwargs) if kwargs else list(args)

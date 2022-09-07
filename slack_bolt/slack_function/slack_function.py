@@ -5,7 +5,6 @@ from slack_bolt.listener_matcher import builtins as builtin_matchers
 
 from slack_bolt.response import BoltResponse
 from slack_bolt.middleware import Middleware
-from slack_bolt.middleware.attaching_function_token import AttachingFunctionToken
 
 from slack_bolt.util.utils import extract_listener_callables
 
@@ -71,9 +70,6 @@ class SlackFunction:
             middleware: A list of lister middleware functions.
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         """
-
-        middleware = list(middleware) if middleware else []
-        middleware.insert(0, AttachingFunctionToken())
 
         def __call__(*args, **kwargs):
             functions = extract_listener_callables(kwargs) if kwargs else list(args)
