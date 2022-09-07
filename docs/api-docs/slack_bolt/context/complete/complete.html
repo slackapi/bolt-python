@@ -34,7 +34,6 @@ from slack_bolt.context.complete.internals import get_kwargs_for_logging, get_na
 
 
 class Complete:
-
     client: WebClient
     function_execution_id: Optional[str]
 
@@ -47,24 +46,24 @@ class Complete:
         self.function_execution_id = function_execution_id
 
     def __call__(self, *args, outputs: Optional[Union[str, dict]] = None, error: Optional[str] = None) -&gt; SlackResponse:
-        &#34;&#34;&#34;Complete function for this request.
+        f&#34;&#34;&#34;Complete function for this request.
 
-        Note: This function does NOT accept any positional arguments, 
-        it only ACCEPTS ONE KEYWORD ARGUMENT! A TypeError will be raised
-        if this is not respected.
+        Note: This function does NOT accept any positional arguments! 
+        Additionally only ONE keyword argument is expected, providing
+        multiple will raise a TypeError
 
         Kwargs:
-            outputs: Json serializable containing the output values
+            ** THIS FUNCTION ONLY ACCEPTS ONE OF THE KWARGS BELOW **
+            outputs: Json serializable Dict containing the output values
             error: Error message to return to slack
-
+        
         Returns:
             SlackResponse: the response object returned from slack
-
+        
         Raises:
             TypeError: If positional arguments are provided or more then 1
                 keyword argument is provided.
         &#34;&#34;&#34;
-
         if args:
             raise TypeError(
                 f&#34;{get_name_for_logging(self)} takes 0 positional arguments but &#34;
@@ -114,7 +113,6 @@ class Complete:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Complete:
-
     client: WebClient
     function_execution_id: Optional[str]
 
@@ -127,24 +125,24 @@ class Complete:
         self.function_execution_id = function_execution_id
 
     def __call__(self, *args, outputs: Optional[Union[str, dict]] = None, error: Optional[str] = None) -&gt; SlackResponse:
-        &#34;&#34;&#34;Complete function for this request.
+        f&#34;&#34;&#34;Complete function for this request.
 
-        Note: This function does NOT accept any positional arguments, 
-        it only ACCEPTS ONE KEYWORD ARGUMENT! A TypeError will be raised
-        if this is not respected.
+        Note: This function does NOT accept any positional arguments! 
+        Additionally only ONE keyword argument is expected, providing
+        multiple will raise a TypeError
 
         Kwargs:
-            outputs: Json serializable containing the output values
+            ** THIS FUNCTION ONLY ACCEPTS ONE OF THE KWARGS BELOW **
+            outputs: Json serializable Dict containing the output values
             error: Error message to return to slack
-
+        
         Returns:
             SlackResponse: the response object returned from slack
-
+        
         Raises:
             TypeError: If positional arguments are provided or more then 1
                 keyword argument is provided.
         &#34;&#34;&#34;
-
         if args:
             raise TypeError(
                 f&#34;{get_name_for_logging(self)} takes 0 positional arguments but &#34;

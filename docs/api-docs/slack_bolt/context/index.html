@@ -219,11 +219,11 @@ __all__ = [
         any interactivity handlers associated to a function invocation will no longer be invocable.
 
             @app.function(&#34;reverse&#34;)
-            def handle_button_clicks(context):
+            async def handle_button_clicks(context):
                 context.{COMPLETE}(outputs={{&#34;stringReverse&#34;:&#34;olleh&#34;}})
 
             @app.function(&#34;reverse&#34;)
-            def handle_button_clicks({COMPLETE}):
+            async def handle_button_clicks({COMPLETE}):
                 {COMPLETE}(outputs={{&#34;stringReverse&#34;:&#34;olleh&#34;}})
 
         Returns:
@@ -317,11 +317,11 @@ def complete(self) -&gt; Complete:
     any interactivity handlers associated to a function invocation will no longer be invocable.
 
         @app.function(&#34;reverse&#34;)
-        def handle_button_clicks(context):
+        async def handle_button_clicks(context):
             context.{COMPLETE}(outputs={{&#34;stringReverse&#34;:&#34;olleh&#34;}})
 
         @app.function(&#34;reverse&#34;)
-        def handle_button_clicks({COMPLETE}):
+        async def handle_button_clicks({COMPLETE}):
             {COMPLETE}(outputs={{&#34;stringReverse&#34;:&#34;olleh&#34;}})
 
     Returns:
