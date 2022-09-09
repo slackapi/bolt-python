@@ -1,4 +1,133 @@
-body = {
+import json
+import time
+
+from slack_sdk import WebClient
+from slack_sdk.signature import SignatureVerifier
+
+from slack_bolt import BoltRequest
+from slack_bolt.app import App
+from slack_bolt.slack_function import SlackFunction
+from tests.mock_web_api_server import (
+    setup_mock_web_api_server,
+    cleanup_mock_web_api_server,
+    assert_auth_test_count,
+)
+from tests.utils import remove_os_env_temporarily, restore_os_env
+
+
+class TestFunctionViewSubmission:
+    signing_secret = "secret"
+    valid_token = "xoxb-valid"
+    mock_api_server_base_url = "http://localhost:8888"
+    signature_verifier = SignatureVerifier(signing_secret)
+    web_client = WebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
+
+    def setup_method(self):
+        self.old_os_env = remove_os_env_temporarily()
+        setup_mock_web_api_server(self)
+
+    def teardown_method(self):
+        cleanup_mock_web_api_server(self)
+        restore_os_env(self.old_os_env)
+
+    def generate_signature(self, body: str, timestamp: str):
+        return self.signature_verifier.generate_signature(
+            body=body,
+            timestamp=timestamp,
+        )
+
+    def build_headers(self, timestamp: str, body: str):
+        return {
+            "content-type": ["application/x-www-form-urlencoded"],
+            "x-slack-signature": [self.generate_signature(body, timestamp)],
+            "x-slack-request-timestamp": [timestamp],
+        }
+
+    def build_request_from_body(self, message_body: dict) -> BoltRequest:
+        timestamp, body = str(int(time.time())), json.dumps(message_body)
+        return BoltRequest(body=body, headers=self.build_headers(timestamp, body))
+
+    def test_mock_server_is_running(self):
+        resp = self.web_client.api_test()
+        assert resp != None
+
+    def test_success_view(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        func: SlackFunction = app.function("c")
+        func.view("view-id")(simple_listener)
+
+        request = self.build_request_from_body(function_view_submission_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+
+    def test_success_view_submission(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        func: SlackFunction = app.function("c")
+        func.view_submission("view-id")(simple_listener)
+
+        request = self.build_request_from_body(function_view_submission_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+
+    def test_process_before_response(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            process_before_response=True,
+        )
+        func: SlackFunction = app.function("c")
+        func.view("view-id")(simple_listener)
+
+        request = self.build_request_from_body(function_view_submission_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+
+    def test_failure_view(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        request = self.build_request_from_body(function_view_submission_body)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert_auth_test_count(self, 1)
+
+        func: SlackFunction = app.function("c")
+        func.view("view-idddd")(simple_listener)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert_auth_test_count(self, 1)
+
+    def test_failure_view_submission(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        request = self.build_request_from_body(function_view_submission_body)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert_auth_test_count(self, 1)
+
+        func: SlackFunction = app.function("c")
+        func.view_submission("view-idddd")(simple_listener)
+        response = app.dispatch(request)
+        assert response.status == 404
+        assert_auth_test_count(self, 1)
+
+
+function_view_submission_body = {
     "type": "view_submission",
     "team": {"id": "T111", "domain": "workspace-domain"},
     "enterprise": None,
@@ -30,8 +159,8 @@ body = {
         "submit": {"type": "plain_text", "text": "Submit", "emoji": True},
         "state": {"values": {"input_block_id": {"sample_input_id": {"type": "plain_text_input", "value": "hello world"}}}},
         "hash": "123.abc",
-        "private_metadata": "",
-        "callback_id": "func_sample_view_id",
+        "private_metadata": "This is for you!",
+        "callback_id": "view-id",
         "root_view_id": "V111",
         "previous_view_id": None,
         "clear_on_close": False,
@@ -43,7 +172,7 @@ body = {
     "bot_access_token": "xwfp-111",
     "function_data": {
         "execution_id": "Fx111",
-        "function": {"callback_id": "sample_view_function"},
+        "function": {"callback_id": "c"},
         "inputs": {
             "interactivity": {
                 "interactor": {
@@ -69,3 +198,11 @@ body = {
         "interactivity_pointer": "123.123.acb1",
     },
 }
+
+
+def simple_listener(ack, body, payload, view):
+    assert body["interactivity"]["interactivity_pointer"] == "123.123.acb1"
+    assert body["view"] == payload
+    assert payload == view
+    assert view["private_metadata"] == "This is for you!"
+    ack()
