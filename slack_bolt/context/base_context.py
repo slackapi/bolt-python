@@ -24,6 +24,7 @@ class BaseContext(dict):
         "response_url",
         "matches",
         "authorize_result",
+        "slack_function_bot_access_token",
         "bot_token",
         "bot_id",
         "bot_user_id",
@@ -33,8 +34,7 @@ class BaseContext(dict):
         "ack",
         "say",
         "respond",
-        "complete_success",
-        "complete_error",
+        "complete",
     ]
 
     @property
@@ -117,6 +117,11 @@ class BaseContext(dict):
     def authorize_result(self) -> Optional[AuthorizeResult]:
         """The authorize result resolved for this request."""
         return self.get("authorize_result")
+
+    @property
+    def slack_function_bot_access_token(self) -> Optional[str]:
+        """The bot token resolved for this function request."""
+        return self.get("slack_function_bot_access_token")
 
     @property
     def bot_token(self) -> Optional[str]:

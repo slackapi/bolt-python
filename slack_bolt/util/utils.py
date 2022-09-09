@@ -8,6 +8,7 @@ from slack_sdk import WebClient
 from slack_sdk.models import JsonObject
 
 from slack_bolt.error import BoltError
+from slack_bolt.response import BoltResponse
 from slack_bolt.version import __version__ as bolt_version
 
 
@@ -88,3 +89,14 @@ def get_name_for_callable(func: Callable) -> str:
 
 def get_arg_names_of_callable(func: Callable) -> List[str]:
     return inspect.getfullargspec(inspect.unwrap(func)).args
+
+
+def extract_listener_callables(
+    kwargs: dict,
+) -> Optional[Sequence[Callable[..., Optional[BoltResponse]]]]:
+    if kwargs:
+        functions = [kwargs["ack"]]
+        for sub in kwargs["lazy"]:
+            functions.append(sub)
+        return functions
+    return None

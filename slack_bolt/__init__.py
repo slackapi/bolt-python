@@ -11,8 +11,7 @@ from .context import BoltContext
 from .context.ack import Ack
 from .context.respond import Respond
 from .context.say import Say
-from .context.complete_success import CompleteSuccess
-from .context.complete_error import CompleteError
+from .context.complete import Complete
 from .kwargs_injection import Args
 from .listener import Listener
 from .listener_matcher import CustomListenerMatcher
@@ -25,8 +24,7 @@ __all__ = [
     "Ack",
     "Respond",
     "Say",
-    "CompleteSuccess",
-    "CompleteError",
+    "Complete",
     "Args",
     "Listener",
     "CustomListenerMatcher",
