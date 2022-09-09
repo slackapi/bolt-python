@@ -1,5 +1,6 @@
 import json
 import time
+import pytest
 
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
@@ -62,6 +63,19 @@ class TestFunction:
         assert_auth_test_count(self, 1)
         assert self.mock_received_requests["/functions.completeSuccess"] == 1
 
+    def test_valid_callback_id_complete(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.function("reverse")(complete_it)
+
+        request = self.build_request_from_body(function_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+        assert self.mock_received_requests["/functions.completeSuccess"] == 1
+
     def test_valid_callback_id_error(self):
         app = App(
             client=self.web_client,
@@ -86,6 +100,16 @@ class TestFunction:
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
+
+    def test_invalid_declaration(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        func = app.function("reverse")
+
+        with pytest.raises(TypeError):
+            func("hello world")
 
 
 function_body = {
@@ -125,6 +149,7 @@ function_body = {
         "inputs": {"stringToReverse": "hello"},
         "function_execution_id": "Fx111",
         "event_ts": "1659055013.509853",
+        "bot_access_token": "xwfp-valid",
     },
     "type": "event_callback",
     "event_id": "Ev111",
@@ -169,6 +194,7 @@ wrong_id_function_body = {
         "inputs": {"stringToReverse": "hello"},
         "function_execution_id": "Fx111",
         "event_ts": "1659055013.509853",
+        "bot_access_token": "xwfp-valid",
     },
     "type": "event_callback",
     "event_id": "Ev111",
@@ -177,17 +203,26 @@ wrong_id_function_body = {
 }
 
 
-def reverse(body, event, complete_success):
+def reverse(body, event, complete, context, client):
     assert body == function_body
     assert event == function_body["event"]
-    complete_success(
-        {
+    assert context.slack_function_bot_access_token == "xwfp-valid"
+    assert context.client.token == "xwfp-valid"
+    assert client.token == "xwfp-valid"
+    complete(
+        outputs={
             "reverseString": "olleh",
         }
     )
 
 
-def reverse_error(body, event, complete_error):
+def reverse_error(body, event, complete):
     assert body == function_body
     assert event == function_body["event"]
-    complete_error("there was an error")
+    complete(error="there was an error")
+
+
+def complete_it(body, event, complete):
+    assert body == function_body
+    assert event == function_body["event"]
+    complete()
