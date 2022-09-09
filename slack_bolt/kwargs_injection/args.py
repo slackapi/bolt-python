@@ -5,8 +5,7 @@ from typing import Callable, Dict, Any, Optional
 
 from slack_bolt.context import BoltContext
 from slack_bolt.context.ack import Ack
-from slack_bolt.context.complete_error import CompleteError
-from slack_bolt.context.complete_success import CompleteSuccess
+from slack_bolt.context.complete import Complete
 from slack_bolt.context.respond import Respond
 from slack_bolt.context.say import Say
 from slack_bolt.request import BoltRequest
@@ -71,10 +70,8 @@ class Args:
     """`say()` utility function, which calls `chat.postMessage` API with the associated channel ID"""
     respond: Respond
     """`respond()` utility function, which utilizes the associated `response_url`"""
-    complete_success: CompleteSuccess
-    """`complete_success()` utility function, which returns a successful function response to the Slack servers"""
-    complete_error: CompleteError
-    """`complete_error()` utility function, which returns a function error response to the Slack servers"""
+    complete: Complete
+    """`complete()` utility function, which returns a completion function response to the Slack servers"""
     # middleware
     next: Callable[[], None]
     """`next()` utility function, which tells the middleware chain that it can continue with the next one"""
@@ -101,8 +98,7 @@ class Args:
         ack: Ack,
         say: Say,
         respond: Respond,
-        complete_success: CompleteSuccess,
-        complete_error: CompleteError,
+        complete: Complete,
         # As this method is not supposed to be invoked by bolt-python users,
         # the naming conflict with the built-in one affects
         # only the internals of this method
@@ -128,7 +124,6 @@ class Args:
         self.ack: Ack = ack
         self.say: Say = say
         self.respond: Respond = respond
-        self.complete_success: CompleteSuccess = complete_success
-        self.complete_error: CompleteError = complete_error
+        self.complete: Complete = complete
         self.next: Callable[[], None] = next
         self.next_: Callable[[], None] = next

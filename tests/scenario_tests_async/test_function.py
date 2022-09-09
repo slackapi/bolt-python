@@ -75,6 +75,20 @@ class TestAsyncFunction:
         assert self.mock_received_requests["/functions.completeSuccess"] == 1
 
     @pytest.mark.asyncio
+    async def test_valid_callback_id_complete(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.function("reverse")(complete_it)
+
+        request = self.build_request_from_body(function_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_auth_test_count_async(self, 1)
+        assert self.mock_received_requests["/functions.completeSuccess"] == 1
+
+    @pytest.mark.asyncio
     async def test_valid_callback_id_error(self):
         app = AsyncApp(
             client=self.web_client,
@@ -191,17 +205,23 @@ wrong_id_function_body = {
 }
 
 
-async def reverse(body, event, complete_success):
+async def reverse(body, event, complete):
     assert body == function_body
     assert event == function_body["event"]
-    await complete_success(
-        {
+    await complete(
+        outputs={
             "reverseString": "olleh",
         }
     )
 
 
-async def reverse_error(body, event, complete_error):
+async def reverse_error(body, event, complete):
     assert body == function_body
     assert event == function_body["event"]
-    await complete_error("there was an error")
+    await complete(error="there was an error")
+
+
+async def complete_it(body, event, complete):
+    assert body == function_body
+    assert event == function_body["event"]
+    await complete()

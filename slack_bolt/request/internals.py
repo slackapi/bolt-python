@@ -132,6 +132,18 @@ def extract_function_execution_id(payload: Dict[str, Any]) -> Optional[str]:
         return payload.get("function_execution_id")
     if payload.get("event") is not None:
         return extract_function_execution_id(payload["event"])
+    if payload.get("function_data") is not None:
+        return extract_function_execution_id(payload["function_data"])
+    if payload.get("execution_id") is not None:
+        return payload.get("execution_id")
+    return None
+
+
+def extract_slack_function_bot_access_token(payload: Dict[str, Any]) -> Optional[str]:
+    if payload.get("bot_access_token") is not None:
+        return payload.get("bot_access_token")
+    if payload.get("event") is not None:
+        return extract_slack_function_bot_access_token(payload["event"])
     return None
 
 
@@ -150,8 +162,11 @@ def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
     if channel_id:
         context["channel_id"] = channel_id
     function_execution_id = extract_function_execution_id(body)
-    if function_execution_id:
+    if function_execution_id is not None:
         context["function_execution_id"] = function_execution_id
+    slack_function_bot_access_token = extract_slack_function_bot_access_token(body)
+    if slack_function_bot_access_token is not None:
+        context["slack_function_bot_access_token"] = slack_function_bot_access_token
     if "response_url" in body:
         context["response_url"] = body["response_url"]
     elif "response_urls" in body:
