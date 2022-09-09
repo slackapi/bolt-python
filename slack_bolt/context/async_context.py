@@ -6,16 +6,14 @@ from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.context.base_context import BaseContext
 from slack_bolt.context.respond.async_respond import AsyncRespond
 from slack_bolt.context.say.async_say import AsyncSay
-from slack_bolt.context.complete_error.async_complete_error import AsyncCompleteError
-from slack_bolt.context.complete_success.async_complete_success import AsyncCompleteSuccess
+from slack_bolt.context.complete.async_complete import AsyncComplete
 from slack_bolt.util.utils import create_copy
 
 CLIENT: str = "client"
 ACK: str = "ack"
 SAY: str = "say"
 RESPOND: str = "respond"
-COMPLETE_ERROR: str = "complete_error"
-COMPLETE_SUCCESS: str = "complete_success"
+COMPLETE: str = "complete"
 
 
 class AsyncBoltContext(BaseContext):
@@ -133,41 +131,23 @@ class AsyncBoltContext(BaseContext):
         return self[RESPOND]
 
     @property
-    def complete_success(self) -> AsyncCompleteSuccess:
-        f"""`{COMPLETE_SUCCESS}()` function for this request.
+    def complete(self) -> AsyncComplete:
+        f"""`{COMPLETE}()` function for this request. Once a function's state is set to complete,
+        any outputs the function returns will be passed along to the next step of its housing workflow,
+        or complete the workflow if the function is the last step in a workflow. Additionally,
+        any interactivity handlers associated to a function invocation will no longer be invocable.
 
             @app.function("reverse")
             async def handle_button_clicks(context):
-                await context.{COMPLETE_SUCCESS}({{"stringReverse":"olleh"}})
+                await context.{COMPLETE}(outputs={{"stringReverse":"olleh"}})
 
             @app.function("reverse")
-            async def handle_button_clicks({COMPLETE_SUCCESS}):
-                await {COMPLETE_SUCCESS}({{"stringReverse":"olleh"}})
+            async def handle_button_clicks({COMPLETE}):
+                await {COMPLETE}(outputs={{"stringReverse":"olleh"}})
 
         Returns:
-            Callable `{COMPLETE_SUCCESS}()` function
+            Callable `{COMPLETE}()` function
         """
-        if COMPLETE_SUCCESS not in self:
-            self[COMPLETE_SUCCESS] = AsyncCompleteSuccess(
-                client=self.client, function_execution_id=self.function_execution_id
-            )
-        return self[COMPLETE_SUCCESS]
-
-    @property
-    def complete_error(self) -> AsyncCompleteError:
-        f"""`{COMPLETE_ERROR}()` function for this request.
-
-            @app.function("reverse")
-            async def handle_button_clicks(context):
-                await context.{COMPLETE_ERROR}("an error spawned")
-
-            @app.function("reverse")
-            async def handle_button_clicks({COMPLETE_ERROR}):
-                await {COMPLETE_ERROR}("an error spawned")
-
-        Returns:
-            Callable `{COMPLETE_ERROR}()` function
-        """
-        if COMPLETE_ERROR not in self:
-            self[COMPLETE_ERROR] = AsyncCompleteError(client=self.client, function_execution_id=self.function_execution_id)
-        return self[COMPLETE_ERROR]
+        if COMPLETE not in self:
+            self[COMPLETE] = AsyncComplete(client=self.client, function_execution_id=self.function_execution_id)
+        return self[COMPLETE]

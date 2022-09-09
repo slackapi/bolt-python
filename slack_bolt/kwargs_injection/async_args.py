@@ -6,8 +6,7 @@ from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.context.respond.async_respond import AsyncRespond
 from slack_bolt.context.say.async_say import AsyncSay
-from slack_bolt.context.complete_error.async_complete_error import AsyncCompleteError
-from slack_bolt.context.complete_success.async_complete_success import AsyncCompleteSuccess
+from slack_bolt.context.complete.async_complete import AsyncComplete
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.web.async_client import AsyncWebClient
@@ -70,10 +69,8 @@ class AsyncArgs:
     """`say()` utility function, which calls chat.postMessage API with the associated channel ID"""
     respond: AsyncRespond
     """`respond()` utility function, which utilizes the associated `response_url`"""
-    complete_success: AsyncCompleteSuccess
-    """`complete_success()` utility function, which returns a successful function response to the Slack servers"""
-    complete_error: AsyncCompleteError
-    """`complete_error()` utility function, which returns a function error response to the Slack servers"""
+    complete: AsyncComplete
+    """`complete()` utility function, which returns a complete function response to the Slack servers"""
     # middleware
     next: Callable[[], Awaitable[None]]
     """`next()` utility function, which tells the middleware chain that it can continue with the next one"""
@@ -100,8 +97,7 @@ class AsyncArgs:
         ack: AsyncAck,
         say: AsyncSay,
         respond: AsyncRespond,
-        complete_success: AsyncCompleteSuccess,
-        complete_error: AsyncCompleteError,
+        complete: AsyncComplete,
         next: Callable[[], Awaitable[None]],
         **kwargs  # noqa
     ):
@@ -124,7 +120,6 @@ class AsyncArgs:
         self.ack: AsyncAck = ack
         self.say: AsyncSay = say
         self.respond: AsyncRespond = respond
-        self.complete_success: AsyncCompleteSuccess = complete_success
-        self.complete_error: AsyncCompleteError = complete_error
+        self.complete: AsyncComplete = complete
         self.next: Callable[[], Awaitable[None]] = next
         self.next_: Callable[[], Awaitable[None]] = next

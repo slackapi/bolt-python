@@ -7,16 +7,14 @@ from slack_bolt.context.ack import Ack
 from slack_bolt.context.base_context import BaseContext
 from slack_bolt.context.respond import Respond
 from slack_bolt.context.say import Say
-from slack_bolt.context.complete_success import CompleteSuccess
-from slack_bolt.context.complete_error import CompleteError
+from slack_bolt.context.complete import Complete
 from slack_bolt.util.utils import create_copy
 
 CLIENT: str = "client"
 ACK: str = "ack"
 SAY: str = "say"
 RESPOND: str = "respond"
-COMPLETE_ERROR: str = "complete_error"
-COMPLETE_SUCCESS: str = "complete_success"
+COMPLETE: str = "complete"
 
 
 class BoltContext(BaseContext):
@@ -135,39 +133,23 @@ class BoltContext(BaseContext):
         return self[RESPOND]
 
     @property
-    def complete_success(self) -> CompleteSuccess:
-        f"""`{COMPLETE_SUCCESS}()` function for this request.
+    def complete(self) -> Complete:
+        f"""`{COMPLETE}()` function for this request. Once a function's state is set to complete,
+        any outputs the function returns will be passed along to the next step of its housing workflow,
+        or complete the workflow if the function is the last step in a workflow. Additionally,
+        any interactivity handlers associated to a function invocation will no longer be invocable.
 
             @app.function("reverse")
             def handle_button_clicks(context):
-                context.{COMPLETE_SUCCESS}({{"stringReverse":"olleh"}})
+                context.{COMPLETE}(outputs={{"stringReverse":"olleh"}})
 
             @app.function("reverse")
-            def handle_button_clicks({COMPLETE_SUCCESS}):
-                {COMPLETE_SUCCESS}({{"stringReverse":"olleh"}})
+            def handle_button_clicks({COMPLETE}):
+                {COMPLETE}(outputs={{"stringReverse":"olleh"}})
 
         Returns:
-            Callable `{COMPLETE_SUCCESS}()` function
+            Callable `{COMPLETE}()` function
         """
-        if COMPLETE_SUCCESS not in self:
-            self[COMPLETE_SUCCESS] = CompleteSuccess(client=self.client, function_execution_id=self.function_execution_id)
-        return self[COMPLETE_SUCCESS]
-
-    @property
-    def complete_error(self) -> CompleteError:
-        f"""`{COMPLETE_ERROR}()` function for this request.
-
-            @app.function("reverse")
-            def handle_button_clicks(context):
-                context.{COMPLETE_ERROR}("an error spawned")
-
-            @app.function("reverse")
-            def handle_button_clicks({COMPLETE_ERROR}):
-                {COMPLETE_ERROR}("an error spawned")
-
-        Returns:
-            Callable `{COMPLETE_ERROR}()` function
-        """
-        if COMPLETE_ERROR not in self:
-            self[COMPLETE_ERROR] = CompleteError(client=self.client, function_execution_id=self.function_execution_id)
-        return self[COMPLETE_ERROR]
+        if COMPLETE not in self:
+            self[COMPLETE] = Complete(client=self.client, function_execution_id=self.function_execution_id)
+        return self[COMPLETE]
