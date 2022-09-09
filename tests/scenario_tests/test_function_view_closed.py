@@ -1,12 +1,12 @@
 import json
 import time
 
-from slack_sdk import WebClient
 from slack_sdk.signature import SignatureVerifier
+from slack_sdk.web import WebClient
 
-from slack_bolt import BoltRequest
 from slack_bolt.app import App
 from slack_bolt.slack_function import SlackFunction
+from slack_bolt.request import BoltRequest
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -15,7 +15,7 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-class TestFunctionViewSubmission:
+class TestFunctionViewClosed:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -54,28 +54,28 @@ class TestFunctionViewSubmission:
         resp = self.web_client.api_test()
         assert resp != None
 
-    def test_success_view(self):
+    def test_success(self):
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
         func: SlackFunction = app.function("c")
-        func.view("view-id")(simple_listener)
+        func.view({"type": "view_closed", "callback_id": "view-id"})(simple_listener)
 
-        request = self.build_request_from_body(function_view_submission_body)
+        request = self.build_request_from_body(function_view_closed_body)
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
 
-    def test_success_view_submission(self):
+    def test_success_2(self):
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
         func: SlackFunction = app.function("c")
-        func.view_submission("view-id")(simple_listener)
+        func.view_closed("view-id")(simple_listener)
 
-        request = self.build_request_from_body(function_view_submission_body)
+        request = self.build_request_from_body(function_view_closed_body)
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
@@ -87,9 +87,9 @@ class TestFunctionViewSubmission:
             process_before_response=True,
         )
         func: SlackFunction = app.function("c")
-        func.view("view-id")(simple_listener)
+        func.view({"type": "view_closed", "callback_id": "view-id"})(simple_listener)
 
-        request = self.build_request_from_body(function_view_submission_body)
+        request = self.build_request_from_body(function_view_closed_body)
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
@@ -99,36 +99,34 @@ class TestFunctionViewSubmission:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        request = self.build_request_from_body(function_view_submission_body)
+        request = self.build_request_from_body(function_view_closed_body)
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
 
-        func: SlackFunction = app.function("c")
-        func.view("view-idddd")(simple_listener)
+        app.view({"type": "view_closed", "callback_id": "view-idddd"})(simple_listener)
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
 
-    def test_failure_view_submission(self):
+    def test_failure_view_closed(self):
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        request = self.build_request_from_body(function_view_submission_body)
+        request = self.build_request_from_body(function_view_closed_body)
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
 
-        func: SlackFunction = app.function("c")
-        func.view_submission("view-idddd")(simple_listener)
+        app.view_closed("view-idddd")(simple_listener)
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
 
 
-function_view_submission_body = {
-    "type": "view_submission",
+function_view_closed_body = {
+    "type": "view_closed",
     "team": {"id": "T111", "domain": "workspace-domain"},
     "enterprise": None,
     "user": {"id": "U111", "name": "primary-owner", "team_id": "T111"},
@@ -157,8 +155,8 @@ function_view_submission_body = {
         ],
         "close": None,
         "submit": {"type": "plain_text", "text": "Submit", "emoji": True},
-        "state": {"values": {"input_block_id": {"sample_input_id": {"type": "plain_text_input", "value": "hello world"}}}},
-        "hash": "123.abc",
+        "state": {"values": {}},
+        "hash": "123.aBc1",
         "private_metadata": "This is for you!",
         "callback_id": "view-id",
         "root_view_id": "V111",
@@ -168,7 +166,7 @@ function_view_submission_body = {
         "external_id": "",
     },
     "api_app_id": "A111",
-    "response_urls": [],
+    "is_cleared": False,
     "bot_access_token": "xwfp-111",
     "function_data": {
         "execution_id": "Fx111",
@@ -179,7 +177,7 @@ function_view_submission_body = {
                     "id": "U111",
                     "secret": "NDA111",
                 },
-                "interactivity_pointer": "123.123.acb1",
+                "interactivity_pointer": "123.123.abc1",
             },
             "interactivity.interactor": {
                 "id": "U111",
@@ -187,21 +185,14 @@ function_view_submission_body = {
             },
             "interactivity.interactor.id": "U111",
             "interactivity.interactor.secret": "NDA111",
-            "interactivity.interactivity_pointer": "123.123.acb1",
+            "interactivity.interactivity_pointer": "123.123.abc1",
         },
-    },
-    "interactivity": {
-        "interactor": {
-            "secret": "NDA111",
-            "id": "U111",
-        },
-        "interactivity_pointer": "123.123.acb1",
     },
 }
 
 
 def simple_listener(ack, body, payload, view):
-    assert body["function_data"]["inputs"]["interactivity"]["interactivity_pointer"] == "123.123.acb1"
+    assert body["function_data"]["inputs"]["interactivity"]["interactivity_pointer"] == "123.123.abc1"
     assert body["view"] == payload
     assert payload == view
     assert view["private_metadata"] == "This is for you!"
