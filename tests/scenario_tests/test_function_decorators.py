@@ -68,3 +68,24 @@ class TestAppDecorators:
 
         handle_function_events({})
         assert isinstance(handle_function_events, Callable)
+
+    def test_initialized_decorators(self):
+        app = App(signing_secret=self.signing_secret, client=self.web_client)
+        ack = NoopAck()
+
+        func = app.function("c")
+
+        @func
+        def handle_function_events(body: dict):
+            assert body is not None
+
+        @func.action("some-func-action-id")
+        def handle_function_action(ack: Ack, body: dict):
+            assert body is not None
+            ack()
+
+        handle_function_action(ack, {})
+        assert isinstance(handle_function_action, Callable)
+
+        handle_function_events({})
+        assert isinstance(handle_function_events, Callable)

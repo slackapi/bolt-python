@@ -1,4 +1,4 @@
-from typing import List, Union, Pattern, Callable, Dict, Optional, Sequence
+from typing import Union, Pattern, Callable, Dict, Optional, Sequence
 from logging import Logger
 
 from slack_bolt.listener_matcher import builtins as builtin_matchers
@@ -18,25 +18,25 @@ class SlackFunction:
         register_listener: Callable[..., Optional[Callable[..., Optional[BoltResponse]]]],
         base_logger: Logger,
         callback_id: Union[str, Pattern],
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ):
         self._register_listener = register_listener
         self._base_logger = base_logger
         self.callback_id = callback_id
+        self.matchers = matchers
+        self.middleware = middleware
 
-    def register_listener(
-        self,
-        functions: List[Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]],
-        matchers: Optional[Sequence[Callable[..., bool]]] = None,
-        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
-    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    def register_listener(self, *args, **kwargs) -> None:
+        functions = extract_listener_callables(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.function_event(callback_id=self.callback_id, base_logger=self._base_logger)
-        self.func = self._register_listener(functions, primary_matcher, matchers, middleware, True)
-        return self
+        self.func = self._register_listener(functions, primary_matcher, self.matchers, self.middleware, True)
 
-    def __call__(self, *args, **kwargs) -> Optional[BoltResponse]:
+    def __call__(self, *args, **kwargs) -> Optional[Union[BoltResponse, Callable]]:
         if self.func is not None:
             return self.func(*args, **kwargs)
-        return None
+        self.register_listener(*args, **kwargs)
+        return self
 
     def action(
         self,

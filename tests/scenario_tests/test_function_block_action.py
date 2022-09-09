@@ -144,6 +144,68 @@ class TestFunctionBlockActions:
         assert response.status == 404
         assert_auth_test_count(self, 1)
 
+    def test_success_decorators(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        @app.function("c")
+        def func_listener_wrap(body):
+            return func_listener(body)
+
+        @func_listener_wrap.action("a")
+        def simple_listener_wrap(ack, complete, body, payload, action, client: WebClient, context: BoltContext):
+            simple_listener(ack, complete, body, payload, action, client, context)
+
+        request = self.build_request_from_body(function_action_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+        assert self.mock_received_requests["/functions.completeSuccess"] == 1
+
+    def test_success_deconstructed_decorators(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        func: SlackFunction = app.function("c")
+
+        @func
+        def func_listener_wrap(body):
+            return func_listener(body)
+
+        @func.action("a")
+        def simple_listener_wrap(ack, complete, body, payload, action, client: WebClient, context: BoltContext):
+            simple_listener(ack, complete, body, payload, action, client, context)
+
+        request = self.build_request_from_body(function_action_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+        assert self.mock_received_requests["/functions.completeSuccess"] == 1
+
+    def test_success_mixed_decorators(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        func: SlackFunction = app.function("c")
+
+        @func
+        def func_listener_wrap(body):
+            return func_listener(body)
+
+        @func_listener_wrap.action("a")
+        def simple_listener_wrap(ack, complete, body, payload, action, client: WebClient, context: BoltContext):
+            simple_listener(ack, complete, body, payload, action, client, context)
+
+        request = self.build_request_from_body(function_action_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+        assert self.mock_received_requests["/functions.completeSuccess"] == 1
+
 
 function_action_body = {
     "type": "block_actions",

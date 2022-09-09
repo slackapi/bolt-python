@@ -1,5 +1,6 @@
 import json
 import time
+import pytest
 
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
@@ -99,6 +100,16 @@ class TestFunction:
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
+
+    def test_invalid_declaration(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        func = app.function("reverse")
+
+        with pytest.raises(TypeError):
+            func("hello world")
 
 
 function_body = {

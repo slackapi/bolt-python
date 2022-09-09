@@ -831,12 +831,7 @@ class App:
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         """
 
-        def __call__(*args, **kwargs):
-            functions = extract_listener_callables(kwargs) if kwargs else list(args)
-            slack_function = SlackFunction(self._register_listener, self._base_logger, callback_id)
-            return slack_function.register_listener(list(functions), matchers, middleware)
-
-        return __call__
+        return SlackFunction(self._register_listener, self._base_logger, callback_id, matchers, middleware)
 
     # -------------------------
     # slash commands
