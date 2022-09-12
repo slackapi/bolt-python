@@ -259,12 +259,12 @@ def function_view(
     base_logger: Optional[Logger] = None,
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     if isinstance(constraints, (str, Pattern)):
-        return function_view_submission(callback_id, constraints, asyncio)
+        return function_view_submission(callback_id, constraints, asyncio, base_logger)
     elif "type" in constraints:
         if constraints["type"] == "view_submission":
-            return function_view_submission(callback_id, constraints["callback_id"], asyncio)
+            return function_view_submission(callback_id, constraints["callback_id"], asyncio, base_logger)
         if constraints["type"] == "view_closed":
-            return function_view_closed(callback_id, constraints["callback_id"], asyncio)
+            return function_view_closed(callback_id, constraints["callback_id"], asyncio, base_logger)
 
     raise BoltError(f"function view ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict")
 

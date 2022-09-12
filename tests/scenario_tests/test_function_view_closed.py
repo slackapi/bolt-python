@@ -192,7 +192,6 @@ function_view_closed_body = {
 
 
 def simple_listener(ack, body, payload, view):
-    assert body["function_data"]["inputs"]["interactivity"]["interactivity_pointer"] == "123.123.abc1"
     assert body["view"] == payload
     assert payload == view
     assert view["private_metadata"] == "This is for you!"

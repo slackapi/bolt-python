@@ -89,11 +89,21 @@ class SlackFunction:
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
-        """Registers a new `view_submission`/`view_closed` event listener.
-        This method can be used as either a decorator or a method.
+        """Registers a new `view_submission`/`view_closed` event listener for a function.
+
             # Use this method as a decorator
-            @app.view("view_1")
-            def handle_submission(ack, body, client, view):
+            @app.function("function_1")
+            def sample_view(event, complete: Complete):
+                client.views_open(
+                    interactivity_pointer=interactivity_pointer,
+                    view={...}
+                )
+
+            # Use this method as a decorator
+            @my_function.view("view_1")
+            def handle_submission(ack, body, client, view, complete):
+                # Acknowledge the view_submission event and close the modal
+                ack()
                 # Assume there's an input block with `block_c` as the block_id and `dreamy_input`
                 hopes_and_dreams = view["state"]["values"]["block_c"]["dreamy_input"]
                 user = body["user"]["id"]
@@ -104,11 +114,14 @@ class SlackFunction:
                 if len(errors) > 0:
                     ack(response_action="errors", errors=errors)
                     return
-                # Acknowledge the view_submission event and close the modal
-                ack()
+                # complete the function
+                complete()
                 # Do whatever you want with the input data - here we're saving it to a DB
+
             # Pass a function to this method
-            app.view("view_1")(handle_submission)
+            sample_view_func = app.function("request-approval")(sample_view)
+            sample_view_func.action("view_1")(handle_submission)
+
         Refer to https://api.slack.com/reference/interaction-payloads/views for details of payloads.
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
         Args:
