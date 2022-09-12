@@ -17,7 +17,7 @@ class SlackFunction:
         self,
         register_listener: Callable[..., Optional[Callable[..., Optional[BoltResponse]]]],
         base_logger: Logger,
-        callback_id: Union[str, Pattern],
+        callback_id: str,
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ):
