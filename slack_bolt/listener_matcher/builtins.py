@@ -293,8 +293,9 @@ def function_view_closed(
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(body: Dict[str, Any]) -> bool:
         return (
-            _function_interactivity_match(function_callback_id, body),
-            is_view_closed(body) and _matches(callback_id, body["view"]["callback_id"]),
+            _function_interactivity_match(function_callback_id, body)
+            and is_view_closed(body)
+            and _matches(callback_id, body["view"]["callback_id"])
         )
 
     return build_listener_matcher(func, asyncio, base_logger)

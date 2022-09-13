@@ -46,7 +46,7 @@ class SlackFunction:
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new action listener to your function. This method can be used as either a decorator or a method.
 
-            # Use this method as a decorator
+            # Define a function handler using the function decorator
             @app.function("request-approval")
             def request_approval(event, complete: Complete):
                 // do something
@@ -89,7 +89,7 @@ class SlackFunction:
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `view_submission`/`view_closed` event listener for a function.
 
-            # Use this method as a decorator
+            # Define a function handler using the function decorator
             @app.function("function_1")
             def sample_view(event, complete: Complete):
                 client.views_open(
@@ -114,11 +114,10 @@ class SlackFunction:
                     return
                 # complete the function
                 complete()
-                # Do whatever you want with the input data - here we're saving it to a DB
 
             # Pass a function to this method
             sample_view_func = app.function("request-approval")(sample_view)
-            sample_view_func.action("view_1")(handle_submission)
+            sample_view_func.view("view_1")(handle_submission)
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
         Args:

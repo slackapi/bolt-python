@@ -87,12 +87,14 @@ class TestFunctionViewClosed:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
+        func: SlackFunction = app.function("c")
+
         request = self.build_request_from_body(function_view_closed_body)
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
 
-        app.view({"type": "view_closed", "callback_id": "view-idddd"})(simple_listener)
+        func.view({"type": "view_closed", "callback_id": "view-idddd"})(simple_listener)
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
@@ -107,7 +109,8 @@ class TestFunctionViewClosed:
         assert response.status == 404
         assert_auth_test_count(self, 1)
 
-        app.view_closed("view-idddd")(simple_listener)
+        func: SlackFunction = app.function("c")
+        func.view_closed("view-idddd")(simple_listener)
         response = app.dispatch(request)
         assert response.status == 404
         assert_auth_test_count(self, 1)
