@@ -60,8 +60,6 @@ class SlackFunction:
             request_approval_func = app.function("request-approval")(request_approval)
             request_approval.action("approve_button")(handle_request_approval_events)
 
-        * Refer to https://api.slack.com/reference/interaction-payloads/block-actions for actions in `blocks`.
-
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
         Args:
@@ -122,7 +120,6 @@ class SlackFunction:
             sample_view_func = app.function("request-approval")(sample_view)
             sample_view_func.action("view_1")(handle_submission)
 
-        Refer to https://api.slack.com/reference/interaction-payloads/views for details of payloads.
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
         Args:
             constraints: The conditions that match a request payload
@@ -145,8 +142,7 @@ class SlackFunction:
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
-        """Registers a new `view_submission` listener.
-        Refer to https://api.slack.com/reference/interaction-payloads/views#view_submission for details."""
+        """Registers a new `view_submission` listener."""
 
         def __call__(*args, **kwargs):
             functions = extract_listener_callables(kwargs) if kwargs else list(args)
@@ -163,8 +159,7 @@ class SlackFunction:
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
-        """Registers a new `view_closed` listener.
-        Refer to https://api.slack.com/reference/interaction-payloads/views#view_closed for details."""
+        """Registers a new `view_closed` listener."""
 
         def __call__(*args, **kwargs):
             functions = extract_listener_callables(kwargs) if kwargs else list(args)
