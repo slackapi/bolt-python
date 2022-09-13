@@ -66,8 +66,9 @@ class TestFunctionViewClosed:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
+        assert self.mock_received_requests["/functions.completeSuccess"] == 1
 
-    def test_success_2(self):
+    def test_success_view_closed(self):
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
@@ -79,20 +80,7 @@ class TestFunctionViewClosed:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-
-    def test_process_before_response(self):
-        app = App(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
-            process_before_response=True,
-        )
-        func: SlackFunction = app.function("c")
-        func.view({"type": "view_closed", "callback_id": "view-id"})(simple_listener)
-
-        request = self.build_request_from_body(function_view_closed_body)
-        response = app.dispatch(request)
-        assert response.status == 200
-        assert_auth_test_count(self, 1)
+        assert self.mock_received_requests["/functions.completeSuccess"] == 1
 
     def test_failure_view(self):
         app = App(
@@ -191,8 +179,9 @@ function_view_closed_body = {
 }
 
 
-def simple_listener(ack, body, payload, view):
+def simple_listener(ack, body, payload, view, complete):
+    ack()
     assert body["view"] == payload
     assert payload == view
     assert view["private_metadata"] == "This is for you!"
-    ack()
+    complete()
