@@ -100,7 +100,7 @@ class SlackFunction:
                 )
 
             # Use this method as a decorator
-            @my_function.view("view_1")
+            @sample_view.view("view_1")
             def handle_submission(ack, body, client, view, complete):
                 # Assume there's an input block with `block_c` as the block_id and `dreamy_input`
                 hopes_and_dreams = view["state"]["values"]["block_c"]["dreamy_input"]
