@@ -122,7 +122,7 @@ class SlackFunction:
             sample_view_func.view("view_1")(handle_submission)
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
-        
+
         Args:
             constraints: The conditions that match a request payload
             matchers: A list of listener matcher functions.
