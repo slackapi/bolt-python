@@ -49,7 +49,7 @@ class SlackFunction:
             # Define a function handler using the function decorator
             @app.function("request-approval")
             def request_approval(event, complete: Complete):
-                // do something
+                # do something
 
             @request_approval.action("approve_button")
             def handle_request_approval_events(ack, complete):
@@ -92,6 +92,8 @@ class SlackFunction:
             # Define a function handler using the function decorator
             @app.function("function_1")
             def sample_view(event, complete: Complete):
+                # Assume there's an interactivity object passed in as input `interactivity`
+                interactivity_pointer = event["inputs"]["interactivity"]["interactivity_pointer"]
                 client.views_open(
                     interactivity_pointer=interactivity_pointer,
                     view={...}
@@ -100,8 +102,6 @@ class SlackFunction:
             # Use this method as a decorator
             @my_function.view("view_1")
             def handle_submission(ack, body, client, view, complete):
-                # Acknowledge the view_submission event and close the modal
-                ack()
                 # Assume there's an input block with `block_c` as the block_id and `dreamy_input`
                 hopes_and_dreams = view["state"]["values"]["block_c"]["dreamy_input"]
                 user = body["user"]["id"]
@@ -112,6 +112,8 @@ class SlackFunction:
                 if len(errors) > 0:
                     ack(response_action="errors", errors=errors)
                     return
+                # Acknowledge the view_submission event and close the modal
+                ack()
                 # complete the function
                 complete()
 
@@ -120,6 +122,7 @@ class SlackFunction:
             sample_view_func.view("view_1")(handle_submission)
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
+        
         Args:
             constraints: The conditions that match a request payload
             matchers: A list of listener matcher functions.
