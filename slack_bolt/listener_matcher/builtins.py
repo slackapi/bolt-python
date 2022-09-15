@@ -209,19 +209,20 @@ def function_event(
 # functions
 
 
+def _function_interactivity_match(callback_id: str, body: Dict[str, Any]) -> bool:
+    return is_function_interactivity(body) and _matches(
+        callback_id, body.get("function_data", {}).get("function", {}).get("callback_id", "")
+    )
+
+
 def function_action(
-    callback_id: Union[str, Pattern],
+    callback_id: str,
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     if isinstance(constraints, (str, Pattern)):
-
-        def func(body: Dict[str, Any]) -> bool:
-            return _function_block_action(callback_id, constraints, body)
-
-        return build_listener_matcher(func, asyncio, base_logger)
-
+        return function_block_action(callback_id, constraints, asyncio)
     elif "type" in constraints:
         action_type = constraints["type"]
         if action_type == "block_actions":
@@ -235,28 +236,67 @@ def function_action(
     raise BoltError(f"action ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict")
 
 
-def _function_block_action(
-    callback_id: Union[str, Pattern],
-    constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
-    body: Dict[str, Any],
-) -> bool:
-    if is_function_interactivity(body) is False and is_block_actions(body) is False:
-        return False
-
-    if _matches(callback_id, body.get("function_data", {}).get("function", {}).get("callback_id", "")) is False:
-        return False
-
-    return _does_block_id_match(constraints, body)
-
-
 def function_block_action(
-    callback_id: Union[str, Pattern],
+    callback_id: str,
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
 ) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
     def func(body: Dict[str, Any]) -> bool:
-        return _function_block_action(callback_id, constraints, body)
+        return (
+            _function_interactivity_match(callback_id, body)
+            and is_block_actions(body)
+            and _does_block_id_match(constraints, body)
+        )
+
+    return build_listener_matcher(func, asyncio, base_logger)
+
+
+def function_view(
+    callback_id: str,
+    constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
+    asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+    if isinstance(constraints, (str, Pattern)):
+        return function_view_submission(callback_id, constraints, asyncio, base_logger)
+    elif "type" in constraints:
+        if constraints["type"] == "view_submission":
+            return function_view_submission(callback_id, constraints["callback_id"], asyncio, base_logger)
+        if constraints["type"] == "view_closed":
+            return function_view_closed(callback_id, constraints["callback_id"], asyncio, base_logger)
+
+    raise BoltError(f"function view ({constraints}: {type(constraints)}) must be any of str, Pattern, and dict")
+
+
+def function_view_submission(
+    function_callback_id: str,
+    callback_id: Union[str, Pattern],
+    asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+    def func(body: Dict[str, Any]) -> bool:
+        return (
+            _function_interactivity_match(function_callback_id, body)
+            and is_view_submission(body)
+            and _matches(callback_id, body["view"]["callback_id"])
+        )
+
+    return build_listener_matcher(func, asyncio, base_logger)
+
+
+def function_view_closed(
+    function_callback_id: str,
+    callback_id: Union[str, Pattern],
+    asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+    def func(body: Dict[str, Any]) -> bool:
+        return (
+            _function_interactivity_match(function_callback_id, body)
+            and is_view_closed(body)
+            and _matches(callback_id, body["view"]["callback_id"])
+        )
 
     return build_listener_matcher(func, asyncio, base_logger)
 
