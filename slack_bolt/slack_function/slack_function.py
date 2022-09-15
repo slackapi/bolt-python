@@ -17,7 +17,7 @@ class SlackFunction:
         self,
         register_listener: Callable[..., Optional[Callable[..., Optional[BoltResponse]]]],
         base_logger: Logger,
-        callback_id: Union[str, Pattern],
+        callback_id: str,
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ):
@@ -46,20 +46,19 @@ class SlackFunction:
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new action listener to your function. This method can be used as either a decorator or a method.
 
-            # Use this method as a decorator
+            # Define a function handler using the function decorator
             @app.function("request-approval")
             def request_approval(event, complete: Complete):
-                complete(outputs={})
+                # do something
 
             @request_approval.action("approve_button")
-            def handle_request_approval_events(ack):
+            def handle_request_approval_events(ack, complete):
                 ack()
+                complete()
 
             # Pass a function to this method
             request_approval_func = app.function("request-approval")(request_approval)
             request_approval.action("approve_button")(handle_request_approval_events)
-
-        * Refer to https://api.slack.com/reference/interaction-payloads/block-actions for actions in `blocks`.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
@@ -78,8 +77,97 @@ class SlackFunction:
 
         return __call__
 
-    # TODO add view listener
+        # -------------------------
 
-    @property
-    def __isabstractmethod__(self):
-        return getattr(self.func, "__isabstractmethod__", False)
+    # view
+
+    def view(
+        self,
+        constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+        """Registers a new `view_submission`/`view_closed` event listener for a function.
+
+            # Define a function handler using the function decorator
+            @app.function("function_1")
+            def sample_view(event, complete: Complete):
+                # Assume there's an interactivity object passed in as input `interactivity`
+                interactivity_pointer = event["inputs"]["interactivity"]["interactivity_pointer"]
+                client.views_open(
+                    interactivity_pointer=interactivity_pointer,
+                    view={...}
+                )
+
+            # Use this method as a decorator
+            @sample_view.view("view_1")
+            def handle_submission(ack, body, client, view, complete):
+                # Assume there's an input block with `block_c` as the block_id and `dreamy_input`
+                hopes_and_dreams = view["state"]["values"]["block_c"]["dreamy_input"]
+                user = body["user"]["id"]
+                # Validate the inputs
+                errors = {}
+                if hopes_and_dreams is not None and len(hopes_and_dreams) <= 5:
+                    errors["block_c"] = "The value must be longer than 5 characters"
+                if len(errors) > 0:
+                    ack(response_action="errors", errors=errors)
+                    return
+                # Acknowledge the view_submission event and close the modal
+                ack()
+                # complete the function
+                complete()
+
+            # Pass a function to this method
+            sample_view_func = app.function("request-approval")(sample_view)
+            sample_view_func.view("view_1")(handle_submission)
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
+
+        Args:
+            constraints: The conditions that match a request payload
+            matchers: A list of listener matcher functions.
+                Only when all the matchers return True, the listener function can be invoked.
+            middleware: A list of lister middleware functions.
+                Only when all the middleware call `next()` method, the listener function can be invoked.
+        """
+
+        def __call__(*args, **kwargs):
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
+            primary_matcher = builtin_matchers.function_view(self.callback_id, constraints, base_logger=self._base_logger)
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+        return __call__
+
+    def view_submission(
+        self,
+        constraints: Union[str, Pattern],
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+        """Registers a new `view_submission` listener."""
+
+        def __call__(*args, **kwargs):
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
+            primary_matcher = builtin_matchers.function_view_submission(
+                self.callback_id, constraints, base_logger=self._base_logger
+            )
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+        return __call__
+
+    def view_closed(
+        self,
+        constraints: Union[str, Pattern],
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+        """Registers a new `view_closed` listener."""
+
+        def __call__(*args, **kwargs):
+            functions = extract_listener_callables(kwargs) if kwargs else list(args)
+            primary_matcher = builtin_matchers.function_view_closed(
+                self.callback_id, constraints, base_logger=self._base_logger
+            )
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+        return __call__
