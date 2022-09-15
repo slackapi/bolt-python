@@ -7,6 +7,7 @@ from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable, Se
 from aiohttp import web
 
 from slack_bolt.app.async_server import AsyncSlackAppServer
+from slack_bolt.slack_function import SlackFunction
 from slack_bolt.listener.async_builtins import AsyncTokenRevocationListeners
 from slack_bolt.listener.async_listener_start_handler import (
     AsyncDefaultListenerStartHandler,
@@ -77,6 +78,7 @@ from slack_bolt.middleware.async_builtins import (
     AsyncRequestVerification,
     AsyncIgnoringSelfEvents,
     AsyncUrlVerification,
+    AsyncAttachingFunctionToken,
 )
 from slack_bolt.middleware.async_custom_middleware import (
     AsyncMiddleware,
@@ -121,6 +123,7 @@ class AsyncApp:
         ignoring_self_events_enabled: bool = True,
         ssl_check_enabled: bool = True,
         url_verification_enabled: bool = True,
+        attaching_function_token_enabled: bool = True,
         # for the OAuth flow
         oauth_settings: Optional[AsyncOAuthSettings] = None,
         oauth_flow: Optional[AsyncOAuthFlow] = None,
@@ -182,6 +185,8 @@ class AsyncApp:
                 that verify the endpoint for Events API in HTTP Mode requests.
             ssl_check_enabled: bool = False if you would like to disable the built-in middleware (Default: True).
                 `AsyncSslCheck` is a built-in middleware that handles ssl_check requests from Slack.
+            attaching_function_token_enabled: False if you would like to disable the built-in middleware (Default: True).
+                `AsyncAttachingFunctionToken` is a built-in middleware that handles tokens with function requests from Slack.
             oauth_settings: The settings related to Slack app installation flow (OAuth flow)
             oauth_flow: Instantiated `slack_bolt.oauth.AsyncOAuthFlow`. This is always prioritized over oauth_settings.
             verification_token: Deprecated verification mechanism. This can used only for ssl_check requests.
@@ -334,6 +339,7 @@ class AsyncApp:
             ignoring_self_events_enabled=ignoring_self_events_enabled,
             ssl_check_enabled=ssl_check_enabled,
             url_verification_enabled=url_verification_enabled,
+            attaching_function_token_enabled=attaching_function_token_enabled,
         )
 
         self._server: Optional[AsyncSlackAppServer] = None
@@ -344,6 +350,7 @@ class AsyncApp:
         ignoring_self_events_enabled: bool = True,
         ssl_check_enabled: bool = True,
         url_verification_enabled: bool = True,
+        attaching_function_token_enabled: bool = True,
     ):
         if self._init_middleware_list_done:
             return
@@ -375,6 +382,8 @@ class AsyncApp:
             self._async_middleware_list.append(AsyncIgnoringSelfEvents(base_logger=self._base_logger))
         if url_verification_enabled is True:
             self._async_middleware_list.append(AsyncUrlVerification(base_logger=self._base_logger))
+        if attaching_function_token_enabled is True:
+            self._async_middleware_list.append(AsyncAttachingFunctionToken())
         self._init_middleware_list_done = True
 
     # -------------------------
@@ -828,7 +837,7 @@ class AsyncApp:
 
     def function(
         self,
-        callback_id: Union[str, Pattern],
+        callback_id: str,
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[BoltResponse]]]]:
@@ -837,14 +846,14 @@ class AsyncApp:
 
             # Use this method as a decorator
             @app.function("reverse")
-            async def reverse_string(event, complete_success: AsyncCompleteSuccess, complete_error: AsyncCompleteError):
+            async def reverse_string(event, complete: AsyncComplete):
                 try:
                     string_to_reverse = event["inputs"]["stringToReverse"]
-                    await complete_success({
+                    await complete(outputs={
                         "reverseString": string_to_reverse[::-1]
                     })
                 except Exception as e:
-                    await complete_error("Cannot reverse string")
+                    await complete(error="Cannot reverse string")
                     raise e
 
             # Pass a function to this method
@@ -860,14 +869,7 @@ class AsyncApp:
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         """
 
-        def __call__(*args, **kwargs):
-            functions = extract_listener_callables(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.function_event(
-                callback_id=callback_id, asyncio=True, base_logger=self._base_logger
-            )
-            return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
-
-        return __call__
+        return SlackFunction(self._register_listener, self._base_logger, callback_id, matchers, middleware, asyncio=True)
 
     # -------------------------
     # slash commands
