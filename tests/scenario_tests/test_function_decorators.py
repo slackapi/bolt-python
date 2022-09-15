@@ -45,6 +45,14 @@ class TestAppDecorators:
         handle_function_action(ack, {})
         assert isinstance(handle_function_action, Callable)
 
+        @handle_function_events.view("some-callback-id")
+        def handle_views(ack: Ack, body: dict):
+            assert body is not None
+            ack()
+
+        handle_views(ack, {})
+        assert isinstance(handle_views, Callable)
+
         handle_function_events({})
         assert isinstance(handle_function_events, Callable)
 
@@ -69,7 +77,7 @@ class TestAppDecorators:
         handle_function_events({})
         assert isinstance(handle_function_events, Callable)
 
-    def test_initialized_decorators(self):
+    def test_mixed_decorators(self):
         app = App(signing_secret=self.signing_secret, client=self.web_client)
         ack = NoopAck()
 
