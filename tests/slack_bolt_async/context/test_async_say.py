@@ -53,3 +53,17 @@ class TestAsyncSay:
         say = AsyncSay(client=self.web_client, channel="C111")
         with pytest.raises(ValueError):
             await say([])
+
+    @pytest.mark.asyncio
+    async def test_say_shared_dict_as_arg(self):
+        # this shared dict object must not be modified by say method
+        shared_template_dict = {"text": "Hi there!"}
+        say = AsyncSay(client=self.web_client, channel="C111")
+        response: AsyncSlackResponse = await say(shared_template_dict)
+        assert response.status_code == 200
+        assert shared_template_dict.get("channel") is None
+
+        say = AsyncSay(client=self.web_client, channel="C222")
+        response: AsyncSlackResponse = await say(shared_template_dict)
+        assert response.status_code == 200
+        assert shared_template_dict.get("channel") is None

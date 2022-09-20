@@ -43,3 +43,16 @@ class TestSay:
         say = Say(client=self.web_client, channel="C111")
         with pytest.raises(ValueError):
             say([])
+
+    def test_say_shared_dict_as_arg(self):
+        # this shared dict object must not be modified by say method
+        shared_template_dict = {"text": "Hi there!"}
+        say = Say(client=self.web_client, channel="C111")
+        response: SlackResponse = say(shared_template_dict)
+        assert response.status_code == 200
+        assert shared_template_dict.get("channel") is None
+
+        say = Say(client=self.web_client, channel="C222")
+        response: SlackResponse = say(shared_template_dict)
+        assert response.status_code == 200
+        assert shared_template_dict.get("channel") is None
