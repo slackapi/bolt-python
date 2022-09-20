@@ -6,6 +6,7 @@ from slack_sdk.models.blocks import Block
 from slack_sdk.web import SlackResponse
 
 from slack_bolt.context.say.internals import _can_say
+from slack_bolt.util.utils import create_copy
 
 
 class Say:
@@ -46,7 +47,7 @@ class Say:
                     **kwargs,
                 )
             elif isinstance(text_or_whole_response, dict):
-                message: dict = text_or_whole_response
+                message: dict = create_copy(text_or_whole_response)
                 if "channel" not in message:
                     message["channel"] = channel or self.channel
                 return self.client.chat_postMessage(**message)

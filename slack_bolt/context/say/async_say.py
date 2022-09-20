@@ -1,6 +1,7 @@
 from typing import Optional, Union, Dict, Sequence
 
 from slack_bolt.context.say.internals import _can_say
+from slack_bolt.util.utils import create_copy
 from slack_sdk.models.attachments import Attachment
 from slack_sdk.models.blocks import Block
 from slack_sdk.web.async_client import AsyncWebClient
@@ -45,7 +46,7 @@ class AsyncSay:
                     **kwargs,
                 )
             elif isinstance(text_or_whole_response, dict):
-                message: dict = text_or_whole_response
+                message: dict = create_copy(text_or_whole_response)
                 if "channel" not in message:
                     message["channel"] = channel or self.channel
                 return await self.client.chat_postMessage(**message)
