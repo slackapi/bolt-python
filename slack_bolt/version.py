@@ -1,2 +1,2 @@
-"""Check the latest version at https://pypi.org/project/slack-bolt/"""
-__version__ = "1.14.3"
+"""Check the latest version at https://pypi.org/project/slack-bolt/ """
+__version__ = "1.15.0.dev0"
