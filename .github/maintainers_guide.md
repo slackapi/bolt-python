@@ -108,6 +108,24 @@ $ FLASK_APP=app.py FLASK_ENV=development flask run -p 3000
 $ ngrok http 3000 --subdomain {your-domain}
 ```
 
+#### Develop Locally
+
+If you want to test the package locally you can.
+1. Build the package locally
+   - Run 
+     ```bash
+     scripts/build_pypi_package.sh
+     ```
+   - This will create a `.whl` file in the `./dist` folder
+2. Use the built package
+   - Example `/dist/slack_bolt-1.2.3-py2.py3-none-any.whl` was created
+   - From anywhere on your machine you can install this package to a project with 
+     ```bash
+     pip install <project path>/dist/slack_bolt-1.2.3-py2.py3-none-any.whl
+     ```
+   - It is also possible to include `<project path>/dist/slack_bolt-1.2.3-py2.py3-none-any.whl` in a [requirements.txt](https://pip.pypa.io/en/stable/user_guide/#requirements-files) file 
+
+
 ### Releasing
 
 #### Generate API documents
@@ -126,65 +144,74 @@ username: {your username}
 password: {your password}
 ```
 
-##### Deployment
 
-You can deploy a new version using `./scripts/deploy_to_test_pypi_org.sh`.
+#### Development Deployment
 
-```bash
-$ echo '__version__ = "{the version}"' > slack_bolt/version.py
-$ ./scripts/deploy_to_test_pypi_org.sh
-```
+1. Create a branch in which the development release will live:
+    - Bump the version number in adherence to [Sematic Versioning](http://semver.org/) and [Developmental Release](https://peps.python.org/pep-0440/#developmental-releases) in `slack_bolt/version.py`
+      - Example the current version is `1.2.3` a proper development bump would be `1.3.0.dev0`
+      - `.dev` will indicate to pip that this is a [Development Release](https://peps.python.org/pep-0440/#developmental-releases) 
+      - Note that the `dev` version can be bumped in development releases: `1.3.0.dev0` -> `1.3.0.dev1`
+    - Commit with a message including the new version number For example `1.3.0.dev0` & Push the commit to a branch where the development release will live (create it if it does not exist)
+      - `git checkout -b future-release`
+      - `git commit -m'version 1.3.0.dev0'`
+      - `git push future-release`
+    - Create a git tag for the release. For example `git tag v1.3.0.dev0`.
+    - Push the tag up to github with `git push origin --tags`
 
-#### Production Deployment
-
-1.  Create the commit for the release:
-
-- Bump the version number in adherence to [Semantic Versioning](http://semver.org/) in `slack_bolt/version.py`
-  - `echo '__version__ = "1.2.3"' > slack_bolt/version.py`
-- Commit with a message including the new version number. For example `1.2.3` & Push the commit to a branch and create a PR to sanity check.
-  - `git checkout -b v1.2.3-release`
-  - `git commit -m'version 1.2.3'`
-  - `git push {your-fork} v1.2.3-release`
-- Merge in release PR after getting an approval from at least one maintainer.
-- Create a git tag for the release. For example `git tag v1.2.3`.
-- Push the tag up to github with `git push origin --tags`
-
-2.  Distribute the release
-
-- Use the latest stable Python runtime
-- `python -m venv env`
-- `./scripts/deploy_to_prod_pypi_org.sh`
-- Create a GitHub release - https://github.com/slackapi/bolt-python/releases
-
-```markdown
-## New Features
-
-### Awesome Feature 1
-
-Description here.
-
-### Awesome Feature 2
-
-Description here.
-
-## Changes
-
-* #123 Make it better - thanks @SlackHQ
-* #123 Fix something wrong - thanks @seratch
-```
+2. Distribute the release
+   - Use the latest stable Python runtime
+   - `python -m venv env`
+   - `./scripts/deploy_to_pypi_org.sh`
+   - You do not need to create a GitHub release
 
 3. (Slack Internal) Communicate the release internally
 
-- Include a link to the GitHub release
+
+#### Production Deployment
+
+1. Create the commit for the release: 
+   - Bump the version number in adherence to [Semantic Versioning](http://semver.org/) in `slack_bolt/version.py`
+   - Commit with a message including the new version number. For example `1.2.3` & Push the commit to a branch and create a PR to sanity check.
+     - `git checkout -b v1.2.3-release`
+     - `git commit -m'version 1.2.3'`
+     - `git push {your-fork} v1.2.3-release`
+   - Merge in release PR after getting an approval from at least one maintainer.
+   - Create a git tag for the release. For example `git tag v1.2.3`.
+   - Push the tag up to github with `git push origin --tags`
+
+2. Distribute the release
+   - Use the latest stable Python runtime
+   - `python -m venv env`
+   - `./scripts/deploy_to_pypi_org.sh`
+   - Create a GitHub release - https://github.com/slackapi bolt-python/releases
+
+   ```markdown
+   ## New Features
+
+   ### Awesome Feature 1
+
+   Description here.
+
+   ### Awesome Feature 2
+
+   Description here.
+
+   ## Changes
+
+   * #123 Make it better - thanks @SlackHQ
+   * #123 Fix something wrong - thanks @seratch
+   ```
+
+3. (Slack Internal) Communicate the release internally
+   - Include a link to the GitHub release
 
 4. Make announcements
-
-- #slack-api in dev4slack.slack.com
-- #tools-bolt in community.slack.com
+   - #slack-api in dev4slack.slack.com
+   - #tools-bolt in community.slack.com
 
 5. (Slack Internal) Tweet by @SlackAPI
-
-- Not necessary for patch updates, might be needed for minor updates, definitely needed for major updates. Include a link to the GitHub release
+   - Not necessary for patch updates, might be needed for minor updates, definitely needed for major updates. Include a link to the GitHub release
 
 ## Workflow
 
