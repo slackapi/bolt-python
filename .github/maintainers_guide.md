@@ -161,7 +161,7 @@ password: {your password}
 
 2. Distribute the release
    - Use the latest stable Python runtime
-   - `python -m venv env`
+   - `python -m venv .venv`
    - `./scripts/deploy_to_pypi_org.sh`
    - You do not need to create a GitHub release
 
@@ -182,7 +182,7 @@ password: {your password}
 
 2. Distribute the release
    - Use the latest stable Python runtime
-   - `python -m venv env`
+   - `python -m venv .venv`
    - `./scripts/deploy_to_pypi_org.sh`
    - Create a GitHub release - https://github.com/slackapi bolt-python/releases
 
@@ -207,7 +207,6 @@ password: {your password}
    - Include a link to the GitHub release
 
 4. Make announcements
-   - #slack-api in dev4slack.slack.com
    - #tools-bolt in community.slack.com
 
 5. (Slack Internal) Tweet by @SlackAPI
