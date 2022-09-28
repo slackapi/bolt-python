@@ -69,7 +69,7 @@ setuptools.setup(
             # async features heavily depends on aiohttp
             "aiohttp>=3,<4",
             # Socket Mode 3rd party implementation
-            "websockets>=8,<10",
+            "websockets>=10,<11" if sys.version_info.minor > 6 else "websockets>=8,<10",
         ],
         # pip install -e ".[adapter]"
         # NOTE: any of async ones requires pip install -e ".[async]" too
@@ -86,7 +86,7 @@ setuptools.setup(
             "Flask>=1,<3",
             "Werkzeug>=2,<3",
             "pyramid>=1,<3",
-            "sanic>=21,<22" if sys.version_info.minor > 6 else "sanic>=20,<21",
+            "sanic>=22,<23" if sys.version_info.minor > 6 else "sanic>=20,<21",
             "starlette>=0.14,<1",
             "tornado>=6,<7",
             # server
