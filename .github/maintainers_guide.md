@@ -148,13 +148,13 @@ password: {your password}
 #### Development Deployment
 
 1. Create a branch in which the development release will live:
-    - Bump the version number in adherence to [Sematic Versioning](http://semver.org/) and [Developmental Release](https://peps.python.org/pep-0440/#developmental-releases) in `slack_bolt/version.py`
+    - Bump the version number in adherence to [Semantic Versioning](http://semver.org/) and [Developmental Release](https://peps.python.org/pep-0440/#developmental-releases) in `slack_bolt/version.py`
       - Example the current version is `1.2.3` a proper development bump would be `1.3.0.dev0`
       - `.dev` will indicate to pip that this is a [Development Release](https://peps.python.org/pep-0440/#developmental-releases) 
       - Note that the `dev` version can be bumped in development releases: `1.3.0.dev0` -> `1.3.0.dev1`
-    - Commit with a message including the new version number For example `1.3.0.dev0` & Push the commit to a branch where the development release will live (create it if it does not exist)
+    - Commit with a message including the new version number. For example `1.3.0.dev0` & Push the commit to a branch where the development release will live (create it if it does not exist)
       - `git checkout -b future-release`
-      - `git commit -m'version 1.3.0.dev0'`
+      - `git commit -m 'version 1.3.0.dev0'`
       - `git push future-release`
     - Create a git tag for the release. For example `git tag v1.3.0.dev0`.
     - Push the tag up to github with `git push origin --tags`
@@ -174,7 +174,7 @@ password: {your password}
    - Bump the version number in adherence to [Semantic Versioning](http://semver.org/) in `slack_bolt/version.py`
    - Commit with a message including the new version number. For example `1.2.3` & Push the commit to a branch and create a PR to sanity check.
      - `git checkout -b v1.2.3-release`
-     - `git commit -m'version 1.2.3'`
+     - `git commit -m 'version 1.2.3'`
      - `git push {your-fork} v1.2.3-release`
    - Merge in release PR after getting an approval from at least one maintainer.
    - Create a git tag for the release. For example `git tag v1.2.3`.
@@ -184,7 +184,7 @@ password: {your password}
    - Use the latest stable Python runtime
    - `python -m venv .venv`
    - `./scripts/deploy_to_pypi_org.sh`
-   - Create a GitHub release - https://github.com/slackapi bolt-python/releases
+   - Create a GitHub release - https://github.com/slackapi/bolt-python/releases
 
    ```markdown
    ## New Features
