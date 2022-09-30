@@ -1419,21 +1419,25 @@ be used.</dd>
     def _init_context(self, req: BoltRequest):
         req.context[&#34;logger&#34;] = get_bolt_app_logger(app_name=self.name, base_logger=self._base_logger)
         req.context[&#34;token&#34;] = self._token
-        if self._token is not None:
-            # This WebClient instance can be safely singleton
-            req.context[&#34;client&#34;] = self._client
-        else:
-            # Set a new dedicated instance for this request
-            client_per_request: WebClient = WebClient(
-                token=None,  # the token will be set later
-                base_url=self._client.base_url,
-                timeout=self._client.timeout,
-                ssl=self._client.ssl,
-                proxy=self._client.proxy,
-                headers=self._client.headers,
-                team_id=req.context.team_id,
-            )
-            req.context[&#34;client&#34;] = client_per_request
+        # Prior to version 1.15, when the token is static, self._client was passed to `req.context`.
+        # The intention was to avoid creating a new instance per request
+        # in the interest of runtime performance/memory footprint optimization.
+        # However, developers may want to replace the token held by req.context.client in some situations.
+        # In this case, this behavior can result in thread-unsafe data modification on `self._client`.
+        # (`self._client` a.k.a. `app.client` is a singleton object per an App instance)
+        # Thus, we&#39;ve changed the behavior to create a new instance per request regardless of token argument
+        # in the App initialization starting v1.15.
+        # The overhead brought by this change is slight so that we believe that it is ignorable in any cases.
+        client_per_request: WebClient = WebClient(
+            token=self._token,  # this can be None, and it can be set later on
+            base_url=self._client.base_url,
+            timeout=self._client.timeout,
+            ssl=self._client.ssl,
+            proxy=self._client.proxy,
+            headers=self._client.headers,
+            team_id=req.context.team_id,
+        )
+        req.context[&#34;client&#34;] = client_per_request
 
     @staticmethod
     def _to_listener_functions(
@@ -4147,7 +4151,7 @@ def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt
                     **kwargs,
                 )
             elif isinstance(text_or_whole_response, dict):
-                message: dict = text_or_whole_response
+                message: dict = create_copy(text_or_whole_response)
                 if &#34;channel&#34; not in message:
                     message[&#34;channel&#34;] = channel or self.channel
                 return self.client.chat_postMessage(**message)
