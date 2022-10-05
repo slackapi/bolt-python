@@ -73,6 +73,12 @@ def extract_enterprise_id(payload: Dict[str, Any]) -> Optional[str]:
 
 
 def extract_team_id(payload: Dict[str, Any]) -> Optional[str]:
+    if payload.get("view") is not None and payload.get("view").get("app_installed_team_id") is not None:
+        # view_submission payloads can have `view.app_installed_team_id` when a modal view that was opened
+        # in a different workspace via some operations inside a Slack Connect channel.
+        # Note that the same for enterprise_id does not exist. When you need to know the enterprise_id as well,
+        # you have to run some query toward your InstallationStore to know the org where the team_id belongs to.
+        return payload.get("view").get("app_installed_team_id")
     if payload.get("team") is not None:
         # With org-wide installations, payload.team in interactivity payloads can be None
         # You need to extract either payload.user.team_id or payload.view.team_id as below

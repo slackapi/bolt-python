@@ -5,7 +5,7 @@ from urllib.parse import quote
 from slack_sdk import WebClient
 from slack_sdk.signature import SignatureVerifier
 
-from slack_bolt import BoltRequest
+from slack_bolt import BoltRequest, BoltContext
 from slack_bolt.app import App
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
@@ -140,6 +140,58 @@ response_url_payload_body = {
 raw_response_url_body = f"payload={quote(json.dumps(response_url_payload_body))}"
 
 
+connect_channel_payload = {
+    "type": "view_submission",
+    "team": {
+        "id": "T-other-side",
+        "domain": "other-side",
+        "enterprise_id": "E-other-side",
+        "enterprise_name": "Kaz Sandbox Org",
+    },
+    "user": {"id": "W111", "username": "kaz", "name": "kaz", "team_id": "T-other-side"},
+    "api_app_id": "A1111",
+    "token": "legacy-fixed-token",
+    "trigger_id": "111.222.xxx",
+    "view": {
+        "id": "V11111",
+        "team_id": "T-other-side",
+        "type": "modal",
+        "blocks": [
+            {
+                "type": "input",
+                "block_id": "zniAM",
+                "label": {"type": "plain_text", "text": "Label"},
+                "element": {
+                    "type": "plain_text_input",
+                    "dispatch_action_config": {"trigger_actions_on": ["on_enter_pressed"]},
+                    "action_id": "qEJr",
+                },
+            }
+        ],
+        "private_metadata": "",
+        "callback_id": "view-id",
+        "state": {"values": {"zniAM": {"qEJr": {"type": "plain_text_input", "value": "Hi there!"}}}},
+        "hash": "1664950703.CmTS8F7U",
+        "title": {"type": "plain_text", "text": "My App"},
+        "close": {"type": "plain_text", "text": "Cancel"},
+        "submit": {"type": "plain_text", "text": "Submit"},
+        "root_view_id": "V00000",
+        "app_id": "A1111",
+        "external_id": "",
+        "app_installed_team_id": "T-installed-workspace",
+        "bot_id": "B1111",
+    },
+    "enterprise": {"id": "E-other-side", "name": "Kaz Sandbox Org"},
+}
+
+connect_channel_body = f"payload={quote(json.dumps(connect_channel_payload))}"
+
+
+def verify_connected_channel(ack, context: BoltContext):
+    assert context.team_id == "T-installed-workspace"
+    ack()
+
+
 class TestViewSubmission:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
@@ -258,6 +310,18 @@ class TestViewSubmission:
             ack()
 
         request = self.build_valid_request(raw_response_url_body)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+
+    def test_connected_channels(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.view("view-id")(verify_connected_channel)
+
+        request = self.build_valid_request(body=connect_channel_body)
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)

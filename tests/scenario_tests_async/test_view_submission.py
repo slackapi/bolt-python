@@ -142,6 +142,53 @@ response_url_payload_body = {
 raw_response_url_body = f"payload={quote(json.dumps(response_url_payload_body))}"
 
 
+connect_channel_payload = {
+    "type": "view_submission",
+    "team": {
+        "id": "T-other-side",
+        "domain": "other-side",
+        "enterprise_id": "E-other-side",
+        "enterprise_name": "Kaz Sandbox Org",
+    },
+    "user": {"id": "W111", "username": "kaz", "name": "kaz", "team_id": "T-other-side"},
+    "api_app_id": "A1111",
+    "token": "legacy-fixed-token",
+    "trigger_id": "111.222.xxx",
+    "view": {
+        "id": "V11111",
+        "team_id": "T-other-side",
+        "type": "modal",
+        "blocks": [
+            {
+                "type": "input",
+                "block_id": "zniAM",
+                "label": {"type": "plain_text", "text": "Label"},
+                "element": {
+                    "type": "plain_text_input",
+                    "dispatch_action_config": {"trigger_actions_on": ["on_enter_pressed"]},
+                    "action_id": "qEJr",
+                },
+            }
+        ],
+        "private_metadata": "",
+        "callback_id": "view-id",
+        "state": {"values": {"zniAM": {"qEJr": {"type": "plain_text_input", "value": "Hi there!"}}}},
+        "hash": "1664950703.CmTS8F7U",
+        "title": {"type": "plain_text", "text": "My App"},
+        "close": {"type": "plain_text", "text": "Cancel"},
+        "submit": {"type": "plain_text", "text": "Submit"},
+        "root_view_id": "V00000",
+        "app_id": "A1111",
+        "external_id": "",
+        "app_installed_team_id": "T-installed-workspace",
+        "bot_id": "B1111",
+    },
+    "enterprise": {"id": "E-other-side", "name": "Kaz Sandbox Org"},
+}
+
+connect_channel_body = f"payload={quote(json.dumps(connect_channel_payload))}"
+
+
 class TestAsyncViewSubmission:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
@@ -275,10 +322,28 @@ class TestAsyncViewSubmission:
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
 
+    @pytest.mark.asyncio
+    async def test_connected_channels(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.view("view-id")(verify_connected_channel)
+
+        request = self.build_valid_request(body=connect_channel_body)
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_auth_test_count_async(self, 1)
+
 
 async def simple_listener(ack, body, payload, view):
     assert body["trigger_id"] == "111.222.valid"
     assert body["view"] == payload
     assert payload == view
     assert view["private_metadata"] == "This is for you!"
+    await ack()
+
+
+async def verify_connected_channel(ack, context):
+    assert context.team_id == "T-installed-workspace"
     await ack()
