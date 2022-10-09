@@ -52,12 +52,12 @@ def extract_is_enterprise_install(payload: Dict[str, Any]) -> Optional[bool]:
 
 
 def extract_enterprise_id(payload: Dict[str, Any]) -> Optional[str]:
-    if payload.get("enterprise") is not None:
-        org = payload.get("enterprise")
+    org = payload.get("enterprise")
+    if org is not None:
         if isinstance(org, str):
             return org
         elif "id" in org:
-            return org.get("id")  # type: ignore
+            return org.get("id")
     if payload.get("authorizations") is not None and len(payload["authorizations"]) > 0:
         # To make Events API handling functioning also for shared channels,
         # we should use .authorizations[0].enterprise_id over .enterprise_id
@@ -103,26 +103,32 @@ def extract_team_id(payload: Dict[str, Any]) -> Optional[str]:
 
 
 def extract_user_id(payload: Dict[str, Any]) -> Optional[str]:
-    if payload.get("user") is not None:
-        user = payload.get("user")
+    user = payload.get("user")
+    if user is not None:
         if isinstance(user, str):
             return user
         elif "id" in user:
-            return user.get("id")  # type: ignore
+            return user.get("id")
     if "user_id" in payload:
         return payload.get("user_id")
     if payload.get("event") is not None:
         return extract_user_id(payload["event"])
+    if payload.get("message") is not None:
+        # message_changed: body["event"]["message"]
+        return extract_user_id(payload["message"])
+    if payload.get("previous_message") is not None:
+        # message_deleted: body["event"]["previous_message"]
+        return extract_user_id(payload["previous_message"])
     return None
 
 
 def extract_channel_id(payload: Dict[str, Any]) -> Optional[str]:
-    if payload.get("channel") is not None:
-        channel = payload.get("channel")
+    channel = payload.get("channel")
+    if channel is not None:
         if isinstance(channel, str):
             return channel
         elif "id" in channel:
-            return channel.get("id")  # type: ignore
+            return channel.get("id")
     if "channel_id" in payload:
         return payload.get("channel_id")
     if payload.get("event") is not None:
