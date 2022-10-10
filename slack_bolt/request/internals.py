@@ -116,6 +116,9 @@ def extract_user_id(payload: Dict[str, Any]) -> Optional[str]:
     if payload.get("message") is not None:
         # message_changed: body["event"]["message"]
         return extract_user_id(payload["message"])
+    if payload.get("previous_message") is not None:
+        # message_deleted: body["event"]["previous_message"]
+        return extract_user_id(payload["previous_message"])
     return None
 
 
