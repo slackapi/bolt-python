@@ -53,8 +53,12 @@ class TestMessageChanged:
 
         @app.event({"type": "message", "subtype": "message_changed"})
         def handle_message_changed(context):
+            # These should come from the main event payload part
             assert context.channel_id == "C111"
             assert context.user_id == "U111"
+            # The following ones come from authorizations[0]
+            assert context.team_id == "T-auth"
+            assert context.enterprise_id == "E-auth"
 
         request = self.build_request(event_payload)
         response = app.dispatch(request)
@@ -108,13 +112,13 @@ event_payload = {
     "event_time": 1665102362,
     "authorizations": [
         {
-            "enterprise_id": "E111",
-            "team_id": "T111",
-            "user_id": "U111",
+            "enterprise_id": "E-auth",
+            "team_id": "T-auth",
+            "user_id": "U-auth",
             "is_bot": True,
             "is_enterprise_install": False,
         }
     ],
     "is_ext_shared_channel": False,
-    "event_context": "1-message-T111-C111",
+    "event_context": "1-message-T-auth-C111",
 }

@@ -59,10 +59,13 @@ class TestAsyncMessageDeleted:
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret, process_before_response=True)
 
         @app.event({"type": "message", "subtype": "message_deleted"})
-        async def handle_message_deleted(context, logger):
-            logger.error(context.user_id)
+        async def handle_message_deleted(context):
+            # These should come from the main event payload part
             assert context.channel_id == "C111"
             assert context.user_id == "U111"
+            # The following ones come from authorizations[0]
+            assert context.team_id == "T-auth"
+            assert context.enterprise_id == "E-auth"
 
         request = self.build_request(event_payload)
         response = await app.async_dispatch(request)
@@ -96,9 +99,9 @@ event_payload = {
     "event_time": 1665368629,
     "authorizations": [
         {
-            "enterprise_id": "E111",
-            "team_id": "T111",
-            "user_id": "U111",
+            "enterprise_id": "E-auth",
+            "team_id": "T-auth",
+            "user_id": "U-auth",
             "is_bot": True,
             "is_enterprise_install": False,
         }
