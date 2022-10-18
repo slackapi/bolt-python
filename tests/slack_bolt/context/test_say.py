@@ -29,6 +29,11 @@ class TestSay:
         response: SlackResponse = say(text="Hi there!", unfurl_media=True, unfurl_links=True)
         assert response.status_code == 200
 
+    def test_say_reply_in_thread(self):
+        say = Say(client=self.web_client, channel="C111")
+        response: SlackResponse = say(text="Hi there!", thread_ts="111.222", reply_broadcast=True)
+        assert response.status_code == 200
+
     def test_say_dict(self):
         say = Say(client=self.web_client, channel="C111")
         response: SlackResponse = say({"text": "Hi!"})
