@@ -37,6 +37,12 @@ class TestAsyncSay:
         assert response.status_code == 200
 
     @pytest.mark.asyncio
+    async def test_say_reply_in_thread(self):
+        say = AsyncSay(client=self.web_client, channel="C111")
+        response: AsyncSlackResponse = await say(text="Hi there!", thread_ts="111.222", reply_broadcast=True)
+        assert response.status_code == 200
+
+    @pytest.mark.asyncio
     async def test_say_dict(self):
         say = AsyncSay(client=self.web_client, channel="C111")
         response: AsyncSlackResponse = await say({"text": "Hi!"})

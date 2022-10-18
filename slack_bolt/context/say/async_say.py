@@ -1,5 +1,7 @@
 from typing import Optional, Union, Dict, Sequence
 
+from slack_sdk.models.metadata import Metadata
+
 from slack_bolt.context.say.internals import _can_say
 from slack_bolt.util.utils import create_copy
 from slack_sdk.models.attachments import Attachment
@@ -26,9 +28,18 @@ class AsyncSay:
         blocks: Optional[Sequence[Union[Dict, Block]]] = None,
         attachments: Optional[Sequence[Union[Dict, Attachment]]] = None,
         channel: Optional[str] = None,
+        as_user: Optional[bool] = None,
         thread_ts: Optional[str] = None,
+        reply_broadcast: Optional[bool] = None,
         unfurl_links: Optional[bool] = None,
         unfurl_media: Optional[bool] = None,
+        icon_emoji: Optional[str] = None,
+        icon_url: Optional[str] = None,
+        username: Optional[str] = None,
+        mrkdwn: Optional[bool] = None,
+        link_names: Optional[bool] = None,
+        parse: Optional[str] = None,  # none, full
+        metadata: Optional[Union[Dict, Metadata]] = None,
         **kwargs,
     ) -> AsyncSlackResponse:
         if _can_say(self, channel):
@@ -40,9 +51,18 @@ class AsyncSay:
                     text=text,
                     blocks=blocks,
                     attachments=attachments,
+                    as_user=as_user,
                     thread_ts=thread_ts,
+                    reply_broadcast=reply_broadcast,
                     unfurl_links=unfurl_links,
                     unfurl_media=unfurl_media,
+                    icon_emoji=icon_emoji,
+                    icon_url=icon_url,
+                    username=username,
+                    mrkdwn=mrkdwn,
+                    link_names=link_names,
+                    parse=parse,
+                    metadata=metadata,
                     **kwargs,
                 )
             elif isinstance(text_or_whole_response, dict):
