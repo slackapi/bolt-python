@@ -39,23 +39,6 @@ $ python -m venv env_3.8.5
 $ source env_3.8.5/bin/activate
 ```
 
-### Additional settings for pip
-
-pip 20.2 introduced a new flag to test the upcoming change: https://discuss.python.org/t/announcement-pip-20-2-release/4863/2
-Turn on the feature on your local machine for testing it. Just running the following command helps you turn it on.
-
-```bash
-pip config set global.use-feature 2020-resolver
-```
-
-The following file should be generated.
-
-```yaml
-# ~/.config/pip/pip.conf
-[global]
-use-feature = 2020-resolver
-```
-
 ## Tasks
 
 ### Testing
