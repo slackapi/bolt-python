@@ -109,6 +109,9 @@ app.view(callback_id)(fn)
 
 # Listen for options requests (from select menus with an external data source)
 app.options(action_id)(fn)
+
+# Listen for function requests
+app.function(function_id)(fn)
 ```
 
 The recommended way to use these methods are decorators:
@@ -134,7 +137,8 @@ Most of the app's functionality will be inside listener functions (the `fn` para
 | `client` | Web API client that uses the token associated with the event. For single-workspace installations, the token is provided to the constructor. For multi-workspace installations, the token is returned by using [the OAuth library](https://slack.dev/bolt-python/concepts#authenticating-oauth), or manually using the `authorize` function.
 | `logger` | The built-in [`logging.Logger`](https://docs.python.org/3/library/logging.html) instance you can use in middleware/listeners.
 
-## Creating an async app
+<details>
+<summary><h2>Creating an async app</h2></summary>
 
 If you'd prefer to build your app with [asyncio](https://docs.python.org/3/library/asyncio.html), you can import the [AIOHTTP](https://docs.aiohttp.org/en/stable/) library and call the `AsyncApp` constructor. Within async apps, you can use the async/await pattern.
 
@@ -176,15 +180,16 @@ If you want to use another async Web framework (e.g., Sanic, FastAPI, Starlette)
 * [The built-in adapters](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter)
 Apps can be run the same way as the syncronous example above. If you'd prefer another async Web framework (e.g., Sanic, FastAPI, Starlette), take a look at [the built-in adapters](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter) and their corresponding [examples](https://github.com/slackapi/bolt-python/tree/main/examples).
 
+</details>
+
 ## Getting Help
 
 [The documentation](https://slack.dev/bolt-python) has more information on basic and advanced concepts for Bolt for Python. Also, all the Python module documents of this library are available [here](https://slack.dev/bolt-python/api-docs/slack_bolt/).
 
 If you otherwise get stuck, we're here to help. The following are the best ways to get assistance working through your issue:
 
-  * [Issue Tracker](http://github.com/slackapi/bolt-python/issues) for questions, bug reports, feature requests, and general discussion related to Bolt for Python. Try searching for an existing issue before creating a new one.
-  * [Email](mailto:support@slack.com) our developer support team: `support@slack.com`
-
+* [Issue Tracker](http://github.com/slackapi/bolt-python/issues) for questions, bug reports, feature requests, and general discussion related to Bolt for Python. Try searching for an existing issue before creating a new one.
+* [Email](mailto:support@slack.com) our developer support team: `support@slack.com`
 
 [pypi-image]: https://badge.fury.io/py/slack-bolt.svg
 [pypi-url]: https://pypi.org/project/slack-bolt/
