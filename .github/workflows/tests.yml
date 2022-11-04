@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
     env:
       # default: multiprocessing
       # threading is more stable on GitHub Actions
@@ -48,13 +48,19 @@ jobs:
       - name: Run tests for HTTP Mode adapters (Django)
         run: |
           pytest tests/adapter_tests/django/
+      # TODO: Enable testing with Falcon 4.x + Python 3.11
+      # See also: https://github.com/slackapi/bolt-python/issues/757
       - name: Run tests for HTTP Mode adapters (Falcon 3.x)
         run: |
-          pytest tests/adapter_tests/falcon/
+          if [ ${{ matrix.python-version }} != "3.11" ]; then
+            pytest tests/adapter_tests/falcon/
+          fi
       - name: Run tests for HTTP Mode adapters (Falcon 2.x)
         run: |
-          pip install "falcon<3"
-          pytest tests/adapter_tests/falcon/
+          if [ ${{ matrix.python-version }} != "3.11" ]; then
+            pip install "falcon<3"
+            pytest tests/adapter_tests/falcon/
+          fi
       - name: Run tests for HTTP Mode adapters (Flask)
         run: |
           pytest tests/adapter_tests/flask/
@@ -71,4 +77,9 @@ jobs:
         run: |
           pip install -e ".[async]"
           pip install "falcon>=3,<4"
+          if [ ${{ matrix.python-version }} == "3.11" ]; then
+            # TODO: Enable testing with Falcon 4.x + Python 3.11
+            # See also: https://github.com/slackapi/bolt-python/issues/757
+            rm -f tests/adapter_tests_async/test_async_falcon.py
+          fi
           pytest tests/adapter_tests_async/
