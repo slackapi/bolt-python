@@ -9,7 +9,7 @@ def parse_query(query: Optional[Union[str, Dict[str, str], Dict[str, Sequence[st
     if query is None:
         return {}
     elif isinstance(query, str):
-        return parse_qs(query)
+        return parse_qs(query, keep_blank_values=True, encoding="latin-1")
     elif isinstance(query, dict) or hasattr(query, "items"):
         result: Dict[str, Sequence[str]] = {}
         for name, value in query.items():
@@ -31,13 +31,13 @@ def parse_body(body: str, content_type: Optional[str]) -> Dict[str, Any]:
         return json.loads(body)
     else:
         if "payload" in body:  # This is not JSON format yet
-            params = dict(parse_qsl(body))
+            params = dict(parse_qsl(body, keep_blank_values=True, encoding="latin-1"))
             if params.get("payload") is not None:
                 return json.loads(params.get("payload"))
             else:
                 return {}
         else:
-            return dict(parse_qsl(body))
+            return dict(parse_qsl(body, keep_blank_values=True, encoding="latin-1"))
 
 
 def extract_is_enterprise_install(payload: Dict[str, Any]) -> Optional[bool]:
