@@ -64,14 +64,20 @@ class AsyncSQLAlchemyInstallationStore(AsyncInstallationStore):
                 await database.execute(self.bots.insert(), b)
 
     async def async_find_bot(
-        self, *, enterprise_id: Optional[str], team_id: Optional[str], is_enterprise_install: Optional[bool]
+        self,
+        *,
+        enterprise_id: Optional[str],
+        team_id: Optional[str],
+        is_enterprise_install: Optional[bool],
     ) -> Optional[Bot]:
         c = self.bots.c
         query = (
             self.bots.select()
             .where(
                 and_(
-                    c.enterprise_id == enterprise_id, c.team_id == team_id, c.is_enterprise_install == is_enterprise_install
+                    c.enterprise_id == enterprise_id,
+                    c.team_id == team_id,
+                    c.is_enterprise_install == is_enterprise_install,
                 )
             )
             .order_by(desc(c.installed_at))
