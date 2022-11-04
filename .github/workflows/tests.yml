@@ -48,13 +48,19 @@ jobs:
       - name: Run tests for HTTP Mode adapters (Django)
         run: |
           pytest tests/adapter_tests/django/
+      # TODO: Enable testing with Falcon 4.x + Python 3.11
+      # See also: https://github.com/slackapi/bolt-python/pull/751#issuecomment-1292794209
       - name: Run tests for HTTP Mode adapters (Falcon 3.x)
         run: |
-          pytest tests/adapter_tests/falcon/
+          if [ ${{ matrix.python-version }} != "3.11" ]; then
+            pytest tests/adapter_tests/falcon/
+          fi
       - name: Run tests for HTTP Mode adapters (Falcon 2.x)
         run: |
-          pip install "falcon<3"
-          pytest tests/adapter_tests/falcon/
+          if [ ${{ matrix.python-version }} != "3.11" ]; then
+            pip install "falcon<3"
+            pytest tests/adapter_tests/falcon/
+          fi
       - name: Run tests for HTTP Mode adapters (Flask)
         run: |
           pytest tests/adapter_tests/flask/
