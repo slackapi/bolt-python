@@ -77,7 +77,7 @@ jobs:
         run: |
           pip install -e ".[async]"
           pip install "falcon>=3,<4"
-          if [ ${{ matrix.python-version }} != "3.11" ]; then
+          if [ ${{ matrix.python-version }} == "3.11" ]; then
             # TODO: Enable testing with Falcon 4.x + Python 3.11
             # See also: https://github.com/slackapi/bolt-python/issues/757
             rm -f tests/adapter_tests_async/test_async_falcon.py
