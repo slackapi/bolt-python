@@ -2,28 +2,28 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG)
 
-from slack_bolt import App
-from slack_bolt.adapter.tornado import SlackEventsHandler
+from slack_bolt.async_app import AsyncApp
+from slack_bolt.adapter.tornado.async_handler import AsyncSlackEventsHandler
 
-app = App()
+app = AsyncApp()
 
 
 @app.middleware  # or app.use(log_request)
-def log_request(logger, body, next_):
+async def log_request(logger, body, next_):
     logger.debug(body)
-    next_()
+    await next_()
 
 
 @app.event("app_mention")
-def event_test(body, say, logger):
+async def event_test(body, say, logger):
     logger.info(body)
-    say("What's up?")
+    await say("What's up?")
 
 
 from tornado.web import Application
 from tornado.ioloop import IOLoop
 
-api = Application([("/slack/events", SlackEventsHandler, dict(app=app))])
+api = Application([("/slack/events", AsyncSlackEventsHandler, dict(app=app))])
 
 if __name__ == "__main__":
     api.listen(3000)
@@ -32,4 +32,4 @@ if __name__ == "__main__":
 # pip install -r requirements.txt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
-# python app.py
+# python async_app.py
