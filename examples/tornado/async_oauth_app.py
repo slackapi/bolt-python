@@ -1,21 +1,21 @@
 import logging
-from slack_bolt import App
-from slack_bolt.adapter.tornado import SlackEventsHandler, SlackOAuthHandler
+from slack_bolt.async_app import AsyncApp
+from slack_bolt.adapter.tornado.async_handler import AsyncSlackEventsHandler, AsyncSlackOAuthHandler
 
 logging.basicConfig(level=logging.DEBUG)
-app = App()
+app = AsyncApp()
 
 
 @app.middleware  # or app.use(log_request)
-def log_request(logger, body, next):
+async def log_request(logger, body, next_):
     logger.debug(body)
-    next()
+    await next_()
 
 
 @app.event("app_mention")
-def event_test(body, say, logger):
+async def event_test(body, say, logger):
     logger.info(body)
-    say("What's up?")
+    await say("What's up?")
 
 
 from tornado.web import Application
@@ -23,9 +23,9 @@ from tornado.ioloop import IOLoop
 
 api = Application(
     [
-        ("/slack/events", SlackEventsHandler, dict(app=app)),
-        ("/slack/install", SlackOAuthHandler, dict(app=app)),
-        ("/slack/oauth_redirect", SlackOAuthHandler, dict(app=app)),
+        ("/slack/events", AsyncSlackEventsHandler, dict(app=app)),
+        ("/slack/install", AsyncSlackOAuthHandler, dict(app=app)),
+        ("/slack/oauth_redirect", AsyncSlackOAuthHandler, dict(app=app)),
     ]
 )
 
@@ -42,4 +42,4 @@ if __name__ == "__main__":
 # export SLACK_CLIENT_SECRET=***
 # export SLACK_SCOPES=app_mentions:read,chat:write
 
-# python oauth_app.py
+# python async_oauth_app.py
