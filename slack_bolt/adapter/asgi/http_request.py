@@ -13,6 +13,10 @@ class AsgiHttpRequest:
         return self.scope["method"]
 
     @property
+    def path(self) -> str:
+        return self.scope["path"]
+
+    @property
     def query_string(self) -> str:
         raw_query_string: bytes = self.scope["query_string"]
         return raw_query_string.decode(ENCODING)
@@ -27,12 +31,13 @@ class AsgiHttpRequest:
         return bytes(chunks).decode(ENCODING)
 
     async def _get_chunks(self, chunks: bytearray) -> bytearray:
-        chunk: Dict[str, Union[str, bytes]] = await self.receive()
+        while True:
+            chunk: Dict[str, Union[str, bytes]] = await self.receive()
 
-        if chunk.get("type") != "http.request":
-            raise Exception("Body chunks could not be received from asgi server")
+            if chunk.get("type") != "http.request":
+                raise Exception("Body chunks could not be received from asgi server")
 
-        chunks.extend(chunk.get("body", b""))
-        if chunk.get("more_body"):
-            return self._get_chunks(chunks)
+            chunks.extend(chunk.get("body", b""))
+            if not chunk.get("more_body", False):
+                break
         return chunks

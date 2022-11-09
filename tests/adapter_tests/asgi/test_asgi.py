@@ -55,8 +55,15 @@ class TestAsgi:
             (b"x-slack-signature", bytes(self.generate_signature(body, timestamp), "latin-1")),
         ]
 
-    def build_scope(self, method, timestamp, body):
-        return {"type": "http", "method": method, "query_string": "", "headers": self.build_raw_headers(timestamp, body)}
+    def build_scope(self, method: str, path: str, timestamp, body):
+        return {
+            "type": "http",
+            "method": method,
+            "path": path,
+            "raw_path": bytes(path, "latin-1"),
+            "query_string": b"",
+            "headers": self.build_raw_headers(timestamp, body),
+        }
 
     @pytest.mark.asyncio
     async def test_commands(self):
@@ -87,10 +94,10 @@ class TestAsgi:
         )
         timestamp, body = str(int(time())), input
 
-        scope = self.build_scope("GET", timestamp, body)
+        scope = self.build_scope("POST", "/slack/events", timestamp, body)
 
-        def receive():
-            return {"type": "http.request", "body": bytes(body), "more_body": False}
+        async def receive():
+            return {"type": "http.request", "body": bytes(body, "latin-1"), "more_body": False}
 
         asgi_app = SlackRequestHandler(app)
 
