@@ -21,6 +21,7 @@ Alternatively, workflow steps can also be created using the `WorkflowStepBuilder
 
 <div>
 <span class="annotation">Refer to the module documents (<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">common</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html" target="_blank">step-specific</a>) to learn the available arguments.</span>
+
 ```python
 import os
 from slack_bolt import App
@@ -48,7 +49,9 @@ ws = WorkflowStep(
     save=save,
     execute=execute,
 )
+
 # Pass Step to set up listeners
 app.step(ws)
 ```
+
 </div>

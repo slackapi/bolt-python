@@ -23,7 +23,7 @@ html, body {
 
 span.beta {
   background-color: #E8F5FA;
-  color: #1264A3;
+  color: var(--blue);
   padding: 4px 9px;
   margin-right: 2px;
   border-radius: 16px;
@@ -117,6 +117,27 @@ span.beta {
   font-weight: 600;
 }
 
+.panel .sidebar-content ul.sidebar-section .label-legacy {
+  line-height: 1em;
+  vertical-align: middle;
+  color: var(--white);
+  background-color: var(--dark-grey);
+  font-size: 0.5em;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.panel .sidebar-content ul.sidebar-section .label-beta {
+  line-height: 1em;
+  vertical-align: middle;
+  color: var(--white);
+  background-color: var(--blue);
+  font-size: 0.5em;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
 /* Main page */
 .header {
   width: 95%;
@@ -172,16 +193,16 @@ span.beta {
   border-color: #F2F2F2;
   border-image: linear-gradient(
     to bottom, 
-    #FFFFFF 0%, 
+    var(--white) 0%, 
     #F2F2F2 6%,
-    #FFFFFF 100%
+    var(--white) 100%
   ) 1 100%;
   list-style: none;
   padding-top: 1.5em;
 }
 
 .circle {
-  background: #ddd;
+  background: var(--soft-grey);
   border-radius: 50%;
   height: 1em;
   width: 1em;
@@ -218,14 +239,14 @@ span.beta {
   width: 85%;
   margin: 0.2em auto;
   display: block;
-  box-shadow: 0 0 15px #DDDDDD;
+  box-shadow: 0 0 15px var(--soft-grey);
 }
 
 .tutorial blockquote {
   margin: 0 0 0 1em;
   padding: 0 6em 0 2em;
   border-radius: 6px;
-  border-left: 6px solid #DDD;
+  border-left: 6px solid var(--soft-grey);
   font-size: 1em;
 }
 
@@ -233,6 +254,29 @@ span.beta {
   padding-bottom: 1em;
 }
 
+.tutorial .label-beta {
+  line-height: 1em;
+  vertical-align: middle;
+  color: var(--white);
+  background-color: var(--blue);
+  font-size: 0.45em;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-left: 10px;
+}
+
+.section-wrapper .label-beta {
+  line-height: 1em;
+  vertical-align: middle;
+  color: var(--white);
+  background-color: var(--blue);
+  font-size: 0.45em;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-left: 10px;
+}
 .content .section-wrapper .highlighter-rouge {
   grid-area: code;
 }
@@ -240,34 +284,49 @@ span.beta {
 pre {
   background-color: var(--light-grey) !important;
   background-image: none;
-  padding: 1.2em;
-  border: 1px solid #DDDDDD;
+  padding: 1em 1.5em;
+  border: 1px solid var(--soft-grey);
+  margin: 0;
+  border-radius: 1em;
 }
 
-pre code pre {
-  padding: 0;
-  font-size: 0.9em;
-  line-height: 2.2em;
+pre.structure {
+  padding: 0.5em;
+  line-height: 1.1em;
+  font-size: 0.9em !important;
 }
 
-pre code span {
+/* Code block with column numbers */
+pre.highlight {
+  line-height: 2em;
+  overflow-x: auto;
+}
+
+pre.highlight code span {
   padding: 0;
   margin: 0;
   height: 0;
 }
 
-table, pre tbody, pre tbody td, pre tbody td pre {
+pre.highlight code pre {
+  padding: 0;
+  border: 0;
+  font-size: 0.9em;
+  overflow: visible;
+}
+
+table.rouge-table, td.rouge-code, td.rouge-gutter  {
   padding: 0;
   border: 0;
   margin: 0;
-  text-align: left;
 }
 
-pre tbody td.gl pre {
-  color: #999988;
-  padding-right: 1.6em;
+td.rouge-gutter {
+  padding-right: 1em;
   user-select: none;
+  color: var(--dark-grey);
 }
+/* End Code block with column numbers */
 
 .content .section-wrapper .section-content {
   grid-area: body;
@@ -291,8 +350,20 @@ pre tbody td.gl pre {
 .content .section-wrapper hr {
   grid-area: divider;
   height: 1px;
-  border-top: 1px solid #DDD;
+  border-top: 1px solid var(--soft-grey);
   width: 100%;
+}
+
+.content .section-wrapper .label-legacy {
+  line-height: 1em;
+  vertical-align: middle;
+  color: var(--white);
+  background-color: var(--dark-grey);
+  font-size: 0.5em;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-left: 10px;
 }
 
 a:hover {
@@ -390,17 +461,17 @@ summary h4 {
 
 
 /*
- * Github theme stylesheet from: http://jwarby.github.io/jekyll-pygments-themes/languages/javascript.html
+ * Github theme stylesheet from: http://jwarby.github.io/jekyll-pygments-themes/languages/python.html
  */
  .highlight .hll { background-color: #ffffcc }
- .highlight .c { color: #999988; } /* Comment */
+ .highlight .c { color: #999988; font-style: italic } /* Comment */
  .highlight .err { color: #a61717; background-color: #e3d2d2 } /* Error */
  .highlight .k { color: #000000; font-weight: bold } /* Keyword */
  .highlight .o { color: #000000; font-weight: bold } /* Operator */
- .highlight .cm { color: #999988; } /* Comment.Multiline */
- .highlight .cp { color: #999999; font-weight: bold; } /* Comment.Preproc */
- .highlight .c1 { color: #999988; } /* Comment.Single */
- .highlight .cs { color: #999999; font-weight: bold; } /* Comment.Special */
+ .highlight .cm { color: #999988; font-style: italic } /* Comment.Multiline */
+ .highlight .cp { color: #999999; font-weight: bold; font-style: italic } /* Comment.Preproc */
+ .highlight .c1 { color: #999988; font-style: italic } /* Comment.Single */
+ .highlight .cs { color: #999999; font-weight: bold; font-style: italic } /* Comment.Special */
  .highlight .gd { color: #000000; background-color: #ffdddd } /* Generic.Deleted */
  .highlight .ge { color: #000000; font-style: italic } /* Generic.Emph */
  .highlight .gr { color: #aa0000 } /* Generic.Error */

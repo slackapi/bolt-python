@@ -19,6 +19,7 @@ To learn more about opening configuration modals, [read the documentation](https
 
 <div>
 <span class="annotation">Refer to the module documents (<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html" target="_blank">common</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html" target="_blank">step-specific</a>) to learn the available arguments.</span>
+
 ```python
 def edit(ack, step, configure):
     ack()
@@ -55,4 +56,5 @@ ws = WorkflowStep(
 )
 app.step(ws)
 ```
+
 </div>

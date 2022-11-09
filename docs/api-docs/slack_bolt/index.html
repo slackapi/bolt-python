@@ -1588,7 +1588,7 @@ def process_before_response(self) -&gt; bool:
 <h3>Methods</h3>
 <dl>
 <dt id="slack_bolt.App.action"><code class="name flex">
-<span>def <span class="ident">action</span></span>(<span>self, constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">action</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Pattern[~AnyStr]]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new action listener. This method can be used as either a decorator or a method.</p>
@@ -1660,7 +1660,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.App.attachment_action"><code class="name flex">
-<span>def <span class="ident">attachment_action</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">attachment_action</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>interactive_message</code> action listener.
@@ -1687,7 +1687,7 @@ Refer to <a href="https://api.slack.com/legacy/message-buttons">https://api.slac
 </details>
 </dd>
 <dt id="slack_bolt.App.block_action"><code class="name flex">
-<span>def <span class="ident">block_action</span></span>(<span>self, constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">block_action</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Pattern[~AnyStr]]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>block_actions</code> action listener.
@@ -1715,7 +1715,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-act
 </details>
 </dd>
 <dt id="slack_bolt.App.block_suggestion"><code class="name flex">
-<span>def <span class="ident">block_suggestion</span></span>(<span>self, action_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">block_suggestion</span></span>(<span>self, action_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>block_suggestion</code> listener.</p></div>
@@ -1740,7 +1740,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-act
 </details>
 </dd>
 <dt id="slack_bolt.App.command"><code class="name flex">
-<span>def <span class="ident">command</span></span>(<span>self, command: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">command</span></span>(<span>self, command: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new slash command listener.
@@ -1846,7 +1846,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.App.dialog_cancellation"><code class="name flex">
-<span>def <span class="ident">dialog_cancellation</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">dialog_cancellation</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>dialog_cancellation</code> listener.
@@ -1873,7 +1873,7 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 </details>
 </dd>
 <dt id="slack_bolt.App.dialog_submission"><code class="name flex">
-<span>def <span class="ident">dialog_submission</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">dialog_submission</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>dialog_submission</code> listener.
@@ -1900,7 +1900,7 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 </details>
 </dd>
 <dt id="slack_bolt.App.dialog_suggestion"><code class="name flex">
-<span>def <span class="ident">dialog_suggestion</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">dialog_suggestion</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>dialog_suggestion</code> listener.
@@ -2112,7 +2112,7 @@ when getting an unhandled error in Bolt app.</dd>
 </details>
 </dd>
 <dt id="slack_bolt.App.event"><code class="name flex">
-<span>def <span class="ident">event</span></span>(<span>self, event: Union[str, Pattern, Dict[str, Union[str, Sequence[Union[str, Pattern, ForwardRef(None)]], ForwardRef(None)]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">event</span></span>(<span>self, event: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Sequence[Union[str, Pattern[~AnyStr], None]], None]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new event listener. This method can be used as either a decorator or a method.</p>
@@ -2190,7 +2190,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.App.global_shortcut"><code class="name flex">
-<span>def <span class="ident">global_shortcut</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">global_shortcut</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new global shortcut listener.</p></div>
@@ -2215,7 +2215,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.App.message"><code class="name flex">
-<span>def <span class="ident">message</span></span>(<span>self, keyword: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">message</span></span>(<span>self, keyword: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new message event listener. This method can be used as either a decorator or a method.
@@ -2306,7 +2306,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.App.message_shortcut"><code class="name flex">
-<span>def <span class="ident">message_shortcut</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">message_shortcut</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new message shortcut listener.</p></div>
@@ -2396,7 +2396,7 @@ app.middleware(middleware_func)
 </details>
 </dd>
 <dt id="slack_bolt.App.options"><code class="name flex">
-<span>def <span class="ident">options</span></span>(<span>self, constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">options</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Pattern[~AnyStr]]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new options listener.
@@ -2488,7 +2488,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.App.shortcut"><code class="name flex">
-<span>def <span class="ident">shortcut</span></span>(<span>self, constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">shortcut</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Pattern[~AnyStr]]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new shortcut listener.
@@ -2626,7 +2626,7 @@ For production, consider using a production-ready WSGI server such as Gunicorn.<
 </details>
 </dd>
 <dt id="slack_bolt.App.step"><code class="name flex">
-<span>def <span class="ident">step</span></span>(<span>self, callback_id: Union[str, Pattern, <a title="slack_bolt.workflows.step.step.WorkflowStep" href="workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStep">WorkflowStep</a>, <a title="slack_bolt.workflows.step.step.WorkflowStepBuilder" href="workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder">WorkflowStepBuilder</a>], edit: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable], ForwardRef(None)] = None, save: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable], ForwardRef(None)] = None, execute: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable], ForwardRef(None)] = None)</span>
+<span>def <span class="ident">step</span></span>(<span>self, callback_id: Union[str, Pattern[~AnyStr], <a title="slack_bolt.workflows.step.step.WorkflowStep" href="workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStep">WorkflowStep</a>, <a title="slack_bolt.workflows.step.step.WorkflowStepBuilder" href="workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder">WorkflowStepBuilder</a>], edit: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable], None] = None, save: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable], None] = None, execute: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.listener.Listener" href="listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a>, Sequence[Callable], None] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new Workflow Step listener.
@@ -2734,7 +2734,7 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="workflows/st
 </details>
 </dd>
 <dt id="slack_bolt.App.view"><code class="name flex">
-<span>def <span class="ident">view</span></span>(<span>self, constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">view</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr], Dict[str, Union[str, Pattern[~AnyStr]]]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>view_submission</code>/<code>view_closed</code> event listener.
@@ -2826,7 +2826,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </details>
 </dd>
 <dt id="slack_bolt.App.view_closed"><code class="name flex">
-<span>def <span class="ident">view_closed</span></span>(<span>self, constraints: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">view_closed</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>view_closed</code> listener.
@@ -2853,7 +2853,7 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#vie
 </details>
 </dd>
 <dt id="slack_bolt.App.view_submission"><code class="name flex">
-<span>def <span class="ident">view_submission</span></span>(<span>self, constraints: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+<span>def <span class="ident">view_submission</span></span>(<span>self, constraints: Union[str, Pattern[~AnyStr]], matchers: Optional[Sequence[Callable[..., bool]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Registers a new <code>view_submission</code> listener.
@@ -3470,7 +3470,7 @@ def say(self) -&gt; Say:
 </dd>
 <dt id="slack_bolt.BoltRequest"><code class="flex name class">
 <span>class <span class="ident">BoltRequest</span></span>
-<span>(</span><span>*, body: Union[str, dict], query: Union[str, Dict[str, str], Dict[str, Sequence[str]], ForwardRef(None)] = None, headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None, context: Optional[Dict[str, str]] = None, mode: str = 'http')</span>
+<span>(</span><span>*, body: Union[str, dict], query: Union[str, Dict[str, str], Dict[str, Sequence[str]], None] = None, headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None, context: Optional[Dict[str, str]] = None, mode: str = 'http')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Request to a Bolt app.</p>
