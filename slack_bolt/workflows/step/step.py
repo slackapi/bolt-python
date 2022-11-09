@@ -319,6 +319,18 @@ class WorkflowStep:
         app_name: Optional[str] = None,
         base_logger: Optional[Logger] = None,
     ):
+        """
+        Args:
+            callback_id: The callback_id for this workflow step
+            edit: Either a single function or a list of functions for opening a modal in the builder UI
+                When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
+            save: Either a single function or a list of functions for handling modal interactions in the builder UI
+                When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
+            execute: Either a single function or a list of functions for handling workflow step executions
+                When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
+            app_name: The app name that can be mainly used for logging
+            base_logger: The logger instance that can be used as a template when creating this step's logger
+        """
         self.callback_id = callback_id
         app_name = app_name or __name__
         self.edit = self.build_listener(
