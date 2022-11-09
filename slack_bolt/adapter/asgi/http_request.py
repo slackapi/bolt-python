@@ -27,10 +27,7 @@ class AsgiHttpRequest:
         return {header[0].decode(ENCODING): header[1].decode(ENCODING) for header in raw_headers}
 
     async def get_raw_body(self) -> str:
-        chunks = await self._get_chunks(bytearray())
-        return bytes(chunks).decode(ENCODING)
-
-    async def _get_chunks(self, chunks: bytearray) -> bytearray:
+        chunks = bytearray()
         while True:
             chunk: Dict[str, Union[str, bytes]] = await self.receive()
 
@@ -40,4 +37,4 @@ class AsgiHttpRequest:
             chunks.extend(chunk.get("body", b""))
             if not chunk.get("more_body", False):
                 break
-        return chunks
+        return bytes(chunks).decode(ENCODING)

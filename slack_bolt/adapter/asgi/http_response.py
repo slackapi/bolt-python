@@ -9,7 +9,7 @@ class AsgiHttpResponse:
         self.headers = headers
         self.body = body
 
-    @ property
+    @property
     def raw_headers(self) -> Iterable[Tuple[bytes, bytes]]:
         headers = [(bytes(key, ENCODING), bytes(value[0], ENCODING)) for key, value in self.headers.items()]
         headers.append((b"content-length", bytes(str(len(self.body)), ENCODING)))
