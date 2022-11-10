@@ -10,7 +10,7 @@ layout: future
 
 Your app can use the `function()` method to listen to incoming function requests. The method requires a function `callback_id` of type `str`. This `callback_id` must also be defined in your [Function](/bolt-python/future/concepts#manifest-functions) definition. Functions must eventually be completed with the `complete()` function to inform Slack that your app has processed the function request. `complete()` requires **one of two** keyword arguments: `outputs` or `error`. There are two ways to complete a Function with `complete()`:
 
-* `outputs` of type `dict` completes your function **successfully** and provide a dictionary containing the outputs of your function as defined in the app's manifest.
+* `outputs` of type `dict` completes your function **successfully** and provides a dictionary containing the outputs of your function as defined in the app's manifest.
 * `error` of type `str` completes your function **unsuccessfully** and provides a message containing information regarding why your function was not successful.
 
 </div>
@@ -20,7 +20,7 @@ Your app can use the `function()` method to listen to incoming function requests
 ```python
 # The sample function simply outputs an input
 @app.function("sample_function")
-def sample_func(event, complete: Complete):
+def sample_func(event: dict, complete: Complete):
     try:
         message = event["inputs"]["message"]
         complete(
@@ -29,7 +29,7 @@ def sample_func(event, complete: Complete):
             }
         )
     except Exception as e:
-        complete(error="Cannot submit the message")
+        complete(error=f"Cannot submit the message: {e}")
         raise e
 ```
 </div>
@@ -46,7 +46,7 @@ The `function()` method returns a `SlackFunction` decorator object. This object 
 * It was created during the handling of a `function` event.
 * The `action_id` matches the interactive listeners `action_id`.
 
-These listeners behave similarly to the ones assigned directly to your app. the notable difference is that `complete()` must be called once your function is completed.
+These listeners behave similarly to the ones assigned directly to your app. The notable difference is that `complete()` must be called once your function is completed.
 
 </div>
 
@@ -54,7 +54,7 @@ These listeners behave similarly to the ones assigned directly to your app. the 
 # Your listener will be called when your function "sample_function" is triggered from a workflow
 # When triggered a message containing a button with an action_id "approve_button" is posted
 @app.function("sample_function")
-def sample_func(event, complete: Complete):
+def sample_func(event: dict, complete: Complete):
     try:
         client.chat_postMessage(
             channel="a-channel-id",
@@ -78,7 +78,7 @@ def sample_func(event, complete: Complete):
             ],
         )
     except Exception as e:
-        complete(error="Cannot post message")
+        complete(error=f"Cannot post the message: {e}")
         raise e
 
 # Your listener will be called when a block element
@@ -98,7 +98,7 @@ def update_message(ack, body, client, complete):
         complete()
     except Exception as e:
         logger.error(e)
-        complete(error="Cannot react to message")
+        complete(error=f"Cannot react to message: {e}")
         raise e
 ```
 

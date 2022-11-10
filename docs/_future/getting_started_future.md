@@ -40,7 +40,7 @@ Install the Slack CLI by following this <a href="https://api.slack.com/future/qu
 
 #### Dependencies {#setting-up-dependencies}
 
-Once the CLI is set up, make sure your machine has the most recent version of <a href="https://www.python.org/" target="_blank">Python</a> installed. You can install Python through a package manager (such as <a href="https://brew.sh/" target="_blank">Homebrew</a> for Mac) or directly from the <a href="https://www.python.org/downloads/" target="_blank">website</a>.
+Once the CLI is set up, make sure your machine has the most recent version of <a href="https://www.python.org/" target="_blank">Python</a> installed. You can install Python through a package manager (such as <a href="https://brew.sh/" target="_blank">Homebrew</a> for macOS) or directly from the <a href="https://www.python.org/downloads/" target="_blank">website</a>.
 
 ---
 
@@ -78,7 +78,7 @@ Once the app is successfully created, you should see a message like this:
 
 ### Set up your trigger {#setup-trigger}
 
-As mentioned, this app comes with preexisting functionality - it uses Functions, Workflows and a Trigger set up to kick things off. Let's run a command to initialize that Trigger via the CLI.
+As mentioned, this app comes with pre-existing functionality - it uses Functions, Workflows and a Trigger set up to kick things off. Let's run a command to initialize that Trigger via the CLI.
 
 First, make sure you're in the project directory in your command line: `cd my-app`
 
@@ -88,7 +88,7 @@ Then, run the following command to create a Trigger:
 slack triggers create --trigger-def "triggers/sample-trigger.json"      
 ```
 
-The above command will create a trigger for the selected workspace. Make sure to select the workspace you want and that it is appended by `(dev)`. This will create a dev instance of your app. Once the trigger is successfully created, you should see an output like this:
+The above command will create a trigger for the selected workspace. Make sure to select the workspace you want. Once the trigger is successfully created, you should see an output like this:
 
 ```bash
 ⚡ Trigger created
@@ -122,7 +122,7 @@ You'll be prompted to select a workspace to install the app to&mdash;select the 
 
 > 💡 If you don't see the workspace you'd like to use in the list, you can `CTRL + C` out of the `slack run` command and run `slack auth login`. This will allow you to authenticate in your desired workspace to have it show up in the list for `slack run`.
 
-Once the app is successfully ran, you'll see output in your Terminal to indicate it's running, similar to what you would see with any other Bolt for Python app. You can search for the `⚡️ Bolt app is running! ⚡️` message to make sure that your app has successfully started up.
+You'll see an output in your Terminal to indicate your app is running, similar to what you would see with any other Bolt for Python app. You can search for the `⚡️ Bolt app is running! ⚡️` message to make sure that your app has successfully started up.
 
 ### Trigger your app's workflow {#trigger-workflow}
 

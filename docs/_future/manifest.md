@@ -9,7 +9,7 @@ layout: future
 
 <div class="section-content">
 
-Your project should contain a `manifest.json` file that defines your app's manifest, which is where you can configure your application name and scopes, declare the functions your app will use, and more.
+Your project should contain a `manifest.json` file that defines your app's manifest. This is where you'll configure your application name and scopes, declare the functions your app will use, and more.
 Refer to the <a href="https://api.slack.com/reference/manifests" target="_blank">App Manifest documentation</a> to learn
 about the available manifest configurations.
 
