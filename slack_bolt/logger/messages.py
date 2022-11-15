@@ -10,7 +10,8 @@ from slack_bolt.request.payload_utils import (
     is_options,
     is_shortcut,
     is_slash_command,
-    is_view,
+    is_view_submission,
+    is_view_closed,
     is_workflow_step_edit,
     is_workflow_step_save,
     is_workflow_step_execute,
@@ -241,13 +242,24 @@ app.step(ws)
     logger.info(body)
 """,
         )
-    if is_view(req.body):
+    if is_view_submission(req.body):
         # @app.view
         return _build_unhandled_request_suggestion(
             default_message,
             f"""
 @app.view("{req.body.get('view', {}).get('callback_id', 'modal-view-id')}")
-{'async ' if is_async else ''}def handle_view_events(ack, body, logger):
+{'async ' if is_async else ''}def handle_view_submission_events(ack, body, logger):
+    {'await ' if is_async else ''}ack()
+    logger.info(body)
+""",
+        )
+    if is_view_closed(req.body):
+        # @app.view
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f"""
+@app.view_closed("{req.body.get('view', {}).get('callback_id', 'modal-view-id')}")
+{'async ' if is_async else ''}def handle_view_closed_events(ack, body, logger):
     {'await ' if is_async else ''}ack()
     logger.info(body)
 """,
