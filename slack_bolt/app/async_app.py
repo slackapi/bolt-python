@@ -1259,6 +1259,9 @@ class AsyncApp:
             trust_env_in_session=self._async_client.trust_env_in_session,
             headers=self._async_client.headers,
             team_id=req.context.team_id,
+            retry_handlers=self._async_client.retry_handlers.copy()
+            if self._async_client.retry_handlers is not None
+            else None,
         )
         req.context["client"] = client_per_request
 
