@@ -38,7 +38,8 @@ from slack_bolt.request.payload_utils import (
     is_options,
     is_shortcut,
     is_slash_command,
-    is_view,
+    is_view_submission,
+    is_view_closed,
     is_workflow_step_edit,
     is_workflow_step_save,
     is_workflow_step_execute,
@@ -269,13 +270,24 @@ app.step(ws)
     logger.info(body)
 &#34;&#34;&#34;,
         )
-    if is_view(req.body):
+    if is_view_submission(req.body):
         # @app.view
         return _build_unhandled_request_suggestion(
             default_message,
             f&#34;&#34;&#34;
 @app.view(&#34;{req.body.get(&#39;view&#39;, {}).get(&#39;callback_id&#39;, &#39;modal-view-id&#39;)}&#34;)
-{&#39;async &#39; if is_async else &#39;&#39;}def handle_view_events(ack, body, logger):
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_view_submission_events(ack, body, logger):
+    {&#39;await &#39; if is_async else &#39;&#39;}ack()
+    logger.info(body)
+&#34;&#34;&#34;,
+        )
+    if is_view_closed(req.body):
+        # @app.view
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+@app.view_closed(&#34;{req.body.get(&#39;view&#39;, {}).get(&#39;callback_id&#39;, &#39;modal-view-id&#39;)}&#34;)
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_view_closed_events(ack, body, logger):
     {&#39;await &#39; if is_async else &#39;&#39;}ack()
     logger.info(body)
 &#34;&#34;&#34;,
@@ -811,13 +823,24 @@ app.step(ws)
     logger.info(body)
 &#34;&#34;&#34;,
         )
-    if is_view(req.body):
+    if is_view_submission(req.body):
         # @app.view
         return _build_unhandled_request_suggestion(
             default_message,
             f&#34;&#34;&#34;
 @app.view(&#34;{req.body.get(&#39;view&#39;, {}).get(&#39;callback_id&#39;, &#39;modal-view-id&#39;)}&#34;)
-{&#39;async &#39; if is_async else &#39;&#39;}def handle_view_events(ack, body, logger):
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_view_submission_events(ack, body, logger):
+    {&#39;await &#39; if is_async else &#39;&#39;}ack()
+    logger.info(body)
+&#34;&#34;&#34;,
+        )
+    if is_view_closed(req.body):
+        # @app.view
+        return _build_unhandled_request_suggestion(
+            default_message,
+            f&#34;&#34;&#34;
+@app.view_closed(&#34;{req.body.get(&#39;view&#39;, {}).get(&#39;callback_id&#39;, &#39;modal-view-id&#39;)}&#34;)
+{&#39;async &#39; if is_async else &#39;&#39;}def handle_view_closed_events(ack, body, logger):
     {&#39;await &#39; if is_async else &#39;&#39;}ack()
     logger.info(body)
 &#34;&#34;&#34;,

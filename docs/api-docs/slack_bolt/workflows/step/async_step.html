@@ -336,6 +336,18 @@ class AsyncWorkflowStep:
         app_name: Optional[str] = None,
         base_logger: Optional[Logger] = None,
     ):
+        &#34;&#34;&#34;
+        Args:
+            callback_id: The callback_id for this workflow step
+            edit: Either a single function or a list of functions for opening a modal in the builder UI
+                When it&#39;s a list, the first one is responsible for ack() while the rest are lazy listeners.
+            save: Either a single function or a list of functions for handling modal interactions in the builder UI
+                When it&#39;s a list, the first one is responsible for ack() while the rest are lazy listeners.
+            execute: Either a single function or a list of functions for handling workflow step executions
+                When it&#39;s a list, the first one is responsible for ack() while the rest are lazy listeners.
+            app_name: The app name that can be mainly used for logging
+            base_logger: The logger instance that can be used as a template when creating this step&#39;s logger
+        &#34;&#34;&#34;
         self.callback_id = callback_id
         app_name = app_name or __name__
         self.edit = self.build_listener(
@@ -540,7 +552,24 @@ def _build_execute_listener_middleware(
 <span>(</span><span>*, callback_id: Union[str, Pattern], edit: Union[Callable[..., Awaitable[<a title="slack_bolt.response.response.BoltResponse" href="../../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="../../listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable]], save: Union[Callable[..., Awaitable[<a title="slack_bolt.response.response.BoltResponse" href="../../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="../../listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable]], execute: Union[Callable[..., Awaitable[<a title="slack_bolt.response.response.BoltResponse" href="../../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="../../listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable]], app_name: Optional[str] = None, base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>callback_id</code></strong></dt>
+<dd>The callback_id for this workflow step</dd>
+<dt><strong><code>edit</code></strong></dt>
+<dd>Either a single function or a list of functions for opening a modal in the builder UI
+When it's a list, the first one is responsible for ack() while the rest are lazy listeners.</dd>
+<dt><strong><code>save</code></strong></dt>
+<dd>Either a single function or a list of functions for handling modal interactions in the builder UI
+When it's a list, the first one is responsible for ack() while the rest are lazy listeners.</dd>
+<dt><strong><code>execute</code></strong></dt>
+<dd>Either a single function or a list of functions for handling workflow step executions
+When it's a list, the first one is responsible for ack() while the rest are lazy listeners.</dd>
+<dt><strong><code>app_name</code></strong></dt>
+<dd>The app name that can be mainly used for logging</dd>
+<dt><strong><code>base_logger</code></strong></dt>
+<dd>The logger instance that can be used as a template when creating this step's logger</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -565,6 +594,18 @@ def _build_execute_listener_middleware(
         app_name: Optional[str] = None,
         base_logger: Optional[Logger] = None,
     ):
+        &#34;&#34;&#34;
+        Args:
+            callback_id: The callback_id for this workflow step
+            edit: Either a single function or a list of functions for opening a modal in the builder UI
+                When it&#39;s a list, the first one is responsible for ack() while the rest are lazy listeners.
+            save: Either a single function or a list of functions for handling modal interactions in the builder UI
+                When it&#39;s a list, the first one is responsible for ack() while the rest are lazy listeners.
+            execute: Either a single function or a list of functions for handling workflow step executions
+                When it&#39;s a list, the first one is responsible for ack() while the rest are lazy listeners.
+            app_name: The app name that can be mainly used for logging
+            base_logger: The logger instance that can be used as a template when creating this step&#39;s logger
+        &#34;&#34;&#34;
         self.callback_id = callback_id
         app_name = app_name or __name__
         self.edit = self.build_listener(
