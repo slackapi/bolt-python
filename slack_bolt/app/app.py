@@ -1223,6 +1223,7 @@ class App:
             proxy=self._client.proxy,
             headers=self._client.headers,
             team_id=req.context.team_id,
+            retry_handlers=self._client.retry_handlers.copy() if self._client.retry_handlers is not None else None,
         )
         req.context["client"] = client_per_request
 
