@@ -10,7 +10,7 @@ layout: future
 <div class="section-content">
 
 Your project should contain a `manifest.json` file that defines your app's manifest. This is where you'll configure your application name and scopes, declare the functions your app will use, and more.
-Refer to the <a href="https://api.slack.com/reference/manifests" target="_blank">App Manifest documentation</a> to learn
+Refer to the <a href="https://api.slack.com/reference/manifests" target="_blank">App Manifest</a> and <a href="https://api.slack.com/future/manifest#manifest-properties" target="_blank">Manifest Property</a> documentation to learn
 about the available manifest configurations.
 
 Notably, the App Manifest informs Slack of the definitions for:
@@ -18,7 +18,7 @@ Notably, the App Manifest informs Slack of the definitions for:
 * [Functions](/bolt-python/future/concepts#manifest-functions)
 * [Workflows](/bolt-python/future/concepts#manifest-workflows)
 
-`manifest.json` is located at the top level of <a href="https://github.com/slack-samples/bolt-python-starter-template" target="_blank">our example projects</a>, along with a `triggers` folder containing
+`manifest.json` is located at the top level of <a href="https://github.com/slack-samples/bolt-python-starter-template/tree/future" target="_blank">our example projects</a>, along with a `triggers` folder containing
 `*_trigger.json` files that define the <a href="https://api.slack.com/future/triggers" target="_blank">triggers</a>
 for your app.
 

@@ -19,7 +19,7 @@ Find out about the next-generation platform on Slack's <a href="https://api.slac
 
 ### Limitations
 
-Bolt for Python supports app development using next-gen platform features like Functions, Workflows and tools such as the Slack CLI alongside all current generally available Slack Platform features.
+Bolt for Python supports app development using next-gen platform features like <a href="/bolt-python/future/concepts#functions" target="_blank">Functions</a>, <a href="/bolt-python/future/concepts#manifest-workflows" target="_blank">Workflows</a> and tools such as the Slack CLI alongside all current generally available Slack Platform features.
 
 #### We do not yet support
 
@@ -78,7 +78,7 @@ Once the app is successfully created, you should see a message like this:
 
 ### Set up your trigger {#setup-trigger}
 
-As mentioned, this app comes with pre-existing functionality - it uses Functions, Workflows and a Trigger set up to kick things off. Let's run a command to initialize that Trigger via the CLI.
+As mentioned, this app comes with pre-existing functionality - it uses Functions, Workflows and a <a href="https://api.slack.com/future/triggers/link" target="_blank">Link Trigger</a> that will allow users in Slack to initiate the functionality provided by the app. Let's run a command to initialize that Link Trigger via the CLI.
 
 First, make sure you're in the project directory in your command line: `cd my-app`
 
@@ -88,7 +88,7 @@ Then, run the following command to create a Trigger:
 slack triggers create --trigger-def "triggers/sample-trigger.json"      
 ```
 
-The above command will create a trigger for the selected workspace. Make sure to select the workspace you want. Once the trigger is successfully created, you should see an output like this:
+The above command will create a <a href="https://api.slack.com/future/triggers/link" target="_blank">Link Trigger</a> for the selected workspace. Make sure to select the workspace you want. Once the trigger is successfully created, you should see an output like this:
 
 ```bash
 ⚡ Trigger created
@@ -98,7 +98,7 @@ The above command will create a trigger for the selected workspace. Make sure to
    URL: https://slack.com/shortcuts/[ID]/[Some ID]
 ```
 
-The provided URL will be what you use to run your Trigger. Copy this URL and save it somewhere; you'll need it for later.
+The provided URL can be pasted into Slack; Slack will unfurl it into a button that users can interact with to initiate your app's functionality! Copy this URL and save it somewhere; you'll need it for later.
 
 ---
 
