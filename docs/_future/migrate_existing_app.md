@@ -119,4 +119,4 @@ You have probably made changes to your app’s manifest (adding a Function or a 
 
 ### Conclusion {#conclusion}
 
-Congratulations on migrating your app to the your next-generation Slack Platform! 🎉 You can continue your journey by learning about [Manifests](/bolt-python/future/concepts#manifest) or looking into adding [Functions](/bolt-python/future/concepts#functions) and [Workflows](/bolt-python/future/concepts#manifest-workflows) to your app!
+Congratulations on migrating your app to the next-generation Slack Platform! 🎉 You can continue your journey by learning about [Manifests](/bolt-python/future/concepts#manifest) or looking into adding [Functions](/bolt-python/future/concepts#functions) and [Workflows](/bolt-python/future/concepts#manifest-workflows) to your app!

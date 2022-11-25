@@ -6,7 +6,6 @@ lang: en
 layout: tutorial
 permalink: /tutorial/getting-started-future
 ---
-
 ## Getting started <span class="label-beta">BETA</span>
 
 <div class="section-content">
@@ -26,7 +25,7 @@ Bolt for Python supports app development using next-gen platform features like <
 - Deployment to secure and managed Slack infrastructure.
 - Datastores API <a href="https://api.slack.com/future/datastores" target="_blank">Datastores</a> functionality.
 
-> If you'd like to deploy your app with Slack infrastructure, consider building your next-generation application with the Deno Slack API. You can get started with that <a href="https://api.slack.com/future/get-started" target="_blank">here</a>.
+> 💡 If you'd like to deploy your app with Slack infrastructure, consider building your next-generation application with the Deno Slack API. You can get started with that <a href="https://api.slack.com/future/get-started" target="_blank">here</a>.
 
 ---
 
