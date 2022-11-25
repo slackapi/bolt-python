@@ -19,7 +19,7 @@ class AsgiHttpRequest:
         while True:
             chunk: Dict[str, Union[str, bytes]] = await self.receive()
 
-            if chunk.get("type") != "http.request":
+            if chunk["type"] != "http.request":
                 raise Exception("Body chunks could not be received from asgi server")
 
             chunks.extend(chunk.get("body", b""))
