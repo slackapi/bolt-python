@@ -153,7 +153,7 @@ async def handle_shortcuts(ack, body, logger):
 [Suggestion] You can handle this type of event with the following listener function:
 
 @app.view("view-id")
-async def handle_view_events(ack, body, logger):
+async def handle_view_submission_events(ack, body, logger):
     await ack()
     logger.info(body)
 """
@@ -171,8 +171,8 @@ async def handle_view_events(ack, body, logger):
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
-@app.view("view-id")
-async def handle_view_events(ack, body, logger):
+@app.view_closed("view-id")
+async def handle_view_closed_events(ack, body, logger):
     await ack()
     logger.info(body)
 """
