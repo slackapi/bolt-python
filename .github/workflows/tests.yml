@@ -7,16 +7,12 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    # Avoiding -latest due to https://github.com/actions/setup-python/issues/162
+    runs-on: ubuntu-20.04
     timeout-minutes: 10
     strategy:
       matrix:
-        os:
-          - ubuntu-latest
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
-        include:
-          - python-version: "3.6"
-            os: ubuntu-20.04
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
     env:
       # default: multiprocessing
       # threading is more stable on GitHub Actions
