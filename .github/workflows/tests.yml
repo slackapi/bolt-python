@@ -11,8 +11,6 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        os:
-          - ubuntu-latest
         python-version:
           - "3.7"
           - "3.8"
