@@ -1,16 +1,16 @@
 ---
-title: Migrate an existing app
+title: Setup an existing app
 order: 7
-slug: migrate-existing-app
+slug: setup-existing-app
 lang: en
 layout: tutorial
-permalink: /tutorial/migrate-existing-app
+permalink: /tutorial/setup-existing-app
 ---
 
-## Migrate an existing app <span class="label-beta">BETA</span>
+## Setup an existing app <span class="label-beta">BETA</span>
 
 <div class="section-content">
-If you have an existing Slack app written with Bolt for Python that you'd like to migrate to the <a href="https://api.slack.com/future/intro" target="_blank">next-generation platform</a>, this guide is for you!
+If you would like to setup an existing Slack app written with the beta tools from the <a href="https://api.slack.com/future/intro" target="_blank">next-generation platform</a>, this guide is for you!
 </div>
 
 To get started with a new Bolt for Python application take a look at this [Getting Started guide](/bolt-python/tutorial/getting-started-future) instead.
