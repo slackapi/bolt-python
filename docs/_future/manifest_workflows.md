@@ -8,7 +8,7 @@ layout: future
 
 <div class="section-content">
 
-Your app can use Functions by referencing them in Workflows. Your Functions and the ones provided by Slack can be used as steps in Workflow definitions.
+Your app can use Functions by referencing them in Workflows. Your <a href="https://api.slack.com/future/functions/custom" target="_blank">Custom Functions</a> and the <a href="https://api.slack.com/future/functions" target="_blank">Built-in Functions</a> can be used as steps in Workflow definitions.
 
 Workflows are invoked by <a href="https://api.slack.com/future/triggers" target="_blank">Triggers</a>. You will need to set up a Trigger in order to use your defined workflows. Triggers, Workflows, and Functions work together in the following way:
 

@@ -7,7 +7,7 @@ layout: future
 ---
 
 <div class="section-content">
-Your app can [invoke Functions](/bolt-python/future/concepts#functions) defined and created by you. In order for this to work, Slack must know they exist. Define them in your [App Manifest](/bolt-python/concepts#manifest) also known as `manifest.json` in your project. The next time you `slack run` your app will inform Slack they exist.
+Your app can [invoke Functions](/bolt-python/future/concepts#functions) defined and created by you (<a href="https://api.slack.com/future/functions/custom" target="_blank">Custom Functions</a>). In order for this to work, Slack must know they exist. Define them in your [App Manifest](/bolt-python/concepts#manifest) also known as `manifest.json` in your project. The next time you `slack run` your app will inform Slack they exist.
 
 <table id="functions_dict">
   <tr>
