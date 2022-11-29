@@ -32,31 +32,31 @@ sidebar_style: main
         {% endfor %}
       </div>
 
-      <div id="steps">
-        {% assign workflow_steps = site.steps | sort: "order" | where: "lang", page.lang %} {% for section in
-          workflow_steps %}
-        <div class="section-wrapper">
-          <h3 id="{{section.slug}}">{{ section.title }}</h3>
-          {{ section.content | markdownify }}
-          <hr />
-        </div>
-        {% endfor %}
-      </div>
-
       <div id="advanced">
         {% assign advanced_sections = site.advanced | sort: "order" | where: "lang", page.lang %}
         {% for section in advanced_sections %}
         <div class="section-wrapper">
           <h3 id="{{section.slug}}">{{ section.title }}</h3>
 
-          {{ section.content | replace: "&amp;", "&" | replace: "&lt;", "<" | replace: "&gt;", ">" | markdownify }}
+          {{ section.content | replace: "&amp;", "&" | replace: "&lt;", "<" | replace: "&gt;" , ">" | markdownify }}
+            <hr>
+        </div>
+        {% endfor %}
+      </div>
 
-          <hr>
+      <div id="steps">
+        {% assign workflow_steps = site.steps | sort: "order" | where: "lang", page.lang %} {% for section in
+        workflow_steps %}
+        <div class="section-wrapper">
+          <h3 id="{{section.slug}}">
+            {{ section.title }} <span class="label-legacy">{{ site.t[page.lang].legacy }}</span>
+          </h3>
+          {{ section.content | markdownify }}
+          <hr />
         </div>
         {% endfor %}
       </div>
     </div>
-
   </div>
   {% include analytics.html %}
 </body>
