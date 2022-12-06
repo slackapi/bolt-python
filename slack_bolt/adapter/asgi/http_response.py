@@ -1,4 +1,4 @@
-from typing import Iterable, Sequence, Tuple, Dict, Union
+from typing import Iterable, Sequence, Tuple, Dict, Union, List
 
 ENCODING = "utf-8"  # should always be utf-8
 
@@ -8,7 +8,7 @@ class AsgiHttpResponse:
 
     def __init__(self, status: int, headers: Dict[str, Sequence[str]] = {}, body: str = ""):
         self.status: int = status
-        self.raw_headers: Iterable[Tuple[bytes, bytes]] = [
+        self.raw_headers: List[Tuple[bytes, bytes]] = [
             (bytes(key, ENCODING), bytes(value[0], ENCODING)) for key, value in headers.items()
         ]
         self.raw_headers.append((b"content-length", bytes(str(len(body)), ENCODING)))

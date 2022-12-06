@@ -1,3 +1,3 @@
-from .handler import SlackRequestHandler
+from .builtin import SlackRequestHandler
 
 __all__ = ["SlackRequestHandler"]

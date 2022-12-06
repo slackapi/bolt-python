@@ -1,6 +1,8 @@
+import logging
 from slack_bolt import App
 from slack_bolt.adapter.asgi import SlackRequestHandler
 
+logging.basicConfig(level=logging.DEBUG)
 app = App()
 
 
@@ -10,10 +12,4 @@ def handle_app_mentions(body, say, logger):
     say("What's up?")
 
 
-api = SlackRequestHandler(app)
-
-# pip install -r requirements.txt
-# export SLACK_SIGNING_SECRET=***
-# export SLACK_BOT_TOKEN=xoxb-***
-# uvicorn app:api --reload --port 3000 --log-level debug
-# ngrok http 3000
+asgi_app = SlackRequestHandler(app)

@@ -6,7 +6,7 @@ import pytest
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 
-from slack_bolt.adapter.asgi.handler import SlackRequestHandler
+from slack_bolt.adapter.asgi import SlackRequestHandler
 from slack_bolt.app import App
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_asgi_server import AsgiTestServer

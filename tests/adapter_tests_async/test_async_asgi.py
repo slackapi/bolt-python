@@ -6,7 +6,7 @@ import pytest
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 
-from slack_bolt.adapter.asgi.handler import SlackRequestHandler
+from slack_bolt.adapter.asgi.async_handler import AsyncSlackRequestHandler
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
 from tests.mock_asgi_server import AsgiTestServer
@@ -87,7 +87,7 @@ class TestAsyncAsgi:
 
         headers = self.build_raw_headers(str(int(time())), body)
 
-        asgi_server = AsgiTestServer(SlackRequestHandler(app))
+        asgi_server = AsgiTestServer(AsyncSlackRequestHandler(app))
 
         response = await asgi_server.http_request("POST", headers, body)
 
@@ -131,7 +131,7 @@ class TestAsyncAsgi:
         )
         headers = self.build_raw_headers(str(int(time())), body)
 
-        asgi_server = AsgiTestServer(SlackRequestHandler(app))
+        asgi_server = AsgiTestServer(AsyncSlackRequestHandler(app))
         response = await asgi_server.http_request("POST", headers, body)
 
         assert response.status_code == 200
@@ -168,7 +168,7 @@ class TestAsyncAsgi:
         body = f"payload={quote(json.dumps(body_data))}"
         headers = self.build_raw_headers(str(int(time())), body)
 
-        asgi_server = AsgiTestServer(SlackRequestHandler(app))
+        asgi_server = AsgiTestServer(AsyncSlackRequestHandler(app))
         response = await asgi_server.http_request("POST", headers, body)
 
         assert response.status_code == 200
@@ -189,7 +189,7 @@ class TestAsyncAsgi:
 
         headers = self.build_raw_headers(str(int(time())), "")
 
-        asgi_server = AsgiTestServer(SlackRequestHandler(app))
+        asgi_server = AsgiTestServer(AsyncSlackRequestHandler(app))
         response = await asgi_server.http_request("GET", headers, "", "/slack/install")
 
         assert response.status_code == 200
@@ -212,7 +212,7 @@ class TestAsyncAsgi:
         body = f"payload={quote(json.dumps(body_data))}"
         headers = self.build_raw_headers(str(int(time())), body)
 
-        asgi_server = AsgiTestServer(SlackRequestHandler(app))
+        asgi_server = AsgiTestServer(AsyncSlackRequestHandler(app))
         response = await asgi_server.http_request(
             "POST",
             headers,

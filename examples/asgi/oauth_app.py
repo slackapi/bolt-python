@@ -2,13 +2,13 @@ from slack_bolt import App
 from slack_bolt.adapter.asgi import SlackRequestHandler
 
 app = App()
-api = SlackRequestHandler(app)
-
 
 @app.event("app_mention")
 def handle_app_mentions(body, say, logger):
     logger.info(body)
     say("What's up?")
+
+api = SlackRequestHandler(app)
 
 # pip install -r requirements.txt
 

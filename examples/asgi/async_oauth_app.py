@@ -1,14 +1,15 @@
 from slack_bolt.async_app import AsyncApp
-from slack_bolt.adapter.asgi import SlackRequestHandler
+from slack_bolt.adapter.asgi.async_handler import AsyncSlackRequestHandler
 
 app = AsyncApp()
-api = SlackRequestHandler(app)
 
 
 @app.event("app_mention")
 async def handle_app_mentions(body, say, logger):
     logger.info(body)
     await say("What's up?")
+
+api = AsyncSlackRequestHandler(app)
 
 # pip install -r requirements.txt
 

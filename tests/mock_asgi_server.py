@@ -1,5 +1,5 @@
-from typing import Iterable, Tuple
-from slack_bolt.adapter.asgi.handler import SlackRequestHandler
+from typing import Iterable, Tuple, Union
+from slack_bolt.adapter.asgi.base_handler import BaseSlackRequestHandler
 
 ENCODING = "latin-1"
 
@@ -22,7 +22,7 @@ class AsgiTestServerResponse:
 class AsgiTestServer:
     def __init__(
         self,
-        asgi_app: SlackRequestHandler,
+        asgi_app: BaseSlackRequestHandler,
         root_path: str = "",
         scheme: str = "http",
         asgi: dict = {"version": "3.0", "spec_version": "2.3"},
