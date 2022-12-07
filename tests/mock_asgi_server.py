@@ -1,7 +1,7 @@
 from typing import Iterable, Tuple, Union
 from slack_bolt.adapter.asgi.base_handler import BaseSlackRequestHandler
 
-ENCODING = "latin-1"
+ENCODING = "utf-8"
 
 
 class AsgiTestServerResponse:

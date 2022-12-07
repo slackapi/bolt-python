@@ -1,8 +1,6 @@
 from typing import Callable, Dict, Union
 
-from .utils import scope_type
-
-ENCODING = "latin-1"  # should always be encoded in ISO-8859-1
+from .utils import scope_type, ENCODING
 
 
 class AsgiHttpRequest:

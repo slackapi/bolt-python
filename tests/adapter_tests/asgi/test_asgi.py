@@ -9,7 +9,7 @@ from slack_sdk.web import WebClient
 from slack_bolt.adapter.asgi import SlackRequestHandler
 from slack_bolt.app import App
 from slack_bolt.oauth.oauth_settings import OAuthSettings
-from tests.mock_asgi_server import AsgiTestServer
+from tests.mock_asgi_server import AsgiTestServer, ENCODING
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -47,14 +47,14 @@ class TestAsgi:
         return [
             (b"host", b"123.123.123"),
             (b"user-agent", b"some slack thing"),
-            (b"content-length", bytes(str(len(body)), "latin-1")),
+            (b"content-length", bytes(str(len(body)), ENCODING)),
             (b"accept", b"application/json,*/*"),
             (b"accept-encoding", b"gzip,deflate"),
-            (b"content-type", bytes(content_type, "latin-1")),
+            (b"content-type", bytes(content_type, ENCODING)),
             (b"x-forwarded-for", b"123.123.123"),
             (b"x-forwarded-proto", b"https"),
-            (b"x-slack-request-timestamp", bytes(timestamp, "latin-1")),
-            (b"x-slack-signature", bytes(self.generate_signature(body, timestamp), "latin-1")),
+            (b"x-slack-request-timestamp", bytes(timestamp, ENCODING)),
+            (b"x-slack-signature", bytes(self.generate_signature(body, timestamp), ENCODING)),
         ]
 
     @pytest.mark.asyncio

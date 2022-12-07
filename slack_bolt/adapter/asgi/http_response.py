@@ -1,6 +1,6 @@
 from typing import Iterable, Sequence, Tuple, Dict, Union, List
 
-ENCODING = "utf-8"  # should always be utf-8
+from .utils import ENCODING
 
 
 class AsgiHttpResponse:
