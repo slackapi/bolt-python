@@ -22,11 +22,11 @@ class BaseSlackRequestHandler:
         raise NotImplementedError
 
     async def handle_installation(self, request: AsgiHttpRequest) -> BoltResponse:
-        """Handles installation of the OauthFlow"""
+        """Handles installation of the OAuthFlow"""
         raise NotImplementedError
 
     async def handle_callback(self, request: AsgiHttpRequest) -> BoltResponse:
-        """Handles the callback of the OauthFlow"""
+        """Handles the callback of the OAuthFlow"""
         raise NotImplementedError
 
     async def _get_http_response(self, method: str, path: str, request: AsgiHttpRequest) -> AsgiHttpResponse:
