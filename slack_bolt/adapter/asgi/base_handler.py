@@ -2,7 +2,7 @@ from typing import Callable, Dict
 
 from .http_request import AsgiHttpRequest
 from .http_response import AsgiHttpResponse
-from .models import ScopeType
+from .utils import scope_type
 
 from slack_bolt import App
 
@@ -57,7 +57,7 @@ class BaseSlackRequestHandler:
                 """Do something before shutdown"""
                 return {"type": "lifespan.shutdown.complete"}
 
-    async def __call__(self, scope: ScopeType, receive: Callable, send: Callable) -> None:
+    async def __call__(self, scope: scope_type, receive: Callable, send: Callable) -> None:
         if scope["type"] == "http":
             response: AsgiHttpResponse = await self._get_http_response(
                 scope["method"], scope["path"], AsgiHttpRequest(scope, receive)

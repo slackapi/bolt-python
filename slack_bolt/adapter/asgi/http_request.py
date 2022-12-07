@@ -1,5 +1,6 @@
-from typing import Callable, Iterable, Tuple, Dict, Union, ByteString
-from .models import ScopeType
+from typing import Callable, Dict, Union
+
+from .utils import scope_type
 
 ENCODING = "latin-1"  # should always be encoded in ISO-8859-1
 
@@ -7,10 +8,10 @@ ENCODING = "latin-1"  # should always be encoded in ISO-8859-1
 class AsgiHttpRequest:
     __slots__ = ("receive", "query_string", "raw_headers")
 
-    def __init__(self, scope: ScopeType, receive: Callable):
+    def __init__(self, scope: scope_type, receive: Callable):
         self.receive = receive
         self.query_string = str(scope["query_string"], ENCODING)
-        self.raw_headers: Iterable[Tuple[ByteString, ByteString]] = scope["headers"]
+        self.raw_headers = scope["headers"]
 
     def get_headers(self) -> Dict[str, str]:
         return {str(header[0], ENCODING): str(header[1], (ENCODING)) for header in self.raw_headers}

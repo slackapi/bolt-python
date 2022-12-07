@@ -3,7 +3,6 @@
 #
 FROM python:3.11-alpine3.17 as builder
 COPY requirements.txt /build/
-COPY slack_bolt-1.15.2-py2.py3-none-any.whl /build/slack_bolt-1.15.2-py2.py3-none-any.whl
 WORKDIR /build/
 RUN pip install -U pip && pip install -r requirements.txt
 
