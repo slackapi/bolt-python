@@ -19,6 +19,12 @@ class AsgiTestServerResponse:
         return {header[0].decode(ENCODING): header[1].decode(ENCODING) for header in self._headers}
 
 
+class AsgiTestServerLifespanResponse:
+    def __init__(self):
+        self.type: str = None
+        self.message: str = ""
+
+
 class AsgiTestServer:
     def __init__(
         self,
@@ -31,7 +37,7 @@ class AsgiTestServer:
         self.asgi_app = asgi_app
         self.server_scope = {"root_path": root_path, "scheme": scheme, "asgi": asgi, "server": server}
 
-    async def http_request(
+    async def http(
         self,
         method: str,
         headers: Iterable[Tuple[bytes, bytes]],
@@ -71,3 +77,46 @@ class AsgiTestServer:
 
         await self.asgi_app(scope, receive, send)
         return response
+
+    async def lifespan(self, event: str) -> AsgiTestServerLifespanResponse:
+        """This implements the server side behavior of the lifespan event
+        https://asgi.readthedocs.io/en/latest/specs/lifespan.html
+
+        Args:
+            event (str): the lifespan type ex: "startup" for "lifespan.startup"
+        """
+        scope = dict(
+            self.server_scope,
+            **{
+                "type": "lifespan",
+            },
+        )
+
+        async def receive():
+            return {"type": f"lifespan.{event}"}
+
+        response = AsgiTestServerLifespanResponse()
+
+        async def send(event: dict):
+            response.type = event["type"]
+            response.message = event.get("message", "")
+
+        await self.asgi_app(scope, receive, send)
+        return response
+
+    async def websocket(self) -> None:
+        """This is not implemented"""
+        scope = dict(
+            self.server_scope,
+            **{
+                "type": "websocket",
+            },
+        )
+
+        async def receive():
+            return {}
+
+        async def send(event: dict):
+            print(event)
+
+        await self.asgi_app(scope, receive, send)

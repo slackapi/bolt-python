@@ -18,7 +18,7 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-class TestAsgi:
+class TestAsgiHttp:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -89,7 +89,7 @@ class TestAsgi:
 
         asgi_server = AsgiTestServer(SlackRequestHandler(app))
 
-        response = await asgi_server.http_request("POST", headers, body)
+        response = await asgi_server.http("POST", headers, body)
 
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/plain;charset=utf-8"
@@ -132,7 +132,7 @@ class TestAsgi:
         headers = self.build_raw_headers(str(int(time())), body)
 
         asgi_server = AsgiTestServer(SlackRequestHandler(app))
-        response = await asgi_server.http_request("POST", headers, body)
+        response = await asgi_server.http("POST", headers, body)
 
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/plain;charset=utf-8"
@@ -169,7 +169,7 @@ class TestAsgi:
         headers = self.build_raw_headers(str(int(time())), body)
 
         asgi_server = AsgiTestServer(SlackRequestHandler(app))
-        response = await asgi_server.http_request("POST", headers, body)
+        response = await asgi_server.http("POST", headers, body)
 
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/plain;charset=utf-8"
@@ -190,7 +190,7 @@ class TestAsgi:
         headers = self.build_raw_headers(str(int(time())), "")
 
         asgi_server = AsgiTestServer(SlackRequestHandler(app))
-        response = await asgi_server.http_request("GET", headers, "", "/slack/install")
+        response = await asgi_server.http("GET", headers, "", "/slack/install")
 
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
@@ -213,7 +213,7 @@ class TestAsgi:
         headers = self.build_raw_headers(str(int(time())), body)
 
         asgi_server = AsgiTestServer(SlackRequestHandler(app))
-        response = await asgi_server.http_request(
+        response = await asgi_server.http(
             "POST",
             headers,
             body,
@@ -221,4 +221,21 @@ class TestAsgi:
 
         assert response.status_code == 200
         assert response.headers.get("content-type") == "application/json;charset=utf-8"
+        assert_auth_test_count(self, 1)
+
+    @pytest.mark.asyncio
+    async def test_unsupported_method(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        body = ""
+        headers = self.build_raw_headers(str(int(time())), "")
+
+        asgi_server = AsgiTestServer(SlackRequestHandler(app))
+        response = await asgi_server.http("PUT", headers, body)
+
+        assert response.status_code == 404
+        assert response.headers.get("content-type") == "text/plain;charset=utf-8"
         assert_auth_test_count(self, 1)

@@ -89,7 +89,7 @@ class TestAsyncAsgi:
 
         asgi_server = AsgiTestServer(AsyncSlackRequestHandler(app))
 
-        response = await asgi_server.http_request("POST", headers, body)
+        response = await asgi_server.http("POST", headers, body)
 
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/plain;charset=utf-8"
@@ -132,7 +132,7 @@ class TestAsyncAsgi:
         headers = self.build_raw_headers(str(int(time())), body)
 
         asgi_server = AsgiTestServer(AsyncSlackRequestHandler(app))
-        response = await asgi_server.http_request("POST", headers, body)
+        response = await asgi_server.http("POST", headers, body)
 
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/plain;charset=utf-8"
@@ -169,7 +169,7 @@ class TestAsyncAsgi:
         headers = self.build_raw_headers(str(int(time())), body)
 
         asgi_server = AsgiTestServer(AsyncSlackRequestHandler(app))
-        response = await asgi_server.http_request("POST", headers, body)
+        response = await asgi_server.http("POST", headers, body)
 
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/plain;charset=utf-8"
@@ -190,7 +190,7 @@ class TestAsyncAsgi:
         headers = self.build_raw_headers(str(int(time())), "")
 
         asgi_server = AsgiTestServer(AsyncSlackRequestHandler(app))
-        response = await asgi_server.http_request("GET", headers, "", "/slack/install")
+        response = await asgi_server.http("GET", headers, "", "/slack/install")
 
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
@@ -213,7 +213,7 @@ class TestAsyncAsgi:
         headers = self.build_raw_headers(str(int(time())), body)
 
         asgi_server = AsgiTestServer(AsyncSlackRequestHandler(app))
-        response = await asgi_server.http_request(
+        response = await asgi_server.http(
             "POST",
             headers,
             body,
