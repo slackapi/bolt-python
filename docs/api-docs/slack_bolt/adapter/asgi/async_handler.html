@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>slack_bolt.version API documentation</title>
-<meta name="description" content="Check the latest version at https://pypi.org/project/slack-bolt/" />
+<title>slack_bolt.adapter.asgi.async_handler API documentation</title>
+<meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -19,16 +19,16 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>slack_bolt.version</code></h1>
+<h1 class="title">Module <code>slack_bolt.adapter.asgi.async_handler</code></h1>
 </header>
 <section id="section-intro">
-<p>Check the latest version at <a href="https://pypi.org/project/slack-bolt/">https://pypi.org/project/slack-bolt/</a></p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34;Check the latest version at https://pypi.org/project/slack-bolt/&#34;&#34;&#34;
-__version__ = &#34;1.16.0&#34;</code></pre>
+<pre><code class="python">from .aiohttp import AsyncSlackRequestHandler
+
+__all__ = [&#34;AsyncSlackRequestHandler&#34;]</code></pre>
 </details>
 </section>
 <section>
@@ -38,6 +38,104 @@ __version__ = &#34;1.16.0&#34;</code></pre>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="slack_bolt.adapter.asgi.async_handler.AsyncSlackRequestHandler"><code class="flex name class">
+<span>class <span class="ident">AsyncSlackRequestHandler</span></span>
+<span>(</span><span>app: <a title="slack_bolt.app.async_app.AsyncApp" href="../../app/async_app.html#slack_bolt.app.async_app.AsyncApp">AsyncApp</a>, path: str = '/slack/events')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Setup Bolt as an ASGI web framework, this will make your application compatible with ASGI web servers.
+This can be used for production deployment.</p>
+<p>With the default settings, <code>http://localhost:3000/slack/events</code>
+Run Bolt with <a href="https://www.uvicorn.org/">uvicron</a></p>
+<pre><code># Python
+app = AsyncApp()
+api = SlackRequestHandler(app)
+
+# bash
+export SLACK_SIGNING_SECRET=***
+export SLACK_BOT_TOKEN=xoxb-***
+uvicorn app:api --port 3000 --log-level debug
+</code></pre>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>app</code></strong></dt>
+<dd>Your bolt application</dd>
+<dt><strong><code>path</code></strong></dt>
+<dd>The path to handle request from Slack (Default: <code>/slack/events</code>)</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AsyncSlackRequestHandler(SlackRequestHandler):
+    app: AsyncApp
+
+    def __init__(self, app: AsyncApp, path: str = &#34;/slack/events&#34;):
+        &#34;&#34;&#34;Setup Bolt as an ASGI web framework, this will make your application compatible with ASGI web servers.
+        This can be used for production deployment.
+
+        With the default settings, `http://localhost:3000/slack/events`
+        Run Bolt with [uvicron](https://www.uvicorn.org/)
+
+            # Python
+            app = AsyncApp()
+            api = SlackRequestHandler(app)
+
+            # bash
+            export SLACK_SIGNING_SECRET=***
+            export SLACK_BOT_TOKEN=xoxb-***
+            uvicorn app:api --port 3000 --log-level debug
+
+        Args:
+            app: Your bolt application
+            path: The path to handle request from Slack (Default: `/slack/events`)
+        &#34;&#34;&#34;
+        self.path = path
+        self.app = app
+
+    async def dispatch(self, request: AsgiHttpRequest) -&gt; BoltResponse:
+        return await self.app.async_dispatch(
+            AsyncBoltRequest(body=await request.get_raw_body(), query=request.query_string, headers=request.get_headers())
+        )
+
+    async def handle_installation(self, request: AsgiHttpRequest) -&gt; BoltResponse:
+        oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
+        return await oauth_flow.handle_installation(
+            AsyncBoltRequest(body=await request.get_raw_body(), query=request.query_string, headers=request.get_headers())
+        )
+
+    async def handle_callback(self, request: AsgiHttpRequest) -&gt; BoltResponse:
+        oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
+        return await oauth_flow.handle_callback(
+            AsyncBoltRequest(body=await request.get_raw_body(), query=request.query_string, headers=request.get_headers())
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.adapter.asgi.builtin.SlackRequestHandler" href="builtin/index.html#slack_bolt.adapter.asgi.builtin.SlackRequestHandler">SlackRequestHandler</a></li>
+<li><a title="slack_bolt.adapter.asgi.base_handler.BaseSlackRequestHandler" href="base_handler.html#slack_bolt.adapter.asgi.base_handler.BaseSlackRequestHandler">BaseSlackRequestHandler</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.adapter.asgi.async_handler.AsyncSlackRequestHandler.app"><code class="name">var <span class="ident">app</span> : <a title="slack_bolt.app.async_app.AsyncApp" href="../../app/async_app.html#slack_bolt.app.async_app.AsyncApp">AsyncApp</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="slack_bolt.adapter.asgi.builtin.SlackRequestHandler" href="builtin/index.html#slack_bolt.adapter.asgi.builtin.SlackRequestHandler">SlackRequestHandler</a></b></code>:
+<ul class="hlist">
+<li><code><a title="slack_bolt.adapter.asgi.builtin.SlackRequestHandler.dispatch" href="base_handler.html#slack_bolt.adapter.asgi.base_handler.BaseSlackRequestHandler.dispatch">dispatch</a></code></li>
+<li><code><a title="slack_bolt.adapter.asgi.builtin.SlackRequestHandler.handle_callback" href="base_handler.html#slack_bolt.adapter.asgi.base_handler.BaseSlackRequestHandler.handle_callback">handle_callback</a></code></li>
+<li><code><a title="slack_bolt.adapter.asgi.builtin.SlackRequestHandler.handle_installation" href="base_handler.html#slack_bolt.adapter.asgi.base_handler.BaseSlackRequestHandler.handle_installation">handle_installation</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -48,7 +146,17 @@ __version__ = &#34;1.16.0&#34;</code></pre>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="slack_bolt" href="index.html">slack_bolt</a></code></li>
+<li><code><a title="slack_bolt.adapter.asgi" href="index.html">slack_bolt.adapter.asgi</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="slack_bolt.adapter.asgi.async_handler.AsyncSlackRequestHandler" href="#slack_bolt.adapter.asgi.async_handler.AsyncSlackRequestHandler">AsyncSlackRequestHandler</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.adapter.asgi.async_handler.AsyncSlackRequestHandler.app" href="#slack_bolt.adapter.asgi.async_handler.AsyncSlackRequestHandler.app">app</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
