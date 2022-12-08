@@ -27,7 +27,7 @@ def ask_for_introduction(event, say):
 </div>
 
 <details class="secondary-wrapper" >
-  
+
 <summary class="section-head" markdown="0">
   <h4 class="section-head">Filtering on message subtypes</h4>
 </summary>
@@ -35,7 +35,7 @@ def ask_for_introduction(event, say):
 <div class="secondary-content" markdown="0">
 The `message()` listener is equivalent to `event("message")`.
 
-You can filter on subtypes of events by passing in the additional key `subtype`. Common message subtypes like `bot_message` and `message_replied` can be found [on the message event page](https://api.slack.com/events/message#message_subtypes).
+You can filter on subtypes of events by passing in the additional key `subtype`. Common message subtypes like `bot_message` and `message_replied` can be found [on the message event page](https://api.slack.com/events/message#subtypes).
 You can explicitly filter for events without a subtype by explicitly setting `None`.
 
 </div>
