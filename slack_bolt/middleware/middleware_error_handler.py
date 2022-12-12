@@ -63,5 +63,5 @@ class DefaultMiddlewareErrorHandler(MiddlewareErrorHandler):
         request: BoltRequest,
         response: Optional[BoltResponse],
     ):
-        message = f"Failed to run a middleware middleware (error: {error})"
+        message = f"Failed to run a middleware (error: {error})"
         self.logger.exception(message)
