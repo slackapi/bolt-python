@@ -26,6 +26,42 @@ def handle_submission(ack, body):
 Similarly, there are options for [displaying errors](https://api.slack.com/surfaces/modals/using#displaying_errors) in response to view submissions.
 Read more about view submissions in our <a href="https://api.slack.com/surfaces/modals/using#handling_submissions">API documentation</a>.
 
+---
+
+##### Handling views on close
+
+When listening for `view_closed` requests, you must pass `callback_id` and add a `notify_on_close` property to the view during creation. See below for an example of this:
+
+See the <a href="https://api.slack.com/surfaces/modals/using#modal_cancellations">API documentation</a> for more information about view_closed.
+
+```python
+
+client.views_open(
+    trigger_id=body.get("trigger_id"),
+    view={
+        "type": "modal",
+        "callback_id": "modal-id", # Used when calling view_closed
+        "title": {
+            "type": "plain_text",
+            "text": "Modal title"
+        },
+        "blocks": [],
+        "close": {
+            "type": "plain_text",
+            "text": "Cancel"
+        },
+        "notify_on_close": True,  # This attribute is required
+    }
+)
+
+# Handle a view_closed request
+@app.view_closed("modal-id")
+def handle_view_closed(ack, body, logger):
+    ack()
+    logger.info("--------------- view_closed handler called ---------------")
+    logger.info(body)
+```
+
 </div>
 
 <div>
