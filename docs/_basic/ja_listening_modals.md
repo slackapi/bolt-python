@@ -27,6 +27,39 @@ def handle_submission(ack, body):
 
 モーダルの送信について詳しくは、<a href="https://api.slack.com/surfaces/modals/using#handling_submissions">API ドキュメント</a>を参照してください。
 
+---
+
+##### Handling views on close
+
+`view_closed` リクエストをリッスンするためには `callback_id` を指定して、かつ `notify_on_close` 属性をモーダルのビューに設定する必要があります。以下のコード例をご覧ください。
+
+よく詳しい情報は、<a href="https://api.slack.com/surfaces/modals/using#modal_cancellations">API ドキュメント</a>を参照してください。
+
+```python
+client.views_open(
+    trigger_id=body.get("trigger_id"),
+    view={
+        "type": "modal",
+        "callback_id": "modal-id",  # view_closed の処理時に必要
+        "title": {
+            "type": "plain_text",
+            "text": "Modal title"
+        },
+        "blocks": [],
+        "close": {
+            "type": "plain_text",
+            "text": "Cancel"
+        },
+        "notify_on_close": True,  # この属性は必須
+    }
+)
+# view_closed リクエストを処理する
+@app.view_closed("modal-id")
+def handle_view_closed(ack, body, logger):
+    ack()
+    logger.info(body)
+```
+
 </div>
 
 <div>
