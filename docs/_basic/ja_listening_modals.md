@@ -29,7 +29,7 @@ def handle_submission(ack, body):
 
 ---
 
-##### Handling views on close
+##### モーダルが閉じられたときの対応
 
 `view_closed` リクエストをリッスンするためには `callback_id` を指定して、かつ `notify_on_close` 属性をモーダルのビューに設定する必要があります。以下のコード例をご覧ください。
 
