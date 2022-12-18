@@ -40,7 +40,7 @@ client.views_open(
     trigger_id=body.get("trigger_id"),
     view={
         "type": "modal",
-        "callback_id": "modal-id", # Used when calling view_closed
+        "callback_id": "modal-id",  # Used when calling view_closed
         "title": {
             "type": "plain_text",
             "text": "Modal title"
