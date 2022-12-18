@@ -58,7 +58,6 @@ client.views_open(
 @app.view_closed("modal-id")
 def handle_view_closed(ack, body, logger):
     ack()
-    logger.info("--------------- view_closed handler called ---------------")
     logger.info(body)
 ```
 
