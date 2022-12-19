@@ -58,7 +58,7 @@ setuptools.setup(
     ),
     include_package_data=True,  # MANIFEST.in
     install_requires=[
-        "slack_sdk>=3.17.2,<4",
+        "slack_sdk>=3.18.5,<4",
     ],
     setup_requires=["pytest-runner==5.2"],
     tests_require=async_test_dependencies,
@@ -77,8 +77,7 @@ setuptools.setup(
             # used only under src/slack_bolt/adapter
             "boto3<=2",
             "bottle>=0.12,<1",
-            "chalice>=1.26.5,<2",
-            "click>=7,<8",  # for chalice
+            "chalice>=1.27.3,<2",
             "CherryPy>=18,<19",
             "Django>=3,<5",
             "falcon>=3.1.1,<4" if sys.version_info.minor >= 11 else "falcon>=2,<4",
@@ -90,7 +89,7 @@ setuptools.setup(
             "starlette>=0.14,<1",
             "tornado>=6,<7",
             # server
-            "uvicorn<1",
+            "uvicorn>=0.20,<1",
             "gunicorn>=20,<21",
             # Socket Mode 3rd party implementation
             # Note: 1.2.2 has a regression (https://github.com/websocket-client/websocket-client/issues/769)
