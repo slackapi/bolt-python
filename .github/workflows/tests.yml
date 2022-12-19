@@ -78,7 +78,7 @@ jobs:
           # Falcon supports Python 3.11 since its v3.1.1
           pip install "falcon>=3.1.1,<4"
           pytest tests/adapter_tests_async/
-      - name: Run tests for HTTP Mode adapters (Asgi)
+      - name: Run tests for HTTP Mode adapters (ASGI)
         run: |
           # Requires async test dependencies
           pytest tests/adapter_tests/asgi/
