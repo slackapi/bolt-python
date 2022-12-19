@@ -89,7 +89,7 @@ setuptools.setup(
             "starlette>=0.14,<1",
             "tornado>=6,<7",
             # server
-            "uvicorn>=0.20,<1",
+            "uvicorn<1",  # The oldest version can vary among Python runtime versions
             "gunicorn>=20,<21",
             # Socket Mode 3rd party implementation
             # Note: 1.2.2 has a regression (https://github.com/websocket-client/websocket-client/issues/769)
