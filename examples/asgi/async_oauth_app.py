@@ -9,6 +9,7 @@ async def handle_app_mentions(body, say, logger):
     logger.info(body)
     await say("What's up?")
 
+
 api = AsyncSlackRequestHandler(app)
 
 # pip install -r requirements.txt
