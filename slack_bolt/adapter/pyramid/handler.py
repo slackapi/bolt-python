@@ -45,15 +45,15 @@ class SlackRequestHandler:
             if self.app.oauth_flow is not None:
                 oauth_flow: OAuthFlow = self.app.oauth_flow
                 if request.path == oauth_flow.install_path:
-                    bolt_req = _attach_pyramid_request_to_context(to_bolt_request(request))
+                    bolt_req = _attach_pyramid_request_to_context(to_bolt_request(request), request)
                     bolt_resp = oauth_flow.handle_installation(bolt_req)
                     return to_pyramid_response(bolt_resp)
                 elif request.path == oauth_flow.redirect_uri_path:
-                    bolt_req = _attach_pyramid_request_to_context(to_bolt_request(request))
+                    bolt_req = _attach_pyramid_request_to_context(to_bolt_request(request), request)
                     bolt_resp = oauth_flow.handle_callback(bolt_req)
                     return to_pyramid_response(bolt_resp)
         elif request.method == "POST":
-            bolt_req = _attach_pyramid_request_to_context(to_bolt_request(request))
+            bolt_req = _attach_pyramid_request_to_context(to_bolt_request(request), request)
             bolt_resp = self.app.dispatch(bolt_req)
             return to_pyramid_response(bolt_resp)
 
