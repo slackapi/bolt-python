@@ -38,10 +38,19 @@ def get_shortcut_code_snippet(is_async: bool, id: str) -> str:
 """
 
 
-def get_view_code_snippet(is_async: bool, callback_id: str) -> str:
+def get_view_submission_code_snippet(is_async: bool, callback_id: str) -> str:
     return f"""
 @app.view("{callback_id}")
-{'async ' if is_async else ''}def handle_view_events(ack, body, logger):
+{'async ' if is_async else ''}def handle_view_submission_events(ack, body, logger):
+    {'await ' if is_async else ''}ack()
+    logger.info(body)
+"""
+
+
+def get_view_closed_code_snippet(is_async: bool, callback_id: str) -> str:
+    return f"""
+@app.view_closed("{callback_id}")
+{'async ' if is_async else ''}def handle_view_closed_events(ack, body, logger):
     {'await ' if is_async else ''}ack()
     logger.info(body)
 """
