@@ -11,7 +11,8 @@ from slack_bolt.request.payload_utils import (
     is_options,
     is_shortcut,
     is_slash_command,
-    is_view,
+    is_view_submission,
+    is_view_closed,
     is_workflow_step_edit,
     is_workflow_step_save,
     is_workflow_step_execute,
@@ -24,7 +25,8 @@ from .warning_utils import (
     get_workflow_step_code_snippet,
     get_action_code_snippet,
     get_options_code_snippet,
-    get_view_code_snippet,
+    get_view_submission_code_snippet,
+    get_view_closed_code_snippet,
 )
 
 # -------------------------------
@@ -218,10 +220,17 @@ def warning_unhandled_request(  # type: ignore
         # @app.shortcut
         id = req.body.get("action_id") or req.body.get("callback_id")
         return _build_unhandled_request_suggestion(default_message, get_shortcut_code_snippet(is_async, id))
-    if is_view(req.body):
+    if is_view_submission(req.body):
         # @app.view
         return _build_unhandled_request_suggestion(
-            default_message, get_view_code_snippet(is_async, req.body.get("view", {}).get("callback_id", "modal-view-id"))
+            default_message,
+            get_view_submission_code_snippet(is_async, req.body.get("view", {}).get("callback_id", "modal-view-id")),
+        )
+    if is_view_closed(req.body):
+        # @app.view
+        return _build_unhandled_request_suggestion(
+            default_message,
+            get_view_closed_code_snippet(is_async, req.body.get("view", {}).get("callback_id", "modal-view-id")),
         )
     if is_event(req.body):
         # @app.event
