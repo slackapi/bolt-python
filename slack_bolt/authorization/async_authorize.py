@@ -244,7 +244,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                             raise BoltError(self._config_error_message)
                         refreshed = await self.token_rotator.perform_bot_token_rotation(
                             bot=bot,
-                            token_rotation_expiration_minutes=self.token_rotation_expiration_minutes,
+                            minutes_before_expiration=self.token_rotation_expiration_minutes,
                         )
                         if refreshed is not None:
                             await self.installation_store.async_save_bot(refreshed)
