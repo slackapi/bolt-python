@@ -80,7 +80,7 @@ As you did at [Getting Started Guide](https://slack.dev/bolt-python/tutorial/get
   * Turn the feature on
   * Set the "Request URL" to `https://{your public domain}/slack/events`
 * Visit `https://{your public domain}/slack/install` and complete the installation flow
-* Add `https://{your public domain}/slack/oauth_redirect` as your redirect URL for your app. 
+* Add `https://{your public domain}/slack/oauth_redirect` as your redirect URL for your app in Oauth & Permissions on the Slack app configuration page. 
 * Invite the app's bot user to a channel
 * Mention the bot user in the channel
 * You'll see a reply from your app's bot user!
