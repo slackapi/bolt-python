@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        python-version: ["3.9"]
+        python-version: ["3.11"]
     env:
       # default: multiprocessing
       # threading is more stable on GitHub Actions
@@ -37,3 +37,4 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: true
+          verbose: true
