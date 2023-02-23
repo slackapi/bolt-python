@@ -6,12 +6,3 @@ coverage:
     patch:
       default:
         target: 50%
-ignore:
-  # Traceback (most recent call last):
-  #  File "/opt/hostedtoolcache/Python/3.11.2/x64/lib/python3.11/site-packages/slack_sdk-3.20.0-py3.11.egg/slack_sdk/web/async_internal_utils.py", line 151, in _request_with_session
-  #    if await handler.can_retry_async(
-  #             ^^^^^^^^^^^^^^^^^^^^^^^^
-  # TypeError: AsyncRetryHandler.can_retry_async() missing 1 required positional argument: 'self'
-  # https://github.com/slackapi/bolt-python/actions/runs/4256962250/jobs/7406550470
-  - "slack_bolt/app/async_app.py"
-  - "slack_bolt/middleware/authorization/async_single_team_authorization.py"
