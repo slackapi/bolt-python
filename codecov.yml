@@ -14,4 +14,4 @@ ignore:
   # TypeError: AsyncRetryHandler.can_retry_async() missing 1 required positional argument: 'self'
   # https://github.com/slackapi/bolt-python/actions/runs/4256962250/jobs/7406550470
   - "slack_bolt/app/async_app.py"
-  - "slack_sdk/**/*.py"
+  - "slack_bolt/middleware/authorization/async_single_team_authorization.py"
