@@ -16,7 +16,7 @@ jobs:
       # default: multiprocessing
       # threading is more stable on GitHub Actions
       BOLT_PYTHON_MOCK_SERVER_MODE: threading
-      CODECOV_RUNNING: 1
+      CODECOV_RUNNING: "1"
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
