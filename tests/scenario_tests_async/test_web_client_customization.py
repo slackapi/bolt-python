@@ -61,7 +61,7 @@ class TestWebClientCustomization:
 
     @pytest.mark.asyncio
     async def test_web_client_customization(self):
-        if str(os.environ.get("CODECOV_RUNNING")) == "1":
+        if os.environ.get("BOLT_PYTHON_CODECOV_RUNNING") == "1":
             # Traceback (most recent call last):
             #   File "/opt/hostedtoolcache/Python/3.11.2/x64/lib/python3.11/site-packages/slack_sdk-3.20.0-py3.11.egg/slack_sdk/web/async_internal_utils.py", line 151, in _request_with_session
             #     if await handler.can_retry_async(
