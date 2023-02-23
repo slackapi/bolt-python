@@ -27,6 +27,19 @@ class Args:
                 view={ ... }
             )
 
+    Alternatively, you can include a parameter named `args` and it will be injected with an instance of this class.
+
+        @app.action("link_button")
+        def handle_buttons(args):
+            args.logger.info(f"request body: {args.body}")
+            args.ack()
+            if args.context.channel_id is not None:
+                args.respond("Hi!")
+            args.client.views_open(
+                trigger_id=args.body["trigger_id"],
+                view={ ... }
+            )
+
     """
 
     client: WebClient
