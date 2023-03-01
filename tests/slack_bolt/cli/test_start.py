@@ -1,7 +1,7 @@
 import pytest
 import os
 
-from slack_bolt.cli.start import start
+from slack_bolt.cli.start import start, get_module_name, load_app
 
 
 class TestStart:
@@ -42,3 +42,17 @@ class TestStart:
         out, err = capsys.readouterr()
         assert err is ""
         assert "Entrypoint not found!\nLooking for: tests/slack_bolt/cli/app.py" in out
+
+    def test_get_module_name(self, capsys):
+        path = f"{self.working_directory}/app.py"
+
+        module_name = get_module_name(path)
+
+        assert "app" == module_name
+
+    def test_get_module_name(self, capsys):
+        path = f"{self.working_directory}/app.py"
+
+        module_name = load_app(path)
+
+        assert "app" == module_name
