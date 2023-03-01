@@ -1,21 +1,35 @@
 import pytest
 import os
 
-from slack_bolt.cli.start import start, get_module_name, load_app
+from slack_bolt.cli.start import start
+from tests.mock_web_api_server import cleanup_mock_web_api_server, setup_mock_web_api_server
+from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
 class TestStart:
 
     working_directory = "tests/slack_bolt/cli/test_app"
 
-    def setup_method(self, method):
-        os.environ["SLACK_CLI_XOXB"] = "xoxb-xxx"
+    # signing_secret = "secret"
+    # valid_token = "xoxb-valid"
+    # mock_api_server_base_url = "http://localhost:8888"
+    # web_client = WebClient(
+    #     token=valid_token,
+    #     base_url=mock_api_server_base_url,
+    # )
+
+    def setup_method(self):
+        self.old_os_env = remove_os_env_temporarily()
+        setup_mock_web_api_server(self)
+        os.environ["SLACK_CLI_XOXB"] = "xoxb-valid"
         os.environ["SLACK_CLI_XAPP"] = "xapp-xxx"
 
-    def teardown_method(self, method):
+    def teardown_method(self):
         os.environ.pop("SLACK_CLI_XOXB", None)
         os.environ.pop("SLACK_CLI_XAPP", None)
         os.environ.pop("SLACK_CLI_CUSTOM_FILE_PATH", None)
+        cleanup_mock_web_api_server(self)
+        restore_os_env(self.old_os_env)
 
     def test_start(self, capsys):
         start(self.working_directory)
@@ -42,17 +56,3 @@ class TestStart:
         out, err = capsys.readouterr()
         assert err is ""
         assert "Entrypoint not found!\nLooking for: tests/slack_bolt/cli/app.py" in out
-
-    def test_get_module_name(self, capsys):
-        path = f"{self.working_directory}/app.py"
-
-        module_name = get_module_name(path)
-
-        assert "app" == module_name
-
-    def test_get_module_name(self, capsys):
-        path = f"{self.working_directory}/app.py"
-
-        module_name = load_app(path)
-
-        assert "app" == module_name
