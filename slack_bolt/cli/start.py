@@ -1,14 +1,10 @@
 #!/usr/bin/env python
 import os
-import sys
-import subprocess
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
-from typing import List, Generator
 
-from slack_bolt.cli.app_loader import load_app
 from ..error import CliError
-from .utils import handle_exception
+from .utils import load_app, handle_exceptions
 
 
 DEFAULT_ENTRYPOINT_FILE = "app.py"
@@ -33,13 +29,7 @@ def get_entrypoint_path(working_directory: str) -> str:
     return f"{working_directory}/{DEFAULT_ENTRYPOINT_FILE}"
 
 
-def execute_process(command: List[str], env: dict) -> Generator[str, None, None]:
-    with subprocess.Popen(command, env=env, stdout=subprocess.PIPE, universal_newlines=True, bufsize=1) as app_process:
-        for line in app_process.stdout:
-            yield line
-
-
-@handle_exception()
+@handle_exceptions()
 def start(working_directory: str) -> None:
     validate_env()
 
@@ -51,11 +41,12 @@ def start(working_directory: str) -> None:
     os.environ[SLACK_BOT_TOKEN] = os.environ[SLACK_CLI_XOXB]
     os.environ[SLACK_APP_TOKEN] = os.environ[SLACK_CLI_XAPP]
 
-    app: App = load_app(entrypoint_path)
-    SocketModeHandler(app, os.environ.get("SLACK_APP_TOKEN")).start()
-
-    os.environ.pop(SLACK_BOT_TOKEN, None)
-    os.environ.pop(SLACK_APP_TOKEN, None)
+    try:
+        app: App = load_app(entrypoint_path)
+        SocketModeHandler(app, os.environ.get(SLACK_APP_TOKEN)).start()
+    finally:
+        os.environ.pop(SLACK_BOT_TOKEN, None)
+        os.environ.pop(SLACK_APP_TOKEN, None)
 
 
 if __name__ == "__main__":

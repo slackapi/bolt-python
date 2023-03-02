@@ -2,7 +2,7 @@
 import os
 import re
 from ..error import CliError
-from .utils import handle_exception
+from .utils import handle_exceptions
 from typing import List
 
 FILE = "manifest"
@@ -37,7 +37,7 @@ def find_file_path(path: str, file: str) -> str:
     raise CliError(f"Manifest file not found!\nPath: {path}\nFile: {file}")
 
 
-@handle_exception()
+@handle_exceptions()
 def get_manifest(working_directory: str) -> str:
     file_path = find_file_path(working_directory, f"{FILE}.json")
 
