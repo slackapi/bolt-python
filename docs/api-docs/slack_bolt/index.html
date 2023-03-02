@@ -3879,7 +3879,7 @@ def say(self) -&gt; Say:
         return (resp, False)
 
     @abstractmethod
-    def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt; BoltResponse:
+    def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt; Optional[BoltResponse]:
         &#34;&#34;&#34;Runs all the registered middleware and then run the listener function.
 
         Args:
@@ -3944,7 +3944,7 @@ def say(self) -&gt; Say:
 </details>
 </dd>
 <dt id="slack_bolt.Listener.run_ack_function"><code class="name flex">
-<span>def <span class="ident">run_ack_function</span></span>(<span>self, *, request: <a title="slack_bolt.request.request.BoltRequest" href="request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>, response: <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>) ‑> <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a></span>
+<span>def <span class="ident">run_ack_function</span></span>(<span>self, *, request: <a title="slack_bolt.request.request.BoltRequest" href="request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>, response: <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>) ‑> Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Runs all the registered middleware and then run the listener function.</p>
@@ -3962,7 +3962,7 @@ def say(self) -&gt; Say:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
-def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt; BoltResponse:
+def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt; Optional[BoltResponse]:
     &#34;&#34;&#34;Runs all the registered middleware and then run the listener function.
 
     Args:

@@ -84,7 +84,7 @@ def build_required_kwargs(
         first_arg_name = required_arg_names[0]
         if first_arg_name in {"self", "cls"}:
             required_arg_names.pop(0)
-        elif first_arg_name not in all_available_args.keys():
+        elif first_arg_name not in all_available_args.keys() and first_arg_name != "args":
             if this_func is None:
                 logger.warning(warning_skip_uncommon_arg_name(first_arg_name))
                 required_arg_names.pop(0)
@@ -101,7 +101,7 @@ def build_required_kwargs(
             else:
                 logger.warning(f"Unknown Request object type detected ({type(request)})")
 
-        if name not in found_arg_names:
+        elif name not in found_arg_names:
             logger.warning(f"{name} is not a valid argument")
             kwargs[name] = None
     return kwargs
