@@ -11,11 +11,12 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        python-version: ["3.9"]
+        python-version: ["3.11"]
     env:
       # default: multiprocessing
       # threading is more stable on GitHub Actions
       BOLT_PYTHON_MOCK_SERVER_MODE: threading
+      BOLT_PYTHON_CODECOV_RUNNING: "1"
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -37,3 +38,4 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: true
+          verbose: true

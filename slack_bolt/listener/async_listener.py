@@ -57,7 +57,7 @@ class AsyncListener(metaclass=ABCMeta):
         return (resp, False)
 
     @abstractmethod
-    async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltResponse) -> BoltResponse:
+    async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltResponse) -> Optional[BoltResponse]:
         """Runs all the registered middleware and then run the listener function.
 
         Args:

@@ -27,6 +27,19 @@ class AsyncArgs:
                 view={ ... }
             )
 
+    Alternatively, you can include a parameter named `args` and it will be injected with an instance of this class.
+
+        @app.action("link_button")
+        async def handle_buttons(args):
+            args.logger.info(f"request body: {args.body}")
+            await args.ack()
+            if args.context.channel_id is not None:
+                await args.respond("Hi!")
+            await args.client.views_open(
+                trigger_id=args.body["trigger_id"],
+                view={ ... }
+            )
+
     """
 
     logger: Logger
