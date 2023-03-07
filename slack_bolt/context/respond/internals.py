@@ -15,6 +15,7 @@ def _build_message(
     delete_original: Optional[bool] = None,
     unfurl_links: Optional[bool] = None,
     unfurl_media: Optional[bool] = None,
+    thread_ts: Optional[str] = None,
 ) -> Dict[str, Any]:
     message = {"text": text}
     if blocks is not None and len(blocks) > 0:
@@ -31,4 +32,6 @@ def _build_message(
         message["unfurl_links"] = unfurl_links
     if unfurl_media is not None:
         message["unfurl_media"] = unfurl_media
+    if thread_ts is not None:
+        message["thread_ts"] = thread_ts
     return message
