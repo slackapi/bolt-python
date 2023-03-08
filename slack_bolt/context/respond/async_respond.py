@@ -34,6 +34,7 @@ class AsyncRespond:
         delete_original: Optional[bool] = None,
         unfurl_links: Optional[bool] = None,
         unfurl_media: Optional[bool] = None,
+        thread_ts: Optional[str] = None,
     ) -> WebhookResponse:
         if self.response_url is not None:
             client = AsyncWebhookClient(
@@ -52,6 +53,7 @@ class AsyncRespond:
                     delete_original=delete_original,
                     unfurl_links=unfurl_links,
                     unfurl_media=unfurl_media,
+                    thread_ts=thread_ts,
                 )
                 return await client.send_dict(message)
             elif isinstance(text_or_whole_response, dict):
