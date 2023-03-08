@@ -2899,6 +2899,18 @@ def handle_buttons(ack, respond, logger, context, body, client):
         trigger_id=body["trigger_id"],
         view={ ... }
     )
+</code></pre>
+<p>Alternatively, you can include a parameter named <code>args</code> and it will be injected with an instance of this class.</p>
+<pre><code>@app.action("link_button")
+def handle_buttons(args):
+    args.logger.info(f"request body: {args.body}")
+    args.ack()
+    if args.context.channel_id is not None:
+        args.respond("Hi!")
+    args.client.views_open(
+        trigger_id=args.body["trigger_id"],
+        view={ ... }
+    )
 </code></pre></div>
 <details class="source">
 <summary>
@@ -2916,6 +2928,19 @@ def handle_buttons(ack, respond, logger, context, body, client):
                 respond(&#34;Hi!&#34;)
             client.views_open(
                 trigger_id=body[&#34;trigger_id&#34;],
+                view={ ... }
+            )
+
+    Alternatively, you can include a parameter named `args` and it will be injected with an instance of this class.
+
+        @app.action(&#34;link_button&#34;)
+        def handle_buttons(args):
+            args.logger.info(f&#34;request body: {args.body}&#34;)
+            args.ack()
+            if args.context.channel_id is not None:
+                args.respond(&#34;Hi!&#34;)
+            args.client.views_open(
+                trigger_id=args.body[&#34;trigger_id&#34;],
                 view={ ... }
             )
 
@@ -4059,6 +4084,7 @@ def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt
         delete_original: Optional[bool] = None,
         unfurl_links: Optional[bool] = None,
         unfurl_media: Optional[bool] = None,
+        thread_ts: Optional[str] = None,
     ) -&gt; WebhookResponse:
         if self.response_url is not None:
             client = WebhookClient(
@@ -4078,6 +4104,7 @@ def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt
                     delete_original=delete_original,
                     unfurl_links=unfurl_links,
                     unfurl_media=unfurl_media,
+                    thread_ts=thread_ts,
                 )
                 return client.send_dict(message)
             elif isinstance(text_or_whole_response, dict):

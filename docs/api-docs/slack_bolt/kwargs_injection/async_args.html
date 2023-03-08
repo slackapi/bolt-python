@@ -54,6 +54,19 @@ class AsyncArgs:
                 view={ ... }
             )
 
+    Alternatively, you can include a parameter named `args` and it will be injected with an instance of this class.
+
+        @app.action(&#34;link_button&#34;)
+        async def handle_buttons(args):
+            args.logger.info(f&#34;request body: {args.body}&#34;)
+            await args.ack()
+            if args.context.channel_id is not None:
+                await args.respond(&#34;Hi!&#34;)
+            await args.client.views_open(
+                trigger_id=args.body[&#34;trigger_id&#34;],
+                view={ ... }
+            )
+
     &#34;&#34;&#34;
 
     logger: Logger
@@ -174,6 +187,18 @@ async def handle_buttons(ack, respond, logger, context, body, client):
         trigger_id=body["trigger_id"],
         view={ ... }
     )
+</code></pre>
+<p>Alternatively, you can include a parameter named <code>args</code> and it will be injected with an instance of this class.</p>
+<pre><code>@app.action("link_button")
+async def handle_buttons(args):
+    args.logger.info(f"request body: {args.body}")
+    await args.ack()
+    if args.context.channel_id is not None:
+        await args.respond("Hi!")
+    await args.client.views_open(
+        trigger_id=args.body["trigger_id"],
+        view={ ... }
+    )
 </code></pre></div>
 <details class="source">
 <summary>
@@ -191,6 +216,19 @@ async def handle_buttons(ack, respond, logger, context, body, client):
                 await respond(&#34;Hi!&#34;)
             await client.views_open(
                 trigger_id=body[&#34;trigger_id&#34;],
+                view={ ... }
+            )
+
+    Alternatively, you can include a parameter named `args` and it will be injected with an instance of this class.
+
+        @app.action(&#34;link_button&#34;)
+        async def handle_buttons(args):
+            args.logger.info(f&#34;request body: {args.body}&#34;)
+            await args.ack()
+            if args.context.channel_id is not None:
+                await args.respond(&#34;Hi!&#34;)
+            await args.client.views_open(
+                trigger_id=args.body[&#34;trigger_id&#34;],
                 view={ ... }
             )
 

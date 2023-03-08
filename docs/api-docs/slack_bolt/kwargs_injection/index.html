@@ -144,7 +144,7 @@ __all__ = [
         first_arg_name = required_arg_names[0]
         if first_arg_name in {&#34;self&#34;, &#34;cls&#34;}:
             required_arg_names.pop(0)
-        elif first_arg_name not in all_available_args.keys():
+        elif first_arg_name not in all_available_args.keys() and first_arg_name != &#34;args&#34;:
             if this_func is None:
                 logger.warning(warning_skip_uncommon_arg_name(first_arg_name))
                 required_arg_names.pop(0)
@@ -161,7 +161,7 @@ __all__ = [
             else:
                 logger.warning(f&#34;Unknown Request object type detected ({type(request)})&#34;)
 
-        if name not in found_arg_names:
+        elif name not in found_arg_names:
             logger.warning(f&#34;{name} is not a valid argument&#34;)
             kwargs[name] = None
     return kwargs</code></pre>
@@ -189,6 +189,18 @@ def handle_buttons(ack, respond, logger, context, body, client):
         trigger_id=body["trigger_id"],
         view={ ... }
     )
+</code></pre>
+<p>Alternatively, you can include a parameter named <code><a title="slack_bolt.kwargs_injection.args" href="args.html">slack_bolt.kwargs_injection.args</a></code> and it will be injected with an instance of this class.</p>
+<pre><code>@app.action("link_button")
+def handle_buttons(args):
+    args.logger.info(f"request body: {args.body}")
+    args.ack()
+    if args.context.channel_id is not None:
+        args.respond("Hi!")
+    args.client.views_open(
+        trigger_id=args.body["trigger_id"],
+        view={ ... }
+    )
 </code></pre></div>
 <details class="source">
 <summary>
@@ -206,6 +218,19 @@ def handle_buttons(ack, respond, logger, context, body, client):
                 respond(&#34;Hi!&#34;)
             client.views_open(
                 trigger_id=body[&#34;trigger_id&#34;],
+                view={ ... }
+            )
+
+    Alternatively, you can include a parameter named `args` and it will be injected with an instance of this class.
+
+        @app.action(&#34;link_button&#34;)
+        def handle_buttons(args):
+            args.logger.info(f&#34;request body: {args.body}&#34;)
+            args.ack()
+            if args.context.channel_id is not None:
+                args.respond(&#34;Hi!&#34;)
+            args.client.views_open(
+                trigger_id=args.body[&#34;trigger_id&#34;],
                 view={ ... }
             )
 
