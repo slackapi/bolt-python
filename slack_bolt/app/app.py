@@ -736,7 +736,7 @@ class App:
 
     def message(
         self,
-        keyword: Union[str, Pattern],
+        keyword: Union[str, Pattern] = "",
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:

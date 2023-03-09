@@ -82,6 +82,42 @@ class TestAsyncMessage:
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     @pytest.mark.asyncio
+    async def test_all_message_matching_1(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        @app.message("")
+        async def handle_all_new_messages(say):
+            await say("Thanks!")
+
+        request = self.build_request2()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_auth_test_count_async(self, 1)
+        await asyncio.sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
+    @pytest.mark.asyncio
+    async def test_all_message_matching_2(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        @app.message()
+        async def handle_all_new_messages(say):
+            await say("Thanks!")
+
+        request = self.build_request2()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_auth_test_count_async(self, 1)
+        await asyncio.sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
+    @pytest.mark.asyncio
     async def test_string_keyword_capturing(self):
         app = AsyncApp(
             client=self.web_client,

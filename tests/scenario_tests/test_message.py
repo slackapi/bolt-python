@@ -74,6 +74,40 @@ class TestMessage:
         time.sleep(1)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
+    def test_all_message_matching_1(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        @app.message("")
+        def handle_all_new_messages(say):
+            say("Thanks!")
+
+        request = self.build_request2()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+        time.sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
+    def test_all_message_matching_2(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        @app.message()
+        def handle_all_new_messages(say):
+            say("Thanks!")
+
+        request = self.build_request2()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+        time.sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
     def test_string_keyword_capturing(self):
         app = App(
             client=self.web_client,
