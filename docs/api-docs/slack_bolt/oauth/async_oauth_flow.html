@@ -222,7 +222,11 @@ class AsyncOAuthFlow:
         return await self.settings.state_store.async_issue()
 
     async def build_authorize_url(self, state: str, request: AsyncBoltRequest) -&gt; str:
-        return self.settings.authorize_url_generator.generate(state)
+        team_ids: Optional[Sequence[str]] = request.query.get(&#34;team&#34;)
+        return self.settings.authorize_url_generator.generate(
+            state=state,
+            team=team_ids[0] if team_ids is not None else None,
+        )
 
     async def build_install_page_html(self, url: str, request: AsyncBoltRequest) -&gt; str:
         return _build_default_install_page_html(url)
@@ -587,7 +591,11 @@ class AsyncOAuthFlow:
         return await self.settings.state_store.async_issue()
 
     async def build_authorize_url(self, state: str, request: AsyncBoltRequest) -&gt; str:
-        return self.settings.authorize_url_generator.generate(state)
+        team_ids: Optional[Sequence[str]] = request.query.get(&#34;team&#34;)
+        return self.settings.authorize_url_generator.generate(
+            state=state,
+            team=team_ids[0] if team_ids is not None else None,
+        )
 
     async def build_install_page_html(self, url: str, request: AsyncBoltRequest) -&gt; str:
         return _build_default_install_page_html(url)
@@ -923,7 +931,11 @@ def logger(self) -&gt; Logger:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">async def build_authorize_url(self, state: str, request: AsyncBoltRequest) -&gt; str:
-    return self.settings.authorize_url_generator.generate(state)</code></pre>
+    team_ids: Optional[Sequence[str]] = request.query.get(&#34;team&#34;)
+    return self.settings.authorize_url_generator.generate(
+        state=state,
+        team=team_ids[0] if team_ids is not None else None,
+    )</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow.build_install_page_html"><code class="name flex">

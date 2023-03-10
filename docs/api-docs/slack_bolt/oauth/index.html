@@ -271,7 +271,11 @@ __all__ = [
         return self.settings.state_store.issue()
 
     def build_authorize_url(self, state: str, request: BoltRequest) -&gt; str:
-        return self.settings.authorize_url_generator.generate(state)
+        team_ids: Optional[Sequence[str]] = request.query.get(&#34;team&#34;)
+        return self.settings.authorize_url_generator.generate(
+            state=state,
+            team=team_ids[0] if team_ids is not None else None,
+        )
 
     def build_install_page_html(self, url: str, request: BoltRequest) -&gt; str:
         return _build_default_install_page_html(url)
@@ -613,7 +617,11 @@ def logger(self) -&gt; Logger:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def build_authorize_url(self, state: str, request: BoltRequest) -&gt; str:
-    return self.settings.authorize_url_generator.generate(state)</code></pre>
+    team_ids: Optional[Sequence[str]] = request.query.get(&#34;team&#34;)
+    return self.settings.authorize_url_generator.generate(
+        state=state,
+        team=team_ids[0] if team_ids is not None else None,
+    )</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.oauth.OAuthFlow.build_install_page_html"><code class="name flex">
