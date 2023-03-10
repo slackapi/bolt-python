@@ -773,7 +773,7 @@ class AsyncApp:
 
     def message(
         self,
-        keyword: Union[str, Pattern],
+        keyword: Union[str, Pattern] = "",
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
