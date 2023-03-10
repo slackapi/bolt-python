@@ -217,9 +217,16 @@ class App:
 
         self._authorize: Optional[Authorize] = None
         if authorize is not None:
-            if oauth_settings is not None or oauth_flow is not None:
-                raise BoltError(error_authorize_conflicts())
-            self._authorize = CallableAuthorize(logger=self._framework_logger, func=authorize)
+            if isinstance(authorize, Authorize):
+                # As long as an advanced developer understands what they're doing,
+                # bolt-python should not prevent customizing authorize middleware
+                self._authorize = authorize
+            else:
+                if oauth_settings is not None or oauth_flow is not None:
+                    # If the given authorize is a simple function,
+                    # it does not work along with installation_store.
+                    raise BoltError(error_authorize_conflicts())
+                self._authorize = CallableAuthorize(logger=self._framework_logger, func=authorize)
 
         self._installation_store: Optional[InstallationStore] = installation_store
         if self._installation_store is not None and self._authorize is None:

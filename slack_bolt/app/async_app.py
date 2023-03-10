@@ -222,10 +222,16 @@ class AsyncApp:
 
         self._async_authorize: Optional[AsyncAuthorize] = None
         if authorize is not None:
-            if oauth_settings is not None or oauth_flow is not None:
-                raise BoltError(error_authorize_conflicts())
-
-            self._async_authorize = AsyncCallableAuthorize(logger=self._framework_logger, func=authorize)
+            if isinstance(authorize, AsyncAuthorize):
+                # As long as an advanced developer understands what they're doing,
+                # bolt-python should not prevent customizing authorize middleware
+                self._async_authorize = authorize
+            else:
+                if oauth_settings is not None or oauth_flow is not None:
+                    # If the given authorize is a simple function,
+                    # it does not work along with installation_store.
+                    raise BoltError(error_authorize_conflicts())
+                self._async_authorize = AsyncCallableAuthorize(logger=self._framework_logger, func=authorize)
 
         self._async_installation_store: Optional[AsyncInstallationStore] = installation_store
         if self._async_installation_store is not None and self._async_authorize is None:
