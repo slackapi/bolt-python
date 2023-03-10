@@ -17,6 +17,9 @@ class BaseContext(dict):
         "is_enterprise_install",
         "team_id",
         "user_id",
+        "actor_enterprise_id",
+        "actor_team_id",
+        "actor_user_id",
         "channel_id",
         "response_url",
         "matches",
@@ -60,6 +63,30 @@ class BaseContext(dict):
     def user_id(self) -> Optional[str]:
         """The user ID associated ith this request."""
         return self.get("user_id")
+
+    @property
+    def actor_enterprise_id(self) -> Optional[str]:
+        """The action's actor's Enterprise Grid organization ID.
+        Note that this property is especially useful for handling events in Slack Connect channels.
+        That being said, it's not guaranteed to have a valid ID for all events due to server-side inconsistency.
+        """
+        return self.get("actor_enterprise_id")
+
+    @property
+    def actor_team_id(self) -> Optional[str]:
+        """The action's actor's workspace ID.
+        Note that this property is especially useful for handling events in Slack Connect channels.
+        That being said, it's not guaranteed to have a valid ID for all events due to server-side inconsistency.
+        """
+        return self.get("actor_team_id")
+
+    @property
+    def actor_user_id(self) -> Optional[str]:
+        """The action's actor's user ID.
+        Note that this property is especially useful for handling events in Slack Connect channels.
+        That being said, it's not guaranteed to have a valid ID for all events due to server-side inconsistency.
+        """
+        return self.get("actor_user_id")
 
     @property
     def channel_id(self) -> Optional[str]:

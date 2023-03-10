@@ -30,6 +30,10 @@ class AsyncAuthorize:
         enterprise_id: Optional[str],
         team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
+        # actor_* can be used only when user_token_resolution: "actor" is set
+        actor_enterprise_id: Optional[str] = None,
+        actor_team_id: Optional[str] = None,
+        actor_user_id: Optional[str] = None,
     ) -> Optional[AuthorizeResult]:
         raise NotImplementedError()
 
@@ -51,6 +55,10 @@ class AsyncCallableAuthorize(AsyncAuthorize):
         enterprise_id: Optional[str],
         team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
+        # actor_* can be used only when user_token_resolution: "actor" is set
+        actor_enterprise_id: Optional[str] = None,
+        actor_team_id: Optional[str] = None,
+        actor_user_id: Optional[str] = None,
     ) -> Optional[AuthorizeResult]:
         try:
             all_available_args = {
@@ -66,6 +74,9 @@ class AsyncCallableAuthorize(AsyncAuthorize):
                 "enterprise_id": enterprise_id,
                 "team_id": team_id,
                 "user_id": user_id,
+                "actor_enterprise_id": actor_enterprise_id,
+                "actor_team_id": actor_team_id,
+                "actor_user_id": actor_user_id,
             }
             for k, v in context.items():
                 if k not in all_available_args:
@@ -103,6 +114,8 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
     """
 
     authorize_result_cache: Dict[str, AuthorizeResult]
+    bot_only: bool
+    user_token_resolution: str
     find_installation_available: Optional[bool]
     find_bot_available: Optional[bool]
     token_rotator: Optional[AsyncTokenRotator]
@@ -122,10 +135,13 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
         bot_only: bool = False,
         cache_enabled: bool = False,
         client: Optional[AsyncWebClient] = None,
+        # Since v1.27, user token resolution can be actor ID based when the mode is enabled
+        user_token_resolution: str = "authed_user",
     ):
         self.logger = logger
         self.installation_store = installation_store
         self.bot_only = bot_only
+        self.user_token_resolution = user_token_resolution
         self.cache_enabled = cache_enabled
         self.authorize_result_cache = {}
         self.find_installation_available = None
@@ -147,6 +163,10 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
         enterprise_id: Optional[str],
         team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
+        # actor_* can be used only when user_token_resolution: "actor" is set
+        actor_enterprise_id: Optional[str] = None,
+        actor_team_id: Optional[str] = None,
+        actor_user_id: Optional[str] = None,
     ) -> Optional[AuthorizeResult]:
 
         if self.find_installation_available is None:
@@ -194,16 +214,34 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
 
                         # try to fetch the request user's installation
                         # to reflect the user's access token if exists
-                        this_user_installation = await self.installation_store.async_find_installation(
-                            enterprise_id=enterprise_id,
-                            team_id=team_id,
-                            user_id=user_id,
-                            is_enterprise_install=context.is_enterprise_install,
-                        )
+                        # try to fetch the request user's installation
+                        # to reflect the user's access token if exists
+                        if self.user_token_resolution == "actor":
+                            if actor_enterprise_id is not None or actor_team_id is not None:
+                                # Note that actor_team_id can be absent for app_mention events
+                                this_user_installation = await self.installation_store.async_find_installation(
+                                    enterprise_id=actor_enterprise_id,
+                                    team_id=actor_team_id,
+                                    user_id=actor_user_id,
+                                    is_enterprise_install=None,
+                                )
+                        else:
+                            this_user_installation = await self.installation_store.async_find_installation(
+                                enterprise_id=enterprise_id,
+                                team_id=team_id,
+                                user_id=user_id,
+                                is_enterprise_install=context.is_enterprise_install,
+                            )
                         if this_user_installation is not None:
                             user_token = this_user_installation.user_token
                             user_scopes = this_user_installation.user_scopes
-                            if latest_bot_installation.bot_token is None:
+                            if (
+                                latest_bot_installation.bot_token is None
+                                # enterprise_id/team_id can be different for Slack Connect channel events
+                                # when enabling user_token_resolution: "actor"
+                                and latest_bot_installation.enterprise_id == this_user_installation.enterprise_id
+                                and latest_bot_installation.team_id == this_user_installation.team_id
+                            ):
                                 # If latest_installation has a bot token, we never overwrite the value
                                 bot_token = this_user_installation.bot_token
                                 bot_scopes = this_user_installation.bot_scopes
@@ -213,7 +251,13 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                             if refreshed is not None:
                                 user_token = refreshed.user_token
                                 user_scopes = refreshed.user_scopes
-                                if latest_bot_installation.bot_token is None:
+                                if (
+                                    latest_bot_installation.bot_token is None
+                                    # enterprise_id/team_id can be different for Slack Connect channel events
+                                    # when enabling user_token_resolution: "actor"
+                                    and latest_bot_installation.enterprise_id == this_user_installation.enterprise_id
+                                    and latest_bot_installation.team_id == this_user_installation.team_id
+                                ):
                                     # If latest_installation has a bot token, we never overwrite the value
                                     bot_token = refreshed.bot_token
                                     bot_scopes = refreshed.bot_scopes

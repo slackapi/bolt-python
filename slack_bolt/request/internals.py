@@ -72,6 +72,20 @@ def extract_enterprise_id(payload: Dict[str, Any]) -> Optional[str]:
     return None
 
 
+def extract_actor_enterprise_id(payload: Dict[str, Any]) -> Optional[str]:
+    if payload.get("is_ext_shared_channel") is True:
+        if payload.get("type") == "event_callback":
+            # For safety, we don't set actor IDs for the events like "file_shared",
+            # which do not provide any team ID in $.event data. In the case, the IDs cannot be correct.
+            event_team_id = payload.get("event", {}).get("user_team") or payload.get("event", {}).get("team")
+            if event_team_id is not None and str(event_team_id).startswith("E"):
+                return event_team_id
+            if event_team_id == payload.get("team_id"):
+                return payload.get("enterprise_id")
+            return None
+    return extract_enterprise_id(payload)
+
+
 def extract_team_id(payload: Dict[str, Any]) -> Optional[str]:
     if payload.get("view", {}).get("app_installed_team_id") is not None:
         # view_submission payloads can have `view.app_installed_team_id` when a modal view that was opened
@@ -102,6 +116,48 @@ def extract_team_id(payload: Dict[str, Any]) -> Optional[str]:
     return None
 
 
+def extract_actor_team_id(payload: Dict[str, Any]) -> Optional[str]:
+    if payload.get("is_ext_shared_channel") is True:
+        if payload.get("type") == "event_callback":
+            event_type = payload.get("event", {}).get("type")
+            if event_type == "app_mention":
+                # The $.event.user_team can be an enterprise_id in app_mention events.
+                # In the scenario, there is no way to retrieve actor_team_id as of March 2023
+                user_team = payload.get("event", {}).get("user_team")
+                if user_team is None:
+                    # working with an app installed in this user's org/workspace side
+                    return payload.get("event", {}).get("team")
+                if str(user_team).startswith("T"):
+                    # interacting from a connected non-grid workspace
+                    return user_team
+                # Interacting from a connected grid workspace; in this case, team_id cannot be resolved as of March 2023
+                return None
+            # For safety, we don't set actor IDs for the events like "file_shared",
+            # which do not provide any team ID in $.event data. In the case, the IDs cannot be correct.
+            event_user_team = payload.get("event", {}).get("user_team")
+            if event_user_team is not None:
+                if str(event_user_team).startswith("T"):
+                    return event_user_team
+                elif str(event_user_team).startswith("E"):
+                    if event_user_team == payload.get("enterprise_id"):
+                        return payload.get("team_id")
+                    elif event_user_team == payload.get("context_enterprise_id"):
+                        return payload.get("context_team_id")
+
+            event_team = payload.get("event", {}).get("team")
+            if event_team is not None:
+                if str(event_team).startswith("T"):
+                    return event_team
+                elif str(event_team).startswith("E"):
+                    if event_team == payload.get("enterprise_id"):
+                        return payload.get("team_id")
+                    elif event_team == payload.get("context_enterprise_id"):
+                        return payload.get("context_team_id")
+            return None
+
+    return extract_team_id(payload)
+
+
 def extract_user_id(payload: Dict[str, Any]) -> Optional[str]:
     user = payload.get("user")
     if user is not None:
@@ -120,6 +176,19 @@ def extract_user_id(payload: Dict[str, Any]) -> Optional[str]:
         # message_deleted: body["event"]["previous_message"]
         return extract_user_id(payload["previous_message"])
     return None
+
+
+def extract_actor_user_id(payload: Dict[str, Any]) -> Optional[str]:
+    if payload.get("is_ext_shared_channel") is True:
+        if payload.get("type") == "event_callback":
+            event = payload.get("event")
+            if event is None:
+                return None
+            if extract_actor_enterprise_id(payload) is None and extract_actor_team_id(payload) is None:
+                # When both enterprise_id and team_id are not identified, we skip returning user_id too for safety
+                return None
+            return event.get("user") or event.get("user_id")
+    return extract_user_id(payload)
 
 
 def extract_channel_id(payload: Dict[str, Any]) -> Optional[str]:
@@ -150,6 +219,16 @@ def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
     user_id = extract_user_id(body)
     if user_id:
         context["user_id"] = user_id
+    # Actor IDs are useful for Events API on a Slack Connect channel
+    actor_enterprise_id = extract_actor_enterprise_id(body)
+    if actor_enterprise_id:
+        context["actor_enterprise_id"] = actor_enterprise_id
+    actor_team_id = extract_actor_team_id(body)
+    if actor_team_id:
+        context["actor_team_id"] = actor_team_id
+    actor_user_id = extract_actor_user_id(body)
+    if actor_user_id:
+        context["actor_user_id"] = actor_user_id
     channel_id = extract_channel_id(body)
     if channel_id:
         context["channel_id"] = channel_id

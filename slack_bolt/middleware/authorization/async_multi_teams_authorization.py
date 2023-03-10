@@ -14,16 +14,24 @@ from ...authorization.async_authorize import AsyncAuthorize
 
 class AsyncMultiTeamsAuthorization(AsyncAuthorization):
     authorize: AsyncAuthorize
+    user_token_resolution: str
 
-    def __init__(self, authorize: AsyncAuthorize, base_logger: Optional[Logger] = None):
+    def __init__(
+        self,
+        authorize: AsyncAuthorize,
+        base_logger: Optional[Logger] = None,
+        user_token_resolution: str = "authed_user",
+    ):
         """Multi-workspace authorization.
 
         Args:
             authorize: The function to authorize incoming requests from Slack.
             base_logger: The base logger
+            user_token_resolution: "authed_user" or "actor"
         """
         self.authorize = authorize
         self.logger = get_bolt_logger(AsyncMultiTeamsAuthorization, base_logger=base_logger)
+        self.user_token_resolution = user_token_resolution
 
     async def async_process(
         self,
@@ -49,12 +57,24 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
             return await next()
 
         try:
-            auth_result: Optional[AuthorizeResult] = await self.authorize(
-                context=req.context,
-                enterprise_id=req.context.enterprise_id,
-                team_id=req.context.team_id,
-                user_id=req.context.user_id,
-            )
+            auth_result: Optional[AuthorizeResult] = None
+            if self.user_token_resolution == "actor":
+                auth_result = await self.authorize(
+                    context=req.context,
+                    enterprise_id=req.context.enterprise_id,
+                    team_id=req.context.team_id,
+                    user_id=req.context.user_id,
+                    actor_enterprise_id=req.context.actor_enterprise_id,
+                    actor_team_id=req.context.actor_team_id,
+                    actor_user_id=req.context.actor_user_id,
+                )
+            else:
+                auth_result = await self.authorize(
+                    context=req.context,
+                    enterprise_id=req.context.enterprise_id,
+                    team_id=req.context.team_id,
+                    user_id=req.context.user_id,
+                )
             if auth_result:
                 req.context.set_authorize_result(auth_result)
                 token = auth_result.bot_token or auth_result.user_token
