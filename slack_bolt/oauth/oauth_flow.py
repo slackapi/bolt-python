@@ -192,7 +192,11 @@ class OAuthFlow:
         return self.settings.state_store.issue()
 
     def build_authorize_url(self, state: str, request: BoltRequest) -> str:
-        return self.settings.authorize_url_generator.generate(state)
+        team_ids: Optional[Sequence[str]] = request.query.get("team")
+        return self.settings.authorize_url_generator.generate(
+            state=state,
+            team=team_ids[0] if team_ids is not None else None,
+        )
 
     def build_install_page_html(self, url: str, request: BoltRequest) -> str:
         return _build_default_install_page_html(url)
