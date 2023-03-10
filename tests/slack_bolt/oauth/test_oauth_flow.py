@@ -83,6 +83,26 @@ class TestOAuthFlow:
         assert "https://slack.com/oauth/v2/authorize?state=" in location_header
         assert resp.headers.get("set-cookie") is not None
 
+    def test_handle_installation_team_param(self):
+        oauth_flow = OAuthFlow(
+            settings=OAuthSettings(
+                client_id="111.222",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+                user_scopes=["search:read"],
+                installation_store=FileInstallationStore(),
+                install_page_rendering_enabled=False,  # disabled
+                state_store=FileOAuthStateStore(expiration_seconds=120),
+            )
+        )
+        req = BoltRequest(body="", query={"team": "T12345"})
+        resp = oauth_flow.handle_installation(req)
+        assert resp.status == 302
+        location_header = resp.headers.get("location")[0]
+        assert "https://slack.com/oauth/v2/authorize?state=" in location_header
+        assert "&team=T12345" in location_header
+        assert resp.headers.get("set-cookie") is not None
+
     def test_handle_installation_no_state_validation(self):
         oauth_flow = OAuthFlow(
             settings=OAuthSettings(
