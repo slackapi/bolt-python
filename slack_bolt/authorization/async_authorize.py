@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Optional, Callable, Awaitable, Dict, Any
+from typing import Optional, Callable, Awaitable, Dict, Any, List
 
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import Bot, Installation

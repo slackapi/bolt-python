@@ -51,13 +51,13 @@ class AuthorizeResult(dict):
         self["bot_token"] = self.bot_token = bot_token
         if bot_scopes is not None and isinstance(bot_scopes, str):
             bot_scopes = [scope.strip() for scope in bot_scopes.split(",")]
-        self["bot_scopes"] = self.bot_scopes = bot_scopes
+        self["bot_scopes"] = self.bot_scopes = bot_scopes  # type: ignore
         # user
         self["user_id"] = self.user_id = user_id
         self["user_token"] = self.user_token = user_token
         if user_scopes is not None and isinstance(user_scopes, str):
             user_scopes = [scope.strip() for scope in user_scopes.split(",")]
-        self["user_scopes"] = self.user_scopes = user_scopes
+        self["user_scopes"] = self.user_scopes = user_scopes  # type: ignore
 
     @classmethod
     def from_auth_test_response(
