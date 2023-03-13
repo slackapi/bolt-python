@@ -77,8 +77,7 @@ setuptools.setup(
             # used only under src/slack_bolt/adapter
             "boto3<=2",
             "bottle>=0.12,<1",
-            # TODO: chalice 1.28 dropped Python 3.6 support
-            "chalice<=1.27.3",
+            "chalice>=1.28,<2" if sys.version_info.minor > 6 else "chalice<=1.27.3",
             "CherryPy>=18,<19",
             "Django>=3,<5",
             "falcon>=3.1.1,<4" if sys.version_info.minor >= 11 else "falcon>=2,<4",
