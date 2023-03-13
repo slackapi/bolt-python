@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Optional, Callable, Awaitable, Dict, Any
+from typing import Optional, Callable, Awaitable, Dict, Any, List
 
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import Bot, Installation
@@ -156,6 +156,10 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
 
         bot_token: Optional[str] = None
         user_token: Optional[str] = None
+        bot_scopes: Optional[List[str]] = None
+        user_scopes: Optional[List[str]] = None
+        latest_bot_installation: Optional[Installation] = None
+        this_user_installation: Optional[Installation] = None
 
         if not self.bot_only and self.find_installation_available:
             # Since v1.1, this is the default way.
@@ -163,7 +167,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
             try:
                 # Note that this is the latest information for the org/workspace.
                 # The installer may not be the user associated with this incoming request.
-                latest_installation: Optional[Installation] = await self.installation_store.async_find_installation(
+                latest_bot_installation = await self.installation_store.async_find_installation(
                     enterprise_id=enterprise_id,
                     team_id=team_id,
                     is_enterprise_install=context.is_enterprise_install,
@@ -173,20 +177,20 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                 # The example use cases are:
                 # - The app's installation requires both bot and user tokens
                 # - The app has two installation paths 1) bot installation 2) individual user authorization
-                this_user_installation: Optional[Installation] = None
-
-                if latest_installation is not None:
+                if latest_bot_installation is not None:
                     # Save the latest bot token
-                    bot_token = latest_installation.bot_token  # this still can be None
-                    user_token = latest_installation.user_token  # this still can be None
+                    bot_token = latest_bot_installation.bot_token  # this still can be None
+                    user_token = latest_bot_installation.user_token  # this still can be None
+                    bot_scopes = latest_bot_installation.bot_scopes  # this still can be None
+                    user_scopes = latest_bot_installation.user_scopes  # this still can be None
 
-                    if latest_installation.user_id != user_id:
+                    if latest_bot_installation.user_id != user_id:
                         # First off, remove the user token as the installer is a different user
                         user_token = None
-                        latest_installation.user_token = None
-                        latest_installation.user_refresh_token = None
-                        latest_installation.user_token_expires_at = None
-                        latest_installation.user_scopes = []
+                        latest_bot_installation.user_token = None
+                        latest_bot_installation.user_refresh_token = None
+                        latest_bot_installation.user_token_expires_at = None
+                        latest_bot_installation.user_scopes = []
 
                         # try to fetch the request user's installation
                         # to reflect the user's access token if exists
@@ -198,26 +202,32 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                         )
                         if this_user_installation is not None:
                             user_token = this_user_installation.user_token
-                            if latest_installation.bot_token is None:
+                            user_scopes = this_user_installation.user_scopes
+                            if latest_bot_installation.bot_token is None:
                                 # If latest_installation has a bot token, we never overwrite the value
                                 bot_token = this_user_installation.bot_token
+                                bot_scopes = this_user_installation.bot_scopes
 
                             # If token rotation is enabled, running rotation may be needed here
                             refreshed = await self._rotate_and_save_tokens_if_necessary(this_user_installation)
                             if refreshed is not None:
                                 user_token = refreshed.user_token
-                                if latest_installation.bot_token is None:
+                                user_scopes = refreshed.user_scopes
+                                if latest_bot_installation.bot_token is None:
                                     # If latest_installation has a bot token, we never overwrite the value
                                     bot_token = refreshed.bot_token
+                                    bot_scopes = refreshed.bot_scopes
 
                     # If token rotation is enabled, running rotation may be needed here
-                    refreshed = await self._rotate_and_save_tokens_if_necessary(latest_installation)
+                    refreshed = await self._rotate_and_save_tokens_if_necessary(latest_bot_installation)
                     if refreshed is not None:
                         bot_token = refreshed.bot_token
+                        bot_scopes = refreshed.bot_scopes
                         if this_user_installation is None:
                             # Only when we don't have `this_user_installation` here,
                             # the `user_token` is for the user associated with this request
                             user_token = refreshed.user_token
+                            user_scopes = refreshed.user_scopes
 
             except NotImplementedError as _:
                 self.find_installation_available = False
@@ -238,6 +248,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                 )
                 if bot is not None:
                     bot_token = bot.bot_token
+                    bot_scopes = bot.bot_scopes
                     if bot.bot_refresh_token is not None:
                         # Token rotation
                         if self.token_rotator is None:
@@ -249,6 +260,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                         if refreshed is not None:
                             await self.installation_store.async_save_bot(refreshed)
                             bot_token = refreshed.bot_token
+                            bot_scopes = refreshed.bot_scopes
 
             except NotImplementedError as _:
                 self.find_bot_available = False
@@ -267,10 +279,16 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
 
         try:
             auth_test_api_response = await context.client.auth_test(token=token)
+            user_auth_test_response = None
+            if user_token is not None and token != user_token:
+                user_auth_test_response = await context.client.auth_test(token=user_token)
             authorize_result = AuthorizeResult.from_auth_test_response(
                 auth_test_response=auth_test_api_response,
+                user_auth_test_response=user_auth_test_response,
                 bot_token=bot_token,
                 user_token=user_token,
+                bot_scopes=bot_scopes,
+                user_scopes=user_scopes,
             )
             if self.cache_enabled:
                 self.authorize_result_cache[token] = authorize_result
