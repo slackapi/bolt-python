@@ -69,8 +69,8 @@ class TestWebClientCustomization:
             return
 
         self.web_client.retry_handlers = [
-            AsyncConnectionErrorRetryHandler,
-            AsyncRateLimitErrorRetryHandler,
+            AsyncConnectionErrorRetryHandler(),
+            AsyncRateLimitErrorRetryHandler(),
         ]
         app = AsyncApp(
             client=self.web_client,
