@@ -243,6 +243,7 @@ class AsyncApp:
                 logger=self._framework_logger,
                 bot_only=installation_store_bot_only,
                 client=self._async_client,  # for proxy use cases etc.
+                user_token_resolution=(settings.user_token_resolution if settings is not None else "authed_user"),
             )
 
         self._async_oauth_flow: Optional[AsyncOAuthFlow] = None
@@ -374,7 +375,11 @@ class AsyncApp:
                 raise BoltError(error_token_required())
         else:
             self._async_middleware_list.append(
-                AsyncMultiTeamsAuthorization(authorize=self._async_authorize, base_logger=self._base_logger)
+                AsyncMultiTeamsAuthorization(
+                    authorize=self._async_authorize,
+                    base_logger=self._base_logger,
+                    user_token_resolution=self._async_oauth_flow.settings.user_token_resolution,
+                )
             )
 
         if ignoring_self_events_enabled is True:

@@ -38,6 +38,7 @@ class OAuthSettings:
     installation_store_bot_only: bool
     token_rotation_expiration_minutes: int
     authorize: Authorize
+    user_token_resolution: str  # default: "authed_user"
     # state parameter related configurations
     state_validation_enabled: bool
     state_store: OAuthStateStore
@@ -71,6 +72,7 @@ class OAuthSettings:
         installation_store: Optional[InstallationStore] = None,
         installation_store_bot_only: bool = False,
         token_rotation_expiration_minutes: int = 120,
+        user_token_resolution: str = "authed_user",
         # state parameter related configurations
         state_validation_enabled: bool = True,
         state_store: Optional[OAuthStateStore] = None,
@@ -97,6 +99,11 @@ class OAuthSettings:
             installation_store: Specify the instance of `InstallationStore` (Default: `FileInstallationStore`)
             installation_store_bot_only: Use `InstallationStore#find_bot()` if True (Default: False)
             token_rotation_expiration_minutes: Minutes before refreshing tokens (Default: 2 hours)
+            user_token_resolution: The option to pick up a user token per request (Default: authed_user)
+                The available values are "authed_user" and "actor". When you want to resolve the user token per request
+                using the event's actor IDs, you can set "actor" instead. With this option, bolt-python tries to resolve
+                a user token for context.actor_enterprise/team/user_id. This can be useful for events in Slack Connect
+                channels. Note that actor IDs can be absent in some scenarios.
             state_validation_enabled: Set False if your OAuth flow omits the state parameter validation (Default: True)
             state_store: Specify the instance of `InstallationStore` (Default: `FileOAuthStateStore`)
             state_cookie_name: The cookie name that is set for installers' browser. (Default: "slack-app-oauth-state")
@@ -136,6 +143,7 @@ class OAuthSettings:
         self.authorization_url = authorization_url or "https://slack.com/oauth/v2/authorize"
         # Installation Management
         self.installation_store = installation_store or get_or_create_default_installation_store(client_id)
+        self.user_token_resolution = user_token_resolution or "authed_user"
         self.installation_store_bot_only = installation_store_bot_only
         self.token_rotation_expiration_minutes = token_rotation_expiration_minutes
         self.authorize = InstallationStoreAuthorize(
@@ -145,6 +153,7 @@ class OAuthSettings:
             token_rotation_expiration_minutes=self.token_rotation_expiration_minutes,
             installation_store=self.installation_store,
             bot_only=self.installation_store_bot_only,
+            user_token_resolution=user_token_resolution,
         )
         # state parameter related configurations
         self.state_validation_enabled = state_validation_enabled

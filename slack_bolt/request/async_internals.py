@@ -8,6 +8,9 @@ from slack_bolt.request.internals import (
     extract_user_id,
     extract_channel_id,
     debug_multiple_response_urls_detected,
+    extract_actor_enterprise_id,
+    extract_actor_team_id,
+    extract_actor_user_id,
 )
 
 
@@ -25,6 +28,16 @@ def build_async_context(
     user_id = extract_user_id(body)
     if user_id:
         context["user_id"] = user_id
+    # Actor IDs are useful for Events API on a Slack Connect channel
+    actor_enterprise_id = extract_actor_enterprise_id(body)
+    if actor_enterprise_id:
+        context["actor_enterprise_id"] = actor_enterprise_id
+    actor_team_id = extract_actor_team_id(body)
+    if actor_team_id:
+        context["actor_team_id"] = actor_team_id
+    actor_user_id = extract_actor_user_id(body)
+    if actor_user_id:
+        context["actor_user_id"] = actor_user_id
     channel_id = extract_channel_id(body)
     if channel_id:
         context["channel_id"] = channel_id
