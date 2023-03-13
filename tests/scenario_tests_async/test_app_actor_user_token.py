@@ -61,12 +61,12 @@ class TestApp:
             "x-slack-request-timestamp": [timestamp],
         }
 
-    def build_request(self) -> AsyncBoltRequest:
+    def build_request(self, team_id: str = "T014GJXU940") -> AsyncBoltRequest:
         timestamp, body = str(int(time())), json.dumps(
             {
-                "team_id": "T014GJXU940",
+                "team_id": team_id,
                 "enterprise_id": "E013Y3SHLAY",
-                "context_team_id": "T014GJXU940",
+                "context_team_id": team_id,
                 "context_enterprise_id": "E013Y3SHLAY",
                 "api_app_id": "A04TEM7H4S0",
                 "event": {
@@ -75,7 +75,7 @@ class TestApp:
                     "upload": False,
                     "user": "W013QGS7BPF",
                     "display_as_bot": False,
-                    "team": "T014GJXU940",
+                    "team": team_id,
                     "channel": "C04T3ACM40K",
                     "subtype": "file_share",
                 },
@@ -123,6 +123,41 @@ class TestApp:
             await say("What's up?")
 
         request = self.build_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_auth_test_count_async(self, 1)
+        await asyncio.sleep(1)  # wait a bit after auto ack()
+        assert self.mock_received_requests["/chat.postMessage"] == 1
+
+    @pytest.mark.asyncio
+    async def test_authorize_result_no_user_token(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            oauth_settings=AsyncOAuthSettings(
+                client_id="111.222",
+                client_secret="secret",
+                installation_store=MemoryInstallationStore(),
+                user_token_resolution="actor",
+            ),
+        )
+
+        @app.event("message")
+        async def handle_events(context: AsyncBoltContext, say: AsyncSay):
+            assert context.actor_enterprise_id == "E013Y3SHLAY"
+            assert context.actor_team_id == "T11111"
+            assert context.actor_user_id == "W013QGS7BPF"
+
+            assert context.authorize_result.bot_id == "BZYBOTHED"
+            assert context.authorize_result.bot_user_id == "W23456789"
+            assert context.authorize_result.bot_token == "xoxb-valid-2"
+            assert context.authorize_result.bot_scopes == ["commands", "chat:write"]
+            assert context.authorize_result.user_id is None
+            assert context.authorize_result.user_token is None
+            assert context.authorize_result.user_scopes is None
+            await say("What's up?")
+
+        request = self.build_request(team_id="T11111")
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
