@@ -1,3 +1,4 @@
+from slack_bolt.middleware.authorization.internals import _build_error_text
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 
@@ -18,5 +19,5 @@ def _build_error_response() -> BoltResponse:
     # show an ephemeral message to the end-user
     return BoltResponse(
         status=200,
-        body=":x: Please install this app into the workspace :bow:",
+        body=_build_error_text(),
     )

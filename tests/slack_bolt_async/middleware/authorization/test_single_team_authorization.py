@@ -6,6 +6,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 from slack_bolt.middleware.authorization.async_single_team_authorization import (
     AsyncSingleTeamAuthorization,
 )
+from slack_bolt.middleware.authorization.internals import _build_error_text
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from tests.mock_web_api_server import (
@@ -56,4 +57,4 @@ class TestSingleTeamAuthorization:
         resp = await authorization.async_process(req=req, resp=resp, next=next)
 
         assert resp.status == 200
-        assert resp.body == ":x: Please install this app into the workspace :bow:"
+        assert resp.body == _build_error_text()

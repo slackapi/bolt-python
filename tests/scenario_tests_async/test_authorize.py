@@ -115,7 +115,7 @@ class TestAsyncAuthorize:
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert response.body == ":x: Please install this app into the workspace :bow:"
+        assert response.body == ""
         assert self.mock_received_requests.get("/auth.test") == None
 
     @pytest.mark.asyncio
