@@ -10,7 +10,6 @@ from slack_sdk.errors import SlackApiError
 from .async_internals import _build_error_response, _is_no_auth_required
 from .internals import _to_authorize_result, _is_no_auth_test_call_required, _build_error_text
 from ...authorization import AuthorizeResult
-from ...request.payload_utils import is_event
 
 
 class AsyncSingleTeamAuthorization(AsyncAuthorization):
@@ -60,9 +59,6 @@ class AsyncSingleTeamAuthorization(AsyncAuthorization):
                 self.logger.error("auth.test API call result is unexpectedly None")
                 if req.context.response_url is not None:
                     await req.context.respond(_build_error_text())
-                    return BoltResponse(status=200, body="")
-                if is_event(req.body) and req.context.channel_id is not None and req.context.token is not None:
-                    await req.context.say(_build_error_text())
                     return BoltResponse(status=200, body="")
                 return _build_error_response()
         except SlackApiError as e:

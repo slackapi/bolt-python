@@ -15,7 +15,6 @@ from .internals import (
     _build_error_text,
 )
 from ...authorization import AuthorizeResult
-from ...request.payload_utils import is_event
 
 
 class SingleTeamAuthorization(Authorization):
@@ -75,9 +74,6 @@ class SingleTeamAuthorization(Authorization):
                 self.logger.error("auth.test API call result is unexpectedly None")
                 if req.context.response_url is not None:
                     req.context.respond(_build_error_text())
-                    return BoltResponse(status=200, body="")
-                if is_event(req.body) and req.context.channel_id is not None and req.context.token is not None:
-                    req.context.say(_build_error_text())
                     return BoltResponse(status=200, body="")
                 return _build_error_response()
         except SlackApiError as e:
