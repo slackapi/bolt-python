@@ -12,6 +12,7 @@ from .internals import (
     _is_no_auth_required,
     _to_authorize_result,
     _is_no_auth_test_call_required,
+    _build_error_text,
 )
 from ...authorization import AuthorizeResult
 
@@ -71,6 +72,9 @@ class SingleTeamAuthorization(Authorization):
             else:
                 # Just in case
                 self.logger.error("auth.test API call result is unexpectedly None")
+                if req.context.response_url is not None:
+                    req.context.respond(_build_error_text())
+                    return BoltResponse(status=200, body="")
                 return _build_error_response()
         except SlackApiError as e:
             self.logger.error(f"Failed to authorize with the given token ({e})")

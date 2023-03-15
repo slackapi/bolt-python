@@ -1,7 +1,7 @@
 from logging import Logger
 from typing import Optional, Callable, Dict, Any, List
 
-from slack_sdk.errors import SlackApiError
+from slack_sdk.errors import SlackApiError, SlackTokenRotationError
 from slack_sdk.oauth import InstallationStore
 from slack_sdk.oauth.installation_store.models.bot import Bot
 from slack_sdk.oauth.installation_store.models.installation import Installation
@@ -271,6 +271,11 @@ class InstallationStoreAuthorize(Authorize):
                             user_token = refreshed.user_token
                             user_scopes = refreshed.user_scopes
 
+            except SlackTokenRotationError as rotation_error:
+                # When token rotation fails, it is usually unrecoverable
+                # So, this built-in middleware gives up continuing with the following middleware and listeners
+                self.logger.error(f"Failed to rotate tokens due to {rotation_error}")
+                return None
             except NotImplementedError as _:
                 self.find_installation_available = False
 
@@ -304,6 +309,11 @@ class InstallationStoreAuthorize(Authorize):
                             bot_token = refreshed.bot_token
                             bot_scopes = refreshed.bot_scopes
 
+            except SlackTokenRotationError as rotation_error:
+                # When token rotation fails, it is usually unrecoverable
+                # So, this built-in middleware gives up continuing with the following middleware and listeners
+                self.logger.error(f"Failed to rotate tokens due to {rotation_error}")
+                return None
             except NotImplementedError as _:
                 self.find_bot_available = False
             except Exception as e:

@@ -11,6 +11,7 @@ from .internals import (
     _build_error_response,
     _is_no_auth_required,
     _is_no_auth_test_call_required,
+    _build_error_text,
 )
 from ...authorization import AuthorizeResult
 from ...authorization.authorize import Authorize
@@ -93,6 +94,9 @@ class MultiTeamsAuthorization(Authorization):
                     "Although the app should be installed into this workspace, "
                     "the AuthorizeResult (returned value from authorize) for it was not found."
                 )
+                if req.context.response_url is not None:
+                    req.context.respond(_build_error_text())
+                    return BoltResponse(status=200, body="")
                 return _build_error_response()
 
         except SlackApiError as e:

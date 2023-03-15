@@ -7,7 +7,7 @@ from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from .async_authorization import AsyncAuthorization
 from .async_internals import _build_error_response, _is_no_auth_required
-from .internals import _is_no_auth_test_call_required
+from .internals import _is_no_auth_test_call_required, _build_error_text
 from ...authorization import AuthorizeResult
 from ...authorization.async_authorize import AsyncAuthorize
 
@@ -91,6 +91,9 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
                     "Although the app should be installed into this workspace, "
                     "the AuthorizeResult (returned value from authorize) for it was not found."
                 )
+                if req.context.response_url is not None:
+                    await req.context.respond(_build_error_text())
+                    return BoltResponse(status=200, body="")
                 return _build_error_response()
 
         except SlackApiError as e:

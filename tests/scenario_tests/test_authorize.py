@@ -107,7 +107,7 @@ class TestAuthorize:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 200
-        assert response.body == ":x: Please install this app into the workspace :bow:"
+        assert response.body == ""
         assert self.mock_received_requests.get("/auth.test") == None
 
     def test_bot_context_attributes(self):
