@@ -101,6 +101,7 @@ class App:
         token_verification_enabled: bool = True,
         client: Optional[WebClient] = None,
         # for multi-workspace apps
+        before_authorize: Optional[Union[Middleware, Callable[..., Any]]] = None,
         authorize: Optional[Callable[..., AuthorizeResult]] = None,
         installation_store: Optional[InstallationStore] = None,
         # for either only bot scope usage or v1.0.x compatibility
@@ -155,6 +156,7 @@ class App:
             token: The bot/user access token required only for single-workspace app.
             token_verification_enabled: Verifies the validity of the given token if True.
             client: The singleton `slack_sdk.WebClient` instance for this app.
+            before_authorize: A global middleware that can be executed right before authorize function
             authorize: The function to authorize an incoming request from Slack
                 by checking if there is a team/user in the installation data.
             installation_store: The module offering save/find operations of installation data
@@ -214,6 +216,17 @@ class App:
         # --------------------------------------
         # Authorize & OAuthFlow initialization
         # --------------------------------------
+
+        self._before_authorize: Optional[Middleware] = None
+        if before_authorize is not None:
+            if isinstance(before_authorize, Callable):
+                self._before_authorize = CustomMiddleware(
+                    app_name=self._name,
+                    func=before_authorize,
+                    base_logger=self._framework_logger,
+                )
+            elif isinstance(before_authorize, Middleware):
+                self._before_authorize = before_authorize
 
         self._authorize: Optional[Authorize] = None
         if authorize is not None:
@@ -356,6 +369,9 @@ class App:
             )
         if request_verification_enabled is True:
             self._middleware_list.append(RequestVerification(self._signing_secret, base_logger=self._base_logger))
+
+        if self._before_authorize is not None:
+            self._middleware_list.append(self._before_authorize)
 
         # As authorize is required for making a Bolt app function, we don't offer the flag to disable this
         if self._oauth_flow is None:

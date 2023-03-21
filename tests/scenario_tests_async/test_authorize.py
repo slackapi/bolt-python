@@ -7,9 +7,11 @@ import pytest
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 
+from slack_bolt import BoltResponse
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.request.async_request import AsyncBoltRequest
+from slack_bolt.request.payload_utils import is_event
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -84,8 +86,37 @@ class TestAsyncAuthorize:
             "x-slack-request-timestamp": [timestamp],
         }
 
-    def build_valid_request(self) -> AsyncBoltRequest:
+    def build_block_actions_request(self) -> AsyncBoltRequest:
         timestamp = str(int(time()))
+        return AsyncBoltRequest(body=block_actions_raw_body, headers=self.build_headers(timestamp, block_actions_raw_body))
+
+    def build_message_changed_event_request(self) -> AsyncBoltRequest:
+        timestamp = str(int(time()))
+        raw_body = json.dumps(
+            {
+                "token": "verification_token",
+                "team_id": "T111",
+                "enterprise_id": "E111",
+                "api_app_id": "A111",
+                "event": {
+                    "type": "message",
+                    "subtype": "message_changed",
+                    "channel": "C2147483705",
+                    "ts": "1358878755.000001",
+                    "message": {
+                        "type": "message",
+                        "user": "U2147483697",
+                        "text": "Hello, world!",
+                        "ts": "1355517523.000005",
+                        "edited": {"user": "U2147483697", "ts": "1358878755.000001"},
+                    },
+                },
+                "type": "event_callback",
+                "event_id": "Ev111",
+                "event_time": 1599616881,
+                "authed_users": ["W111"],
+            }
+        )
         return AsyncBoltRequest(body=raw_body, headers=self.build_headers(timestamp, raw_body))
 
     @pytest.mark.asyncio
@@ -97,7 +128,7 @@ class TestAsyncAuthorize:
         )
         app.action("a")(simple_listener)
 
-        request = self.build_valid_request()
+        request = self.build_block_actions_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
         assert response.body == ""
@@ -112,7 +143,7 @@ class TestAsyncAuthorize:
         )
         app.block_action("a")(simple_listener)
 
-        request = self.build_valid_request()
+        request = self.build_block_actions_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
         assert response.body == ""
@@ -127,7 +158,7 @@ class TestAsyncAuthorize:
         )
         app.action("a")(assert_bot_context_attributes)
 
-        request = self.build_valid_request()
+        request = self.build_block_actions_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
         assert response.body == ""
@@ -142,14 +173,41 @@ class TestAsyncAuthorize:
         )
         app.action("a")(assert_user_context_attributes)
 
-        request = self.build_valid_request()
+        request = self.build_block_actions_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
         assert response.body == ""
         await assert_auth_test_count_async(self, 1)
 
+    @pytest.mark.asyncio
+    async def test_user_context_attributes(self):
+        async def skip_message_changed_events(body: dict, payload: dict, next_):
+            if is_event(body) and payload.get("type") == "message" and payload.get("subtype") == "message_changed":
+                return BoltResponse(status=200, body="as expected")
+            await next_()
 
-body = {
+        app = AsyncApp(
+            client=self.web_client,
+            before_authorize=skip_message_changed_events,
+            authorize=user_authorize,
+            signing_secret=self.signing_secret,
+        )
+        app.action("a")(assert_user_context_attributes)
+
+        request = self.build_block_actions_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert response.body == ""
+        await assert_auth_test_count_async(self, 1)
+
+        request = self.build_message_changed_event_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert response.body == "as expected"
+        await assert_auth_test_count_async(self, 1)  # should be skipped
+
+
+block_actions_body = {
     "type": "block_actions",
     "user": {
         "id": "W99999",
@@ -186,7 +244,7 @@ body = {
     ],
 }
 
-raw_body = f"payload={quote(json.dumps(body))}"
+block_actions_raw_body = f"payload={quote(json.dumps(block_actions_body))}"
 
 
 async def simple_listener(ack, body, payload, action):

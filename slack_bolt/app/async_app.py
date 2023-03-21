@@ -2,7 +2,7 @@ import inspect
 import logging
 import os
 import time
-from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable, Sequence
+from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable, Sequence, Any
 
 from aiohttp import web
 
@@ -112,6 +112,7 @@ class AsyncApp:
         token: Optional[str] = None,
         client: Optional[AsyncWebClient] = None,
         # for multi-workspace apps
+        before_authorize: Optional[Union[AsyncMiddleware, Callable[..., Awaitable[Any]]]] = None,
         authorize: Optional[Callable[..., Awaitable[AuthorizeResult]]] = None,
         installation_store: Optional[AsyncInstallationStore] = None,
         # for either only bot scope usage or v1.0.x compatibility
@@ -163,6 +164,7 @@ class AsyncApp:
             signing_secret: The Signing Secret value used for verifying requests from Slack.
             token: The bot/user access token required only for single-workspace app.
             client: The singleton `slack_sdk.web.async_client.AsyncWebClient` instance for this app.
+            before_authorize: A global middleware that can be executed right before authorize function
             authorize: The function to authorize an incoming request from Slack
                 by checking if there is a team/user in the installation data.
             installation_store: The module offering save/find operations of installation data
@@ -219,6 +221,17 @@ class AsyncApp:
         # --------------------------------------
         # Authorize & OAuthFlow initialization
         # --------------------------------------
+
+        self._async_before_authorize: Optional[AsyncMiddleware] = None
+        if before_authorize is not None:
+            if isinstance(before_authorize, Callable):
+                self._async_before_authorize = AsyncCustomMiddleware(
+                    app_name=self._name,
+                    func=before_authorize,
+                    base_logger=self._framework_logger,
+                )
+            elif isinstance(before_authorize, AsyncMiddleware):
+                self._async_before_authorize = before_authorize
 
         self._async_authorize: Optional[AsyncAuthorize] = None
         if authorize is not None:
@@ -363,6 +376,10 @@ class AsyncApp:
             )
         if request_verification_enabled is True:
             self._async_middleware_list.append(AsyncRequestVerification(self._signing_secret, base_logger=self._base_logger))
+
+        if self._async_before_authorize is not None:
+            self._async_middleware_list.append(self._async_before_authorize)
+
         # As authorize is required for making a Bolt app function, we don't offer the flag to disable this
         if self._async_oauth_flow is None:
             if self._token:
