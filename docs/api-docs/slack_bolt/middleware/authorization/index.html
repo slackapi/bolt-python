@@ -115,7 +115,7 @@ __all__ = [
 </dd>
 <dt id="slack_bolt.middleware.authorization.MultiTeamsAuthorization"><code class="flex name class">
 <span>class <span class="ident">MultiTeamsAuthorization</span></span>
-<span>(</span><span>*, authorize: <a title="slack_bolt.authorization.authorize.Authorize" href="../../authorization/authorize.html#slack_bolt.authorization.authorize.Authorize">Authorize</a>, base_logger: Optional[logging.Logger] = None)</span>
+<span>(</span><span>*, authorize: <a title="slack_bolt.authorization.authorize.Authorize" href="../../authorization/authorize.html#slack_bolt.authorization.authorize.Authorize">Authorize</a>, base_logger: Optional[logging.Logger] = None, user_token_resolution: str = 'authed_user')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
@@ -126,6 +126,8 @@ __all__ = [
 <dd>The function to authorize incoming requests from Slack.</dd>
 <dt><strong><code>base_logger</code></strong></dt>
 <dd>The base logger</dd>
+<dt><strong><code>user_token_resolution</code></strong></dt>
+<dd>"authed_user" or "actor"</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -133,21 +135,25 @@ __all__ = [
 </summary>
 <pre><code class="python">class MultiTeamsAuthorization(Authorization):
     authorize: Authorize
+    user_token_resolution: str
 
     def __init__(
         self,
         *,
         authorize: Authorize,
         base_logger: Optional[Logger] = None,
+        user_token_resolution: str = &#34;authed_user&#34;,
     ):
         &#34;&#34;&#34;Multi-workspace authorization.
 
         Args:
             authorize: The function to authorize incoming requests from Slack.
             base_logger: The base logger
+            user_token_resolution: &#34;authed_user&#34; or &#34;actor&#34;
         &#34;&#34;&#34;
         self.authorize = authorize
         self.logger = get_bolt_logger(MultiTeamsAuthorization, base_logger=base_logger)
+        self.user_token_resolution = user_token_resolution
 
     def process(
         self,
@@ -170,12 +176,24 @@ __all__ = [
             return next()
 
         try:
-            auth_result: Optional[AuthorizeResult] = self.authorize(
-                context=req.context,
-                enterprise_id=req.context.enterprise_id,
-                team_id=req.context.team_id,
-                user_id=req.context.user_id,
-            )
+            auth_result: Optional[AuthorizeResult] = None
+            if self.user_token_resolution == &#34;actor&#34;:
+                auth_result = self.authorize(
+                    context=req.context,
+                    enterprise_id=req.context.enterprise_id,
+                    team_id=req.context.team_id,
+                    user_id=req.context.user_id,
+                    actor_enterprise_id=req.context.actor_enterprise_id,
+                    actor_team_id=req.context.actor_team_id,
+                    actor_user_id=req.context.actor_user_id,
+                )
+            else:
+                auth_result = self.authorize(
+                    context=req.context,
+                    enterprise_id=req.context.enterprise_id,
+                    team_id=req.context.team_id,
+                    user_id=req.context.user_id,
+                )
             if auth_result is not None:
                 req.context.set_authorize_result(auth_result)
                 token = auth_result.bot_token or auth_result.user_token
@@ -192,6 +210,9 @@ __all__ = [
                     &#34;Although the app should be installed into this workspace, &#34;
                     &#34;the AuthorizeResult (returned value from authorize) for it was not found.&#34;
                 )
+                if req.context.response_url is not None:
+                    req.context.respond(_build_error_text())
+                    return BoltResponse(status=200, body=&#34;&#34;)
                 return _build_error_response()
 
         except SlackApiError as e:
@@ -206,6 +227,10 @@ __all__ = [
 <h3>Class variables</h3>
 <dl>
 <dt id="slack_bolt.middleware.authorization.MultiTeamsAuthorization.authorize"><code class="name">var <span class="ident">authorize</span> : <a title="slack_bolt.authorization.authorize.Authorize" href="../../authorization/authorize.html#slack_bolt.authorization.authorize.Authorize">Authorize</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.middleware.authorization.MultiTeamsAuthorization.user_token_resolution"><code class="name">var <span class="ident">user_token_resolution</span> : str</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -293,6 +318,9 @@ __all__ = [
             else:
                 # Just in case
                 self.logger.error(&#34;auth.test API call result is unexpectedly None&#34;)
+                if req.context.response_url is not None:
+                    req.context.respond(_build_error_text())
+                    return BoltResponse(status=200, body=&#34;&#34;)
                 return _build_error_response()
         except SlackApiError as e:
             self.logger.error(f&#34;Failed to authorize with the given token ({e})&#34;)
@@ -348,6 +376,7 @@ __all__ = [
 <h4><code><a title="slack_bolt.middleware.authorization.MultiTeamsAuthorization" href="#slack_bolt.middleware.authorization.MultiTeamsAuthorization">MultiTeamsAuthorization</a></code></h4>
 <ul class="">
 <li><code><a title="slack_bolt.middleware.authorization.MultiTeamsAuthorization.authorize" href="#slack_bolt.middleware.authorization.MultiTeamsAuthorization.authorize">authorize</a></code></li>
+<li><code><a title="slack_bolt.middleware.authorization.MultiTeamsAuthorization.user_token_resolution" href="#slack_bolt.middleware.authorization.MultiTeamsAuthorization.user_token_resolution">user_token_resolution</a></code></li>
 </ul>
 </li>
 <li>

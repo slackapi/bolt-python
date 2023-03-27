@@ -27,9 +27,9 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from logging import Logger
-from typing import Optional, Callable, Dict, Any
+from typing import Optional, Callable, Dict, Any, List
 
-from slack_sdk.errors import SlackApiError
+from slack_sdk.errors import SlackApiError, SlackTokenRotationError
 from slack_sdk.oauth import InstallationStore
 from slack_sdk.oauth.installation_store.models.bot import Bot
 from slack_sdk.oauth.installation_store.models.installation import Installation
@@ -57,6 +57,10 @@ class Authorize:
         enterprise_id: Optional[str],
         team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
+        # actor_* can be used only when user_token_resolution: &#34;actor&#34; is set
+        actor_enterprise_id: Optional[str] = None,
+        actor_team_id: Optional[str] = None,
+        actor_user_id: Optional[str] = None,
     ) -&gt; Optional[AuthorizeResult]:
         raise NotImplementedError()
 
@@ -83,6 +87,10 @@ class CallableAuthorize(Authorize):
         enterprise_id: Optional[str],
         team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
+        # actor_* can be used only when user_token_resolution: &#34;actor&#34; is set
+        actor_enterprise_id: Optional[str] = None,
+        actor_team_id: Optional[str] = None,
+        actor_user_id: Optional[str] = None,
     ) -&gt; Optional[AuthorizeResult]:
         try:
             all_available_args = {
@@ -98,6 +106,9 @@ class CallableAuthorize(Authorize):
                 &#34;enterprise_id&#34;: enterprise_id,
                 &#34;team_id&#34;: team_id,
                 &#34;user_id&#34;: user_id,
+                &#34;actor_enterprise_id&#34;: actor_enterprise_id,
+                &#34;actor_team_id&#34;: actor_team_id,
+                &#34;actor_user_id&#34;: actor_user_id,
             }
             for k, v in context.items():
                 if k not in all_available_args:
@@ -136,6 +147,7 @@ class InstallationStoreAuthorize(Authorize):
 
     authorize_result_cache: Dict[str, AuthorizeResult]
     bot_only: bool
+    user_token_resolution: str
     find_installation_available: bool
     find_bot_available: bool
     token_rotator: Optional[TokenRotator]
@@ -155,10 +167,13 @@ class InstallationStoreAuthorize(Authorize):
         bot_only: bool = False,
         cache_enabled: bool = False,
         client: Optional[WebClient] = None,
+        # Since v1.27, user token resolution can be actor ID based when the mode is enabled
+        user_token_resolution: str = &#34;authed_user&#34;,
     ):
         self.logger = logger
         self.installation_store = installation_store
         self.bot_only = bot_only
+        self.user_token_resolution = user_token_resolution
         self.cache_enabled = cache_enabled
         self.authorize_result_cache = {}
         self.find_installation_available = hasattr(installation_store, &#34;find_installation&#34;)
@@ -180,10 +195,18 @@ class InstallationStoreAuthorize(Authorize):
         enterprise_id: Optional[str],
         team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
+        # actor_* can be used only when user_token_resolution: &#34;actor&#34; is set
+        actor_enterprise_id: Optional[str] = None,
+        actor_team_id: Optional[str] = None,
+        actor_user_id: Optional[str] = None,
     ) -&gt; Optional[AuthorizeResult]:
 
         bot_token: Optional[str] = None
         user_token: Optional[str] = None
+        bot_scopes: Optional[List[str]] = None
+        user_scopes: Optional[List[str]] = None
+        latest_bot_installation: Optional[Installation] = None
+        this_user_installation: Optional[Installation] = None
 
         if not self.bot_only and self.find_installation_available:
             # Since v1.1, this is the default way.
@@ -191,7 +214,7 @@ class InstallationStoreAuthorize(Authorize):
             try:
                 # Note that this is the latest information for the org/workspace.
                 # The installer may not be the user associated with this incoming request.
-                latest_installation: Optional[Installation] = self.installation_store.find_installation(
+                latest_bot_installation = self.installation_store.find_installation(
                     enterprise_id=enterprise_id,
                     team_id=team_id,
                     is_enterprise_install=context.is_enterprise_install,
@@ -201,52 +224,86 @@ class InstallationStoreAuthorize(Authorize):
                 # The example use cases are:
                 # - The app&#39;s installation requires both bot and user tokens
                 # - The app has two installation paths 1) bot installation 2) individual user authorization
-                this_user_installation: Optional[Installation] = None
-
-                if latest_installation is not None:
+                if latest_bot_installation is not None:
                     # Save the latest bot token
-                    bot_token = latest_installation.bot_token  # this still can be None
-                    user_token = latest_installation.user_token  # this still can be None
+                    bot_token = latest_bot_installation.bot_token  # this still can be None
+                    user_token = latest_bot_installation.user_token  # this still can be None
+                    bot_scopes = latest_bot_installation.bot_scopes  # this still can be None
+                    user_scopes = latest_bot_installation.user_scopes  # this still can be None
 
-                    if latest_installation.user_id != user_id:
+                    if latest_bot_installation.user_id != user_id:
                         # First off, remove the user token as the installer is a different user
                         user_token = None
-                        latest_installation.user_token = None
-                        latest_installation.user_refresh_token = None
-                        latest_installation.user_token_expires_at = None
-                        latest_installation.user_scopes = []
+                        user_scopes = None
+                        latest_bot_installation.user_token = None
+                        latest_bot_installation.user_refresh_token = None
+                        latest_bot_installation.user_token_expires_at = None
+                        latest_bot_installation.user_scopes = None
 
                         # try to fetch the request user&#39;s installation
                         # to reflect the user&#39;s access token if exists
-                        this_user_installation = self.installation_store.find_installation(
-                            enterprise_id=enterprise_id,
-                            team_id=team_id,
-                            user_id=user_id,
-                            is_enterprise_install=context.is_enterprise_install,
-                        )
+                        if self.user_token_resolution == &#34;actor&#34;:
+                            if actor_enterprise_id is not None or actor_team_id is not None:
+                                # Note that actor_team_id can be absent for app_mention events
+                                this_user_installation = self.installation_store.find_installation(
+                                    enterprise_id=actor_enterprise_id,
+                                    team_id=actor_team_id,
+                                    user_id=actor_user_id,
+                                    is_enterprise_install=None,
+                                )
+                        else:
+                            this_user_installation = self.installation_store.find_installation(
+                                enterprise_id=enterprise_id,
+                                team_id=team_id,
+                                user_id=user_id,
+                                is_enterprise_install=context.is_enterprise_install,
+                            )
                         if this_user_installation is not None:
                             user_token = this_user_installation.user_token
-                            if latest_installation.bot_token is None:
+                            user_scopes = this_user_installation.user_scopes
+                            if (
+                                latest_bot_installation.bot_token is None
+                                # enterprise_id/team_id can be different for Slack Connect channel events
+                                # when enabling user_token_resolution: &#34;actor&#34;
+                                and latest_bot_installation.enterprise_id == this_user_installation.enterprise_id
+                                and latest_bot_installation.team_id == this_user_installation.team_id
+                            ):
                                 # If latest_installation has a bot token, we never overwrite the value
                                 bot_token = this_user_installation.bot_token
+                                bot_scopes = this_user_installation.bot_scopes
 
                             # If token rotation is enabled, running rotation may be needed here
                             refreshed = self._rotate_and_save_tokens_if_necessary(this_user_installation)
                             if refreshed is not None:
                                 user_token = refreshed.user_token
-                                if latest_installation.bot_token is None:
+                                user_scopes = refreshed.user_scopes
+                                if (
+                                    latest_bot_installation.bot_token is None
+                                    # enterprise_id/team_id can be different for Slack Connect channel events
+                                    # when enabling user_token_resolution: &#34;actor&#34;
+                                    and latest_bot_installation.enterprise_id == this_user_installation.enterprise_id
+                                    and latest_bot_installation.team_id == this_user_installation.team_id
+                                ):
                                     # If latest_installation has a bot token, we never overwrite the value
                                     bot_token = refreshed.bot_token
+                                    bot_scopes = refreshed.bot_scopes
 
                     # If token rotation is enabled, running rotation may be needed here
-                    refreshed = self._rotate_and_save_tokens_if_necessary(latest_installation)
+                    refreshed = self._rotate_and_save_tokens_if_necessary(latest_bot_installation)
                     if refreshed is not None:
                         bot_token = refreshed.bot_token
+                        bot_scopes = refreshed.bot_scopes
                         if this_user_installation is None:
                             # Only when we don&#39;t have `this_user_installation` here,
                             # the `user_token` is for the user associated with this request
                             user_token = refreshed.user_token
+                            user_scopes = refreshed.user_scopes
 
+            except SlackTokenRotationError as rotation_error:
+                # When token rotation fails, it is usually unrecoverable
+                # So, this built-in middleware gives up continuing with the following middleware and listeners
+                self.logger.error(f&#34;Failed to rotate tokens due to {rotation_error}&#34;)
+                return None
             except NotImplementedError as _:
                 self.find_installation_available = False
 
@@ -266,6 +323,7 @@ class InstallationStoreAuthorize(Authorize):
                 )
                 if bot is not None:
                     bot_token = bot.bot_token
+                    bot_scopes = bot.bot_scopes
                     if bot.bot_refresh_token is not None:
                         # Token rotation
                         if self.token_rotator is None:
@@ -277,7 +335,13 @@ class InstallationStoreAuthorize(Authorize):
                         if refreshed is not None:
                             self.installation_store.save_bot(refreshed)
                             bot_token = refreshed.bot_token
+                            bot_scopes = refreshed.bot_scopes
 
+            except SlackTokenRotationError as rotation_error:
+                # When token rotation fails, it is usually unrecoverable
+                # So, this built-in middleware gives up continuing with the following middleware and listeners
+                self.logger.error(f&#34;Failed to rotate tokens due to {rotation_error}&#34;)
+                return None
             except NotImplementedError as _:
                 self.find_bot_available = False
             except Exception as e:
@@ -295,10 +359,16 @@ class InstallationStoreAuthorize(Authorize):
 
         try:
             auth_test_api_response = context.client.auth_test(token=token)
+            user_auth_test_response = None
+            if user_token is not None and token != user_token:
+                user_auth_test_response = context.client.auth_test(token=user_token)
             authorize_result = AuthorizeResult.from_auth_test_response(
                 auth_test_response=auth_test_api_response,
+                user_auth_test_response=user_auth_test_response,
                 bot_token=bot_token,
                 user_token=user_token,
+                bot_scopes=bot_scopes,
+                user_scopes=user_scopes,
             )
             if self.cache_enabled:
                 self.authorize_result_cache[token] = authorize_result
@@ -367,6 +437,10 @@ for an incoming request from Slack.</p></div>
         enterprise_id: Optional[str],
         team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
+        # actor_* can be used only when user_token_resolution: &#34;actor&#34; is set
+        actor_enterprise_id: Optional[str] = None,
+        actor_team_id: Optional[str] = None,
+        actor_user_id: Optional[str] = None,
     ) -&gt; Optional[AuthorizeResult]:
         raise NotImplementedError()</code></pre>
 </details>
@@ -409,6 +483,10 @@ This <code>authorize</code> implementation will be used.</p></div>
         enterprise_id: Optional[str],
         team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
+        # actor_* can be used only when user_token_resolution: &#34;actor&#34; is set
+        actor_enterprise_id: Optional[str] = None,
+        actor_team_id: Optional[str] = None,
+        actor_user_id: Optional[str] = None,
     ) -&gt; Optional[AuthorizeResult]:
         try:
             all_available_args = {
@@ -424,6 +502,9 @@ This <code>authorize</code> implementation will be used.</p></div>
                 &#34;enterprise_id&#34;: enterprise_id,
                 &#34;team_id&#34;: team_id,
                 &#34;user_id&#34;: user_id,
+                &#34;actor_enterprise_id&#34;: actor_enterprise_id,
+                &#34;actor_team_id&#34;: actor_team_id,
+                &#34;actor_user_id&#34;: actor_user_id,
             }
             for k, v in context.items():
                 if k not in all_available_args:
@@ -460,7 +541,7 @@ This <code>authorize</code> implementation will be used.</p></div>
 </dd>
 <dt id="slack_bolt.authorization.authorize.InstallationStoreAuthorize"><code class="flex name class">
 <span>class <span class="ident">InstallationStoreAuthorize</span></span>
-<span>(</span><span>*, logger: logging.Logger, installation_store: slack_sdk.oauth.installation_store.installation_store.InstallationStore, client_id: Optional[str] = None, client_secret: Optional[str] = None, token_rotation_expiration_minutes: Optional[int] = None, bot_only: bool = False, cache_enabled: bool = False, client: Optional[slack_sdk.web.client.WebClient] = None)</span>
+<span>(</span><span>*, logger: logging.Logger, installation_store: slack_sdk.oauth.installation_store.installation_store.InstallationStore, client_id: Optional[str] = None, client_secret: Optional[str] = None, token_rotation_expiration_minutes: Optional[int] = None, bot_only: bool = False, cache_enabled: bool = False, client: Optional[slack_sdk.web.client.WebClient] = None, user_token_resolution: str = 'authed_user')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>If you use the OAuth flow settings, this <code>authorize</code> implementation will be used.
@@ -478,6 +559,7 @@ you can expect that the <code>authorize</code> layer should work for you without
 
     authorize_result_cache: Dict[str, AuthorizeResult]
     bot_only: bool
+    user_token_resolution: str
     find_installation_available: bool
     find_bot_available: bool
     token_rotator: Optional[TokenRotator]
@@ -497,10 +579,13 @@ you can expect that the <code>authorize</code> layer should work for you without
         bot_only: bool = False,
         cache_enabled: bool = False,
         client: Optional[WebClient] = None,
+        # Since v1.27, user token resolution can be actor ID based when the mode is enabled
+        user_token_resolution: str = &#34;authed_user&#34;,
     ):
         self.logger = logger
         self.installation_store = installation_store
         self.bot_only = bot_only
+        self.user_token_resolution = user_token_resolution
         self.cache_enabled = cache_enabled
         self.authorize_result_cache = {}
         self.find_installation_available = hasattr(installation_store, &#34;find_installation&#34;)
@@ -522,10 +607,18 @@ you can expect that the <code>authorize</code> layer should work for you without
         enterprise_id: Optional[str],
         team_id: Optional[str],  # can be None for org-wide installed apps
         user_id: Optional[str],
+        # actor_* can be used only when user_token_resolution: &#34;actor&#34; is set
+        actor_enterprise_id: Optional[str] = None,
+        actor_team_id: Optional[str] = None,
+        actor_user_id: Optional[str] = None,
     ) -&gt; Optional[AuthorizeResult]:
 
         bot_token: Optional[str] = None
         user_token: Optional[str] = None
+        bot_scopes: Optional[List[str]] = None
+        user_scopes: Optional[List[str]] = None
+        latest_bot_installation: Optional[Installation] = None
+        this_user_installation: Optional[Installation] = None
 
         if not self.bot_only and self.find_installation_available:
             # Since v1.1, this is the default way.
@@ -533,7 +626,7 @@ you can expect that the <code>authorize</code> layer should work for you without
             try:
                 # Note that this is the latest information for the org/workspace.
                 # The installer may not be the user associated with this incoming request.
-                latest_installation: Optional[Installation] = self.installation_store.find_installation(
+                latest_bot_installation = self.installation_store.find_installation(
                     enterprise_id=enterprise_id,
                     team_id=team_id,
                     is_enterprise_install=context.is_enterprise_install,
@@ -543,52 +636,86 @@ you can expect that the <code>authorize</code> layer should work for you without
                 # The example use cases are:
                 # - The app&#39;s installation requires both bot and user tokens
                 # - The app has two installation paths 1) bot installation 2) individual user authorization
-                this_user_installation: Optional[Installation] = None
-
-                if latest_installation is not None:
+                if latest_bot_installation is not None:
                     # Save the latest bot token
-                    bot_token = latest_installation.bot_token  # this still can be None
-                    user_token = latest_installation.user_token  # this still can be None
+                    bot_token = latest_bot_installation.bot_token  # this still can be None
+                    user_token = latest_bot_installation.user_token  # this still can be None
+                    bot_scopes = latest_bot_installation.bot_scopes  # this still can be None
+                    user_scopes = latest_bot_installation.user_scopes  # this still can be None
 
-                    if latest_installation.user_id != user_id:
+                    if latest_bot_installation.user_id != user_id:
                         # First off, remove the user token as the installer is a different user
                         user_token = None
-                        latest_installation.user_token = None
-                        latest_installation.user_refresh_token = None
-                        latest_installation.user_token_expires_at = None
-                        latest_installation.user_scopes = []
+                        user_scopes = None
+                        latest_bot_installation.user_token = None
+                        latest_bot_installation.user_refresh_token = None
+                        latest_bot_installation.user_token_expires_at = None
+                        latest_bot_installation.user_scopes = None
 
                         # try to fetch the request user&#39;s installation
                         # to reflect the user&#39;s access token if exists
-                        this_user_installation = self.installation_store.find_installation(
-                            enterprise_id=enterprise_id,
-                            team_id=team_id,
-                            user_id=user_id,
-                            is_enterprise_install=context.is_enterprise_install,
-                        )
+                        if self.user_token_resolution == &#34;actor&#34;:
+                            if actor_enterprise_id is not None or actor_team_id is not None:
+                                # Note that actor_team_id can be absent for app_mention events
+                                this_user_installation = self.installation_store.find_installation(
+                                    enterprise_id=actor_enterprise_id,
+                                    team_id=actor_team_id,
+                                    user_id=actor_user_id,
+                                    is_enterprise_install=None,
+                                )
+                        else:
+                            this_user_installation = self.installation_store.find_installation(
+                                enterprise_id=enterprise_id,
+                                team_id=team_id,
+                                user_id=user_id,
+                                is_enterprise_install=context.is_enterprise_install,
+                            )
                         if this_user_installation is not None:
                             user_token = this_user_installation.user_token
-                            if latest_installation.bot_token is None:
+                            user_scopes = this_user_installation.user_scopes
+                            if (
+                                latest_bot_installation.bot_token is None
+                                # enterprise_id/team_id can be different for Slack Connect channel events
+                                # when enabling user_token_resolution: &#34;actor&#34;
+                                and latest_bot_installation.enterprise_id == this_user_installation.enterprise_id
+                                and latest_bot_installation.team_id == this_user_installation.team_id
+                            ):
                                 # If latest_installation has a bot token, we never overwrite the value
                                 bot_token = this_user_installation.bot_token
+                                bot_scopes = this_user_installation.bot_scopes
 
                             # If token rotation is enabled, running rotation may be needed here
                             refreshed = self._rotate_and_save_tokens_if_necessary(this_user_installation)
                             if refreshed is not None:
                                 user_token = refreshed.user_token
-                                if latest_installation.bot_token is None:
+                                user_scopes = refreshed.user_scopes
+                                if (
+                                    latest_bot_installation.bot_token is None
+                                    # enterprise_id/team_id can be different for Slack Connect channel events
+                                    # when enabling user_token_resolution: &#34;actor&#34;
+                                    and latest_bot_installation.enterprise_id == this_user_installation.enterprise_id
+                                    and latest_bot_installation.team_id == this_user_installation.team_id
+                                ):
                                     # If latest_installation has a bot token, we never overwrite the value
                                     bot_token = refreshed.bot_token
+                                    bot_scopes = refreshed.bot_scopes
 
                     # If token rotation is enabled, running rotation may be needed here
-                    refreshed = self._rotate_and_save_tokens_if_necessary(latest_installation)
+                    refreshed = self._rotate_and_save_tokens_if_necessary(latest_bot_installation)
                     if refreshed is not None:
                         bot_token = refreshed.bot_token
+                        bot_scopes = refreshed.bot_scopes
                         if this_user_installation is None:
                             # Only when we don&#39;t have `this_user_installation` here,
                             # the `user_token` is for the user associated with this request
                             user_token = refreshed.user_token
+                            user_scopes = refreshed.user_scopes
 
+            except SlackTokenRotationError as rotation_error:
+                # When token rotation fails, it is usually unrecoverable
+                # So, this built-in middleware gives up continuing with the following middleware and listeners
+                self.logger.error(f&#34;Failed to rotate tokens due to {rotation_error}&#34;)
+                return None
             except NotImplementedError as _:
                 self.find_installation_available = False
 
@@ -608,6 +735,7 @@ you can expect that the <code>authorize</code> layer should work for you without
                 )
                 if bot is not None:
                     bot_token = bot.bot_token
+                    bot_scopes = bot.bot_scopes
                     if bot.bot_refresh_token is not None:
                         # Token rotation
                         if self.token_rotator is None:
@@ -619,7 +747,13 @@ you can expect that the <code>authorize</code> layer should work for you without
                         if refreshed is not None:
                             self.installation_store.save_bot(refreshed)
                             bot_token = refreshed.bot_token
+                            bot_scopes = refreshed.bot_scopes
 
+            except SlackTokenRotationError as rotation_error:
+                # When token rotation fails, it is usually unrecoverable
+                # So, this built-in middleware gives up continuing with the following middleware and listeners
+                self.logger.error(f&#34;Failed to rotate tokens due to {rotation_error}&#34;)
+                return None
             except NotImplementedError as _:
                 self.find_bot_available = False
             except Exception as e:
@@ -637,10 +771,16 @@ you can expect that the <code>authorize</code> layer should work for you without
 
         try:
             auth_test_api_response = context.client.auth_test(token=token)
+            user_auth_test_response = None
+            if user_token is not None and token != user_token:
+                user_auth_test_response = context.client.auth_test(token=user_token)
             authorize_result = AuthorizeResult.from_auth_test_response(
                 auth_test_response=auth_test_api_response,
+                user_auth_test_response=user_auth_test_response,
                 bot_token=bot_token,
                 user_token=user_token,
+                bot_scopes=bot_scopes,
+                user_scopes=user_scopes,
             )
             if self.cache_enabled:
                 self.authorize_result_cache[token] = authorize_result
@@ -701,6 +841,10 @@ you can expect that the <code>authorize</code> layer should work for you without
 <dd>
 <div class="desc"></div>
 </dd>
+<dt id="slack_bolt.authorization.authorize.InstallationStoreAuthorize.user_token_resolution"><code class="name">var <span class="ident">user_token_resolution</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -733,6 +877,7 @@ you can expect that the <code>authorize</code> layer should work for you without
 <li><code><a title="slack_bolt.authorization.authorize.InstallationStoreAuthorize.find_bot_available" href="#slack_bolt.authorization.authorize.InstallationStoreAuthorize.find_bot_available">find_bot_available</a></code></li>
 <li><code><a title="slack_bolt.authorization.authorize.InstallationStoreAuthorize.find_installation_available" href="#slack_bolt.authorization.authorize.InstallationStoreAuthorize.find_installation_available">find_installation_available</a></code></li>
 <li><code><a title="slack_bolt.authorization.authorize.InstallationStoreAuthorize.token_rotator" href="#slack_bolt.authorization.authorize.InstallationStoreAuthorize.token_rotator">token_rotator</a></code></li>
+<li><code><a title="slack_bolt.authorization.authorize.InstallationStoreAuthorize.user_token_resolution" href="#slack_bolt.authorization.authorize.InstallationStoreAuthorize.user_token_resolution">user_token_resolution</a></code></li>
 </ul>
 </li>
 </ul>

@@ -195,7 +195,7 @@ __all__ = [
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp"><code class="flex name class">
 <span>class <span class="ident">AsyncApp</span></span>
-<span>(</span><span>*, logger: Optional[logging.Logger] = None, name: Optional[str] = None, process_before_response: bool = False, raise_error_for_unhandled_request: bool = False, signing_secret: Optional[str] = None, token: Optional[str] = None, client: Optional[slack_sdk.web.async_client.AsyncWebClient] = None, authorize: Optional[Callable[..., Awaitable[<a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]]] = None, installation_store: Optional[slack_sdk.oauth.installation_store.async_installation_store.AsyncInstallationStore] = None, installation_store_bot_only: Optional[bool] = None, request_verification_enabled: bool = True, ignoring_self_events_enabled: bool = True, ssl_check_enabled: bool = True, url_verification_enabled: bool = True, oauth_settings: Optional[<a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings" href="oauth/async_oauth_settings.html#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings">AsyncOAuthSettings</a>] = None, oauth_flow: Optional[<a title="slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow" href="oauth/async_oauth_flow.html#slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow">AsyncOAuthFlow</a>] = None, verification_token: Optional[str] = None)</span>
+<span>(</span><span>*, logger: Optional[logging.Logger] = None, name: Optional[str] = None, process_before_response: bool = False, raise_error_for_unhandled_request: bool = False, signing_secret: Optional[str] = None, token: Optional[str] = None, client: Optional[slack_sdk.web.async_client.AsyncWebClient] = None, before_authorize: Union[<a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>, Callable[..., Awaitable[Any]], ForwardRef(None)] = None, authorize: Optional[Callable[..., Awaitable[<a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]]] = None, installation_store: Optional[slack_sdk.oauth.installation_store.async_installation_store.AsyncInstallationStore] = None, installation_store_bot_only: Optional[bool] = None, request_verification_enabled: bool = True, ignoring_self_events_enabled: bool = True, ssl_check_enabled: bool = True, url_verification_enabled: bool = True, oauth_settings: Optional[<a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings" href="oauth/async_oauth_settings.html#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings">AsyncOAuthSettings</a>] = None, oauth_flow: Optional[<a title="slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow" href="oauth/async_oauth_flow.html#slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow">AsyncOAuthFlow</a>] = None, verification_token: Optional[str] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Bolt App that provides functionalities to register middleware/listeners.</p>
@@ -239,6 +239,8 @@ the built-in handler, which pints warning logs and returns 404 to Slack (Default
 <dd>The bot/user access token required only for single-workspace app.</dd>
 <dt><strong><code>client</code></strong></dt>
 <dd>The singleton <code>slack_sdk.web.async_client.AsyncWebClient</code> instance for this app.</dd>
+<dt><strong><code>before_authorize</code></strong></dt>
+<dd>A global middleware that can be executed right before authorize function</dd>
 <dt><strong><code>authorize</code></strong></dt>
 <dd>The function to authorize an incoming request from Slack
 by checking if there is a team/user in the installation data.</dd>
@@ -293,6 +295,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         token: Optional[str] = None,
         client: Optional[AsyncWebClient] = None,
         # for multi-workspace apps
+        before_authorize: Optional[Union[AsyncMiddleware, Callable[..., Awaitable[Any]]]] = None,
         authorize: Optional[Callable[..., Awaitable[AuthorizeResult]]] = None,
         installation_store: Optional[AsyncInstallationStore] = None,
         # for either only bot scope usage or v1.0.x compatibility
@@ -344,6 +347,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             signing_secret: The Signing Secret value used for verifying requests from Slack.
             token: The bot/user access token required only for single-workspace app.
             client: The singleton `slack_sdk.web.async_client.AsyncWebClient` instance for this app.
+            before_authorize: A global middleware that can be executed right before authorize function
             authorize: The function to authorize an incoming request from Slack
                 by checking if there is a team/user in the installation data.
             installation_store: The module offering save/find operations of installation data
@@ -401,6 +405,17 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         # Authorize &amp; OAuthFlow initialization
         # --------------------------------------
 
+        self._async_before_authorize: Optional[AsyncMiddleware] = None
+        if before_authorize is not None:
+            if isinstance(before_authorize, Callable):
+                self._async_before_authorize = AsyncCustomMiddleware(
+                    app_name=self._name,
+                    func=before_authorize,
+                    base_logger=self._framework_logger,
+                )
+            elif isinstance(before_authorize, AsyncMiddleware):
+                self._async_before_authorize = before_authorize
+
         self._async_authorize: Optional[AsyncAuthorize] = None
         if authorize is not None:
             if isinstance(authorize, AsyncAuthorize):
@@ -424,6 +439,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                 logger=self._framework_logger,
                 bot_only=installation_store_bot_only,
                 client=self._async_client,  # for proxy use cases etc.
+                user_token_resolution=(settings.user_token_resolution if settings is not None else &#34;authed_user&#34;),
             )
 
         self._async_oauth_flow: Optional[AsyncOAuthFlow] = None
@@ -543,6 +559,10 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             )
         if request_verification_enabled is True:
             self._async_middleware_list.append(AsyncRequestVerification(self._signing_secret, base_logger=self._base_logger))
+
+        if self._async_before_authorize is not None:
+            self._async_middleware_list.append(self._async_before_authorize)
+
         # As authorize is required for making a Bolt app function, we don&#39;t offer the flag to disable this
         if self._async_oauth_flow is None:
             if self._token:
@@ -555,7 +575,11 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                 raise BoltError(error_token_required())
         else:
             self._async_middleware_list.append(
-                AsyncMultiTeamsAuthorization(authorize=self._async_authorize, base_logger=self._base_logger)
+                AsyncMultiTeamsAuthorization(
+                    authorize=self._async_authorize,
+                    base_logger=self._base_logger,
+                    user_token_resolution=self._async_oauth_flow.settings.user_token_resolution,
+                )
             )
 
         if ignoring_self_events_enabled is True:
@@ -3328,6 +3352,9 @@ def say(self) -&gt; AsyncSay:
 <ul class="hlist">
 <li><code><b><a title="slack_bolt.context.base_context.BaseContext" href="context/base_context.html#slack_bolt.context.base_context.BaseContext">BaseContext</a></b></code>:
 <ul class="hlist">
+<li><code><a title="slack_bolt.context.base_context.BaseContext.actor_enterprise_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.actor_enterprise_id">actor_enterprise_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.actor_team_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.actor_team_id">actor_team_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.actor_user_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.actor_user_id">actor_user_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.authorize_result" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.authorize_result">authorize_result</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.bot_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.bot_id">bot_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.bot_token" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.bot_token">bot_token</a></code></li>

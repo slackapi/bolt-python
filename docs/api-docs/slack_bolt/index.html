@@ -210,7 +210,7 @@ if the execution chain should continue running the following middleware …</p><
 </dd>
 <dt id="slack_bolt.App"><code class="flex name class">
 <span>class <span class="ident">App</span></span>
-<span>(</span><span>*, logger: Optional[logging.Logger] = None, name: Optional[str] = None, process_before_response: bool = False, raise_error_for_unhandled_request: bool = False, signing_secret: Optional[str] = None, token: Optional[str] = None, token_verification_enabled: bool = True, client: Optional[slack_sdk.web.client.WebClient] = None, authorize: Optional[Callable[..., <a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]] = None, installation_store: Optional[slack_sdk.oauth.installation_store.installation_store.InstallationStore] = None, installation_store_bot_only: Optional[bool] = None, request_verification_enabled: bool = True, ignoring_self_events_enabled: bool = True, ssl_check_enabled: bool = True, url_verification_enabled: bool = True, oauth_settings: Optional[<a title="slack_bolt.oauth.oauth_settings.OAuthSettings" href="oauth/oauth_settings.html#slack_bolt.oauth.oauth_settings.OAuthSettings">OAuthSettings</a>] = None, oauth_flow: Optional[<a title="slack_bolt.oauth.oauth_flow.OAuthFlow" href="oauth/oauth_flow.html#slack_bolt.oauth.oauth_flow.OAuthFlow">OAuthFlow</a>] = None, verification_token: Optional[str] = None, listener_executor: Optional[concurrent.futures._base.Executor] = None)</span>
+<span>(</span><span>*, logger: Optional[logging.Logger] = None, name: Optional[str] = None, process_before_response: bool = False, raise_error_for_unhandled_request: bool = False, signing_secret: Optional[str] = None, token: Optional[str] = None, token_verification_enabled: bool = True, client: Optional[slack_sdk.web.client.WebClient] = None, before_authorize: Union[<a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>, Callable[..., Any], ForwardRef(None)] = None, authorize: Optional[Callable[..., <a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]] = None, installation_store: Optional[slack_sdk.oauth.installation_store.installation_store.InstallationStore] = None, installation_store_bot_only: Optional[bool] = None, request_verification_enabled: bool = True, ignoring_self_events_enabled: bool = True, ssl_check_enabled: bool = True, url_verification_enabled: bool = True, oauth_settings: Optional[<a title="slack_bolt.oauth.oauth_settings.OAuthSettings" href="oauth/oauth_settings.html#slack_bolt.oauth.oauth_settings.OAuthSettings">OAuthSettings</a>] = None, oauth_flow: Optional[<a title="slack_bolt.oauth.oauth_flow.OAuthFlow" href="oauth/oauth_flow.html#slack_bolt.oauth.oauth_flow.OAuthFlow">OAuthFlow</a>] = None, verification_token: Optional[str] = None, listener_executor: Optional[concurrent.futures._base.Executor] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Bolt App that provides functionalities to register middleware/listeners.</p>
@@ -256,6 +256,8 @@ the built-in handler, which pints warning logs and returns 404 to Slack (Default
 <dd>Verifies the validity of the given token if True.</dd>
 <dt><strong><code>client</code></strong></dt>
 <dd>The singleton <code>slack_sdk.WebClient</code> instance for this app.</dd>
+<dt><strong><code>before_authorize</code></strong></dt>
+<dd>A global middleware that can be executed right before authorize function</dd>
 <dt><strong><code>authorize</code></strong></dt>
 <dd>The function to authorize an incoming request from Slack
 by checking if there is a team/user in the installation data.</dd>
@@ -314,6 +316,7 @@ be used.</dd>
         token_verification_enabled: bool = True,
         client: Optional[WebClient] = None,
         # for multi-workspace apps
+        before_authorize: Optional[Union[Middleware, Callable[..., Any]]] = None,
         authorize: Optional[Callable[..., AuthorizeResult]] = None,
         installation_store: Optional[InstallationStore] = None,
         # for either only bot scope usage or v1.0.x compatibility
@@ -368,6 +371,7 @@ be used.</dd>
             token: The bot/user access token required only for single-workspace app.
             token_verification_enabled: Verifies the validity of the given token if True.
             client: The singleton `slack_sdk.WebClient` instance for this app.
+            before_authorize: A global middleware that can be executed right before authorize function
             authorize: The function to authorize an incoming request from Slack
                 by checking if there is a team/user in the installation data.
             installation_store: The module offering save/find operations of installation data
@@ -428,6 +432,17 @@ be used.</dd>
         # Authorize &amp; OAuthFlow initialization
         # --------------------------------------
 
+        self._before_authorize: Optional[Middleware] = None
+        if before_authorize is not None:
+            if isinstance(before_authorize, Callable):
+                self._before_authorize = CustomMiddleware(
+                    app_name=self._name,
+                    func=before_authorize,
+                    base_logger=self._framework_logger,
+                )
+            elif isinstance(before_authorize, Middleware):
+                self._before_authorize = before_authorize
+
         self._authorize: Optional[Authorize] = None
         if authorize is not None:
             if isinstance(authorize, Authorize):
@@ -451,6 +466,7 @@ be used.</dd>
                 logger=self._framework_logger,
                 bot_only=installation_store_bot_only,
                 client=self._client,  # for proxy use cases etc.
+                user_token_resolution=(settings.user_token_resolution if settings is not None else &#34;authed_user&#34;),
             )
 
         self._oauth_flow: Optional[OAuthFlow] = None
@@ -569,6 +585,9 @@ be used.</dd>
         if request_verification_enabled is True:
             self._middleware_list.append(RequestVerification(self._signing_secret, base_logger=self._base_logger))
 
+        if self._before_authorize is not None:
+            self._middleware_list.append(self._before_authorize)
+
         # As authorize is required for making a Bolt app function, we don&#39;t offer the flag to disable this
         if self._oauth_flow is None:
             if self._token is not None:
@@ -592,7 +611,13 @@ be used.</dd>
             else:
                 raise BoltError(error_token_required())
         else:
-            self._middleware_list.append(MultiTeamsAuthorization(authorize=self._authorize, base_logger=self._base_logger))
+            self._middleware_list.append(
+                MultiTeamsAuthorization(
+                    authorize=self._authorize,
+                    base_logger=self._base_logger,
+                    user_token_resolution=self._oauth_flow.settings.user_token_resolution,
+                )
+            )
         if ignoring_self_events_enabled is True:
             self._middleware_list.append(IgnoringSelfEvents(base_logger=self._base_logger))
         if url_verification_enabled is True:
@@ -3483,6 +3508,9 @@ def say(self) -&gt; Say:
 <ul class="hlist">
 <li><code><b><a title="slack_bolt.context.base_context.BaseContext" href="context/base_context.html#slack_bolt.context.base_context.BaseContext">BaseContext</a></b></code>:
 <ul class="hlist">
+<li><code><a title="slack_bolt.context.base_context.BaseContext.actor_enterprise_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.actor_enterprise_id">actor_enterprise_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.actor_team_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.actor_team_id">actor_team_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.actor_user_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.actor_user_id">actor_user_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.authorize_result" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.authorize_result">authorize_result</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.bot_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.bot_id">bot_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.bot_token" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.bot_token">bot_token</a></code></li>

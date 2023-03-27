@@ -87,6 +87,7 @@ class LambdaS3OAuthFlow(OAuthFlow):
             client_secret=settings.client_secret,
             installation_store=settings.installation_store,
             bot_only=settings.installation_store_bot_only,
+            user_token_resolution=(settings.user_token_resolution if settings is not None else &#34;authed_user&#34;),
         )
 
         OAuthFlow.__init__(self, client=client, logger=logger, settings=settings)
@@ -176,6 +177,7 @@ class LambdaS3OAuthFlow(OAuthFlow):
             client_secret=settings.client_secret,
             installation_store=settings.installation_store,
             bot_only=settings.installation_store_bot_only,
+            user_token_resolution=(settings.user_token_resolution if settings is not None else &#34;authed_user&#34;),
         )
 
         OAuthFlow.__init__(self, client=client, logger=logger, settings=settings)
