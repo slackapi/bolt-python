@@ -7,8 +7,9 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # Avoiding -latest due to https://github.com/actions/setup-python/issues/162
+    runs-on: ubuntu-20.04
+    timeout-minutes: 15
     strategy:
       matrix:
         python-version: ["3.11"]
