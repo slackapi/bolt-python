@@ -58,7 +58,6 @@ class TestWebClientCustomization:
         timestamp = str(int(time()))
         return AsyncBoltRequest(body=raw_body, headers=self.build_headers(timestamp, raw_body))
 
-
     @pytest.mark.asyncio
     async def test_web_client_customization(self):
         if os.environ.get("BOLT_PYTHON_CODECOV_RUNNING") == "1":
