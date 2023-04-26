@@ -27,5 +27,6 @@ class BoltUnhandledRequestError(BoltError):
     def __str__(self) -> str:
         return "unhandled request error"
 
+
 class CliError(Exception):
     """General class for cli error"""
