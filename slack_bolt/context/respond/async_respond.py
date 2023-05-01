@@ -35,7 +35,7 @@ class AsyncRespond:
         unfurl_links: Optional[bool] = None,
         unfurl_media: Optional[bool] = None,
         thread_ts: Optional[str] = None,
-        metadata: Dict[str, Any] = None,
+        metadata: Optional[Dict[str, Any]] = None,
     ) -> WebhookResponse:
         if self.response_url is not None:
             client = AsyncWebhookClient(
