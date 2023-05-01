@@ -16,7 +16,7 @@ def _build_message(
     unfurl_links: Optional[bool] = None,
     unfurl_media: Optional[bool] = None,
     thread_ts: Optional[str] = None,
-    metadata: Dict[str, Any] = None,
+    metadata: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     message = {"text": text}
     if blocks is not None and len(blocks) > 0:
