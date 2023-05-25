@@ -21,6 +21,9 @@ order: 12
 # モーダル送信でのビューの更新
 @app.view("view_1")
 def handle_submission(ack, body):
+    # build_new_view() method はモーダルビューを返します
+    # モーダルの構築には Block Kit Builder を試してみてください：
+    # https://app.slack.com/block-kit-builder/#%7B%22type%22:%22modal%22,%22callback_id%22:%22view_1%22,%22title%22:%7B%22type%22:%22plain_text%22,%22text%22:%22My%20App%22,%22emoji%22:true%7D,%22blocks%22:%5B%5D%7D
     ack(response_action="update", view=build_new_view(body))
 ```
 この例と同様に、モーダルでの送信リクエストに対して、<a href="https://api.slack.com/surfaces/modals/using#displaying_errors">エラーを表示する</a>ためのオプションもあります。
