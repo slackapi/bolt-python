@@ -32,7 +32,7 @@ def update_message(ack):
 
 <div class="secondary-content" markdown="0">
 
-You can use a constraints object to listen to `callback_id`s, `block_id`s, and `action_id`s (or any combination of them). Constraints in the object can be of type `str` or `re.Pattern`.
+You can use a constraints object to listen to `block_id`s and `action_id`s (or any combination of them). Constraints in the object can be of type `str` or `re.Pattern`.
 
 </div>
 

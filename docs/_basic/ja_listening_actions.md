@@ -32,7 +32,7 @@ def update_message(ack):
 
 <div class="secondary-content" markdown="0">
 
-制約付きのオブジェクトを使用すると、`callback_id`、`block_id`、および `action_id` をそれぞれ、または任意に組み合わせてリッスンできます。オブジェクト内の制約は、`str` 型または `re.Pattern` 型で指定できます。
+制約付きのオブジェクトを使用すると、`block_id` と `action_id` をそれぞれ、または任意に組み合わせてリッスンできます。オブジェクト内の制約は、`str` 型または `re.Pattern` 型で指定できます。
 
 </div>
 
