@@ -2,6 +2,7 @@ import asyncio
 from time import time
 
 import pytest
+from tests.utils import get_event_loop
 from slack_sdk.signature import SignatureVerifier
 
 from slack_bolt.middleware.request_verification.async_request_verification import (
@@ -34,7 +35,7 @@ class TestAsyncRequestVerification:
 
     @pytest.fixture
     def event_loop(self):
-        loop = asyncio.get_event_loop()
+        loop = get_event_loop()
         yield loop
         loop.close()
 

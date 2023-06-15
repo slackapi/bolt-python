@@ -13,7 +13,7 @@ from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
 )
-from tests.utils import remove_os_env_temporarily, restore_os_env
+from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
 
 
 class TestAsyncLazy:
@@ -31,7 +31,7 @@ class TestAsyncLazy:
         old_os_env = remove_os_env_temporarily()
         try:
             setup_mock_web_api_server(self)
-            loop = asyncio.get_event_loop()
+            loop = get_event_loop()
             yield loop
             loop.close()
             cleanup_mock_web_api_server(self)
