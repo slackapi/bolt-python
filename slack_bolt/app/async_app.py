@@ -470,7 +470,7 @@ class AsyncApp:
             )
         return self._server
 
-    def web_app(self, path: str = "/slack/events") -> web.Application:
+    def web_app(self, path: str = "/slack/events", port: int = 3000) -> web.Application:
         """Returns a `web.Application` instance for aiohttp-devtools users.
 
             from slack_bolt.async_app import AsyncApp
@@ -488,8 +488,9 @@ class AsyncApp:
 
         Args:
             path: The path to receive incoming requests from Slack
+            port: The port to listen on (Default: 3000)
         """
-        return self.server(path=path).web_app
+        return self.server(path=path, port=port).web_app
 
     def start(self, port: int = 3000, path: str = "/slack/events", host: Optional[str] = None) -> None:
         """Start a web server using AIOHTTP.
