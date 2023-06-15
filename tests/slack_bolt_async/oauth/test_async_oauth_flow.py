@@ -4,6 +4,7 @@ from time import time
 from urllib.parse import quote
 
 import pytest
+from tests.utils import get_event_loop
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 from slack_sdk.oauth.state_store.async_state_store import AsyncOAuthStateStore
@@ -35,7 +36,7 @@ class TestAsyncOAuthFlow:
     @pytest.fixture
     def event_loop(self):
         setup_mock_web_api_server(self)
-        loop = asyncio.get_event_loop()
+        loop = get_event_loop()
         yield loop
         loop.close()
         cleanup_mock_web_api_server(self)
