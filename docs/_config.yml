@@ -18,9 +18,6 @@ collections:
   tutorials:
     output: true
     permalink: /tutorials/:slug
-  future:
-    output: true
-    permalink: /future/:slug
 
 defaults:
   - scope:

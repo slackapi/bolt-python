@@ -128,16 +128,6 @@ span.beta {
   border-radius: 12px;
 }
 
-.panel .sidebar-content ul.sidebar-section .label-beta {
-  line-height: 1em;
-  vertical-align: middle;
-  color: var(--white);
-  background-color: var(--blue);
-  font-size: 0.5em;
-  font-weight: 800;
-  padding: 4px 10px;
-  border-radius: 12px;
-}
 /* Main page */
 .header {
   width: 95%;
@@ -254,29 +244,6 @@ span.beta {
   padding-bottom: 1em;
 }
 
-.tutorial .label-beta {
-  line-height: 1em;
-  vertical-align: middle;
-  color: var(--white);
-  background-color: var(--blue);
-  font-size: 0.45em;
-  font-weight: 800;
-  padding: 4px 10px;
-  border-radius: 12px;
-  margin-left: 10px;
-}
-
-.section-wrapper .label-beta {
-  line-height: 1em;
-  vertical-align: middle;
-  color: var(--white);
-  background-color: var(--blue);
-  font-size: 0.45em;
-  font-weight: 800;
-  padding: 4px 10px;
-  border-radius: 12px;
-  margin-left: 10px;
-}
 .content .section-wrapper .highlighter-rouge {
   grid-area: code;
 }
