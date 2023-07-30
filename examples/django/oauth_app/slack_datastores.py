@@ -42,7 +42,6 @@ class DjangoInstallationStore(InstallationStore):
             SlackInstallation.objects.filter(client_id=self.client_id)
             .filter(enterprise_id=installation.enterprise_id)
             .filter(team_id=installation.team_id)
-            .filter(installed_at=i["installed_at"])
             .first()
         )
         if row_to_update is not None:
