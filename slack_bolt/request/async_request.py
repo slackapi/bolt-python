@@ -29,7 +29,7 @@ class AsyncBoltRequest:
         body: Union[str, dict],
         query: Optional[Union[str, Dict[str, str], Dict[str, Sequence[str]]]] = None,
         headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None,
-        context: Optional[Dict[str, str]] = None,
+        context: Optional[Dict[str, Any]] = None,
         mode: str = "http",  # either "http" or "socket_mode"
     ):
         """Request to a Bolt app.
