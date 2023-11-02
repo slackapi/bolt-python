@@ -2,7 +2,6 @@
 
 [![Python Version][python-version]][pypi-url]
 [![pypi package][pypi-image]][pypi-url]
-[![Build Status][build-image]][build-url]
 [![Codecov][codecov-image]][codecov-url]
 
 A Python framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://slack.dev/bolt-python/tutorial/getting-started) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt. The Python module documents are available [here](https://slack.dev/bolt-python/api-docs/slack_bolt/).
@@ -188,8 +187,6 @@ If you otherwise get stuck, we're here to help. The following are the best ways 
 
 [pypi-image]: https://badge.fury.io/py/slack-bolt.svg
 [pypi-url]: https://pypi.org/project/slack-bolt/
-[build-image]: https://github.com/slackapi/bolt-python/workflows/CI%20Build/badge.svg
-[build-url]: https://github.com/slackapi/bolt-python/actions?query=workflow%3A%22CI+Build%22
 [codecov-image]: https://codecov.io/gh/slackapi/bolt-python/branch/main/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/slackapi/bolt-python
 [python-version]: https://img.shields.io/pypi/pyversions/slack-bolt.svg

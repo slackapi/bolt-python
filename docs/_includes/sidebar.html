@@ -42,30 +42,6 @@
   </ul>
 
   <ul class="sidebar-section">
-    {% assign future_sections = site.future | sort: "order" | where: "lang", page.lang %}
-    {% for section in future_sections %}
-    {% if section.layout == "tutorial" %}
-    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/tutorial/{{ section.slug }}">
-      <li>{{section.title}}</li>
-    </a>
-    {% else %}
-    {% if section.order == 0 %}
-    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/future/concepts">
-      <li class="title">
-        {{section.title}}
-        <span class="label-beta">{{ site.t[page.lang].beta }}</span>
-      </li>
-    </a>
-    {% else %}
-    <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/future/concepts#{{ section.slug }}">
-      <li>{{section.title}}</li>
-    </a>
-    {% endif %}
-    {% endif %}
-    {% endfor %}
-  </ul>
-
-  <ul class="sidebar-section">
     <a href="{{ site.url | append: site.baseurl | append: localized_base_url }}/concepts#advanced">
       <li class="title">{{ site.t[page.lang].advanced }}</li>
     </a>
