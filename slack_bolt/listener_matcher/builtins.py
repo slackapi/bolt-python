@@ -176,6 +176,17 @@ def _verify_message_event_type(event_type: str) -> None:
         raise ValueError(error_message_event_type(event_type))
 
 
+def function_event(
+    callback_id: Union[str, Pattern],
+    asyncio: bool = False,
+    base_logger: Optional[Logger] = None,
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+    def func(body: Dict[str, Any]) -> bool:
+        return is_function(body) and _matches(callback_id, body.get("event", {}).get("function", {}).get("callback_id", ""))
+
+    return build_listener_matcher(func, asyncio, base_logger)
+
+
 def workflow_step_execute(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,

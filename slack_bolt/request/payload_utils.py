@@ -20,6 +20,10 @@ def to_message(body: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     return None
 
 
+def is_function(body: Dict[str, Any]) -> bool:
+    return is_event(body) and "function_executed" == body["event"]["type"] and "function_execution_id" in body["event"]
+
+
 def is_event(body: Dict[str, Any]) -> bool:
     return body is not None and _is_expected_type(body, "event_callback") and "event" in body and "type" in body["event"]
 
@@ -176,6 +180,19 @@ def to_step(body: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if is_workflow_step_execute(body):
         return body["event"]["workflow_step"]
     return None
+
+
+# -------------------
+# Function
+# -------------------
+
+
+def is_function_interactivity(body: Dict[str, Any]) -> bool:
+    return "function_data" in body and (
+        _is_expected_type(body, "block_actions")
+        or _is_expected_type(body, "view_submission")
+        or _is_expected_type(body, "view_closed")
+    )
 
 
 # ------------------------------------------

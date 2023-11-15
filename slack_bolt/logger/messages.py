@@ -266,7 +266,20 @@ app.step(ws)
         )
     if is_event(req.body):
         # @app.event
-        event_type = req.body.get("event", {}).get("type")
+        event = req.body.get("event", {})
+        event_type = event.get("type")
+        if is_function(req.body):
+            # @app.function
+            callback_id = event.get("function", {}).get("callback_id", "function_id")
+            return _build_unhandled_request_suggestion(
+                default_message,
+                f"""
+@app.function("{callback_id}")
+{'async ' if is_async else ''}def handle_{callback_id}_function(body, complete, fail, logger):
+    logger.info(body)
+    fail("Function not implemented")
+""",
+            )
         return _build_unhandled_request_suggestion(
             default_message,
             f"""

@@ -24,10 +24,12 @@ class BaseContext(dict):
         "response_url",
         "matches",
         "authorize_result",
+        "function_bot_access_token",
         "bot_token",
         "bot_id",
         "bot_user_id",
         "user_token",
+        "function_execution_id",
         "client",
         "ack",
         "say",
@@ -103,12 +105,22 @@ class BaseContext(dict):
         """Returns all the matched parts in message listener's regexp"""
         return self.get("matches")
 
+    @property
+    def function_execution_id(self) -> Optional[str]:
+        """The `function_execution_id` associated with this request."""
+        return self.get("function_execution_id")
+
     # --------------------------------
 
     @property
     def authorize_result(self) -> Optional[AuthorizeResult]:
         """The authorize result resolved for this request."""
         return self.get("authorize_result")
+
+    @property
+    def function_bot_access_token(self) -> Optional[str]:
+        """The bot token resolved for this function request."""
+        return self.get("function_bot_access_token")
 
     @property
     def bot_token(self) -> Optional[str]:

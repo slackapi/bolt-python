@@ -1,4 +1,5 @@
 import pytest
+from build.lib.slack_bolt.request.internals import extract_function_execution_id
 
 from slack_bolt.request.internals import (
     extract_channel_id,
@@ -79,6 +80,18 @@ class TestRequestInternals:
             "enterprise": None,
             "callback_id": "run-socket-mode",
             "trigger_id": "111.222.xxx",
+        },
+    ]
+
+    function_event_requests = [
+        {
+            "token": "xxx",
+            "enterprise_id": "E111",
+            "team_id": "T111",
+            "event": {
+                "function_execution_id": "Fx111",
+            },
+            "type": "event_callback",
         },
     ]
 
@@ -275,6 +288,9 @@ class TestRequestInternals:
         for req in self.no_enterprise_no_channel_requests:
             team_id = extract_team_id(req)
             assert team_id == "T111"
+        for req in self.function_event_requests:
+            team_id = extract_team_id(req)
+            assert team_id == "T111"
 
     def test_enterprise_id_extraction(self):
         for req in self.requests:
@@ -286,6 +302,14 @@ class TestRequestInternals:
         for req in self.no_enterprise_no_channel_requests:
             enterprise_id = extract_enterprise_id(req)
             assert enterprise_id is None
+        for req in self.function_event_requests:
+            enterprise_id = extract_enterprise_id(req)
+            assert enterprise_id == "E111"
+
+    def test_function_execution_id_extraction(self):
+        for req in self.function_event_requests:
+            enterprise_id = extract_function_execution_id(req)
+            assert enterprise_id == "Fx111"
 
     def test_is_enterprise_install_extraction(self):
         for req in self.requests:
