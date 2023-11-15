@@ -1,5 +1,5 @@
 import pytest
-from build.lib.slack_bolt.request.internals import extract_function_execution_id
+from slack_bolt.request.internals import extract_function_execution_id
 
 from slack_bolt.request.internals import (
     extract_channel_id,
