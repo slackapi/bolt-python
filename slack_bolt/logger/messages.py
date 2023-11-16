@@ -276,9 +276,15 @@ app.step(ws)
                 default_message,
                 f"""
 @app.function("{callback_id}")
-{'async ' if is_async else ''}def handle_{callback_id}_function(body, complete, fail, logger):
+{'async ' if is_async else ''}def handle_{callback_id}_function(body, event, client, logger):
     logger.info(body)
-    fail("Function not implemented")
+    {'await ' if is_async else ''}client.api_call(
+        "functions.completeError",
+        json={{
+            "function_execution_id": event["function_execution_id"],
+            "error": "there was an error",
+        }},
+    )
 """,
             )
         return _build_unhandled_request_suggestion(
