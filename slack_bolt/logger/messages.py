@@ -7,6 +7,7 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.request.payload_utils import (
     is_action,
     is_event,
+    is_function,
     is_options,
     is_shortcut,
     is_slash_command,

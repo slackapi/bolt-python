@@ -14,7 +14,7 @@ class AsyncAttachingFunctionToken(AsyncMiddleware):  # type: ignore
         # This method is not supposed to be invoked by bolt-python users
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> BoltResponse:
-        if req.context.slack_function_bot_access_token is not None:
-            req.context.client.token = req.context.slack_function_bot_access_token
+        if req.context.function_bot_access_token is not None:
+            req.context.client.token = req.context.function_bot_access_token
 
         return await next()

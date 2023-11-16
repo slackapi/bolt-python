@@ -6,6 +6,7 @@ from logging import Logger
 from slack_bolt.error import BoltError
 from slack_bolt.request.payload_utils import (
     is_block_actions,
+    is_function,
     is_global_shortcut,
     is_message_shortcut,
     is_attachment_action,
