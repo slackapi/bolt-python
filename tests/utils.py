@@ -1,7 +1,6 @@
 import os
 import asyncio
 
-
 def remove_os_env_temporarily() -> dict:
     old_env = os.environ.copy()
     os.environ.clear()
@@ -28,7 +27,6 @@ def get_mock_server_mode() -> str:
         return "threading"
     else:
         return mode
-
 
 def get_event_loop():
     try:
