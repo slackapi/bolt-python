@@ -846,14 +846,24 @@ class App:
         This method can be used as either a decorator or a method.
             # Use this method as a decorator
             @app.function("reverse")
-            def reverse_string(event, complete: Complete):
+            def reverse_string(event, client: WebClient, context: BoltContext ):
                 try:
                     string_to_reverse = event["inputs"]["stringToReverse"]
-                    complete(outputs={
-                        "reverseString": string_to_reverse[::-1]
-                    })
+                    client.api_call(
+                        "functions.completeSuccess",
+                        json={
+                            "function_execution_id": context.function_execution_id,
+                            "outputs": {"reverseString": string_to_reverse[::-1]},
+                        },
+                    )
                 except Exception as e:
-                    complete(error="Cannot reverse string")
+                    client.api_call(
+                        "functions.completeError",
+                        json={
+                            "function_execution_id": context.function_execution_id,
+                            "error": "Cannot reverse string",
+                        },
+                    )
                     raise e
             # Pass a function to this method
             app.function("reverse")(reverse_string)
