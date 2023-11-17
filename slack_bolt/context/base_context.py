@@ -107,7 +107,7 @@ class BaseContext(dict):
 
     @property
     def function_execution_id(self) -> Optional[str]:
-        """The `function_execution_id` associated with this request."""
+        """The `function_execution_id` associated with this request. Only available for function related events"""
         return self.get("function_execution_id")
 
     # --------------------------------
@@ -119,7 +119,7 @@ class BaseContext(dict):
 
     @property
     def function_bot_access_token(self) -> Optional[str]:
-        """The bot token resolved for this function request."""
+        """The bot token resolved for this function request. Only available for function related events"""
         return self.get("function_bot_access_token")
 
     @property

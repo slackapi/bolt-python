@@ -914,7 +914,7 @@ class AsyncApp:
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
-            primary_matcher = builtin_matchers.function_event(
+            primary_matcher = builtin_matchers.function_executed(
                 callback_id=callback_id, base_logger=self._base_logger, asyncio=True
             )
             return self._register_listener(functions, primary_matcher, matchers, middleware, True)

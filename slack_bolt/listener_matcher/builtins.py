@@ -177,7 +177,7 @@ def _verify_message_event_type(event_type: str) -> None:
         raise ValueError(error_message_event_type(event_type))
 
 
-def function_event(
+def function_executed(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
