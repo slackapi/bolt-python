@@ -62,8 +62,8 @@ from slack_bolt.middleware import (
     MultiTeamsAuthorization,
     IgnoringSelfEvents,
     CustomMiddleware,
+    AttachingFunctionToken,
 )
-from slack_bolt.middleware.attaching_function_token import AttachingFunctionToken
 from slack_bolt.middleware.message_listener_matches import MessageListenerMatches
 from slack_bolt.middleware.middleware_error_handler import (
     DefaultMiddlewareErrorHandler,

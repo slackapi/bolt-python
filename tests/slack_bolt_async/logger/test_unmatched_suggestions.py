@@ -95,14 +95,25 @@ async def handle_app_mention_events(body, logger):
 
 @app.function("reverse")
 async def handle_reverse_function(body, event, client, logger):
-    logger.info(body)
-    await client.api_call(
-        "functions.completeError",
-        json={{
-            "function_execution_id": event["function_execution_id"],
-            "error": "there was an error",
-        }},
-    )
+    try:
+        # TODO: do something here
+        outputs = {{}}
+        await client.api_call(
+            "functions.completeSuccess",
+            json={{
+                "function_execution_id": context.function_execution_id,
+                "outputs": outputs,
+            }},
+        )
+    except Exception as e:
+        error = f"Failed to handle a function request (error: {{e}})"
+        await client.api_call(
+            "functions.completeError",
+            json={{
+                "function_execution_id": context.function_execution_id,
+                "error": error,
+            }},
+        )
 """
             == message
         )

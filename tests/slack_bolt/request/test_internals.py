@@ -10,7 +10,7 @@ from slack_bolt.request.internals import (
     extract_actor_enterprise_id,
     extract_actor_team_id,
     extract_actor_user_id,
-    extract_function_execution_id
+    extract_function_execution_id,
 )
 
 

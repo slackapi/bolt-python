@@ -16,6 +16,7 @@ from .middleware import Middleware
 from .request_verification import RequestVerification
 from .ssl_check import SslCheck
 from .url_verification import UrlVerification
+from .attaching_function_token import AttachingFunctionToken
 
 builtin_middleware_classes = [
     SslCheck,
@@ -24,6 +25,7 @@ builtin_middleware_classes = [
     MultiTeamsAuthorization,
     IgnoringSelfEvents,
     UrlVerification,
+    AttachingFunctionToken,
 ]
 for cls in builtin_middleware_classes:
     Middleware.register(cls)
@@ -37,5 +39,5 @@ __all__ = [
     "RequestVerification",
     "SslCheck",
     "UrlVerification",
-    "builtin_middleware_classes",
+    "AttachingFunctionToken" "builtin_middleware_classes",
 ]
