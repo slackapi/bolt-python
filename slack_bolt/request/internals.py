@@ -214,9 +214,7 @@ def extract_function_execution_id(payload: Dict[str, Any]) -> Optional[str]:
     if payload.get("event") is not None:
         return extract_function_execution_id(payload["event"])
     if payload.get("function_data") is not None:
-        return extract_function_execution_id(payload["function_data"])
-    if payload.get("execution_id") is not None:
-        return payload.get("execution_id")
+        return payload["function_data"].get("execution_id")
     return None
 
 

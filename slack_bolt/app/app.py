@@ -838,7 +838,7 @@ class App:
 
     def function(
         self,
-        callback_id: str,
+        callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
@@ -861,7 +861,7 @@ class App:
                         "functions.completeError",
                         json={
                             "function_execution_id": context.function_execution_id,
-                            "error": "Cannot reverse string",
+                            "error": f"Cannot reverse string (error: {e})",
                         },
                     )
                     raise e

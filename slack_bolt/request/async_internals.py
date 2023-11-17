@@ -43,14 +43,14 @@ def build_async_context(
     channel_id = extract_channel_id(body)
     if channel_id:
         context["channel_id"] = channel_id
-    if "response_url" in body:
-        context["response_url"] = body["response_url"]
     function_execution_id = extract_function_execution_id(body)
     if function_execution_id:
         context["function_execution_id"] = function_execution_id
     function_bot_access_token = extract_function_bot_access_token(body)
     if function_bot_access_token is not None:
         context["function_bot_access_token"] = function_bot_access_token
+    if "response_url" in body:
+        context["response_url"] = body["response_url"]
     elif "response_urls" in body:
         # In the case where response_url_enabled: true in a modal exists
         response_urls = body["response_urls"]

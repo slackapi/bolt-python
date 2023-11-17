@@ -1,5 +1,4 @@
 import pytest
-from slack_bolt.request.internals import extract_function_execution_id
 
 from slack_bolt.request.internals import (
     extract_channel_id,
@@ -11,6 +10,7 @@ from slack_bolt.request.internals import (
     extract_actor_enterprise_id,
     extract_actor_team_id,
     extract_actor_user_id,
+    extract_function_execution_id
 )
 
 
@@ -308,8 +308,8 @@ class TestRequestInternals:
 
     def test_function_execution_id_extraction(self):
         for req in self.function_event_requests:
-            enterprise_id = extract_function_execution_id(req)
-            assert enterprise_id == "Fx111"
+            function_execution_id = extract_function_execution_id(req)
+            assert function_execution_id == "Fx111"
 
     def test_is_enterprise_install_extraction(self):
         for req in self.requests:

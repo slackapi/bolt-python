@@ -277,14 +277,25 @@ app.step(ws)
                 f"""
 @app.function("{callback_id}")
 {'async ' if is_async else ''}def handle_{callback_id}_function(body, event, client, logger):
-    logger.info(body)
-    {'await ' if is_async else ''}client.api_call(
-        "functions.completeError",
-        json={{
-            "function_execution_id": event["function_execution_id"],
-            "error": "there was an error",
-        }},
-    )
+    try:
+        # TODO: do something here
+        outputs = {{}}
+        {'await ' if is_async else ''}client.api_call(
+            "functions.completeSuccess",
+            json={{
+                "function_execution_id": context.function_execution_id,
+                "outputs": outputs,
+            }},
+        )
+    except Exception as e:
+        error = f"Failed to handle a function request (error: {{e}})"
+        {'await ' if is_async else ''}client.api_call(
+            "functions.completeError",
+            json={{
+                "function_execution_id": context.function_execution_id,
+                "error": error,
+            }},
+        )
 """,
             )
         return _build_unhandled_request_suggestion(

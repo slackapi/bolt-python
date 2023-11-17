@@ -871,7 +871,7 @@ class AsyncApp:
 
     def function(
         self,
-        callback_id: str,
+        callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[BoltResponse]]]]:
@@ -879,7 +879,7 @@ class AsyncApp:
         This method can be used as either a decorator or a method.
             # Use this method as a decorator
             @app.function("reverse")
-            async def reverse_string(event, complete: AsyncComplete):
+            async def reverse_string(event, client: AsyncWebClient, complete: AsyncComplete):
                 try:
                     string_to_reverse = event["inputs"]["stringToReverse"]
                     await client.api_call(
@@ -894,7 +894,7 @@ class AsyncApp:
                         "functions.completeError",
                         json={
                             "function_execution_id": context.function_execution_id,
-                            "error": "Cannot reverse string",
+                            "error": f"Cannot reverse string (error: {e})",
                         },
                     )
                     raise e
