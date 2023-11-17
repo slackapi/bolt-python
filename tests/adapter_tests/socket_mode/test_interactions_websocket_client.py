@@ -57,10 +57,11 @@ class TestSocketModeWebsocketClient:
         )
         try:
             handler.client.wss_uri = "ws://localhost:3012/link"
+            handler.client.default_auto_reconnect_enabled = False
 
             handler.connect()
-            assert handler.client.is_connected() is True
             time.sleep(2)  # wait for the message receiver
+            assert handler.client.is_connected() is True
 
             handler.client.send_message("foo")
 
