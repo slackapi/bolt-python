@@ -222,7 +222,7 @@ def extract_function_bot_access_token(payload: Dict[str, Any]) -> Optional[str]:
     if payload.get("bot_access_token") is not None:
         return payload.get("bot_access_token")
     if payload.get("event") is not None:
-        return extract_function_bot_access_token(payload["event"])
+        return payload["event"].get("bot_access_token")
     return None
 
 
@@ -253,9 +253,9 @@ def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
     function_execution_id = extract_function_execution_id(body)
     if function_execution_id is not None:
         context["function_execution_id"] = function_execution_id
-    function_bot_access_token = extract_function_bot_access_token(body)
-    if function_bot_access_token is not None:
-        context["function_bot_access_token"] = function_bot_access_token
+        function_bot_access_token = extract_function_bot_access_token(body)
+        if function_bot_access_token is not None:
+            context["function_bot_access_token"] = function_bot_access_token
     if "response_url" in body:
         context["response_url"] = body["response_url"]
     elif "response_urls" in body:

@@ -46,9 +46,9 @@ def build_async_context(
     function_execution_id = extract_function_execution_id(body)
     if function_execution_id:
         context["function_execution_id"] = function_execution_id
-    function_bot_access_token = extract_function_bot_access_token(body)
-    if function_bot_access_token is not None:
-        context["function_bot_access_token"] = function_bot_access_token
+        function_bot_access_token = extract_function_bot_access_token(body)
+        if function_bot_access_token is not None:
+            context["function_bot_access_token"] = function_bot_access_token
     if "response_url" in body:
         context["response_url"] = body["response_url"]
     elif "response_urls" in body:
