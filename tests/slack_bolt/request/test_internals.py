@@ -2,6 +2,7 @@ import pytest
 
 from slack_bolt.request.internals import (
     extract_channel_id,
+    extract_function_bot_access_token,
     extract_user_id,
     extract_team_id,
     extract_enterprise_id,
@@ -85,13 +86,31 @@ class TestRequestInternals:
 
     function_event_requests = [
         {
+            "type": "event_callback",
             "token": "xxx",
             "enterprise_id": "E111",
             "team_id": "T111",
-            "event": {
-                "function_execution_id": "Fx111",
+            "event": {"function_execution_id": "Fx111", "bot_access_token": "xwfp-xxx"},
+        },
+        {
+            "type": "block_actions",
+            "enterprise_id": "E111",
+            "team_id": "T111",
+            "bot_access_token": "xwfp-xxx",
+            "function_data": {
+                "execution_id": "Fx111",
             },
-            "type": "event_callback",
+            "interactivity": {"interactivity_pointer": "111.222.xxx"},
+        },
+        {
+            "type": "view_submission",
+            "enterprise_id": "E111",
+            "team_id": "T111",
+            "bot_access_token": "xwfp-xxx",
+            "function_data": {
+                "execution_id": "Fx111",
+            },
+            "interactivity": {"interactivity_pointer": "111.222.xxx"},
         },
     ]
 
@@ -305,6 +324,11 @@ class TestRequestInternals:
         for req in self.function_event_requests:
             enterprise_id = extract_enterprise_id(req)
             assert enterprise_id == "E111"
+
+    def test_bot_access_token_extraction(self):
+        for req in self.function_event_requests:
+            function_bot_access_token = extract_function_bot_access_token(req)
+            assert function_bot_access_token == "xwfp-xxx"
 
     def test_function_execution_id_extraction(self):
         for req in self.function_event_requests:
