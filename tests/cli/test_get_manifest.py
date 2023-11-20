@@ -1,7 +1,7 @@
 import json
 import pytest
 
-from cli.get_manifest import get_manifest
+from slack_bolt.cli import get_manifest
 
 
 class TestGetManifest:

@@ -11,10 +11,9 @@ if __name__ == "__main__":
     print(f"ran as __main__")
 
 web_client = WebClient(
-    token=os.environ["SLACK_BOT_TOKEN"],
     base_url="http://localhost:8888",
 )
 
 app = App(signing_secret="valid", client=web_client)
 
-SocketModeHandler(app, os.environ.get("SLACK_APP_TOKEN")).start()
+SocketModeHandler(app).start()

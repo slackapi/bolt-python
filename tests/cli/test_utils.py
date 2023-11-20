@@ -1,7 +1,7 @@
 # import pytest
 
-# from cli.utils import get_module_name, load_app_module
-# from cli.error import CliError
+# from slack_bolt.cli.start import _get_module_name, load_app_module
+# from slack_bolt.cli.error import CliError
 # from tests.mock_web_api_server import cleanup_mock_web_api_server, setup_mock_web_api_server
 # from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -23,7 +23,7 @@
 #     def test_get_module_name(self):
 #         path = f"{self.working_directory}/test_app/app.py"
 
-#         module_name = get_module_name(path)
+#         module_name = _get_module_name(path)
 
 #         assert "app" == module_name
 

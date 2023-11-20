@@ -1,7 +1,7 @@
 import pytest
 import os
 
-from cli.start import start
+from slack_bolt.cli.start import start
 from tests.mock_web_api_server import cleanup_mock_web_api_server, setup_mock_web_api_server
 from tests.utils import remove_os_env_temporarily, restore_os_env
 from slack_sdk.errors import SlackApiError
@@ -20,7 +20,7 @@ class TestStart:
     def teardown_method(self):
         os.environ.pop("SLACK_CLI_XOXB", None)
         os.environ.pop("SLACK_CLI_XAPP", None)
-        os.environ.pop("SLACK_CLI_CUSTOM_FILE_PATH", None)
+        os.environ.pop("SLACK_APP_PATH", None)
         cleanup_mock_web_api_server(self)
         restore_os_env(self.old_os_env)
 
@@ -35,7 +35,7 @@ class TestStart:
         assert "ran as __main__" not in out
 
     def test_start_with_entrypoint(self, capsys, caplog):
-        os.environ["SLACK_CLI_CUSTOM_FILE_PATH"] = "my_app.py"
+        os.environ["SLACK_APP_PATH"] = "my_app.py"
         with pytest.raises(SlackApiError):
             start(self.working_directory)
 
@@ -53,4 +53,5 @@ class TestStart:
 
         out, err = capsys.readouterr()
         assert err is ""
+        print(err)
         assert "Entrypoint not found!\nLooking for: tests/cli/app.py" in out
