@@ -39,5 +39,6 @@ __all__ = [
     "RequestVerification",
     "SslCheck",
     "UrlVerification",
-    "AttachingFunctionToken" "builtin_middleware_classes",
+    "AttachingFunctionToken",
+    "builtin_middleware_classes",
 ]
