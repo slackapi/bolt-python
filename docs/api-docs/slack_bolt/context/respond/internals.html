@@ -44,6 +44,7 @@ def _build_message(
     unfurl_links: Optional[bool] = None,
     unfurl_media: Optional[bool] = None,
     thread_ts: Optional[str] = None,
+    metadata: Optional[Dict[str, Any]] = None,
 ) -&gt; Dict[str, Any]:
     message = {&#34;text&#34;: text}
     if blocks is not None and len(blocks) &gt; 0:
@@ -62,6 +63,8 @@ def _build_message(
         message[&#34;unfurl_media&#34;] = unfurl_media
     if thread_ts is not None:
         message[&#34;thread_ts&#34;] = thread_ts
+    if metadata is not None:
+        message[&#34;metadata&#34;] = metadata
     return message</code></pre>
 </details>
 </section>

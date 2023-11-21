@@ -320,7 +320,7 @@ def action(
             return workflow_step_edit(constraints[&#34;callback_id&#34;], asyncio)
 
         raise BoltError(f&#34;type: {action_type} is unsupported&#34;)
-    elif &#34;action_id&#34; in constraints:
+    elif &#34;action_id&#34; in constraints or &#34;block_id&#34; in constraints:
         # The default value is &#34;block_actions&#34;
         return block_action(constraints, asyncio)
 
@@ -341,8 +341,11 @@ def _block_action(
     elif isinstance(constraints, dict):
         # block_id matching is optional
         block_id: Optional[Union[str, Pattern]] = constraints.get(&#34;block_id&#34;)
+        action_id: Optional[Union[str, Pattern]] = constraints.get(&#34;action_id&#34;)
+        if block_id is None and action_id is None:
+            return False
         block_id_matched = block_id is None or _matches(block_id, action.get(&#34;block_id&#34;))
-        action_id_matched = _matches(constraints[&#34;action_id&#34;], action[&#34;action_id&#34;])
+        action_id_matched = action_id is None or _matches(action_id, action.get(&#34;action_id&#34;))
         return block_id_matched and action_id_matched
 
 
@@ -608,7 +611,7 @@ def _matches(str_or_pattern: Union[str, Pattern], input: Optional[str]) -&gt; bo
             return workflow_step_edit(constraints[&#34;callback_id&#34;], asyncio)
 
         raise BoltError(f&#34;type: {action_type} is unsupported&#34;)
-    elif &#34;action_id&#34; in constraints:
+    elif &#34;action_id&#34; in constraints or &#34;block_id&#34; in constraints:
         # The default value is &#34;block_actions&#34;
         return block_action(constraints, asyncio)
 
