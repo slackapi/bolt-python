@@ -94,7 +94,7 @@ def handle_app_mention_events(body, logger):
 [Suggestion] You can handle this type of event with the following listener function:
 
 @app.function("reverse")
-def handle_reverse_function(body, event, client, logger):
+def handle_some_function(body, event, client, logger):
     try:
         # TODO: do something here
         outputs = {{}}

@@ -276,7 +276,7 @@ app.step(ws)
                 default_message,
                 f"""
 @app.function("{callback_id}")
-{'async ' if is_async else ''}def handle_{callback_id}_function(body, event, client, logger):
+{'async ' if is_async else ''}def handle_some_function(body, event, client, logger):
     try:
         # TODO: do something here
         outputs = {{}}
