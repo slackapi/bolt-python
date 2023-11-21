@@ -47,5 +47,3 @@ if __name__ == "__main__":
     except CliError as e:
         print(e)
         exit()
-    except KeyboardInterrupt:
-        exit(130)

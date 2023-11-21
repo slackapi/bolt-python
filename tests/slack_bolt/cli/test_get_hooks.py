@@ -1,13 +1,14 @@
 import json
+import runpy
 
-from cli import get_hooks, get_manifest, start
+from slack_bolt.cli import get_hooks, get_manifest, start
 
 
 class TestGetHooks:
     def test_get_manifest(self, capsys):
         get_manifest_module = get_manifest.__name__
 
-        get_hooks.main()
+        runpy.run_module(get_hooks.__name__, run_name="__main__")
 
         out, err = capsys.readouterr()
         json_response = json.loads(out)
@@ -18,7 +19,7 @@ class TestGetHooks:
     def test_start(self, capsys):
         start_module = start.__name__
 
-        get_hooks.main()
+        runpy.run_module(get_hooks.__name__, run_name="__main__")
 
         out, err = capsys.readouterr()
         json_response = json.loads(out)

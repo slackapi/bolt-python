@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os
 import runpy
-import sys
 
 from slack_bolt.app.app import App
 
@@ -30,50 +29,6 @@ def get_entrypoint_path(working_directory: str) -> str:
     return f"{working_directory}/{DEFAULT_ENTRYPOINT_FILE}"
 
 
-def load_app_module(entrypoint_path: str) -> str:
-    module_name = _get_module_name(entrypoint_path)
-
-    try:
-        __import__(module_name)
-    except ImportError:
-        raise CliError(f"Unable to load module {module_name} found in Entrypoint {entrypoint_path}!")
-
-    module = sys.modules[module_name]
-
-    matches = [v for v in module.__dict__.values() if isinstance(v, App)]
-
-    if len(matches) >= 1:
-        return module_name
-
-    raise CliError(f"No Slack App(s) objects detected in module {module_name} from entrypoint {entrypoint_path}")
-
-
-def _get_module_name(path: str) -> str:
-    path = os.path.realpath(path)
-
-    fname, ext = os.path.splitext(path)
-    if ext == ".py":
-        path = fname
-
-    if os.path.basename(path) == "__init__":
-        path = os.path.dirname(path)
-
-    module_name = []
-
-    # move up until outside package structure (no __init__.py)
-    while True:
-        path, name = os.path.split(path)
-        module_name.append(name)
-
-        if not os.path.exists(os.path.join(path, "__init__.py")):
-            break
-
-    if sys.path[0] != path:
-        sys.path.insert(0, path)
-
-    return ".".join(module_name[::-1])
-
-
 def start(working_directory: str) -> None:
     validate_env()
 
@@ -87,8 +42,7 @@ def start(working_directory: str) -> None:
     os.environ[SLACK_APP_TOKEN] = os.environ[SLACK_CLI_XAPP]
 
     try:
-        module: str = load_app_module(entrypoint_path)
-        runpy.run_module(module)
+        runpy.run_path(entrypoint_path, run_name="__main__")
     finally:
         os.environ.pop(SLACK_BOT_TOKEN, None)
         os.environ.pop(SLACK_APP_TOKEN, None)
@@ -100,5 +54,3 @@ if __name__ == "__main__":
     except CliError as e:
         print(e)
         exit()
-    except KeyboardInterrupt:
-        exit(130)

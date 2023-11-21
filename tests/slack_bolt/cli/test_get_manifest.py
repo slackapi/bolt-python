@@ -1,7 +1,8 @@
 import json
 import pytest
+from slack_bolt.cli.error import CliError
 
-from slack_bolt.cli import get_manifest
+from slack_bolt.cli.get_manifest import get_manifest
 
 
 class TestGetManifest:
@@ -13,12 +14,12 @@ class TestGetManifest:
         json_manifest = json.loads(manifest)
         assert "_metadata" in json_manifest
 
-    def test_get_manifest_no_manifest(self, capsys):
+    def test_get_manifest_no_manifest(self):
         working_directory = "tests/slack_bolt/cli/test_app_no_manifest"
 
-        with pytest.raises(SystemExit):
+        with pytest.raises(CliError) as e:
             get_manifest(working_directory)
 
-        out, err = capsys.readouterr()
-        assert err is ""
-        assert out == "Manifest file not found!\nPath: tests/slack_bolt/cli/test_app_no_manifest\nFile: manifest.json\n"
+        assert (
+            str(e.value) == "Manifest file not found!\nPath: tests/slack_bolt/cli/test_app_no_manifest\nFile: manifest.json"
+        )

@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 import json
 
-
-hook_payload = {
+hooks_payload = {
     "hooks": {
         "get-manifest": "python -m slack_bolt.cli.get_manifest",
         "start": "python -m slack_bolt.cli.start",
@@ -13,6 +12,5 @@ hook_payload = {
     },
 }
 
-
-def main() -> None:
-    print(json.dumps(hook_payload))
+if __name__ == "__main__":
+    print(json.dumps(hooks_payload))
