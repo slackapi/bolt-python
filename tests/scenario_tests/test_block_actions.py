@@ -109,6 +109,15 @@ class TestBlockActions:
         assert response.status == 200
         assert_auth_test_count(self, 1)
 
+    def test_default_type_no_action_id(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        app.action({"block_id": "b"})(simple_listener)
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_auth_test_count(self, 1)
+
     def test_default_type_and_unmatched_block_id(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
         app.action({"action_id": "a", "block_id": "bbb"})(simple_listener)

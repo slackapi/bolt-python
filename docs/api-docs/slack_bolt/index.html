@@ -3543,7 +3543,7 @@ def say(self) -&gt; Say:
 </dd>
 <dt id="slack_bolt.BoltRequest"><code class="flex name class">
 <span>class <span class="ident">BoltRequest</span></span>
-<span>(</span><span>*, body: Union[str, dict], query: Union[str, Dict[str, str], Dict[str, Sequence[str]], ForwardRef(None)] = None, headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None, context: Optional[Dict[str, str]] = None, mode: str = 'http')</span>
+<span>(</span><span>*, body: Union[str, dict], query: Union[str, Dict[str, str], Dict[str, Sequence[str]], ForwardRef(None)] = None, headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None, context: Optional[Dict[str, Any]] = None, mode: str = 'http')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Request to a Bolt app.</p>
@@ -3581,7 +3581,7 @@ def say(self) -&gt; Say:
         body: Union[str, dict],
         query: Optional[Union[str, Dict[str, str], Dict[str, Sequence[str]]]] = None,
         headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None,
-        context: Optional[Dict[str, str]] = None,
+        context: Optional[Dict[str, Any]] = None,
         mode: str = &#34;http&#34;,  # either &#34;http&#34; or &#34;socket_mode&#34;
     ):
         &#34;&#34;&#34;Request to a Bolt app.
@@ -4132,6 +4132,7 @@ def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt
         unfurl_links: Optional[bool] = None,
         unfurl_media: Optional[bool] = None,
         thread_ts: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
     ) -&gt; WebhookResponse:
         if self.response_url is not None:
             client = WebhookClient(
@@ -4152,6 +4153,7 @@ def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt
                     unfurl_links=unfurl_links,
                     unfurl_media=unfurl_media,
                     thread_ts=thread_ts,
+                    metadata=metadata,
                 )
                 return client.send_dict(message)
             elif isinstance(text_or_whole_response, dict):

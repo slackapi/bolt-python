@@ -115,6 +115,19 @@ class TestAsyncBlockActions:
         await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
+    async def test_default_type_no_action_id(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.action({"block_id": "b"})(simple_listener)
+
+        request = self.build_valid_request()
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_auth_test_count_async(self, 1)
+
+    @pytest.mark.asyncio
     async def test_default_type_unmatched_block_id(self):
         app = AsyncApp(
             client=self.web_client,

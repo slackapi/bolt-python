@@ -58,7 +58,7 @@ setuptools.setup(
     ),
     include_package_data=True,  # MANIFEST.in
     install_requires=[
-        "slack_sdk>=3.21.2,<4",
+        "slack_sdk>=3.25.0,<4",
     ],
     setup_requires=["pytest-runner==5.2"],
     tests_require=async_test_dependencies,
@@ -109,6 +109,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: Implementation :: CPython",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
