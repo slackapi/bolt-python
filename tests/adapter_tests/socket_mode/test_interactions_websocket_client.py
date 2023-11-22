@@ -27,7 +27,6 @@ class TestSocketModeWebsocketClient:
             base_url="http://localhost:8888",
         )
         start_socket_mode_server(self, 3012)
-        time.sleep(2)  # wait for the server
 
     def teardown_method(self):
         cleanup_mock_web_api_server(self)

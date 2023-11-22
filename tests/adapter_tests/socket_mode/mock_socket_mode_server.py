@@ -1,9 +1,11 @@
+import json
 import logging
 import sys
 import threading
 import time
+import requests
 from multiprocessing.context import Process
-from typing import List, Optional
+from typing import List
 from unittest import TestCase
 
 from tests.utils import get_mock_server_mode
@@ -22,6 +24,11 @@ def start_thread_socket_mode_server(test: TestCase, port: int):
     def _start_thread_socket_mode_server():
         logger = logging.getLogger(__name__)
         app: Flask = Flask(__name__)
+
+        @app.route("/state")
+        def state():
+            return json.dumps({"success": True}), 200, {"ContentType": "application/json"}
+
         sockets: Sockets = Sockets(app)
 
         envelopes_to_consume: List[str] = list(socket_mode_envelopes)
@@ -81,10 +88,18 @@ def start_socket_mode_server(test, port: int):
         test.sm_thread = threading.Thread(target=start_thread_socket_mode_server(test, port))
         test.sm_thread.daemon = True
         test.sm_thread.start()
-        time.sleep(2)  # wait for the server
+        wait_for_socket_mode_server(port, 2)  # wait for the server
     else:
         test.sm_process = Process(target=start_process_socket_mode_server, kwargs={"port": port})
         test.sm_process.start()
+
+
+def wait_for_socket_mode_server(port: int, secs: int):
+    start_time = time.time()
+    while (time.time() - start_time) < secs:
+        response = requests.get(url=f"http://localhost:{port}/state")
+        if response.ok:
+            break
 
 
 def stop_socket_mode_server(test):

@@ -39,7 +39,6 @@ class TestSocketModeWebsockets:
     @pytest.mark.asyncio
     async def test_events(self):
         start_socket_mode_server(self, 3022)
-        await asyncio.sleep(1)  # wait for the server
 
         app = AsyncApp(client=self.web_client)
 
