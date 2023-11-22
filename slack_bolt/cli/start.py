@@ -32,7 +32,6 @@ def get_entrypoint_path(working_directory: str) -> str:
 def start(working_directory: str) -> None:
     validate_env()
 
-    # TODO improve this to look for the App object in the module then us this file as the entrypoint path
     entrypoint_path = get_entrypoint_path(working_directory)
 
     if not os.path.exists(entrypoint_path):
@@ -49,8 +48,4 @@ def start(working_directory: str) -> None:
 
 
 if __name__ == "__main__":
-    try:
-        start(os.getcwd())
-    except CliError as e:
-        print(e)
-        exit()
+    start(os.getcwd())

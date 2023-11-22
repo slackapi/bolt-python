@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 import os
 import re
+import sys
+
+from slack_bolt.cli.utils import excepthook
 from .error import CliError
 from typing import List
 
@@ -31,7 +34,7 @@ def find_file_path(path: str, file: str) -> str:
         dirs[:] = filter_directories(dirs)
         if file in files:
             return os.path.join(root, file)
-    raise CliError(f"Manifest file not found!\nPath: {path}\nFile: {file}")
+    raise CliError(f"Could not find a manifest.json file")
 
 
 def get_manifest(working_directory: str) -> str:
@@ -42,8 +45,5 @@ def get_manifest(working_directory: str) -> str:
 
 
 if __name__ == "__main__":
-    try:
-        print(get_manifest(os.getcwd()))
-    except CliError as e:
-        print(e)
-        exit()
+    sys.excepthook = excepthook
+    print(get_manifest(os.getcwd()))
