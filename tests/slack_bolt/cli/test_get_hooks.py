@@ -1,28 +1,15 @@
-import json
-import runpy
-
-from slack_bolt.cli import get_hooks, get_manifest, start
+from slack_bolt.cli.get_hooks import hooks_payload
 
 
 class TestGetHooks:
-    def test_get_manifest(self, capsys):
-        get_manifest_module = get_manifest.__name__
+    def test_hooks_payload(self):
+        hooks = hooks_payload["hooks"]
 
-        runpy.run_module(get_hooks.__name__, run_name="__main__")
+        assert "slack_bolt.cli.get_manifest" in hooks["get-manifest"]
+        assert "slack_bolt.cli.start" in hooks["start"]
 
-        out, err = capsys.readouterr()
-        json_response = json.loads(out)
-        assert err is ""
-        assert "hooks" in json_response
-        assert get_manifest_module in json_response["hooks"]["get-manifest"]
+    def test_hooks_payload_config(self):
+        config = hooks_payload["config"]
 
-    def test_start(self, capsys):
-        start_module = start.__name__
-
-        runpy.run_module(get_hooks.__name__, run_name="__main__")
-
-        out, err = capsys.readouterr()
-        json_response = json.loads(out)
-        assert err is ""
-        assert "hooks" in json_response
-        assert start_module in json_response["hooks"]["start"]
+        assert config["sdk-managed-connection-enabled"] == True
+        assert config["protocol-version"] == ["message-boundaries", "default"]

@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 import json
 from .protocol import Protocol, MessageBoundaryProtocol, DefaultProtocol, protocol_factory
+from slack_bolt.cli import get_manifest, start
 
 PROTOCOL: Protocol
 
 hooks_payload = {
     "hooks": {
-        "get-manifest": "python -m slack_bolt.cli.get_manifest",
-        "start": "python -m slack_bolt.cli.start",
+        "get-manifest": f"python -m {get_manifest.__name__}",
+        "start": f"python -m {start.__name__}",
     },
     "config": {
         "watcher": {"filter-regex": "^manifest\\.(json)$", "paths": ["."]},

@@ -2,7 +2,7 @@ import os
 
 from slack_sdk import WebClient
 from slack_bolt.app import App
-from tests.slack_bolt.cli.test_app.utils import get_test_socket_mode_handler, wait_for_test_socket_connection
+from utils import get_test_socket_mode_handler, wait_for_test_socket_connection
 
 assert "SLACK_BOT_TOKEN" in os.environ
 assert "SLACK_APP_TOKEN" in os.environ
