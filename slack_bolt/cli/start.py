@@ -2,10 +2,11 @@
 import os
 import runpy
 
-from slack_bolt.app.app import App
-
 from .error import CliError
 
+from .protocol import Protocol, protocol_factory
+
+PROTOCOL: Protocol
 
 DEFAULT_ENTRYPOINT_FILE = "app.py"
 
@@ -48,4 +49,5 @@ def start(working_directory: str) -> None:
 
 
 if __name__ == "__main__":
+    PROTOCOL = protocol_factory()
     start(os.getcwd())

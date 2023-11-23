@@ -20,6 +20,4 @@ class TestGetManifest:
         with pytest.raises(CliError) as e:
             get_manifest(working_directory)
 
-        assert (
-            str(e.value) == "Manifest file not found!\nPath: tests/slack_bolt/cli/test_app_no_manifest\nFile: manifest.json"
-        )
+        assert str(e.value) == "Could not find a manifest.json file"

@@ -2,10 +2,12 @@
 import os
 import re
 import sys
-
-from slack_bolt.cli.utils import excepthook
-from .error import CliError
 from typing import List
+
+from .error import CliError
+from .protocol import Protocol, protocol_factory
+
+PROTOCOL: Protocol
 
 EXCLUDED_DIRECTORIES = [
     "lib",
@@ -45,5 +47,5 @@ def get_manifest(working_directory: str) -> str:
 
 
 if __name__ == "__main__":
-    sys.excepthook = excepthook
-    print(get_manifest(os.getcwd()))
+    PROTOCOL = protocol_factory()
+    PROTOCOL.respond(get_manifest(os.getcwd()))
