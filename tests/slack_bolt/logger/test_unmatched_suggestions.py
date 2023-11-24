@@ -109,7 +109,7 @@ def handle_some_function(body, event, client, logger):
         error = f"Failed to handle a function request (error: {{e}})"
         client.functions_completeError(
             function_execution_id=context.function_execution_id,
-            error= error,
+            error=error,
         )
 """
             == message

@@ -291,7 +291,7 @@ app.step(ws)
         error = f"Failed to handle a function request (error: {{e}})"
         {'await ' if is_async else ''}client.functions_completeError(
             function_execution_id=context.function_execution_id,
-            error: error,
+            error=error,
         )
 """,
             )
