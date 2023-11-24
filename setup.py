@@ -21,6 +21,7 @@ test_dependencies = [
     "Jinja2==3.0.3",  # https://github.com/pallets/flask/issues/4494
     "black==22.8.0",  # Until we drop Python 3.6 support, we have to stay with this version
     "click<=8.0.4",  # black is affected by https://github.com/pallets/click/issues/2225
+    "requests>=2,<3",  # For Cli Scenario tests
 ]
 
 adapter_test_dependencies = [
