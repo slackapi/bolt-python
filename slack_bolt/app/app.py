@@ -849,12 +849,9 @@ class App:
             def reverse_string(event, client: WebClient, context: BoltContext):
                 try:
                     string_to_reverse = event["inputs"]["stringToReverse"]
-                    client.api_call(
-                        "functions.completeSuccess",
-                        json={
-                            "function_execution_id": context.function_execution_id,
-                            "outputs": {"reverseString": string_to_reverse[::-1]},
-                        },
+                    client.functions_completeSuccess(
+                        function_execution_id=context.function_execution_id,
+                        outputs={"reverseString": string_to_reverse[::-1]},
                     )
                 except Exception as e:
                     client.api_call(

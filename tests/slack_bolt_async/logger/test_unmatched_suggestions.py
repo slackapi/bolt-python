@@ -98,12 +98,9 @@ async def handle_some_function(body, event, client, logger):
     try:
         # TODO: do something here
         outputs = {{}}
-        await client.api_call(
-            "functions.completeSuccess",
-            json={{
-                "function_execution_id": context.function_execution_id,
-                "outputs": outputs,
-            }},
+        await client.functions_completeSuccess(
+            function_execution_id=context.function_execution_id,
+            outputs=outputs,
         )
     except Exception as e:
         error = f"Failed to handle a function request (error: {{e}})"

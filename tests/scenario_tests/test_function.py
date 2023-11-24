@@ -210,12 +210,9 @@ def reverse(body, event, context, client):
     assert context.function_bot_access_token == "xwfp-valid"
     assert context.client.token == "xwfp-valid"
     assert client.token == "xwfp-valid"
-    client.api_call(
-        "functions.completeSuccess",
-        json={
-            "function_execution_id": event["function_execution_id"],
-            "outputs": {"reverseString": "olleh"},
-        },
+    client.functions_completeSuccess(
+        function_execution_id=event["function_execution_id"],
+        outputs={"reverseString": "olleh"},
     )
 
 
@@ -228,9 +225,4 @@ def reverse_error(body, event, client, context):
 def complete_it(body, event, client):
     assert body == function_body
     assert event == function_body["event"]
-    client.api_call(
-        "functions.completeSuccess",
-        json={
-            "function_execution_id": event["function_execution_id"],
-        },
-    )
+    client.functions_completeSuccess(function_execution_id=event["function_execution_id"], outputs={})

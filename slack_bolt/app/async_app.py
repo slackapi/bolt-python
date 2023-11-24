@@ -882,12 +882,9 @@ class AsyncApp:
             async def reverse_string(event, client: AsyncWebClient, complete: AsyncComplete):
                 try:
                     string_to_reverse = event["inputs"]["stringToReverse"]
-                    await client.api_call(
-                        "functions.completeSuccess",
-                        json={
-                            "function_execution_id": context.function_execution_id,
-                            "outputs": {"reverseString": string_to_reverse[::-1]},
-                        },
+                    await client.functions_completeSuccess(
+                        function_execution_id=context.function_execution_id,
+                        outputs={"reverseString": string_to_reverse[::-1]},
                     )
                 except Exception as e:
                     await client.functions_completeError(

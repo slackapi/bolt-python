@@ -280,12 +280,9 @@ app.step(ws)
     try:
         # TODO: do something here
         outputs = {{}}
-        {'await ' if is_async else ''}client.api_call(
-            "functions.completeSuccess",
-            json={{
-                "function_execution_id": context.function_execution_id,
-                "outputs": outputs,
-            }},
+        {'await ' if is_async else ''}client.functions_completeSuccess(
+            function_execution_id=context.function_execution_id,
+            outputs=outputs,
         )
     except Exception as e:
         error = f"Failed to handle a function request (error: {{e}})"
