@@ -27,7 +27,7 @@ jobs:
         run: |
           python setup.py install
           pip install -U pip
-          pip install -e ".[testing_without_asyncio]"
+          pip install -e ".[testing]"
       - name: Run tests without aiohttp
         run: |
           pytest tests/slack_bolt/
