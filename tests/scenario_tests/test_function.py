@@ -222,13 +222,7 @@ def reverse(body, event, context, client):
 def reverse_error(body, event, client, context):
     assert body == function_body
     assert event == function_body["event"]
-    client.api_call(
-        "functions.completeError",
-        json={
-            "function_execution_id": event["function_execution_id"],
-            "error": "there was an error",
-        },
-    )
+    client.functions_completeError(function_execution_id=event["function_execution_id"], error="there was an error")
 
 
 def complete_it(body, event, client):

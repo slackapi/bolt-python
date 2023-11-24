@@ -289,12 +289,9 @@ app.step(ws)
         )
     except Exception as e:
         error = f"Failed to handle a function request (error: {{e}})"
-        {'await ' if is_async else ''}client.api_call(
-            "functions.completeError",
-            json={{
-                "function_execution_id": context.function_execution_id,
-                "error": error,
-            }},
+        {'await ' if is_async else ''}client.functions_completeError(
+            function_execution_id=context.function_execution_id,
+            error: error,
         )
 """,
             )

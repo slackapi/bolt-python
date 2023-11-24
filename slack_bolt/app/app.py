@@ -858,11 +858,9 @@ class App:
                     )
                 except Exception as e:
                     client.api_call(
-                        "functions.completeError",
-                        json={
-                            "function_execution_id": context.function_execution_id,
-                            "error": f"Cannot reverse string (error: {e})",
-                        },
+                    client.functions_completeError(
+                        function_execution_id=context.function_execution_id,
+                        error=f"Cannot reverse string (error: {e})",
                     )
                     raise e
             # Pass a function to this method

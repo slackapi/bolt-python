@@ -226,12 +226,9 @@ async def reverse(body, event, client, context):
 async def reverse_error(body, event, client, context):
     assert body == function_body
     assert event == function_body["event"]
-    await client.api_call(
-        "functions.completeError",
-        json={
-            "function_execution_id": event["function_execution_id"],
-            "error": "there was an error",
-        },
+    await client.functions_completeError(
+        function_execution_id=event["function_execution_id"],
+        error="there was an error",
     )
 
 

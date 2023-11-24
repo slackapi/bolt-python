@@ -107,12 +107,9 @@ def handle_some_function(body, event, client, logger):
         )
     except Exception as e:
         error = f"Failed to handle a function request (error: {{e}})"
-        client.api_call(
-            "functions.completeError",
-            json={{
-                "function_execution_id": context.function_execution_id,
-                "error": error,
-            }},
+        client.functions_completeError(
+            function_execution_id=context.function_execution_id,
+            error= error,
         )
 """
             == message
