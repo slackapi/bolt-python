@@ -1,0 +1,5 @@
+# pip install -r requirements/testing.txt
+-r testing_without_asyncio.txt
+
+pytest-asyncio>=0.18.2,<1
+aiohttp>=3,<4

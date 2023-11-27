@@ -27,15 +27,15 @@ jobs:
         run: |
           python setup.py install
           pip install -U pip
-          pip install -e ".[testing]"
+          pip install -r requirements/testing_without_asyncio.txt
       - name: Run tests without aiohttp
         run: |
           pytest tests/slack_bolt/
           pytest tests/scenario_tests/
       - name: Run tests for Socket Mode adapters
         run: |
-          pip install -e ".[adapter]"
-          pip install -e ".[adapter_testing]"
+          pip install -r requirements/adapter.txt
+          pip install -r requirements/adapter_testing.txt
           pytest tests/adapter_tests/socket_mode/
       - name: Run tests for HTTP Mode adapters (AWS)
         run: |
@@ -74,7 +74,7 @@ jobs:
           pytest tests/adapter_tests/tornado/
       - name: Run tests for HTTP Mode adapters (asyncio-based libraries)
         run: |
-          pip install -e ".[async]"
+          pip install -r requirements/async.txt
           # Falcon supports Python 3.11 since its v3.1.1
           pip install "falcon>=3.1.1,<4"
           pytest tests/adapter_tests_async/

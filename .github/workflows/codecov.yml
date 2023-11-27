@@ -28,10 +28,10 @@ jobs:
         run: |
           python setup.py install
           pip install -U pip
-          pip install -e ".[async]"
-          pip install -e ".[adapter]"
-          pip install -e ".[testing]"
-          pip install -e ".[adapter_testing]"
+          pip install -r requirements/async.txt
+          pip install -r requirements/adapter.txt
+          pip install -r requirements/testing.txt
+          pip install -r requirements/adapter_testing.txt
       - name: Run all tests for codecov
         run: |
           pytest --cov=./slack_bolt/ --cov-report=xml

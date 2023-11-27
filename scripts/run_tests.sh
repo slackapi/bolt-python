@@ -19,8 +19,8 @@ else
     # pytype's behavior can be different in older Python versions
     black slack_bolt/ tests/ \
       && pytest -vv \
-      && pip install -e ".[adapter]" \
-      && pip install -e ".[adapter_testing]" \
+      && pip install -r requirements/adapter.txt \
+      && pip install -r requirements/adapter_testing.txt \
       && pip install -U pip setuptools wheel \
       && pip install -U pytype \
       && pytype slack_bolt/

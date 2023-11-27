@@ -1,0 +1,8 @@
+# pip install -r requirements/adapter_testing.txt
+moto>=3,<4                               # For AWS tests
+docker>=5,<6                             # Used by moto
+boddle>=0.2,<0.3                         # For Bottle app tests
+Flask>=1,<2                              # TODO: Flask-Sockets is not yet compatible with Flask 2.x
+Werkzeug>=1,<2                           # TODO: Flask-Sockets is not yet compatible with Flask 2.x
+sanic-testing>=0.7; python_version>"3.6"
+requests>=2,<3                           # For Starlette's TestClient

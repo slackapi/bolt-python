@@ -5,8 +5,8 @@ cd ${script_dir}/..
 rm -rf ./slack_bolt.egg-info
 
 pip install -U pip && \
-  pip install twine wheel && \
+  pip install twine build && \
   rm -rf dist/ build/ slack_bolt.egg-info/ && \
-  python setup.py sdist bdist_wheel && \
+  python -m build --sdist --wheel && \
   twine check dist/* && \
   twine upload dist/*

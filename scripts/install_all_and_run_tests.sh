@@ -17,9 +17,9 @@ if [[ $test_target != "" ]]
 then
   # To fix: Using legacy 'setup.py install' for greenlet, since package 'wheel' is not installed.
   pip install -U wheel && \
-    pip install -e ".[testing]" && \
-    pip install -e ".[adapter]" && \
-    pip install -e ".[adapter_testing]" && \
+    pip install -r requirements/testing.txt && \
+    pip install -r requirements/adapter.txt && \
+    pip install -r requirements/adapter_testing.txt && \
     # To avoid errors due to the old versions of click forced by Chalice
     pip install -U pip click && \
     black slack_bolt/ tests/ && \
@@ -27,9 +27,9 @@ then
 else
   # To fix: Using legacy 'setup.py install' for greenlet, since package 'wheel' is not installed.
   pip install -U wheel && \
-    pip install -e ".[testing]" && \
-    pip install -e ".[adapter]" && \
-    pip install -e ".[adapter_testing]" && \
+    pip install -r requirements/testing.txt && \
+    pip install -r requirements/adapter.txt && \
+    pip install -r requirements/adapter_testing.txt && \
     # To avoid errors due to the old versions of click forced by Chalice
     pip install -U pip click && \
     black slack_bolt/ tests/ && \
