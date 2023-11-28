@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -U pip
-          pip install .
+          pip install -e .
           pip install -r requirements/async.txt
           pip install -r requirements/adapter.txt
           pip install -r requirements/testing.txt
