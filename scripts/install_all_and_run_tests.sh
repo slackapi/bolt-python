@@ -10,8 +10,14 @@ rm -rf ./slack_bolt.egg-info
 pip uninstall python-lambda
 
 test_target="$1"
+python_version=`python --version | awk '{print $2}'`
 
-pip install -e .
+if [ ${python_version:0:3} == "3.6" ]
+then
+  pip install -r requirements.txt
+else
+  pip install -e .
+fi
 
 if [[ $test_target != "" ]]
 then
