@@ -15,8 +15,6 @@ pip install -e .
 
 if [[ $test_target != "" ]]
 then
-  # To fix: Using legacy 'setup.py install' for greenlet, since package 'wheel' is not installed.
-  pip install -U wheel && \
     pip install -r requirements/testing.txt && \
     pip install -r requirements/adapter.txt && \
     pip install -r requirements/adapter_testing.txt && \
@@ -25,8 +23,6 @@ then
     black slack_bolt/ tests/ && \
     pytest $1
 else
-  # To fix: Using legacy 'setup.py install' for greenlet, since package 'wheel' is not installed.
-  pip install -U wheel && \
     pip install -r requirements/testing.txt && \
     pip install -r requirements/adapter.txt && \
     pip install -r requirements/adapter_testing.txt && \
