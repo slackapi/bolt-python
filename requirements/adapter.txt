@@ -1,6 +1,6 @@
 # pip install -r requirements/adapter.txt
 # NOTE: any of async ones requires pip install -r requirements/async.txt too
-# used only under src/slack_bolt/adapter
+# used only under slack_bolt/adapter
 boto3<=2
 bottle>=0.12,<1
 chalice<=1.27.3; python_version=="3.6"
