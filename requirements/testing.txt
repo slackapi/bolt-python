@@ -1,0 +1,6 @@
+# pip install -r requirements/testing.txt
+-r testing_without_asyncio.txt
+
+pytest-asyncio>=0.16.0; python_version=="3.6"
+pytest-asyncio>=0.18.2,<1; python_version>"3.6"
+aiohttp>=3,<4

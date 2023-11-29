@@ -1,4 +1,53 @@
-# black project prefers pyproject.toml
-# that's why we have this file in addition to other setting files
+[build-system]
+requires = ["setuptools", "pytest-runner==5.2", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slack_bolt"
+dynamic = ["version", "readme", "dependencies"]
+description = "The Bolt Framework for Python"
+license = { text = "MIT" }
+authors = [{ name = "Slack Technologies, LLC", email = "opensource@slack.com" }]
+classifiers = [
+	"Programming Language :: Python :: 3.6",
+	"Programming Language :: Python :: 3.7",
+	"Programming Language :: Python :: 3.8",
+	"Programming Language :: Python :: 3.9",
+	"Programming Language :: Python :: 3.10",
+	"Programming Language :: Python :: 3.11",
+	"Programming Language :: Python :: 3.12",
+	"Programming Language :: Python :: Implementation :: CPython",
+	"License :: OSI Approved :: MIT License",
+	"Operating System :: OS Independent",
+]
+requires-python = ">=3.6"
+
+
+[project.urls]
+homepage = "https://github.com/slackapi/bolt-python"
+
+[tool.setuptools.packages.find]
+include = ["slack_bolt*"]
+
+[tool.setuptools.dynamic]
+version = { attr = "slack_bolt.version.__version__" }
+readme = { file = ["README.md"], content-type = "text/markdown" }
+dependencies = { file = ["requirements.txt"] }
+
+[tool.distutils.bdist_wheel]
+universal = true
+
 [tool.black]
 line-length = 125
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+log_file = "logs/pytest.log"
+log_file_level = "DEBUG"
+log_format = "%(asctime)s %(levelname)s %(message)s"
+log_date_format = "%Y-%m-%d %H:%M:%S"
+filterwarnings = [
+	"ignore:\"@coroutine\" decorator is deprecated since Python 3.8, use \"async def\" instead:DeprecationWarning",
+	"ignore:The loop argument is deprecated since Python 3.8, and scheduled for removal in Python 3.10.:DeprecationWarning",
+]
+asyncio_mode = "auto"

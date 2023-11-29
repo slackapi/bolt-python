@@ -10,26 +10,28 @@ rm -rf ./slack_bolt.egg-info
 pip uninstall python-lambda
 
 test_target="$1"
+python_version=`python --version | awk '{print $2}'`
 
-pip install -e .
+if [ ${python_version:0:3} == "3.6" ]
+then
+  pip install -r requirements.txt
+else
+  pip install -e .
+fi
 
 if [[ $test_target != "" ]]
 then
-  # To fix: Using legacy 'setup.py install' for greenlet, since package 'wheel' is not installed.
-  pip install -U wheel && \
-    pip install -e ".[testing]" && \
-    pip install -e ".[adapter]" && \
-    pip install -e ".[adapter_testing]" && \
+    pip install -r requirements/testing.txt && \
+    pip install -r requirements/adapter.txt && \
+    pip install -r requirements/adapter_testing.txt && \
     # To avoid errors due to the old versions of click forced by Chalice
     pip install -U pip click && \
     black slack_bolt/ tests/ && \
     pytest $1
 else
-  # To fix: Using legacy 'setup.py install' for greenlet, since package 'wheel' is not installed.
-  pip install -U wheel && \
-    pip install -e ".[testing]" && \
-    pip install -e ".[adapter]" && \
-    pip install -e ".[adapter_testing]" && \
+    pip install -r requirements/testing.txt && \
+    pip install -r requirements/adapter.txt && \
+    pip install -r requirements/adapter_testing.txt && \
     # To avoid errors due to the old versions of click forced by Chalice
     pip install -U pip click && \
     black slack_bolt/ tests/ && \
