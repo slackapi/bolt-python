@@ -4,10 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "slack_bolt"
-dynamic = ["version", "readme", "dependencies"]
+dynamic = ["version", "readme", "dependencies", "authors"]
 description = "The Bolt Framework for Python"
 license = { text = "MIT" }
-authors = [{ name = "Slack Technologies, LLC", email = "opensource@slack.com" }]
 classifiers = [
 	"Programming Language :: Python :: 3.6",
 	"Programming Language :: Python :: 3.7",
@@ -24,7 +23,7 @@ requires-python = ">=3.6"
 
 
 [project.urls]
-homepage = "https://github.com/slackapi/bolt-python"
+Documentation = "https://slack.dev/bolt-python"
 
 [tool.setuptools.packages.find]
 include = ["slack_bolt*"]

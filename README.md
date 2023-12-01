@@ -1,4 +1,4 @@
-# Bolt ![Bolt logo](docs/assets/bolt-logo.svg) for Python
+# Bolt ![Bolt logo][bolt-image] for Python
 
 [![Python Version][python-version]][pypi-url]
 [![pypi package][pypi-image]][pypi-url]
@@ -184,7 +184,7 @@ If you otherwise get stuck, we're here to help. The following are the best ways 
   * [Issue Tracker](http://github.com/slackapi/bolt-python/issues) for questions, bug reports, feature requests, and general discussion related to Bolt for Python. Try searching for an existing issue before creating a new one.
   * [Email](mailto:support@slack.com) our developer support team: `support@slack.com`
 
-
+[bolt-image]: https://raw.githubusercontent.com/slackapi/bolt-python/main/docs/assets/bolt-logo.svg
 [pypi-image]: https://badge.fury.io/py/slack-bolt.svg
 [pypi-url]: https://pypi.org/project/slack-bolt/
 [codecov-image]: https://codecov.io/gh/slackapi/bolt-python/branch/main/graph/badge.svg
