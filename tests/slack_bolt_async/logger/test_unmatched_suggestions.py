@@ -94,20 +94,16 @@ async def handle_app_mention_events(body, logger):
 [Suggestion] You can handle this type of event with the following listener function:
 
 @app.function("reverse")
-async def handle_some_function(body, event, client, logger):
+async def handle_some_function(ack, body, complete, fail, logger):
+    await ack()
+    logger.info(body)
     try:
         # TODO: do something here
         outputs = {{}}
-        await client.functions_completeSuccess(
-            function_execution_id=context.function_execution_id,
-            outputs=outputs,
-        )
+        await complete(outputs=outputs)
     except Exception as e:
         error = f"Failed to handle a function request (error: {{e}})"
-        await client.functions_completeError(
-            function_execution_id=context.function_execution_id,
-            error=error,
-        )
+        await fail(error=error)
 """
             == message
         )

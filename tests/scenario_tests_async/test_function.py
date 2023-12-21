@@ -58,7 +58,7 @@ class TestAsyncFunction:
     @pytest.mark.asyncio
     async def test_mock_server_is_running(self):
         resp = await self.web_client.api_test()
-        assert resp != None
+        assert resp is not None
 
     @pytest.mark.asyncio
     async def test_valid_callback_id_success(self):
@@ -207,32 +207,33 @@ wrong_id_function_body = {
 }
 
 
-async def reverse(body, event, client, context):
+async def reverse(body, event, client, context, complete, inputs):
     assert body == function_body
     assert event == function_body["event"]
+    assert inputs == function_body["event"]["inputs"]
     assert context.function_execution_id == "Fx111"
+    assert complete.function_execution_id == "Fx111"
     assert context.function_bot_access_token == "xwfp-valid"
     assert context.client.token == "xwfp-valid"
     assert client.token == "xwfp-valid"
-    await client.functions_completeSuccess(
-        function_execution_id=event["function_execution_id"],
+    assert complete.client.token == "xwfp-valid"
+    await complete(
         outputs={"reverseString": "olleh"},
     )
 
 
-async def reverse_error(body, event, client, context):
+async def reverse_error(body, event, fail):
     assert body == function_body
     assert event == function_body["event"]
-    await client.functions_completeError(
-        function_execution_id=event["function_execution_id"],
+    assert fail.function_execution_id == "Fx111"
+    await fail(
         error="there was an error",
     )
 
 
-async def complete_it(body, event, client):
+async def complete_it(body, event, complete):
     assert body == function_body
     assert event == function_body["event"]
-    await client.functions_completeSuccess(
-        function_execution_id=event["function_execution_id"],
+    await complete(
         outputs={},
     )

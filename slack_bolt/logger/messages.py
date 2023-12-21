@@ -276,20 +276,16 @@ app.step(ws)
                 default_message,
                 f"""
 @app.function("{callback_id}")
-{'async ' if is_async else ''}def handle_some_function(body, event, client, logger):
+{'async ' if is_async else ''}def handle_some_function(ack, body, complete, fail, logger):
+    {'await ' if is_async else ''}ack()
+    logger.info(body)
     try:
         # TODO: do something here
         outputs = {{}}
-        {'await ' if is_async else ''}client.functions_completeSuccess(
-            function_execution_id=context.function_execution_id,
-            outputs=outputs,
-        )
+        {'await ' if is_async else ''}complete(outputs=outputs)
     except Exception as e:
         error = f"Failed to handle a function request (error: {{e}})"
-        {'await ' if is_async else ''}client.functions_completeError(
-            function_execution_id=context.function_execution_id,
-            error=error,
-        )
+        {'await ' if is_async else ''}fail(error=error)
 """,
             )
         return _build_unhandled_request_suggestion(

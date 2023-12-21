@@ -203,26 +203,29 @@ wrong_id_function_body = {
 }
 
 
-def reverse(body, event, context, client):
+def reverse(body, event, context, client, complete, inputs):
     assert body == function_body
     assert event == function_body["event"]
+    assert inputs == function_body["event"]["inputs"]
     assert context.function_execution_id == "Fx111"
+    assert complete.function_execution_id == "Fx111"
     assert context.function_bot_access_token == "xwfp-valid"
     assert context.client.token == "xwfp-valid"
     assert client.token == "xwfp-valid"
-    client.functions_completeSuccess(
-        function_execution_id=event["function_execution_id"],
+    assert complete.client.token == "xwfp-valid"
+    complete(
         outputs={"reverseString": "olleh"},
     )
 
 
-def reverse_error(body, event, client, context):
+def reverse_error(body, event, fail):
     assert body == function_body
     assert event == function_body["event"]
-    client.functions_completeError(function_execution_id=event["function_execution_id"], error="there was an error")
+    assert fail.function_execution_id == "Fx111"
+    fail(error="there was an error")
 
 
-def complete_it(body, event, client):
+def complete_it(body, event, complete):
     assert body == function_body
     assert event == function_body["event"]
-    client.functions_completeSuccess(function_execution_id=event["function_execution_id"], outputs={})
+    complete(outputs={})
