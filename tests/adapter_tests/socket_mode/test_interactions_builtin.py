@@ -34,7 +34,6 @@ class TestSocketModeBuiltin:
         stop_socket_mode_server(self)
 
     def test_interactions(self):
-
         app = App(client=self.web_client)
 
         result = {"shortcut": False, "command": False}

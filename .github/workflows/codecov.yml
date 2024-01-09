@@ -16,7 +16,6 @@ jobs:
     env:
       # default: multiprocessing
       # threading is more stable on GitHub Actions
-      BOLT_PYTHON_MOCK_SERVER_MODE: threading
       BOLT_PYTHON_CODECOV_RUNNING: "1"
     steps:
       - uses: actions/checkout@v3
