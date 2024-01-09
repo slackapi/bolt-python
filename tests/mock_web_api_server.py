@@ -228,11 +228,6 @@ class MockHandler(SimpleHTTPRequestHandler):
         return request_body
 
 
-#
-# threading
-#
-
-
 class MockServerThread(threading.Thread):
     def __init__(self, test: TestCase, handler: Type[SimpleHTTPRequestHandler] = MockHandler):
         threading.Thread.__init__(self)
