@@ -69,7 +69,6 @@ def wait_for_socket_mode_server(port: int, secs: int):
 
 
 def stop_socket_mode_server(test):
-    print(test)
     test.server.stop()
     test.server.close()
 
