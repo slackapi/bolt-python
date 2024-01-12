@@ -1,6 +1,8 @@
 # pip install -r requirements/testing.txt
--r testing_without_asyncio.txt
-
+pytest>=6.2.5,<7
+pytest-cov>=3,<4
+aiohttp<4
+black==22.8.0             # Until we drop Python 3.6 support, we have to stay with this version
+click<=8.0.4              # black is affected by https://github.com/pallets/click/issues/2225
 pytest-asyncio>=0.16.0; python_version=="3.6"
 pytest-asyncio>=0.18.2,<1; python_version>"3.6"
-aiohttp>=3,<4
