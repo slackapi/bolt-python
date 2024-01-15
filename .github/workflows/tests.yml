@@ -23,7 +23,7 @@ jobs:
         run: |
           pip install -U pip
           pip install -r requirements.txt
-          pip install -r requirements/testing_without_asyncio
+          pip install -r requirements/testing_without_asyncio.txt
       - name: Run tests without aiohttp
         run: |
           pytest tests/slack_bolt/
