@@ -1,4 +1,4 @@
 # pip install -r requirements/testing.txt
 -r testing_without_asyncio.txt
-aiohttp<4
+-r async.txt
 pytest-asyncio<1;
