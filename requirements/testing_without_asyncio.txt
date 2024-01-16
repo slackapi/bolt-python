@@ -7,3 +7,4 @@ itsdangerous==2.0.1       # TODO: Flask-Sockets is not yet compatible with Flask
 Jinja2==3.0.3             # https://github.com/pallets/flask/issues/4494
 black==22.8.0             # Until we drop Python 3.6 support, we have to stay with this version
 click<=8.0.4              # black is affected by https://github.com/pallets/click/issues/2225
+bjoern<4                  # this requires libev
