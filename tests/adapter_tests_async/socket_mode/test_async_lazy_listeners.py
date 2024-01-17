@@ -12,7 +12,7 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
 from ...adapter_tests.socket_mode.mock_socket_mode_server import (
     start_socket_mode_server,
-    stop_socket_mode_server_async,
+    stop_socket_mode_server,
 )
 
 
@@ -80,4 +80,4 @@ class TestSocketModeAiohttp:
 
         finally:
             await handler.client.close()
-            await stop_socket_mode_server_async(self)
+            stop_socket_mode_server(self)

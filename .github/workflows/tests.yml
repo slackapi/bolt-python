@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+      - name: Install synchronous dependencies
         run: |
           apt-get install libev-dev
           pip install -U pip
@@ -29,11 +29,10 @@ jobs:
         run: |
           pytest tests/slack_bolt/
           pytest tests/scenario_tests/
-      - name: Run tests for Socket Mode adapters
+      - name: Install adapter dependencies
         run: |
           pip install -r requirements/adapter.txt
           pip install -r requirements/adapter_testing.txt
-          pytest tests/adapter_tests/socket_mode/
       - name: Run tests for HTTP Mode adapters (AWS)
         run: |
           pytest tests/adapter_tests/aws/
@@ -69,9 +68,15 @@ jobs:
       - name: Run tests for HTTP Mode adapters (Tornado)
         run: |
           pytest tests/adapter_tests/tornado/
-      - name: Run tests for HTTP Mode adapters (asyncio-based libraries)
+      - name: Install async dependencies
         run: |
           pip install -r requirements/async.txt
+      - name: Run tests for Socket Mode adapters
+        run: |
+          # Requires async test dependencies
+          pytest tests/adapter_tests/socket_mode/
+      - name: Run tests for HTTP Mode adapters (asyncio-based libraries)
+        run: |
           # Falcon supports Python 3.11 since its v3.1.1
           pip install "falcon>=3.1.1,<4"
           pytest tests/adapter_tests_async/
