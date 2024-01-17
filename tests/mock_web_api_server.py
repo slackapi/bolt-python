@@ -2,241 +2,91 @@ import asyncio
 from io import BytesIO
 import json
 import logging
-import threading
 import time
-from http.client import responses
-from http import HTTPStatus
-from http.server import HTTPServer, SimpleHTTPRequestHandler
-from typing import Callable, Dict, List, Tuple, Type, Optional
+from http import client
+from typing import Callable, List, Tuple, Optional
 from unittest import TestCase
-from urllib import request
 from urllib.error import URLError
 from urllib.parse import urlparse, parse_qs, ParseResult
 from urllib.request import urlopen
 from wsgiref.headers import Headers
 import bjoern
-from multiprocessing import Process
+from multiprocessing import Process, Queue
+
+INVALID_AUTH = json.dumps(
+    {
+        "ok": False,
+        "error": "invalid_auth",
+    }
+)
+
+OAUTH_V2_ACCESS_RESPONSE = json.dumps(
+    {
+        "ok": True,
+        "access_token": "xoxb-17653672481-19874698323-pdFZKVeTuE8sk7oOcBrzbqgy",
+        "token_type": "bot",
+        "scope": "chat:write,commands",
+        "bot_user_id": "U0KRQLJ9H",
+        "app_id": "A0KRD7HC3",
+        "team": {"name": "Slack Softball Team", "id": "T9TK3CUKW"},
+        "enterprise": {"name": "slack-sports", "id": "E12345678"},
+        "authed_user": {"id": "U1234", "scope": "chat:write", "access_token": "xoxp-1234", "token_type": "user"},
+    }
+)
+
+OAUTH_V2_ACCESS_BOT_REFRESH_RESPONSE = json.dumps(
+    {
+        "ok": True,
+        "app_id": "A0KRD7HC3",
+        "access_token": "xoxb-valid-refreshed",
+        "expires_in": 43200,
+        "refresh_token": "xoxe-1-valid-bot-refreshed",
+        "token_type": "bot",
+        "scope": "chat:write,commands",
+        "bot_user_id": "U0KRQLJ9H",
+        "team": {"name": "Slack Softball Team", "id": "T9TK3CUKW"},
+        "enterprise": {"name": "slack-sports", "id": "E12345678"},
+    }
+)
+
+OAUTH_V2_ACCESS_USER_REFRESH_RESPONSE = json.dumps(
+    {
+        "ok": True,
+        "app_id": "A0KRD7HC3",
+        "access_token": "xoxp-valid-refreshed",
+        "expires_in": 43200,
+        "refresh_token": "xoxe-1-valid-user-refreshed",
+        "token_type": "user",
+        "scope": "search:read",
+        "team": {"name": "Slack Softball Team", "id": "T9TK3CUKW"},
+        "enterprise": {"name": "slack-sports", "id": "E12345678"},
+    }
+)
+BOT_AUTH_TEST_RESPONSE = json.dumps(
+    {
+        "ok": True,
+        "url": "https://subarachnoid.slack.com/",
+        "team": "Subarachnoid Workspace",
+        "user": "bot",
+        "team_id": "T0G9PQBBK",
+        "user_id": "W23456789",
+        "bot_id": "BZYBOTHED",
+    }
+)
+
+USER_AUTH_TEST_RESPONSE = json.dumps(
+    {
+        "ok": True,
+        "url": "https://subarachnoid.slack.com/",
+        "team": "Subarachnoid Workspace",
+        "user": "some-user",
+        "team_id": "T0G9PQBBK",
+        "user_id": "W99999",
+    }
+)
 
 
-# class MockHandler(SimpleHTTPRequestHandler):
-#     protocol_version = "HTTP/1.1"
-#     default_request_version = "HTTP/1.1"
-#     logger = logging.getLogger(__name__)
-#     received_requests = {}
-
-#     def is_valid_token(self):
-#         return "Authorization" in self.headers and str(self.headers["Authorization"]).startswith("Bearer xoxb-")
-
-#     def is_valid_user_token(self):
-#         return "Authorization" in self.headers and str(self.headers["Authorization"]).startswith("Bearer xoxp-")
-
-#     def set_common_headers(self):
-#         self.send_header("content-type", "application/json;charset=utf-8")
-#         self.send_header("connection", "close")
-#         self.end_headers()
-
-#     invalid_auth = {
-#         "ok": False,
-#         "error": "invalid_auth",
-#     }
-
-#     oauth_v2_access_response = """
-# {
-#     "ok": true,
-#     "access_token": "xoxb-17653672481-19874698323-pdFZKVeTuE8sk7oOcBrzbqgy",
-#     "token_type": "bot",
-#     "scope": "chat:write,commands",
-#     "bot_user_id": "U0KRQLJ9H",
-#     "app_id": "A0KRD7HC3",
-#     "team": {
-#         "name": "Slack Softball Team",
-#         "id": "T9TK3CUKW"
-#     },
-#     "enterprise": {
-#         "name": "slack-sports",
-#         "id": "E12345678"
-#     },
-#     "authed_user": {
-#         "id": "U1234",
-#         "scope": "chat:write",
-#         "access_token": "xoxp-1234",
-#         "token_type": "user"
-#     }
-# }
-# """
-#     oauth_v2_access_bot_refresh_response = """
-#     {
-#         "ok": true,
-#         "app_id": "A0KRD7HC3",
-#         "access_token": "xoxb-valid-refreshed",
-#         "expires_in": 43200,
-#         "refresh_token": "xoxe-1-valid-bot-refreshed",
-#         "token_type": "bot",
-#         "scope": "chat:write,commands",
-#         "bot_user_id": "U0KRQLJ9H",
-#         "team": {
-#             "name": "Slack Softball Team",
-#             "id": "T9TK3CUKW"
-#         },
-#         "enterprise": {
-#             "name": "slack-sports",
-#             "id": "E12345678"
-#         }
-#     }
-# """
-#     oauth_v2_access_user_refresh_response = """
-#         {
-#             "ok": true,
-#             "app_id": "A0KRD7HC3",
-#             "access_token": "xoxp-valid-refreshed",
-#             "expires_in": 43200,
-#             "refresh_token": "xoxe-1-valid-user-refreshed",
-#             "token_type": "user",
-#             "scope": "search:read",
-#             "team": {
-#                 "name": "Slack Softball Team",
-#                 "id": "T9TK3CUKW"
-#             },
-#             "enterprise": {
-#                 "name": "slack-sports",
-#                 "id": "E12345678"
-#             }
-#         }
-#     """
-#     bot_auth_test_response = """
-# {
-#     "ok": true,
-#     "url": "https://subarachnoid.slack.com/",
-#     "team": "Subarachnoid Workspace",
-#     "user": "bot",
-#     "team_id": "T0G9PQBBK",
-#     "user_id": "W23456789",
-#     "bot_id": "BZYBOTHED"
-# }
-# """
-
-#     user_auth_test_response = """
-# {
-#     "ok": true,
-#     "url": "https://subarachnoid.slack.com/",
-#     "team": "Subarachnoid Workspace",
-#     "user": "some-user",
-#     "team_id": "T0G9PQBBK",
-#     "user_id": "W99999"
-# }
-# """
-
-#     def _handle(self):
-#         parsed_path: ParseResult = urlparse(self.path)
-#         path = parsed_path.path
-#         self.received_requests[path] = self.received_requests.get(path, 0) + 1
-#         try:
-#             if path == "/webhook":
-#                 self.send_response(200)
-#                 self.set_common_headers()
-#                 self.wfile.write("OK".encode("utf-8"))
-#                 return
-
-#             if path == "/received_requests.json":
-#                 self.send_response(200)
-#                 self.set_common_headers()
-#                 self.wfile.write(json.dumps(self.received_requests).encode("utf-8"))
-#                 return
-
-#             body = {"ok": True}
-#             if path == "/oauth.v2.access":
-#                 if self.headers.get("authorization") is not None:
-#                     request_body = self._parse_request_body(
-#                         parsed_path=parsed_path,
-#                         content_len=int(self.headers.get("Content-Length") or 0),
-#                     )
-#                     self.logger.info(f"request body: {request_body}")
-
-#                     if request_body.get("grant_type") == "refresh_token":
-#                         refresh_token = request_body.get("refresh_token")
-#                         if refresh_token is not None:
-#                             if "bot-valid" in refresh_token:
-#                                 self.send_response(200)
-#                                 self.set_common_headers()
-#                                 body = self.oauth_v2_access_bot_refresh_response
-#                                 self.wfile.write(body.encode("utf-8"))
-#                                 return
-#                             if "user-valid" in refresh_token:
-#                                 self.send_response(200)
-#                                 self.set_common_headers()
-#                                 body = self.oauth_v2_access_user_refresh_response
-#                                 self.wfile.write(body.encode("utf-8"))
-#                                 return
-#                     elif request_body.get("code") is not None:
-#                         self.send_response(200)
-#                         self.set_common_headers()
-#                         self.wfile.write(self.oauth_v2_access_response.encode("utf-8"))
-#                         return
-
-#             if self.is_valid_user_token():
-#                 if path == "/auth.test":
-#                     self.send_response(200)
-#                     self.set_common_headers()
-#                     self.wfile.write(self.user_auth_test_response.encode("utf-8"))
-#                     return
-
-#             if self.is_valid_token():
-#                 if path == "/auth.test":
-#                     self.send_response(200)
-#                     self.set_common_headers()
-#                     self.wfile.write(self.bot_auth_test_response.encode("utf-8"))
-#                     return
-
-#                 request_body = self._parse_request_body(
-#                     parsed_path=parsed_path,
-#                     content_len=int(self.headers.get("Content-Length") or 0),
-#                 )
-#                 self.logger.info(f"request: {path} {request_body}")
-
-#                 header = self.headers["authorization"]
-#                 pattern = str(header).split("xoxb-", 1)[1]
-#                 if pattern.isnumeric():
-#                     self.send_response(int(pattern))
-#                     self.set_common_headers()
-#                     self.wfile.write("""{"ok":false}""".encode("utf-8"))
-#                     return
-#             else:
-#                 body = self.invalid_auth
-
-#             self.send_response(HTTPStatus.OK)
-#             self.set_common_headers()
-#             self.wfile.write(json.dumps(body).encode("utf-8"))
-#             self.wfile.close()
-
-#         except Exception as e:
-#             self.logger.error(str(e), exc_info=True)
-#             raise
-
-#     def do_GET(self):
-#         self._handle()
-
-#     def do_POST(self):
-#         self._handle()
-
-#     def _parse_request_body(self, parsed_path: str, content_len: int) -> Optional[dict]:
-#         post_body = self.rfile.read(content_len)
-#         request_body = None
-#         if post_body:
-#             try:
-#                 post_body = post_body.decode("utf-8")
-#                 if post_body.startswith("{"):
-#                     request_body = json.loads(post_body)
-#                 else:
-#                     request_body = {k: v[0] for k, v in parse_qs(post_body).items()}
-#             except UnicodeDecodeError:
-#                 pass
-#         else:
-#             if parsed_path and parsed_path.query:
-#                 request_body = {k: v[0] for k, v in parse_qs(parsed_path.query).items()}
-#         return request_body
-
-
-class FakeWSGIResponse:
+class MockWsgiHandlerResponse:
     def __init__(self, status: int, headers: List[Tuple[str, str]], body: str):
         self.status = status
         self.headers = headers
@@ -244,10 +94,10 @@ class FakeWSGIResponse:
 
     @property
     def status_line(self) -> str:
-        return f"{str(self.status)} {responses[self.status]}"
+        return f"{str(self.status)} {client.responses[self.status]}"
 
 
-class WSGIEnviron:
+class MockWsgiHandlerRequest:
     def __init__(self, environ: dict):
         self.environ = environ
 
@@ -270,183 +120,8 @@ class WSGIEnviron:
         except KeyError:
             return BytesIO()
 
-
-class MockWSGIHandler:
-    logger = logging.getLogger(__name__)
-
-    received_requests: Dict[str, int] = {}
-
-    invalid_auth = {
-        "ok": False,
-        "error": "invalid_auth",
-    }
-
-    oauth_v2_access_response = """
-{
-    "ok": true,
-    "access_token": "xoxb-17653672481-19874698323-pdFZKVeTuE8sk7oOcBrzbqgy",
-    "token_type": "bot",
-    "scope": "chat:write,commands",
-    "bot_user_id": "U0KRQLJ9H",
-    "app_id": "A0KRD7HC3",
-    "team": {
-        "name": "Slack Softball Team",
-        "id": "T9TK3CUKW"
-    },
-    "enterprise": {
-        "name": "slack-sports",
-        "id": "E12345678"
-    },
-    "authed_user": {
-        "id": "U1234",
-        "scope": "chat:write",
-        "access_token": "xoxp-1234",
-        "token_type": "user"
-    }
-}
-"""
-    oauth_v2_access_bot_refresh_response = """
-    {
-        "ok": true,
-        "app_id": "A0KRD7HC3",
-        "access_token": "xoxb-valid-refreshed",
-        "expires_in": 43200,
-        "refresh_token": "xoxe-1-valid-bot-refreshed",
-        "token_type": "bot",
-        "scope": "chat:write,commands",
-        "bot_user_id": "U0KRQLJ9H",
-        "team": {
-            "name": "Slack Softball Team",
-            "id": "T9TK3CUKW"
-        },
-        "enterprise": {
-            "name": "slack-sports",
-            "id": "E12345678"
-        }
-    }
-"""
-    oauth_v2_access_user_refresh_response = """
-        {
-            "ok": true,
-            "app_id": "A0KRD7HC3",
-            "access_token": "xoxp-valid-refreshed",
-            "expires_in": 43200,
-            "refresh_token": "xoxe-1-valid-user-refreshed",
-            "token_type": "user",
-            "scope": "search:read",
-            "team": {
-                "name": "Slack Softball Team",
-                "id": "T9TK3CUKW"
-            },
-            "enterprise": {
-                "name": "slack-sports",
-                "id": "E12345678"
-            }
-        }
-    """
-    bot_auth_test_response = """
-{
-    "ok": true,
-    "url": "https://subarachnoid.slack.com/",
-    "team": "Subarachnoid Workspace",
-    "user": "bot",
-    "team_id": "T0G9PQBBK",
-    "user_id": "W23456789",
-    "bot_id": "BZYBOTHED"
-}
-"""
-
-    user_auth_test_response = """
-{
-    "ok": true,
-    "url": "https://subarachnoid.slack.com/",
-    "team": "Subarachnoid Workspace",
-    "user": "some-user",
-    "team_id": "T0G9PQBBK",
-    "user_id": "W99999"
-}
-"""
-
-    def is_valid_token(self, environ: WSGIEnviron):
-        try:
-            return environ.get_header("Authorization").startswith("Bearer xoxb-")
-        except KeyError:
-            return False
-
-    def is_valid_user_token(self, environ: WSGIEnviron):
-        try:
-            return environ.get_header("Authorization").startswith("Bearer xoxp-")
-        except KeyError:
-            return False
-
-    def _handle(self, environ: WSGIEnviron) -> FakeWSGIResponse:
-        parsed_path: ParseResult = urlparse(environ.get_path())
-        path = parsed_path.path
-        self.received_requests[path] = self.received_requests.get(path, 0) + 1
-        try:
-            if path == "/health":
-                return FakeWSGIResponse(200, self.get_common_headers(), "OK")
-
-            if path == "/webhook":
-                return FakeWSGIResponse(200, self.get_common_headers(), "OK")
-
-            if path == "/received_requests.json":
-                return FakeWSGIResponse(200, self.get_common_headers(), json.dumps(self.received_requests))
-
-            body = {"ok": True}
-            if path == "/oauth.v2.access":
-                if environ.get_header("authorization") is not None:
-                    request_body = self._parse_request_body(
-                        parsed_path=parsed_path,
-                        body=environ.body(),
-                        content_len=environ.get_content_length(),
-                    )
-                    # self.logger.info(f"request body: {request_body}")
-
-                    if request_body.get("grant_type") == "refresh_token":
-                        refresh_token = request_body.get("refresh_token")
-                        if refresh_token is not None:
-                            if "bot-valid" in refresh_token:
-                                return FakeWSGIResponse(
-                                    200, self.get_common_headers(), self.oauth_v2_access_bot_refresh_response
-                                )
-                            if "user-valid" in refresh_token:
-                                return FakeWSGIResponse(
-                                    200, self.get_common_headers(), self.oauth_v2_access_user_refresh_response
-                                )
-                    elif request_body.get("code") is not None:
-                        return FakeWSGIResponse(200, self.get_common_headers(), self.oauth_v2_access_response)
-
-            if self.is_valid_user_token(environ):
-                if path == "/auth.test":
-                    return FakeWSGIResponse(200, self.get_common_headers(), self.user_auth_test_response)
-
-            if self.is_valid_token(environ):
-                if path == "/auth.test":
-                    return FakeWSGIResponse(200, self.get_common_headers(), self.bot_auth_test_response)
-
-                request_body = self._parse_request_body(
-                    parsed_path=parsed_path,
-                    body=environ.body(),
-                    content_len=environ.get_content_length(),
-                )
-                self.logger.info(f"request: {path} {request_body}")
-
-                header = environ.get_header("authorization")
-                pattern = str(header).split("xoxb-", 1)[1]
-                if pattern.isnumeric():
-                    return FakeWSGIResponse(int(pattern), self.get_common_headers(), """{"ok":false}""")
-            else:
-                body = self.invalid_auth
-
-            return FakeWSGIResponse(200, self.get_common_headers(), json.dumps(body))
-
-        except Exception as e:
-            self.logger.error(str(e), exc_info=True)
-            raise
-
-    def _parse_request_body(self, parsed_path: str, body: BytesIO, content_len: int) -> Optional[dict]:
-        post_body = body.read(content_len)
+    def parse_request_body(self, parsed_path: ParseResult) -> Optional[dict]:
+        post_body = self.body().read(self.get_content_length())
         request_body = None
         if post_body:
             try:
@@ -462,60 +137,138 @@ class MockWSGIHandler:
                 request_body = {k: v[0] for k, v in parse_qs(parsed_path.query).items()}
         return request_body
 
+
+class MockWsgiHandler:
+    logger = logging.getLogger(__name__)
+
+    def __init__(self, queue: Queue):
+        self.queue = queue
+
+    def is_valid_token(self, request: MockWsgiHandlerRequest):
+        try:
+            return request.get_header("Authorization").startswith("Bearer xoxb-")
+        except KeyError:
+            return False
+
+    def is_valid_user_token(self, request: MockWsgiHandlerRequest):
+        try:
+            return request.get_header("Authorization").startswith("Bearer xoxp-")
+        except KeyError:
+            return False
+
+    def _handle(self, request: MockWsgiHandlerRequest) -> MockWsgiHandlerResponse:
+        parsed_path: ParseResult = urlparse(request.get_path())
+        path = parsed_path.path
+        self.queue.put(path)
+        try:
+            if path == "/health":
+                return MockWsgiHandlerResponse(200, self.get_common_headers(), "OK")
+
+            if path == "/webhook":
+                return MockWsgiHandlerResponse(200, self.get_common_headers(), "OK")
+
+            body = {"ok": True}
+            if path == "/oauth.v2.access":
+                if request.get_header("authorization") is not None:
+                    request_body = request.parse_request_body(parsed_path=parsed_path)
+                    # self.logger.info(f"request body: {request_body}")
+
+                    if request_body.get("grant_type") == "refresh_token":
+                        refresh_token = request_body.get("refresh_token")
+                        if refresh_token is not None:
+                            if "bot-valid" in refresh_token:
+                                return MockWsgiHandlerResponse(
+                                    200, self.get_common_headers(), OAUTH_V2_ACCESS_BOT_REFRESH_RESPONSE
+                                )
+                            if "user-valid" in refresh_token:
+                                return MockWsgiHandlerResponse(
+                                    200, self.get_common_headers(), OAUTH_V2_ACCESS_USER_REFRESH_RESPONSE
+                                )
+                    elif request_body.get("code") is not None:
+                        return MockWsgiHandlerResponse(200, self.get_common_headers(), OAUTH_V2_ACCESS_RESPONSE)
+
+            if self.is_valid_user_token(request):
+                if path == "/auth.test":
+                    return MockWsgiHandlerResponse(200, self.get_common_headers(), USER_AUTH_TEST_RESPONSE)
+
+            if self.is_valid_token(request):
+                if path == "/auth.test":
+                    return MockWsgiHandlerResponse(200, self.get_common_headers(), BOT_AUTH_TEST_RESPONSE)
+
+                request_body = request.parse_request_body(parsed_path=parsed_path)
+                self.logger.info(f"request: {path} {request_body}")
+
+                header = request.get_header("authorization")
+                pattern = str(header).split("xoxb-", 1)[1]
+                if pattern.isnumeric():
+                    return MockWsgiHandlerResponse(int(pattern), self.get_common_headers(), """{"ok":false}""")
+            else:
+                body = INVALID_AUTH
+
+            return MockWsgiHandlerResponse(200, self.get_common_headers(), json.dumps(body))
+
+        except Exception as e:
+            self.logger.error(str(e), exc_info=True)
+            raise
+
     def get_common_headers(self, headers: List[Tuple[str, str]] = []) -> Headers:
         headers.append(("content-type", "application/json;charset=utf-8"))
-        headers.append(("connection", "close"))
         return headers
 
     def __call__(self, environ: dict, start_response: Callable):
-        response = self._handle(WSGIEnviron(environ))
+        response = self._handle(MockWsgiHandlerRequest(environ))
 
         start_response(response.status_line, response.headers)
         return response.body.encode("utf-8")
 
 
-def start_fake_server_thread(test: TestCase, port: int):
-    test.handler = MockWSGIHandler()
-    test.socket = bjoern.listen(test.handler, "127.0.0.1", port)
-    test.host, test.port = test.socket.getsockname()
-
+def start_fake_server_thread(host: str, port: int, queue: Queue):
+    handler = MockWsgiHandler(queue)
+    bjoern.listen(handler, host, port)
     bjoern.run()
 
 
 class MockReceivedRequests:
+    def __init__(self, queue: Queue):
+        self.queue = queue
+        self.received_requests = {}
+
     def get(self, key, default=None):
-        url = "http://127.0.0.1:8888/received_requests.json"
-        r = urlopen(url)
-        data: dict = json.loads(r.read().decode(r.info().get_param("charset") or "utf-8"))
-        return data.get(key, default)
+        while not self.queue.empty():
+            path = self.queue.get()
+            self.received_requests[path] = self.received_requests.get(path, 0) + 1
+        return self.received_requests.get(key, default)
 
     def __getitem__(self, item):
-        url = "http://127.0.0.1:8888/received_requests.json"
-        r = urlopen(url)
-        data = json.loads(r.read().decode(r.info().get_param("charset") or "utf-8"))
-        return data[item]
+        while not self.queue.empty():
+            path = self.queue.get()
+            self.received_requests[path] = self.received_requests.get(path, 0) + 1
+        return self.received_requests[item]
 
 
 def setup_mock_web_api_server(test: TestCase):
-    test.thread = Process(target=start_fake_server_thread, args=(test, 8888))
-    test.thread.start()
-    test.thread.pid
-    test.mock_received_requests = MockReceivedRequests()
-    wait_for_socket_mode_server(8888, 5)
+    test.mock_received_requests = MockReceivedRequests(Queue())
+    test.host = "127.0.0.1"
+    test.port = 8888
+    test.process = Process(target=start_fake_server_thread, args=(test.host, test.port, test.mock_received_requests.queue))
+    test.process.start()
+    wait_for_socket_mode_server(test.host, test.port, 5)
 
 
-def wait_for_socket_mode_server(port: int, timeout: int):
+def wait_for_socket_mode_server(host: str, port: int, timeout: int):
     start_time = time.time()
     while (time.time() - start_time) < timeout:
         try:
-            urlopen(f"http://127.0.0.1:{port}/health")
+            urlopen(f"http://{host}:{port}/health")
             return
         except URLError:
             time.sleep(0.01)
 
 
 def cleanup_mock_web_api_server(test: TestCase):
-    test.thread.kill()
+    test.mock_received_requests.queue.close()
+    test.mock_received_requests.queue.join_thread()
+    test.process.terminate()
 
 
 def assert_auth_test_count(test: TestCase, expected_count: int):
@@ -524,8 +277,7 @@ def assert_auth_test_count(test: TestCase, expected_count: int):
     error = None
     while retry_count < 3:
         try:
-            received_requests = MockReceivedRequests()
-            received_requests.get("/auth.test", 0) == expected_count
+            test.mock_received_requests.get("/auth.test", 0) == expected_count
             break
         except Exception as e:
             error = e
@@ -543,8 +295,7 @@ async def assert_auth_test_count_async(test: TestCase, expected_count: int):
     error = None
     while retry_count < 3:
         try:
-            received_requests = MockReceivedRequests()
-            received_requests.get("/auth.test", 0) == expected_count
+            test.mock_received_requests.get("/auth.test", 0) == expected_count
             break
         except Exception as e:
             error = e
