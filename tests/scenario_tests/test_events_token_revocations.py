@@ -40,7 +40,7 @@ class MyInstallationStore(InstallationStore):
         enterprise_id: Optional[str],
         team_id: Optional[str],
         user_id: Optional[str] = None,
-        is_enterprise_install: Optional[bool] = False,
+        is_enterprise_install: Optional[bool] = False
     ) -> Optional[Installation]:
         assert enterprise_id == "E111"
         assert team_id is None
