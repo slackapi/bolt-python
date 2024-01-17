@@ -21,7 +21,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install synchronous dependencies
         run: |
-          apt-get install libev-dev
+          sudo apt-get install -y libev-dev
           pip install -U pip
           pip install -r requirements.txt
           pip install -r requirements/testing_without_asyncio.txt
