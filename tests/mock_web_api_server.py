@@ -1,17 +1,18 @@
 import asyncio
-from io import BytesIO
 import json
 import logging
 import time
 from http import client
-from typing import Callable, List, Tuple, Optional
+from io import BytesIO
+from multiprocessing import Process, Queue
+from typing import Callable, List, Optional, Tuple
 from unittest import TestCase
 from urllib.error import URLError
-from urllib.parse import urlparse, parse_qs, ParseResult
+from urllib.parse import ParseResult, parse_qs, urlparse
 from urllib.request import urlopen
 from wsgiref.headers import Headers
+
 import bjoern
-from multiprocessing import Process, Queue
 
 INVALID_AUTH = json.dumps(
     {
@@ -86,7 +87,7 @@ USER_AUTH_TEST_RESPONSE = json.dumps(
 )
 
 
-class MockWsgiHandlerResponse:
+class WsgiMockHandlerResponse:
     def __init__(self, status: int, headers: List[Tuple[str, str]], body: str):
         self.status = status
         self.headers = headers
@@ -97,7 +98,7 @@ class MockWsgiHandlerResponse:
         return f"{str(self.status)} {client.responses[self.status]}"
 
 
-class MockWsgiHandlerRequest:
+class WsgiMockHandlerRequest:
     def __init__(self, environ: dict):
         self.environ = environ
 
@@ -138,34 +139,34 @@ class MockWsgiHandlerRequest:
         return request_body
 
 
-class MockWsgiHandler:
+class WsgiMockHandler:
     logger = logging.getLogger(__name__)
 
     def __init__(self, queue: Queue):
         self.queue = queue
 
-    def is_valid_token(self, request: MockWsgiHandlerRequest):
+    def is_valid_token(self, request: WsgiMockHandlerRequest):
         try:
             return request.get_header("Authorization").startswith("Bearer xoxb-")
         except KeyError:
             return False
 
-    def is_valid_user_token(self, request: MockWsgiHandlerRequest):
+    def is_valid_user_token(self, request: WsgiMockHandlerRequest):
         try:
             return request.get_header("Authorization").startswith("Bearer xoxp-")
         except KeyError:
             return False
 
-    def _handle(self, request: MockWsgiHandlerRequest) -> MockWsgiHandlerResponse:
+    def _handle(self, request: WsgiMockHandlerRequest) -> WsgiMockHandlerResponse:
         parsed_path: ParseResult = urlparse(request.get_path())
         path = parsed_path.path
         self.queue.put(path)
         try:
             if path == "/health":
-                return MockWsgiHandlerResponse(200, self.get_common_headers(), "OK")
+                return WsgiMockHandlerResponse(200, self.get_common_headers(), "OK")
 
             if path == "/webhook":
-                return MockWsgiHandlerResponse(200, self.get_common_headers(), "OK")
+                return WsgiMockHandlerResponse(200, self.get_common_headers(), "OK")
 
             body = {"ok": True}
             if path == "/oauth.v2.access":
@@ -177,23 +178,23 @@ class MockWsgiHandler:
                         refresh_token = request_body.get("refresh_token")
                         if refresh_token is not None:
                             if "bot-valid" in refresh_token:
-                                return MockWsgiHandlerResponse(
+                                return WsgiMockHandlerResponse(
                                     200, self.get_common_headers(), OAUTH_V2_ACCESS_BOT_REFRESH_RESPONSE
                                 )
                             if "user-valid" in refresh_token:
-                                return MockWsgiHandlerResponse(
+                                return WsgiMockHandlerResponse(
                                     200, self.get_common_headers(), OAUTH_V2_ACCESS_USER_REFRESH_RESPONSE
                                 )
                     elif request_body.get("code") is not None:
-                        return MockWsgiHandlerResponse(200, self.get_common_headers(), OAUTH_V2_ACCESS_RESPONSE)
+                        return WsgiMockHandlerResponse(200, self.get_common_headers(), OAUTH_V2_ACCESS_RESPONSE)
 
             if self.is_valid_user_token(request):
                 if path == "/auth.test":
-                    return MockWsgiHandlerResponse(200, self.get_common_headers(), USER_AUTH_TEST_RESPONSE)
+                    return WsgiMockHandlerResponse(200, self.get_common_headers(), USER_AUTH_TEST_RESPONSE)
 
             if self.is_valid_token(request):
                 if path == "/auth.test":
-                    return MockWsgiHandlerResponse(200, self.get_common_headers(), BOT_AUTH_TEST_RESPONSE)
+                    return WsgiMockHandlerResponse(200, self.get_common_headers(), BOT_AUTH_TEST_RESPONSE)
 
                 request_body = request.parse_request_body(parsed_path=parsed_path)
                 self.logger.info(f"request: {path} {request_body}")
@@ -201,11 +202,11 @@ class MockWsgiHandler:
                 header = request.get_header("authorization")
                 pattern = str(header).split("xoxb-", 1)[1]
                 if pattern.isnumeric():
-                    return MockWsgiHandlerResponse(int(pattern), self.get_common_headers(), """{"ok":false}""")
+                    return WsgiMockHandlerResponse(int(pattern), self.get_common_headers(), """{"ok":false}""")
             else:
                 body = INVALID_AUTH
 
-            return MockWsgiHandlerResponse(200, self.get_common_headers(), json.dumps(body))
+            return WsgiMockHandlerResponse(200, self.get_common_headers(), json.dumps(body))
 
         except Exception as e:
             self.logger.error(str(e), exc_info=True)
@@ -216,14 +217,14 @@ class MockWsgiHandler:
         return headers
 
     def __call__(self, environ: dict, start_response: Callable):
-        response = self._handle(MockWsgiHandlerRequest(environ))
+        response = self._handle(WsgiMockHandlerRequest(environ))
 
         start_response(response.status_line, response.headers)
         return response.body.encode("utf-8")
 
 
 def start_fake_server_thread(host: str, port: int, queue: Queue):
-    handler = MockWsgiHandler(queue)
+    handler = WsgiMockHandler(queue)
     bjoern.listen(handler, host, port)
     bjoern.run()
 
