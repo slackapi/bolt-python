@@ -14,12 +14,10 @@ from wsgiref.headers import Headers
 
 import bjoern
 
-INVALID_AUTH = json.dumps(
-    {
-        "ok": False,
-        "error": "invalid_auth",
-    }
-)
+INVALID_AUTH = {
+    "ok": False,
+    "error": "invalid_auth",
+}
 
 OAUTH_V2_ACCESS_RESPONSE = json.dumps(
     {
