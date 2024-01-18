@@ -271,7 +271,7 @@ def cleanup_mock_web_api_server(test: TestCase):
 
 
 def assert_auth_test_count(test: TestCase, expected_count: int):
-    time.sleep(0.1)
+    # time.sleep(0.01)
     retry_count = 0
     error = None
     while retry_count < 3:
@@ -282,14 +282,14 @@ def assert_auth_test_count(test: TestCase, expected_count: int):
             error = e
             retry_count += 1
             # waiting for mock_received_requests updates
-            time.sleep(0.1)
+            # time.sleep(0.01)
 
     if error is not None:
         raise error
 
 
 async def assert_auth_test_count_async(test: TestCase, expected_count: int):
-    await asyncio.sleep(0.1)
+    # await asyncio.sleep(0.01)
     retry_count = 0
     error = None
     while retry_count < 3:
@@ -300,7 +300,7 @@ async def assert_auth_test_count_async(test: TestCase, expected_count: int):
             error = e
             retry_count += 1
             # waiting for mock_received_requests updates
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.01)
 
     if error is not None:
         raise error

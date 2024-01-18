@@ -38,7 +38,7 @@ class TestEventsIgnoreSelf:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         # The listener should not be executed
         assert self.mock_received_requests.get("/chat.postMessage") is None
 
@@ -53,7 +53,7 @@ class TestEventsIgnoreSelf:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         # The listener should not be executed
         assert self.mock_received_requests.get("/chat.postMessage") is None
 
@@ -68,7 +68,7 @@ class TestEventsIgnoreSelf:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         assert self.mock_received_requests.get("/chat.postMessage") == 1
 
     def test_self_events_disabled(self):
@@ -85,7 +85,7 @@ class TestEventsIgnoreSelf:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         # The listener should be executed as the ignoring logic is disabled
         assert self.mock_received_requests.get("/chat.postMessage") == 1
 

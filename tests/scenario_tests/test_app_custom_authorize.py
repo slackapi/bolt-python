@@ -210,7 +210,7 @@ class TestApp:
         response = app.dispatch(self.build_app_mention_request())
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     def test_installation_store_and_authorize(self):
@@ -231,7 +231,7 @@ class TestApp:
         response = app.dispatch(self.build_app_mention_request())
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     def test_installation_store_and_func_authorize(self):

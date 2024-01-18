@@ -76,7 +76,7 @@ class TestBotMessage:
         assert response.status == 200
 
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
+        time.sleep(0.2)  # wait a bit after auto ack()
         assert result["call_count"] == 3
 
 

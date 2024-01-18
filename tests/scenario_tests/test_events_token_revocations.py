@@ -40,7 +40,7 @@ class MyInstallationStore(InstallationStore):
         enterprise_id: Optional[str],
         team_id: Optional[str],
         user_id: Optional[str] = None,
-        is_enterprise_install: Optional[bool] = False
+        is_enterprise_install: Optional[bool] = False,
     ) -> Optional[Installation]:
         assert enterprise_id == "E111"
         assert team_id is None
@@ -132,7 +132,7 @@ class TestEventsTokenRevocations:
 
         # auth.test API call must be skipped
         assert_auth_test_count(self, 0)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         assert app.installation_store.delete_bot_called is True
         assert app.installation_store.delete_installation_called is True
         assert app.installation_store.delete_all_called is False
@@ -165,7 +165,7 @@ class TestEventsTokenRevocations:
         assert response.status == 200
         # auth.test API call must be skipped
         assert_auth_test_count(self, 0)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         assert app.installation_store.delete_bot_called is True
         assert app.installation_store.delete_installation_called is True
         assert app.installation_store.delete_all_called is True

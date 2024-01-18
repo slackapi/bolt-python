@@ -108,7 +108,7 @@ class TestEventsSharedChannels:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     def test_middleware_skip(self):
@@ -180,7 +180,7 @@ class TestEventsSharedChannels:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     def test_stable_auto_ack(self):
@@ -250,7 +250,7 @@ class TestEventsSharedChannels:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         # The listener should not be executed
         assert self.mock_received_requests.get("/chat.postMessage") is None
 
@@ -333,7 +333,7 @@ class TestEventsSharedChannels:
         response = app.dispatch(request)
         assert response.status == 200
 
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 2
 
     def test_member_join_left_events(self):
@@ -415,7 +415,7 @@ class TestEventsSharedChannels:
         response = app.dispatch(request)
         assert response.status == 200
 
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         # the listeners should not be executed
         assert self.mock_received_requests["/chat.postMessage"] == 2
 
@@ -490,5 +490,5 @@ class TestEventsSharedChannels:
 
         # this should not be called when we have authorize
         assert self.mock_received_requests.get("/auth.test") is None
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 2

@@ -107,7 +107,7 @@ class TestEventsOrgApps:
         assert response.status == 200
         # auth.test API call must be skipped
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         assert result.called is True
 
     def test_team_access_revoked(self):
@@ -144,7 +144,7 @@ class TestEventsOrgApps:
         assert response.status == 200
         # auth.test API call must be skipped
         assert self.mock_received_requests.get("/auth.test") is None
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         assert result.called is True
 
     def test_app_home_opened(self):
@@ -194,7 +194,7 @@ class TestEventsOrgApps:
         assert response.status == 200
         # auth.test API call must be skipped
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         assert result.called is True
 
     def test_message(self):
@@ -250,5 +250,5 @@ class TestEventsOrgApps:
         assert response.status == 200
         # auth.test API call must be skipped
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.2)  # wait a bit after auto ack()
         assert result.called is True

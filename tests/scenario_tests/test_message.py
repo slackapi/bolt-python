@@ -71,7 +71,7 @@ class TestMessage:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
+        time.sleep(0.2)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     def test_all_message_matching_1(self):
@@ -88,7 +88,7 @@ class TestMessage:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
+        time.sleep(0.2)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     def test_all_message_matching_2(self):
@@ -105,7 +105,7 @@ class TestMessage:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
+        time.sleep(0.2)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     def test_string_keyword_capturing(self):
@@ -119,7 +119,7 @@ class TestMessage:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
+        time.sleep(0.2)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     def test_string_keyword_capturing2(self):
@@ -133,7 +133,7 @@ class TestMessage:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
+        time.sleep(0.2)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     def test_string_keyword_capturing_multi_capture(self):
@@ -147,7 +147,7 @@ class TestMessage:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
+        time.sleep(0.2)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     def test_string_keyword_unmatched(self):
@@ -173,7 +173,7 @@ class TestMessage:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
+        time.sleep(0.2)  # wait a bit after auto ack()
         assert self.mock_received_requests["/chat.postMessage"] == 1
 
     def test_regexp_keyword_unmatched(self):

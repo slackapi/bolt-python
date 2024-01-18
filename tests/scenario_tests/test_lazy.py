@@ -106,7 +106,7 @@ class TestErrorHandler:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 200
-        time.sleep(1)  # wait a bit
+        time.sleep(0.9)  # wait a bit
         assert self.mock_received_requests["/chat.postMessage"] == 2
 
     def test_lazy_class(self):
@@ -134,7 +134,7 @@ class TestErrorHandler:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 200
-        time.sleep(1)  # wait a bit
+        time.sleep(0.9)  # wait a bit
         assert self.mock_received_requests["/chat.postMessage"] == 2
 
     def test_issue_545_context_copy_failure(self):
@@ -204,5 +204,5 @@ class TestErrorHandler:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 200
-        time.sleep(1)  # wait a bit
+        time.sleep(0.9)  # wait a bit
         assert self.mock_received_requests["/chat.postMessage"] == 2
