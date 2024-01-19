@@ -302,21 +302,19 @@ def assert_auth_test_count(test: TestCase, expected_count: int):
     assert_received_request_count(test, "/auth.test", expected_count, 0.5)
 
 
-async def assert_received_request_count_async(test: TestCase, path: str, expected_count: int, timeout: float):
-    start_time = time.time()
+async def assert_auth_test_count_async(test: TestCase, expected_count: int):
+    await asyncio.sleep(0.1)
+    retry_count = 0
     error = None
-    while time.time() - start_time < timeout:
+    while retry_count < 3:
         try:
-            assert test.received_requests_handler.get(path, 0) == expected_count
-            return
+            test.mock_received_requests.get("/auth.test", 0) == expected_count
+            break
         except Exception as e:
             error = e
+            retry_count += 1
             # waiting for mock_received_requests updates
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(0.1)
 
     if error is not None:
         raise error
-
-
-async def assert_auth_test_count_async(test: TestCase, expected_count: int):
-    await assert_received_request_count(test, "/auth.test", expected_count, 0.5)
