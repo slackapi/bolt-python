@@ -1,18 +1,18 @@
 import json
 import logging
-import time as time_module
 from time import time
 from urllib.parse import quote
 
 from slack_sdk.signature import SignatureVerifier
-from slack_sdk.web import WebClient, SlackResponse
+from slack_sdk.web import SlackResponse, WebClient
 
-from slack_bolt import App, BoltRequest, Ack
-from slack_bolt.workflows.step import Complete, Fail, Update, Configure
+from slack_bolt import Ack, App, BoltRequest
+from slack_bolt.workflows.step import Complete, Configure, Fail, Update
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
     assert_auth_test_count,
+    assert_received_request_count,
+    cleanup_mock_web_api_server,
+    setup_mock_web_api_server,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -142,8 +142,7 @@ class TestWorkflowSteps:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time_module.sleep(0.5)
-        assert self.mock_received_requests["/workflows.stepCompleted"] == 1
+        assert_received_request_count(self, path="/workflows.stepCompleted", min_count=1, timeout=0.5)
 
         app = self.build_app("copy_review___")
         response = app.dispatch(request)
@@ -162,8 +161,7 @@ class TestWorkflowSteps:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time_module.sleep(0.5)
-        assert self.mock_received_requests["/workflows.stepCompleted"] == 1
+        assert_received_request_count(self, path="/workflows.stepCompleted", min_count=1, timeout=0.5)
 
         app = self.build_process_before_response_app("copy_review___")
         response = app.dispatch(request)

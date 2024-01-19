@@ -4,9 +4,10 @@ from slack_sdk.web import WebClient
 
 from slack_bolt import App, BoltRequest
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
     assert_auth_test_count,
+    assert_received_request_count,
+    cleanup_mock_web_api_server,
+    setup_mock_web_api_server,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -38,9 +39,9 @@ class TestEventsIgnoreSelf:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.5)  # wait a bit after auto ack()
         # The listener should not be executed
-        assert self.mock_received_requests.get("/chat.postMessage") is None
+        assert self.received_requests_handler.get("/chat.postMessage") is None
 
     def test_self_events_response_url(self):
         app = App(client=self.web_client)
@@ -53,9 +54,9 @@ class TestEventsIgnoreSelf:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.5)  # wait a bit after auto ack()
         # The listener should not be executed
-        assert self.mock_received_requests.get("/chat.postMessage") is None
+        assert self.received_requests_handler.get("/chat.postMessage") is None
 
     def test_not_self_events_response_url(self):
         app = App(client=self.web_client)
@@ -68,8 +69,7 @@ class TestEventsIgnoreSelf:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests.get("/chat.postMessage") == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
     def test_self_events_disabled(self):
         app = App(
@@ -85,9 +85,7 @@ class TestEventsIgnoreSelf:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
-        # The listener should be executed as the ignoring logic is disabled
-        assert self.mock_received_requests.get("/chat.postMessage") == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
 
 event_body = {

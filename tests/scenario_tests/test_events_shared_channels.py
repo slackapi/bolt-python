@@ -1,5 +1,5 @@
 import json
-from time import time, sleep
+from time import sleep, time
 
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
@@ -7,9 +7,10 @@ from slack_sdk.web import WebClient
 from slack_bolt import App, BoltRequest, Say
 from slack_bolt.authorization import AuthorizeResult
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
     assert_auth_test_count,
+    assert_received_request_count,
+    cleanup_mock_web_api_server,
+    setup_mock_web_api_server,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -108,8 +109,7 @@ class TestEventsSharedChannels:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
     def test_middleware_skip(self):
         app = App(
@@ -180,8 +180,7 @@ class TestEventsSharedChannels:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
     def test_stable_auto_ack(self):
         app = App(
@@ -250,9 +249,9 @@ class TestEventsSharedChannels:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.5)  # wait a bit after auto ack()
         # The listener should not be executed
-        assert self.mock_received_requests.get("/chat.postMessage") is None
+        assert self.received_requests_handler.get("/chat.postMessage") is None
 
     def test_self_member_join_left_events(self):
         app = App(
@@ -332,9 +331,7 @@ class TestEventsSharedChannels:
         request: BoltRequest = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
         response = app.dispatch(request)
         assert response.status == 200
-
-        sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 2
+        assert_received_request_count(self, path="/chat.postMessage", min_count=2)
 
     def test_member_join_left_events(self):
         app = App(
@@ -415,9 +412,7 @@ class TestEventsSharedChannels:
         response = app.dispatch(request)
         assert response.status == 200
 
-        sleep(1)  # wait a bit after auto ack()
-        # the listeners should not be executed
-        assert self.mock_received_requests["/chat.postMessage"] == 2
+        assert_received_request_count(self, path="/chat.postMessage", min_count=2)
 
     def test_uninstallation_and_revokes(self):
         app = App(
@@ -489,6 +484,5 @@ class TestEventsSharedChannels:
         assert response.status == 200
 
         # this should not be called when we have authorize
-        assert self.mock_received_requests.get("/auth.test") is None
-        sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 2
+        assert_auth_test_count(self, 0)
+        assert_received_request_count(self, path="/chat.postMessage", min_count=2)

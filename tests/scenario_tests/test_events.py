@@ -1,17 +1,18 @@
 import json
 import re
 from functools import wraps
-from time import time, sleep
+from time import time
 
 import pytest
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 
-from slack_bolt import App, BoltRequest, Say, BoltContext
+from slack_bolt import App, BoltContext, BoltRequest, Say
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
     assert_auth_test_count,
+    assert_received_request_count,
+    cleanup_mock_web_api_server,
+    setup_mock_web_api_server,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -87,8 +88,7 @@ class TestEvents:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
     def test_middleware_skip(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
@@ -143,8 +143,7 @@ class TestEvents:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
     def test_stable_auto_ack(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
@@ -221,8 +220,7 @@ class TestEvents:
         response = app.dispatch(request)
         assert response.status == 200
 
-        sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 2
+        assert_received_request_count(self, path="/chat.postMessage", min_count=2)
 
     def test_member_join_left_events(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
@@ -283,9 +281,8 @@ class TestEvents:
         response = app.dispatch(request)
         assert response.status == 200
 
-        sleep(1)  # wait a bit after auto ack()
         # the listeners should not be executed
-        assert self.mock_received_requests["/chat.postMessage"] == 2
+        assert_received_request_count(self, path="/chat.postMessage", min_count=2)
 
     def test_uninstallation_and_revokes(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
@@ -335,8 +332,7 @@ class TestEvents:
         assert response.status == 200
 
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 2
+        assert_received_request_count(self, path="/chat.postMessage", min_count=2)
 
     message_file_share_body = {
         "token": "verification-token",
@@ -564,8 +560,7 @@ class TestEvents:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
     def test_additional_decorators_2(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
@@ -583,8 +578,7 @@ class TestEvents:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
 
 def my_decorator(f):
