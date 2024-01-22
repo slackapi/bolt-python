@@ -25,7 +25,7 @@ class MockHandler(SimpleHTTPRequestHandler):
 
     def set_common_headers(self, content_length: int = 0):
         self.send_header("content-type", "application/json;charset=utf-8")
-        self.send_header("Content-Length", str(content_length))
+        self.send_header("content-length", str(content_length))
         self.end_headers()
 
     invalid_auth = {
