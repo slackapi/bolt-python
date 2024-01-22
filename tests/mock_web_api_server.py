@@ -131,12 +131,6 @@ class MockHandler(SimpleHTTPRequestHandler):
                 self.wfile.write("OK".encode("utf-8"))
                 return
 
-            if path == "/health":
-                self.send_response(200)
-                self.set_common_headers(len("OK"))
-                self.wfile.write("OK".encode("utf-8"))
-                return
-
             body = {"ok": True}
             if path == "/oauth.v2.access":
                 if self.headers.get("authorization") is not None:
