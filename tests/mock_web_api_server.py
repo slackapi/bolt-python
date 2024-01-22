@@ -262,7 +262,7 @@ class ReceivedRequestsHandler:
         self.queue = queue
         self.received_requests = {}
 
-    def get(self, key, default=None):
+    def get(self, key: str, default: Optional[int] =None) -> Optional[int]:
         while not self.queue.empty():
             path = self.queue.get()
             self.received_requests[path] = self.received_requests.get(path, 0) + 1
