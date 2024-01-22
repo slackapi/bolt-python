@@ -94,7 +94,7 @@ class TestApp:
             token_verification_enabled=False,
         )
 
-        assert self.received_requests_handler.get("/auth.test") is None
+        assert self.received_requests.get("/auth.test") is None
 
     # --------------------------
     # multi teams auth

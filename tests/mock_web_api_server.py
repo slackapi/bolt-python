@@ -237,7 +237,7 @@ class MockServerThread(threading.Thread):
         self.join()
 
 
-class ReceivedRequestsHandler:
+class ReceivedRequests:
     def __init__(self, queue: Queue):
         self.queue = queue
         self.received_requests = {}
@@ -251,8 +251,8 @@ class ReceivedRequestsHandler:
 
 def setup_mock_web_api_server(test: TestCase):
     test.server_started = threading.Event()
-    test.received_requests_handler = ReceivedRequestsHandler(Queue())
-    test.thread = MockServerThread(test.received_requests_handler.queue, test)
+    test.received_requests = ReceivedRequests(Queue())
+    test.thread = MockServerThread(test.received_requests.queue, test)
     test.thread.start()
     test.server_started.wait()
 
@@ -267,11 +267,11 @@ def assert_received_request_count(test: TestCase, path: str, min_count: int, tim
     error = None
     while time.time() - start_time < timeout:
         try:
-            assert test.received_requests_handler.get(path, 0) == min_count
+            assert test.received_requests.get(path, 0) == min_count
             return
         except Exception as e:
             error = e
-            # waiting for mock_received_requests updates
+            # waiting for some requests to be received
             time.sleep(0.05)
 
     if error is not None:

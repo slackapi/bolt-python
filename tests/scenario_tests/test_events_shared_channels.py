@@ -251,7 +251,7 @@ class TestEventsSharedChannels:
         assert_auth_test_count(self, 1)
         sleep(0.5)  # wait a bit after auto ack()
         # The listener should not be executed
-        assert self.received_requests_handler.get("/chat.postMessage") is None
+        assert self.received_requests.get("/chat.postMessage") is None
 
     def test_self_member_join_left_events(self):
         app = App(
