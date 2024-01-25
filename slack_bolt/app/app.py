@@ -62,6 +62,7 @@ from slack_bolt.middleware import (
     MultiTeamsAuthorization,
     IgnoringSelfEvents,
     CustomMiddleware,
+    AttachingFunctionToken,
 )
 from slack_bolt.middleware.message_listener_matches import MessageListenerMatches
 from slack_bolt.middleware.middleware_error_handler import (
@@ -111,6 +112,7 @@ class App:
         ignoring_self_events_enabled: bool = True,
         ssl_check_enabled: bool = True,
         url_verification_enabled: bool = True,
+        attaching_function_token_enabled: bool = True,
         # for the OAuth flow
         oauth_settings: Optional[OAuthSettings] = None,
         oauth_flow: Optional[OAuthFlow] = None,
@@ -174,6 +176,8 @@ class App:
             url_verification_enabled: False if you would like to disable the built-in middleware (Default: True).
                 `UrlVerification` is a built-in middleware that handles url_verification requests
                 that verify the endpoint for Events API in HTTP Mode requests.
+            attaching_function_token_enabled: False if you would like to disable the built-in middleware (Default: True).
+                `AttachingFunctionToken` is a built-in middleware that handles tokens with function requests from Slack.
             ssl_check_enabled: bool = False if you would like to disable the built-in middleware (Default: True).
                 `SslCheck` is a built-in middleware that handles ssl_check requests from Slack.
             oauth_settings: The settings related to Slack app installation flow (OAuth flow)
@@ -348,6 +352,7 @@ class App:
             ignoring_self_events_enabled=ignoring_self_events_enabled,
             ssl_check_enabled=ssl_check_enabled,
             url_verification_enabled=url_verification_enabled,
+            attaching_function_token_enabled=attaching_function_token_enabled,
         )
 
     def _init_middleware_list(
@@ -357,6 +362,7 @@ class App:
         ignoring_self_events_enabled: bool = True,
         ssl_check_enabled: bool = True,
         url_verification_enabled: bool = True,
+        attaching_function_token_enabled: bool = True,
     ):
         if self._init_middleware_list_done:
             return
@@ -407,6 +413,8 @@ class App:
             self._middleware_list.append(IgnoringSelfEvents(base_logger=self._base_logger))
         if url_verification_enabled is True:
             self._middleware_list.append(UrlVerification(base_logger=self._base_logger))
+        if attaching_function_token_enabled is True:
+            self._middleware_list.append(AttachingFunctionToken())
         self._init_middleware_list_done = True
 
     # -------------------------
@@ -825,6 +833,51 @@ class App:
             )
             middleware.insert(0, MessageListenerMatches(keyword))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
+
+        return __call__
+
+    def function(
+        self,
+        callback_id: Union[str, Pattern],
+        matchers: Optional[Sequence[Callable[..., bool]]] = None,
+        middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+    ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+        """Registers a new Function listener.
+        This method can be used as either a decorator or a method.
+            # Use this method as a decorator
+            @app.function("reverse")
+            def reverse_string(event, client: WebClient, context: BoltContext):
+                try:
+                    string_to_reverse = event["inputs"]["stringToReverse"]
+                    client.functions_completeSuccess(
+                        function_execution_id=context.function_execution_id,
+                        outputs={"reverseString": string_to_reverse[::-1]},
+                    )
+                except Exception as e:
+                    client.api_call(
+                    client.functions_completeError(
+                        function_execution_id=context.function_execution_id,
+                        error=f"Cannot reverse string (error: {e})",
+                    )
+                    raise e
+            # Pass a function to this method
+            app.function("reverse")(reverse_string)
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
+        Args:
+            callback_id: The callback id to identify the function
+            matchers: A list of listener matcher functions.
+                Only when all the matchers return True, the listener function can be invoked.
+            middleware: A list of lister middleware functions.
+                Only when all the middleware call `next()` method, the listener function can be invoked.
+        """
+
+        matchers = list(matchers) if matchers else []
+        middleware = list(middleware) if middleware else []
+
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            primary_matcher = builtin_matchers.function_executed(callback_id=callback_id, base_logger=self._base_logger)
+            return self._register_listener(functions, primary_matcher, matchers, middleware, True)
 
         return __call__
 

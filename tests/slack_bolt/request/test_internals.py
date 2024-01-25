@@ -2,6 +2,8 @@ import pytest
 
 from slack_bolt.request.internals import (
     extract_channel_id,
+    extract_function_bot_access_token,
+    extract_function_inputs,
     extract_user_id,
     extract_team_id,
     extract_enterprise_id,
@@ -10,6 +12,7 @@ from slack_bolt.request.internals import (
     extract_actor_enterprise_id,
     extract_actor_team_id,
     extract_actor_user_id,
+    extract_function_execution_id,
 )
 
 
@@ -79,6 +82,32 @@ class TestRequestInternals:
             "enterprise": None,
             "callback_id": "run-socket-mode",
             "trigger_id": "111.222.xxx",
+        },
+    ]
+
+    function_event_requests = [
+        {
+            "type": "event_callback",
+            "token": "xxx",
+            "enterprise_id": "E111",
+            "team_id": "T111",
+            "event": {"function_execution_id": "Fx111", "bot_access_token": "xwfp-xxx", "inputs": {"customer_id": "Ux111"}},
+        },
+        {
+            "type": "block_actions",
+            "enterprise_id": "E111",
+            "team_id": "T111",
+            "bot_access_token": "xwfp-xxx",
+            "function_data": {"execution_id": "Fx111", "inputs": {"customer_id": "Ux111"}},
+            "interactivity": {"interactivity_pointer": "111.222.xxx"},
+        },
+        {
+            "type": "view_submission",
+            "enterprise_id": "E111",
+            "team_id": "T111",
+            "bot_access_token": "xwfp-xxx",
+            "function_data": {"execution_id": "Fx111", "inputs": {"customer_id": "Ux111"}},
+            "interactivity": {"interactivity_pointer": "111.222.xxx"},
         },
     ]
 
@@ -275,6 +304,9 @@ class TestRequestInternals:
         for req in self.no_enterprise_no_channel_requests:
             team_id = extract_team_id(req)
             assert team_id == "T111"
+        for req in self.function_event_requests:
+            team_id = extract_team_id(req)
+            assert team_id == "T111"
 
     def test_enterprise_id_extraction(self):
         for req in self.requests:
@@ -286,6 +318,24 @@ class TestRequestInternals:
         for req in self.no_enterprise_no_channel_requests:
             enterprise_id = extract_enterprise_id(req)
             assert enterprise_id is None
+        for req in self.function_event_requests:
+            enterprise_id = extract_enterprise_id(req)
+            assert enterprise_id == "E111"
+
+    def test_bot_access_token_extraction(self):
+        for req in self.function_event_requests:
+            function_bot_access_token = extract_function_bot_access_token(req)
+            assert function_bot_access_token == "xwfp-xxx"
+
+    def test_function_execution_id_extraction(self):
+        for req in self.function_event_requests:
+            function_execution_id = extract_function_execution_id(req)
+            assert function_execution_id == "Fx111"
+
+    def test_function_inputs_extraction(self):
+        for req in self.function_event_requests:
+            inputs = extract_function_inputs(req)
+            assert inputs == {"customer_id": "Ux111"}
 
     def test_is_enterprise_install_extraction(self):
         for req in self.requests:
