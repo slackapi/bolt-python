@@ -25,7 +25,6 @@ jobs:
         run: |
           pip install -U pip
           pip install .
-          pip install -r requirements/async.txt
           pip install -r requirements/adapter.txt
           pip install -r requirements/testing.txt
           pip install -r requirements/adapter_testing.txt

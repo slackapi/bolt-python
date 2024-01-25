@@ -1,10 +1,12 @@
-import json
+import asyncio
 import logging
 import threading
 import time
-import requests
-from typing import List
 from unittest import TestCase
+from urllib.error import URLError
+from urllib.request import urlopen
+
+from aiohttp import WSMsgType, web
 
 socket_mode_envelopes = [
     """{"envelope_id":"57d6a792-4d35-4d0b-b6aa-3361493e1caf","payload":{"type":"shortcut","token":"xxx","action_ts":"1610198080.300836","team":{"id":"T111","domain":"seratch"},"user":{"id":"U111","username":"seratch","team_id":"T111"},"is_enterprise_install":false,"enterprise":null,"callback_id":"do-something","trigger_id":"111.222.xxx"},"type":"interactive","accepts_response_payload":false}""",
@@ -12,67 +14,94 @@ socket_mode_envelopes = [
     """{"envelope_id":"08cfc559-d933-402e-a5c1-79e135afaae4","payload":{"token":"xxx","team_id":"T111","api_app_id":"A111","event":{"client_msg_id":"c9b466b5-845c-49c6-a371-57ae44359bf1","type":"message","text":"<@W111>","user":"U111","ts":"1610197986.000300","team":"T111","blocks":[{"type":"rich_text","block_id":"1HBPc","elements":[{"type":"rich_text_section","elements":[{"type":"user","user_id":"U111"}]}]}],"channel":"C111","event_ts":"1610197986.000300","channel_type":"channel"},"type":"event_callback","event_id":"Ev111","event_time":1610197986,"authorizations":[{"enterprise_id":null,"team_id":"T111","user_id":"U111","is_bot":true,"is_enterprise_install":false}],"is_ext_shared_channel":false,"event_context":"1-message-T111-C111"},"type":"events_api","accepts_response_payload":false,"retry_attempt":1,"retry_reason":"timeout"}""",
 ]
 
-from flask import Flask
-from flask_sockets import Sockets
-
 
 def start_thread_socket_mode_server(test: TestCase, port: int):
-    def _start_thread_socket_mode_server():
-        logger = logging.getLogger(__name__)
-        app: Flask = Flask(__name__)
+    logger = logging.getLogger(__name__)
+    state = {}
 
-        @app.route("/state")
-        def state():
-            return json.dumps({"success": True}), 200, {"ContentType": "application/json"}
+    def reset_server_state():
+        state.update(
+            envelopes_to_consume=list(socket_mode_envelopes),
+        )
 
-        sockets: Sockets = Sockets(app)
+    test.reset_server_state = reset_server_state
 
-        envelopes_to_consume: List[str] = list(socket_mode_envelopes)
+    async def health(request: web.Request):
+        wr = web.Response()
+        await wr.prepare(request)
+        wr.set_status(200)
+        return wr
 
-        @sockets.route("/link")
-        def link(ws):
-            while not ws.closed:
-                message = ws.read_message()
-                if message is not None:
-                    if len(envelopes_to_consume) > 0:
-                        e = envelopes_to_consume.pop(0)
-                        logger.debug(f"Send an envelope: {e}")
-                        ws.send(e)
+    async def link(request: web.Request):
+        ws = web.WebSocketResponse()
+        await ws.prepare(request)
 
-                    logger.debug(f"Server received a message: {message}")
-                    ws.send(message)
+        async for msg in ws:
+            if msg.type != WSMsgType.TEXT:
+                continue
 
-        from gevent import pywsgi
-        from geventwebsocket.handler import WebSocketHandler
+            if state["envelopes_to_consume"]:
+                e = state["envelopes_to_consume"].pop(0)
+                logger.debug(f"Send an envelope: {e}")
+                await ws.send_str(e)
 
-        server = pywsgi.WSGIServer(("", port), app, handler_class=WebSocketHandler)
-        test.server = server
-        server.serve_forever(stop_timeout=1)
+            message = msg.data
+            logger.debug(f"Server received a message: {message}")
 
-    return _start_thread_socket_mode_server
+            await ws.send_str(message)
+
+        return ws
+
+    app = web.Application()
+    app.add_routes(
+        [
+            web.get("/link", link),
+            web.get("/health", health),
+        ]
+    )
+    runner = web.AppRunner(app)
+
+    def run_server():
+        reset_server_state()
+
+        test.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(test.loop)
+        test.loop.run_until_complete(runner.setup())
+        site = web.TCPSite(runner, "127.0.0.1", port, reuse_port=True)
+        test.loop.run_until_complete(site.start())
+
+        # run until it's stopped from the main thread
+        test.loop.run_forever()
+
+        test.loop.run_until_complete(runner.cleanup())
+        test.loop.close()
+
+    return run_server
 
 
 def start_socket_mode_server(test, port: int):
     test.sm_thread = threading.Thread(target=start_thread_socket_mode_server(test, port))
     test.sm_thread.daemon = True
     test.sm_thread.start()
-    wait_for_socket_mode_server(port, 4)  # wait for the server
+    wait_for_socket_mode_server(port, 4)
 
 
-def wait_for_socket_mode_server(port: int, secs: int):
+def wait_for_socket_mode_server(port: int, timeout: int):
     start_time = time.time()
-    while (time.time() - start_time) < secs:
-        response = requests.get(url=f"http://localhost:{port}/state")
-        if response.ok:
-            break
-        time.sleep(0.01)
+    while (time.time() - start_time) < timeout:
+        try:
+            urlopen(f"http://127.0.0.1:{port}/health")
+            return
+        except URLError:
+            time.sleep(0.01)
 
 
-def stop_socket_mode_server(test):
-    test.server.stop()
-    test.server.close()
-
-
-async def stop_socket_mode_server_async(test: TestCase):
-    test.server.stop()
-    test.server.close()
+def stop_socket_mode_server(test: TestCase):
+    # An event loop runs in a thread and executes all callbacks and Tasks in
+    # its thread. While a Task is running in the event loop, no other Tasks
+    # can run in the same thread. When a Task executes an await expression, the
+    # running Task gets suspended, and the event loop executes the next Task.
+    # To schedule a callback from another OS thread, the loop.call_soon_threadsafe() method should be used.
+    # https://docs.python.org/3/library/asyncio-dev.html#asyncio-multithreading
+    test.loop.call_soon_threadsafe(test.loop.stop)
+    test.sm_thread.join(timeout=5)
