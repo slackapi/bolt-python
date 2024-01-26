@@ -854,7 +854,6 @@ class App:
                         outputs={"reverseString": string_to_reverse[::-1]},
                     )
                 except Exception as e:
-                    client.api_call(
                     client.functions_completeError(
                         function_execution_id=context.function_execution_id,
                         error=f"Cannot reverse string (error: {e})",
