@@ -16,7 +16,7 @@ class Complete:
         self.client = client
         self.function_execution_id = function_execution_id
 
-    def __call__(self, outputs: Dict[str, Any] = {}) -> SlackResponse:
+    def __call__(self, outputs: Optional[Dict[str, Any]] = None) -> SlackResponse:
         """Signal the successful completion of the custom function.
 
         Kwargs:
@@ -31,4 +31,4 @@ class Complete:
         if self.function_execution_id is None:
             raise ValueError("complete is unsupported here as there is no function_execution_id")
 
-        return self.client.functions_completeSuccess(function_execution_id=self.function_execution_id, outputs=outputs)
+        return self.client.functions_completeSuccess(function_execution_id=self.function_execution_id, outputs=outputs or {})

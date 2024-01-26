@@ -16,7 +16,7 @@ class Fail:
         self.client = client
         self.function_execution_id = function_execution_id
 
-    def __call__(self, error: str = "") -> SlackResponse:
+    def __call__(self, error: str) -> SlackResponse:
         """Signal that the custom function failed to complete.
 
         Kwargs:

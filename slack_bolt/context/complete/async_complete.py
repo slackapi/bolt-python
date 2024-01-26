@@ -16,7 +16,7 @@ class AsyncComplete:
         self.client = client
         self.function_execution_id = function_execution_id
 
-    async def __call__(self, outputs: Dict[str, Any] = {}) -> AsyncSlackResponse:
+    async def __call__(self, outputs: Optional[Dict[str, Any]] = None) -> AsyncSlackResponse:
         """Signal the successful completion of the custom function.
 
         Kwargs:
@@ -31,4 +31,6 @@ class AsyncComplete:
         if self.function_execution_id is None:
             raise ValueError("complete is unsupported here as there is no function_execution_id")
 
-        return await self.client.functions_completeSuccess(function_execution_id=self.function_execution_id, outputs=outputs)
+        return await self.client.functions_completeSuccess(
+            function_execution_id=self.function_execution_id, outputs=outputs or {}
+        )

@@ -16,7 +16,7 @@ class AsyncFail:
         self.client = client
         self.function_execution_id = function_execution_id
 
-    async def __call__(self, error: str = "") -> AsyncSlackResponse:
+    async def __call__(self, error: str) -> AsyncSlackResponse:
         """Signal that the custom function failed to complete.
 
         Kwargs:
