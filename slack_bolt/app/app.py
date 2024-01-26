@@ -846,7 +846,7 @@ class App:
         This method can be used as either a decorator or a method.
             # Use this method as a decorator
             @app.function("reverse")
-            def reverse_string(event, client: WebClient, context: BoltContext):
+            def reverse_string(event: dict, client: WebClient, context: BoltContext):
                 try:
                     string_to_reverse = event["inputs"]["stringToReverse"]
                     client.functions_completeSuccess(
