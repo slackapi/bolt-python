@@ -879,7 +879,7 @@ class AsyncApp:
         This method can be used as either a decorator or a method.
             # Use this method as a decorator
             @app.function("reverse")
-            async def reverse_string(event, client: AsyncWebClient, complete: AsyncComplete):
+            async def reverse_string(event: dict, client: AsyncWebClient, complete: AsyncComplete):
                 try:
                     string_to_reverse = event["inputs"]["stringToReverse"]
                     await client.functions_completeSuccess(
