@@ -13,6 +13,7 @@ from slack_bolt.adapter.aws_lambda.internals import _first_value
 from slack_bolt.app import App
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
+    assert_received_request_count,
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
     assert_auth_test_count,
@@ -279,7 +280,7 @@ class TestAWSLambda:
         response = SlackRequestHandler(app).handle(event, self.context)
         assert response["statusCode"] == 200
         assert_auth_test_count(self, 1)
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, "/chat.postMessage", 1)
 
     @mock_lambda
     def test_oauth(self):
