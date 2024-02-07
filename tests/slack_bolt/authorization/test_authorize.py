@@ -183,7 +183,7 @@ class TestAuthorize:
         assert result.team_id == "T0G9PQBBK"
         assert result.team == "Subarachnoid Workspace"
         assert result.url == "https://subarachnoid.slack.com/"
-        assert_auth_test_count(self, 1)
+        assert_auth_test_count(self, 2)
 
         result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
@@ -194,7 +194,7 @@ class TestAuthorize:
         assert result.team_id == "T0G9PQBBK"
         assert result.team == "Subarachnoid Workspace"
         assert result.url == "https://subarachnoid.slack.com/"
-        assert_auth_test_count(self, 2)
+        assert_auth_test_count(self, 4)
 
     def test_installation_store_cached(self):
         installation_store = MemoryInstallationStore()
@@ -215,7 +215,7 @@ class TestAuthorize:
         assert result.team_id == "T0G9PQBBK"
         assert result.team == "Subarachnoid Workspace"
         assert result.url == "https://subarachnoid.slack.com/"
-        assert_auth_test_count(self, 1)
+        assert_auth_test_count(self, 2)
 
         result = authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
@@ -226,7 +226,7 @@ class TestAuthorize:
         assert result.team_id == "T0G9PQBBK"
         assert result.team == "Subarachnoid Workspace"
         assert result.url == "https://subarachnoid.slack.com/"
-        assert_auth_test_count(self, 1)  # cached
+        assert_auth_test_count(self, 2)  # cached
 
     def test_fetch_different_user_token(self):
         installation_store = ValidUserTokenInstallationStore()
@@ -243,7 +243,7 @@ class TestAuthorize:
         assert result.team_id == "T0G9PQBBK"
         assert result.team == "Subarachnoid Workspace"
         assert result.url == "https://subarachnoid.slack.com/"
-        assert_auth_test_count(self, 1)
+        assert_auth_test_count(self, 2)
 
     def test_fetch_different_user_token_with_rotation(self):
         context = BoltContext()
@@ -279,7 +279,7 @@ class TestAuthorize:
         assert result.team_id == "T0G9PQBBK"
         assert result.team == "Subarachnoid Workspace"
         assert result.url == "https://subarachnoid.slack.com/"
-        assert_auth_test_count(self, 1)
+        assert_auth_test_count(self, 2)
 
     def test_remove_latest_user_token_if_it_is_not_relevant(self):
         installation_store = ValidUserTokenInstallationStore()

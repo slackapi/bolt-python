@@ -1,11 +1,12 @@
 import json
-from time import sleep, time
+from time import time
 
 from slack_sdk.web import WebClient
 from slack_sdk.signature import SignatureVerifier
 
 from slack_bolt import App, BoltRequest
 from tests.mock_web_api_server import (
+    assert_received_request_count,
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
     assert_auth_test_count,
@@ -57,8 +58,7 @@ class TestEventsRequestVerification:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests.get("/chat.postMessage") == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
     def test_disabled(self):
         app = App(
@@ -78,8 +78,7 @@ class TestEventsRequestVerification:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests.get("/chat.postMessage") == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
 
 event_body = {

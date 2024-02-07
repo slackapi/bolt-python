@@ -1,5 +1,5 @@
 import json
-from time import time, sleep
+from time import sleep, time
 from typing import Optional
 
 from slack_sdk.oauth import InstallationStore
@@ -8,11 +8,7 @@ from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 
 from slack_bolt import App, BoltRequest
-from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
-    assert_auth_test_count,
-)
+from tests.mock_web_api_server import assert_auth_test_count, cleanup_mock_web_api_server, setup_mock_web_api_server
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 valid_token = "xoxb-valid"
@@ -25,7 +21,7 @@ class OrgAppInstallationStore(InstallationStore):
         enterprise_id: Optional[str],
         team_id: Optional[str],
         user_id: Optional[str] = None,
-        is_enterprise_install: Optional[bool] = False
+        is_enterprise_install: Optional[bool] = False,
     ) -> Optional[Installation]:
         assert enterprise_id == "E111"
         assert team_id is None
@@ -107,7 +103,7 @@ class TestEventsOrgApps:
         assert response.status == 200
         # auth.test API call must be skipped
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.5)  # wait a bit after auto ack()
         assert result.called is True
 
     def test_team_access_revoked(self):
@@ -143,8 +139,8 @@ class TestEventsOrgApps:
         response = app.dispatch(request)
         assert response.status == 200
         # auth.test API call must be skipped
-        assert self.mock_received_requests.get("/auth.test") is None
-        sleep(1)  # wait a bit after auto ack()
+        assert_auth_test_count(self, 0)
+        sleep(0.5)  # wait a bit after auto ack()
         assert result.called is True
 
     def test_app_home_opened(self):
@@ -194,7 +190,7 @@ class TestEventsOrgApps:
         assert response.status == 200
         # auth.test API call must be skipped
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.5)  # wait a bit after auto ack()
         assert result.called is True
 
     def test_message(self):
@@ -250,5 +246,5 @@ class TestEventsOrgApps:
         assert response.status == 200
         # auth.test API call must be skipped
         assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.5)  # wait a bit after auto ack()
         assert result.called is True

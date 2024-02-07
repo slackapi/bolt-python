@@ -1,20 +1,21 @@
 import datetime
 import json
 import logging
-from time import time, sleep
+from time import time
 from typing import Optional
 
 from slack_sdk import WebClient
 from slack_sdk.oauth import InstallationStore
-from slack_sdk.oauth.installation_store import Installation, Bot
+from slack_sdk.oauth.installation_store import Bot, Installation
 from slack_sdk.signature import SignatureVerifier
 
-from slack_bolt import App, BoltRequest, Say, BoltContext
+from slack_bolt import App, BoltContext, BoltRequest, Say
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
     assert_auth_test_count,
+    assert_received_request_count,
+    cleanup_mock_web_api_server,
+    setup_mock_web_api_server,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -153,6 +154,5 @@ class TestApp:
 
         response = app.dispatch(self.build_app_mention_request())
         assert response.status == 200
-        assert_auth_test_count(self, 1)
-        sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_auth_test_count(self, 2)
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)

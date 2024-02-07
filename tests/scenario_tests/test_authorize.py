@@ -9,11 +9,7 @@ from slack_bolt import BoltRequest, BoltResponse
 from slack_bolt.app import App
 from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.request.payload_utils import is_event
-from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
-    assert_auth_test_count,
-)
+from tests.mock_web_api_server import assert_auth_test_count, cleanup_mock_web_api_server, setup_mock_web_api_server
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 valid_token = "xoxb-valid"
@@ -138,7 +134,7 @@ class TestAuthorize:
         response = app.dispatch(request)
         assert response.status == 200
         assert response.body == ""
-        assert self.mock_received_requests.get("/auth.test") == None
+        assert_auth_test_count(self, 0)
 
     def test_bot_context_attributes(self):
         app = App(

@@ -1,5 +1,5 @@
 import json
-from time import time, sleep
+from time import sleep, time
 from typing import Optional
 
 import pytest as pytest
@@ -10,11 +10,7 @@ from slack_sdk.web import WebClient
 
 from slack_bolt import App, BoltRequest
 from slack_bolt.error import BoltError
-from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
-    assert_auth_test_count,
-)
+from tests.mock_web_api_server import assert_auth_test_count, cleanup_mock_web_api_server, setup_mock_web_api_server
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 valid_token = "xoxb-valid"
@@ -40,7 +36,7 @@ class MyInstallationStore(InstallationStore):
         enterprise_id: Optional[str],
         team_id: Optional[str],
         user_id: Optional[str] = None,
-        is_enterprise_install: Optional[bool] = False
+        is_enterprise_install: Optional[bool] = False,
     ) -> Optional[Installation]:
         assert enterprise_id == "E111"
         assert team_id is None
@@ -132,7 +128,7 @@ class TestEventsTokenRevocations:
 
         # auth.test API call must be skipped
         assert_auth_test_count(self, 0)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.5)  # wait a bit after auto ack()
         assert app.installation_store.delete_bot_called is True
         assert app.installation_store.delete_installation_called is True
         assert app.installation_store.delete_all_called is False
@@ -165,7 +161,7 @@ class TestEventsTokenRevocations:
         assert response.status == 200
         # auth.test API call must be skipped
         assert_auth_test_count(self, 0)
-        sleep(1)  # wait a bit after auto ack()
+        sleep(0.5)  # wait a bit after auto ack()
         assert app.installation_store.delete_bot_called is True
         assert app.installation_store.delete_installation_called is True
         assert app.installation_store.delete_all_called is True

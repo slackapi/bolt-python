@@ -1,15 +1,11 @@
 import json
 from time import time
 
-from slack_sdk.web import WebClient
 from slack_sdk.signature import SignatureVerifier
+from slack_sdk.web import WebClient
 
 from slack_bolt import App, BoltRequest
-from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
-    assert_auth_test_count,
-)
+from tests.mock_web_api_server import assert_auth_test_count, cleanup_mock_web_api_server, setup_mock_web_api_server
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
@@ -53,7 +49,7 @@ class TestEventsUrlVerification:
         response = app.dispatch(request)
         assert response.status == 200
         assert response.body == """{"challenge": "3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P"}"""
-        assert_auth_test_count(self, 0)
+        assert_auth_test_count(self, 1)
 
     def test_disabled(self):
         app = App(
@@ -67,7 +63,7 @@ class TestEventsUrlVerification:
         response = app.dispatch(request)
         assert response.status == 404
         assert response.body == """{"error": "unhandled request"}"""
-        assert_auth_test_count(self, 0)
+        assert_auth_test_count(self, 1)
 
 
 event_body = {

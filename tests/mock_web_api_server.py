@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+from queue import Queue
 import threading
 import time
 import re
@@ -9,6 +10,84 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 from typing import Type, Optional
 from unittest import TestCase
 from urllib.parse import urlparse, parse_qs, ParseResult
+
+INVALID_AUTH = json.dumps(
+    {
+        "ok": False,
+        "error": "invalid_auth",
+    }
+)
+
+OK_FALSE_RESPONSE = json.dumps(
+    {
+        "ok": False,
+    }
+)
+
+OAUTH_V2_ACCESS_RESPONSE = json.dumps(
+    {
+        "ok": True,
+        "access_token": "xoxb-17653672481-19874698323-pdFZKVeTuE8sk7oOcBrzbqgy",
+        "token_type": "bot",
+        "scope": "chat:write,commands",
+        "bot_user_id": "U0KRQLJ9H",
+        "app_id": "A0KRD7HC3",
+        "team": {"name": "Slack Softball Team", "id": "T9TK3CUKW"},
+        "enterprise": {"name": "slack-sports", "id": "E12345678"},
+        "authed_user": {"id": "U1234", "scope": "chat:write", "access_token": "xoxp-1234", "token_type": "user"},
+    }
+)
+
+OAUTH_V2_ACCESS_BOT_REFRESH_RESPONSE = json.dumps(
+    {
+        "ok": True,
+        "app_id": "A0KRD7HC3",
+        "access_token": "xoxb-valid-refreshed",
+        "expires_in": 43200,
+        "refresh_token": "xoxe-1-valid-bot-refreshed",
+        "token_type": "bot",
+        "scope": "chat:write,commands",
+        "bot_user_id": "U0KRQLJ9H",
+        "team": {"name": "Slack Softball Team", "id": "T9TK3CUKW"},
+        "enterprise": {"name": "slack-sports", "id": "E12345678"},
+    }
+)
+
+OAUTH_V2_ACCESS_USER_REFRESH_RESPONSE = json.dumps(
+    {
+        "ok": True,
+        "app_id": "A0KRD7HC3",
+        "access_token": "xoxp-valid-refreshed",
+        "expires_in": 43200,
+        "refresh_token": "xoxe-1-valid-user-refreshed",
+        "token_type": "user",
+        "scope": "search:read",
+        "team": {"name": "Slack Softball Team", "id": "T9TK3CUKW"},
+        "enterprise": {"name": "slack-sports", "id": "E12345678"},
+    }
+)
+BOT_AUTH_TEST_RESPONSE = json.dumps(
+    {
+        "ok": True,
+        "url": "https://subarachnoid.slack.com/",
+        "team": "Subarachnoid Workspace",
+        "user": "bot",
+        "team_id": "T0G9PQBBK",
+        "user_id": "W23456789",
+        "bot_id": "BZYBOTHED",
+    }
+)
+
+USER_AUTH_TEST_RESPONSE = json.dumps(
+    {
+        "ok": True,
+        "url": "https://subarachnoid.slack.com/",
+        "team": "Subarachnoid Workspace",
+        "user": "some-user",
+        "team_id": "T0G9PQBBK",
+        "user_id": "W99999",
+    }
+)
 
 
 class MockHandler(SimpleHTTPRequestHandler):
@@ -26,120 +105,24 @@ class MockHandler(SimpleHTTPRequestHandler):
     def is_valid_function_bot_access_token(self):
         return "Authorization" in self.headers and str(self.headers["Authorization"]).startswith("Bearer xwfp-")
 
-    def set_common_headers(self):
+    def set_common_headers(self, content_length: int = 0):
         self.send_header("content-type", "application/json;charset=utf-8")
-        self.send_header("connection", "close")
+        self.send_header("content-length", str(content_length))
         self.end_headers()
-
-    invalid_auth = {
-        "ok": False,
-        "error": "invalid_auth",
-    }
-
-    oauth_v2_access_response = """
-{
-    "ok": true,
-    "access_token": "xoxb-17653672481-19874698323-pdFZKVeTuE8sk7oOcBrzbqgy",
-    "token_type": "bot",
-    "scope": "chat:write,commands",
-    "bot_user_id": "U0KRQLJ9H",
-    "app_id": "A0KRD7HC3",
-    "team": {
-        "name": "Slack Softball Team",
-        "id": "T9TK3CUKW"
-    },
-    "enterprise": {
-        "name": "slack-sports",
-        "id": "E12345678"
-    },
-    "authed_user": {
-        "id": "U1234",
-        "scope": "chat:write",
-        "access_token": "xoxp-1234",
-        "token_type": "user"
-    }
-}
-"""
-    oauth_v2_access_bot_refresh_response = """
-    {
-        "ok": true,
-        "app_id": "A0KRD7HC3",
-        "access_token": "xoxb-valid-refreshed",
-        "expires_in": 43200,
-        "refresh_token": "xoxe-1-valid-bot-refreshed",
-        "token_type": "bot",
-        "scope": "chat:write,commands",
-        "bot_user_id": "U0KRQLJ9H",
-        "team": {
-            "name": "Slack Softball Team",
-            "id": "T9TK3CUKW"
-        },
-        "enterprise": {
-            "name": "slack-sports",
-            "id": "E12345678"
-        }
-    }
-"""
-    oauth_v2_access_user_refresh_response = """
-        {
-            "ok": true,
-            "app_id": "A0KRD7HC3",
-            "access_token": "xoxp-valid-refreshed",
-            "expires_in": 43200,
-            "refresh_token": "xoxe-1-valid-user-refreshed",
-            "token_type": "user",
-            "scope": "search:read",
-            "team": {
-                "name": "Slack Softball Team",
-                "id": "T9TK3CUKW"
-            },
-            "enterprise": {
-                "name": "slack-sports",
-                "id": "E12345678"
-            }
-        }
-    """
-    bot_auth_test_response = """
-{
-    "ok": true,
-    "url": "https://subarachnoid.slack.com/",
-    "team": "Subarachnoid Workspace",
-    "user": "bot",
-    "team_id": "T0G9PQBBK",
-    "user_id": "W23456789",
-    "bot_id": "BZYBOTHED"
-}
-"""
-
-    user_auth_test_response = """
-{
-    "ok": true,
-    "url": "https://subarachnoid.slack.com/",
-    "team": "Subarachnoid Workspace",
-    "user": "some-user",
-    "team_id": "T0G9PQBBK",
-    "user_id": "W99999"
-}
-"""
 
     def _handle(self):
         parsed_path: ParseResult = urlparse(self.path)
         path = parsed_path.path
+        self.server.queue.put(path)
         self.received_requests[path] = self.received_requests.get(path, 0) + 1
         try:
             if path == "/webhook":
                 self.send_response(200)
-                self.set_common_headers()
+                self.set_common_headers(len("OK"))
                 self.wfile.write("OK".encode("utf-8"))
                 return
 
-            if path == "/received_requests.json":
-                self.send_response(200)
-                self.set_common_headers()
-                self.wfile.write(json.dumps(self.received_requests).encode("utf-8"))
-                return
-
-            body = {"ok": True}
+            body = """{"ok": true}"""
             if path == "/oauth.v2.access":
                 if self.headers.get("authorization") is not None:
                     request_body = self._parse_request_body(
@@ -153,34 +136,32 @@ class MockHandler(SimpleHTTPRequestHandler):
                         if refresh_token is not None:
                             if "bot-valid" in refresh_token:
                                 self.send_response(200)
-                                self.set_common_headers()
-                                body = self.oauth_v2_access_bot_refresh_response
-                                self.wfile.write(body.encode("utf-8"))
+                                self.set_common_headers(len(OAUTH_V2_ACCESS_BOT_REFRESH_RESPONSE))
+                                self.wfile.write(OAUTH_V2_ACCESS_BOT_REFRESH_RESPONSE.encode("utf-8"))
                                 return
                             if "user-valid" in refresh_token:
                                 self.send_response(200)
-                                self.set_common_headers()
-                                body = self.oauth_v2_access_user_refresh_response
-                                self.wfile.write(body.encode("utf-8"))
+                                self.set_common_headers(len(OAUTH_V2_ACCESS_USER_REFRESH_RESPONSE))
+                                self.wfile.write(OAUTH_V2_ACCESS_USER_REFRESH_RESPONSE.encode("utf-8"))
                                 return
                     elif request_body.get("code") is not None:
                         self.send_response(200)
-                        self.set_common_headers()
-                        self.wfile.write(self.oauth_v2_access_response.encode("utf-8"))
+                        self.set_common_headers(len(OAUTH_V2_ACCESS_RESPONSE))
+                        self.wfile.write(OAUTH_V2_ACCESS_RESPONSE.encode("utf-8"))
                         return
 
             if self.is_valid_user_token():
                 if path == "/auth.test":
                     self.send_response(200)
-                    self.set_common_headers()
-                    self.wfile.write(self.user_auth_test_response.encode("utf-8"))
+                    self.set_common_headers(len(USER_AUTH_TEST_RESPONSE))
+                    self.wfile.write(USER_AUTH_TEST_RESPONSE.encode("utf-8"))
                     return
 
             if self.is_valid_token() or self.is_valid_function_bot_access_token():
                 if path == "/auth.test":
                     self.send_response(200)
-                    self.set_common_headers()
-                    self.wfile.write(self.bot_auth_test_response.encode("utf-8"))
+                    self.set_common_headers(len(BOT_AUTH_TEST_RESPONSE))
+                    self.wfile.write(BOT_AUTH_TEST_RESPONSE.encode("utf-8"))
                     return
 
                 request_body = self._parse_request_body(
@@ -193,16 +174,15 @@ class MockHandler(SimpleHTTPRequestHandler):
                 pattern = re.split(r"xoxb-|xwfp-", header, 1)[1]
                 if pattern.isnumeric():
                     self.send_response(int(pattern))
-                    self.set_common_headers()
-                    self.wfile.write("""{"ok":false}""".encode("utf-8"))
+                    self.set_common_headers(len(OK_FALSE_RESPONSE))
+                    self.wfile.write(OK_FALSE_RESPONSE.encode("utf-8"))
                     return
             else:
-                body = self.invalid_auth
+                body = INVALID_AUTH
 
             self.send_response(HTTPStatus.OK)
-            self.set_common_headers()
-            self.wfile.write(json.dumps(body).encode("utf-8"))
-            self.wfile.close()
+            self.set_common_headers(len(body))
+            self.wfile.write(body.encode("utf-8"))
 
         except Exception as e:
             self.logger.error(str(e), exc_info=True)
@@ -233,13 +213,15 @@ class MockHandler(SimpleHTTPRequestHandler):
 
 
 class MockServerThread(threading.Thread):
-    def __init__(self, test: TestCase, handler: Type[SimpleHTTPRequestHandler] = MockHandler):
+    def __init__(self, queue: Queue, test: TestCase, handler: Type[SimpleHTTPRequestHandler] = MockHandler):
         threading.Thread.__init__(self)
         self.handler = handler
         self.test = test
+        self.queue = queue
 
     def run(self):
         self.server = HTTPServer(("localhost", 8888), self.handler)
+        self.server.queue = self.queue
         self.test.mock_received_requests = self.handler.received_requests
         self.test.server_url = "http://localhost:8888"
         self.test.host, self.test.port = self.server.socket.getsockname()
@@ -253,13 +235,28 @@ class MockServerThread(threading.Thread):
 
     def stop(self):
         self.handler.received_requests = {}
+        with self.server.queue.mutex:
+            del self.server.queue
         self.server.shutdown()
         self.join()
 
 
+class ReceivedRequests:
+    def __init__(self, queue: Queue):
+        self.queue = queue
+        self.received_requests = {}
+
+    def get(self, key: str, default: Optional[int] = None) -> Optional[int]:
+        while not self.queue.empty():
+            path = self.queue.get()
+            self.received_requests[path] = self.received_requests.get(path, 0) + 1
+        return self.received_requests.get(key, default)
+
+
 def setup_mock_web_api_server(test: TestCase):
     test.server_started = threading.Event()
-    test.thread = MockServerThread(test)
+    test.received_requests = ReceivedRequests(Queue())
+    test.thread = MockServerThread(test.received_requests.queue, test)
     test.thread.start()
     test.server_started.wait()
 
@@ -269,22 +266,24 @@ def cleanup_mock_web_api_server(test: TestCase):
     test.thread = None
 
 
-def assert_auth_test_count(test: TestCase, expected_count: int):
-    time.sleep(0.1)
-    retry_count = 0
+def assert_received_request_count(test: TestCase, path: str, min_count: int, timeout: float = 1):
+    start_time = time.time()
     error = None
-    while retry_count < 3:
+    while time.time() - start_time < timeout:
         try:
-            test.mock_received_requests.get("/auth.test", 0) == expected_count
-            break
+            assert test.received_requests.get(path, 0) == min_count
+            return
         except Exception as e:
             error = e
-            retry_count += 1
-            # waiting for mock_received_requests updates
-            time.sleep(0.1)
+            # waiting for some requests to be received
+            time.sleep(0.05)
 
     if error is not None:
         raise error
+
+
+def assert_auth_test_count(test: TestCase, expected_count: int):
+    assert_received_request_count(test, "/auth.test", expected_count, 0.5)
 
 
 async def assert_auth_test_count_async(test: TestCase, expected_count: int):

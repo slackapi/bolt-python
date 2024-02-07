@@ -221,4 +221,4 @@ class TestAsyncAsgi:
 
         assert response.status_code == 200
         assert response.headers.get("content-type") == "application/json;charset=utf-8"
-        assert_auth_test_count(self, 1)
+        assert_auth_test_count(self, 0)
