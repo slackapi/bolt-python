@@ -8,6 +8,7 @@ from slack_sdk.web import WebClient
 from slack_bolt.app import App
 from slack_bolt.request import BoltRequest
 from tests.mock_web_api_server import (
+    assert_received_request_count,
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
     assert_auth_test_count,
@@ -61,7 +62,7 @@ class TestFunction:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        assert self.mock_received_requests["/functions.completeSuccess"] == 1
+        assert_received_request_count(self, "/functions.completeSuccess", 1)
 
     def test_valid_callback_id_complete(self):
         app = App(
@@ -74,7 +75,7 @@ class TestFunction:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        assert self.mock_received_requests["/functions.completeSuccess"] == 1
+        assert_received_request_count(self, "/functions.completeSuccess", 1)
 
     def test_valid_callback_id_error(self):
         app = App(
@@ -87,7 +88,7 @@ class TestFunction:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        assert self.mock_received_requests["/functions.completeError"] == 1
+        assert_received_request_count(self, "/functions.completeError", 1)
 
     def test_invalid_callback_id(self):
         app = App(
