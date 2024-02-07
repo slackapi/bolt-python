@@ -1,16 +1,17 @@
 import inspect
 import json
-from time import time, sleep
+from time import time
 from typing import Callable
 
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 
-from slack_bolt import App, BoltRequest, Say, Ack, BoltContext
+from slack_bolt import Ack, App, BoltContext, BoltRequest, Say
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
     assert_auth_test_count,
+    assert_received_request_count,
+    cleanup_mock_web_api_server,
+    setup_mock_web_api_server,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -115,8 +116,7 @@ class TestAppUsingMethodsInClass:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        sleep(0.5)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
     def test_class_methods(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)

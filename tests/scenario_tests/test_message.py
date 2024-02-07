@@ -9,9 +9,10 @@ from slack_bolt import BoltResponse
 from slack_bolt.app import App
 from slack_bolt.request import BoltRequest
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
     assert_auth_test_count,
+    assert_received_request_count,
+    cleanup_mock_web_api_server,
+    setup_mock_web_api_server,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -71,8 +72,7 @@ class TestMessage:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
     def test_all_message_matching_1(self):
         app = App(
@@ -88,8 +88,7 @@ class TestMessage:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
     def test_all_message_matching_2(self):
         app = App(
@@ -105,8 +104,7 @@ class TestMessage:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
     def test_string_keyword_capturing(self):
         app = App(
@@ -119,8 +117,7 @@ class TestMessage:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
     def test_string_keyword_capturing2(self):
         app = App(
@@ -133,8 +130,7 @@ class TestMessage:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
     def test_string_keyword_capturing_multi_capture(self):
         app = App(
@@ -147,8 +143,7 @@ class TestMessage:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
     def test_string_keyword_unmatched(self):
         app = App(
@@ -173,8 +168,7 @@ class TestMessage:
         response = app.dispatch(request)
         assert response.status == 200
         assert_auth_test_count(self, 1)
-        time.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
     def test_regexp_keyword_unmatched(self):
         app = App(

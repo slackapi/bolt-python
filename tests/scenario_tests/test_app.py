@@ -8,15 +8,12 @@ from slack_sdk import WebClient
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 
-from slack_bolt import App, Say, BoltRequest, BoltContext
+from slack_bolt import App, BoltContext, BoltRequest, Say
 from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.error import BoltError
 from slack_bolt.oauth import OAuthFlow
 from slack_bolt.oauth.oauth_settings import OAuthSettings
-from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
-)
+from tests.mock_web_api_server import cleanup_mock_web_api_server, setup_mock_web_api_server
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
@@ -77,7 +74,7 @@ class TestApp:
 
     def test_valid_single_auth(self):
         app = App(signing_secret="valid", client=self.web_client)
-        assert app != None
+        assert app is not None
 
     def test_token_absence(self):
         with pytest.raises(BoltError):
@@ -97,7 +94,7 @@ class TestApp:
             token_verification_enabled=False,
         )
 
-        assert self.mock_received_requests.get("/auth.test") is None
+        assert self.received_requests.get("/auth.test") is None
 
     # --------------------------
     # multi teams auth
@@ -108,7 +105,7 @@ class TestApp:
             signing_secret="valid",
             oauth_settings=OAuthSettings(client_id="111.222", client_secret="valid"),
         )
-        assert app != None
+        assert app is not None
 
     def test_valid_multi_auth_oauth_flow(self):
         oauth_flow = OAuthFlow(
@@ -120,7 +117,7 @@ class TestApp:
             )
         )
         app = App(signing_secret="valid", oauth_flow=oauth_flow)
-        assert app != None
+        assert app is not None
 
     def test_valid_multi_auth_client_id_absence(self):
         with pytest.raises(BoltError):

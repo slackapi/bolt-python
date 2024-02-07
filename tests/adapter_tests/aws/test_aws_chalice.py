@@ -21,6 +21,7 @@ from slack_bolt.adapter.aws_lambda.chalice_handler import (
 from slack_bolt.app import App
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.mock_web_api_server import (
+    assert_received_request_count,
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
     assert_auth_test_count,
@@ -263,7 +264,7 @@ class TestAwsChalice:
         response: Response = slack_handler.handle(request)
         assert response.status_code == 200
         assert_auth_test_count(self, 1)
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        assert_received_request_count(self, "/chat.postMessage", 1)
 
     def test_lazy_listeners_cli(self):
         with mock.patch.dict(os.environ, {"AWS_CHALICE_CLI_MODE": "true"}):
@@ -316,7 +317,7 @@ class TestAwsChalice:
 
             assert response.status_code == 200, f"Failed request: {response.body}"
             assert_auth_test_count(self, 1)
-            assert self.mock_received_requests["/chat.postMessage"] == 1
+            assert_received_request_count(self, "/chat.postMessage", 1)
 
     @mock.patch(
         "slack_bolt.adapter.aws_lambda.chalice_lazy_listener_runner.boto3",

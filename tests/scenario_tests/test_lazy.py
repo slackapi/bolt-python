@@ -7,10 +7,7 @@ from slack_sdk.signature import SignatureVerifier
 
 from slack_bolt import BoltRequest
 from slack_bolt.app import App
-from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
-)
+from tests.mock_web_api_server import assert_received_request_count, cleanup_mock_web_api_server, setup_mock_web_api_server
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
@@ -106,8 +103,7 @@ class TestErrorHandler:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 200
-        time.sleep(1)  # wait a bit
-        assert self.mock_received_requests["/chat.postMessage"] == 2
+        assert_received_request_count(self, path="/chat.postMessage", min_count=2)
 
     def test_lazy_class(self):
         def just_ack(ack):
@@ -134,8 +130,7 @@ class TestErrorHandler:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 200
-        time.sleep(1)  # wait a bit
-        assert self.mock_received_requests["/chat.postMessage"] == 2
+        assert_received_request_count(self, path="/chat.postMessage", min_count=2)
 
     def test_issue_545_context_copy_failure(self):
         def just_ack(ack):
@@ -204,5 +199,4 @@ class TestErrorHandler:
         request = self.build_valid_request()
         response = app.dispatch(request)
         assert response.status == 200
-        time.sleep(1)  # wait a bit
-        assert self.mock_received_requests["/chat.postMessage"] == 2
+        assert_received_request_count(self, path="/chat.postMessage", min_count=2)
