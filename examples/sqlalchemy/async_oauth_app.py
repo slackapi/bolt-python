@@ -68,7 +68,7 @@ class AsyncSQLAlchemyInstallationStore(AsyncInstallationStore):
         *,
         enterprise_id: Optional[str],
         team_id: Optional[str],
-        is_enterprise_install: Optional[bool],
+        is_enterprise_install: Optional[bool] = False,
     ) -> Optional[Bot]:
         c = self.bots.c
         query = (
