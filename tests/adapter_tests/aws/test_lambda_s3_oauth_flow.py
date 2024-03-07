@@ -1,8 +1,11 @@
-from moto import mock_s3
-
 from slack_bolt.adapter.aws_lambda.lambda_s3_oauth_flow import LambdaS3OAuthFlow
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from tests.utils import remove_os_env_temporarily, restore_os_env
+
+try:
+    from moto import mock_aws
+except ImportError:
+    from moto import mock_s3 as mock_aws
 
 
 class TestLambdaS3OAuthFlow:
@@ -12,7 +15,7 @@ class TestLambdaS3OAuthFlow:
     def teardown_method(self):
         restore_os_env(self.old_os_env)
 
-    @mock_s3
+    @mock_aws
     def test_instantiation(self):
         oauth_flow = LambdaS3OAuthFlow(
             settings=OAuthSettings(
