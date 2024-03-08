@@ -1,4 +1,3 @@
-# TODO: This CI job hangs as of April 2023
 name: Run codecov
 
 on:
