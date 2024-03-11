@@ -6,7 +6,7 @@ bottle>=0.12,<1
 chalice<=1.27.3; python_version=="3.6"
 chalice>=1.28,<2; python_version>"3.6"
 CherryPy>=18,<19
-Django>=3,<5
+Django>=3,<6
 falcon>=2,<4; python_version<"3.11"
 falcon>=3.1.1,<4; python_version>="3.11"
 fastapi>=0.70.0,<1
