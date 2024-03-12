@@ -1,8 +1,6 @@
 import json
 from time import time
 from urllib.parse import quote
-
-from moto import mock_lambda
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 from slack_sdk.oauth import OAuthStateStore
@@ -19,6 +17,11 @@ from tests.mock_web_api_server import (
     assert_auth_test_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
+
+try:
+    from moto import mock_aws
+except ImportError:
+    from moto import mock_lambda as mock_aws
 
 
 class LambdaContext:
@@ -72,7 +75,7 @@ class TestAWSLambda:
         assert _first_value({"foo": []}, "foo") is None
         assert _first_value({}, "foo") is None
 
-    @mock_lambda
+    @mock_aws
     def test_clear_all_log_handlers(self):
         app = App(
             client=self.web_client,
@@ -81,7 +84,7 @@ class TestAWSLambda:
         handler = SlackRequestHandler(app)
         handler.clear_all_log_handlers()
 
-    @mock_lambda
+    @mock_aws
     def test_events(self):
         app = App(
             client=self.web_client,
@@ -136,7 +139,7 @@ class TestAWSLambda:
         assert response["statusCode"] == 200
         assert_auth_test_count(self, 1)
 
-    @mock_lambda
+    @mock_aws
     def test_shortcuts(self):
         app = App(
             client=self.web_client,
@@ -186,7 +189,7 @@ class TestAWSLambda:
         assert response["statusCode"] == 200
         assert_auth_test_count(self, 1)
 
-    @mock_lambda
+    @mock_aws
     def test_commands(self):
         app = App(
             client=self.web_client,
@@ -236,7 +239,7 @@ class TestAWSLambda:
         assert response["statusCode"] == 200
         assert_auth_test_count(self, 1)
 
-    @mock_lambda
+    @mock_aws
     def test_lazy_listeners(self):
         app = App(
             client=self.web_client,
@@ -282,7 +285,7 @@ class TestAWSLambda:
         assert_auth_test_count(self, 1)
         assert_received_request_count(self, "/chat.postMessage", 1)
 
-    @mock_lambda
+    @mock_aws
     def test_oauth(self):
         app = App(
             client=self.web_client,
@@ -318,7 +321,7 @@ class TestAWSLambda:
         assert response["headers"]["content-type"] == "text/html; charset=utf-8"
         assert "https://slack.com/oauth/v2/authorize?state=" in response.get("body")
 
-    @mock_lambda
+    @mock_aws
     def test_oauth_redirect(self):
         class TestStateStore(OAuthStateStore):
             def consume(self, state: str) -> bool:
