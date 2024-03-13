@@ -4,6 +4,7 @@ import logging
 from queue import Queue
 import threading
 import time
+import re
 from http import HTTPStatus
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from typing import Type, Optional
@@ -101,6 +102,9 @@ class MockHandler(SimpleHTTPRequestHandler):
     def is_valid_user_token(self):
         return "Authorization" in self.headers and str(self.headers["Authorization"]).startswith("Bearer xoxp-")
 
+    def is_valid_function_bot_access_token(self):
+        return "Authorization" in self.headers and str(self.headers["Authorization"]).startswith("Bearer xwfp-")
+
     def set_common_headers(self, content_length: int = 0):
         self.send_header("content-type", "application/json;charset=utf-8")
         self.send_header("content-length", str(content_length))
@@ -153,7 +157,7 @@ class MockHandler(SimpleHTTPRequestHandler):
                     self.wfile.write(USER_AUTH_TEST_RESPONSE.encode("utf-8"))
                     return
 
-            if self.is_valid_token():
+            if self.is_valid_token() or self.is_valid_function_bot_access_token():
                 if path == "/auth.test":
                     self.send_response(200)
                     self.set_common_headers(len(BOT_AUTH_TEST_RESPONSE))
@@ -167,7 +171,7 @@ class MockHandler(SimpleHTTPRequestHandler):
                 self.logger.info(f"request: {path} {request_body}")
 
                 header = self.headers["authorization"]
-                pattern = str(header).split("xoxb-", 1)[1]
+                pattern = re.split(r"xoxb-|xwfp-", header, 1)[1]
                 if pattern.isnumeric():
                     self.send_response(int(pattern))
                     self.set_common_headers(len(OK_FALSE_RESPONSE))

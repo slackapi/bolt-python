@@ -9,6 +9,7 @@ from .url_verification.async_url_verification import AsyncUrlVerification
 from .message_listener_matches.async_message_listener_matches import (
     AsyncMessageListenerMatches,
 )
+from .attaching_function_token.async_attaching_function_token import AsyncAttachingFunctionToken
 
 __all__ = [
     "AsyncIgnoringSelfEvents",
@@ -16,4 +17,5 @@ __all__ = [
     "AsyncSslCheck",
     "AsyncUrlVerification",
     "AsyncMessageListenerMatches",
+    "AsyncAttachingFunctionToken",
 ]

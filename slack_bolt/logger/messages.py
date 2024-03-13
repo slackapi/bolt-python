@@ -7,6 +7,7 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.request.payload_utils import (
     is_action,
     is_event,
+    is_function,
     is_options,
     is_shortcut,
     is_slash_command,
@@ -266,7 +267,27 @@ app.step(ws)
         )
     if is_event(req.body):
         # @app.event
-        event_type = req.body.get("event", {}).get("type")
+        event = req.body.get("event", {})
+        event_type = event.get("type")
+        if is_function(req.body):
+            # @app.function
+            callback_id = event.get("function", {}).get("callback_id", "function_id")
+            return _build_unhandled_request_suggestion(
+                default_message,
+                f"""
+@app.function("{callback_id}")
+{'async ' if is_async else ''}def handle_some_function(ack, body, complete, fail, logger):
+    {'await ' if is_async else ''}ack()
+    logger.info(body)
+    try:
+        # TODO: do something here
+        outputs = {{}}
+        {'await ' if is_async else ''}complete(outputs=outputs)
+    except Exception as e:
+        error = f"Failed to handle a function request (error: {{e}})"
+        {'await ' if is_async else ''}fail(error=error)
+""",
+            )
         return _build_unhandled_request_suggestion(
             default_message,
             f"""
