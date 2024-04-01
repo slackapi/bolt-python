@@ -1,4 +1,4 @@
 # pip install -r requirements/testing_without_asyncio.txt
 pytest>=6.2.5,<9
 pytest-cov>=3,<5
-black==22.8.0             # Until we drop Python 3.6 support, we have to stay with this version
+black==24.3.0             # Until we drop Python 3.6 support, we have to stay with this version
