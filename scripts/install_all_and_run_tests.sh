@@ -14,24 +14,24 @@ python_version=`python --version | awk '{print $2}'`
 
 if [ ${python_version:0:3} == "3.6" ]
 then
-  pip install -r requirements.txt
+  pip install -U -r requirements.txt
 else
   pip install -e .
 fi
 
 if [[ $test_target != "" ]]
 then
-    pip install -r requirements/testing.txt && \
-    pip install -r requirements/adapter.txt && \
-    pip install -r requirements/adapter_testing.txt && \
+    pip install -U -r requirements/testing.txt && \
+    pip install -U -r requirements/adapter.txt && \
+    pip install -U -r requirements/adapter_testing.txt && \
     # To avoid errors due to the old versions of click forced by Chalice
     pip install -U pip click && \
     black slack_bolt/ tests/ && \
     pytest $1
 else
-    pip install -r requirements/testing.txt && \
-    pip install -r requirements/adapter.txt && \
-    pip install -r requirements/adapter_testing.txt && \
+    pip install -U -r requirements/testing.txt && \
+    pip install -U -r requirements/adapter.txt && \
+    pip install -U -r requirements/adapter_testing.txt && \
     # To avoid errors due to the old versions of click forced by Chalice
     pip install -U pip click && \
     black slack_bolt/ tests/ && \

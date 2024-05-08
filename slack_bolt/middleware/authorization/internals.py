@@ -43,18 +43,18 @@ def _is_no_auth_test_call_required(req: Union[BoltRequest, "AsyncBoltRequest"]) 
     return _is_no_auth_test_events(req)
 
 
-def _build_error_text() -> str:
+def _build_user_facing_authorize_error_message() -> str:
     return (
         ":warning: We apologize, but for some unknown reason, your installation with this app is no longer available. "
         "Please reinstall this app into your workspace :bow:"
     )
 
 
-def _build_error_response() -> BoltResponse:
+def _build_user_facing_error_response(message: str) -> BoltResponse:
     # show an ephemeral message to the end-user
     return BoltResponse(
         status=200,
-        body=_build_error_text(),
+        body=message,
     )
 
 
