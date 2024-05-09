@@ -7,16 +7,23 @@ from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.web.async_slack_response import AsyncSlackResponse
 from slack_sdk.errors import SlackApiError
-from .async_internals import _build_error_response, _is_no_auth_required
-from .internals import _to_authorize_result, _is_no_auth_test_call_required, _build_error_text
+from .async_internals import _build_user_facing_error_response, _is_no_auth_required
+from .internals import _to_authorize_result, _is_no_auth_test_call_required, _build_user_facing_authorize_error_message
 from ...authorization import AuthorizeResult
 
 
 class AsyncSingleTeamAuthorization(AsyncAuthorization):
-    def __init__(self, base_logger: Optional[Logger] = None):
+    def __init__(
+        self,
+        base_logger: Optional[Logger] = None,
+        user_facing_authorize_error_message: Optional[str] = None,
+    ):
         """Single-workspace authorization."""
         self.auth_test_result: Optional[AsyncSlackResponse] = None
         self.logger = get_bolt_logger(AsyncSingleTeamAuthorization, base_logger=base_logger)
+        self.user_facing_authorize_error_message = (
+            user_facing_authorize_error_message or _build_user_facing_authorize_error_message()
+        )
 
     async def async_process(
         self,
@@ -58,9 +65,9 @@ class AsyncSingleTeamAuthorization(AsyncAuthorization):
                 # Just in case
                 self.logger.error("auth.test API call result is unexpectedly None")
                 if req.context.response_url is not None:
-                    await req.context.respond(_build_error_text())
+                    await req.context.respond(self.user_facing_authorize_error_message)
                     return BoltResponse(status=200, body="")
-                return _build_error_response()
+                return _build_user_facing_error_response(self.user_facing_authorize_error_message)
         except SlackApiError as e:
             self.logger.error(f"Failed to authorize with the given token ({e})")
-            return _build_error_response()
+            return _build_user_facing_error_response(self.user_facing_authorize_error_message)

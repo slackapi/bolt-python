@@ -103,6 +103,7 @@ class App:
         # for multi-workspace apps
         before_authorize: Optional[Union[Middleware, Callable[..., Any]]] = None,
         authorize: Optional[Callable[..., AuthorizeResult]] = None,
+        user_facing_authorize_error_message: Optional[str] = None,
         installation_store: Optional[InstallationStore] = None,
         # for either only bot scope usage or v1.0.x compatibility
         installation_store_bot_only: Optional[bool] = None,
@@ -159,6 +160,8 @@ class App:
             before_authorize: A global middleware that can be executed right before authorize function
             authorize: The function to authorize an incoming request from Slack
                 by checking if there is a team/user in the installation data.
+            user_facing_authorize_error_message: The user-facing error message to display
+                when the app is installed but the installation is not managed by this app's installation store
             installation_store: The module offering save/find operations of installation data
             installation_store_bot_only: Use `InstallationStore#find_bot()` if True (Default: False)
             request_verification_enabled: False if you would like to disable the built-in middleware (Default: True).
@@ -178,7 +181,7 @@ class App:
                 `SslCheck` is a built-in middleware that handles ssl_check requests from Slack.
             oauth_settings: The settings related to Slack app installation flow (OAuth flow)
             oauth_flow: Instantiated `slack_bolt.oauth.OAuthFlow`. This is always prioritized over oauth_settings.
-            verification_token: Deprecated verification mechanism. This can used only for ssl_check requests.
+            verification_token: Deprecated verification mechanism. This can be used only for ssl_check requests.
             listener_executor: Custom executor to run background tasks. If absent, the default `ThreadPoolExecutor` will
                 be used.
         """
@@ -348,6 +351,7 @@ class App:
             ignoring_self_events_enabled=ignoring_self_events_enabled,
             ssl_check_enabled=ssl_check_enabled,
             url_verification_enabled=url_verification_enabled,
+            user_facing_authorize_error_message=user_facing_authorize_error_message,
         )
 
     def _init_middleware_list(
@@ -357,6 +361,7 @@ class App:
         ignoring_self_events_enabled: bool = True,
         ssl_check_enabled: bool = True,
         url_verification_enabled: bool = True,
+        user_facing_authorize_error_message: Optional[str] = None,
     ):
         if self._init_middleware_list_done:
             return
@@ -385,13 +390,18 @@ class App:
                         SingleTeamAuthorization(
                             auth_test_result=auth_test_result,
                             base_logger=self._base_logger,
+                            user_facing_authorize_error_message=user_facing_authorize_error_message,
                         )
                     )
                 except SlackApiError as err:
                     raise BoltError(error_auth_test_failure(err.response))
             elif self._authorize is not None:
                 self._middleware_list.append(
-                    MultiTeamsAuthorization(authorize=self._authorize, base_logger=self._base_logger)
+                    MultiTeamsAuthorization(
+                        authorize=self._authorize,
+                        base_logger=self._base_logger,
+                        user_facing_authorize_error_message=user_facing_authorize_error_message,
+                    )
                 )
             else:
                 raise BoltError(error_token_required())
@@ -401,6 +411,7 @@ class App:
                     authorize=self._authorize,
                     base_logger=self._base_logger,
                     user_token_resolution=self._oauth_flow.settings.user_token_resolution,
+                    user_facing_authorize_error_message=user_facing_authorize_error_message,
                 )
             )
         if ignoring_self_events_enabled is True:
