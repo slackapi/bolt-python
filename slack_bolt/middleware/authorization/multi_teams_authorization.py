@@ -8,10 +8,10 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from .authorization import Authorization
 from .internals import (
-    _build_error_response,
+    _build_user_facing_error_response,
     _is_no_auth_required,
     _is_no_auth_test_call_required,
-    _build_error_text,
+    _build_user_facing_authorize_error_message,
 )
 from ...authorization import AuthorizeResult
 from ...authorization.authorize import Authorize
@@ -27,6 +27,7 @@ class MultiTeamsAuthorization(Authorization):
         authorize: Authorize,
         base_logger: Optional[Logger] = None,
         user_token_resolution: str = "authed_user",
+        user_facing_authorize_error_message: Optional[str] = None,
     ):
         """Multi-workspace authorization.
 
@@ -34,10 +35,14 @@ class MultiTeamsAuthorization(Authorization):
             authorize: The function to authorize incoming requests from Slack.
             base_logger: The base logger
             user_token_resolution: "authed_user" or "actor"
+            user_facing_authorize_error_message: The user-facing error message when installation is not found
         """
         self.authorize = authorize
         self.logger = get_bolt_logger(MultiTeamsAuthorization, base_logger=base_logger)
         self.user_token_resolution = user_token_resolution
+        self.user_facing_authorize_error_message = (
+            user_facing_authorize_error_message or _build_user_facing_authorize_error_message()
+        )
 
     def process(
         self,
@@ -95,10 +100,10 @@ class MultiTeamsAuthorization(Authorization):
                     "the AuthorizeResult (returned value from authorize) for it was not found."
                 )
                 if req.context.response_url is not None:
-                    req.context.respond(_build_error_text())
+                    req.context.respond(self.user_facing_authorize_error_message)
                     return BoltResponse(status=200, body="")
-                return _build_error_response()
+                return _build_user_facing_error_response(self.user_facing_authorize_error_message)
 
         except SlackApiError as e:
             self.logger.error(f"Failed to authorize with the given token ({e})")
-            return _build_error_response()
+            return _build_user_facing_error_response(self.user_facing_authorize_error_message)

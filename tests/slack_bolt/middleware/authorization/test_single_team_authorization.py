@@ -1,7 +1,7 @@
 from slack_sdk import WebClient
 
 from slack_bolt.middleware import SingleTeamAuthorization
-from slack_bolt.middleware.authorization.internals import _build_error_text
+from slack_bolt.middleware.authorization.internals import _build_user_facing_authorize_error_message
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from tests.mock_web_api_server import (
@@ -43,4 +43,15 @@ class TestSingleTeamAuthorization:
         resp = authorization.process(req=req, resp=resp, next=next)
 
         assert resp.status == 200
-        assert resp.body == _build_error_text()
+        assert resp.body == _build_user_facing_authorize_error_message()
+
+    def test_failure_pattern_custom_message(self):
+        authorization = SingleTeamAuthorization(auth_test_result={}, user_facing_authorize_error_message="foo")
+        req = BoltRequest(body="payload={}", headers={})
+        req.context["client"] = WebClient(base_url=self.mock_api_server_base_url, token="dummy")
+        resp = BoltResponse(status=404)
+
+        resp = authorization.process(req=req, resp=resp, next=next)
+
+        assert resp.status == 200
+        assert resp.body == "foo"

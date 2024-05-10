@@ -115,6 +115,7 @@ class AsyncApp:
         # for multi-workspace apps
         before_authorize: Optional[Union[AsyncMiddleware, Callable[..., Awaitable[Any]]]] = None,
         authorize: Optional[Callable[..., Awaitable[AuthorizeResult]]] = None,
+        user_facing_authorize_error_message: Optional[str] = None,
         installation_store: Optional[AsyncInstallationStore] = None,
         # for either only bot scope usage or v1.0.x compatibility
         installation_store_bot_only: Optional[bool] = None,
@@ -169,6 +170,8 @@ class AsyncApp:
             before_authorize: A global middleware that can be executed right before authorize function
             authorize: The function to authorize an incoming request from Slack
                 by checking if there is a team/user in the installation data.
+            user_facing_authorize_error_message: The user-facing error message to display
+                when the app is installed but the installation is not managed by this app's installation store
             installation_store: The module offering save/find operations of installation data
             installation_store_bot_only: Use `AsyncInstallationStore#async_find_bot()` if True (Default: False)
             request_verification_enabled: False if you would like to disable the built-in middleware (Default: True).
@@ -359,6 +362,7 @@ class AsyncApp:
             ssl_check_enabled=ssl_check_enabled,
             url_verification_enabled=url_verification_enabled,
             attaching_function_token_enabled=attaching_function_token_enabled,
+            user_facing_authorize_error_message=user_facing_authorize_error_message,
         )
 
         self._server: Optional[AsyncSlackAppServer] = None
@@ -370,6 +374,7 @@ class AsyncApp:
         ssl_check_enabled: bool = True,
         url_verification_enabled: bool = True,
         attaching_function_token_enabled: bool = True,
+        user_facing_authorize_error_message: Optional[str] = None,
     ):
         if self._init_middleware_list_done:
             return
@@ -389,10 +394,19 @@ class AsyncApp:
         # As authorize is required for making a Bolt app function, we don't offer the flag to disable this
         if self._async_oauth_flow is None:
             if self._token:
-                self._async_middleware_list.append(AsyncSingleTeamAuthorization(base_logger=self._base_logger))
+                self._async_middleware_list.append(
+                    AsyncSingleTeamAuthorization(
+                        base_logger=self._base_logger,
+                        user_facing_authorize_error_message=user_facing_authorize_error_message,
+                    )
+                )
             elif self._async_authorize is not None:
                 self._async_middleware_list.append(
-                    AsyncMultiTeamsAuthorization(authorize=self._async_authorize, base_logger=self._base_logger)
+                    AsyncMultiTeamsAuthorization(
+                        authorize=self._async_authorize,
+                        base_logger=self._base_logger,
+                        user_facing_authorize_error_message=user_facing_authorize_error_message,
+                    )
                 )
             else:
                 raise BoltError(error_token_required())
@@ -402,6 +416,7 @@ class AsyncApp:
                     authorize=self._async_authorize,
                     base_logger=self._base_logger,
                     user_token_resolution=self._async_oauth_flow.settings.user_token_resolution,
+                    user_facing_authorize_error_message=user_facing_authorize_error_message,
                 )
             )
 

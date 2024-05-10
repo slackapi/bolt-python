@@ -8,11 +8,11 @@ from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
 from slack_sdk.web import SlackResponse
 from .internals import (
-    _build_error_response,
+    _build_user_facing_error_response,
     _is_no_auth_required,
     _to_authorize_result,
     _is_no_auth_test_call_required,
-    _build_error_text,
+    _build_user_facing_authorize_error_message,
 )
 from ...authorization import AuthorizeResult
 
@@ -23,6 +23,7 @@ class SingleTeamAuthorization(Authorization):
         *,
         auth_test_result: Optional[SlackResponse] = None,
         base_logger: Optional[Logger] = None,
+        user_facing_authorize_error_message: Optional[str] = None,
     ):
         """Single-workspace authorization.
 
@@ -32,6 +33,9 @@ class SingleTeamAuthorization(Authorization):
         """
         self.auth_test_result = auth_test_result
         self.logger = get_bolt_logger(SingleTeamAuthorization, base_logger=base_logger)
+        self.user_facing_authorize_error_message = (
+            user_facing_authorize_error_message or _build_user_facing_authorize_error_message()
+        )
 
     def process(
         self,
@@ -73,9 +77,9 @@ class SingleTeamAuthorization(Authorization):
                 # Just in case
                 self.logger.error("auth.test API call result is unexpectedly None")
                 if req.context.response_url is not None:
-                    req.context.respond(_build_error_text())
+                    req.context.respond(self.user_facing_authorize_error_message)
                     return BoltResponse(status=200, body="")
-                return _build_error_response()
+                return _build_user_facing_error_response(self.user_facing_authorize_error_message)
         except SlackApiError as e:
             self.logger.error(f"Failed to authorize with the given token ({e})")
-            return _build_error_response()
+            return _build_user_facing_error_response(self.user_facing_authorize_error_message)
