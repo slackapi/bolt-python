@@ -12,13 +12,13 @@ class WsgiHttpRequest:
 
     def get_headers(self) -> Dict[str, str]:
         headers = {}
-        for key in self.environ:
+        for key, value in self.environ.items():
             if key in {"CONTENT_LENGTH", "CONTENT_TYPE"}:
                 name = key.lower().replace("_", "-")
-                headers[name] = self.environ[key]
+                headers[name] = value
             if key.startswith("HTTP_"):
                 name = key[len("HTTP_") :].lower().replace("_", "-")
-                headers[name] = self.environ[key]
+                headers[name] = value
         return headers
 
     def get_raw_body(self) -> str:

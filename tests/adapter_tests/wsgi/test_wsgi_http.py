@@ -1,7 +1,6 @@
 import json
 from urllib.parse import quote
 from time import time
-import pytest
 
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
@@ -9,7 +8,7 @@ from slack_sdk.web import WebClient
 from slack_bolt.adapter.wsgi import SlackRequestHandler
 from slack_bolt.app import App
 from slack_bolt.oauth.oauth_settings import OAuthSettings
-from tests.mock_asgi_server import AsgiTestServer, ENCODING
+from tests.mock_wsgi_server import WsgiTestServer, ENCODING
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -17,7 +16,7 @@ from tests.mock_web_api_server import (
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
-test = { 'wsgi.version': (1, 0), 'wsgi.multithread': False, 'wsgi.multiprocess': False, 'wsgi.run_once': False, 'wsgi.input_terminated': True, 'SERVER_SOFTWARE': 'gunicorn/22.0.0', 'wsgi.input': "something to read", 'gunicorn.socket': "a socket", 'REQUEST_METHOD': 'POST', 'QUERY_STRING': '', 'RAW_URI': '/slack/events', 'SERVER_PROTOCOL': 'HTTP/1.1', 'HTTP_HOST': '0245-165-225-212-255.ngrok-free.app', 'HTTP_USER_AGENT': 'Slackbot 1.0 (+https://api.slack.com/robots)', 'CONTENT_LENGTH': '432', 'HTTP_ACCEPT': 'application/json,*/*', 'HTTP_ACCEPT_ENCODING': 'gzip,deflate', 'CONTENT_TYPE': 'application/x-www-form-urlencoded', 'HTTP_X_FORWARDED_FOR': '44.222.212.158', 'HTTP_X_FORWARDED_HOST': '0245-165-225-212-255.ngrok-free.app', 'HTTP_X_FORWARDED_PROTO': 'https', 'HTTP_X_SLACK_REQUEST_TIMESTAMP': '1716484929', 'HTTP_X_SLACK_SIGNATURE': 'v0=15bd6dd37b1d0774f1f86b301284f9df11c7dccb7a4186186bb2ae1c4bd90066', 'wsgi.url_scheme': 'https', 'REMOTE_ADDR': '127.0.0.1', 'REMOTE_PORT': '63263', 'SERVER_NAME': '0.0.0.0', 'SERVER_PORT': '3000', 'PATH_INFO': '/slack/events', 'SCRIPT_NAME': ''}
+
 class TestWsgiHttp:
     signing_secret = "secret"
     valid_token = "xoxb-valid"
@@ -57,8 +56,7 @@ class TestWsgiHttp:
             (b"x-slack-signature", bytes(self.generate_signature(body, timestamp), ENCODING)),
         ]
 
-    @pytest.mark.asyncio
-    async def test_commands(self):
+    def test_commands(self):
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
@@ -87,16 +85,15 @@ class TestWsgiHttp:
 
         headers = self.build_raw_headers(str(int(time())), body)
 
-        asgi_server = AsgiTestServer(SlackRequestHandler(app))
+        wsgi_server = WsgiTestServer(SlackRequestHandler(app))
 
-        response = await asgi_server.http("POST", headers, body)
+        response = wsgi_server.http("POST", headers, body)
 
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/plain;charset=utf-8"
         assert_auth_test_count(self, 1)
 
-    @pytest.mark.asyncio
-    async def test_events(self):
+    def test_events(self):
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
@@ -131,15 +128,14 @@ class TestWsgiHttp:
         )
         headers = self.build_raw_headers(str(int(time())), body)
 
-        asgi_server = AsgiTestServer(SlackRequestHandler(app))
-        response = await asgi_server.http("POST", headers, body)
+        wsgi_server = WsgiTestServer(SlackRequestHandler(app))
+        response = wsgi_server.http("POST", headers, body)
 
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/plain;charset=utf-8"
         assert_auth_test_count(self, 1)
 
-    @pytest.mark.asyncio
-    async def test_shortcuts(self):
+    def test_shortcuts(self):
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
@@ -168,15 +164,14 @@ class TestWsgiHttp:
         body = f"payload={quote(json.dumps(body_data))}"
         headers = self.build_raw_headers(str(int(time())), body)
 
-        asgi_server = AsgiTestServer(SlackRequestHandler(app))
-        response = await asgi_server.http("POST", headers, body)
+        wsgi_server = WsgiTestServer(SlackRequestHandler(app))
+        response = wsgi_server.http("POST", headers, body)
 
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/plain;charset=utf-8"
         assert_auth_test_count(self, 1)
 
-    @pytest.mark.asyncio
-    async def test_oauth(self):
+    def test_oauth(self):
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
@@ -189,15 +184,14 @@ class TestWsgiHttp:
 
         headers = self.build_raw_headers(str(int(time())), "")
 
-        asgi_server = AsgiTestServer(SlackRequestHandler(app))
-        response = await asgi_server.http("GET", headers, "", "/slack/install")
+        wsgi_server = WsgiTestServer(SlackRequestHandler(app))
+        response = wsgi_server.http("GET", headers, "", "/slack/install")
 
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
         assert "https://slack.com/oauth/v2/authorize?state=" in response.body
 
-    @pytest.mark.asyncio
-    async def test_url_verification(self):
+    def test_url_verification(self):
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
@@ -212,8 +206,8 @@ class TestWsgiHttp:
         body = f"payload={quote(json.dumps(body_data))}"
         headers = self.build_raw_headers(str(int(time())), body)
 
-        asgi_server = AsgiTestServer(SlackRequestHandler(app))
-        response = await asgi_server.http(
+        wsgi_server = WsgiTestServer(SlackRequestHandler(app))
+        response = wsgi_server.http(
             "POST",
             headers,
             body,
@@ -223,8 +217,7 @@ class TestWsgiHttp:
         assert response.headers.get("content-type") == "application/json;charset=utf-8"
         assert_auth_test_count(self, 1)
 
-    @pytest.mark.asyncio
-    async def test_unsupported_method(self):
+    def test_unsupported_method(self):
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
@@ -233,8 +226,8 @@ class TestWsgiHttp:
         body = ""
         headers = self.build_raw_headers(str(int(time())), "")
 
-        asgi_server = AsgiTestServer(SlackRequestHandler(app))
-        response = await asgi_server.http("PUT", headers, body)
+        wsgi_server = WsgiTestServer(SlackRequestHandler(app))
+        response = wsgi_server.http("PUT", headers, body)
 
         assert response.status_code == 404
         assert response.headers.get("content-type") == "text/plain;charset=utf-8"
