@@ -18,7 +18,7 @@ class SlackRequestHandler():
         This can be used for production deployment.
 
         With the default settings, `http://localhost:3000/slack/events`
-        Run Bolt with [uvicron](https://www.uvicorn.org/)
+        Run Bolt with [gunicorn](https://gunicorn.org/)
 
             # Python
             app = App()
@@ -27,7 +27,7 @@ class SlackRequestHandler():
             # bash
             export SLACK_SIGNING_SECRET=***
             export SLACK_BOT_TOKEN=xoxb-***
-            uvicorn app:api --port 3000 --log-level debug
+            gunicorn app:api -b 0.0.0.0:3000 --log-level debug
 
         Args:
             app: Your bolt application
@@ -71,21 +71,14 @@ class SlackRequestHandler():
             return WsgiHttpResponse(status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body)
         return WsgiHttpResponse(status=404, headers={"content-type": ["text/plain;charset=utf-8"]}, body="Not Found")
 
-    def _handle_lifespan(self, receive: Callable) -> Dict[str, str]:
-        while True:
-            lifespan = receive()
-            if lifespan["type"] == "lifespan.startup":
-                """Do something before startup"""
-                return {"type": "lifespan.startup.complete"}
-            if lifespan["type"] == "lifespan.shutdown":
-                """Do something before shutdown"""
-                return {"type": "lifespan.shutdown.complete"}
-
     def __call__( self, environ: Dict[str, Any], start_response: Callable[[str, List[Tuple[str, str]]], Callable[[bytes], object]]) -> Iterable[bytes]:
-        if "HTTP" in environ["SERVER_PROTOCOL"]:
+        print(environ)
+        if "HTTP" in environ.get("SERVER_PROTOCOL", ""):
             response: WsgiHttpResponse = self._get_http_response(
-                environ.get("REQUEST_METHOD", "GET"), environ.get("PATH_INFO", ""), WsgiHttpRequest(environ)
+                method=environ.get("REQUEST_METHOD", "GET"), path=environ.get("PATH_INFO", ""), request=WsgiHttpRequest(environ)
             )
             start_response(response.status, response.raw_headers)
+            for test in response.body:
+                print(test.decode("utf-8"))
             return response.body
         raise TypeError(f"Unsupported SERVER_PROTOCOL: {environ["SERVER_PROTOCOL"]}")

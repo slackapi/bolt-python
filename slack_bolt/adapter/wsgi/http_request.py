@@ -1,33 +1,28 @@
-from typing import Any, Callable, Dict, Union
+from typing import Any, Dict
 
 from .utils import ENCODING
 
 
 class WsgiHttpRequest:
-    __slots__ = ("receive", "query_string", "raw_headers")
+    __slots__ = ("query_string", "environ")
 
-    def __init__(self,  environ: Dict[str, Any]):
-        self.receive = environ["wsgi.input"]
-        self.query_string = str(environ["QUERY_STRING"], ENCODING)
+    def __init__(self, environ: Dict[str, Any]):
+        self.query_string = environ.get("QUERY_STRING", "")
         self.environ = environ
 
     def get_headers(self) -> Dict[str, str]:
         headers = {}
-        for e in self.environ:
-            if e[0].startswith("HTTP_"):
-                key = e[0][len("HTTP_"):].lower().replace("_", "-")
-                headers[key] = e[1]
+        for key in self.environ:
+            if key in {"CONTENT_LENGTH", "CONTENT_TYPE"}:
+                name = key.lower().replace("_", "-")
+                headers[name] = self.environ[key]
+            if key.startswith("HTTP_"):
+                name = key[len("HTTP_") :].lower().replace("_", "-")
+                headers[name] = self.environ[key]
         return headers
 
-    async def get_raw_body(self) -> str:
-        chunks = bytearray()
-        while True:
-            chunk: Dict[str, Union[str, bytes]] = await self.receive()
-
-            if chunk["type"] != "http.request":
-                raise Exception("Body chunks could not be received from asgi server")
-
-            chunks.extend(chunk.get("body", b""))
-            if not chunk.get("more_body", False):
-                break
-        return bytes(chunks).decode(ENCODING)
+    def get_raw_body(self) -> str:
+        if "wsgi.input" not in self.environ:
+            return ""
+        content_length = int(self.environ.get("CONTENT_LENGTH", 0))
+        return self.environ["wsgi.input"].read(content_length).decode(ENCODING)
