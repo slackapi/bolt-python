@@ -12,7 +12,8 @@ scope_value_type = Union[str, bytes, Iterable[Tuple[bytes, bytes]]]
 
 scope_type = Dict[str, scope_value_type]
 
-class SlackRequestHandler():
+
+class SlackRequestHandler:
     def __init__(self, app: App, path: str = "/slack/events"):  # type: ignore
         """Setup Bolt as a WSGI web framework, this will make your application compatible with WSGI web servers.
         This can be used for production deployments.
@@ -29,7 +30,7 @@ class SlackRequestHandler():
             export SLACK_SIGNING_SECRET=***
 
             export SLACK_BOT_TOKEN=xoxb-***
-        
+
             gunicorn app:api -b 0.0.0.0:3000 --log-level debug
 
         Args:
@@ -74,11 +75,17 @@ class SlackRequestHandler():
             return WsgiHttpResponse(status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body)
         return WsgiHttpResponse(status=404, headers={"content-type": ["text/plain;charset=utf-8"]}, body="Not Found")
 
-    def __call__( self, environ: Dict[str, Any], start_response: Callable[[str, List[Tuple[str, str]]], Callable[[bytes], object]]) -> Iterable[bytes]:
+    def __call__(
+        self,
+        environ: Dict[str, Any],
+        start_response: Callable[[str, List[Tuple[str, str]]], None],
+    ) -> Iterable[bytes]:
         if "HTTP" in environ.get("SERVER_PROTOCOL", ""):
             response: WsgiHttpResponse = self._get_http_response(
-                method=environ.get("REQUEST_METHOD", "GET"), path=environ.get("PATH_INFO", ""), request=WsgiHttpRequest(environ)
+                method=environ.get("REQUEST_METHOD", "GET"),
+                path=environ.get("PATH_INFO", ""),
+                request=WsgiHttpRequest(environ),
             )
-            start_response(response.status, response.raw_headers)
+            start_response(response.status, response.headers)
             return response.body
-        raise TypeError(f"Unsupported SERVER_PROTOCOL: {environ["SERVER_PROTOCOL"]}")
+        raise TypeError(f"Unsupported SERVER_PROTOCOL: {environ['SERVER_PROTOCOL']}")

@@ -8,7 +8,7 @@ from slack_sdk.web import WebClient
 from slack_bolt.adapter.wsgi import SlackRequestHandler
 from slack_bolt.app import App
 from slack_bolt.oauth.oauth_settings import OAuthSettings
-from tests.mock_wsgi_server import WsgiTestServer, ENCODING
+from tests.mock_wsgi_server import WsgiTestServer
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -41,20 +41,20 @@ class TestWsgiHttp:
             timestamp=timestamp,
         )
 
-    def build_raw_headers(self, timestamp: str, body: str):
+    def build_raw_headers(self, timestamp: str, body: str = ""):
         content_type = "application/json" if body.startswith("{") else "application/x-www-form-urlencoded"
-        return [
-            (b"host", b"123.123.123"),
-            (b"user-agent", b"some slack thing"),
-            (b"content-length", bytes(str(len(body)), ENCODING)),
-            (b"accept", b"application/json,*/*"),
-            (b"accept-encoding", b"gzip,deflate"),
-            (b"content-type", bytes(content_type, ENCODING)),
-            (b"x-forwarded-for", b"123.123.123"),
-            (b"x-forwarded-proto", b"https"),
-            (b"x-slack-request-timestamp", bytes(timestamp, ENCODING)),
-            (b"x-slack-signature", bytes(self.generate_signature(body, timestamp), ENCODING)),
-        ]
+        return {
+            "host": "123.123.123",
+            "user-agent": "some slack thing",
+            "content-length": str(len(body)),
+            "accept": "application/json,*/*",
+            "accept-encoding": "gzip,deflate",
+            "content-type": content_type,
+            "x-forwarded-for": "123.123.123",
+            "x-forwarded-proto": "https",
+            "x-slack-request-timestamp": timestamp,
+            "x-slack-signature": self.generate_signature(body, timestamp),
+        }
 
     def test_commands(self):
         app = App(
@@ -87,9 +87,9 @@ class TestWsgiHttp:
 
         wsgi_server = WsgiTestServer(SlackRequestHandler(app))
 
-        response = wsgi_server.http("POST", headers, body)
+        response = wsgi_server.http(method="POST", headers=headers, body=body)
 
-        assert response.status_code == 200
+        assert response.status == "200 OK"
         assert response.headers.get("content-type") == "text/plain;charset=utf-8"
         assert_auth_test_count(self, 1)
 
@@ -129,9 +129,9 @@ class TestWsgiHttp:
         headers = self.build_raw_headers(str(int(time())), body)
 
         wsgi_server = WsgiTestServer(SlackRequestHandler(app))
-        response = wsgi_server.http("POST", headers, body)
+        response = wsgi_server.http(method="POST", headers=headers, body=body)
 
-        assert response.status_code == 200
+        assert response.status == "200 OK"
         assert response.headers.get("content-type") == "text/plain;charset=utf-8"
         assert_auth_test_count(self, 1)
 
@@ -165,9 +165,9 @@ class TestWsgiHttp:
         headers = self.build_raw_headers(str(int(time())), body)
 
         wsgi_server = WsgiTestServer(SlackRequestHandler(app))
-        response = wsgi_server.http("POST", headers, body)
+        response = wsgi_server.http(method="POST", headers=headers, body=body)
 
-        assert response.status_code == 200
+        assert response.status == "200 OK"
         assert response.headers.get("content-type") == "text/plain;charset=utf-8"
         assert_auth_test_count(self, 1)
 
@@ -182,12 +182,12 @@ class TestWsgiHttp:
             ),
         )
 
-        headers = self.build_raw_headers(str(int(time())), "")
+        headers = self.build_raw_headers(str(int(time())))
 
         wsgi_server = WsgiTestServer(SlackRequestHandler(app))
-        response = wsgi_server.http("GET", headers, "", "/slack/install")
+        response = wsgi_server.http(method="GET", headers=headers, path="/slack/install")
 
-        assert response.status_code == 200
+        assert response.status == "200 OK"
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
         assert "https://slack.com/oauth/v2/authorize?state=" in response.body
 
@@ -208,12 +208,12 @@ class TestWsgiHttp:
 
         wsgi_server = WsgiTestServer(SlackRequestHandler(app))
         response = wsgi_server.http(
-            "POST",
-            headers,
-            body,
+            method="POST",
+            headers=headers,
+            body=body,
         )
 
-        assert response.status_code == 200
+        assert response.status == "200 OK"
         assert response.headers.get("content-type") == "application/json;charset=utf-8"
         assert_auth_test_count(self, 1)
 
@@ -227,8 +227,8 @@ class TestWsgiHttp:
         headers = self.build_raw_headers(str(int(time())), "")
 
         wsgi_server = WsgiTestServer(SlackRequestHandler(app))
-        response = wsgi_server.http("PUT", headers, body)
+        response = wsgi_server.http(method="PUT", headers=headers, body=body)
 
-        assert response.status_code == 404
+        assert response.status == "404 Not Found"
         assert response.headers.get("content-type") == "text/plain;charset=utf-8"
         assert_auth_test_count(self, 1)
