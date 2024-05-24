@@ -1,7 +1,7 @@
 from typing import Sequence, Tuple, Dict, List
+from http import HTTPStatus
 
 from .utils import ENCODING
-from http import HTTPStatus
 
 
 class WsgiHttpResponse:

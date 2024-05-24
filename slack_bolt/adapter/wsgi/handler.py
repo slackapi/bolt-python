@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Iterable, List, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Tuple
 from slack_bolt.oauth.oauth_flow import OAuthFlow
 from slack_bolt.adapter.wsgi.http_request import WsgiHttpRequest
 from slack_bolt.adapter.wsgi.http_response import WsgiHttpResponse
@@ -8,13 +8,9 @@ from slack_bolt import App
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
-scope_value_type = Union[str, bytes, Iterable[Tuple[bytes, bytes]]]
-
-scope_type = Dict[str, scope_value_type]
-
 
 class SlackRequestHandler:
-    def __init__(self, app: App, path: str = "/slack/events"):  # type: ignore
+    def __init__(self, app: App, path: str = "/slack/events"):
         """Setup Bolt as a WSGI web framework, this will make your application compatible with WSGI web servers.
         This can be used for production deployments.
 
@@ -42,19 +38,19 @@ class SlackRequestHandler:
 
     def dispatch(self, request: WsgiHttpRequest) -> BoltResponse:
         return self.app.dispatch(
-            BoltRequest(body=request.get_raw_body(), query=request.query_string, headers=request.get_headers())
+            BoltRequest(body=request.get_body(), query=request.query_string, headers=request.get_headers())
         )
 
     def handle_installation(self, request: WsgiHttpRequest) -> BoltResponse:
         oauth_flow: OAuthFlow = self.app.oauth_flow
         return oauth_flow.handle_installation(
-            BoltRequest(body=request.get_raw_body(), query=request.query_string, headers=request.get_headers())
+            BoltRequest(body=request.get_body(), query=request.query_string, headers=request.get_headers())
         )
 
     def handle_callback(self, request: WsgiHttpRequest) -> BoltResponse:
         oauth_flow: OAuthFlow = self.app.oauth_flow
         return oauth_flow.handle_callback(
-            BoltRequest(body=request.get_raw_body(), query=request.query_string, headers=request.get_headers())
+            BoltRequest(body=request.get_body(), query=request.query_string, headers=request.get_headers())
         )
 
     def _get_http_response(self, method: str, path: str, request: WsgiHttpRequest) -> WsgiHttpResponse:

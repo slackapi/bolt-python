@@ -21,7 +21,7 @@ class WsgiHttpRequest:
                 headers[name] = value
         return headers
 
-    def get_raw_body(self) -> str:
+    def get_body(self) -> str:
         if "wsgi.input" not in self.environ:
             return ""
         content_length = int(self.environ.get("CONTENT_LENGTH", 0))
