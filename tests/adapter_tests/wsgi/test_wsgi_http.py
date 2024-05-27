@@ -1,6 +1,6 @@
 import json
-from urllib.parse import quote
 from time import time
+from urllib.parse import quote
 
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
@@ -8,12 +8,8 @@ from slack_sdk.web import WebClient
 from slack_bolt.adapter.wsgi import SlackRequestHandler
 from slack_bolt.app import App
 from slack_bolt.oauth.oauth_settings import OAuthSettings
+from tests.mock_web_api_server import assert_auth_test_count, cleanup_mock_web_api_server, setup_mock_web_api_server
 from tests.mock_wsgi_server import WsgiTestServer
-from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
-    assert_auth_test_count,
-)
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 

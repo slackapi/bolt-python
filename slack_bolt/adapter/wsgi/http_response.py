@@ -1,5 +1,5 @@
-from typing import Iterable, Sequence, Tuple, Dict, List
 from http import HTTPStatus
+from typing import Dict, Iterable, List, Sequence, Tuple
 
 from .internals import ENCODING
 

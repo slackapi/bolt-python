@@ -1,4 +1,5 @@
 from typing import Dict, Iterable, Optional, Tuple
+
 from slack_bolt.adapter.wsgi import SlackRequestHandler
 
 ENCODING = "utf-8"

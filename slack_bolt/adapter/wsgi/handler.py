@@ -1,10 +1,9 @@
 from typing import Any, Callable, Dict, Iterable, List, Tuple
-from slack_bolt.oauth.oauth_flow import OAuthFlow
-from slack_bolt.adapter.wsgi.http_request import WsgiHttpRequest
-from slack_bolt.adapter.wsgi.http_response import WsgiHttpResponse
 
 from slack_bolt import App
-
+from slack_bolt.adapter.wsgi.http_request import WsgiHttpRequest
+from slack_bolt.adapter.wsgi.http_response import WsgiHttpResponse
+from slack_bolt.oauth.oauth_flow import OAuthFlow
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
