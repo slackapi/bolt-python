@@ -1,13 +1,22 @@
 from typing import Any, Dict
 
-from .utils import ENCODING
+from .internals import ENCODING
 
 
 class WsgiHttpRequest:
-    __slots__ = ("query_string", "environ")
+    """This Class uses the PEP 3333 standard to extract request information
+    from the WSGI web server running the application
+
+    PEP 3333: https://peps.python.org/pep-3333/
+    """
+
+    __slots__ = ("method", "path", "query_string", "protocol", "environ")
 
     def __init__(self, environ: Dict[str, Any]):
-        self.query_string = environ.get("QUERY_STRING", "")
+        self.method: str = environ.get("REQUEST_METHOD", "GET")
+        self.path: str = environ.get("PATH_INFO", "")
+        self.query_string: str = environ.get("QUERY_STRING", "")
+        self.protocol: str = environ.get("SERVER_PROTOCOL", "")
         self.environ = environ
 
     def get_headers(self) -> Dict[str, str]:
@@ -17,7 +26,7 @@ class WsgiHttpRequest:
                 name = key.lower().replace("_", "-")
                 headers[name] = value
             if key.startswith("HTTP_"):
-                name = key[len("HTTP_") :].lower().replace("_", "-")
+                name = key[len("HTTP_"):].lower().replace("_", "-")  # fmt: skip
                 headers[name] = value
         return headers
 

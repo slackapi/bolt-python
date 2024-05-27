@@ -53,20 +53,20 @@ class SlackRequestHandler:
             BoltRequest(body=request.get_body(), query=request.query_string, headers=request.get_headers())
         )
 
-    def _get_http_response(self, method: str, path: str, request: WsgiHttpRequest) -> WsgiHttpResponse:
-        if method == "GET":
+    def _get_http_response(self, request: WsgiHttpRequest) -> WsgiHttpResponse:
+        if request.method == "GET":
             if self.app.oauth_flow is not None:
-                if path == self.app.oauth_flow.install_path:
+                if request.path == self.app.oauth_flow.install_path:
                     bolt_response: BoltResponse = self.handle_installation(request)
                     return WsgiHttpResponse(
                         status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body
                     )
-                if path == self.app.oauth_flow.redirect_uri_path:
+                if request.path == self.app.oauth_flow.redirect_uri_path:
                     bolt_response: BoltResponse = self.handle_callback(request)
                     return WsgiHttpResponse(
                         status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body
                     )
-        if method == "POST" and path == self.path:
+        if request.method == "POST" and request.path == self.path:
             bolt_response: BoltResponse = self.dispatch(request)
             return WsgiHttpResponse(status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body)
         return WsgiHttpResponse(status=404, headers={"content-type": ["text/plain;charset=utf-8"]}, body="Not Found")
@@ -76,12 +76,11 @@ class SlackRequestHandler:
         environ: Dict[str, Any],
         start_response: Callable[[str, List[Tuple[str, str]]], None],
     ) -> Iterable[bytes]:
-        if "HTTP" in environ.get("SERVER_PROTOCOL", ""):
+        request = WsgiHttpRequest(environ)
+        if "HTTP" in request.protocol:
             response: WsgiHttpResponse = self._get_http_response(
-                method=environ.get("REQUEST_METHOD", "GET"),
-                path=environ.get("PATH_INFO", ""),
-                request=WsgiHttpRequest(environ),
+                request=request,
             )
-            start_response(response.status, response.headers)
-            return response.body
-        raise TypeError(f"Unsupported SERVER_PROTOCOL: {environ['SERVER_PROTOCOL']}")
+            start_response(response.status, response.get_headers())
+            return response.get_body()
+        raise TypeError(f"Unsupported SERVER_PROTOCOL: {request.protocol}")

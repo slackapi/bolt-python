@@ -1,22 +1,33 @@
-from typing import Sequence, Tuple, Dict, List
+from typing import Iterable, Sequence, Tuple, Dict, List
 from http import HTTPStatus
 
-from .utils import ENCODING
+from .internals import ENCODING
 
 
 class WsgiHttpResponse:
-    __slots__ = ("status", "headers", "body")
+    """This Class uses the PEP 3333 standard to adapt bolt response information
+    for the WSGI web server running the application
+
+    PEP 3333: https://peps.python.org/pep-3333/
+    """
+
+    __slots__ = ("status", "_headers", "_body")
 
     def __init__(self, status: int, headers: Dict[str, Sequence[str]] = {}, body: str = ""):
         _status = HTTPStatus(status)
         self.status = f"{_status.value} {_status.phrase}"
+        self._headers = headers
+        self._body = bytes(body, ENCODING)
 
-        self.headers: List[Tuple[str, str]] = []
-        for key, value in headers.items():
+    def get_headers(self) -> List[Tuple[str, str]]:
+        headers: List[Tuple[str, str]] = []
+        for key, value in self._headers.items():
             if key.lower() == "content-length":
                 continue
-            self.headers.append((key, value[0]))
+            headers.append((key, value[0]))
 
-        _body = bytes(body, ENCODING)
-        self.headers.append(("content-length", str(len(_body))))
-        self.body = [_body]
+        headers.append(("content-length", str(len(self._body))))
+        return headers
+
+    def get_body(self) -> Iterable[bytes]:
+        return [self._body]
