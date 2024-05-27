@@ -1,1 +1,1 @@
-ENCODING = "utf-8"  # should always be utf-8
+ENCODING = "utf-8"  # The content encoding for Slack requests/responses is always utf-8
