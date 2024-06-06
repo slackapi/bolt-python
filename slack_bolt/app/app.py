@@ -696,8 +696,10 @@ class App:
             execute: The function for handling the step execution
         """
         warnings.warn(
-            ("Steps from Apps for legacy workflows are now deprecated. "
-             "Use new custom steps: https://api.slack.com/automation/functions/custom-bolt"),
+            (
+                "Steps from Apps for legacy workflows are now deprecated. "
+                "Use new custom steps: https://api.slack.com/automation/functions/custom-bolt"
+            ),
             category=DeprecationWarning,
         )
         step = callback_id
