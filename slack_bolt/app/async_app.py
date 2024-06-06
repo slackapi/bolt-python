@@ -3,6 +3,7 @@ import logging
 import os
 import time
 from typing import Optional, List, Union, Callable, Pattern, Dict, Awaitable, Sequence, Any
+import warnings
 
 from aiohttp import web
 
@@ -689,7 +690,12 @@ class AsyncApp:
         execute: Optional[Union[Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]]] = None,
     ):
         """
+        Deprecated:
+            Steps from Apps for legacy workflows are now deprecated.
+            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+
         Registers a new Workflow Step listener.
+
         Unlike others, this method doesn't behave as a decorator.
         If you want to register a workflow step by a decorator, use `AsyncWorkflowStepBuilder`'s methods.
 
@@ -717,6 +723,11 @@ class AsyncApp:
             save: The function for handling configuration in the Workflow Builder
             execute: The function for handling the step execution
         """
+        warnings.warn(
+            ("Steps from Apps for legacy workflows are now deprecated. "
+             "Use new custom steps: https://api.slack.com/automation/functions/custom-bolt"),
+            category=DeprecationWarning,
+        )
         step = callback_id
         if isinstance(callback_id, (str, Pattern)):
             step = AsyncWorkflowStep(

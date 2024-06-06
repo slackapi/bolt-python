@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import time
+import warnings
 from concurrent.futures import Executor
 from concurrent.futures.thread import ThreadPoolExecutor
 from http.server import SimpleHTTPRequestHandler, HTTPServer
@@ -659,7 +660,13 @@ class App:
         save: Optional[Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]] = None,
         execute: Optional[Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]] = None,
     ):
-        """Registers a new Workflow Step listener.
+        """
+        Deprecated:
+            Steps from Apps for legacy workflows are now deprecated.
+            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+
+        Registers a new Workflow Step listener.
+
         Unlike others, this method doesn't behave as a decorator.
         If you want to register a workflow step by a decorator, use `WorkflowStepBuilder`'s methods.
 
@@ -688,6 +695,11 @@ class App:
             save: The function for handling configuration in the Workflow Builder
             execute: The function for handling the step execution
         """
+        warnings.warn(
+            ("Steps from Apps for legacy workflows are now deprecated. "
+             "Use new custom steps: https://api.slack.com/automation/functions/custom-bolt"),
+            category=DeprecationWarning,
+        )
         step = callback_id
         if isinstance(callback_id, (str, Pattern)):
             step = WorkflowStep(
