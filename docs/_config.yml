@@ -43,7 +43,7 @@ t:
     start: Bolt 入門ガイド
     contribute: 貢献
     beta: BETA
-    deprecated: 使用されていない
+    deprecated: 非推奨
 
 # Metadata
 repo_name: bolt-python
