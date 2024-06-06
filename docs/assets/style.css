@@ -117,7 +117,7 @@ span.beta {
   font-weight: 600;
 }
 
-.panel .sidebar-content ul.sidebar-section .label-legacy {
+.panel .sidebar-content ul.sidebar-section .label-deprecated {
   line-height: 1em;
   vertical-align: middle;
   color: var(--white);
@@ -321,7 +321,7 @@ td.rouge-gutter {
   width: 100%;
 }
 
-.content .section-wrapper .label-legacy {
+.content .section-wrapper .label-deprecated {
   line-height: 1em;
   vertical-align: middle;
   color: var(--white);
