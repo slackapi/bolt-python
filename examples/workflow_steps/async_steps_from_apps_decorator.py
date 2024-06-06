@@ -11,6 +11,11 @@ from slack_bolt.workflows.step.async_step import (
     AsyncWorkflowStep,
 )
 
+################################################################################
+# Steps from Apps for legacy workflows are now deprecated.                     #
+# Use new custom steps: https://api.slack.com/automation/functions/custom-bolt #
+################################################################################
+
 logging.basicConfig(level=logging.DEBUG)
 
 # export SLACK_SIGNING_SECRET=***
