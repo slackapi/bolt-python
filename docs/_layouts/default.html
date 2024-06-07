@@ -49,8 +49,8 @@ sidebar_style: main
         workflow_steps %}
         <div class="section-wrapper">
           <h3 id="{{section.slug}}">
-            {{ section.title }} 
-            <!-- UNCOMMENT AFTER GA <span class="label-legacy">{{ site.t[page.lang].legacy }}</span> -->
+            {{ section.title }}
+            <span class="label-deprecated">{{ site.t[page.lang].deprecated }}</span>
           </h3>
           {{ section.content | markdownify }}
           <hr />

@@ -35,7 +35,7 @@ t:
     start: Getting started
     contribute: Contributing
     beta: BETA
-    legacy: LEGACY
+    deprecated: Deprecated
   ja-jp:
     basic: 基本的な概念
     steps: ワークフローステップ
@@ -43,7 +43,7 @@ t:
     start: Bolt 入門ガイド
     contribute: 貢献
     beta: BETA
-    legacy: LEGACY
+    deprecated: 非推奨
 
 # Metadata
 repo_name: bolt-python
