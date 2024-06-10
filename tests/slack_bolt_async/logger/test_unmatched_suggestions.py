@@ -81,6 +81,33 @@ async def handle_app_mention_events(body, logger):
             == message
         )
 
+    def test_function_event(self):
+        req: AsyncBoltRequest = AsyncBoltRequest(body=function_event, mode="socket_mode")
+        filtered_body = {
+            "type": "event_callback",
+            "event": {"type": "function_executed"},
+        }
+        message = warning_unhandled_request(req)
+        assert (
+            f"""Unhandled request ({filtered_body})
+---
+[Suggestion] You can handle this type of event with the following listener function:
+
+@app.function("reverse")
+async def handle_some_function(ack, body, complete, fail, logger):
+    await ack()
+    logger.info(body)
+    try:
+        # TODO: do something here
+        outputs = {{}}
+        await complete(outputs=outputs)
+    except Exception as e:
+        error = f"Failed to handle a function request (error: {{e}})"
+        await fail(error=error)
+"""
+            == message
+        )
+
     def test_commands(self):
         req: AsyncBoltRequest = AsyncBoltRequest(body=slash_command, mode="socket_mode")
         message = warning_unhandled_request(req)
@@ -397,6 +424,50 @@ app_mention_event = {
     "type": "event_callback",
     "event_id": "Ev111",
     "event_time": 1595926230,
+}
+
+function_event = {
+    "token": "verification_token",
+    "enterprise_id": "E111",
+    "team_id": "T111",
+    "api_app_id": "A111",
+    "event": {
+        "type": "function_executed",
+        "function": {
+            "id": "Fn111",
+            "callback_id": "reverse",
+            "title": "Reverse",
+            "description": "Takes a string and reverses it",
+            "type": "app",
+            "input_parameters": [
+                {
+                    "type": "string",
+                    "name": "stringToReverse",
+                    "description": "The string to reverse",
+                    "title": "String To Reverse",
+                    "is_required": True,
+                }
+            ],
+            "output_parameters": [
+                {
+                    "type": "string",
+                    "name": "reverseString",
+                    "description": "The string in reverse",
+                    "title": "Reverse String",
+                    "is_required": True,
+                }
+            ],
+            "app_id": "A111",
+            "date_updated": 1659054991,
+        },
+        "inputs": {"stringToReverse": "hello"},
+        "function_execution_id": "Fx111",
+        "event_ts": "1659055013.509853",
+    },
+    "type": "event_callback",
+    "event_id": "Ev111",
+    "event_time": 1659055013,
+    "authed_users": ["W111"],
 }
 
 slash_command = {
