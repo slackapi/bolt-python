@@ -43,7 +43,12 @@ class AsyncWorkflowStepBuilder:
         app_name: Optional[str] = None,
         base_logger: Optional[Logger] = None,
     ):
-        """This builder is supposed to be used as decorator.
+        """
+        Deprecated:
+            Steps from Apps for legacy workflows are now deprecated.
+            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+
+        This builder is supposed to be used as decorator.
 
             my_step = AsyncWorkflowStep.builder("my_step")
             @my_step.edit
@@ -80,7 +85,13 @@ class AsyncWorkflowStepBuilder:
         middleware: Optional[Union[Callable, AsyncMiddleware]] = None,
         lazy: Optional[List[Callable[..., Awaitable[None]]]] = None,
     ):
-        """Registers a new edit listener with details.
+        """
+        Deprecated:
+            Steps from Apps for legacy workflows are now deprecated.
+            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+
+        Registers a new edit listener with details.
+
         You can use this method as decorator as well.
 
             @my_step.edit
@@ -127,7 +138,13 @@ class AsyncWorkflowStepBuilder:
         middleware: Optional[Union[Callable, AsyncMiddleware]] = None,
         lazy: Optional[List[Callable[..., Awaitable[None]]]] = None,
     ):
-        """Registers a new save listener with details.
+        """
+        Deprecated:
+            Steps from Apps for legacy workflows are now deprecated.
+            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+
+        Registers a new save listener with details.
+
         You can use this method as decorator as well.
 
             @my_step.save
@@ -174,7 +191,13 @@ class AsyncWorkflowStepBuilder:
         middleware: Optional[Union[Callable, AsyncMiddleware]] = None,
         lazy: Optional[List[Callable[..., Awaitable[None]]]] = None,
     ):
-        """Registers a new execute listener with details.
+        """
+        Deprecated:
+            Steps from Apps for legacy workflows are now deprecated.
+            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+
+        Registers a new execute listener with details.
+
         You can use this method as decorator as well.
 
             @my_step.execute
@@ -215,7 +238,12 @@ class AsyncWorkflowStepBuilder:
         return _inner
 
     def build(self, base_logger: Optional[Logger] = None) -> "AsyncWorkflowStep":
-        """Constructs a WorkflowStep object. This method may raise an exception
+        """
+        Deprecated:
+            Steps from Apps for legacy workflows are now deprecated.
+            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+
+        Constructs a WorkflowStep object. This method may raise an exception
         if the builder doesn't have enough configurations to build the object.
 
         Returns:
@@ -309,6 +337,10 @@ class AsyncWorkflowStep:
         base_logger: Optional[Logger] = None,
     ):
         """
+        Deprecated:
+            Steps from Apps for legacy workflows are now deprecated.
+            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+
         Args:
             callback_id: The callback_id for this workflow step
             edit: Either a single function or a list of functions for opening a modal in the builder UI
@@ -350,6 +382,11 @@ class AsyncWorkflowStep:
         callback_id: Union[str, Pattern],
         base_logger: Optional[Logger] = None,
     ) -> AsyncWorkflowStepBuilder:
+        """
+        Deprecated:
+            Steps from Apps for legacy workflows are now deprecated.
+            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+        """
         return AsyncWorkflowStepBuilder(callback_id, base_logger=base_logger)
 
     @classmethod

@@ -3,6 +3,11 @@ import logging
 from slack_sdk.web.async_client import AsyncSlackResponse, AsyncWebClient
 from slack_bolt.async_app import AsyncApp, AsyncAck
 
+################################################################################
+# Steps from Apps for legacy workflows are now deprecated.                     #
+# Use new custom steps: https://api.slack.com/automation/functions/custom-bolt #
+################################################################################
+
 logging.basicConfig(level=logging.DEBUG)
 
 # export SLACK_SIGNING_SECRET=***
