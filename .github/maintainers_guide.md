@@ -153,10 +153,12 @@ password: {your password}
 
 #### Production Deployment
 
-1. Create the commit for the release: 
+1. Create the commit for the release:
    - Bump the version number in adherence to [Semantic Versioning](http://semver.org/) in `slack_bolt/version.py`
+   - Build the docs with `./scripts/generate_api_docs.sh`.
    - Commit with a message including the new version number. For example `1.2.3` & Push the commit to a branch and create a PR to sanity check.
      - `git checkout -b v1.2.3-release`
+     - `git add --all`
      - `git commit -m 'version 1.2.3'`
      - `git push {your-fork} v1.2.3-release`
    - Merge in release PR after getting an approval from at least one maintainer.

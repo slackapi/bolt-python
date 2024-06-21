@@ -195,7 +195,7 @@ __all__ = [
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp"><code class="flex name class">
 <span>class <span class="ident">AsyncApp</span></span>
-<span>(</span><span>*, logger: Optional[logging.Logger] = None, name: Optional[str] = None, process_before_response: bool = False, raise_error_for_unhandled_request: bool = False, signing_secret: Optional[str] = None, token: Optional[str] = None, client: Optional[slack_sdk.web.async_client.AsyncWebClient] = None, before_authorize: Union[<a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>, Callable[..., Awaitable[Any]], ForwardRef(None)] = None, authorize: Optional[Callable[..., Awaitable[<a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]]] = None, installation_store: Optional[slack_sdk.oauth.installation_store.async_installation_store.AsyncInstallationStore] = None, installation_store_bot_only: Optional[bool] = None, request_verification_enabled: bool = True, ignoring_self_events_enabled: bool = True, ssl_check_enabled: bool = True, url_verification_enabled: bool = True, oauth_settings: Optional[<a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings" href="oauth/async_oauth_settings.html#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings">AsyncOAuthSettings</a>] = None, oauth_flow: Optional[<a title="slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow" href="oauth/async_oauth_flow.html#slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow">AsyncOAuthFlow</a>] = None, verification_token: Optional[str] = None)</span>
+<span>(</span><span>*, logger: Optional[logging.Logger] = None, name: Optional[str] = None, process_before_response: bool = False, raise_error_for_unhandled_request: bool = False, signing_secret: Optional[str] = None, token: Optional[str] = None, client: Optional[slack_sdk.web.async_client.AsyncWebClient] = None, before_authorize: Union[<a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>, Callable[..., Awaitable[Any]], ForwardRef(None)] = None, authorize: Optional[Callable[..., Awaitable[<a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]]] = None, user_facing_authorize_error_message: Optional[str] = None, installation_store: Optional[slack_sdk.oauth.installation_store.async_installation_store.AsyncInstallationStore] = None, installation_store_bot_only: Optional[bool] = None, request_verification_enabled: bool = True, ignoring_self_events_enabled: bool = True, ssl_check_enabled: bool = True, url_verification_enabled: bool = True, oauth_settings: Optional[<a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings" href="oauth/async_oauth_settings.html#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings">AsyncOAuthSettings</a>] = None, oauth_flow: Optional[<a title="slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow" href="oauth/async_oauth_flow.html#slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow">AsyncOAuthFlow</a>] = None, verification_token: Optional[str] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Bolt App that provides functionalities to register middleware/listeners.</p>
@@ -244,6 +244,9 @@ the built-in handler, which pints warning logs and returns 404 to Slack (Default
 <dt><strong><code>authorize</code></strong></dt>
 <dd>The function to authorize an incoming request from Slack
 by checking if there is a team/user in the installation data.</dd>
+<dt><strong><code>user_facing_authorize_error_message</code></strong></dt>
+<dd>The user-facing error message to display
+when the app is installed but the installation is not managed by this app's installation store</dd>
 <dt><strong><code>installation_store</code></strong></dt>
 <dd>The module offering save/find operations of installation data</dd>
 <dt><strong><code>installation_store_bot_only</code></strong></dt>
@@ -297,6 +300,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         # for multi-workspace apps
         before_authorize: Optional[Union[AsyncMiddleware, Callable[..., Awaitable[Any]]]] = None,
         authorize: Optional[Callable[..., Awaitable[AuthorizeResult]]] = None,
+        user_facing_authorize_error_message: Optional[str] = None,
         installation_store: Optional[AsyncInstallationStore] = None,
         # for either only bot scope usage or v1.0.x compatibility
         installation_store_bot_only: Optional[bool] = None,
@@ -350,6 +354,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             before_authorize: A global middleware that can be executed right before authorize function
             authorize: The function to authorize an incoming request from Slack
                 by checking if there is a team/user in the installation data.
+            user_facing_authorize_error_message: The user-facing error message to display
+                when the app is installed but the installation is not managed by this app&#39;s installation store
             installation_store: The module offering save/find operations of installation data
             installation_store_bot_only: Use `AsyncInstallationStore#async_find_bot()` if True (Default: False)
             request_verification_enabled: False if you would like to disable the built-in middleware (Default: True).
@@ -537,6 +543,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             ignoring_self_events_enabled=ignoring_self_events_enabled,
             ssl_check_enabled=ssl_check_enabled,
             url_verification_enabled=url_verification_enabled,
+            user_facing_authorize_error_message=user_facing_authorize_error_message,
         )
 
         self._server: Optional[AsyncSlackAppServer] = None
@@ -547,6 +554,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         ignoring_self_events_enabled: bool = True,
         ssl_check_enabled: bool = True,
         url_verification_enabled: bool = True,
+        user_facing_authorize_error_message: Optional[str] = None,
     ):
         if self._init_middleware_list_done:
             return
@@ -566,10 +574,19 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         # As authorize is required for making a Bolt app function, we don&#39;t offer the flag to disable this
         if self._async_oauth_flow is None:
             if self._token:
-                self._async_middleware_list.append(AsyncSingleTeamAuthorization(base_logger=self._base_logger))
+                self._async_middleware_list.append(
+                    AsyncSingleTeamAuthorization(
+                        base_logger=self._base_logger,
+                        user_facing_authorize_error_message=user_facing_authorize_error_message,
+                    )
+                )
             elif self._async_authorize is not None:
                 self._async_middleware_list.append(
-                    AsyncMultiTeamsAuthorization(authorize=self._async_authorize, base_logger=self._base_logger)
+                    AsyncMultiTeamsAuthorization(
+                        authorize=self._async_authorize,
+                        base_logger=self._base_logger,
+                        user_facing_authorize_error_message=user_facing_authorize_error_message,
+                    )
                 )
             else:
                 raise BoltError(error_token_required())
@@ -579,6 +596,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                     authorize=self._async_authorize,
                     base_logger=self._base_logger,
                     user_token_resolution=self._async_oauth_flow.settings.user_token_resolution,
+                    user_facing_authorize_error_message=user_facing_authorize_error_message,
                 )
             )
 
@@ -857,7 +875,12 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         execute: Optional[Union[Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]]] = None,
     ):
         &#34;&#34;&#34;
+        Deprecated:
+            Steps from Apps for legacy workflows are now deprecated.
+            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+
         Registers a new Workflow Step listener.
+
         Unlike others, this method doesn&#39;t behave as a decorator.
         If you want to register a workflow step by a decorator, use `AsyncWorkflowStepBuilder`&#39;s methods.
 
@@ -885,6 +908,13 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             save: The function for handling configuration in the Workflow Builder
             execute: The function for handling the step execution
         &#34;&#34;&#34;
+        warnings.warn(
+            (
+                &#34;Steps from Apps for legacy workflows are now deprecated. &#34;
+                &#34;Use new custom steps: https://api.slack.com/automation/functions/custom-bolt&#34;
+            ),
+            category=DeprecationWarning,
+        )
         step = callback_id
         if isinstance(callback_id, (str, Pattern)):
             step = AsyncWorkflowStep(
@@ -2721,8 +2751,11 @@ Refer to <a href="https://docs.aiohttp.org/">https://docs.aiohttp.org/</a> for m
 <span>def <span class="ident">step</span></span>(<span>self, callback_id: Union[str, Pattern, <a title="slack_bolt.workflows.step.async_step.AsyncWorkflowStep" href="workflows/step/async_step.html#slack_bolt.workflows.step.async_step.AsyncWorkflowStep">AsyncWorkflowStep</a>, <a title="slack_bolt.workflows.step.async_step.AsyncWorkflowStepBuilder" href="workflows/step/async_step.html#slack_bolt.workflows.step.async_step.AsyncWorkflowStepBuilder">AsyncWorkflowStepBuilder</a>], edit: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable], ForwardRef(None)] = None, save: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable], ForwardRef(None)] = None, execute: Union[Callable[..., Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]], <a title="slack_bolt.listener.async_listener.AsyncListener" href="listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a>, Sequence[Callable], ForwardRef(None)] = None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Registers a new Workflow Step listener.
-Unlike others, this method doesn't behave as a decorator.
+<div class="desc"><h2 id="deprecated">Deprecated</h2>
+<p>Steps from Apps for legacy workflows are now deprecated.
+Use new custom steps: <a href="https://api.slack.com/automation/functions/custom-bolt">https://api.slack.com/automation/functions/custom-bolt</a></p>
+<p>Registers a new Workflow Step listener.</p>
+<p>Unlike others, this method doesn't behave as a decorator.
 If you want to register a workflow step by a decorator, use <code>AsyncWorkflowStepBuilder</code>'s methods.</p>
 <pre><code># Create a new WorkflowStep instance
 from slack_bolt.workflows.async_step import AsyncWorkflowStep
@@ -2763,7 +2796,12 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
     execute: Optional[Union[Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]]] = None,
 ):
     &#34;&#34;&#34;
+    Deprecated:
+        Steps from Apps for legacy workflows are now deprecated.
+        Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+
     Registers a new Workflow Step listener.
+
     Unlike others, this method doesn&#39;t behave as a decorator.
     If you want to register a workflow step by a decorator, use `AsyncWorkflowStepBuilder`&#39;s methods.
 
@@ -2791,6 +2829,13 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
         save: The function for handling configuration in the Workflow Builder
         execute: The function for handling the step execution
     &#34;&#34;&#34;
+    warnings.warn(
+        (
+            &#34;Steps from Apps for legacy workflows are now deprecated. &#34;
+            &#34;Use new custom steps: https://api.slack.com/automation/functions/custom-bolt&#34;
+        ),
+        category=DeprecationWarning,
+    )
     step = callback_id
     if isinstance(callback_id, (str, Pattern)):
         step = AsyncWorkflowStep(

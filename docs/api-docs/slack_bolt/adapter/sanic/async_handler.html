@@ -99,7 +99,7 @@ class AsyncSlackRequestHandler:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="slack_bolt.adapter.sanic.async_handler.to_async_bolt_request"><code class="name flex">
-<span>def <span class="ident">to_async_bolt_request</span></span>(<span>req: sanic.request.Request) ‑> <a title="slack_bolt.request.async_request.AsyncBoltRequest" href="../../request/async_request.html#slack_bolt.request.async_request.AsyncBoltRequest">AsyncBoltRequest</a></span>
+<span>def <span class="ident">to_async_bolt_request</span></span>(<span>req: sanic.request.types.Request) ‑> <a title="slack_bolt.request.async_request.AsyncBoltRequest" href="../../request/async_request.html#slack_bolt.request.async_request.AsyncBoltRequest">AsyncBoltRequest</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -116,7 +116,7 @@ class AsyncSlackRequestHandler:
 </details>
 </dd>
 <dt id="slack_bolt.adapter.sanic.async_handler.to_sanic_response"><code class="name flex">
-<span>def <span class="ident">to_sanic_response</span></span>(<span>bolt_resp: <a title="slack_bolt.response.response.BoltResponse" href="../../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>) ‑> sanic.response.HTTPResponse</span>
+<span>def <span class="ident">to_sanic_response</span></span>(<span>bolt_resp: <a title="slack_bolt.response.response.BoltResponse" href="../../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>) ‑> sanic.response.types.HTTPResponse</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -188,7 +188,7 @@ class AsyncSlackRequestHandler:
 <h3>Methods</h3>
 <dl>
 <dt id="slack_bolt.adapter.sanic.async_handler.AsyncSlackRequestHandler.handle"><code class="name flex">
-<span>async def <span class="ident">handle</span></span>(<span>self, req: sanic.request.Request) ‑> sanic.response.HTTPResponse</span>
+<span>async def <span class="ident">handle</span></span>(<span>self, req: sanic.request.types.Request) ‑> sanic.response.types.HTTPResponse</span>
 </code></dt>
 <dd>
 <div class="desc"></div>

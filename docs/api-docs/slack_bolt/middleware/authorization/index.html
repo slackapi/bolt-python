@@ -115,7 +115,7 @@ __all__ = [
 </dd>
 <dt id="slack_bolt.middleware.authorization.MultiTeamsAuthorization"><code class="flex name class">
 <span>class <span class="ident">MultiTeamsAuthorization</span></span>
-<span>(</span><span>*, authorize: <a title="slack_bolt.authorization.authorize.Authorize" href="../../authorization/authorize.html#slack_bolt.authorization.authorize.Authorize">Authorize</a>, base_logger: Optional[logging.Logger] = None, user_token_resolution: str = 'authed_user')</span>
+<span>(</span><span>*, authorize: <a title="slack_bolt.authorization.authorize.Authorize" href="../../authorization/authorize.html#slack_bolt.authorization.authorize.Authorize">Authorize</a>, base_logger: Optional[logging.Logger] = None, user_token_resolution: str = 'authed_user', user_facing_authorize_error_message: Optional[str] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
@@ -128,6 +128,8 @@ __all__ = [
 <dd>The base logger</dd>
 <dt><strong><code>user_token_resolution</code></strong></dt>
 <dd>"authed_user" or "actor"</dd>
+<dt><strong><code>user_facing_authorize_error_message</code></strong></dt>
+<dd>The user-facing error message when installation is not found</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -143,6 +145,7 @@ __all__ = [
         authorize: Authorize,
         base_logger: Optional[Logger] = None,
         user_token_resolution: str = &#34;authed_user&#34;,
+        user_facing_authorize_error_message: Optional[str] = None,
     ):
         &#34;&#34;&#34;Multi-workspace authorization.
 
@@ -150,10 +153,14 @@ __all__ = [
             authorize: The function to authorize incoming requests from Slack.
             base_logger: The base logger
             user_token_resolution: &#34;authed_user&#34; or &#34;actor&#34;
+            user_facing_authorize_error_message: The user-facing error message when installation is not found
         &#34;&#34;&#34;
         self.authorize = authorize
         self.logger = get_bolt_logger(MultiTeamsAuthorization, base_logger=base_logger)
         self.user_token_resolution = user_token_resolution
+        self.user_facing_authorize_error_message = (
+            user_facing_authorize_error_message or _build_user_facing_authorize_error_message()
+        )
 
     def process(
         self,
@@ -211,13 +218,13 @@ __all__ = [
                     &#34;the AuthorizeResult (returned value from authorize) for it was not found.&#34;
                 )
                 if req.context.response_url is not None:
-                    req.context.respond(_build_error_text())
+                    req.context.respond(self.user_facing_authorize_error_message)
                     return BoltResponse(status=200, body=&#34;&#34;)
-                return _build_error_response()
+                return _build_user_facing_error_response(self.user_facing_authorize_error_message)
 
         except SlackApiError as e:
             self.logger.error(f&#34;Failed to authorize with the given token ({e})&#34;)
-            return _build_error_response()</code></pre>
+            return _build_user_facing_error_response(self.user_facing_authorize_error_message)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -247,7 +254,7 @@ __all__ = [
 </dd>
 <dt id="slack_bolt.middleware.authorization.SingleTeamAuthorization"><code class="flex name class">
 <span>class <span class="ident">SingleTeamAuthorization</span></span>
-<span>(</span><span>*, auth_test_result: Optional[slack_sdk.web.slack_response.SlackResponse] = None, base_logger: Optional[logging.Logger] = None)</span>
+<span>(</span><span>*, auth_test_result: Optional[slack_sdk.web.slack_response.SlackResponse] = None, base_logger: Optional[logging.Logger] = None, user_facing_authorize_error_message: Optional[str] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
@@ -269,6 +276,7 @@ __all__ = [
         *,
         auth_test_result: Optional[SlackResponse] = None,
         base_logger: Optional[Logger] = None,
+        user_facing_authorize_error_message: Optional[str] = None,
     ):
         &#34;&#34;&#34;Single-workspace authorization.
 
@@ -278,6 +286,9 @@ __all__ = [
         &#34;&#34;&#34;
         self.auth_test_result = auth_test_result
         self.logger = get_bolt_logger(SingleTeamAuthorization, base_logger=base_logger)
+        self.user_facing_authorize_error_message = (
+            user_facing_authorize_error_message or _build_user_facing_authorize_error_message()
+        )
 
     def process(
         self,
@@ -319,12 +330,12 @@ __all__ = [
                 # Just in case
                 self.logger.error(&#34;auth.test API call result is unexpectedly None&#34;)
                 if req.context.response_url is not None:
-                    req.context.respond(_build_error_text())
+                    req.context.respond(self.user_facing_authorize_error_message)
                     return BoltResponse(status=200, body=&#34;&#34;)
-                return _build_error_response()
+                return _build_user_facing_error_response(self.user_facing_authorize_error_message)
         except SlackApiError as e:
             self.logger.error(f&#34;Failed to authorize with the given token ({e})&#34;)
-            return _build_error_response()</code></pre>
+            return _build_user_facing_error_response(self.user_facing_authorize_error_message)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">

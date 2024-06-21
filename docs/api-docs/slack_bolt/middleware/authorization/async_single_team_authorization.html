@@ -35,16 +35,23 @@ from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.web.async_slack_response import AsyncSlackResponse
 from slack_sdk.errors import SlackApiError
-from .async_internals import _build_error_response, _is_no_auth_required
-from .internals import _to_authorize_result, _is_no_auth_test_call_required, _build_error_text
+from .async_internals import _build_user_facing_error_response, _is_no_auth_required
+from .internals import _to_authorize_result, _is_no_auth_test_call_required, _build_user_facing_authorize_error_message
 from ...authorization import AuthorizeResult
 
 
 class AsyncSingleTeamAuthorization(AsyncAuthorization):
-    def __init__(self, base_logger: Optional[Logger] = None):
+    def __init__(
+        self,
+        base_logger: Optional[Logger] = None,
+        user_facing_authorize_error_message: Optional[str] = None,
+    ):
         &#34;&#34;&#34;Single-workspace authorization.&#34;&#34;&#34;
         self.auth_test_result: Optional[AsyncSlackResponse] = None
         self.logger = get_bolt_logger(AsyncSingleTeamAuthorization, base_logger=base_logger)
+        self.user_facing_authorize_error_message = (
+            user_facing_authorize_error_message or _build_user_facing_authorize_error_message()
+        )
 
     async def async_process(
         self,
@@ -86,12 +93,12 @@ class AsyncSingleTeamAuthorization(AsyncAuthorization):
                 # Just in case
                 self.logger.error(&#34;auth.test API call result is unexpectedly None&#34;)
                 if req.context.response_url is not None:
-                    await req.context.respond(_build_error_text())
+                    await req.context.respond(self.user_facing_authorize_error_message)
                     return BoltResponse(status=200, body=&#34;&#34;)
-                return _build_error_response()
+                return _build_user_facing_error_response(self.user_facing_authorize_error_message)
         except SlackApiError as e:
             self.logger.error(f&#34;Failed to authorize with the given token ({e})&#34;)
-            return _build_error_response()</code></pre>
+            return _build_user_facing_error_response(self.user_facing_authorize_error_message)</code></pre>
 </details>
 </section>
 <section>
@@ -105,7 +112,7 @@ class AsyncSingleTeamAuthorization(AsyncAuthorization):
 <dl>
 <dt id="slack_bolt.middleware.authorization.async_single_team_authorization.AsyncSingleTeamAuthorization"><code class="flex name class">
 <span>class <span class="ident">AsyncSingleTeamAuthorization</span></span>
-<span>(</span><span>base_logger: Optional[logging.Logger] = None)</span>
+<span>(</span><span>base_logger: Optional[logging.Logger] = None, user_facing_authorize_error_message: Optional[str] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
@@ -115,10 +122,17 @@ class AsyncSingleTeamAuthorization(AsyncAuthorization):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncSingleTeamAuthorization(AsyncAuthorization):
-    def __init__(self, base_logger: Optional[Logger] = None):
+    def __init__(
+        self,
+        base_logger: Optional[Logger] = None,
+        user_facing_authorize_error_message: Optional[str] = None,
+    ):
         &#34;&#34;&#34;Single-workspace authorization.&#34;&#34;&#34;
         self.auth_test_result: Optional[AsyncSlackResponse] = None
         self.logger = get_bolt_logger(AsyncSingleTeamAuthorization, base_logger=base_logger)
+        self.user_facing_authorize_error_message = (
+            user_facing_authorize_error_message or _build_user_facing_authorize_error_message()
+        )
 
     async def async_process(
         self,
@@ -160,12 +174,12 @@ class AsyncSingleTeamAuthorization(AsyncAuthorization):
                 # Just in case
                 self.logger.error(&#34;auth.test API call result is unexpectedly None&#34;)
                 if req.context.response_url is not None:
-                    await req.context.respond(_build_error_text())
+                    await req.context.respond(self.user_facing_authorize_error_message)
                     return BoltResponse(status=200, body=&#34;&#34;)
-                return _build_error_response()
+                return _build_user_facing_error_response(self.user_facing_authorize_error_message)
         except SlackApiError as e:
             self.logger.error(f&#34;Failed to authorize with the given token ({e})&#34;)
-            return _build_error_response()</code></pre>
+            return _build_user_facing_error_response(self.user_facing_authorize_error_message)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
