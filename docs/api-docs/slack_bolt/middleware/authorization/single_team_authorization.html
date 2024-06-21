@@ -36,11 +36,11 @@ from slack_bolt.response import BoltResponse
 from slack_sdk.errors import SlackApiError
 from slack_sdk.web import SlackResponse
 from .internals import (
-    _build_error_response,
+    _build_user_facing_error_response,
     _is_no_auth_required,
     _to_authorize_result,
     _is_no_auth_test_call_required,
-    _build_error_text,
+    _build_user_facing_authorize_error_message,
 )
 from ...authorization import AuthorizeResult
 
@@ -51,6 +51,7 @@ class SingleTeamAuthorization(Authorization):
         *,
         auth_test_result: Optional[SlackResponse] = None,
         base_logger: Optional[Logger] = None,
+        user_facing_authorize_error_message: Optional[str] = None,
     ):
         &#34;&#34;&#34;Single-workspace authorization.
 
@@ -60,6 +61,9 @@ class SingleTeamAuthorization(Authorization):
         &#34;&#34;&#34;
         self.auth_test_result = auth_test_result
         self.logger = get_bolt_logger(SingleTeamAuthorization, base_logger=base_logger)
+        self.user_facing_authorize_error_message = (
+            user_facing_authorize_error_message or _build_user_facing_authorize_error_message()
+        )
 
     def process(
         self,
@@ -101,12 +105,12 @@ class SingleTeamAuthorization(Authorization):
                 # Just in case
                 self.logger.error(&#34;auth.test API call result is unexpectedly None&#34;)
                 if req.context.response_url is not None:
-                    req.context.respond(_build_error_text())
+                    req.context.respond(self.user_facing_authorize_error_message)
                     return BoltResponse(status=200, body=&#34;&#34;)
-                return _build_error_response()
+                return _build_user_facing_error_response(self.user_facing_authorize_error_message)
         except SlackApiError as e:
             self.logger.error(f&#34;Failed to authorize with the given token ({e})&#34;)
-            return _build_error_response()</code></pre>
+            return _build_user_facing_error_response(self.user_facing_authorize_error_message)</code></pre>
 </details>
 </section>
 <section>
@@ -120,7 +124,7 @@ class SingleTeamAuthorization(Authorization):
 <dl>
 <dt id="slack_bolt.middleware.authorization.single_team_authorization.SingleTeamAuthorization"><code class="flex name class">
 <span>class <span class="ident">SingleTeamAuthorization</span></span>
-<span>(</span><span>*, auth_test_result: Optional[slack_sdk.web.slack_response.SlackResponse] = None, base_logger: Optional[logging.Logger] = None)</span>
+<span>(</span><span>*, auth_test_result: Optional[slack_sdk.web.slack_response.SlackResponse] = None, base_logger: Optional[logging.Logger] = None, user_facing_authorize_error_message: Optional[str] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
@@ -142,6 +146,7 @@ class SingleTeamAuthorization(Authorization):
         *,
         auth_test_result: Optional[SlackResponse] = None,
         base_logger: Optional[Logger] = None,
+        user_facing_authorize_error_message: Optional[str] = None,
     ):
         &#34;&#34;&#34;Single-workspace authorization.
 
@@ -151,6 +156,9 @@ class SingleTeamAuthorization(Authorization):
         &#34;&#34;&#34;
         self.auth_test_result = auth_test_result
         self.logger = get_bolt_logger(SingleTeamAuthorization, base_logger=base_logger)
+        self.user_facing_authorize_error_message = (
+            user_facing_authorize_error_message or _build_user_facing_authorize_error_message()
+        )
 
     def process(
         self,
@@ -192,12 +200,12 @@ class SingleTeamAuthorization(Authorization):
                 # Just in case
                 self.logger.error(&#34;auth.test API call result is unexpectedly None&#34;)
                 if req.context.response_url is not None:
-                    req.context.respond(_build_error_text())
+                    req.context.respond(self.user_facing_authorize_error_message)
                     return BoltResponse(status=200, body=&#34;&#34;)
-                return _build_error_response()
+                return _build_user_facing_error_response(self.user_facing_authorize_error_message)
         except SlackApiError as e:
             self.logger.error(f&#34;Failed to authorize with the given token ({e})&#34;)
-            return _build_error_response()</code></pre>
+            return _build_user_facing_error_response(self.user_facing_authorize_error_message)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">

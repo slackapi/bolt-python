@@ -34,8 +34,8 @@ from slack_bolt.logger import get_bolt_logger
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from .async_authorization import AsyncAuthorization
-from .async_internals import _build_error_response, _is_no_auth_required
-from .internals import _is_no_auth_test_call_required, _build_error_text
+from .async_internals import _build_user_facing_error_response, _is_no_auth_required
+from .internals import _is_no_auth_test_call_required, _build_user_facing_authorize_error_message
 from ...authorization import AuthorizeResult
 from ...authorization.async_authorize import AsyncAuthorize
 
@@ -49,6 +49,7 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
         authorize: AsyncAuthorize,
         base_logger: Optional[Logger] = None,
         user_token_resolution: str = &#34;authed_user&#34;,
+        user_facing_authorize_error_message: Optional[str] = None,
     ):
         &#34;&#34;&#34;Multi-workspace authorization.
 
@@ -56,10 +57,14 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
             authorize: The function to authorize incoming requests from Slack.
             base_logger: The base logger
             user_token_resolution: &#34;authed_user&#34; or &#34;actor&#34;
+            user_facing_authorize_error_message: The user-facing error message when installation is not found
         &#34;&#34;&#34;
         self.authorize = authorize
         self.logger = get_bolt_logger(AsyncMultiTeamsAuthorization, base_logger=base_logger)
         self.user_token_resolution = user_token_resolution
+        self.user_facing_authorize_error_message = (
+            user_facing_authorize_error_message or _build_user_facing_authorize_error_message()
+        )
 
     async def async_process(
         self,
@@ -120,13 +125,13 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
                     &#34;the AuthorizeResult (returned value from authorize) for it was not found.&#34;
                 )
                 if req.context.response_url is not None:
-                    await req.context.respond(_build_error_text())
+                    await req.context.respond(self.user_facing_authorize_error_message)
                     return BoltResponse(status=200, body=&#34;&#34;)
-                return _build_error_response()
+                return _build_user_facing_error_response(self.user_facing_authorize_error_message)
 
         except SlackApiError as e:
             self.logger.error(f&#34;Failed to authorize with the given token ({e})&#34;)
-            return _build_error_response()</code></pre>
+            return _build_user_facing_error_response(self.user_facing_authorize_error_message)</code></pre>
 </details>
 </section>
 <section>
@@ -140,7 +145,7 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
 <dl>
 <dt id="slack_bolt.middleware.authorization.async_multi_teams_authorization.AsyncMultiTeamsAuthorization"><code class="flex name class">
 <span>class <span class="ident">AsyncMultiTeamsAuthorization</span></span>
-<span>(</span><span>authorize: <a title="slack_bolt.authorization.async_authorize.AsyncAuthorize" href="../../authorization/async_authorize.html#slack_bolt.authorization.async_authorize.AsyncAuthorize">AsyncAuthorize</a>, base_logger: Optional[logging.Logger] = None, user_token_resolution: str = 'authed_user')</span>
+<span>(</span><span>authorize: <a title="slack_bolt.authorization.async_authorize.AsyncAuthorize" href="../../authorization/async_authorize.html#slack_bolt.authorization.async_authorize.AsyncAuthorize">AsyncAuthorize</a>, base_logger: Optional[logging.Logger] = None, user_token_resolution: str = 'authed_user', user_facing_authorize_error_message: Optional[str] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
@@ -153,6 +158,8 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
 <dd>The base logger</dd>
 <dt><strong><code>user_token_resolution</code></strong></dt>
 <dd>"authed_user" or "actor"</dd>
+<dt><strong><code>user_facing_authorize_error_message</code></strong></dt>
+<dd>The user-facing error message when installation is not found</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -167,6 +174,7 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
         authorize: AsyncAuthorize,
         base_logger: Optional[Logger] = None,
         user_token_resolution: str = &#34;authed_user&#34;,
+        user_facing_authorize_error_message: Optional[str] = None,
     ):
         &#34;&#34;&#34;Multi-workspace authorization.
 
@@ -174,10 +182,14 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
             authorize: The function to authorize incoming requests from Slack.
             base_logger: The base logger
             user_token_resolution: &#34;authed_user&#34; or &#34;actor&#34;
+            user_facing_authorize_error_message: The user-facing error message when installation is not found
         &#34;&#34;&#34;
         self.authorize = authorize
         self.logger = get_bolt_logger(AsyncMultiTeamsAuthorization, base_logger=base_logger)
         self.user_token_resolution = user_token_resolution
+        self.user_facing_authorize_error_message = (
+            user_facing_authorize_error_message or _build_user_facing_authorize_error_message()
+        )
 
     async def async_process(
         self,
@@ -238,13 +250,13 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
                     &#34;the AuthorizeResult (returned value from authorize) for it was not found.&#34;
                 )
                 if req.context.response_url is not None:
-                    await req.context.respond(_build_error_text())
+                    await req.context.respond(self.user_facing_authorize_error_message)
                     return BoltResponse(status=200, body=&#34;&#34;)
-                return _build_error_response()
+                return _build_user_facing_error_response(self.user_facing_authorize_error_message)
 
         except SlackApiError as e:
             self.logger.error(f&#34;Failed to authorize with the given token ({e})&#34;)
-            return _build_error_response()</code></pre>
+            return _build_user_facing_error_response(self.user_facing_authorize_error_message)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
