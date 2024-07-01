@@ -1,4 +1,4 @@
 # pip install -r requirements/testing_without_asyncio.txt
-pytest>=6.2.5,<8.2        # https://github.com/tornadoweb/tornado/issues/3375
+pytest>=8.2.2,<8.3        # https://github.com/tornadoweb/tornado/issues/3375
 pytest-cov>=3,<6
 black==22.8.0             # Until we drop Python 3.6 support, we have to stay with this version
