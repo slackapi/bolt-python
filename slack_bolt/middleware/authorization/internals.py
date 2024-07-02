@@ -76,4 +76,6 @@ def _to_authorize_result(  # type: ignore
         bot_token=token if _is_bot_token(token) else None,
         user_id=request_user_id or (user_id if not _is_bot_token(token) else None),
         user_token=token if not _is_bot_token(token) else None,
+        bot_scopes=auth_test_result.headers.get("x-oauth-scopes", []) if _is_bot_token(token) else None,
+        user_scopes=None if _is_bot_token(token) else auth_test_result.headers.get("x-oauth-scopes", []),
     )
