@@ -149,6 +149,7 @@ class MockHandler(SimpleHTTPRequestHandler):
             if self.is_valid_user_token():
                 if path == "/auth.test":
                     self.send_response(200)
+                    self.send_header("x-oauth-scopes", "chat:write,search:read")
                     self.set_common_headers(len(USER_AUTH_TEST_RESPONSE))
                     self.wfile.write(USER_AUTH_TEST_RESPONSE.encode("utf-8"))
                     return
@@ -156,6 +157,7 @@ class MockHandler(SimpleHTTPRequestHandler):
             if self.is_valid_token():
                 if path == "/auth.test":
                     self.send_response(200)
+                    self.send_header("x-oauth-scopes", "chat:write,commands")
                     self.set_common_headers(len(BOT_AUTH_TEST_RESPONSE))
                     self.wfile.write(BOT_AUTH_TEST_RESPONSE.encode("utf-8"))
                     return
