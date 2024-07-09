@@ -1,4 +1,3 @@
-import asyncio
 import json
 from time import time
 from urllib.parse import quote
@@ -13,9 +12,9 @@ from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.request.payload_utils import is_event
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
+    cleanup_mock_web_api_server_async,
     assert_auth_test_count_async,
+    setup_mock_web_api_server_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
 
@@ -65,11 +64,11 @@ class TestAsyncAuthorize:
     def event_loop(self):
         old_os_env = remove_os_env_temporarily()
         try:
-            setup_mock_web_api_server(self)
+            setup_mock_web_api_server_async(self)
             loop = get_event_loop()
             yield loop
             loop.close()
-            cleanup_mock_web_api_server(self)
+            cleanup_mock_web_api_server_async(self)
         finally:
             restore_os_env(old_os_env)
 
@@ -147,7 +146,7 @@ class TestAsyncAuthorize:
         response = await app.async_dispatch(request)
         assert response.status == 200
         assert response.body == ""
-        assert self.mock_received_requests.get("/auth.test") == None
+        assert await self.received_requests.get_async("/auth.test", 0) == 0
 
     @pytest.mark.asyncio
     async def test_bot_context_attributes(self):
@@ -180,7 +179,7 @@ class TestAsyncAuthorize:
         await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
-    async def test_user_context_attributes(self):
+    async def test_user_context_attributes_msg_change(self):
         async def skip_message_changed_events(body: dict, payload: dict, next_):
             if is_event(body) and payload.get("type") == "message" and payload.get("subtype") == "message_changed":
                 return BoltResponse(status=200, body="as expected")
