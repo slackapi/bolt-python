@@ -94,7 +94,7 @@ class TestApp:
         request = self.build_valid_app_mention_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        await assert_auth_test_count_async(self, 1)
+        await assert_auth_test_count_async(self, 2)
         await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
 

@@ -11,9 +11,10 @@ from slack_bolt import BoltResponse
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
+    assert_received_request_count_async,
+    cleanup_mock_web_api_server_async,
     assert_auth_test_count_async,
+    setup_mock_web_api_server_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
 
@@ -32,11 +33,11 @@ class TestAsyncMessage:
     def event_loop(self):
         old_os_env = remove_os_env_temporarily()
         try:
-            setup_mock_web_api_server(self)
+            setup_mock_web_api_server_async(self)
             loop = get_event_loop()
             yield loop
             loop.close()
-            cleanup_mock_web_api_server(self)
+            cleanup_mock_web_api_server_async(self)
         finally:
             restore_os_env(old_os_env)
 
@@ -78,8 +79,7 @@ class TestAsyncMessage:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
     @pytest.mark.asyncio
     async def test_all_message_matching_1(self):
@@ -96,8 +96,7 @@ class TestAsyncMessage:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
     @pytest.mark.asyncio
     async def test_all_message_matching_2(self):
@@ -114,8 +113,7 @@ class TestAsyncMessage:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
     @pytest.mark.asyncio
     async def test_string_keyword_capturing(self):
@@ -129,8 +127,7 @@ class TestAsyncMessage:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
     @pytest.mark.asyncio
     async def test_string_keyword_capturing2(self):
@@ -144,8 +141,7 @@ class TestAsyncMessage:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
     @pytest.mark.asyncio
     async def test_string_keyword_capturing_multi_capture(self):
@@ -187,8 +183,7 @@ class TestAsyncMessage:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
     @pytest.mark.asyncio
     async def test_regexp_keyword_unmatched(self):
