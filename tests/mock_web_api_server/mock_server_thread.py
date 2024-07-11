@@ -20,7 +20,6 @@ class MockServerThread(threading.Thread):
     def run(self):
         self.server = HTTPServer(("localhost", 8888), self.handler)
         self.server.queue = self.queue
-        self.test.mock_received_requests = self.handler.received_requests
         self.test.server_url = "http://localhost:8888"
         self.test.host, self.test.port = self.server.socket.getsockname()
         self.test.server_started.set()  # threading.Event()
@@ -32,14 +31,12 @@ class MockServerThread(threading.Thread):
             self.server.server_close()
 
     def stop(self):
-        self.handler.received_requests = {}
         with self.server.queue.mutex:
             del self.server.queue
         self.server.shutdown()
         self.join()
 
     def stop_unsafe(self):
-        self.handler.received_requests = {}
         del self.server.queue
         self.server.shutdown()
         self.join()

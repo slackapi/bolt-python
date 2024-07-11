@@ -155,8 +155,7 @@ class TestAsyncMessage:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
     @pytest.mark.asyncio
     async def test_string_keyword_unmatched(self):

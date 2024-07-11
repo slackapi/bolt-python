@@ -26,7 +26,10 @@ def assert_received_request_count(test: TestCase, path: str, min_count: int, tim
     error = None
     while time.time() - start_time < timeout:
         try:
-            assert test.received_requests.get(path, 0) == min_count
+            received_count = test.received_requests.get(path, 0)
+            assert (
+                received_count == min_count
+            ), f"Expected {min_count} '{path}' {'requests' if min_count > 1 else 'request'}, but got {received_count}!"
             return
         except Exception as e:
             error = e
@@ -39,6 +42,11 @@ def assert_received_request_count(test: TestCase, path: str, min_count: int, tim
 
 def assert_auth_test_count(test: TestCase, expected_count: int):
     assert_received_request_count(test, "/auth.test", expected_count, 0.5)
+
+
+#########
+# async #
+#########
 
 
 def setup_mock_web_api_server_async(test: TestCase):
@@ -59,10 +67,10 @@ async def assert_received_request_count_async(test: TestCase, path: str, min_cou
     error = None
     while time.time() - start_time < timeout:
         try:
-            received_requests = await test.received_requests.get_async(path, 0)
+            received_count = await test.received_requests.get_async(path, 0)
             assert (
-                received_requests == min_count
-            ), f"Expected {min_count} '{path}' {'requests' if min_count > 1 else 'request'}, but got {received_requests}!"
+                received_count == min_count
+            ), f"Expected {min_count} '{path}' {'requests' if min_count > 1 else 'request'}, but got {received_count}!"
             return
         except Exception as e:
             error = e
