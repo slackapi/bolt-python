@@ -6,9 +6,10 @@ from slack_sdk.web.async_client import AsyncWebClient
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
+    assert_received_request_count_async,
+    cleanup_mock_web_api_server_async,
     assert_auth_test_count_async,
+    setup_mock_web_api_server_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
 
@@ -25,11 +26,11 @@ class TestAsyncEventsIgnoreSelf:
     def event_loop(self):
         old_os_env = remove_os_env_temporarily()
         try:
-            setup_mock_web_api_server(self)
+            setup_mock_web_api_server_async(self)
             loop = get_event_loop()
             yield loop
             loop.close()
-            cleanup_mock_web_api_server(self)
+            cleanup_mock_web_api_server_async(self)
         finally:
             restore_os_env(old_os_env)
 
@@ -41,9 +42,9 @@ class TestAsyncEventsIgnoreSelf:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
+        await asyncio.sleep(0.1)  # wait a bit after auto ack()
         # The listener should not be executed
-        assert self.mock_received_requests.get("/chat.postMessage") is None
+        await assert_received_request_count_async(self, "/chat.postMessage", 0)
 
     @pytest.mark.asyncio
     async def test_self_events_response_url(self):
@@ -53,9 +54,9 @@ class TestAsyncEventsIgnoreSelf:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
+        await asyncio.sleep(0.1)  # wait a bit after auto ack()
         # The listener should not be executed
-        assert self.mock_received_requests.get("/chat.postMessage") is None
+        await assert_received_request_count_async(self, "/chat.postMessage", 0)
 
     @pytest.mark.asyncio
     async def test_not_self_events_response_url(self):
@@ -65,8 +66,7 @@ class TestAsyncEventsIgnoreSelf:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests.get("/chat.postMessage") == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
     @pytest.mark.asyncio
     async def test_self_events_disabled(self):
@@ -75,10 +75,8 @@ class TestAsyncEventsIgnoreSelf:
         request = AsyncBoltRequest(body=self_event, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
-        await assert_auth_test_count_async(self, 0)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        # The listener should be executed
-        assert self.mock_received_requests.get("/chat.postMessage") == 1
+        await assert_auth_test_count_async(self, 1)
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
 
 self_event = {

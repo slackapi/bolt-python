@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import logging
 from logging import Logger
@@ -18,9 +17,9 @@ from slack_bolt.authorization.async_authorize import (
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.error import BoltError
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
+    cleanup_mock_web_api_server_async,
     assert_auth_test_count_async,
+    setup_mock_web_api_server_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
 
@@ -35,11 +34,11 @@ class TestAsyncAuthorize:
     def event_loop(self):
         old_os_env = remove_os_env_temporarily()
         try:
-            setup_mock_web_api_server(self)
+            setup_mock_web_api_server_async(self)
             loop = get_event_loop()
             yield loop
             loop.close()
-            cleanup_mock_web_api_server(self)
+            cleanup_mock_web_api_server_async(self)
         finally:
             restore_os_env(old_os_env)
 
@@ -206,13 +205,13 @@ class TestAsyncAuthorize:
         assert result.team_id == "T0G9PQBBK"
         assert result.team == "Subarachnoid Workspace"
         assert result.url == "https://subarachnoid.slack.com/"
-        await assert_auth_test_count_async(self, 1)
+        await assert_auth_test_count_async(self, 2)
 
         result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
         assert result.bot_user_id == "W23456789"
         assert result.user_token == "xoxp-valid"
-        await assert_auth_test_count_async(self, 2)
+        await assert_auth_test_count_async(self, 4)
 
     @pytest.mark.asyncio
     async def test_installation_store_cached(self):
@@ -235,7 +234,7 @@ class TestAsyncAuthorize:
         assert result.team_id == "T0G9PQBBK"
         assert result.team == "Subarachnoid Workspace"
         assert result.url == "https://subarachnoid.slack.com/"
-        await assert_auth_test_count_async(self, 1)
+        await assert_auth_test_count_async(self, 2)
 
         result = await authorize(context=context, enterprise_id="E111", team_id="T0G9PQBBK", user_id="W11111")
         assert result.bot_id == "BZYBOTHED"
@@ -246,7 +245,7 @@ class TestAsyncAuthorize:
         assert result.team_id == "T0G9PQBBK"
         assert result.team == "Subarachnoid Workspace"
         assert result.url == "https://subarachnoid.slack.com/"
-        await assert_auth_test_count_async(self, 1)  # cached
+        await assert_auth_test_count_async(self, 2)  # cached
 
     @pytest.mark.asyncio
     async def test_fetch_different_user_token(self):
@@ -264,7 +263,7 @@ class TestAsyncAuthorize:
         assert result.team_id == "T0G9PQBBK"
         assert result.team == "Subarachnoid Workspace"
         assert result.url == "https://subarachnoid.slack.com/"
-        await assert_auth_test_count_async(self, 1)
+        await assert_auth_test_count_async(self, 2)
 
     @pytest.mark.asyncio
     async def test_fetch_different_user_token_with_rotation(self):
@@ -301,7 +300,7 @@ class TestAsyncAuthorize:
         assert result.team_id == "T0G9PQBBK"
         assert result.team == "Subarachnoid Workspace"
         assert result.url == "https://subarachnoid.slack.com/"
-        await assert_auth_test_count_async(self, 1)
+        await assert_auth_test_count_async(self, 2)
 
     @pytest.mark.asyncio
     async def test_remove_latest_user_token_if_it_is_not_relevant(self):

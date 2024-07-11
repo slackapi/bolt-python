@@ -1,4 +1,3 @@
-import asyncio
 import json
 from time import time
 from urllib.parse import quote
@@ -17,8 +16,10 @@ from slack_bolt.workflows.step.utilities.async_configure import AsyncConfigure
 from slack_bolt.workflows.step.utilities.async_fail import AsyncFail
 from slack_bolt.workflows.step.utilities.async_update import AsyncUpdate
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
+    assert_auth_test_count_async,
+    assert_received_request_count_async,
+    cleanup_mock_web_api_server_async,
+    setup_mock_web_api_server_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
 
@@ -37,14 +38,14 @@ class TestAsyncWorkflowStepsDecorator:
     def event_loop(self):
         old_os_env = remove_os_env_temporarily()
         try:
-            setup_mock_web_api_server(self)
+            setup_mock_web_api_server_async(self)
             self.app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
             self.app.step(copy_review_step)
 
             loop = get_event_loop()
             yield loop
             loop.close()
-            cleanup_mock_web_api_server(self)
+            cleanup_mock_web_api_server_async(self)
         finally:
             restore_os_env(old_os_env)
 
@@ -65,7 +66,7 @@ class TestAsyncWorkflowStepsDecorator:
         request = AsyncBoltRequest(body=body, headers=headers)
         response = await self.app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         self.app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
         self.app.step(callback_id="copy_review___", edit=edit, save=save, execute=execute)
@@ -83,7 +84,7 @@ class TestAsyncWorkflowStepsDecorator:
         request = AsyncBoltRequest(body=body, headers=headers)
         response = await self.app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
+        await assert_auth_test_count_async(self, 1)
 
         self.app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
         self.app.step(callback_id="copy_review___", edit=edit, save=save, execute=execute)
@@ -101,9 +102,8 @@ class TestAsyncWorkflowStepsDecorator:
         request = AsyncBoltRequest(body=body, headers=headers)
         response = await self.app.async_dispatch(request)
         assert response.status == 200
-        assert self.mock_received_requests["/auth.test"] == 1
-        await asyncio.sleep(0.5)
-        assert self.mock_received_requests["/workflows.stepCompleted"] == 1
+        await assert_auth_test_count_async(self, 1)
+        await assert_received_request_count_async(self, "/workflows.stepCompleted", 1)
 
         self.app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
         self.app.step(callback_id="copy_review___", edit=edit, save=save, execute=execute)

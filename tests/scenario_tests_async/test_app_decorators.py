@@ -7,8 +7,8 @@ from slack_bolt import BoltResponse
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.context.ack.async_ack import AsyncAck
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
+    cleanup_mock_web_api_server_async,
+    setup_mock_web_api_server_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -28,7 +28,7 @@ class TestAppDecorators:
     async def test_decorators(self):
         try:
             self.old_os_env = remove_os_env_temporarily()
-            setup_mock_web_api_server(self)
+            setup_mock_web_api_server_async(self)
 
             app = AsyncApp(signing_secret=self.signing_secret, client=self.web_client)
             ack = NoopAsyncAck()
@@ -106,5 +106,5 @@ class TestAppDecorators:
             assert isinstance(middleware, Callable)
 
         finally:
-            cleanup_mock_web_api_server(self)
+            cleanup_mock_web_api_server_async(self)
             restore_os_env(self.old_os_env)

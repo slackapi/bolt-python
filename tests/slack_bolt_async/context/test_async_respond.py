@@ -1,23 +1,21 @@
-import asyncio
-
 import pytest
 
 from tests.utils import get_event_loop
 from slack_bolt.context.respond.async_respond import AsyncRespond
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
+    cleanup_mock_web_api_server_async,
+    setup_mock_web_api_server_async,
 )
 
 
 class TestAsyncRespond:
     @pytest.fixture
     def event_loop(self):
-        setup_mock_web_api_server(self)
+        setup_mock_web_api_server_async(self)
         loop = get_event_loop()
         yield loop
         loop.close()
-        cleanup_mock_web_api_server(self)
+        cleanup_mock_web_api_server_async(self)
 
     @pytest.mark.asyncio
     async def test_respond(self):

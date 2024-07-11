@@ -1,4 +1,3 @@
-import asyncio
 import json
 from time import time
 from urllib.parse import quote
@@ -24,9 +23,9 @@ from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
-    cleanup_mock_web_api_server,
-    setup_mock_web_api_server,
+    cleanup_mock_web_api_server_async,
     assert_auth_test_count_async,
+    setup_mock_web_api_server_async,
 )
 
 
@@ -35,11 +34,11 @@ class TestAsyncOAuthFlow:
 
     @pytest.fixture
     def event_loop(self):
-        setup_mock_web_api_server(self)
+        setup_mock_web_api_server_async(self)
         loop = get_event_loop()
         yield loop
         loop.close()
-        cleanup_mock_web_api_server(self)
+        cleanup_mock_web_api_server_async(self)
 
     def next(self):
         pass
