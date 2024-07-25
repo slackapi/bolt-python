@@ -2,7 +2,6 @@
 title: 認可（Authorization）
 lang: ja-jp
 slug: /concepts/authorization
-order: 5
 ---
 
 

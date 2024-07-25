@@ -2,7 +2,6 @@
 title: ロギング
 lang: ja-jp
 slug: /concepts/logging
-order: 4
 ---
 
 

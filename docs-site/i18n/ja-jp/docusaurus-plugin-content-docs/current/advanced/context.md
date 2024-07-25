@@ -2,7 +2,6 @@
 title: コンテキストの追加
 lang: ja-jp
 slug: /concepts/context
-order: 9
 ---
 
 

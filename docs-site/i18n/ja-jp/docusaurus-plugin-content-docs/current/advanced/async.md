@@ -2,7 +2,6 @@
 title: Async（asyncio）の使用
 lang: ja-jp
 slug: /concepts/async
-order: 2
 ---
 
 
