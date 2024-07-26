@@ -1,4 +1,5 @@
 from slack_sdk import WebClient
+from slack_sdk.web import SlackResponse
 
 from slack_bolt.middleware import SingleTeamAuthorization
 from slack_bolt.middleware.authorization.internals import _build_user_facing_authorize_error_message
@@ -33,6 +34,29 @@ class TestSingleTeamAuthorization:
 
         assert resp.status == 200
         assert resp.body == ""
+
+    def test_success_pattern_with_bot_scopes(self):
+        client = WebClient(base_url=self.mock_api_server_base_url, token="xoxb-valid")
+        auth_test_result: SlackResponse = SlackResponse(
+            client=client,
+            http_verb="POST",
+            api_url="https://slack.com/api/auth.test",
+            req_args={},
+            data={},
+            headers={"x-oauth-scopes": "chat:write,commands"},
+            status_code=200,
+        )
+        authorization = SingleTeamAuthorization(auth_test_result=auth_test_result)
+        req = BoltRequest(body="payload={}", headers={})
+        req.context["client"] = client
+        resp = BoltResponse(status=404)
+
+        resp = authorization.process(req=req, resp=resp, next=next)
+
+        assert resp.status == 200
+        assert resp.body == ""
+        assert req.context.authorize_result.bot_scopes == ["chat:write", "commands"]
+        assert req.context.authorize_result.user_scopes is None
 
     def test_failure_pattern(self):
         authorization = SingleTeamAuthorization(auth_test_result={})

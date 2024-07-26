@@ -10,8 +10,9 @@ from slack_sdk.web.async_client import AsyncWebClient
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
+    assert_received_request_count_async,
+    cleanup_mock_web_api_server_async,
+    setup_mock_web_api_server_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
 
@@ -30,11 +31,11 @@ class TestAsyncLazy:
     def event_loop(self):
         old_os_env = remove_os_env_temporarily()
         try:
-            setup_mock_web_api_server(self)
+            setup_mock_web_api_server_async(self)
             loop = get_event_loop()
             yield loop
             loop.close()
-            cleanup_mock_web_api_server(self)
+            cleanup_mock_web_api_server_async(self)
         finally:
             restore_os_env(old_os_env)
 
@@ -113,8 +114,7 @@ class TestAsyncLazy:
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        await asyncio.sleep(1)  # wait a bit
-        assert self.mock_received_requests["/chat.postMessage"] == 2
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
     @pytest.mark.asyncio
     async def test_issue_545_context_copy_failure(self):
@@ -183,5 +183,4 @@ class TestAsyncLazy:
         request = self.build_valid_request()
         response = await app.async_dispatch(request)
         assert response.status == 200
-        await asyncio.sleep(1)  # wait a bit
-        assert self.mock_received_requests["/chat.postMessage"] == 2
+        await assert_received_request_count_async(self, "/chat.postMessage", 2)

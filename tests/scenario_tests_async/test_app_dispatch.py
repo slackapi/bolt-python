@@ -1,13 +1,11 @@
-import asyncio
-
 import pytest
 from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
+    cleanup_mock_web_api_server_async,
+    setup_mock_web_api_server_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
 
@@ -22,11 +20,11 @@ class TestAsyncAppDispatch:
     def event_loop(self):
         old_os_env = remove_os_env_temporarily()
         try:
-            setup_mock_web_api_server(self)
+            setup_mock_web_api_server_async(self)
             loop = get_event_loop()
             yield loop
             loop.close()
-            cleanup_mock_web_api_server(self)
+            cleanup_mock_web_api_server_async(self)
         finally:
             restore_os_env(old_os_env)
 

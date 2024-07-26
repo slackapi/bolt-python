@@ -1,5 +1,3 @@
-import asyncio
-
 import pytest
 from slack_sdk.web.async_client import AsyncWebClient
 
@@ -13,8 +11,8 @@ from slack_bolt.oauth.async_callback_options import (
 from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
-    cleanup_mock_web_api_server,
-    setup_mock_web_api_server,
+    cleanup_mock_web_api_server_async,
+    setup_mock_web_api_server_async,
 )
 
 
@@ -23,11 +21,11 @@ class TestAsyncOAuthFlowSQLite3:
 
     @pytest.fixture
     def event_loop(self):
-        setup_mock_web_api_server(self)
+        setup_mock_web_api_server_async(self)
         loop = get_event_loop()
         yield loop
         loop.close()
-        cleanup_mock_web_api_server(self)
+        cleanup_mock_web_api_server_async(self)
 
     def next(self):
         pass

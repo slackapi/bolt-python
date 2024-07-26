@@ -1,8 +1,18 @@
-# Bolt ![Bolt logo](docs/assets/bolt-logo.svg) for Python
+<h1 align="center">Bolt <img src="https://raw.githubusercontent.com/slackapi/bolt-python/main/docs/assets/bolt-logo.svg" alt="Bolt logo"/> for Python</h1>
 
-[![Python Version][python-version]][pypi-url]
-[![pypi package][pypi-image]][pypi-url]
-[![Codecov][codecov-image]][codecov-url]
+<p align="center">
+    <a href="https://pypi.org/project/slack-bolt/">
+        <img alt="PyPI - Version" src="https://img.shields.io/pypi/v/slack-bolt"></a>
+    <a href="https://codecov.io/gh/slackapi/bolt-python">
+        <img alt="Codecov" src="https://img.shields.io/codecov/c/gh/slackapi/bolt-python"></a>
+    <a href="https://pepy.tech/project/slack-bolt">
+        <img alt="Pepy Total Downloads" src="https://img.shields.io/pepy/dt/slack-bolt"></a>
+    <br>
+    <a href="https://pypi.org/project/slack-bolt/">
+        <img alt="Python Versions" src="https://img.shields.io/pypi/pyversions/slack-bolt.svg"></a>
+    <a href="https://slack.dev/bolt-python/">
+        <img alt="Documentation" src="https://img.shields.io/badge/dev-docs-yellow"></a>
+</p>
 
 A Python framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://slack.dev/bolt-python/tutorial/getting-started) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt. The Python module documents are available [here](https://slack.dev/bolt-python/api-docs/slack_bolt/).
 

@@ -14,9 +14,10 @@ from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.context.say.async_say import AsyncSay
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
+    assert_received_request_count_async,
+    cleanup_mock_web_api_server_async,
     assert_auth_test_count_async,
+    setup_mock_web_api_server_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
 
@@ -35,11 +36,11 @@ class TestAsyncEvents:
     def event_loop(self):
         old_os_env = remove_os_env_temporarily()
         try:
-            setup_mock_web_api_server(self)
+            setup_mock_web_api_server_async(self)
             loop = get_event_loop()
             yield loop
             loop.close()
-            cleanup_mock_web_api_server(self)
+            cleanup_mock_web_api_server_async(self)
         finally:
             restore_os_env(old_os_env)
 
@@ -77,8 +78,7 @@ class TestAsyncEvents:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
     @pytest.mark.asyncio
     async def test_process_before_response(self):
@@ -93,8 +93,7 @@ class TestAsyncEvents:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        # no sleep here
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
     @pytest.mark.asyncio
     async def test_middleware_skip(self):
@@ -125,8 +124,8 @@ class TestAsyncEvents:
         # Verifies all the tasks have been completed with 200 OK
         assert sum([t.result().status for t in tasks if t.done()]) == 200 * times
 
-        assert self.mock_received_requests["/auth.test"] == times
-        assert self.mock_received_requests["/chat.postMessage"] == times
+        await assert_received_request_count_async(self, "/auth.test", times, 5)
+        await assert_received_request_count_async(self, "/chat.postMessage", times, 5)
 
     def build_valid_reaction_added_request(self) -> AsyncBoltRequest:
         timestamp, body = str(int(time())), json.dumps(reaction_added_body)
@@ -144,8 +143,7 @@ class TestAsyncEvents:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
     @pytest.mark.asyncio
     async def test_stable_auto_ack(self):
@@ -224,9 +222,7 @@ class TestAsyncEvents:
         response = await app.async_dispatch(request)
         assert response.status == 200
 
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        # The listeners should be executed
-        assert self.mock_received_requests.get("/chat.postMessage") == 2
+        await assert_received_request_count_async(self, "/chat.postMessage", 2)
 
     @pytest.mark.asyncio
     async def test_joined_left_events(self):
@@ -292,9 +288,7 @@ class TestAsyncEvents:
         response = await app.async_dispatch(request)
         assert response.status == 200
 
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        # The listeners should be executed
-        assert self.mock_received_requests.get("/chat.postMessage") == 2
+        await assert_received_request_count_async(self, "/chat.postMessage", 2)
 
     @pytest.mark.asyncio
     async def test_uninstallation_and_revokes(self):
@@ -345,9 +339,8 @@ class TestAsyncEvents:
         assert response.status == 200
 
         # AsyncApp doesn't call auth.test when booting
-        assert self.mock_received_requests.get("/auth.test") is None
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 2
+        await assert_auth_test_count_async(self, 0)
+        await assert_received_request_count_async(self, "/chat.postMessage", 2)
 
     message_file_share_body = {
         "token": "verification-token",
@@ -582,8 +575,7 @@ class TestAsyncEvents:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
     @pytest.mark.asyncio
     async def test_additional_decorators_2(self):
@@ -599,8 +591,7 @@ class TestAsyncEvents:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
 
 def my_decorator(f):

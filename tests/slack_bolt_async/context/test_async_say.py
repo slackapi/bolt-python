@@ -1,5 +1,3 @@
-import asyncio
-
 import pytest
 from slack_sdk.web.async_client import AsyncWebClient
 from slack_sdk.web.async_slack_response import AsyncSlackResponse
@@ -7,15 +5,15 @@ from slack_sdk.web.async_slack_response import AsyncSlackResponse
 from tests.utils import get_event_loop
 from slack_bolt.context.say.async_say import AsyncSay
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
+    cleanup_mock_web_api_server_async,
+    setup_mock_web_api_server_async,
 )
 
 
 class TestAsyncSay:
     @pytest.fixture
     def event_loop(self):
-        setup_mock_web_api_server(self)
+        setup_mock_web_api_server_async(self)
         valid_token = "xoxb-valid"
         mock_api_server_base_url = "http://localhost:8888"
         self.web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url)
@@ -23,7 +21,7 @@ class TestAsyncSay:
         loop = get_event_loop()
         yield loop
         loop.close()
-        cleanup_mock_web_api_server(self)
+        cleanup_mock_web_api_server_async(self)
 
     @pytest.mark.asyncio
     async def test_say(self):

@@ -36,6 +36,6 @@ else
     pip install -U pip click && \
     black slack_bolt/ tests/ && \
     pytest && \
-    pip install -U pytype && \
+    pip install "pytype==2022.12.15" && \
     pytype slack_bolt/
 fi

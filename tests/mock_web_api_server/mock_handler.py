@@ -1,15 +1,9 @@
-import asyncio
 import json
 import logging
-from queue import Queue
-import threading
-import time
-import re
 from http import HTTPStatus
-from http.server import HTTPServer, SimpleHTTPRequestHandler
-from typing import Type, Optional
-from unittest import TestCase
-from urllib.parse import urlparse, parse_qs, ParseResult
+from http.server import SimpleHTTPRequestHandler
+from typing import Optional
+from urllib.parse import ParseResult, parse_qs, urlparse
 
 INVALID_AUTH = json.dumps(
     {
@@ -94,16 +88,12 @@ class MockHandler(SimpleHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
     default_request_version = "HTTP/1.1"
     logger = logging.getLogger(__name__)
-    received_requests = {}
 
     def is_valid_token(self):
         return "Authorization" in self.headers and str(self.headers["Authorization"]).startswith("Bearer xoxb-")
 
     def is_valid_user_token(self):
         return "Authorization" in self.headers and str(self.headers["Authorization"]).startswith("Bearer xoxp-")
-
-    def is_valid_function_bot_access_token(self):
-        return "Authorization" in self.headers and str(self.headers["Authorization"]).startswith("Bearer xwfp-")
 
     def set_common_headers(self, content_length: int = 0):
         self.send_header("content-type", "application/json;charset=utf-8")
@@ -113,8 +103,8 @@ class MockHandler(SimpleHTTPRequestHandler):
     def _handle(self):
         parsed_path: ParseResult = urlparse(self.path)
         path = parsed_path.path
-        self.server.queue.put(path)
-        self.received_requests[path] = self.received_requests.get(path, 0) + 1
+        # put_nowait is common between Queue & asyncio.Queue, it does not need to be awaited
+        self.server.queue.put_nowait(path)
         try:
             if path == "/webhook":
                 self.send_response(200)
@@ -153,13 +143,15 @@ class MockHandler(SimpleHTTPRequestHandler):
             if self.is_valid_user_token():
                 if path == "/auth.test":
                     self.send_response(200)
+                    self.send_header("x-oauth-scopes", "chat:write,search:read")
                     self.set_common_headers(len(USER_AUTH_TEST_RESPONSE))
                     self.wfile.write(USER_AUTH_TEST_RESPONSE.encode("utf-8"))
                     return
 
-            if self.is_valid_token() or self.is_valid_function_bot_access_token():
+            if self.is_valid_token():
                 if path == "/auth.test":
                     self.send_response(200)
+                    self.send_header("x-oauth-scopes", "chat:write,commands")
                     self.set_common_headers(len(BOT_AUTH_TEST_RESPONSE))
                     self.wfile.write(BOT_AUTH_TEST_RESPONSE.encode("utf-8"))
                     return
@@ -171,7 +163,7 @@ class MockHandler(SimpleHTTPRequestHandler):
                 self.logger.info(f"request: {path} {request_body}")
 
                 header = self.headers["authorization"]
-                pattern = re.split(r"xoxb-|xwfp-", header, 1)[1]
+                pattern = str(header).split("xoxb-", 1)[1]
                 if pattern.isnumeric():
                     self.send_response(int(pattern))
                     self.set_common_headers(len(OK_FALSE_RESPONSE))
@@ -210,95 +202,3 @@ class MockHandler(SimpleHTTPRequestHandler):
             if parsed_path and parsed_path.query:
                 request_body = {k: v[0] for k, v in parse_qs(parsed_path.query).items()}
         return request_body
-
-
-class MockServerThread(threading.Thread):
-    def __init__(self, queue: Queue, test: TestCase, handler: Type[SimpleHTTPRequestHandler] = MockHandler):
-        threading.Thread.__init__(self)
-        self.handler = handler
-        self.test = test
-        self.queue = queue
-
-    def run(self):
-        self.server = HTTPServer(("localhost", 8888), self.handler)
-        self.server.queue = self.queue
-        self.test.mock_received_requests = self.handler.received_requests
-        self.test.server_url = "http://localhost:8888"
-        self.test.host, self.test.port = self.server.socket.getsockname()
-        self.test.server_started.set()  # threading.Event()
-
-        self.test = None
-        try:
-            self.server.serve_forever(0.05)
-        finally:
-            self.server.server_close()
-
-    def stop(self):
-        self.handler.received_requests = {}
-        with self.server.queue.mutex:
-            del self.server.queue
-        self.server.shutdown()
-        self.join()
-
-
-class ReceivedRequests:
-    def __init__(self, queue: Queue):
-        self.queue = queue
-        self.received_requests = {}
-
-    def get(self, key: str, default: Optional[int] = None) -> Optional[int]:
-        while not self.queue.empty():
-            path = self.queue.get()
-            self.received_requests[path] = self.received_requests.get(path, 0) + 1
-        return self.received_requests.get(key, default)
-
-
-def setup_mock_web_api_server(test: TestCase):
-    test.server_started = threading.Event()
-    test.received_requests = ReceivedRequests(Queue())
-    test.thread = MockServerThread(test.received_requests.queue, test)
-    test.thread.start()
-    test.server_started.wait()
-
-
-def cleanup_mock_web_api_server(test: TestCase):
-    test.thread.stop()
-    test.thread = None
-
-
-def assert_received_request_count(test: TestCase, path: str, min_count: int, timeout: float = 1):
-    start_time = time.time()
-    error = None
-    while time.time() - start_time < timeout:
-        try:
-            assert test.received_requests.get(path, 0) == min_count
-            return
-        except Exception as e:
-            error = e
-            # waiting for some requests to be received
-            time.sleep(0.05)
-
-    if error is not None:
-        raise error
-
-
-def assert_auth_test_count(test: TestCase, expected_count: int):
-    assert_received_request_count(test, "/auth.test", expected_count, 0.5)
-
-
-async def assert_auth_test_count_async(test: TestCase, expected_count: int):
-    await asyncio.sleep(0.1)
-    retry_count = 0
-    error = None
-    while retry_count < 3:
-        try:
-            test.mock_received_requests.get("/auth.test", 0) == expected_count
-            break
-        except Exception as e:
-            error = e
-            retry_count += 1
-            # waiting for mock_received_requests updates
-            await asyncio.sleep(0.1)
-
-    if error is not None:
-        raise error

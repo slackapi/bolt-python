@@ -14,9 +14,9 @@ from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.error import BoltError
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
+    cleanup_mock_web_api_server_async,
     assert_auth_test_count_async,
+    setup_mock_web_api_server_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
 
@@ -53,11 +53,11 @@ class TestEventsTokenRevocations:
     def event_loop(self):
         old_os_env = remove_os_env_temporarily()
         try:
-            setup_mock_web_api_server(self)
+            setup_mock_web_api_server_async(self)
             loop = get_event_loop()
             yield loop
             loop.close()
-            cleanup_mock_web_api_server(self)
+            cleanup_mock_web_api_server_async(self)
         finally:
             restore_os_env(old_os_env)
 
@@ -120,7 +120,7 @@ class TestEventsTokenRevocations:
         assert response.status == 200
         # auth.test API call must be skipped
         await assert_auth_test_count_async(self, 0)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
+        await asyncio.sleep(0.1)  # wait a bit after auto ack()
         assert app.installation_store.delete_bot_called is True
         assert app.installation_store.delete_installation_called is True
         assert app.installation_store.delete_all_called is False
@@ -154,7 +154,7 @@ class TestEventsTokenRevocations:
         assert response.status == 200
         # auth.test API call must be skipped
         await assert_auth_test_count_async(self, 0)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
+        await asyncio.sleep(0.1)  # wait a bit after auto ack()
         assert app.installation_store.delete_bot_called is True
         assert app.installation_store.delete_installation_called is True
         assert app.installation_store.delete_all_called is True

@@ -12,9 +12,10 @@ from slack_bolt.authorization import AuthorizeResult
 from slack_bolt.context.say.async_say import AsyncSay
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
+    assert_received_request_count_async,
+    cleanup_mock_web_api_server_async,
     assert_auth_test_count_async,
+    setup_mock_web_api_server_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
 
@@ -42,11 +43,11 @@ class TestAsyncEventsSharedChannels:
     def event_loop(self):
         old_os_env = remove_os_env_temporarily()
         try:
-            setup_mock_web_api_server(self)
+            setup_mock_web_api_server_async(self)
             loop = get_event_loop()
             yield loop
             loop.close()
-            cleanup_mock_web_api_server(self)
+            cleanup_mock_web_api_server_async(self)
         finally:
             restore_os_env(old_os_env)
 
@@ -85,8 +86,7 @@ class TestAsyncEventsSharedChannels:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
     @pytest.mark.asyncio
     async def test_process_before_response(self):
@@ -103,7 +103,7 @@ class TestAsyncEventsSharedChannels:
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
         # no sleep here
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1, 0.01)
 
     @pytest.mark.asyncio
     async def test_middleware_skip(self):
@@ -139,8 +139,8 @@ class TestAsyncEventsSharedChannels:
         # Verifies all the tasks have been completed with 200 OK
         assert sum([t.result().status for t in tasks if t.done()]) == 200 * times
 
-        assert self.mock_received_requests["/auth.test"] == times
-        assert self.mock_received_requests["/chat.postMessage"] == times
+        await assert_auth_test_count_async(self, times)
+        await assert_received_request_count_async(self, "/chat.postMessage", times)
 
     def build_valid_reaction_added_request(self) -> AsyncBoltRequest:
         timestamp, body = str(int(time())), json.dumps(reaction_added_body)
@@ -159,8 +159,7 @@ class TestAsyncEventsSharedChannels:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 1
+        await assert_received_request_count_async(self, "/chat.postMessage", 1)
 
     @pytest.mark.asyncio
     async def test_stable_auto_ack(self):
@@ -220,9 +219,9 @@ class TestAsyncEventsSharedChannels:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_auth_test_count_async(self, 1)
-        await asyncio.sleep(1)  # wait a bit after auto ack()
+        await asyncio.sleep(0.1)  # wait a bit after auto ack()
         # The listener should not be executed
-        assert self.mock_received_requests.get("/chat.postMessage") is None
+        await assert_received_request_count_async(self, "/chat.postMessage", 0)
 
     @pytest.mark.asyncio
     async def test_self_joined_left_events(self):
@@ -305,9 +304,7 @@ class TestAsyncEventsSharedChannels:
         response = await app.async_dispatch(request)
         assert response.status == 200
 
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        # The listeners should be executed
-        assert self.mock_received_requests.get("/chat.postMessage") == 2
+        await assert_received_request_count_async(self, "/chat.postMessage", 2)
 
     @pytest.mark.asyncio
     async def test_joined_left_events(self):
@@ -390,9 +387,7 @@ class TestAsyncEventsSharedChannels:
         response = await app.async_dispatch(request)
         assert response.status == 200
 
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        # The listeners should be executed
-        assert self.mock_received_requests.get("/chat.postMessage") == 2
+        await assert_received_request_count_async(self, "/chat.postMessage", 2)
 
     @pytest.mark.asyncio
     async def test_uninstallation_and_revokes(self):
@@ -465,9 +460,8 @@ class TestAsyncEventsSharedChannels:
         assert response.status == 200
 
         # AsyncApp doesn't call auth.test when booting
-        assert self.mock_received_requests.get("/auth.test") is None
-        await asyncio.sleep(1)  # wait a bit after auto ack()
-        assert self.mock_received_requests["/chat.postMessage"] == 2
+        await assert_auth_test_count_async(self, 0)
+        await assert_received_request_count_async(self, "/chat.postMessage", 2)
 
 
 app_mention_body = {

@@ -1,5 +1,3 @@
-import asyncio
-
 import pytest
 from slack_sdk.web.async_client import AsyncWebClient
 
@@ -10,8 +8,8 @@ from slack_bolt.middleware.authorization.internals import _build_user_facing_aut
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
+    cleanup_mock_web_api_server_async,
+    setup_mock_web_api_server_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
 
@@ -27,11 +25,11 @@ class TestSingleTeamAuthorization:
     def event_loop(self):
         old_os_env = remove_os_env_temporarily()
         try:
-            setup_mock_web_api_server(self)
+            setup_mock_web_api_server_async(self)
             loop = get_event_loop()
             yield loop
             loop.close()
-            cleanup_mock_web_api_server(self)
+            cleanup_mock_web_api_server_async(self)
         finally:
             restore_os_env(old_os_env)
 
@@ -46,6 +44,21 @@ class TestSingleTeamAuthorization:
 
         assert resp.status == 200
         assert resp.body == ""
+
+    @pytest.mark.asyncio
+    async def test_success_pattern_with_bot_scopes(self):
+        client = AsyncWebClient(base_url=self.mock_api_server_base_url, token="xoxb-valid")
+        authorization = AsyncSingleTeamAuthorization()
+        req = AsyncBoltRequest(body="payload={}", headers={})
+        req.context["client"] = client
+        resp = BoltResponse(status=404)
+
+        resp = await authorization.async_process(req=req, resp=resp, next=next)
+
+        assert resp.status == 200
+        assert resp.body == ""
+        assert req.context.authorize_result.bot_scopes == ["chat:write", "commands"]
+        assert req.context.authorize_result.user_scopes is None
 
     @pytest.mark.asyncio
     async def test_failure_pattern(self):
