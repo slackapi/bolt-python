@@ -87,7 +87,7 @@ const sidebars = {
     {
       type: 'link',
       label: 'Reference',
-      href: '/api-docs/slack_bolt/',
+      href: 'pathname:///api-docs/slack_bolt/',
     },
     {type: 'html', value: '<hr>'},
     'Changelog',
