@@ -4,7 +4,6 @@ lang: ja-jp
 slug: /concepts/lazy-listeners
 ---
 
-
 Lazy リスナー関数は、FaaS 環境への Slack アプリのデプロイを容易にする機能です。この機能は Bolt for Python でのみ利用可能で、他の Bolt フレームワークでこの機能に対応することは予定していません。
 
 通常、アクション（action）、コマンド（command）、ショートカット（shortcut）、オプション（options）、およびモーダルからのデータ送信（view_submission）をハンドルするとき、 `ack()` を呼び出し、Slack からのリクエストを 3 秒以内に確認する必要があります。`ack()` を呼び出すと Slack に HTTP ステータスが 200 OK の応答が返されます。こうすることで、アプリがリクエストの応答を処理中であることを Slack に伝えられます。通常であれば、この確認処理を処理関数の最初のステップとして行うことを推奨しています。
@@ -37,9 +36,9 @@ app.command("/start-process")(
 )
 ```
 
-<details class="secondary-wrapper">
-<summary class="section-head" markdown="0">
-<h4 class="section-head">AWS Lambda を使用した例</h4>
+<details>
+<summary>
+AWS Lambda を使用した例
 </summary>
 
 

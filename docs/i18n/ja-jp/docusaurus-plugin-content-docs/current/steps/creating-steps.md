@@ -4,8 +4,6 @@ lang: ja-jp
 slug: /concepts/creating-steps
 ---
 
-
-
 ワークフローステップの作成には、Bolt が提供する `WorkflowStep` クラスを利用します。
 
 ステップの `callback_id` と設定オブジェクトを指定して、`WorkflowStep` の新しいインスタンスを作成します。
@@ -16,10 +14,8 @@ slug: /concepts/creating-steps
 
 また、デコレーターとして利用できる `WorkflowStepBuilder` クラスを使ってワークフローステップを定義することもできます。 詳細は、[こちらのドキュメント](https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder)のコード例などを参考にしてください。
 
+指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">共通</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">ステップ用</a>
 
-
-
-<span>指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">共通</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">ステップ用</a>）</span>
 ```python
 import os
 from slack_bolt import App

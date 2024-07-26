@@ -4,7 +4,6 @@ lang: en
 slug: /concepts/socket-mode
 ---
 
-
 With the introduction of [Socket Mode](https://api.slack.com/apis/connections/socket), Bolt for Python introduced support in version `1.2.0`. With Socket Mode, instead of creating a server with endpoints that Slack sends payloads too, the app will instead connect to Slack via a WebSocket connection and receive data from Slack over the socket connection. Make sure to enable Socket Mode in your app configuration settings. 
 
 To use the Socket Mode, add `SLACK_APP_TOKEN` as an environment variable. You can get your App Token in your app configuration settings under the **Basic Information** section. 
@@ -17,7 +16,6 @@ While we recommend using [the built-in Socket Mode adapter](https://github.com/s
 |[websocket_client](https://pypi.org/project/websocket_client/)|[slack_bolt.adapter.socket_mode.websocket_client](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter/socket_mode/websocket_client)|
 |[aiohttp](https://pypi.org/project/aiohttp/) (asyncio-based)|[slack_bolt.adapter.socket_mode.aiohttp](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter/socket_mode/aiohttp)|
 |[websockets](https://pypi.org/project/websockets/) (asyncio-based)|[slack_bolt.adapter.socket_mode.websockets](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter/socket_mode/websockets)|
-
 
 
 ```python
@@ -42,11 +40,9 @@ if __name__ == "__main__":
 Using Async (asyncio)
 </summary>
 
-
 To use the asyncio-based adapters such as aiohttp, your whole app needs to be compatible with asyncio's async/await programming model. `AsyncSocketModeHandler` is available for running `AsyncApp` and its async middleware and listeners. 
 
 To learn how to use `AsyncApp`, checkout the [using Async](/concepts/async) document and relevant [examples](https://github.com/slackapi/bolt-python/tree/main/examples).
-
 
 ```python
 from slack_bolt.app.async_app import AsyncApp
@@ -65,5 +61,4 @@ if __name__ == "__main__":
     import asyncio
     asyncio.run(main())
 ```
-
 </details>

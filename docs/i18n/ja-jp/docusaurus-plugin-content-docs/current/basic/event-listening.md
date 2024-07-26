@@ -4,14 +4,9 @@ lang: ja-jp
 slug: /concepts/event-listening
 ---
 
-
-
 `event()` メソッドを使うと、[Events API](https://api.slack.com/events) の任意のイベントをリッスンできます。リッスンするイベントは、アプリの設定であらかじめサブスクライブしておく必要があります。これを利用することで、アプリがインストールされたワークスペースで何らかのイベント（例：ユーザーがメッセージにリアクションをつけた、ユーザーがチャンネルに参加した）が発生したときに、アプリに何らかのアクションを実行させることができます。
 
 `event()` メソッドには `str` 型の `eventType` を指定する必要があります。
-
-
-
 
 <span>指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
@@ -24,18 +19,15 @@ def ask_for_introduction(event, say):
     say(text=text, channel=welcome_channel_id)
 ```
 
-
-<details class="secondary-wrapper" >
+<details>
   
-<summary class="section-head" markdown="0">
-  <h4 class="section-head">メッセージのサブタイプのフィルタリング</h4>
+<summary">
+メッセージのサブタイプのフィルタリング
 </summary>
-
 
 `message()` リスナーは `event("message")` と等価の機能を提供します。
 
 `subtype` という追加のキーを指定して、イベントのサブタイプでフィルタリングすることもできます。よく使われるサブタイプには、`bot_message` や `message_replied` があります。詳しくは[メッセージイベントページ](https://api.slack.com/events/message#message_subtypes)を参照してください。サブタイプなしのイベントだけにフィルターするために明に `None` を指定することもできます。
-
 
 
 ```python

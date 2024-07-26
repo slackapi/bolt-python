@@ -8,7 +8,7 @@ slug: /concepts/acknowledge
 
 アクション（action）、コマンド（command）、ショートカット（shortcut）、オプション（options）、およびモーダルからのデータ送信（view_submission）の各リクエストは、**必ず** `ack()` 関数を使って確認を行う必要があります。これによってリクエストが受信されたことが Slack に認識され、Slack のユーザーインターフェイスが適切に更新されます。
 
-リクエストの種類によっては、確認で通知方法が異なる場合があります。例えば、外部データソースを使用する選択メニューのオプションのリクエストに対する確認では、適切な[オプション](https://api.slack.com/reference/block-kit/composition-objects#option)のリストとともに `ack()` を呼び出します。モーダルからのデータ送信に対する確認では、 `response_action` を渡すことで[モーダルの更新](/concepts/update-pushing-views)などを行えます。
+リクエストの種類によっては、確認で通知方法が異なる場合があります。例えば、外部データソースを使用する選択メニューのオプションのリクエストに対する確認では、適切な[オプション](https://api.slack.com/reference/block-kit/composition-objects#option)のリストとともに `ack()` を呼び出します。モーダルからのデータ送信に対する確認では、 `response_action` を渡すことで[モーダルの更新](/concepts/view_submissions)などを行えます。
 
 確認までの猶予は 3 秒しかないため、新しいメッセージの送信やデータベースからの情報の取得といった時間のかかる処理は、`ack()` を呼び出した後で行うことをおすすめします。
 

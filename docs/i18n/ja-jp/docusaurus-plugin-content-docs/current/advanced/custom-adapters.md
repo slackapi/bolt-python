@@ -4,7 +4,6 @@ lang: ja-jp
 slug: /concepts/custom-adapters
 ---
 
-
 [アダプター](/concepts/adapters)はフレキシブルで、あなたが使用したいフレームワークに合わせた調整も可能です。アダプターでは、次の 2 つの要素が必須となっています。
 
 - `__init__(app:App)` : コンストラクター。Bolt の `App` のインスタンスを受け取り、保持します。

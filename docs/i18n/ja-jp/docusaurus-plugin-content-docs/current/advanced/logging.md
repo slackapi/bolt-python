@@ -4,11 +4,9 @@ lang: ja-jp
 slug: /concepts/logging
 ---
 
-
 デフォルトでは、アプリからのログ情報は、既定の出力先に出力されます。`logging` モジュールをインポートすれば、`basicConfig()` の `level` パラメーターでrootのログレベルを変更することができます。指定できるログレベルは、重要度の低い方から `debug`、`info`、`warning`、`error`、および `critical` です。 
 
 グローバルのコンテキストとは別に、指定のログレベルに応じて単一のメッセージをログ出力することもできます。Bolt では [Python 標準の logging モジュール](https://docs.python.org/3/library/logging.html)が使われているため、このモジュールが持つすべての機能を利用できます。
-
 
 ```python
 import logging

@@ -4,8 +4,6 @@ lang: ja-jp
 slug: /concepts/updating-pushing-views
 ---
 
-
-
 モーダル内では、複数のモーダルをスタックのように重ねることができます。<a href="https://api.slack.com/methods/views.open">`views_open`</a> という APIを呼び出すと、親となるとなるモーダルビューが追加されます。この最初の呼び出しの後、<a href="https://api.slack.com/methods/views.update">`views_update`</a> を呼び出すことでそのビューを更新することができます。また、<a href="https://api.slack.com/methods/views.push">`views_push`</a> を呼び出すと、親のモーダルの上にさらに新しいモーダルビューを重ねることもできます。
 
 **`views_update`**
@@ -18,10 +16,8 @@ slug: /concepts/updating-pushing-views
 
 モーダルの更新と多重表示に関する詳細は、<a href="https://api.slack.com/surfaces/modals/using#modifying">API ドキュメント</a>を参照してください。
 
+指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。
 
-
-
-<span>指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # モーダルに含まれる、`button_abc` という action_id のボタンの呼び出しをリッスン
 @app.action("button_abc")
@@ -54,5 +50,3 @@ def update_modal(ack, body, client):
         }
     )
 ```
-
-

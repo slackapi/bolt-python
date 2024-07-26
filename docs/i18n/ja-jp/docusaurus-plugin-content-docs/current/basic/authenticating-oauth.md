@@ -4,8 +4,6 @@ lang: ja-jp
 slug: /concepts/authenticating-oauth
 ---
 
-
-
 Slack アプリを複数のワークスペースにインストールできるようにするためには、OAuth フローを実装した上で、アクセストークンなどのインストールに関する情報をセキュアな方法で保存する必要があります。アプリを初期化する際に `client_id`、`client_secret`、`scopes`、`installation_store`、`state_store` を指定することで、OAuth のエンドポイントのルート情報や stateパラメーターの検証をBolt for Python にハンドリングさせることができます。カスタムのアダプターを実装する場合は、SDK が提供する組み込みの[OAuth ライブラリ](https://slack.dev/python-slack-sdk/oauth/)を利用するのが便利です。これは Slack が開発したモジュールで、Bolt for Python 内部でも利用しています。
 
 Bolt for Python によって `slack/oauth_redirect` という**リダイレクト URL** が生成されます。Slack はアプリのインストールフローを完了させたユーザーをこの URL にリダイレクトします。この**リダイレクト URL** は、アプリの設定の「**OAuth and Permissions**」であらかじめ追加しておく必要があります。この URL は、後ほど説明するように `OAuthSettings` というコンストラクタの引数で指定することもできます。
@@ -15,8 +13,6 @@ Bolt for Python は `slack/install` というルートも生成します。こ�
 バージョン 1.1.0 以降の Bolt for Python では、[OrG 全体へのインストール](https://api.slack.com/enterprise/apps)がデフォルトでサポートされています。OrG 全体へのインストールは、アプリの設定の「**Org Level Apps**」で有効化できます。
 
 Slack での OAuth を使ったインストールフローについて詳しくは、[API ドキュメントを参照してください](https://api.slack.com/authentication/oauth-v2)。
-
-
 
 ```python
 import os
@@ -39,11 +35,10 @@ app = App(
 )
 ```
 
-<details class="secondary-wrapper">
-<summary class="section-head" markdown="0">
-<h4 class="section-head">OAuth デフォルト設定をカスタマイズ</h4>
+<details>
+<summary>
+OAuth デフォルト設定をカスタマイズ
 </summary>
-
 
 `oauth_settings` を使って OAuth モジュールのデフォルト設定を上書きすることができます。このカスタマイズされた設定は App の初期化時に渡します。以下の情報を変更可能です:
 
@@ -52,8 +47,6 @@ app = App(
 - `callback_options` : OAuth フローの最後に表示するカスタムの成功ページと失敗ページの表示処理を提供するために使用
 - `state_store` : 組み込みの `FileOAuthStateStore` に代わる、カスタムの stateに関するデータストアを指定するために使用
 - `installation_store` : 組み込みの `FileInstallationStore` に代わる、カスタムのデータストアを指定するために使用
-
-
 
 ```python
 from slack_bolt.oauth.callback_options import CallbackOptions, SuccessArgs, FailureArgs

@@ -4,12 +4,9 @@ lang: ja-jp
 slug: /concepts/listener-middleware
 ---
 
-
 リスナーミドルウェアは、それを渡したリスナーでのみ実行されるミドルウェアです。リスナーには、`middleware` パラメーターを使ってミドルウェア関数をいくつでも渡すことができます。このパラメーターには、1 つまたは複数のミドルウェア関数からなるリストを指定します。
 
 非常にシンプルなリスナーミドルウェアの場合であれば、`next()` メソッドを呼び出す代わりに `bool` 値（処理を継続したい場合は `True`）を返すだけで済む「リスナーマッチャー」を使うとよいでしょう。
-
-
 
 <span>指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 
@@ -37,4 +34,3 @@ def no_bot_messages(message) -> bool:
 def log_message(logger, event):
     logger.info(f"(MSG) User: {event['user']}\nMessage: {event['text']}")
 ```
-

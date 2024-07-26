@@ -4,8 +4,6 @@ lang: ja-jp
 slug: /concepts/view_submissions
 ---
 
-
-
 <a href="https://api.slack.com/reference/block-kit/views">モーダルのペイロード</a>に `input` ブロックを含める場合、その入力値を受け取るために`view_submission` リクエストをリッスンする必要があります。`view_submission` リクエストのリッスンには、組み込みの`view()` メソッドを利用することができます。`view()` の引数には、`str` 型または `re.Pattern` 型の `callback_id` を指定します。
 
 `input` ブロックの値にアクセスするには `state` オブジェクトを参照します。`state` 内には `values` というオブジェクトがあり、`block_id` と一意の `action_id` に紐づける形で入力値を保持しています。
@@ -62,10 +60,8 @@ def handle_view_closed(ack, body, logger):
     logger.info(body)
 ```
 
+指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。
 
-
-
-<span>指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # view_submission リクエストを処理
 @app.view("view_1")
@@ -101,4 +97,3 @@ def handle_submission(ack, body, client, view, logger):
         logger.exception(f"Failed to post a message {e}")
 
 ```
-

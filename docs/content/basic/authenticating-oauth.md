@@ -4,8 +4,6 @@ lang: en
 slug: /concepts/authenticating-oauth
 ---
 
-
-
 Slack apps installed on multiple workspaces will need to implement OAuth, then store installation information (like access tokens) securely. By providing `client_id`, `client_secret`, `scopes`, `installation_store`, and `state_store` when initializing App, Bolt for Python will handle the work of setting up OAuth routes and verifying state. If you're implementing a custom adapter, you can make use of our [OAuth library](https://slack.dev/python-slack-sdk/oauth/), which is what Bolt for Python uses under the hood.
 
 Bolt for Python will create a **Redirect URL** `slack/oauth_redirect`, which Slack uses to redirect users after they complete your app's installation flow. You will need to add this **Redirect URL** in your app configuration settings under **OAuth and Permissions**. This path can be configured in the `OAuthSettings` argument described below.
@@ -15,8 +13,6 @@ Bolt for Python will also create a `slack/install` route, where you can find an 
 Bolt for Python automatically includes support for [org wide installations](https://api.slack.com/enterprise/apps) in version `1.1.0+`. Org wide installations can be enabled in your app configuration settings under **Org Level Apps**.
 
 To learn more about the OAuth installation flow with Slack, [read the API documentation](https://api.slack.com/authentication/oauth-v2).
-
-
 
 ```python
 import os
@@ -44,7 +40,6 @@ app = App(
 Customizing OAuth defaults
 </summary>
 
-
 You can override the default OAuth using `oauth_settings`, which can be passed in during the initialization of App. You can override the following:
 
 - `install_path`: Override default path for "Add to Slack" button
@@ -52,8 +47,6 @@ You can override the default OAuth using `oauth_settings`, which can be passed i
 - `callback_options`: Provide custom success and failure pages at the end of the OAuth flow
 - `state_store`: Provide a custom state store instead of using the built in `FileOAuthStateStore`
 - `installation_store`: Provide a custom installation store instead of the built-in `FileInstallationStore`
-
-
 
 ```python
 from slack_bolt.oauth.callback_options import CallbackOptions, SuccessArgs, FailureArgs

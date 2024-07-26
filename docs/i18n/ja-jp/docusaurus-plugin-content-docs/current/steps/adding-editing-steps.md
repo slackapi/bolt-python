@@ -4,8 +4,6 @@ lang: ja-jp
 slug: /concepts/adding-editing-steps
 ---
 
-
-
 作成したワークフローステップがワークフローに追加またはその設定を変更されるタイミングで、[`workflow_step_edit` イベントがアプリに送信されます](https://api.slack.com/reference/workflows/workflow_step_edit)。このイベントがアプリに届くと、`WorkflowStep` で設定した `edit` コールバックが実行されます。
 
 ステップの追加と編集のどちらが行われるときも、[ワークフローステップの設定モーダル](https://api.slack.com/reference/workflows/configuration-view)をビルダーに送信する必要があります。このモーダルは、そのステップ独自の設定を選択するための場所です。通常のモーダルより制限が強く、例えば `title`、`submit`、`close` のプロパティを含めることができません。設定モーダルの `callback_id` は、デフォルトではワークフローステップと同じものになります。
@@ -14,10 +12,8 @@ slug: /concepts/adding-editing-steps
 
 設定モーダルの開き方に関する詳細は、[こちらのドキュメント](https://api.slack.com/workflows/steps#handle_config_view)を参照してください。
 
+指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">共通</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">ステップ用</a>
 
-
-
-<span>指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">共通</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">ステップ用</a>）</span>
 ```python
 def edit(ack, step, configure):
     ack()

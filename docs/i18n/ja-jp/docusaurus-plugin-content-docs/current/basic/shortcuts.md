@@ -4,8 +4,6 @@ lang: ja-jp
 slug: /concepts/shortcuts
 ---
 
-
-
 `shortcut()` メソッドは、[グローバルショートカット](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts)と[メッセージショートカット](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts)の 2 つをサポートしています。
 
 ショートカットは、いつでも呼び出せるアプリのエントリーポイントを提供するものです。グローバルショートカットは Slack のテキスト入力エリアや検索ウィンドウからアクセスできます。メッセージショートカットはメッセージのコンテキストメニューからアクセスできます。アプリは、ショートカットリクエストをリッスンするために `shortcut()` メソッドを使用します。このメソッドには `str` 型または `re.Pattern` 型の `callback_id` パラメーターを指定します。
@@ -17,9 +15,6 @@ slug: /concepts/shortcuts
 アプリの設定でショートカットを登録する際は、他の URL と同じように、リクエスト URL の末尾に `/slack/events` をつけます。
 
 ⚠️ グローバルショートカットのペイロードにはチャンネル ID が **含まれません**。アプリでチャンネル ID を取得する必要がある場合は、モーダル内に [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) エレメントを配置します。メッセージショートカットにはチャンネル ID が含まれます。
-
-
-
 
 <span>指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
@@ -58,18 +53,15 @@ def open_modal(ack, shortcut, client):
     )
 ```
 
-
-<details class="secondary-wrapper">
-<summary class="section-head" markdown="0">
-<h4 class="section-head">制約付きオブジェクトを使用したショートカットのリスニング</h4>
+<details>
+<summary>
+制約付きオブジェクトを使用したショートカットのリスニング<
 </summary>
 
 
 制約付きオブジェクトを使って `callback_id` や `type` によるリッスンできます。オブジェクト内の制約は `str` 型または `re.Pattern` オブジェクトを使用できます。
 
-
 ```python
-
 # このリスナーが呼び出されるのは、callback_id が 'open_modal' と一致し
 # かつ type が 'message_action' と一致するときのみ
 @app.shortcut({"callback_id": "open_modal", "type": "message_action"})
@@ -104,5 +96,4 @@ def open_modal(ack, shortcut, client):
         }
     )
 ```
-
 </details>

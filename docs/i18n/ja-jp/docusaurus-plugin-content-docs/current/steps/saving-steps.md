@@ -4,8 +4,6 @@ lang: ja-jp
 slug: /concepts/saving-steps
 ---
 
-
-
 設定モーダルを開いた後、アプリは `view_submission` イベントをリッスンします。このイベントがアプリに届くと、`WorkflowStep` で設定した `save` コールバックが実行されます。
 
 `save` コールバック内では、`update()` メソッドを使って、ワークフローに追加されたステップの設定を保存することができます。このメソッドには次の引数を指定します。
@@ -17,10 +15,8 @@ slug: /concepts/saving-steps
 
 これらのパラメータの構成方法に関する詳細は、[こちらのドキュメント](https://api.slack.com/reference/workflows/workflow_step)を参照してください。
 
+指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">共通</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">ステップ用</a>
 
-
-
-<span>指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">共通</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">ステップ用</a>）</span>
 ```python
 def save(ack, view, update):
     ack()

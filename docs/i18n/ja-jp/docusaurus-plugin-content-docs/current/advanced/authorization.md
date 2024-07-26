@@ -4,7 +4,6 @@ lang: ja-jp
 slug: /concepts/authorization
 ---
 
-
 認可（Authorization）は、Slack からの受信リクエストを処理するにあたって、どのようなSlack
 クレデンシャル (ボットトークンなど) を使用可能にするかを決定するプロセスです。
 
@@ -14,12 +13,10 @@ slug: /concepts/authorization
 
 `AuthorizeResult` には、いくつか特定のプロパティを指定する必要があり、いずれも `str` 型です。
 
-
 - **`bot_token`**（xoxb）*または* **`user_token`**（xoxp）: どちらか一方が**必須**です。ほとんどのアプリでは、デフォルトの `bot_token` を使用すればよいでしょう。トークンを渡すことで、`say()` などの組み込みの関数を機能させることができます。
 - **`bot_user_id`** および **`bot_id`** : `bot_token` を使用する場合に指定します。
 - **`enterprise_id`** および **`team_id`** : アプリに届いたリクエストから見つけることができます。
 - **`user_id`** : `user_token` を使用する場合に必須です。
-
 
 ```python
 import os

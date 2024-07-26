@@ -4,12 +4,9 @@ lang: en
 slug: /concepts/app-home
 ---
 
-
 <a href="https://api.slack.com/surfaces/tabs/using">Home tabs</a> are customizable surfaces accessible via the sidebar and search that allow apps to display views on a per-user basis. After enabling App Home within your app configuration, home tabs can be published and updated by passing a `user_id` and <a href="https://api.slack.com/reference/block-kit/views">view payload</a> to the <a href="https://api.slack.com/methods/views.publish">`views.publish`</a> method.
 
 You can subscribe to the <a href="https://api.slack.com/events/app_home_opened">`app_home_opened`</a> event to listen for when users open your App Home.
-
-
 
 Refer to [the module document](https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 ```python

@@ -4,16 +4,11 @@ lang: ja-jp
 slug: /concepts/executing-steps
 ---
 
-
-
 エンドユーザーがワークフローステップを実行すると、アプリに [`workflow_step_execute` イベントが送信されます](https://api.slack.com/events/workflow_step_execute)。このイベントがアプリに届くと、`WorkflowStep` で設定した `execute` コールバックが実行されます。
 
 `save` コールバックで取り出した `inputs` を使って、サードパーティの API を呼び出す、情報をデータベースに保存する、ユーザーのホームタブを更新するといった処理を実行することができます。また、ワークフローの後続のステップで利用する出力値を `outputs` オブジェクトに設定します。
 
 `execute` コールバック内では、`complete()` を呼び出してステップの実行が成功したことを示すか、`fail()` を呼び出してステップの実行が失敗したことを示す必要があります。
-
-
-
 
 <span>指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">共通</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">ステップ用</a>）</span>
 ```python

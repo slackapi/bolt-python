@@ -1,14 +1,10 @@
 ---
 title: Bolt 入門ガイド
-order: 0
 slug: getting-started
 lang: ja-jp
-layout: tutorial
-redirect_from:
-  - /getting-started/ja-jp
 ---
-# Bolt 入門ガイド
 
+# Bolt 入門ガイド
 
 このガイドでは、Bolt for Python を使った Slack アプリの設定と起動する方法について説明します。ここで説明する手順は、新しい Slack アプリを作成し、ローカルの開発環境をセットアップし、Slack ワークスペースからのメッセージをリッスンして応答するアプリを開発するという流れになります。
 

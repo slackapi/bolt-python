@@ -4,8 +4,6 @@ lang: en
 slug: /concepts/shortcuts
 ---
 
-
-
 The `shortcut()` method supports both [global shortcuts](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts) and [message shortcuts](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts).
 
 Shortcuts are invokable entry points to apps. Global shortcuts are available from within search and text composer area in Slack. Message shortcuts are available in the context menus of messages. Your app can use the `shortcut()` method to listen to incoming shortcut requests. The method requires a `callback_id` parameter of type `str` or `re.Pattern`.
@@ -17,9 +15,6 @@ Shortcuts include a `trigger_id` which an app can use to [open a modal](/concept
 When setting up shortcuts within your app configuration, as with other URLs, you'll append `/slack/events` to your request URL.
 
 ⚠️ Note that global shortcuts do **not** include a channel ID. If your app needs access to a channel ID, you may use a [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) element within a modal. Message shortcuts do include a channel ID.
-
-
-
 
 Refer to [the module document](https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
@@ -58,16 +53,12 @@ def open_modal(ack, shortcut, client):
     )
 ```
 
-
 <details>
   <summary>
   Listening to shortcuts using a constraint object
   </summary>
-
-  
   You can use a constraints object to listen to `callback_id`s, and `type`s. Constraints in the object can be of type `str` or `re.Pattern`.
   
-
 ```python
 # Your listener will only be called when the callback_id matches 'open_modal' AND the type matches 'message_action'
 @app.shortcut({"callback_id": "open_modal", "type": "message_action"})
@@ -102,5 +93,4 @@ def open_modal(ack, shortcut, client):
         }
     )
 ```
-
 </details>

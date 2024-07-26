@@ -4,13 +4,9 @@ lang: ja-jp
 slug: /concepts/message-listening
 ---
 
-
-
 [あなたのアプリがアクセス権限を持つ](https://api.slack.com/messaging/retrieving#permissions)メッセージの投稿イベントをリッスンするには `message()` メソッドを利用します。このメソッドは `type` が `message` ではないイベントを処理対象から除外します。
 
 `message()` の引数には `str` 型または `re.Pattern` オブジェクトを指定できます。この条件のパターンに一致しないメッセージは除外されます。
-
-
 
 <span>指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
@@ -21,17 +17,12 @@ def say_hello(message, say):
     say(f"Hi there, <@{user}>!")
 ```
 
-
-<details class="secondary-wrapper">
-<summary markdown="0">
-<h4 class="secondary-header">正規表現パターンの利用</h4>
+<details>
+<summary>
+正規表現パターンの利用
 </summary>
 
-
-
 文字列の代わりに `re.compile()` メソッドを使用すれば、より細やかな条件指定ができます。
-
-
 
 ```python
 import re
@@ -42,5 +33,4 @@ def say_hello_regex(say, context):
     greeting = context['matches'][0]
     say(f"{greeting}, how are you?")
 ```
-
 </details>

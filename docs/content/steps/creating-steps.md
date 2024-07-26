@@ -24,9 +24,6 @@ After instantiating a `WorkflowStep`, you can pass it into `app.step()`. Behind 
 
 Alternatively, workflow steps can also be created using the `WorkflowStepBuilder` class alongside a decorator pattern. For more information, including an example of this approach, [refer to the documentation](https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder).
 
-
-
-
 Refer to the module documents (<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">common</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">step-specific</a>) to learn the available arguments.
 
 ```python
@@ -60,5 +57,3 @@ ws = WorkflowStep(
 # Pass Step to set up listeners
 app.step(ws)
 ```
-
-

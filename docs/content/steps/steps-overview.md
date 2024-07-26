@@ -14,7 +14,6 @@ Please [read the Slack API changelog entry](https://api.slack.com/changelog/2023
 
 :::
 
-
 Steps from Apps for legacy workflows are now deprecated. Use new [custom steps](https://api.slack.com/automation/functions/custom-bolt).
 
 Workflow Steps from apps allow your app to create and process custom workflow steps that users can add using [Workflow Builder](https://api.slack.com/workflows).
@@ -28,5 +27,3 @@ A workflow step is made up of three distinct user events:
 All three events must be handled for a workflow step to function.
 
 Read more about workflow steps from apps in the [API documentation](https://api.slack.com/workflows/steps).
-
-

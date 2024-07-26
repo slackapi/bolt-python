@@ -4,8 +4,6 @@ lang: en
 slug: /concepts/updating-pushing-views
 ---
 
-
-
 Modals contain a stack of views. When you call <a href="https://api.slack.com/methods/views.open">`views_open`</a>, you add the root view to the modal. After the initial call, you can dynamically update a view by calling <a href="https://api.slack.com/methods/views.update">`views_update`</a>, or stack a new view on top of the root view by calling <a href="https://api.slack.com/methods/views.push">`views_push`</a>.
 
 **`views_update`**
@@ -17,9 +15,6 @@ To update a view, you can use the built-in client to call `views_update` with th
 To push a new view onto the view stack, you can use the built-in client to call `views_push` with a valid `trigger_id` a new <a href="https://api.slack.com/reference/block-kit/views">view payload</a>. The arguments for `views_push` is the same as <a href="#creating-modals">opening modals</a>. After you open a modal, you may only push two additional views onto the view stack.
 
 Learn more about updating and pushing views in our <a href="https://api.slack.com/surfaces/modals/using#modifying">API documentation</a>.
-
-
-
 
 Refer to [the module document](https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 ```python

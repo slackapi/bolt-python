@@ -4,7 +4,6 @@ lang: ja-jp
 slug: /concepts/async
 ---
 
-
 非同期バージョンの Bolt を使用する場合は、`App` の代わりに `AsyncApp` インスタンスをインポートして初期化します。`AsyncApp` では <a href="https://docs.aiohttp.org/">AIOHTTP</a> を使って API リクエストを行うため、`aiohttp` をインストールする必要があります（`requirements.txt` に追記するか、`pip install aiohttp` を実行します）。
 
 非同期バージョンのプロジェクトのサンプルは、リポジトリの <a href="https://github.com/slackapi/bolt-python/tree/main/examples">`examples` フォルダ</a>にあります。
@@ -28,11 +27,10 @@ if __name__ == "__main__":
     app.start(3000)
 ```
 
-<details class="secondary-wrapper">
-<summary class="section-head" markdown="0">
-<h4 class="section-head">他のフレームワークを使用する</h4>
+<details>
+<summary>
+>他のフレームワークを使用する
 </summary>
-
 
 
 `AsyncApp#start()` では内部的に [`AIOHTTP`](https://docs.aiohttp.org/) のWebサーバーが実装されています。必要に応じて、受信リクエストの処理に `AIOHTTP` 以外のフレームワークを使用することができます。
