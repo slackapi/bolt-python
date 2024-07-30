@@ -24,7 +24,6 @@ const sidebars = {
       defaultStyle: true, // Use the default menu item styling
     },
     'getting-started',
-    {type: 'html', value: '<hr>'},
     {
       type: 'category',
       label: 'Basic concepts',
@@ -68,7 +67,7 @@ const sidebars = {
       type: 'category',
       label: 'Workflow steps (Deprecated)',
       items: [
-        'steps/steps-overview',
+        'steps/steps',
         'steps/executing-steps',
         'steps/creating-steps',
         'steps/adding-editing-steps',
@@ -87,7 +86,7 @@ const sidebars = {
     {
       type: 'link',
       label: 'Reference',
-      href: 'pathname:///api-docs/slack_bolt/',
+      href: '/api-docs/slack_bolt/',
     },
     {type: 'html', value: '<hr>'},
     'Changelog',

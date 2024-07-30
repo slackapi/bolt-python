@@ -4,6 +4,8 @@ if (ExecutionEnvironment.canUseDOM) {
 (function() {
   // List of specific URLs to handle
   const urlsToHandle = [
+        '/bolt-python/concepts#basic',
+        '/bolt-python/concepts#advanced',
         '/bolt-python/concepts#message-listening',
         '/bolt-python/concepts#message-sending',
         '/bolt-python/concepts#event-listening',

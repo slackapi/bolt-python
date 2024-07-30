@@ -1,7 +1,7 @@
 ---
 title: Overview of Workflow Steps for apps
 lang: en
-slug: /concepts/steps-overview
+slug: /concepts/steps
 ---
 
 :::danger
