@@ -6,5 +6,5 @@ cd ${script_dir}/..
 
 pip install -U pdoc3
 rm -rf docs/api-docs
-pdoc slack_bolt --html -o docs/api-docs
+pdoc slack_bolt --html -o docs/static/api-docs
 open docs/api-docs/slack_bolt/index.html
