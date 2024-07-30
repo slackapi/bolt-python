@@ -111,7 +111,7 @@ If you want to test the package locally you can.
 
 ### Releasing
 
-#### Generate API documents
+#### Generate API reference documents
 
 ```bash
 ./scripts/generate_api_docs.sh
@@ -229,6 +229,10 @@ with labels. An issue should have **one** of the following labels applied: `bug`
 
 Issues are closed when a resolution has been reached. If for any reason a closed issue seems relevant once again,
 reopening is great and better than creating a duplicate issue.
+
+## Managing Documentation
+
+See the [`/docs/README.md`](./docs/README.md) file for documentation instructions. 
 
 ## Everything else
 

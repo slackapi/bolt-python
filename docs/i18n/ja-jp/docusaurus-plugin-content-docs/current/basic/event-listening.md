@@ -21,7 +21,7 @@ def ask_for_introduction(event, say):
 
 <details>
   
-<summary">
+<summary>
 メッセージのサブタイプのフィルタリング
 </summary>
 

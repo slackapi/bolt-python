@@ -40,7 +40,7 @@ const config = {
           breadcrumbs: false,
           routeBasePath: '/', // Serve the docs at the site's root
           sidebarPath: './sidebars.js',
-          editUrl: 'https://github.com/slackapi/slackapi.github.io',
+          editUrl: 'https://github.com/slackapi/bolt-python/tree/main/docs',
         },
         blog: false,
         theme: {
@@ -59,10 +59,11 @@ const config = {
 
     ['@docusaurus/plugin-client-redirects',
       {
+        fromExtensions: ['html', 'htm'], // /myPage.html -> /myPage
         redirects: [
           {
             to: '/getting-started',
-            from: ['/tutorial/getting-started'],
+            from: ['/tutorial/getting-started','/'],
           },
         ],
       },

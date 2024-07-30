@@ -55,7 +55,9 @@ def open_modal(ack, shortcut, client):
 
 <details>
 <summary>
-制約付きオブジェクトを使用したショートカットのリスニング<
+
+制約付きオブジェクトを使用したショートカットのリスニング
+
 </summary>
 
 
