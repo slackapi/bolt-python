@@ -20,14 +20,18 @@ website/
 ├── static/
 │   ├── css/
 │   │   └── custom.css (the css for everything!)
-│   └── img/ (the pictures for the site)
-│       ├── rory.png 
-│       └── oslo.svg 
+│   ├── img/ (the pictures for the site)
+│   │   ├── rory.png 
+│   │   └── oslo.svg 
+│   └── api-docs/slack_bolt (the generated reference docs with their own HTML/CSS)
+│       ├── index.html 
+│       └── adaptor 
+│           └── index.html 
 ├── src/
 │   ├── pages/ (stuff that isn't docs. This is empty for every repo but homepage)
 │   └── theme (only contains the 404 page)
 ├── docusaurus.config.js (main config file. also where to set navbar/footer)
-└── redirects.js (a redirects script because the old site used # as pages which docusaurus can't handle)
+├── redirects.js (a redirects script because the old site used # as pages which docusaurus can't handle)
 └── sidebar.js (manually set where the docs are in the sidebar.)
 ```
 
@@ -80,9 +84,9 @@ npm run start
 open http://localhost:3000/bolt-python/getting-started  # Visit a landing page
 ```
 
-Edits to pages are reflected live — no restarting the server or reloading the page. (I'd say... 95% of the time, and 100% time if you're just editing a markdown file)
+Edits to pages are reflected live — no restarting the server or reloading the page. (I'd say... 95% of the time, and 100% time if you're just editing a markdown file). The generated reference docs only load in prod!
 
-Remember — you're only viewing the Bolt for Python docs right now. The links to the other docs won't show you the new version until deployment
+Remember — you're only viewing the Bolt for Python docs right now.
 
 #### Running locally in Japanese
 
