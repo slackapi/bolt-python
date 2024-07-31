@@ -16,7 +16,7 @@
     "description": "The label for category Workflow steps (Deprecated) in sidebar sidebarBoltPy"
   },
   "sidebar.sidebarBoltPy.category.Tutorials": {
-    "message": "Tutorials",
+    "message": "チュートリアル",
     "description": "The label for category Tutorials in sidebar sidebarBoltPy"
   },
   "sidebar.sidebarBoltPy.link.Code on GitHub": {
