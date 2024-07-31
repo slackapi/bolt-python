@@ -232,7 +232,7 @@ reopening is great and better than creating a duplicate issue.
 
 ## Managing Documentation
 
-See the [`/docs/README.md`](./docs/README.md) file for documentation instructions. 
+See the [`/docs/README.md`](../docs/README.md) file for documentation instructions. 
 
 ## Everything else
 
