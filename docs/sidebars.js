@@ -90,7 +90,11 @@ const sidebars = {
       href: '/api-docs/slack_bolt/',
     },
     {type: 'html', value: '<hr>'},
-    'Changelog',
+    {
+      type: 'link',
+      label: 'Release notes',
+      href: 'https://github.com/slackapi/bolt-python/releases',
+    },
     {
       type: 'link',
       label: 'Code on GitHub',
