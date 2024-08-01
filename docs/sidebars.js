@@ -19,9 +19,10 @@ const sidebars = {
   // But you can create a sidebar manually
   sidebarBoltPy: [
     {
-      type: 'html',
-      value: '<h3>Bolt for Python</h3>', // The HTML to be rendered
-      defaultStyle: true, // Use the default menu item styling
+      type: 'doc',
+      id: 'index',
+      label: 'Bolt for Python',
+      className: 'sidebar-title',
     },
     'getting-started',
     {

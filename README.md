@@ -1,4 +1,4 @@
-<h1 align="center">Bolt <img src="https://raw.githubusercontent.com/slackapi/bolt-python/main/docs/assets/bolt-logo.svg" alt="Bolt logo"/> for Python</h1>
+<h1 align="center">Bolt <img src="https://raw.githubusercontent.com/slackapi/bolt-python/main/docs/static/img/bolt-logo.svg" alt="Bolt logo" width="32"/> for Python</h1>
 
 <p align="center">
     <a href="https://pypi.org/project/slack-bolt/">
@@ -14,7 +14,7 @@
         <img alt="Documentation" src="https://img.shields.io/badge/dev-docs-yellow"></a>
 </p>
 
-A Python framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://slack.dev/bolt-python/tutorial/getting-started) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt. The Python module documents are available [here](https://slack.dev/bolt-python/api-docs/slack_bolt/).
+A Python framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://slack.dev/bolt-python/getting-started) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt. The Python module documents are available [here](https://slack.dev/bolt-python/api-docs/slack_bolt/).
 
 ## Setup
 
@@ -137,10 +137,10 @@ Most of the app's functionality will be inside listener functions (the `fn` para
 | `body` | Dictionary that contains the entire body of the request (superset of `payload`). Some accessory data is only available outside of the payload (such as `trigger_id` and `authorizations`).
 | `payload` | Contents of the incoming event. The payload structure depends on the listener. For example, for an Events API event, `payload` will be the [event type structure](https://api.slack.com/events-api#event_type_structure). For a block action, it will be the action from within the `actions` list. The `payload` dictionary is also accessible via the alias corresponding to the listener (`message`, `event`, `action`, `shortcut`, `view`, `command`, or `options`). For example, if you were building a `message()` listener, you could use the `payload` and `message` arguments interchangably. **An easy way to understand what's in a payload is to log it**. |
 | `context` | Event context. This dictionary contains data about the event and app, such as the `botId`. Middleware can add additional context before the event is passed to listeners.
-| `ack` | Function that **must** be called to acknowledge that your app received the incoming event. `ack` exists for all actions, shortcuts, view submissions, slash command and options requests. `ack` returns a promise that resolves when complete. Read more in [Acknowledging events](https://slack.dev/bolt-python/concepts#acknowledge).
+| `ack` | Function that **must** be called to acknowledge that your app received the incoming event. `ack` exists for all actions, shortcuts, view submissions, slash command and options requests. `ack` returns a promise that resolves when complete. Read more in [Acknowledging events](https://slack.dev/bolt-python/concepts/acknowledge).
 | `respond` | Utility function that responds to incoming events **if** it contains a `response_url` (shortcuts, actions, and slash commands).
 | `say` | Utility function to send a message to the channel associated with the incoming event. This argument is only available when the listener is triggered for events that contain a `channel_id` (the most common being `message` events). `say` accepts simple strings (for plain-text messages) and dictionaries (for messages containing blocks).
-| `client` | Web API client that uses the token associated with the event. For single-workspace installations, the token is provided to the constructor. For multi-workspace installations, the token is returned by using [the OAuth library](https://slack.dev/bolt-python/concepts#authenticating-oauth), or manually using the `authorize` function.
+| `client` | Web API client that uses the token associated with the event. For single-workspace installations, the token is provided to the constructor. For multi-workspace installations, the token is returned by using [the OAuth library](https://slack.dev/bolt-python/concepts/authenticating-oauth), or manually using the `authorize` function.
 | `logger` | The built-in [`logging.Logger`](https://docs.python.org/3/library/logging.html) instance you can use in middleware/listeners.
 
 ## Creating an async app

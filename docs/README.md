@@ -28,16 +28,15 @@ website/
 │       └── adaptor 
 │           └── index.html 
 ├── src/
-│   ├── pages/ (stuff that isn't docs. This is empty for every repo but homepage)
-│   └── theme (only contains the 404 page)
+│   ├── pages/ (stuff that isn't docs. This is empty for this repo!)
+│   └── theme/ (only contains the 404 page)
 ├── docusaurus.config.js (main config file. also where to set navbar/footer)
-├── redirects.js (a redirects script because the old site used # as pages which docusaurus can't handle)
 └── sidebar.js (manually set where the docs are in the sidebar.)
 ```
 
 A cheat-sheet:
 * _I want to edit a doc._ `docs/*/*.md`
-* _I want to edit a Japanese doc._ `i18n/ja-jp/docusaurus-plugin-content-docs/current/*/*.md`
+* _I want to edit a Japanese doc._ `i18n/ja-jp/docusaurus-plugin-content-docs/current/*/*.md`. See the [Japanese docs README](./docs/README.md)
 * _I want to change the docs sidebar._ `sidebar.js`
 * _I want to change the css._ Don't use this repo, use the home repo and the changes will propagate here.
 * _I want to change anything else._ `docusaurus.config.js`
