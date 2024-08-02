@@ -80,7 +80,6 @@ The following command starts a local development server and opens up a browser w
 
 ```
 npm run start
-open http://localhost:3000/bolt-python/getting-started  # Visit a landing page
 ```
 
 Edits to pages are reflected live — no restarting the server or reloading the page. (I'd say... 95% of the time, and 100% time if you're just editing a markdown file). The generated reference docs only load in prod!

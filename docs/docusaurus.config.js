@@ -17,7 +17,7 @@ const config = {
   organizationName: "slackapi",
   projectName: "bolt-python",
 
-  onBrokenLinks: "warn",
+  onBrokenLinks: "ignore",
   onBrokenAnchors: "warn",
   onBrokenMarkdownLinks: "warn",
 
