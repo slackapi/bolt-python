@@ -1,5 +1,3 @@
-<!-- <img src="./img/bolt-py-logo.svg" alt="logo" width="128"/> -->
-
 # Bolt for Python
 
 Bolt for Python is a Python framework to build Slack apps with the latest Slack platform features. Read the [Getting Started Guide](/getting-started) to set up and run your first Bolt app.
