@@ -5,6 +5,8 @@ from slack_sdk import WebClient
 
 from slack_bolt.context.ack import Ack
 from slack_bolt.context.base_context import BaseContext
+from slack_bolt.context.complete import Complete
+from slack_bolt.context.fail import Fail
 from slack_bolt.context.respond import Respond
 from slack_bolt.context.say import Say
 from slack_bolt.util.utils import create_copy
@@ -124,3 +126,51 @@ class BoltContext(BaseContext):
                 ssl=self.client.ssl,
             )
         return self["respond"]
+
+    @property
+    def complete(self) -> Complete:
+        """`complete()` function for this request. Once a custom function's state is set to complete,
+        any outputs the function returns will be passed along to the next step of its housing workflow,
+        or complete the workflow if the function is the last step in a workflow. Additionally,
+        any interactivity handlers associated to a function invocation will no longer be invocable.
+
+            @app.function("reverse")
+            def handle_button_clicks(ack, complete):
+                ack()
+                complete(outputs={"stringReverse":"olleh"})
+
+            @app.function("reverse")
+            def handle_button_clicks(context):
+                context.ack()
+                context.complete(outputs={"stringReverse":"olleh"})
+
+        Returns:
+            Callable `complete()` function
+        """
+        if "complete" not in self:
+            self["complete"] = Complete(client=self.client, function_execution_id=self.function_execution_id)
+        return self["complete"]
+
+    @property
+    def fail(self) -> Fail:
+        """`fail()` function for this request. Once a custom function's state is set to error,
+        its housing workflow will be interrupted and any provided error message will be passed
+        on to the end user through SlackBot. Additionally, any interactivity handlers associated
+        to a function invocation will no longer be invocable.
+
+            @app.function("reverse")
+            def handle_button_clicks(ack, fail):
+                ack()
+                fail(error="something went wrong")
+
+            @app.function("reverse")
+            def handle_button_clicks(context):
+                context.ack()
+                context.fail(error="something went wrong")
+
+        Returns:
+            Callable `fail()` function
+        """
+        if "fail" not in self:
+            self["fail"] = Fail(client=self.client, function_execution_id=self.function_execution_id)
+        return self["fail"]

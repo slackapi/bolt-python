@@ -4,6 +4,8 @@ from typing import Callable, Awaitable, Dict, Any, Optional
 
 from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.context.async_context import AsyncBoltContext
+from slack_bolt.context.complete.async_complete import AsyncComplete
+from slack_bolt.context.fail.async_fail import AsyncFail
 from slack_bolt.context.respond.async_respond import AsyncRespond
 from slack_bolt.context.say.async_say import AsyncSay
 from slack_bolt.request.async_request import AsyncBoltRequest
@@ -81,6 +83,10 @@ class AsyncArgs:
     """`say()` utility function, which calls chat.postMessage API with the associated channel ID"""
     respond: AsyncRespond
     """`respond()` utility function, which utilizes the associated `response_url`"""
+    complete: AsyncComplete
+    """`complete()` utility function, signals a successful completion of the custom function"""
+    fail: AsyncFail
+    """`fail()` utility function, signal that the custom function failed to complete"""
     # middleware
     next: Callable[[], Awaitable[None]]
     """`next()` utility function, which tells the middleware chain that it can continue with the next one"""
@@ -107,6 +113,8 @@ class AsyncArgs:
         ack: AsyncAck,
         say: AsyncSay,
         respond: AsyncRespond,
+        complete: AsyncComplete,
+        fail: AsyncFail,
         next: Callable[[], Awaitable[None]],
         **kwargs  # noqa
     ):
@@ -129,5 +137,7 @@ class AsyncArgs:
         self.ack: AsyncAck = ack
         self.say: AsyncSay = say
         self.respond: AsyncRespond = respond
+        self.complete: AsyncComplete = complete
+        self.fail: AsyncFail = fail
         self.next: Callable[[], Awaitable[None]] = next
         self.next_: Callable[[], Awaitable[None]] = next
