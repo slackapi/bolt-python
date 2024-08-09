@@ -317,6 +317,6 @@ if __name__ == "__main__":
 ここまでで基本的なアプリをセットアップして実行することはできたので、次は自分だけの Bolt アプリを作る方法を調べてみましょう。参考になりそうな記事をいくつかご紹介します。
 
 * 基本的な概念について読む。Bolt アプリがアクセスできるさまざまメソッドや機能について知ることができます。
-* [`events()` メソッド](/concepts/event-listening)でボットがリッスンできるイベントをほかにも試してみる。すべてのイベントの一覧は [API サイト](https://api.slack.com/events)で確認できます。
+* [`app.event()` メソッド](/concepts/event-listening)でボットがリッスンできるイベントをほかにも試してみる。すべてのイベントの一覧は [API サイト](https://api.slack.com/events)で確認できます。
 * Bolt では、アプリにアタッチされたクライアントから [Web API メソッドを呼び出す](/concepts/web-api)ことができます。API サイトに [220 以上のメソッド](https://api.slack.com/methods)を一覧しています。
 * [API サイト](https://api.slack.com/docs/token-types)でほかのタイプのトークンを確認する。アプリで実行したいアクションによって、異なるトークンが必要になる場合があります。HTTPの代わりにソケットモードを利用したい場合には、`connections:write` のスコープを追加した、追加のトークン (`xapp`) が必要です。
