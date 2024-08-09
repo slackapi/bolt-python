@@ -315,7 +315,7 @@ Now that you have a basic app up and running, you can start exploring how to mak
 
 * Read through the _Basic concepts_ to learn about the different methods and features your Bolt app has access to.
 
-* Explore the different events your bot can listen to with the [`events()` method](/concepts/event-listening). All of the events are listed [on the API site](https://api.slack.com/events).
+* Explore the different events your bot can listen to with the [`app.event()` method](/concepts/event-listening). All of the events are listed [on the API site](https://api.slack.com/events).
 
 * Bolt allows you to [call Web API methods](/concepts/web-api) with the client attached to your app. There are [over 220 methods](https://api.slack.com/methods) on our API site.
 
