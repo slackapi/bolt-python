@@ -2,7 +2,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 
 
 class AsyncComplete:
-    """`complete()` utility to tell Slack the completion of a workflow step execution.
+    """`complete()` utility to tell Slack the completion of a step from app execution.
 
         async def execute(step, complete, fail):
             inputs = step["inputs"]

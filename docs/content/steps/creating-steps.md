@@ -1,28 +1,28 @@
 ---
-title: Creating workflow steps
+title: Creating steps from apps
 lang: en
 slug: /concepts/creating-steps
 ---
 
 :::danger
 
-Workflow Steps from Apps are a deprecated feature.
+Steps from apps are a deprecated feature.
 
-Workflow Steps from Apps are different than, and not interchangable with, Slack automation workflows. We encourage those who are currently publishing Workflow Steps from Apps to consider the new [Slack automation features](https://api.slack.com/automation), such as custom functions for Bolt.
+Steps from apps are different than, and not interchangeable with, Slack automation workflows. We encourage those who are currently publishing steps from apps to consider the new [Slack automation features](https://api.slack.com/automation), such as custom steps for Bolt.
 
 Please [read the Slack API changelog entry](https://api.slack.com/changelog/2023-08-workflow-steps-from-apps-step-back) for more information.
 
 :::
 
-To create a workflow step, Bolt provides the `WorkflowStep` class.
+To create a step from app, Bolt provides the `WorkflowStep` class.
 
 When instantiating a new `WorkflowStep`, pass in the step's `callback_id` and a configuration object.
 
-The configuration object contains three keys: `edit`, `save`, and `execute`. Each of these keys must be a single callback or a list of callbacks. All callbacks have access to a `step` object that contains information about the workflow step event.
+The configuration object contains three keys: `edit`, `save`, and `execute`. Each of these keys must be a single callback or a list of callbacks. All callbacks have access to a `step` object that contains information about the step from app event.
 
-After instantiating a `WorkflowStep`, you can pass it into `app.step()`. Behind the scenes, your app will listen and respond to the workflow step’s events using the callbacks provided in the configuration object.
+After instantiating a `WorkflowStep`, you can pass it into `app.step()`. Behind the scenes, your app will listen and respond to the step’s events using the callbacks provided in the configuration object.
 
-Alternatively, workflow steps can also be created using the `WorkflowStepBuilder` class alongside a decorator pattern. For more information, including an example of this approach, [refer to the documentation](https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder).
+Alternatively, steps from apps can also be created using the `WorkflowStepBuilder` class alongside a decorator pattern. For more information, including an example of this approach, [refer to the documentation](https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder).
 
 Refer to the module documents (<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">common</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">step-specific</a>) to learn the available arguments.
 
