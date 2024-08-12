@@ -43,6 +43,7 @@ const sidebars = {
         'basic/view_submissions',
         'basic/app-home',
         'basic/options',
+        'basic/custom-steps',
         'basic/authenticating-oauth',
         'basic/socket-mode'
       ],
@@ -62,7 +63,7 @@ const sidebars = {
         'advanced/global-middleware',
         'advanced/context',
         'advanced/lazy-listeners',
-        ],
+      ],
     },
     {
       type: 'category',
@@ -75,7 +76,7 @@ const sidebars = {
         'steps/saving-steps',
       ],
     },
-    {type: 'html', value: '<hr>'},
+    { type: 'html', value: '<hr>' },
     {
       type: 'category',
       label: 'Tutorials',
@@ -83,13 +84,13 @@ const sidebars = {
         'tutorial/getting-started-http'
       ],
     },
-    {type: 'html', value: '<hr>'},
+    { type: 'html', value: '<hr>' },
     {
       type: 'link',
       label: 'Reference',
       href: 'https://slack.dev/bolt-python/api-docs/slack_bolt/',
     },
-    {type: 'html', value: '<hr>'},
+    { type: 'html', value: '<hr>' },
     {
       type: 'link',
       label: 'Release notes',
