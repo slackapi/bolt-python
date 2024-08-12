@@ -1,6 +1,6 @@
 ---
 title: Listening and responding to custom steps
-lang: en
+lang: ja-jp
 slug: /concepts/custom-steps
 ---
 
