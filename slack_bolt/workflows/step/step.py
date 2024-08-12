@@ -22,7 +22,7 @@ from slack_sdk.web import WebClient
 
 
 class WorkflowStepBuilder:
-    """Steps from Apps
+    """Steps from apps
     Refer to https://api.slack.com/workflows/steps for details.
     """
 
@@ -40,7 +40,7 @@ class WorkflowStepBuilder:
     ):
         """
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
         This builder is supposed to be used as decorator.
@@ -82,7 +82,7 @@ class WorkflowStepBuilder:
     ):
         """
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
         Registers a new edit listener with details.
@@ -136,7 +136,7 @@ class WorkflowStepBuilder:
     ):
         """
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
         Registers a new save listener with details.
@@ -189,7 +189,7 @@ class WorkflowStepBuilder:
     ):
         """
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
         Registers a new execute listener with details.
@@ -236,7 +236,7 @@ class WorkflowStepBuilder:
     def build(self, base_logger: Optional[Logger] = None) -> "WorkflowStep":
         """
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
         Constructs a WorkflowStep object. This method may raise an exception
@@ -329,13 +329,13 @@ class WorkflowStepBuilder:
 
 class WorkflowStep:
     callback_id: Union[str, Pattern]
-    """The Callback ID of the workflow step"""
+    """The Callback ID of the step from app"""
     edit: Listener
     """`edit` listener, which displays a modal in Workflow Builder"""
     save: Listener
     """`save` listener, which accepts workflow creator's data submission in Workflow Builder"""
     execute: Listener
-    """`execute` listener, which processes workflow step execution"""
+    """`execute` listener, which processes step from app execution"""
 
     def __init__(
         self,
@@ -349,16 +349,16 @@ class WorkflowStep:
     ):
         """
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
         Args:
-            callback_id: The callback_id for this workflow step
+            callback_id: The callback_id for this step from app
             edit: Either a single function or a list of functions for opening a modal in the builder UI
                 When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
             save: Either a single function or a list of functions for handling modal interactions in the builder UI
                 When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
-            execute: Either a single function or a list of functions for handling workflow step executions
+            execute: Either a single function or a list of functions for handling step from app executions
                 When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
             app_name: The app name that can be mainly used for logging
             base_logger: The logger instance that can be used as a template when creating this step's logger
@@ -391,7 +391,7 @@ class WorkflowStep:
     def builder(cls, callback_id: Union[str, Pattern], base_logger: Optional[Logger] = None) -> WorkflowStepBuilder:
         """
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
         """
         return WorkflowStepBuilder(

@@ -659,7 +659,7 @@ class App:
         return None
 
     # -------------------------
-    # Workflows: Steps from Apps
+    # Workflows: Steps from apps
 
     def step(
         self,
@@ -670,13 +670,13 @@ class App:
     ):
         """
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
-        Registers a new Workflow Step listener.
+        Registers a new step from app listener.
 
         Unlike others, this method doesn't behave as a decorator.
-        If you want to register a workflow step by a decorator, use `WorkflowStepBuilder`'s methods.
+        If you want to register a step from app by a decorator, use `WorkflowStepBuilder`'s methods.
 
             # Create a new WorkflowStep instance
             from slack_bolt.workflows.step import WorkflowStep
@@ -689,7 +689,7 @@ class App:
             # Pass Step to set up listeners
             app.step(ws)
 
-        Refer to https://api.slack.com/workflows/steps for details of Steps from Apps.
+        Refer to https://api.slack.com/workflows/steps for details of steps from apps.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
@@ -698,14 +698,14 @@ class App:
         refer to `slack_bolt.workflows.step.utilities` API documents.
 
         Args:
-            callback_id: The Callback ID for this workflow step
+            callback_id: The Callback ID for this step from app
             edit: The function for displaying a modal in the Workflow Builder
             save: The function for handling configuration in the Workflow Builder
             execute: The function for handling the step execution
         """
         warnings.warn(
             (
-                "Steps from Apps for legacy workflows are now deprecated. "
+                "Steps from apps for legacy workflows are now deprecated. "
                 "Use new custom steps: https://api.slack.com/automation/functions/custom-bolt"
             ),
             category=DeprecationWarning,
