@@ -1,5 +1,5 @@
 ---
-title: Overview of steps form apps
+title: Overview of steps from apps
 lang: en
 slug: /concepts/steps
 ---
