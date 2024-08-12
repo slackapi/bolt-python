@@ -4,7 +4,7 @@ lang: en
 slug: /concepts/custom-steps
 ---
 
-Your app can use the `function()` method to listen to incoming custom step requests. The method requires a step `callback_id` of type `str`. This `callback_id` must also be defined in your [Function](https://api.slack.com/concepts/manifests#functions) definition. Custom steps must be finalized using the `complete()` or `fail()` listener arguments to notify Slack that your app has processed the request.
+Your app can use the `function()` method to listen to incoming [custom step requests](https://api.slack.com/automation/functions/custom-bolt). The method requires a step `callback_id` of type `str`. This `callback_id` must also be defined in your [Function](https://api.slack.com/concepts/manifests#functions) definition. Custom steps must be finalized using the `complete()` or `fail()` listener arguments to notify Slack that your app has processed the request.
 
 * `complete()` requires **one** argument: `outputs` of type `dict`. It completes your custom step **successfully** and provides a dictionary containing the outputs of your custom step as per its definition.
 * `fail` requires **one** argument: `error` of type `str`. It completes your custom step **unsuccessfully** and provides a message containing information regarding why your custom step failed.
