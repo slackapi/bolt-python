@@ -347,7 +347,7 @@ class AsyncWorkflowStep:
                 When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
             save: Either a single function or a list of functions for handling modal interactions in the builder UI
                 When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
-            execute: Either a single function or a list of functions for handling step from apps executions
+            execute: Either a single function or a list of functions for handling steps from apps executions
                 When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
             app_name: The app name that can be mainly used for logging
             base_logger: The logger instance that can be used as a template when creating this step's logger

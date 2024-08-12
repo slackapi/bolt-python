@@ -18,7 +18,7 @@ Steps from apps for legacy workflows are now deprecated. Use new [custom steps](
 
 Steps from apps allow your app to create and process steps that users can add using [Workflow Builder](https://api.slack.com/workflows).
 
-A step from apps is made up of three distinct user events:
+Steps from apps are made up of three distinct user events:
 
 - Adding or editing the step in a Workflow
 - Saving or updating the step's configuration
@@ -26,4 +26,4 @@ A step from apps is made up of three distinct user events:
 
 All three events must be handled for a step from app to function.
 
-Read more about step from apps in the [API documentation](https://api.slack.com/workflows/steps).
+Read more about steps from apps in the [API documentation](https://api.slack.com/workflows/steps).
