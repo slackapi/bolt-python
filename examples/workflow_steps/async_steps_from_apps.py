@@ -10,7 +10,7 @@ from slack_bolt.workflows.step.async_step import (
 )
 
 ################################################################################
-# Steps from Apps for legacy workflows are now deprecated.                     #
+# Steps from apps for legacy workflows are now deprecated.                     #
 # Use new custom steps: https://api.slack.com/automation/functions/custom-bolt #
 ################################################################################
 

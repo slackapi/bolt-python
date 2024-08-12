@@ -147,7 +147,7 @@ def _build_filtered_body(body: Optional[Dict[str, Any]]) -> dict:
         filtered_body["command"] = body.get("command")
 
     if payload_type in ["workflow_step_edit", "shortcut", "message_action"]:
-        # Workflow Steps, Global Shortcuts, Message Shortcuts
+        # Step from apps, Global Shortcuts, Message Shortcuts
         filtered_body["callback_id"] = body.get("callback_id")
 
     if payload_type == "interactive_message":

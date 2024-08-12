@@ -1,6 +1,6 @@
-"""Utilities specific to workflow steps from apps.
+"""Utilities specific to steps from apps.
 
-In workflow step listeners, you can use a few specific listener/middleware arguments.
+In step from apps listeners, you can use a few specific listener/middleware arguments.
 
 ### `edit` listener
 

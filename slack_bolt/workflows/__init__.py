@@ -1,4 +1,4 @@
-"""Workflow Steps from Apps enables developers to build their own custom workflow steps.
+"""Steps from apps enables developers to build their own steps.
 
 Check the following API documents first:
 

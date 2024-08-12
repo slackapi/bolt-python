@@ -11,9 +11,9 @@
     "message": "応用コンセプト",
     "description": "The label for category Advanced concepts in sidebar sidebarBoltPy"
   },
-  "sidebar.sidebarBoltPy.category.Workflow steps (Deprecated)": {
+  "sidebar.sidebarBoltPy.category.steps from apps (Deprecated)": {
     "message": "ワークフローステップ 非推奨",
-    "description": "The label for category Workflow steps (Deprecated) in sidebar sidebarBoltPy"
+    "description": "The label for category steps from apps (Deprecated) in sidebar sidebarBoltPy"
   },
   "sidebar.sidebarBoltPy.category.Tutorials": {
     "message": "チュートリアル",
