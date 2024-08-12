@@ -2,7 +2,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 
 
 class AsyncFail:
-    """`fail()` utility to tell Slack the execution failure of a workflow step.
+    """`fail()` utility to tell Slack the execution failure of a step from app.
 
         async def execute(step, complete, fail):
             inputs = step["inputs"]

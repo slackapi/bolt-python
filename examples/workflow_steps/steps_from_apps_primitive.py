@@ -6,7 +6,7 @@ from slack_sdk.web import SlackResponse
 from slack_bolt import App, Ack
 
 ################################################################################
-# Steps from Apps for legacy workflows are now deprecated.                     #
+# Steps from apps for legacy workflows are now deprecated.                     #
 # Use new custom steps: https://api.slack.com/automation/functions/custom-bolt #
 ################################################################################
 
