@@ -145,8 +145,8 @@ Most of the app's functionality will be inside listener functions (the `fn` para
 | `say` | Utility function to send a message to the channel associated with the incoming event. This argument is only available when the listener is triggered for events that contain a `channel_id` (the most common being `message` events). `say` accepts simple strings (for plain-text messages) and dictionaries (for messages containing blocks).
 | `client` | Web API client that uses the token associated with the event. For single-workspace installations, the token is provided to the constructor. For multi-workspace installations, the token is returned by using [the OAuth library](https://slack.dev/bolt-python/concepts/authenticating-oauth), or manually using the `authorize` function.
 | `logger` | The built-in [`logging.Logger`](https://docs.python.org/3/library/logging.html) instance you can use in middleware/listeners.
-| `complete` | Utility function used to signal the successful completion of a custom step execution. This argument is only available with the `.function` and `.action` listener when handling custom workflow step executions.
-| `fail` | Utility function used to signal that a custom step failed to complete. This argument is only available with the `.function` and `.action` listener when handling custom workflow step executions.
+| `complete` | Utility function used to signal the successful completion of a custom step execution. This tells Slack to proceed with the next steps in the workflow. This argument is only available with the `.function` and `.action` listener when handling custom workflow step executions.
+| `fail` | Utility function used to signal that a custom step failed to complete. This tells Slack to stop the workflow execution. This argument is only available with the `.function` and `.action` listener when handling custom workflow step executions.
 
 ## Creating an async app
 
