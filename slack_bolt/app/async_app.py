@@ -191,7 +191,8 @@ class AsyncApp:
             ssl_check_enabled: bool = False if you would like to disable the built-in middleware (Default: True).
                 `AsyncSslCheck` is a built-in middleware that handles ssl_check requests from Slack.
             attaching_function_token_enabled: False if you would like to disable the built-in middleware (Default: True).
-                `AsyncAttachingFunctionToken` is a built-in middleware that handles tokens with function requests from Slack.
+                `AsyncAttachingFunctionToken` is a built-in middleware that injects the just-in-time workflow-execution token
+                when your app receives `function_executed` or interactivity events scoped to a custom step.
             oauth_settings: The settings related to Slack app installation flow (OAuth flow)
             oauth_flow: Instantiated `slack_bolt.oauth.AsyncOAuthFlow`. This is always prioritized over oauth_settings.
             verification_token: Deprecated verification mechanism. This can used only for ssl_check requests.
@@ -905,24 +906,23 @@ class AsyncApp:
     ) -> Callable[..., Optional[Callable[..., Awaitable[BoltResponse]]]]:
         """Registers a new Function listener.
         This method can be used as either a decorator or a method.
+
             # Use this method as a decorator
             @app.function("reverse")
-            async def reverse_string(event: dict, client: AsyncWebClient, complete: AsyncComplete):
+            async def reverse_string(ack: AsyncAck, inputs: dict, complete: AsyncComplete, fail: AsyncFail):
                 try:
-                    string_to_reverse = event["inputs"]["stringToReverse"]
-                    await client.functions_completeSuccess(
-                        function_execution_id=context.function_execution_id,
-                        outputs={"reverseString": string_to_reverse[::-1]},
-                    )
+                    await ack()
+                    string_to_reverse = inputs["stringToReverse"]
+                    await complete({"reverseString": string_to_reverse[::-1]})
                 except Exception as e:
-                    await client.functions_completeError(
-                        function_execution_id=context.function_execution_id,
-                        error=f"Cannot reverse string (error: {e})",
-                    )
+                    await fail(f"Cannot reverse string (error: {e})")
                     raise e
+
             # Pass a function to this method
             app.function("reverse")(reverse_string)
+
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
+
         Args:
             callback_id: The callback id to identify the function
             matchers: A list of listener matcher functions.

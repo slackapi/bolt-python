@@ -110,7 +110,7 @@ class BaseContext(dict):
 
     @property
     def function_execution_id(self) -> Optional[str]:
-        """The `function_execution_id` associated with this request. Only available for function related events"""
+        """The `function_execution_id` associated with this request. Only available for `function_executed` and interactivity events scoped to a custom step."""
         return self.get("function_execution_id")
 
     @property

@@ -181,7 +181,8 @@ class App:
                 `UrlVerification` is a built-in middleware that handles url_verification requests
                 that verify the endpoint for Events API in HTTP Mode requests.
             attaching_function_token_enabled: False if you would like to disable the built-in middleware (Default: True).
-                `AttachingFunctionToken` is a built-in middleware that handles tokens with function requests from Slack.
+                `AttachingFunctionToken` is a built-in middleware that injects the just-in-time workflow-execution tokens
+                when your app receives `function_executed` or interactivity events scoped to a custom step.
             ssl_check_enabled: bool = False if you would like to disable the built-in middleware (Default: True).
                 `SslCheck` is a built-in middleware that handles ssl_check requests from Slack.
             oauth_settings: The settings related to Slack app installation flow (OAuth flow)
@@ -869,24 +870,23 @@ class App:
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new Function listener.
         This method can be used as either a decorator or a method.
+
             # Use this method as a decorator
             @app.function("reverse")
-            def reverse_string(event: dict, client: WebClient, context: BoltContext):
+            def reverse_string(ack: Ack, inputs: dict, complete: Complete, fail: Fail):
                 try:
-                    string_to_reverse = event["inputs"]["stringToReverse"]
-                    client.functions_completeSuccess(
-                        function_execution_id=context.function_execution_id,
-                        outputs={"reverseString": string_to_reverse[::-1]},
-                    )
+                    ack()
+                    string_to_reverse = inputs["stringToReverse"]
+                    complete(outputs={"reverseString": string_to_reverse[::-1]})
                 except Exception as e:
-                    client.functions_completeError(
-                        function_execution_id=context.function_execution_id,
-                        error=f"Cannot reverse string (error: {e})",
-                    )
+                    fail(f"Cannot reverse string (error: {e})")
                     raise e
+
             # Pass a function to this method
             app.function("reverse")(reverse_string)
+
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
+
         Args:
             callback_id: The callback id to identify the function
             matchers: A list of listener matcher functions.
