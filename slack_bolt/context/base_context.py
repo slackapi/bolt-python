@@ -127,7 +127,7 @@ class BaseContext(dict):
 
     @property
     def function_bot_access_token(self) -> Optional[str]:
-        """The bot token resolved for this function request. Only available for function related events"""
+        """The bot token resolved for this function request. Only available for `function_executed` and interactivity events scoped to a custom step."""
         return self.get("function_bot_access_token")
 
     @property
