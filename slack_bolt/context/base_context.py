@@ -115,7 +115,7 @@ class BaseContext(dict):
 
     @property
     def inputs(self) -> Optional[Dict[str, Any]]:
-        """The `inputs` associated with this request. Only available for function related events"""
+        """The `inputs` associated with this request. Only available for `function_executed` and interactivity events scoped to a custom step."""
         return self.get("inputs")
 
     # --------------------------------
