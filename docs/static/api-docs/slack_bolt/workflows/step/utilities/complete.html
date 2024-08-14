@@ -40,7 +40,7 @@ hljs.highlightAll();
 <span>(</span><span>*, client: slack_sdk.web.client.WebClient, body: dict)</span>
 </code></dt>
 <dd>
-<div class="desc"><p><code>complete()</code> utility to tell Slack the completion of a workflow step execution.</p>
+<div class="desc"><p><code>complete()</code> utility to tell Slack the completion of a step from app execution.</p>
 <pre><code>def execute(step, complete, fail):
     inputs = step["inputs"]
     # if everything was successful
@@ -65,7 +65,7 @@ Refer to <a href="https://api.slack.com/methods/workflows.stepCompleted">https:/
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Complete:
-    &#34;&#34;&#34;`complete()` utility to tell Slack the completion of a workflow step execution.
+    &#34;&#34;&#34;`complete()` utility to tell Slack the completion of a step from app execution.
 
         def execute(step, complete, fail):
             inputs = step[&#34;inputs&#34;]

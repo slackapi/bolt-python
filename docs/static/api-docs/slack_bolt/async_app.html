@@ -128,7 +128,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp"><code class="flex name class">
 <span>class <span class="ident">AsyncApp</span></span>
-<span>(</span><span>*, logger: Optional[logging.Logger] = None, name: Optional[str] = None, process_before_response: bool = False, raise_error_for_unhandled_request: bool = False, signing_secret: Optional[str] = None, token: Optional[str] = None, client: Optional[slack_sdk.web.async_client.AsyncWebClient] = None, before_authorize: Union[<a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>, Callable[..., Awaitable[Any]], ForwardRef(None)] = None, authorize: Optional[Callable[..., Awaitable[<a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]]] = None, user_facing_authorize_error_message: Optional[str] = None, installation_store: Optional[slack_sdk.oauth.installation_store.async_installation_store.AsyncInstallationStore] = None, installation_store_bot_only: Optional[bool] = None, request_verification_enabled: bool = True, ignoring_self_events_enabled: bool = True, ssl_check_enabled: bool = True, url_verification_enabled: bool = True, oauth_settings: Optional[<a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings" href="oauth/async_oauth_settings.html#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings">AsyncOAuthSettings</a>] = None, oauth_flow: Optional[<a title="slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow" href="oauth/async_oauth_flow.html#slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow">AsyncOAuthFlow</a>] = None, verification_token: Optional[str] = None)</span>
+<span>(</span><span>*, logger: Optional[logging.Logger] = None, name: Optional[str] = None, process_before_response: bool = False, raise_error_for_unhandled_request: bool = False, signing_secret: Optional[str] = None, token: Optional[str] = None, client: Optional[slack_sdk.web.async_client.AsyncWebClient] = None, before_authorize: Union[<a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>, Callable[..., Awaitable[Any]], ForwardRef(None)] = None, authorize: Optional[Callable[..., Awaitable[<a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]]] = None, user_facing_authorize_error_message: Optional[str] = None, installation_store: Optional[slack_sdk.oauth.installation_store.async_installation_store.AsyncInstallationStore] = None, installation_store_bot_only: Optional[bool] = None, request_verification_enabled: bool = True, ignoring_self_events_enabled: bool = True, ssl_check_enabled: bool = True, url_verification_enabled: bool = True, attaching_function_token_enabled: bool = True, oauth_settings: Optional[<a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings" href="oauth/async_oauth_settings.html#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings">AsyncOAuthSettings</a>] = None, oauth_flow: Optional[<a title="slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow" href="oauth/async_oauth_flow.html#slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow">AsyncOAuthFlow</a>] = None, verification_token: Optional[str] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Bolt App that provides functionalities to register middleware/listeners.</p>
@@ -203,6 +203,10 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
 <dt><strong><code>ssl_check_enabled</code></strong></dt>
 <dd>bool = False if you would like to disable the built-in middleware (Default: True).
 <code>AsyncSslCheck</code> is a built-in middleware that handles ssl_check requests from Slack.</dd>
+<dt><strong><code>attaching_function_token_enabled</code></strong></dt>
+<dd>False if you would like to disable the built-in middleware (Default: True).
+<code>AsyncAttachingFunctionToken</code> is a built-in middleware that injects the just-in-time workflow-execution token
+when your app receives <code>function_executed</code> or interactivity events scoped to a custom step.</dd>
 <dt><strong><code>oauth_settings</code></strong></dt>
 <dd>The settings related to Slack app installation flow (OAuth flow)</dd>
 <dt><strong><code>oauth_flow</code></strong></dt>
@@ -242,6 +246,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         ignoring_self_events_enabled: bool = True,
         ssl_check_enabled: bool = True,
         url_verification_enabled: bool = True,
+        attaching_function_token_enabled: bool = True,
         # for the OAuth flow
         oauth_settings: Optional[AsyncOAuthSettings] = None,
         oauth_flow: Optional[AsyncOAuthFlow] = None,
@@ -306,6 +311,9 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
                 that verify the endpoint for Events API in HTTP Mode requests.
             ssl_check_enabled: bool = False if you would like to disable the built-in middleware (Default: True).
                 `AsyncSslCheck` is a built-in middleware that handles ssl_check requests from Slack.
+            attaching_function_token_enabled: False if you would like to disable the built-in middleware (Default: True).
+                `AsyncAttachingFunctionToken` is a built-in middleware that injects the just-in-time workflow-execution token
+                when your app receives `function_executed` or interactivity events scoped to a custom step.
             oauth_settings: The settings related to Slack app installation flow (OAuth flow)
             oauth_flow: Instantiated `slack_bolt.oauth.AsyncOAuthFlow`. This is always prioritized over oauth_settings.
             verification_token: Deprecated verification mechanism. This can used only for ssl_check requests.
@@ -476,6 +484,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             ignoring_self_events_enabled=ignoring_self_events_enabled,
             ssl_check_enabled=ssl_check_enabled,
             url_verification_enabled=url_verification_enabled,
+            attaching_function_token_enabled=attaching_function_token_enabled,
             user_facing_authorize_error_message=user_facing_authorize_error_message,
         )
 
@@ -487,6 +496,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         ignoring_self_events_enabled: bool = True,
         ssl_check_enabled: bool = True,
         url_verification_enabled: bool = True,
+        attaching_function_token_enabled: bool = True,
         user_facing_authorize_error_message: Optional[str] = None,
     ):
         if self._init_middleware_list_done:
@@ -537,6 +547,8 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             self._async_middleware_list.append(AsyncIgnoringSelfEvents(base_logger=self._base_logger))
         if url_verification_enabled is True:
             self._async_middleware_list.append(AsyncUrlVerification(base_logger=self._base_logger))
+        if attaching_function_token_enabled is True:
+            self._async_middleware_list.append(AsyncAttachingFunctionToken())
         self._init_middleware_list_done = True
 
     # -------------------------
@@ -798,7 +810,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         return None
 
     # -------------------------
-    # Workflows: Steps from Apps
+    # Workflows: Steps from apps
 
     def step(
         self,
@@ -809,13 +821,13 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
     ):
         &#34;&#34;&#34;
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
-        Registers a new Workflow Step listener.
+        Registers a new step from app listener.
 
         Unlike others, this method doesn&#39;t behave as a decorator.
-        If you want to register a workflow step by a decorator, use `AsyncWorkflowStepBuilder`&#39;s methods.
+        If you want to register a step from app by a decorator, use `AsyncWorkflowStepBuilder`&#39;s methods.
 
             # Create a new WorkflowStep instance
             from slack_bolt.workflows.async_step import AsyncWorkflowStep
@@ -828,7 +840,7 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             # Pass Step to set up listeners
             app.step(ws)
 
-        Refer to https://api.slack.com/workflows/steps for details of Steps from Apps.
+        Refer to https://api.slack.com/workflows/steps for details of steps from apps.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
         For further information about AsyncWorkflowStep specific function arguments
@@ -836,14 +848,14 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
         refer to the `async` prefixed ones in `slack_bolt.workflows.step.utilities` API documents.
 
         Args:
-            callback_id: The Callback ID for this workflow step
+            callback_id: The Callback ID for this step from app
             edit: The function for displaying a modal in the Workflow Builder
             save: The function for handling configuration in the Workflow Builder
             execute: The function for handling the step execution
         &#34;&#34;&#34;
         warnings.warn(
             (
-                &#34;Steps from Apps for legacy workflows are now deprecated. &#34;
+                &#34;Steps from apps for legacy workflows are now deprecated. &#34;
                 &#34;Use new custom steps: https://api.slack.com/automation/functions/custom-bolt&#34;
             ),
             category=DeprecationWarning,
@@ -1004,6 +1016,51 @@ that verify the endpoint for Events API in HTTP Mode requests.</dd>
             )
             middleware.insert(0, AsyncMessageListenerMatches(keyword))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
+
+        return __call__
+
+    def function(
+        self,
+        callback_id: Union[str, Pattern],
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
+    ) -&gt; Callable[..., Optional[Callable[..., Awaitable[BoltResponse]]]]:
+        &#34;&#34;&#34;Registers a new Function listener.
+        This method can be used as either a decorator or a method.
+
+            # Use this method as a decorator
+            @app.function(&#34;reverse&#34;)
+            async def reverse_string(ack: AsyncAck, inputs: dict, complete: AsyncComplete, fail: AsyncFail):
+                try:
+                    await ack()
+                    string_to_reverse = inputs[&#34;stringToReverse&#34;]
+                    await complete({&#34;reverseString&#34;: string_to_reverse[::-1]})
+                except Exception as e:
+                    await fail(f&#34;Cannot reverse string (error: {e})&#34;)
+                    raise e
+
+            # Pass a function to this method
+            app.function(&#34;reverse&#34;)(reverse_string)
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
+
+        Args:
+            callback_id: The callback id to identify the function
+            matchers: A list of listener matcher functions.
+                Only when all the matchers return True, the listener function can be invoked.
+            middleware: A list of lister middleware functions.
+                Only when all the middleware call `next()` method, the listener function can be invoked.
+        &#34;&#34;&#34;
+
+        matchers = list(matchers) if matchers else []
+        middleware = list(middleware) if middleware else []
+
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            primary_matcher = builtin_matchers.function_executed(
+                callback_id=callback_id, base_logger=self._base_logger, asyncio=True
+            )
+            return self._register_listener(functions, primary_matcher, matchers, middleware, True)
 
         return __call__
 
@@ -1793,6 +1850,39 @@ Only when all the matchers return True, the listener function can be invoked.</d
 Only when all the middleware call <code>next()</code> method, the listener function can be invoked.</dd>
 </dl></div>
 </dd>
+<dt id="slack_bolt.async_app.AsyncApp.function"><code class="name flex">
+<span>def <span class="ident">function</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Registers a new Function listener.
+This method can be used as either a decorator or a method.</p>
+<pre><code># Use this method as a decorator
+@app.function("reverse")
+async def reverse_string(ack: AsyncAck, inputs: dict, complete: AsyncComplete, fail: AsyncFail):
+    try:
+        await ack()
+        string_to_reverse = inputs["stringToReverse"]
+        await complete({"reverseString": string_to_reverse[::-1]})
+    except Exception as e:
+        await fail(f"Cannot reverse string (error: {e})")
+        raise e
+
+# Pass a function to this method
+app.function("reverse")(reverse_string)
+</code></pre>
+<p>To learn available arguments for middleware/listeners, see <code><a title="slack_bolt.kwargs_injection.async_args" href="kwargs_injection/async_args.html">slack_bolt.kwargs_injection.async_args</a></code>'s API document.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>callback_id</code></strong></dt>
+<dd>The callback id to identify the function</dd>
+<dt><strong><code>matchers</code></strong></dt>
+<dd>A list of listener matcher functions.
+Only when all the matchers return True, the listener function can be invoked.</dd>
+<dt><strong><code>middleware</code></strong></dt>
+<dd>A list of lister middleware functions.
+Only when all the middleware call <code>next()</code> method, the listener function can be invoked.</dd>
+</dl></div>
+</dd>
 <dt id="slack_bolt.async_app.AsyncApp.global_shortcut"><code class="name flex">
 <span>def <span class="ident">global_shortcut</span></span>(<span>self, callback_id: Union[str, Pattern], matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None, middleware: Optional[Sequence[Union[Callable, <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>]]] = None) ‑> Callable[..., Optional[Callable[..., Awaitable[Optional[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]]]]</span>
 </code></dt>
@@ -1969,11 +2059,11 @@ Refer to <a href="https://docs.aiohttp.org/">https://docs.aiohttp.org/</a> for m
 </code></dt>
 <dd>
 <div class="desc"><h2 id="deprecated">Deprecated</h2>
-<p>Steps from Apps for legacy workflows are now deprecated.
+<p>Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: <a href="https://api.slack.com/automation/functions/custom-bolt">https://api.slack.com/automation/functions/custom-bolt</a></p>
-<p>Registers a new Workflow Step listener.</p>
+<p>Registers a new step from app listener.</p>
 <p>Unlike others, this method doesn't behave as a decorator.
-If you want to register a workflow step by a decorator, use <code>AsyncWorkflowStepBuilder</code>'s methods.</p>
+If you want to register a step from app by a decorator, use <code>AsyncWorkflowStepBuilder</code>'s methods.</p>
 <pre><code># Create a new WorkflowStep instance
 from slack_bolt.workflows.async_step import AsyncWorkflowStep
 ws = AsyncWorkflowStep(
@@ -1985,7 +2075,7 @@ ws = AsyncWorkflowStep(
 # Pass Step to set up listeners
 app.step(ws)
 </code></pre>
-<p>Refer to <a href="https://api.slack.com/workflows/steps">https://api.slack.com/workflows/steps</a> for details of Steps from Apps.</p>
+<p>Refer to <a href="https://api.slack.com/workflows/steps">https://api.slack.com/workflows/steps</a> for details of steps from apps.</p>
 <p>To learn available arguments for middleware/listeners, see <code><a title="slack_bolt.kwargs_injection.async_args" href="kwargs_injection/async_args.html">slack_bolt.kwargs_injection.async_args</a></code>'s API document.
 For further information about AsyncWorkflowStep specific function arguments
 such as <code>configure</code>, <code>update</code>, <code>complete</code>, and <code>fail</code>,
@@ -1993,7 +2083,7 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>callback_id</code></strong></dt>
-<dd>The Callback ID for this workflow step</dd>
+<dd>The Callback ID for this step from app</dd>
 <dt><strong><code>edit</code></strong></dt>
 <dd>The function for displaying a modal in the Workflow Builder</dd>
 <dt><strong><code>save</code></strong></dt>
@@ -2212,7 +2302,55 @@ def app_factory():
                 proxy=self.client.proxy,
                 ssl=self.client.ssl,
             )
-        return self[&#34;respond&#34;]</code></pre>
+        return self[&#34;respond&#34;]
+
+    @property
+    def complete(self) -&gt; AsyncComplete:
+        &#34;&#34;&#34;`complete()` function for this request. Once a custom function&#39;s state is set to complete,
+        any outputs the function returns will be passed along to the next step of its housing workflow,
+        or complete the workflow if the function is the last step in a workflow. Additionally,
+        any interactivity handlers associated to a function invocation will no longer be invocable.
+
+            @app.function(&#34;reverse&#34;)
+            async def handle_button_clicks(ack, complete):
+                await ack()
+                await complete(outputs={&#34;stringReverse&#34;:&#34;olleh&#34;})
+
+            @app.function(&#34;reverse&#34;)
+            async def handle_button_clicks(context):
+                await context.ack()
+                await context.complete(outputs={&#34;stringReverse&#34;:&#34;olleh&#34;})
+
+        Returns:
+            Callable `complete()` function
+        &#34;&#34;&#34;
+        if &#34;complete&#34; not in self:
+            self[&#34;complete&#34;] = AsyncComplete(client=self.client, function_execution_id=self.function_execution_id)
+        return self[&#34;complete&#34;]
+
+    @property
+    def fail(self) -&gt; AsyncFail:
+        &#34;&#34;&#34;`fail()` function for this request. Once a custom function&#39;s state is set to error,
+        its housing workflow will be interrupted and any provided error message will be passed
+        on to the end user through SlackBot. Additionally, any interactivity handlers associated
+        to a function invocation will no longer be invocable.
+
+            @app.function(&#34;reverse&#34;)
+            async def handle_button_clicks(ack, fail):
+                await ack()
+                await fail(error=&#34;something went wrong&#34;)
+
+            @app.function(&#34;reverse&#34;)
+            async def handle_button_clicks(context):
+                await context.ack()
+                await context.fail(error=&#34;something went wrong&#34;)
+
+        Returns:
+            Callable `fail()` function
+        &#34;&#34;&#34;
+        if &#34;fail&#34; not in self:
+            self[&#34;fail&#34;] = AsyncFail(client=self.client, function_execution_id=self.function_execution_id)
+        return self[&#34;fail&#34;]</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -2309,6 +2447,100 @@ def client(self) -&gt; Optional[AsyncWebClient]:
     if &#34;client&#34; not in self:
         self[&#34;client&#34;] = AsyncWebClient(token=None)
     return self[&#34;client&#34;]</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.async_app.AsyncBoltContext.complete"><code class="name">prop <span class="ident">complete</span> : <a title="slack_bolt.context.complete.async_complete.AsyncComplete" href="context/complete/async_complete.html#slack_bolt.context.complete.async_complete.AsyncComplete">AsyncComplete</a></code></dt>
+<dd>
+<div class="desc"><p><code>complete()</code> function for this request. Once a custom function's state is set to complete,
+any outputs the function returns will be passed along to the next step of its housing workflow,
+or complete the workflow if the function is the last step in a workflow. Additionally,
+any interactivity handlers associated to a function invocation will no longer be invocable.</p>
+<pre><code>@app.function("reverse")
+async def handle_button_clicks(ack, complete):
+    await ack()
+    await complete(outputs={"stringReverse":"olleh"})
+
+@app.function("reverse")
+async def handle_button_clicks(context):
+    await context.ack()
+    await context.complete(outputs={"stringReverse":"olleh"})
+</code></pre>
+<h2 id="returns">Returns</h2>
+<p>Callable <code>complete()</code> function</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def complete(self) -&gt; AsyncComplete:
+    &#34;&#34;&#34;`complete()` function for this request. Once a custom function&#39;s state is set to complete,
+    any outputs the function returns will be passed along to the next step of its housing workflow,
+    or complete the workflow if the function is the last step in a workflow. Additionally,
+    any interactivity handlers associated to a function invocation will no longer be invocable.
+
+        @app.function(&#34;reverse&#34;)
+        async def handle_button_clicks(ack, complete):
+            await ack()
+            await complete(outputs={&#34;stringReverse&#34;:&#34;olleh&#34;})
+
+        @app.function(&#34;reverse&#34;)
+        async def handle_button_clicks(context):
+            await context.ack()
+            await context.complete(outputs={&#34;stringReverse&#34;:&#34;olleh&#34;})
+
+    Returns:
+        Callable `complete()` function
+    &#34;&#34;&#34;
+    if &#34;complete&#34; not in self:
+        self[&#34;complete&#34;] = AsyncComplete(client=self.client, function_execution_id=self.function_execution_id)
+    return self[&#34;complete&#34;]</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.async_app.AsyncBoltContext.fail"><code class="name">prop <span class="ident">fail</span> : <a title="slack_bolt.context.fail.async_fail.AsyncFail" href="context/fail/async_fail.html#slack_bolt.context.fail.async_fail.AsyncFail">AsyncFail</a></code></dt>
+<dd>
+<div class="desc"><p><code>fail()</code> function for this request. Once a custom function's state is set to error,
+its housing workflow will be interrupted and any provided error message will be passed
+on to the end user through SlackBot. Additionally, any interactivity handlers associated
+to a function invocation will no longer be invocable.</p>
+<pre><code>@app.function("reverse")
+async def handle_button_clicks(ack, fail):
+    await ack()
+    await fail(error="something went wrong")
+
+@app.function("reverse")
+async def handle_button_clicks(context):
+    await context.ack()
+    await context.fail(error="something went wrong")
+</code></pre>
+<h2 id="returns">Returns</h2>
+<p>Callable <code>fail()</code> function</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def fail(self) -&gt; AsyncFail:
+    &#34;&#34;&#34;`fail()` function for this request. Once a custom function&#39;s state is set to error,
+    its housing workflow will be interrupted and any provided error message will be passed
+    on to the end user through SlackBot. Additionally, any interactivity handlers associated
+    to a function invocation will no longer be invocable.
+
+        @app.function(&#34;reverse&#34;)
+        async def handle_button_clicks(ack, fail):
+            await ack()
+            await fail(error=&#34;something went wrong&#34;)
+
+        @app.function(&#34;reverse&#34;)
+        async def handle_button_clicks(context):
+            await context.ack()
+            await context.fail(error=&#34;something went wrong&#34;)
+
+    Returns:
+        Callable `fail()` function
+    &#34;&#34;&#34;
+    if &#34;fail&#34; not in self:
+        self[&#34;fail&#34;] = AsyncFail(client=self.client, function_execution_id=self.function_execution_id)
+    return self[&#34;fail&#34;]</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.async_app.AsyncBoltContext.respond"><code class="name">prop <span class="ident">respond</span> : Optional[<a title="slack_bolt.context.respond.async_respond.AsyncRespond" href="context/respond/async_respond.html#slack_bolt.context.respond.async_respond.AsyncRespond">AsyncRespond</a>]</code></dt>
@@ -2424,6 +2656,9 @@ def say(self) -&gt; AsyncSay:
 <li><code><a title="slack_bolt.context.base_context.BaseContext.bot_user_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.bot_user_id">bot_user_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.channel_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.channel_id">channel_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.enterprise_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.enterprise_id">enterprise_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.function_bot_access_token" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.function_bot_access_token">function_bot_access_token</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.function_execution_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.function_execution_id">function_execution_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.inputs" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.inputs">inputs</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.is_enterprise_install" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.is_enterprise_install">is_enterprise_install</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.logger" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.logger">logger</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.matches" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.matches">matches</a></code></li>
@@ -2993,6 +3228,7 @@ def say(self) -&gt; AsyncSay:
 <li><code><a title="slack_bolt.async_app.AsyncApp.enable_token_revocation_listeners" href="#slack_bolt.async_app.AsyncApp.enable_token_revocation_listeners">enable_token_revocation_listeners</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncApp.error" href="#slack_bolt.async_app.AsyncApp.error">error</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncApp.event" href="#slack_bolt.async_app.AsyncApp.event">event</a></code></li>
+<li><code><a title="slack_bolt.async_app.AsyncApp.function" href="#slack_bolt.async_app.AsyncApp.function">function</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncApp.global_shortcut" href="#slack_bolt.async_app.AsyncApp.global_shortcut">global_shortcut</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncApp.installation_store" href="#slack_bolt.async_app.AsyncApp.installation_store">installation_store</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncApp.listener_runner" href="#slack_bolt.async_app.AsyncApp.listener_runner">listener_runner</a></code></li>
@@ -3017,9 +3253,11 @@ def say(self) -&gt; AsyncSay:
 </li>
 <li>
 <h4><code><a title="slack_bolt.async_app.AsyncBoltContext" href="#slack_bolt.async_app.AsyncBoltContext">AsyncBoltContext</a></code></h4>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.ack" href="#slack_bolt.async_app.AsyncBoltContext.ack">ack</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.client" href="#slack_bolt.async_app.AsyncBoltContext.client">client</a></code></li>
+<li><code><a title="slack_bolt.async_app.AsyncBoltContext.complete" href="#slack_bolt.async_app.AsyncBoltContext.complete">complete</a></code></li>
+<li><code><a title="slack_bolt.async_app.AsyncBoltContext.fail" href="#slack_bolt.async_app.AsyncBoltContext.fail">fail</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.respond" href="#slack_bolt.async_app.AsyncBoltContext.respond">respond</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.say" href="#slack_bolt.async_app.AsyncBoltContext.say">say</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.to_copyable" href="#slack_bolt.async_app.AsyncBoltContext.to_copyable">to_copyable</a></code></li>

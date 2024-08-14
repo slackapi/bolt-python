@@ -41,12 +41,12 @@ hljs.highlightAll();
 </code></dt>
 <dd>
 <div class="desc"><h2 id="deprecated">Deprecated</h2>
-<p>Steps from Apps for legacy workflows are now deprecated.
+<p>Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: <a href="https://api.slack.com/automation/functions/custom-bolt">https://api.slack.com/automation/functions/custom-bolt</a></p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>callback_id</code></strong></dt>
-<dd>The callback_id for this workflow step</dd>
+<dd>The callback_id for this step from app</dd>
 <dt><strong><code>edit</code></strong></dt>
 <dd>Either a single function or a list of functions for opening a modal in the builder UI
 When it's a list, the first one is responsible for ack() while the rest are lazy listeners.</dd>
@@ -54,7 +54,7 @@ When it's a list, the first one is responsible for ack() while the rest are lazy
 <dd>Either a single function or a list of functions for handling modal interactions in the builder UI
 When it's a list, the first one is responsible for ack() while the rest are lazy listeners.</dd>
 <dt><strong><code>execute</code></strong></dt>
-<dd>Either a single function or a list of functions for handling workflow step executions
+<dd>Either a single function or a list of functions for handling steps from apps executions
 When it's a list, the first one is responsible for ack() while the rest are lazy listeners.</dd>
 <dt><strong><code>app_name</code></strong></dt>
 <dd>The app name that can be mainly used for logging</dd>
@@ -67,13 +67,13 @@ When it's a list, the first one is responsible for ack() while the rest are lazy
 </summary>
 <pre><code class="python">class AsyncWorkflowStep:
     callback_id: Union[str, Pattern]
-    &#34;&#34;&#34;The Callback ID of the workflow step&#34;&#34;&#34;
+    &#34;&#34;&#34;The Callback ID of the step from app&#34;&#34;&#34;
     edit: AsyncListener
     &#34;&#34;&#34;`edit` listener, which displays a modal in Workflow Builder&#34;&#34;&#34;
     save: AsyncListener
     &#34;&#34;&#34;`save` listener, which accepts workflow creator&#39;s data submission in Workflow Builder&#34;&#34;&#34;
     execute: AsyncListener
-    &#34;&#34;&#34;`execute` listener, which processes workflow step execution&#34;&#34;&#34;
+    &#34;&#34;&#34;`execute` listener, which processes the step from app execution&#34;&#34;&#34;
 
     def __init__(
         self,
@@ -87,16 +87,16 @@ When it's a list, the first one is responsible for ack() while the rest are lazy
     ):
         &#34;&#34;&#34;
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
         Args:
-            callback_id: The callback_id for this workflow step
+            callback_id: The callback_id for this step from app
             edit: Either a single function or a list of functions for opening a modal in the builder UI
                 When it&#39;s a list, the first one is responsible for ack() while the rest are lazy listeners.
             save: Either a single function or a list of functions for handling modal interactions in the builder UI
                 When it&#39;s a list, the first one is responsible for ack() while the rest are lazy listeners.
-            execute: Either a single function or a list of functions for handling workflow step executions
+            execute: Either a single function or a list of functions for handling steps from apps executions
                 When it&#39;s a list, the first one is responsible for ack() while the rest are lazy listeners.
             app_name: The app name that can be mainly used for logging
             base_logger: The logger instance that can be used as a template when creating this step&#39;s logger
@@ -133,7 +133,7 @@ When it's a list, the first one is responsible for ack() while the rest are lazy
     ) -&gt; AsyncWorkflowStepBuilder:
         &#34;&#34;&#34;
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
         &#34;&#34;&#34;
         return AsyncWorkflowStepBuilder(callback_id, base_logger=base_logger)
@@ -212,7 +212,7 @@ When it's a list, the first one is responsible for ack() while the rest are lazy
 <dl>
 <dt id="slack_bolt.workflows.step.async_step.AsyncWorkflowStep.callback_id"><code class="name">var <span class="ident">callback_id</span> : Union[str, Pattern]</code></dt>
 <dd>
-<div class="desc"><p>The Callback ID of the workflow step</p></div>
+<div class="desc"><p>The Callback ID of the step from app</p></div>
 </dd>
 <dt id="slack_bolt.workflows.step.async_step.AsyncWorkflowStep.edit"><code class="name">var <span class="ident">edit</span> : <a title="slack_bolt.listener.async_listener.AsyncListener" href="../../listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a></code></dt>
 <dd>
@@ -220,7 +220,7 @@ When it's a list, the first one is responsible for ack() while the rest are lazy
 </dd>
 <dt id="slack_bolt.workflows.step.async_step.AsyncWorkflowStep.execute"><code class="name">var <span class="ident">execute</span> : <a title="slack_bolt.listener.async_listener.AsyncListener" href="../../listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a></code></dt>
 <dd>
-<div class="desc"><p><code>execute</code> listener, which processes workflow step execution</p></div>
+<div class="desc"><p><code>execute</code> listener, which processes the step from app execution</p></div>
 </dd>
 <dt id="slack_bolt.workflows.step.async_step.AsyncWorkflowStep.save"><code class="name">var <span class="ident">save</span> : <a title="slack_bolt.listener.async_listener.AsyncListener" href="../../listener/async_listener.html#slack_bolt.listener.async_listener.AsyncListener">AsyncListener</a></code></dt>
 <dd>
@@ -240,7 +240,7 @@ When it's a list, the first one is responsible for ack() while the rest are lazy
 </code></dt>
 <dd>
 <div class="desc"><h2 id="deprecated">Deprecated</h2>
-<p>Steps from Apps for legacy workflows are now deprecated.
+<p>Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: <a href="https://api.slack.com/automation/functions/custom-bolt">https://api.slack.com/automation/functions/custom-bolt</a></p></div>
 </dd>
 </dl>
@@ -250,10 +250,10 @@ Use new custom steps: <a href="https://api.slack.com/automation/functions/custom
 <span>(</span><span>callback_id: Union[str, Pattern], app_name: Optional[str] = None, base_logger: Optional[logging.Logger] = None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Steps from Apps
+<div class="desc"><p>Steps from apps
 Refer to <a href="https://api.slack.com/workflows/steps">https://api.slack.com/workflows/steps</a> for details.</p>
 <h2 id="deprecated">Deprecated</h2>
-<p>Steps from Apps for legacy workflows are now deprecated.
+<p>Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: <a href="https://api.slack.com/automation/functions/custom-bolt">https://api.slack.com/automation/functions/custom-bolt</a></p>
 <p>This builder is supposed to be used as decorator.</p>
 <pre><code>my_step = AsyncWorkflowStep.builder("my_step")
@@ -285,7 +285,7 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncWorkflowStepBuilder:
-    &#34;&#34;&#34;Steps from Apps
+    &#34;&#34;&#34;Steps from apps
     Refer to https://api.slack.com/workflows/steps for details.
     &#34;&#34;&#34;
 
@@ -303,7 +303,7 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
     ):
         &#34;&#34;&#34;
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
         This builder is supposed to be used as decorator.
@@ -345,7 +345,7 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
     ):
         &#34;&#34;&#34;
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
         Registers a new edit listener with details.
@@ -398,7 +398,7 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
     ):
         &#34;&#34;&#34;
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
         Registers a new save listener with details.
@@ -451,7 +451,7 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
     ):
         &#34;&#34;&#34;
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
         Registers a new execute listener with details.
@@ -498,7 +498,7 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
     def build(self, base_logger: Optional[Logger] = None) -&gt; &#34;AsyncWorkflowStep&#34;:
         &#34;&#34;&#34;
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
         Constructs a WorkflowStep object. This method may raise an exception
@@ -602,7 +602,7 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
 </code></dt>
 <dd>
 <div class="desc"><h2 id="deprecated">Deprecated</h2>
-<p>Steps from Apps for legacy workflows are now deprecated.
+<p>Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: <a href="https://api.slack.com/automation/functions/custom-bolt">https://api.slack.com/automation/functions/custom-bolt</a></p>
 <p>Constructs a WorkflowStep object. This method may raise an exception
 if the builder doesn't have enough configurations to build the object.</p>
@@ -614,7 +614,7 @@ if the builder doesn't have enough configurations to build the object.</p>
 </code></dt>
 <dd>
 <div class="desc"><h2 id="deprecated">Deprecated</h2>
-<p>Steps from Apps for legacy workflows are now deprecated.
+<p>Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: <a href="https://api.slack.com/automation/functions/custom-bolt">https://api.slack.com/automation/functions/custom-bolt</a></p>
 <p>Registers a new edit listener with details.</p>
 <p>You can use this method as decorator as well.</p>
@@ -647,7 +647,7 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
 </code></dt>
 <dd>
 <div class="desc"><h2 id="deprecated">Deprecated</h2>
-<p>Steps from Apps for legacy workflows are now deprecated.
+<p>Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: <a href="https://api.slack.com/automation/functions/custom-bolt">https://api.slack.com/automation/functions/custom-bolt</a></p>
 <p>Registers a new execute listener with details.</p>
 <p>You can use this method as decorator as well.</p>
@@ -680,7 +680,7 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
 </code></dt>
 <dd>
 <div class="desc"><h2 id="deprecated">Deprecated</h2>
-<p>Steps from Apps for legacy workflows are now deprecated.
+<p>Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: <a href="https://api.slack.com/automation/functions/custom-bolt">https://api.slack.com/automation/functions/custom-bolt</a></p>
 <p>Registers a new save listener with details.</p>
 <p>You can use this method as decorator as well.</p>

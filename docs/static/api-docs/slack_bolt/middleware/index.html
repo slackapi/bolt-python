@@ -50,6 +50,10 @@ It's also possible to run a middleware only for a particular listener.</p>
 <dd>
 <div class="desc"></div>
 </dd>
+<dt><code class="name"><a title="slack_bolt.middleware.attaching_function_token" href="attaching_function_token/index.html">slack_bolt.middleware.attaching_function_token</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt><code class="name"><a title="slack_bolt.middleware.authorization" href="authorization/index.html">slack_bolt.middleware.authorization</a></code></dt>
 <dd>
 <div class="desc"></div>
@@ -95,6 +99,43 @@ It's also possible to run a middleware only for a particular listener.</p>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="slack_bolt.middleware.AttachingFunctionToken"><code class="flex name class">
+<span>class <span class="ident">AttachingFunctionToken</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AttachingFunctionToken(Middleware):  # type: ignore
+    def process(
+        self,
+        *,
+        req: BoltRequest,
+        resp: BoltResponse,
+        # This method is not supposed to be invoked by bolt-python users
+        next: Callable[[], BoltResponse],
+    ) -&gt; BoltResponse:
+        if req.context.function_bot_access_token is not None:
+            req.context.client.token = req.context.function_bot_access_token
+
+        return next()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.middleware.middleware.Middleware" href="middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="slack_bolt.middleware.middleware.Middleware" href="middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a></b></code>:
+<ul class="hlist">
+<li><code><a title="slack_bolt.middleware.middleware.Middleware.name" href="middleware.html#slack_bolt.middleware.middleware.Middleware.name">name</a></code></li>
+<li><code><a title="slack_bolt.middleware.middleware.Middleware.process" href="middleware.html#slack_bolt.middleware.middleware.Middleware.process">process</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
 <dt id="slack_bolt.middleware.CustomMiddleware"><code class="flex name class">
 <span>class <span class="ident">CustomMiddleware</span></span>
 <span>(</span><span>*, app_name: str, func: Callable, base_logger: Optional[logging.Logger] = None)</span>
@@ -318,6 +359,7 @@ It's also possible to run a middleware only for a particular listener.</p>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
+<li><a title="slack_bolt.middleware.attaching_function_token.attaching_function_token.AttachingFunctionToken" href="attaching_function_token/attaching_function_token.html#slack_bolt.middleware.attaching_function_token.attaching_function_token.AttachingFunctionToken">AttachingFunctionToken</a></li>
 <li><a title="slack_bolt.middleware.authorization.authorization.Authorization" href="authorization/authorization.html#slack_bolt.middleware.authorization.authorization.Authorization">Authorization</a></li>
 <li><a title="slack_bolt.middleware.custom_middleware.CustomMiddleware" href="custom_middleware.html#slack_bolt.middleware.custom_middleware.CustomMiddleware">CustomMiddleware</a></li>
 <li><a title="slack_bolt.middleware.ignoring_self_events.ignoring_self_events.IgnoringSelfEvents" href="ignoring_self_events/ignoring_self_events.html#slack_bolt.middleware.ignoring_self_events.ignoring_self_events.IgnoringSelfEvents">IgnoringSelfEvents</a></li>
@@ -898,6 +940,7 @@ Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://ap
 <li><code><a title="slack_bolt.middleware.async_custom_middleware" href="async_custom_middleware.html">slack_bolt.middleware.async_custom_middleware</a></code></li>
 <li><code><a title="slack_bolt.middleware.async_middleware" href="async_middleware.html">slack_bolt.middleware.async_middleware</a></code></li>
 <li><code><a title="slack_bolt.middleware.async_middleware_error_handler" href="async_middleware_error_handler.html">slack_bolt.middleware.async_middleware_error_handler</a></code></li>
+<li><code><a title="slack_bolt.middleware.attaching_function_token" href="attaching_function_token/index.html">slack_bolt.middleware.attaching_function_token</a></code></li>
 <li><code><a title="slack_bolt.middleware.authorization" href="authorization/index.html">slack_bolt.middleware.authorization</a></code></li>
 <li><code><a title="slack_bolt.middleware.custom_middleware" href="custom_middleware.html">slack_bolt.middleware.custom_middleware</a></code></li>
 <li><code><a title="slack_bolt.middleware.ignoring_self_events" href="ignoring_self_events/index.html">slack_bolt.middleware.ignoring_self_events</a></code></li>
@@ -911,6 +954,9 @@ Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://ap
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="slack_bolt.middleware.AttachingFunctionToken" href="#slack_bolt.middleware.AttachingFunctionToken">AttachingFunctionToken</a></code></h4>
+</li>
 <li>
 <h4><code><a title="slack_bolt.middleware.CustomMiddleware" href="#slack_bolt.middleware.CustomMiddleware">CustomMiddleware</a></code></h4>
 <ul class="">

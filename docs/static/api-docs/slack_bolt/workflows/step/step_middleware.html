@@ -40,13 +40,13 @@ hljs.highlightAll();
 <span>(</span><span>step: <a title="slack_bolt.workflows.step.step.WorkflowStep" href="step.html#slack_bolt.workflows.step.step.WorkflowStep">WorkflowStep</a>, listener_runner: <a title="slack_bolt.listener.thread_runner.ThreadListenerRunner" href="../../listener/thread_runner.html#slack_bolt.listener.thread_runner.ThreadListenerRunner">ThreadListenerRunner</a>)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Base middleware for workflow step specific ones</p></div>
+<div class="desc"><p>Base middleware for step from app specific ones</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class WorkflowStepMiddleware(Middleware):  # type:ignore
-    &#34;&#34;&#34;Base middleware for workflow step specific ones&#34;&#34;&#34;
+    &#34;&#34;&#34;Base middleware for step from app specific ones&#34;&#34;&#34;
 
     def __init__(self, step: WorkflowStep, listener_runner: ThreadListenerRunner):
         self.step = step
