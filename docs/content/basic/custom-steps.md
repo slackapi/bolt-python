@@ -43,7 +43,7 @@ def sample_step_callback(inputs: dict, ack: Ack, fail: Fail, complete: Complete)
 ```python
 # This sample custom step posts a message with a button
 @app.function("custom_step_button")
-def sample_step_callback(inputs: dict, say: Say, fail: Fail):
+def sample_step_callback(inputs, say, fail):
     try:
         say(
             channel=inputs["user_id"],  # sending a DM to this user
@@ -65,9 +65,7 @@ def sample_step_callback(inputs: dict, say: Say, fail: Fail):
 
 # Your listener will be called every time a block element with the action_id "sample_click" is triggered
 @app.action("sample_click")
-def handle_sample_click(
-    ack: Ack, body: dict, context: BoltContext, client: WebClient, complete: Complete, fail: Fail
-):
+def handle_sample_click(ack, body, context, client, complete, fail):
     ack()
     try:
         # Since the button no longer works, we should remove it
