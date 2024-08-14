@@ -16,9 +16,8 @@ Refer to [the module document](https://slack.dev/bolt-python/api-docs/slack_bolt
 ```python
 # This sample custom step formats an input and outputs it
 @app.function("sample_custom_step")
-def sample_step_callback(inputs: dict, ack: Ack, fail: Fail, complete: Complete):
+def sample_step_callback(inputs: dict, fail: Fail, complete: Complete):
     try:
-        ack()
         message = inputs["message"]
         complete(
             outputs={
@@ -32,7 +31,7 @@ def sample_step_callback(inputs: dict, ack: Ack, fail: Fail, complete: Complete)
 
 <details>
 <summary>
-definition
+Example app manifest definition
 </summary>
 
 ```json
@@ -120,7 +119,7 @@ def handle_sample_click(ack, body, context, client, complete, fail):
 
 <details>
 <summary>
-definition
+Example app manifest definition
 </summary>
 
 ```json
