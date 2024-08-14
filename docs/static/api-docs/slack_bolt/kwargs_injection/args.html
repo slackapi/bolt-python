@@ -37,7 +37,7 @@ hljs.highlightAll();
 <dl>
 <dt id="slack_bolt.kwargs_injection.args.Args"><code class="flex name class">
 <span>class <span class="ident">Args</span></span>
-<span>(</span><span>*, logger: logging.Logger, client: slack_sdk.web.client.WebClient, req: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>, resp: <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>, context: <a title="slack_bolt.context.context.BoltContext" href="../context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a>, body: Dict[str, Any], payload: Dict[str, Any], options: Optional[Dict[str, Any]] = None, shortcut: Optional[Dict[str, Any]] = None, action: Optional[Dict[str, Any]] = None, view: Optional[Dict[str, Any]] = None, command: Optional[Dict[str, Any]] = None, event: Optional[Dict[str, Any]] = None, message: Optional[Dict[str, Any]] = None, ack: <a title="slack_bolt.context.ack.ack.Ack" href="../context/ack/ack.html#slack_bolt.context.ack.ack.Ack">Ack</a>, say: <a title="slack_bolt.context.say.say.Say" href="../context/say/say.html#slack_bolt.context.say.say.Say">Say</a>, respond: <a title="slack_bolt.context.respond.respond.Respond" href="../context/respond/respond.html#slack_bolt.context.respond.respond.Respond">Respond</a>, next: Callable[[], None], **kwargs)</span>
+<span>(</span><span>*, logger: logging.Logger, client: slack_sdk.web.client.WebClient, req: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>, resp: <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>, context: <a title="slack_bolt.context.context.BoltContext" href="../context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a>, body: Dict[str, Any], payload: Dict[str, Any], options: Optional[Dict[str, Any]] = None, shortcut: Optional[Dict[str, Any]] = None, action: Optional[Dict[str, Any]] = None, view: Optional[Dict[str, Any]] = None, command: Optional[Dict[str, Any]] = None, event: Optional[Dict[str, Any]] = None, message: Optional[Dict[str, Any]] = None, ack: <a title="slack_bolt.context.ack.ack.Ack" href="../context/ack/ack.html#slack_bolt.context.ack.ack.Ack">Ack</a>, say: <a title="slack_bolt.context.say.say.Say" href="../context/say/say.html#slack_bolt.context.say.say.Say">Say</a>, respond: <a title="slack_bolt.context.respond.respond.Respond" href="../context/respond/respond.html#slack_bolt.context.respond.respond.Respond">Respond</a>, complete: <a title="slack_bolt.context.complete.complete.Complete" href="../context/complete/complete.html#slack_bolt.context.complete.complete.Complete">Complete</a>, fail: <a title="slack_bolt.context.fail.fail.Fail" href="../context/fail/fail.html#slack_bolt.context.fail.fail.Fail">Fail</a>, next: Callable[[], None], **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>All the arguments in this class are available in any middleware / listeners.
@@ -139,6 +139,10 @@ def handle_buttons(args):
     &#34;&#34;&#34;`say()` utility function, which calls `chat.postMessage` API with the associated channel ID&#34;&#34;&#34;
     respond: Respond
     &#34;&#34;&#34;`respond()` utility function, which utilizes the associated `response_url`&#34;&#34;&#34;
+    complete: Complete
+    &#34;&#34;&#34;`complete()` utility function, signals a successful completion of the custom function&#34;&#34;&#34;
+    fail: Fail
+    &#34;&#34;&#34;`fail()` utility function, signal that the custom function failed to complete&#34;&#34;&#34;
     # middleware
     next: Callable[[], None]
     &#34;&#34;&#34;`next()` utility function, which tells the middleware chain that it can continue with the next one&#34;&#34;&#34;
@@ -165,6 +169,8 @@ def handle_buttons(args):
         ack: Ack,
         say: Say,
         respond: Respond,
+        complete: Complete,
+        fail: Fail,
         # As this method is not supposed to be invoked by bolt-python users,
         # the naming conflict with the built-in one affects
         # only the internals of this method
@@ -190,6 +196,8 @@ def handle_buttons(args):
         self.ack: Ack = ack
         self.say: Say = say
         self.respond: Respond = respond
+        self.complete: Complete = complete
+        self.fail: Fail = fail
         self.next: Callable[[], None] = next
         self.next_: Callable[[], None] = next</code></pre>
 </details>
@@ -215,6 +223,10 @@ def handle_buttons(args):
 <dd>
 <div class="desc"><p>An alias for payload in an <code>@app.command</code> listener</p></div>
 </dd>
+<dt id="slack_bolt.kwargs_injection.args.Args.complete"><code class="name">var <span class="ident">complete</span> : <a title="slack_bolt.context.complete.complete.Complete" href="../context/complete/complete.html#slack_bolt.context.complete.complete.Complete">Complete</a></code></dt>
+<dd>
+<div class="desc"><p><code>complete()</code> utility function, signals a successful completion of the custom function</p></div>
+</dd>
 <dt id="slack_bolt.kwargs_injection.args.Args.context"><code class="name">var <span class="ident">context</span> : <a title="slack_bolt.context.context.BoltContext" href="../context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a></code></dt>
 <dd>
 <div class="desc"><p>Context data associated with the incoming request</p></div>
@@ -222,6 +234,10 @@ def handle_buttons(args):
 <dt id="slack_bolt.kwargs_injection.args.Args.event"><code class="name">var <span class="ident">event</span> : Optional[Dict[str, Any]]</code></dt>
 <dd>
 <div class="desc"><p>An alias for payload in an <code>@app.event</code> listener</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.args.Args.fail"><code class="name">var <span class="ident">fail</span> : <a title="slack_bolt.context.fail.fail.Fail" href="../context/fail/fail.html#slack_bolt.context.fail.fail.Fail">Fail</a></code></dt>
+<dd>
+<div class="desc"><p><code>fail()</code> utility function, signal that the custom function failed to complete</p></div>
 </dd>
 <dt id="slack_bolt.kwargs_injection.args.Args.logger"><code class="name">var <span class="ident">logger</span> : logging.Logger</code></dt>
 <dd>
@@ -304,8 +320,10 @@ def handle_buttons(args):
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.body" href="#slack_bolt.kwargs_injection.args.Args.body">body</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.client" href="#slack_bolt.kwargs_injection.args.Args.client">client</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.command" href="#slack_bolt.kwargs_injection.args.Args.command">command</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.args.Args.complete" href="#slack_bolt.kwargs_injection.args.Args.complete">complete</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.context" href="#slack_bolt.kwargs_injection.args.Args.context">context</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.event" href="#slack_bolt.kwargs_injection.args.Args.event">event</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.args.Args.fail" href="#slack_bolt.kwargs_injection.args.Args.fail">fail</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.logger" href="#slack_bolt.kwargs_injection.args.Args.logger">logger</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.message" href="#slack_bolt.kwargs_injection.args.Args.message">message</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.args.Args.next" href="#slack_bolt.kwargs_injection.args.Args.next">next</a></code></li>

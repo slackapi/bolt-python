@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.1">
-<title>slack_bolt.workflows.step.utilities.async_fail API documentation</title>
+<title>slack_bolt.context.fail.async_fail API documentation</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
@@ -22,7 +22,7 @@ hljs.highlightAll();
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>slack_bolt.workflows.step.utilities.async_fail</code></h1>
+<h1 class="title">Module <code>slack_bolt.context.fail.async_fail</code></h1>
 </header>
 <section id="section-intro">
 </section>
@@ -35,67 +35,56 @@ hljs.highlightAll();
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="slack_bolt.workflows.step.utilities.async_fail.AsyncFail"><code class="flex name class">
+<dt id="slack_bolt.context.fail.async_fail.AsyncFail"><code class="flex name class">
 <span>class <span class="ident">AsyncFail</span></span>
-<span>(</span><span>*, client: slack_sdk.web.async_client.AsyncWebClient, body: dict)</span>
+<span>(</span><span>client: slack_sdk.web.async_client.AsyncWebClient, function_execution_id: Optional[str])</span>
 </code></dt>
 <dd>
-<div class="desc"><p><code>fail()</code> utility to tell Slack the execution failure of a step from app.</p>
-<pre><code>async def execute(step, complete, fail):
-    inputs = step["inputs"]
-    # if something went wrong
-    error = {"message": "Just testing step failure!"}
-    await fail(error=error)
-
-ws = AsyncWorkflowStep(
-    callback_id="add_task",
-    edit=edit,
-    save=save,
-    execute=execute,
-)
-app.step(ws)
-</code></pre>
-<p>This utility is a thin wrapper of workflows.stepFailed API method.
-Refer to <a href="https://api.slack.com/methods/workflows.stepFailed">https://api.slack.com/methods/workflows.stepFailed</a> for details.</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncFail:
-    &#34;&#34;&#34;`fail()` utility to tell Slack the execution failure of a step from app.
+    client: AsyncWebClient
+    function_execution_id: Optional[str]
 
-        async def execute(step, complete, fail):
-            inputs = step[&#34;inputs&#34;]
-            # if something went wrong
-            error = {&#34;message&#34;: &#34;Just testing step failure!&#34;}
-            await fail(error=error)
-
-        ws = AsyncWorkflowStep(
-            callback_id=&#34;add_task&#34;,
-            edit=edit,
-            save=save,
-            execute=execute,
-        )
-        app.step(ws)
-
-    This utility is a thin wrapper of workflows.stepFailed API method.
-    Refer to https://api.slack.com/methods/workflows.stepFailed for details.
-    &#34;&#34;&#34;
-
-    def __init__(self, *, client: AsyncWebClient, body: dict):
-        self.client = client
-        self.body = body
-
-    async def __call__(
+    def __init__(
         self,
-        *,
-        error: dict,
-    ) -&gt; None:
-        await self.client.workflows_stepFailed(
-            workflow_step_execute_id=self.body[&#34;event&#34;][&#34;workflow_step&#34;][&#34;workflow_step_execute_id&#34;],
-            error=error,
-        )</code></pre>
+        client: AsyncWebClient,
+        function_execution_id: Optional[str],
+    ):
+        self.client = client
+        self.function_execution_id = function_execution_id
+
+    async def __call__(self, error: str) -&gt; AsyncSlackResponse:
+        &#34;&#34;&#34;Signal that the custom function failed to complete.
+
+        Kwargs:
+            error: Error message to return to slack
+
+        Returns:
+            SlackResponse: The response object returned from slack
+
+        Raises:
+            ValueError: If this function cannot be used.
+        &#34;&#34;&#34;
+        if self.function_execution_id is None:
+            raise ValueError(&#34;fail is unsupported here as there is no function_execution_id&#34;)
+
+        return await self.client.functions_completeError(function_execution_id=self.function_execution_id, error=error)</code></pre>
 </details>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.context.fail.async_fail.AsyncFail.client"><code class="name">var <span class="ident">client</span> : slack_sdk.web.async_client.AsyncWebClient</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.context.fail.async_fail.AsyncFail.function_execution_id"><code class="name">var <span class="ident">function_execution_id</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 </dd>
 </dl>
 </section>
@@ -107,13 +96,17 @@ Refer to <a href="https://api.slack.com/methods/workflows.stepFailed">https://ap
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="slack_bolt.workflows.step.utilities" href="index.html">slack_bolt.workflows.step.utilities</a></code></li>
+<li><code><a title="slack_bolt.context.fail" href="index.html">slack_bolt.context.fail</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="slack_bolt.workflows.step.utilities.async_fail.AsyncFail" href="#slack_bolt.workflows.step.utilities.async_fail.AsyncFail">AsyncFail</a></code></h4>
+<h4><code><a title="slack_bolt.context.fail.async_fail.AsyncFail" href="#slack_bolt.context.fail.async_fail.AsyncFail">AsyncFail</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.context.fail.async_fail.AsyncFail.client" href="#slack_bolt.context.fail.async_fail.AsyncFail.client">client</a></code></li>
+<li><code><a title="slack_bolt.context.fail.async_fail.AsyncFail.function_execution_id" href="#slack_bolt.context.fail.async_fail.AsyncFail.function_execution_id">function_execution_id</a></code></li>
+</ul>
 </li>
 </ul>
 </li>

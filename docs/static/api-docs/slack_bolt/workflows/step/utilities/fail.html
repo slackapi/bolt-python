@@ -40,7 +40,7 @@ hljs.highlightAll();
 <span>(</span><span>*, client: slack_sdk.web.client.WebClient, body: dict)</span>
 </code></dt>
 <dd>
-<div class="desc"><p><code>fail()</code> utility to tell Slack the execution failure of a workflow step.</p>
+<div class="desc"><p><code>fail()</code> utility to tell Slack the execution failure of a step from app.</p>
 <pre><code>def execute(step, complete, fail):
     inputs = step["inputs"]
     # if something went wrong
@@ -62,7 +62,7 @@ Refer to <a href="https://api.slack.com/methods/workflows.stepFailed">https://ap
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Fail:
-    &#34;&#34;&#34;`fail()` utility to tell Slack the execution failure of a workflow step.
+    &#34;&#34;&#34;`fail()` utility to tell Slack the execution failure of a step from app.
 
         def execute(step, complete, fail):
             inputs = step[&#34;inputs&#34;]

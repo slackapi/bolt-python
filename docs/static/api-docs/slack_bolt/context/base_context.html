@@ -62,14 +62,19 @@ hljs.highlightAll();
         &#34;response_url&#34;,
         &#34;matches&#34;,
         &#34;authorize_result&#34;,
+        &#34;function_bot_access_token&#34;,
         &#34;bot_token&#34;,
         &#34;bot_id&#34;,
         &#34;bot_user_id&#34;,
         &#34;user_token&#34;,
+        &#34;function_execution_id&#34;,
+        &#34;inputs&#34;,
         &#34;client&#34;,
         &#34;ack&#34;,
         &#34;say&#34;,
         &#34;respond&#34;,
+        &#34;complete&#34;,
+        &#34;fail&#34;,
     ]
 
     @property
@@ -141,12 +146,33 @@ hljs.highlightAll();
         &#34;&#34;&#34;Returns all the matched parts in message listener&#39;s regexp&#34;&#34;&#34;
         return self.get(&#34;matches&#34;)
 
+    @property
+    def function_execution_id(self) -&gt; Optional[str]:
+        &#34;&#34;&#34;The `function_execution_id` associated with this request.
+        Only available for `function_executed` and interactivity events scoped to a custom step.
+        &#34;&#34;&#34;
+        return self.get(&#34;function_execution_id&#34;)
+
+    @property
+    def inputs(self) -&gt; Optional[Dict[str, Any]]:
+        &#34;&#34;&#34;The `inputs` associated with this request.
+        Only available for `function_executed` and interactivity events scoped to a custom step.
+        &#34;&#34;&#34;
+        return self.get(&#34;inputs&#34;)
+
     # --------------------------------
 
     @property
     def authorize_result(self) -&gt; Optional[AuthorizeResult]:
         &#34;&#34;&#34;The authorize result resolved for this request.&#34;&#34;&#34;
         return self.get(&#34;authorize_result&#34;)
+
+    @property
+    def function_bot_access_token(self) -&gt; Optional[str]:
+        &#34;&#34;&#34;The bot token resolved for this function request.
+        Only available for `function_executed` and interactivity events scoped to a custom step.
+        &#34;&#34;&#34;
+        return self.get(&#34;function_bot_access_token&#34;)
 
     @property
     def bot_token(self) -&gt; Optional[str]:
@@ -331,6 +357,54 @@ def enterprise_id(self) -&gt; Optional[str]:
     return self.get(&#34;enterprise_id&#34;)</code></pre>
 </details>
 </dd>
+<dt id="slack_bolt.context.base_context.BaseContext.function_bot_access_token"><code class="name">prop <span class="ident">function_bot_access_token</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"><p>The bot token resolved for this function request.
+Only available for <code>function_executed</code> and interactivity events scoped to a custom step.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def function_bot_access_token(self) -&gt; Optional[str]:
+    &#34;&#34;&#34;The bot token resolved for this function request.
+    Only available for `function_executed` and interactivity events scoped to a custom step.
+    &#34;&#34;&#34;
+    return self.get(&#34;function_bot_access_token&#34;)</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.context.base_context.BaseContext.function_execution_id"><code class="name">prop <span class="ident">function_execution_id</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"><p>The <code>function_execution_id</code> associated with this request.
+Only available for <code>function_executed</code> and interactivity events scoped to a custom step.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def function_execution_id(self) -&gt; Optional[str]:
+    &#34;&#34;&#34;The `function_execution_id` associated with this request.
+    Only available for `function_executed` and interactivity events scoped to a custom step.
+    &#34;&#34;&#34;
+    return self.get(&#34;function_execution_id&#34;)</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.context.base_context.BaseContext.inputs"><code class="name">prop <span class="ident">inputs</span> : Optional[Dict[str, Any]]</code></dt>
+<dd>
+<div class="desc"><p>The <code>inputs</code> associated with this request.
+Only available for <code>function_executed</code> and interactivity events scoped to a custom step.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def inputs(self) -&gt; Optional[Dict[str, Any]]:
+    &#34;&#34;&#34;The `inputs` associated with this request.
+    Only available for `function_executed` and interactivity events scoped to a custom step.
+    &#34;&#34;&#34;
+    return self.get(&#34;inputs&#34;)</code></pre>
+</details>
+</dd>
 <dt id="slack_bolt.context.base_context.BaseContext.is_enterprise_install"><code class="name">prop <span class="ident">is_enterprise_install</span> : Optional[bool]</code></dt>
 <dd>
 <div class="desc"><p>True if the request is associated with an Org-wide installation.</p></div>
@@ -473,6 +547,9 @@ def user_token(self) -&gt; Optional[str]:
 <li><code><a title="slack_bolt.context.base_context.BaseContext.bot_user_id" href="#slack_bolt.context.base_context.BaseContext.bot_user_id">bot_user_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.channel_id" href="#slack_bolt.context.base_context.BaseContext.channel_id">channel_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.enterprise_id" href="#slack_bolt.context.base_context.BaseContext.enterprise_id">enterprise_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.function_bot_access_token" href="#slack_bolt.context.base_context.BaseContext.function_bot_access_token">function_bot_access_token</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.function_execution_id" href="#slack_bolt.context.base_context.BaseContext.function_execution_id">function_execution_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.inputs" href="#slack_bolt.context.base_context.BaseContext.inputs">inputs</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.is_enterprise_install" href="#slack_bolt.context.base_context.BaseContext.is_enterprise_install">is_enterprise_install</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.logger" href="#slack_bolt.context.base_context.BaseContext.logger">logger</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.matches" href="#slack_bolt.context.base_context.BaseContext.matches">matches</a></code></li>

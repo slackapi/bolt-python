@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.1">
-<title>slack_bolt.workflows.step.utilities.async_fail API documentation</title>
+<title>slack_bolt.middleware.attaching_function_token.async_attaching_function_token API documentation</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
@@ -22,7 +22,7 @@ hljs.highlightAll();
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>slack_bolt.workflows.step.utilities.async_fail</code></h1>
+<h1 class="title">Module <code>slack_bolt.middleware.attaching_function_token.async_attaching_function_token</code></h1>
 </header>
 <section id="section-intro">
 </section>
@@ -35,67 +35,42 @@ hljs.highlightAll();
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="slack_bolt.workflows.step.utilities.async_fail.AsyncFail"><code class="flex name class">
-<span>class <span class="ident">AsyncFail</span></span>
-<span>(</span><span>*, client: slack_sdk.web.async_client.AsyncWebClient, body: dict)</span>
+<dt id="slack_bolt.middleware.attaching_function_token.async_attaching_function_token.AsyncAttachingFunctionToken"><code class="flex name class">
+<span>class <span class="ident">AsyncAttachingFunctionToken</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p><code>fail()</code> utility to tell Slack the execution failure of a step from app.</p>
-<pre><code>async def execute(step, complete, fail):
-    inputs = step["inputs"]
-    # if something went wrong
-    error = {"message": "Just testing step failure!"}
-    await fail(error=error)
-
-ws = AsyncWorkflowStep(
-    callback_id="add_task",
-    edit=edit,
-    save=save,
-    execute=execute,
-)
-app.step(ws)
-</code></pre>
-<p>This utility is a thin wrapper of workflows.stepFailed API method.
-Refer to <a href="https://api.slack.com/methods/workflows.stepFailed">https://api.slack.com/methods/workflows.stepFailed</a> for details.</p></div>
+<div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class AsyncFail:
-    &#34;&#34;&#34;`fail()` utility to tell Slack the execution failure of a step from app.
-
-        async def execute(step, complete, fail):
-            inputs = step[&#34;inputs&#34;]
-            # if something went wrong
-            error = {&#34;message&#34;: &#34;Just testing step failure!&#34;}
-            await fail(error=error)
-
-        ws = AsyncWorkflowStep(
-            callback_id=&#34;add_task&#34;,
-            edit=edit,
-            save=save,
-            execute=execute,
-        )
-        app.step(ws)
-
-    This utility is a thin wrapper of workflows.stepFailed API method.
-    Refer to https://api.slack.com/methods/workflows.stepFailed for details.
-    &#34;&#34;&#34;
-
-    def __init__(self, *, client: AsyncWebClient, body: dict):
-        self.client = client
-        self.body = body
-
-    async def __call__(
+<pre><code class="python">class AsyncAttachingFunctionToken(AsyncMiddleware):  # type: ignore
+    async def async_process(
         self,
         *,
-        error: dict,
-    ) -&gt; None:
-        await self.client.workflows_stepFailed(
-            workflow_step_execute_id=self.body[&#34;event&#34;][&#34;workflow_step&#34;][&#34;workflow_step_execute_id&#34;],
-            error=error,
-        )</code></pre>
+        req: AsyncBoltRequest,
+        resp: BoltResponse,
+        # This method is not supposed to be invoked by bolt-python users
+        next: Callable[[], Awaitable[BoltResponse]],
+    ) -&gt; BoltResponse:
+        if req.context.function_bot_access_token is not None:
+            req.context.client.token = req.context.function_bot_access_token
+
+        return await next()</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="../async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="../async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a></b></code>:
+<ul class="hlist">
+<li><code><a title="slack_bolt.middleware.async_middleware.AsyncMiddleware.async_process" href="../async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware.async_process">async_process</a></code></li>
+<li><code><a title="slack_bolt.middleware.async_middleware.AsyncMiddleware.name" href="../async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware.name">name</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -107,13 +82,13 @@ Refer to <a href="https://api.slack.com/methods/workflows.stepFailed">https://ap
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="slack_bolt.workflows.step.utilities" href="index.html">slack_bolt.workflows.step.utilities</a></code></li>
+<li><code><a title="slack_bolt.middleware.attaching_function_token" href="index.html">slack_bolt.middleware.attaching_function_token</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="slack_bolt.workflows.step.utilities.async_fail.AsyncFail" href="#slack_bolt.workflows.step.utilities.async_fail.AsyncFail">AsyncFail</a></code></h4>
+<h4><code><a title="slack_bolt.middleware.attaching_function_token.async_attaching_function_token.AsyncAttachingFunctionToken" href="#slack_bolt.middleware.attaching_function_token.async_attaching_function_token.AsyncAttachingFunctionToken">AsyncAttachingFunctionToken</a></code></h4>
 </li>
 </ul>
 </li>

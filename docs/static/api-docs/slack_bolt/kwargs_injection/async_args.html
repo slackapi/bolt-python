@@ -37,7 +37,7 @@ hljs.highlightAll();
 <dl>
 <dt id="slack_bolt.kwargs_injection.async_args.AsyncArgs"><code class="flex name class">
 <span>class <span class="ident">AsyncArgs</span></span>
-<span>(</span><span>*, logger: logging.Logger, client: slack_sdk.web.async_client.AsyncWebClient, req: <a title="slack_bolt.request.async_request.AsyncBoltRequest" href="../request/async_request.html#slack_bolt.request.async_request.AsyncBoltRequest">AsyncBoltRequest</a>, resp: <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>, context: <a title="slack_bolt.context.async_context.AsyncBoltContext" href="../context/async_context.html#slack_bolt.context.async_context.AsyncBoltContext">AsyncBoltContext</a>, body: Dict[str, Any], payload: Dict[str, Any], options: Optional[Dict[str, Any]] = None, shortcut: Optional[Dict[str, Any]] = None, action: Optional[Dict[str, Any]] = None, view: Optional[Dict[str, Any]] = None, command: Optional[Dict[str, Any]] = None, event: Optional[Dict[str, Any]] = None, message: Optional[Dict[str, Any]] = None, ack: <a title="slack_bolt.context.ack.async_ack.AsyncAck" href="../context/ack/async_ack.html#slack_bolt.context.ack.async_ack.AsyncAck">AsyncAck</a>, say: <a title="slack_bolt.context.say.async_say.AsyncSay" href="../context/say/async_say.html#slack_bolt.context.say.async_say.AsyncSay">AsyncSay</a>, respond: <a title="slack_bolt.context.respond.async_respond.AsyncRespond" href="../context/respond/async_respond.html#slack_bolt.context.respond.async_respond.AsyncRespond">AsyncRespond</a>, next: Callable[[], Awaitable[None]], **kwargs)</span>
+<span>(</span><span>*, logger: logging.Logger, client: slack_sdk.web.async_client.AsyncWebClient, req: <a title="slack_bolt.request.async_request.AsyncBoltRequest" href="../request/async_request.html#slack_bolt.request.async_request.AsyncBoltRequest">AsyncBoltRequest</a>, resp: <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>, context: <a title="slack_bolt.context.async_context.AsyncBoltContext" href="../context/async_context.html#slack_bolt.context.async_context.AsyncBoltContext">AsyncBoltContext</a>, body: Dict[str, Any], payload: Dict[str, Any], options: Optional[Dict[str, Any]] = None, shortcut: Optional[Dict[str, Any]] = None, action: Optional[Dict[str, Any]] = None, view: Optional[Dict[str, Any]] = None, command: Optional[Dict[str, Any]] = None, event: Optional[Dict[str, Any]] = None, message: Optional[Dict[str, Any]] = None, ack: <a title="slack_bolt.context.ack.async_ack.AsyncAck" href="../context/ack/async_ack.html#slack_bolt.context.ack.async_ack.AsyncAck">AsyncAck</a>, say: <a title="slack_bolt.context.say.async_say.AsyncSay" href="../context/say/async_say.html#slack_bolt.context.say.async_say.AsyncSay">AsyncSay</a>, respond: <a title="slack_bolt.context.respond.async_respond.AsyncRespond" href="../context/respond/async_respond.html#slack_bolt.context.respond.async_respond.AsyncRespond">AsyncRespond</a>, complete: <a title="slack_bolt.context.complete.async_complete.AsyncComplete" href="../context/complete/async_complete.html#slack_bolt.context.complete.async_complete.AsyncComplete">AsyncComplete</a>, fail: <a title="slack_bolt.context.fail.async_fail.AsyncFail" href="../context/fail/async_fail.html#slack_bolt.context.fail.async_fail.AsyncFail">AsyncFail</a>, next: Callable[[], Awaitable[None]], **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>All the arguments in this class are available in any middleware / listeners.
@@ -139,6 +139,10 @@ async def handle_buttons(args):
     &#34;&#34;&#34;`say()` utility function, which calls chat.postMessage API with the associated channel ID&#34;&#34;&#34;
     respond: AsyncRespond
     &#34;&#34;&#34;`respond()` utility function, which utilizes the associated `response_url`&#34;&#34;&#34;
+    complete: AsyncComplete
+    &#34;&#34;&#34;`complete()` utility function, signals a successful completion of the custom function&#34;&#34;&#34;
+    fail: AsyncFail
+    &#34;&#34;&#34;`fail()` utility function, signal that the custom function failed to complete&#34;&#34;&#34;
     # middleware
     next: Callable[[], Awaitable[None]]
     &#34;&#34;&#34;`next()` utility function, which tells the middleware chain that it can continue with the next one&#34;&#34;&#34;
@@ -165,6 +169,8 @@ async def handle_buttons(args):
         ack: AsyncAck,
         say: AsyncSay,
         respond: AsyncRespond,
+        complete: AsyncComplete,
+        fail: AsyncFail,
         next: Callable[[], Awaitable[None]],
         **kwargs  # noqa
     ):
@@ -187,6 +193,8 @@ async def handle_buttons(args):
         self.ack: AsyncAck = ack
         self.say: AsyncSay = say
         self.respond: AsyncRespond = respond
+        self.complete: AsyncComplete = complete
+        self.fail: AsyncFail = fail
         self.next: Callable[[], Awaitable[None]] = next
         self.next_: Callable[[], Awaitable[None]] = next</code></pre>
 </details>
@@ -212,6 +220,10 @@ async def handle_buttons(args):
 <dd>
 <div class="desc"><p>An alias for payload in an <code>@app.command</code> listener</p></div>
 </dd>
+<dt id="slack_bolt.kwargs_injection.async_args.AsyncArgs.complete"><code class="name">var <span class="ident">complete</span> : <a title="slack_bolt.context.complete.async_complete.AsyncComplete" href="../context/complete/async_complete.html#slack_bolt.context.complete.async_complete.AsyncComplete">AsyncComplete</a></code></dt>
+<dd>
+<div class="desc"><p><code>complete()</code> utility function, signals a successful completion of the custom function</p></div>
+</dd>
 <dt id="slack_bolt.kwargs_injection.async_args.AsyncArgs.context"><code class="name">var <span class="ident">context</span> : <a title="slack_bolt.context.async_context.AsyncBoltContext" href="../context/async_context.html#slack_bolt.context.async_context.AsyncBoltContext">AsyncBoltContext</a></code></dt>
 <dd>
 <div class="desc"><p>Context data associated with the incoming request</p></div>
@@ -219,6 +231,10 @@ async def handle_buttons(args):
 <dt id="slack_bolt.kwargs_injection.async_args.AsyncArgs.event"><code class="name">var <span class="ident">event</span> : Optional[Dict[str, Any]]</code></dt>
 <dd>
 <div class="desc"><p>An alias for payload in an <code>@app.event</code> listener</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.async_args.AsyncArgs.fail"><code class="name">var <span class="ident">fail</span> : <a title="slack_bolt.context.fail.async_fail.AsyncFail" href="../context/fail/async_fail.html#slack_bolt.context.fail.async_fail.AsyncFail">AsyncFail</a></code></dt>
+<dd>
+<div class="desc"><p><code>fail()</code> utility function, signal that the custom function failed to complete</p></div>
 </dd>
 <dt id="slack_bolt.kwargs_injection.async_args.AsyncArgs.logger"><code class="name">var <span class="ident">logger</span> : logging.Logger</code></dt>
 <dd>
@@ -301,8 +317,10 @@ async def handle_buttons(args):
 <li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.body" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.body">body</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.client" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.client">client</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.command" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.command">command</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.complete" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.complete">complete</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.context" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.context">context</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.event" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.event">event</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.fail" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.fail">fail</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.logger" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.logger">logger</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.message" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.message">message</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.async_args.AsyncArgs.next" href="#slack_bolt.kwargs_injection.async_args.AsyncArgs.next">next</a></code></li>

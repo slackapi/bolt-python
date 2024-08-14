@@ -51,7 +51,7 @@ hljs.highlightAll();
 </dd>
 <dt><code class="name"><a title="slack_bolt.workflows.step.utilities" href="utilities/index.html">slack_bolt.workflows.step.utilities</a></code></dt>
 <dd>
-<div class="desc"><p>Utilities specific to workflow steps from apps …</p></div>
+<div class="desc"><p>Utilities specific to steps from apps …</p></div>
 </dd>
 </dl>
 </section>
@@ -67,7 +67,7 @@ hljs.highlightAll();
 <span>(</span><span>*, client: slack_sdk.web.client.WebClient, body: dict)</span>
 </code></dt>
 <dd>
-<div class="desc"><p><code>complete()</code> utility to tell Slack the completion of a workflow step execution.</p>
+<div class="desc"><p><code>complete()</code> utility to tell Slack the completion of a step from app execution.</p>
 <pre><code>def execute(step, complete, fail):
     inputs = step["inputs"]
     # if everything was successful
@@ -92,7 +92,7 @@ Refer to <a href="https://api.slack.com/methods/workflows.stepCompleted">https:/
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Complete:
-    &#34;&#34;&#34;`complete()` utility to tell Slack the completion of a workflow step execution.
+    &#34;&#34;&#34;`complete()` utility to tell Slack the completion of a step from app execution.
 
         def execute(step, complete, fail):
             inputs = step[&#34;inputs&#34;]
@@ -215,7 +215,7 @@ app.step(ws)
 <span>(</span><span>*, client: slack_sdk.web.client.WebClient, body: dict)</span>
 </code></dt>
 <dd>
-<div class="desc"><p><code>fail()</code> utility to tell Slack the execution failure of a workflow step.</p>
+<div class="desc"><p><code>fail()</code> utility to tell Slack the execution failure of a step from app.</p>
 <pre><code>def execute(step, complete, fail):
     inputs = step["inputs"]
     # if something went wrong
@@ -237,7 +237,7 @@ Refer to <a href="https://api.slack.com/methods/workflows.stepFailed">https://ap
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Fail:
-    &#34;&#34;&#34;`fail()` utility to tell Slack the execution failure of a workflow step.
+    &#34;&#34;&#34;`fail()` utility to tell Slack the execution failure of a step from app.
 
         def execute(step, complete, fail):
             inputs = step[&#34;inputs&#34;]
@@ -374,12 +374,12 @@ Refer to <a href="https://api.slack.com/methods/workflows.updateStep">https://ap
 </code></dt>
 <dd>
 <div class="desc"><h2 id="deprecated">Deprecated</h2>
-<p>Steps from Apps for legacy workflows are now deprecated.
+<p>Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: <a href="https://api.slack.com/automation/functions/custom-bolt">https://api.slack.com/automation/functions/custom-bolt</a></p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>callback_id</code></strong></dt>
-<dd>The callback_id for this workflow step</dd>
+<dd>The callback_id for this step from app</dd>
 <dt><strong><code>edit</code></strong></dt>
 <dd>Either a single function or a list of functions for opening a modal in the builder UI
 When it's a list, the first one is responsible for ack() while the rest are lazy listeners.</dd>
@@ -387,7 +387,7 @@ When it's a list, the first one is responsible for ack() while the rest are lazy
 <dd>Either a single function or a list of functions for handling modal interactions in the builder UI
 When it's a list, the first one is responsible for ack() while the rest are lazy listeners.</dd>
 <dt><strong><code>execute</code></strong></dt>
-<dd>Either a single function or a list of functions for handling workflow step executions
+<dd>Either a single function or a list of functions for handling step from app executions
 When it's a list, the first one is responsible for ack() while the rest are lazy listeners.</dd>
 <dt><strong><code>app_name</code></strong></dt>
 <dd>The app name that can be mainly used for logging</dd>
@@ -400,13 +400,13 @@ When it's a list, the first one is responsible for ack() while the rest are lazy
 </summary>
 <pre><code class="python">class WorkflowStep:
     callback_id: Union[str, Pattern]
-    &#34;&#34;&#34;The Callback ID of the workflow step&#34;&#34;&#34;
+    &#34;&#34;&#34;The Callback ID of the step from app&#34;&#34;&#34;
     edit: Listener
     &#34;&#34;&#34;`edit` listener, which displays a modal in Workflow Builder&#34;&#34;&#34;
     save: Listener
     &#34;&#34;&#34;`save` listener, which accepts workflow creator&#39;s data submission in Workflow Builder&#34;&#34;&#34;
     execute: Listener
-    &#34;&#34;&#34;`execute` listener, which processes workflow step execution&#34;&#34;&#34;
+    &#34;&#34;&#34;`execute` listener, which processes step from app execution&#34;&#34;&#34;
 
     def __init__(
         self,
@@ -420,16 +420,16 @@ When it's a list, the first one is responsible for ack() while the rest are lazy
     ):
         &#34;&#34;&#34;
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
         Args:
-            callback_id: The callback_id for this workflow step
+            callback_id: The callback_id for this step from app
             edit: Either a single function or a list of functions for opening a modal in the builder UI
                 When it&#39;s a list, the first one is responsible for ack() while the rest are lazy listeners.
             save: Either a single function or a list of functions for handling modal interactions in the builder UI
                 When it&#39;s a list, the first one is responsible for ack() while the rest are lazy listeners.
-            execute: Either a single function or a list of functions for handling workflow step executions
+            execute: Either a single function or a list of functions for handling step from app executions
                 When it&#39;s a list, the first one is responsible for ack() while the rest are lazy listeners.
             app_name: The app name that can be mainly used for logging
             base_logger: The logger instance that can be used as a template when creating this step&#39;s logger
@@ -462,7 +462,7 @@ When it's a list, the first one is responsible for ack() while the rest are lazy
     def builder(cls, callback_id: Union[str, Pattern], base_logger: Optional[Logger] = None) -&gt; WorkflowStepBuilder:
         &#34;&#34;&#34;
         Deprecated:
-            Steps from Apps for legacy workflows are now deprecated.
+            Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
         &#34;&#34;&#34;
         return WorkflowStepBuilder(
@@ -558,7 +558,7 @@ When it's a list, the first one is responsible for ack() while the rest are lazy
 <dl>
 <dt id="slack_bolt.workflows.step.WorkflowStep.callback_id"><code class="name">var <span class="ident">callback_id</span> : Union[str, Pattern]</code></dt>
 <dd>
-<div class="desc"><p>The Callback ID of the workflow step</p></div>
+<div class="desc"><p>The Callback ID of the step from app</p></div>
 </dd>
 <dt id="slack_bolt.workflows.step.WorkflowStep.edit"><code class="name">var <span class="ident">edit</span> : <a title="slack_bolt.listener.listener.Listener" href="../../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a></code></dt>
 <dd>
@@ -566,7 +566,7 @@ When it's a list, the first one is responsible for ack() while the rest are lazy
 </dd>
 <dt id="slack_bolt.workflows.step.WorkflowStep.execute"><code class="name">var <span class="ident">execute</span> : <a title="slack_bolt.listener.listener.Listener" href="../../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a></code></dt>
 <dd>
-<div class="desc"><p><code>execute</code> listener, which processes workflow step execution</p></div>
+<div class="desc"><p><code>execute</code> listener, which processes step from app execution</p></div>
 </dd>
 <dt id="slack_bolt.workflows.step.WorkflowStep.save"><code class="name">var <span class="ident">save</span> : <a title="slack_bolt.listener.listener.Listener" href="../../listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a></code></dt>
 <dd>
@@ -586,7 +586,7 @@ When it's a list, the first one is responsible for ack() while the rest are lazy
 </code></dt>
 <dd>
 <div class="desc"><h2 id="deprecated">Deprecated</h2>
-<p>Steps from Apps for legacy workflows are now deprecated.
+<p>Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: <a href="https://api.slack.com/automation/functions/custom-bolt">https://api.slack.com/automation/functions/custom-bolt</a></p></div>
 </dd>
 </dl>
@@ -596,13 +596,13 @@ Use new custom steps: <a href="https://api.slack.com/automation/functions/custom
 <span>(</span><span>step: <a title="slack_bolt.workflows.step.step.WorkflowStep" href="step.html#slack_bolt.workflows.step.step.WorkflowStep">WorkflowStep</a>, listener_runner: <a title="slack_bolt.listener.thread_runner.ThreadListenerRunner" href="../../listener/thread_runner.html#slack_bolt.listener.thread_runner.ThreadListenerRunner">ThreadListenerRunner</a>)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Base middleware for workflow step specific ones</p></div>
+<div class="desc"><p>Base middleware for step from app specific ones</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class WorkflowStepMiddleware(Middleware):  # type:ignore
-    &#34;&#34;&#34;Base middleware for workflow step specific ones&#34;&#34;&#34;
+    &#34;&#34;&#34;Base middleware for step from app specific ones&#34;&#34;&#34;
 
     def __init__(self, step: WorkflowStep, listener_runner: ThreadListenerRunner):
         self.step = step

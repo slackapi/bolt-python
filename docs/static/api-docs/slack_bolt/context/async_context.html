@@ -157,7 +157,55 @@ hljs.highlightAll();
                 proxy=self.client.proxy,
                 ssl=self.client.ssl,
             )
-        return self[&#34;respond&#34;]</code></pre>
+        return self[&#34;respond&#34;]
+
+    @property
+    def complete(self) -&gt; AsyncComplete:
+        &#34;&#34;&#34;`complete()` function for this request. Once a custom function&#39;s state is set to complete,
+        any outputs the function returns will be passed along to the next step of its housing workflow,
+        or complete the workflow if the function is the last step in a workflow. Additionally,
+        any interactivity handlers associated to a function invocation will no longer be invocable.
+
+            @app.function(&#34;reverse&#34;)
+            async def handle_button_clicks(ack, complete):
+                await ack()
+                await complete(outputs={&#34;stringReverse&#34;:&#34;olleh&#34;})
+
+            @app.function(&#34;reverse&#34;)
+            async def handle_button_clicks(context):
+                await context.ack()
+                await context.complete(outputs={&#34;stringReverse&#34;:&#34;olleh&#34;})
+
+        Returns:
+            Callable `complete()` function
+        &#34;&#34;&#34;
+        if &#34;complete&#34; not in self:
+            self[&#34;complete&#34;] = AsyncComplete(client=self.client, function_execution_id=self.function_execution_id)
+        return self[&#34;complete&#34;]
+
+    @property
+    def fail(self) -&gt; AsyncFail:
+        &#34;&#34;&#34;`fail()` function for this request. Once a custom function&#39;s state is set to error,
+        its housing workflow will be interrupted and any provided error message will be passed
+        on to the end user through SlackBot. Additionally, any interactivity handlers associated
+        to a function invocation will no longer be invocable.
+
+            @app.function(&#34;reverse&#34;)
+            async def handle_button_clicks(ack, fail):
+                await ack()
+                await fail(error=&#34;something went wrong&#34;)
+
+            @app.function(&#34;reverse&#34;)
+            async def handle_button_clicks(context):
+                await context.ack()
+                await context.fail(error=&#34;something went wrong&#34;)
+
+        Returns:
+            Callable `fail()` function
+        &#34;&#34;&#34;
+        if &#34;fail&#34; not in self:
+            self[&#34;fail&#34;] = AsyncFail(client=self.client, function_execution_id=self.function_execution_id)
+        return self[&#34;fail&#34;]</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -254,6 +302,100 @@ def client(self) -&gt; Optional[AsyncWebClient]:
     if &#34;client&#34; not in self:
         self[&#34;client&#34;] = AsyncWebClient(token=None)
     return self[&#34;client&#34;]</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.context.async_context.AsyncBoltContext.complete"><code class="name">prop <span class="ident">complete</span> : <a title="slack_bolt.context.complete.async_complete.AsyncComplete" href="complete/async_complete.html#slack_bolt.context.complete.async_complete.AsyncComplete">AsyncComplete</a></code></dt>
+<dd>
+<div class="desc"><p><code>complete()</code> function for this request. Once a custom function's state is set to complete,
+any outputs the function returns will be passed along to the next step of its housing workflow,
+or complete the workflow if the function is the last step in a workflow. Additionally,
+any interactivity handlers associated to a function invocation will no longer be invocable.</p>
+<pre><code>@app.function("reverse")
+async def handle_button_clicks(ack, complete):
+    await ack()
+    await complete(outputs={"stringReverse":"olleh"})
+
+@app.function("reverse")
+async def handle_button_clicks(context):
+    await context.ack()
+    await context.complete(outputs={"stringReverse":"olleh"})
+</code></pre>
+<h2 id="returns">Returns</h2>
+<p>Callable <code>complete()</code> function</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def complete(self) -&gt; AsyncComplete:
+    &#34;&#34;&#34;`complete()` function for this request. Once a custom function&#39;s state is set to complete,
+    any outputs the function returns will be passed along to the next step of its housing workflow,
+    or complete the workflow if the function is the last step in a workflow. Additionally,
+    any interactivity handlers associated to a function invocation will no longer be invocable.
+
+        @app.function(&#34;reverse&#34;)
+        async def handle_button_clicks(ack, complete):
+            await ack()
+            await complete(outputs={&#34;stringReverse&#34;:&#34;olleh&#34;})
+
+        @app.function(&#34;reverse&#34;)
+        async def handle_button_clicks(context):
+            await context.ack()
+            await context.complete(outputs={&#34;stringReverse&#34;:&#34;olleh&#34;})
+
+    Returns:
+        Callable `complete()` function
+    &#34;&#34;&#34;
+    if &#34;complete&#34; not in self:
+        self[&#34;complete&#34;] = AsyncComplete(client=self.client, function_execution_id=self.function_execution_id)
+    return self[&#34;complete&#34;]</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.context.async_context.AsyncBoltContext.fail"><code class="name">prop <span class="ident">fail</span> : <a title="slack_bolt.context.fail.async_fail.AsyncFail" href="fail/async_fail.html#slack_bolt.context.fail.async_fail.AsyncFail">AsyncFail</a></code></dt>
+<dd>
+<div class="desc"><p><code>fail()</code> function for this request. Once a custom function's state is set to error,
+its housing workflow will be interrupted and any provided error message will be passed
+on to the end user through SlackBot. Additionally, any interactivity handlers associated
+to a function invocation will no longer be invocable.</p>
+<pre><code>@app.function("reverse")
+async def handle_button_clicks(ack, fail):
+    await ack()
+    await fail(error="something went wrong")
+
+@app.function("reverse")
+async def handle_button_clicks(context):
+    await context.ack()
+    await context.fail(error="something went wrong")
+</code></pre>
+<h2 id="returns">Returns</h2>
+<p>Callable <code>fail()</code> function</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def fail(self) -&gt; AsyncFail:
+    &#34;&#34;&#34;`fail()` function for this request. Once a custom function&#39;s state is set to error,
+    its housing workflow will be interrupted and any provided error message will be passed
+    on to the end user through SlackBot. Additionally, any interactivity handlers associated
+    to a function invocation will no longer be invocable.
+
+        @app.function(&#34;reverse&#34;)
+        async def handle_button_clicks(ack, fail):
+            await ack()
+            await fail(error=&#34;something went wrong&#34;)
+
+        @app.function(&#34;reverse&#34;)
+        async def handle_button_clicks(context):
+            await context.ack()
+            await context.fail(error=&#34;something went wrong&#34;)
+
+    Returns:
+        Callable `fail()` function
+    &#34;&#34;&#34;
+    if &#34;fail&#34; not in self:
+        self[&#34;fail&#34;] = AsyncFail(client=self.client, function_execution_id=self.function_execution_id)
+    return self[&#34;fail&#34;]</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.context.async_context.AsyncBoltContext.respond"><code class="name">prop <span class="ident">respond</span> : Optional[<a title="slack_bolt.context.respond.async_respond.AsyncRespond" href="respond/async_respond.html#slack_bolt.context.respond.async_respond.AsyncRespond">AsyncRespond</a>]</code></dt>
@@ -369,6 +511,9 @@ def say(self) -&gt; AsyncSay:
 <li><code><a title="slack_bolt.context.base_context.BaseContext.bot_user_id" href="base_context.html#slack_bolt.context.base_context.BaseContext.bot_user_id">bot_user_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.channel_id" href="base_context.html#slack_bolt.context.base_context.BaseContext.channel_id">channel_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.enterprise_id" href="base_context.html#slack_bolt.context.base_context.BaseContext.enterprise_id">enterprise_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.function_bot_access_token" href="base_context.html#slack_bolt.context.base_context.BaseContext.function_bot_access_token">function_bot_access_token</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.function_execution_id" href="base_context.html#slack_bolt.context.base_context.BaseContext.function_execution_id">function_execution_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.inputs" href="base_context.html#slack_bolt.context.base_context.BaseContext.inputs">inputs</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.is_enterprise_install" href="base_context.html#slack_bolt.context.base_context.BaseContext.is_enterprise_install">is_enterprise_install</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.logger" href="base_context.html#slack_bolt.context.base_context.BaseContext.logger">logger</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.matches" href="base_context.html#slack_bolt.context.base_context.BaseContext.matches">matches</a></code></li>
@@ -398,9 +543,11 @@ def say(self) -&gt; AsyncSay:
 <ul>
 <li>
 <h4><code><a title="slack_bolt.context.async_context.AsyncBoltContext" href="#slack_bolt.context.async_context.AsyncBoltContext">AsyncBoltContext</a></code></h4>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.ack" href="#slack_bolt.context.async_context.AsyncBoltContext.ack">ack</a></code></li>
 <li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.client" href="#slack_bolt.context.async_context.AsyncBoltContext.client">client</a></code></li>
+<li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.complete" href="#slack_bolt.context.async_context.AsyncBoltContext.complete">complete</a></code></li>
+<li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.fail" href="#slack_bolt.context.async_context.AsyncBoltContext.fail">fail</a></code></li>
 <li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.respond" href="#slack_bolt.context.async_context.AsyncBoltContext.respond">respond</a></code></li>
 <li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.say" href="#slack_bolt.context.async_context.AsyncBoltContext.say">say</a></code></li>
 <li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.to_copyable" href="#slack_bolt.context.async_context.AsyncBoltContext.to_copyable">to_copyable</a></code></li>
