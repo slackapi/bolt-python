@@ -2,7 +2,7 @@
 # Note: Since 2021.12.8, the pytype code analyzer does not properly work for this file
 
 from logging import Logger
-from typing import Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from slack_bolt.authorization import AuthorizeResult
 
@@ -24,14 +24,19 @@ class BaseContext(dict):
         "response_url",
         "matches",
         "authorize_result",
+        "function_bot_access_token",
         "bot_token",
         "bot_id",
         "bot_user_id",
         "user_token",
+        "function_execution_id",
+        "inputs",
         "client",
         "ack",
         "say",
         "respond",
+        "complete",
+        "fail",
     ]
 
     @property
@@ -103,12 +108,33 @@ class BaseContext(dict):
         """Returns all the matched parts in message listener's regexp"""
         return self.get("matches")
 
+    @property
+    def function_execution_id(self) -> Optional[str]:
+        """The `function_execution_id` associated with this request.
+        Only available for `function_executed` and interactivity events scoped to a custom step.
+        """
+        return self.get("function_execution_id")
+
+    @property
+    def inputs(self) -> Optional[Dict[str, Any]]:
+        """The `inputs` associated with this request.
+        Only available for `function_executed` and interactivity events scoped to a custom step.
+        """
+        return self.get("inputs")
+
     # --------------------------------
 
     @property
     def authorize_result(self) -> Optional[AuthorizeResult]:
         """The authorize result resolved for this request."""
         return self.get("authorize_result")
+
+    @property
+    def function_bot_access_token(self) -> Optional[str]:
+        """The bot token resolved for this function request.
+        Only available for `function_executed` and interactivity events scoped to a custom step.
+        """
+        return self.get("function_bot_access_token")
 
     @property
     def bot_token(self) -> Optional[str]:

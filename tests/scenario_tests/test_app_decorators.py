@@ -43,6 +43,13 @@ class TestAppDecorators:
             handle_message_events({})
             assert isinstance(handle_message_events, Callable)
 
+            @app.function("reverse")
+            def handle_function_events(body: dict):
+                assert body is not None
+
+            handle_function_events({})
+            assert isinstance(handle_function_events, Callable)
+
             @app.command("/hello")
             def handle_commands(ack: Ack, body: dict):
                 assert body is not None

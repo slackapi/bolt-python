@@ -4,6 +4,8 @@ from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.context.base_context import BaseContext
+from slack_bolt.context.complete.async_complete import AsyncComplete
+from slack_bolt.context.fail.async_fail import AsyncFail
 from slack_bolt.context.respond.async_respond import AsyncRespond
 from slack_bolt.context.say.async_say import AsyncSay
 from slack_bolt.util.utils import create_copy
@@ -122,3 +124,51 @@ class AsyncBoltContext(BaseContext):
                 ssl=self.client.ssl,
             )
         return self["respond"]
+
+    @property
+    def complete(self) -> AsyncComplete:
+        """`complete()` function for this request. Once a custom function's state is set to complete,
+        any outputs the function returns will be passed along to the next step of its housing workflow,
+        or complete the workflow if the function is the last step in a workflow. Additionally,
+        any interactivity handlers associated to a function invocation will no longer be invocable.
+
+            @app.function("reverse")
+            async def handle_button_clicks(ack, complete):
+                await ack()
+                await complete(outputs={"stringReverse":"olleh"})
+
+            @app.function("reverse")
+            async def handle_button_clicks(context):
+                await context.ack()
+                await context.complete(outputs={"stringReverse":"olleh"})
+
+        Returns:
+            Callable `complete()` function
+        """
+        if "complete" not in self:
+            self["complete"] = AsyncComplete(client=self.client, function_execution_id=self.function_execution_id)
+        return self["complete"]
+
+    @property
+    def fail(self) -> AsyncFail:
+        """`fail()` function for this request. Once a custom function's state is set to error,
+        its housing workflow will be interrupted and any provided error message will be passed
+        on to the end user through SlackBot. Additionally, any interactivity handlers associated
+        to a function invocation will no longer be invocable.
+
+            @app.function("reverse")
+            async def handle_button_clicks(ack, fail):
+                await ack()
+                await fail(error="something went wrong")
+
+            @app.function("reverse")
+            async def handle_button_clicks(context):
+                await context.ack()
+                await context.fail(error="something went wrong")
+
+        Returns:
+            Callable `fail()` function
+        """
+        if "fail" not in self:
+            self["fail"] = AsyncFail(client=self.client, function_execution_id=self.function_execution_id)
+        return self["fail"]

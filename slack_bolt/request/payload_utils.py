@@ -20,6 +20,10 @@ def to_message(body: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     return None
 
 
+def is_function(body: Dict[str, Any]) -> bool:
+    return is_event(body) and "function_executed" == body["event"]["type"] and "function_execution_id" in body["event"]
+
+
 def is_event(body: Dict[str, Any]) -> bool:
     return body is not None and _is_expected_type(body, "event_callback") and "event" in body and "type" in body["event"]
 
