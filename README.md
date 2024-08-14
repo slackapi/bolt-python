@@ -95,29 +95,32 @@ Apps typically react to a collection of incoming events, which can correspond to
 request, there's a method to build a listener function.
 
 ```python
-# Listen for an event from the Events API
-app.event(event_type)(fn)
-
-# Convenience method to listen to only `message` events using a string or re.Pattern
-app.message([pattern ,])(fn)
-
 # Listen for an action from a Block Kit element (buttons, select menus, date pickers, etc)
 app.action(action_id)(fn)
 
 # Listen for dialog submissions
 app.action({"callback_id": callbackId})(fn)
 
-# Listen for a global or message shortcuts
-app.shortcut(callback_id)(fn)
-
 # Listen for slash commands
 app.command(command_name)(fn)
 
-# Listen for view_submission modal events
-app.view(callback_id)(fn)
+# Listen for an event from the Events API
+app.event(event_type)(fn)
+
+# Listen for a custom step execution from a workflow
+app.function(callback_id)(fn)
+
+# Convenience method to listen to only `message` events using a string or re.Pattern
+app.message([pattern ,])(fn)
 
 # Listen for options requests (from select menus with an external data source)
 app.options(action_id)(fn)
+
+# Listen for a global or message shortcuts
+app.shortcut(callback_id)(fn)
+
+# Listen for view_submission modal events
+app.view(callback_id)(fn)
 ```
 
 The recommended way to use these methods are decorators:
@@ -142,6 +145,8 @@ Most of the app's functionality will be inside listener functions (the `fn` para
 | `say` | Utility function to send a message to the channel associated with the incoming event. This argument is only available when the listener is triggered for events that contain a `channel_id` (the most common being `message` events). `say` accepts simple strings (for plain-text messages) and dictionaries (for messages containing blocks).
 | `client` | Web API client that uses the token associated with the event. For single-workspace installations, the token is provided to the constructor. For multi-workspace installations, the token is returned by using [the OAuth library](https://slack.dev/bolt-python/concepts/authenticating-oauth), or manually using the `authorize` function.
 | `logger` | The built-in [`logging.Logger`](https://docs.python.org/3/library/logging.html) instance you can use in middleware/listeners.
+| `complete` | Utility function used to signal the successful completion of a custom step execution. This tells Slack to proceed with the next steps in the workflow. This argument is only available with the `.function` and `.action` listener when handling custom workflow step executions.
+| `fail` | Utility function used to signal that a custom step failed to complete. This tells Slack to stop the workflow execution. This argument is only available with the `.function` and `.action` listener when handling custom workflow step executions.
 
 ## Creating an async app
 

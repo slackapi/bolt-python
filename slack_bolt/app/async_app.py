@@ -78,6 +78,7 @@ from slack_bolt.middleware.async_builtins import (
     AsyncRequestVerification,
     AsyncIgnoringSelfEvents,
     AsyncUrlVerification,
+    AsyncAttachingFunctionToken,
 )
 from slack_bolt.middleware.async_custom_middleware import (
     AsyncMiddleware,
@@ -124,6 +125,7 @@ class AsyncApp:
         ignoring_self_events_enabled: bool = True,
         ssl_check_enabled: bool = True,
         url_verification_enabled: bool = True,
+        attaching_function_token_enabled: bool = True,
         # for the OAuth flow
         oauth_settings: Optional[AsyncOAuthSettings] = None,
         oauth_flow: Optional[AsyncOAuthFlow] = None,
@@ -188,6 +190,9 @@ class AsyncApp:
                 that verify the endpoint for Events API in HTTP Mode requests.
             ssl_check_enabled: bool = False if you would like to disable the built-in middleware (Default: True).
                 `AsyncSslCheck` is a built-in middleware that handles ssl_check requests from Slack.
+            attaching_function_token_enabled: False if you would like to disable the built-in middleware (Default: True).
+                `AsyncAttachingFunctionToken` is a built-in middleware that injects the just-in-time workflow-execution token
+                when your app receives `function_executed` or interactivity events scoped to a custom step.
             oauth_settings: The settings related to Slack app installation flow (OAuth flow)
             oauth_flow: Instantiated `slack_bolt.oauth.AsyncOAuthFlow`. This is always prioritized over oauth_settings.
             verification_token: Deprecated verification mechanism. This can used only for ssl_check requests.
@@ -358,6 +363,7 @@ class AsyncApp:
             ignoring_self_events_enabled=ignoring_self_events_enabled,
             ssl_check_enabled=ssl_check_enabled,
             url_verification_enabled=url_verification_enabled,
+            attaching_function_token_enabled=attaching_function_token_enabled,
             user_facing_authorize_error_message=user_facing_authorize_error_message,
         )
 
@@ -369,6 +375,7 @@ class AsyncApp:
         ignoring_self_events_enabled: bool = True,
         ssl_check_enabled: bool = True,
         url_verification_enabled: bool = True,
+        attaching_function_token_enabled: bool = True,
         user_facing_authorize_error_message: Optional[str] = None,
     ):
         if self._init_middleware_list_done:
@@ -419,6 +426,8 @@ class AsyncApp:
             self._async_middleware_list.append(AsyncIgnoringSelfEvents(base_logger=self._base_logger))
         if url_verification_enabled is True:
             self._async_middleware_list.append(AsyncUrlVerification(base_logger=self._base_logger))
+        if attaching_function_token_enabled is True:
+            self._async_middleware_list.append(AsyncAttachingFunctionToken())
         self._init_middleware_list_done = True
 
     # -------------------------
@@ -886,6 +895,51 @@ class AsyncApp:
             )
             middleware.insert(0, AsyncMessageListenerMatches(keyword))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
+
+        return __call__
+
+    def function(
+        self,
+        callback_id: Union[str, Pattern],
+        matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
+        middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
+    ) -> Callable[..., Optional[Callable[..., Awaitable[BoltResponse]]]]:
+        """Registers a new Function listener.
+        This method can be used as either a decorator or a method.
+
+            # Use this method as a decorator
+            @app.function("reverse")
+            async def reverse_string(ack: AsyncAck, inputs: dict, complete: AsyncComplete, fail: AsyncFail):
+                try:
+                    await ack()
+                    string_to_reverse = inputs["stringToReverse"]
+                    await complete({"reverseString": string_to_reverse[::-1]})
+                except Exception as e:
+                    await fail(f"Cannot reverse string (error: {e})")
+                    raise e
+
+            # Pass a function to this method
+            app.function("reverse")(reverse_string)
+
+        To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
+
+        Args:
+            callback_id: The callback id to identify the function
+            matchers: A list of listener matcher functions.
+                Only when all the matchers return True, the listener function can be invoked.
+            middleware: A list of lister middleware functions.
+                Only when all the middleware call `next()` method, the listener function can be invoked.
+        """
+
+        matchers = list(matchers) if matchers else []
+        middleware = list(middleware) if middleware else []
+
+        def __call__(*args, **kwargs):
+            functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+            primary_matcher = builtin_matchers.function_executed(
+                callback_id=callback_id, base_logger=self._base_logger, asyncio=True
+            )
+            return self._register_listener(functions, primary_matcher, matchers, middleware, True)
 
         return __call__
 

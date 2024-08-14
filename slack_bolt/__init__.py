@@ -9,6 +9,8 @@ A Python framework to build Slack apps in a flash with the latest platform featu
 from .app import App
 from .context import BoltContext
 from .context.ack import Ack
+from .context.complete import Complete
+from .context.fail import Fail
 from .context.respond import Respond
 from .context.say import Say
 from .kwargs_injection import Args
@@ -21,6 +23,8 @@ __all__ = [
     "App",
     "BoltContext",
     "Ack",
+    "Complete",
+    "Fail",
     "Respond",
     "Say",
     "Args",
