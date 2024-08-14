@@ -43,6 +43,7 @@ const sidebars = {
         'basic/view_submissions',
         'basic/app-home',
         'basic/options',
+        'basic/custom-steps',
         'basic/authenticating-oauth',
         'basic/socket-mode'
       ],
