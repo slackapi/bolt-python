@@ -45,7 +45,7 @@ class AsyncCustomListenerMatcher(AsyncListenerMatcher):
         return await self.func(
             **build_async_required_kwargs(
                 logger=self.logger,
-                required_arg_names=self.arg_names,
+                required_arg_names=self.arg_names,  # type: ignore[arg-type]
                 request=req,
                 response=resp,
                 this_func=self.func,

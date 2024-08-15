@@ -17,7 +17,7 @@ class AsyncIgnoringSelfEvents(IgnoringSelfEvents, AsyncMiddleware):
         auth_result = req.context.authorize_result
         # message events can have $.event.bot_id while it does not have its user_id
         bot_id = req.body.get("event", {}).get("bot_id")
-        if self._is_self_event(auth_result, req.context.user_id, bot_id, req.body):
+        if self._is_self_event(auth_result, req.context.user_id, bot_id, req.body):  # type: ignore[arg-type]
             self._debug_log(req.body)
             return await req.context.ack()
         else:

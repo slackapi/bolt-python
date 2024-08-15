@@ -1,6 +1,6 @@
 from typing import Optional
 
-import cherrypy
+import cherrypy  # type: ignore[import-untyped]
 
 from slack_bolt.app import App
 from slack_bolt.oauth import OAuthFlow
@@ -55,7 +55,7 @@ def slack_in():
 
 
 class SlackRequestHandler:
-    def __init__(self, app: App):  # type: ignore
+    def __init__(self, app: App):
         self.app = app
 
     def handle(self) -> bytes:
@@ -73,7 +73,7 @@ class SlackRequestHandler:
                     set_response_status_and_headers(bolt_resp)
                     return (bolt_resp.body or "").encode("utf-8")
         elif req.method == "POST":
-            bolt_resp: BoltResponse = self.app.dispatch(build_bolt_request())
+            bolt_resp = self.app.dispatch(build_bolt_request())
             set_response_status_and_headers(bolt_resp)
             return (bolt_resp.body or "").encode("utf-8")
 

@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Sequence, Union
 
 from .internals import ENCODING
 
@@ -19,7 +19,7 @@ class WsgiHttpRequest:
         self.protocol: str = environ.get("SERVER_PROTOCOL", "")
         self.environ = environ
 
-    def get_headers(self) -> Dict[str, str]:
+    def get_headers(self) -> Dict[str, Union[str, Sequence[str]]]:
         headers = {}
         for key, value in self.environ.items():
             if key in {"CONTENT_LENGTH", "CONTENT_TYPE"}:

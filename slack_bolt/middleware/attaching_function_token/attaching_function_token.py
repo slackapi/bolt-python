@@ -5,7 +5,7 @@ from slack_bolt.response import BoltResponse
 from slack_bolt.middleware.middleware import Middleware
 
 
-class AttachingFunctionToken(Middleware):  # type: ignore
+class AttachingFunctionToken(Middleware):
     def process(
         self,
         *,
@@ -14,7 +14,7 @@ class AttachingFunctionToken(Middleware):  # type: ignore
         # This method is not supposed to be invoked by bolt-python users
         next: Callable[[], BoltResponse],
     ) -> BoltResponse:
-        if req.context.function_bot_access_token is not None:
+        if req.context.client is not None and req.context.function_bot_access_token is not None:
             req.context.client.token = req.context.function_bot_access_token
 
         return next()

@@ -9,7 +9,7 @@ from .handler import set_response
 
 
 class AsyncSlackEventsHandler(RequestHandler):
-    def initialize(self, app: AsyncApp):  # type: ignore
+    def initialize(self, app: AsyncApp):
         self.app = app
 
     async def post(self):
@@ -19,12 +19,12 @@ class AsyncSlackEventsHandler(RequestHandler):
 
 
 class AsyncSlackOAuthHandler(RequestHandler):
-    def initialize(self, app: AsyncApp):  # type: ignore
+    def initialize(self, app: AsyncApp):
         self.app = app
 
     async def get(self):
-        if self.app.oauth_flow is not None:  # type: ignore
-            oauth_flow: AsyncOAuthFlow = self.app.oauth_flow  # type: ignore
+        if self.app.oauth_flow is not None:
+            oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
             if self.request.path == oauth_flow.install_path:
                 bolt_resp = await oauth_flow.handle_installation(to_async_bolt_request(self.request))
                 set_response(self, bolt_resp)
@@ -40,5 +40,5 @@ def to_async_bolt_request(req: HTTPServerRequest) -> AsyncBoltRequest:
     return AsyncBoltRequest(
         body=req.body.decode("utf-8") if req.body else "",
         query=req.query,
-        headers=req.headers,
+        headers=req.headers,  # type: ignore[arg-type]
     )

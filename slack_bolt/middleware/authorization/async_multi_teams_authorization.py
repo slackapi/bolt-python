@@ -86,7 +86,7 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
                 req.context["token"] = token
                 # As AsyncApp#_init_context() generates a new AsyncWebClient for this request,
                 # it's safe to modify this instance.
-                req.context.client.token = token
+                req.context.client.token = token  # type: ignore[union-attr]
                 return await next()
             else:
                 # This situation can arise if:
@@ -96,7 +96,7 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
                     "Although the app should be installed into this workspace, "
                     "the AuthorizeResult (returned value from authorize) for it was not found."
                 )
-                if req.context.response_url is not None:
+                if req.context.response_url is not None and callable(req.context.respond):
                     await req.context.respond(self.user_facing_authorize_error_message)
                     return BoltResponse(status=200, body="")
                 return _build_user_facing_error_response(self.user_facing_authorize_error_message)

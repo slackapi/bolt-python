@@ -1,4 +1,3 @@
-# pytype: skip-file
 from typing import Optional
 
 from slack_sdk import WebClient
@@ -122,8 +121,8 @@ class BoltContext(BaseContext):
         if "respond" not in self:
             self["respond"] = Respond(
                 response_url=self.response_url,
-                proxy=self.client.proxy,
-                ssl=self.client.ssl,
+                proxy=self.client.proxy,  # type: ignore[union-attr]
+                ssl=self.client.ssl,  # type: ignore[union-attr]
             )
         return self["respond"]
 
@@ -148,7 +147,9 @@ class BoltContext(BaseContext):
             Callable `complete()` function
         """
         if "complete" not in self:
-            self["complete"] = Complete(client=self.client, function_execution_id=self.function_execution_id)
+            self["complete"] = Complete(
+                client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
+            )
         return self["complete"]
 
     @property
@@ -172,5 +173,7 @@ class BoltContext(BaseContext):
             Callable `fail()` function
         """
         if "fail" not in self:
-            self["fail"] = Fail(client=self.client, function_execution_id=self.function_execution_id)
+            self["fail"] = Fail(
+                client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
+            )
         return self["fail"]

@@ -9,7 +9,7 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
-class RequestVerification(Middleware):  # type: ignore
+class RequestVerification(Middleware):
     def __init__(self, signing_secret: str, base_logger: Optional[Logger] = None):
         """Verifies an incoming request by checking the validity of
         `x-slack-signature`, `x-slack-request-timestamp`, and its body data.

@@ -9,7 +9,7 @@ from slack_bolt.response import BoltResponse
 
 class Listener(metaclass=ABCMeta):
     matchers: Sequence[ListenerMatcher]
-    middleware: Sequence[Middleware]  # type: ignore
+    middleware: Sequence[Middleware]
     ack_function: Callable[..., BoltResponse]
     lazy_functions: Sequence[Callable[..., None]]
     auto_acknowledgement: bool
@@ -48,7 +48,7 @@ class Listener(metaclass=ABCMeta):
             def next_():
                 middleware_state["next_called"] = True
 
-            resp = m.process(req=req, resp=resp, next=next_)
+            resp = m.process(req=req, resp=resp, next=next_)  # type: ignore[assignment]
             if not middleware_state["next_called"]:
                 # next() was not called in this middleware
                 return (resp, True)

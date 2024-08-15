@@ -1,7 +1,7 @@
-from datetime import datetime  # type: ignore
+from datetime import datetime
 from http import HTTPStatus
 
-from falcon import Request, Response, version as falcon_version
+from falcon import Request, Response, version as falcon_version  # type: ignore[import-untyped]
 
 from slack_bolt import BoltResponse
 from slack_bolt.app import App
@@ -19,7 +19,7 @@ class SlackAppResource:
     api.add_route("/slack/events", SlackAppResource(app))
     """
 
-    def __init__(self, app: App):  # type: ignore
+    def __init__(self, app: App):
         self.app = app
 
     def on_get(self, req: Request, resp: Response):

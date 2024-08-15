@@ -7,11 +7,11 @@ from slack_bolt.response import BoltResponse
 
 
 def to_bolt_request(req: Request) -> BoltRequest:
-    return BoltRequest(  # type: ignore
+    return BoltRequest(
         body=req.get_data(as_text=True),
         query=req.query_string.decode("utf-8"),
-        headers=req.headers,  # type: ignore
-    )  # type: ignore
+        headers=req.headers,  # type: ignore[arg-type]
+    )
 
 
 def to_flask_response(bolt_resp: BoltResponse) -> Response:
@@ -26,7 +26,7 @@ def to_flask_response(bolt_resp: BoltResponse) -> Response:
 
 
 class SlackRequestHandler:
-    def __init__(self, app: App):  # type: ignore
+    def __init__(self, app: App):
         self.app = app
 
     def handle(self, req: Request) -> Response:
@@ -40,7 +40,7 @@ class SlackRequestHandler:
                     bolt_resp = oauth_flow.handle_callback(to_bolt_request(req))
                     return to_flask_response(bolt_resp)
         elif req.method == "POST":
-            bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(req))
+            bolt_resp = self.app.dispatch(to_bolt_request(req))
             return to_flask_response(bolt_resp)
 
         return make_response("Not Found", 404)

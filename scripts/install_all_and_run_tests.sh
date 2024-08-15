@@ -32,10 +32,11 @@ else
     pip install -U -r requirements/testing.txt && \
     pip install -U -r requirements/adapter.txt && \
     pip install -U -r requirements/adapter_testing.txt && \
+    pip install -r requirements/tools.txt && \
     # To avoid errors due to the old versions of click forced by Chalice
     pip install -U pip click && \
     black slack_bolt/ tests/ && \
+    flake8 slack_bolt/ && flake8 examples/
     pytest && \
-    pip install "pytype==2022.12.15" && \
-    pytype slack_bolt/
+    mypy slack_bolt/
 fi

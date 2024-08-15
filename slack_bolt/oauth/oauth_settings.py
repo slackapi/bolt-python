@@ -110,26 +110,17 @@ class OAuthSettings:
             state_expiration_seconds: The seconds that the state value is alive (Default: 600 seconds)
             logger: The logger that will be used internally
         """
-        client_id: Optional[str] = client_id or os.environ.get("SLACK_CLIENT_ID")
-        client_secret: Optional[str] = client_secret or os.environ.get("SLACK_CLIENT_SECRET")
+        client_id = client_id or os.environ.get("SLACK_CLIENT_ID")
+        client_secret = client_secret or os.environ.get("SLACK_CLIENT_SECRET")
         if client_id is None or client_secret is None:
             raise BoltError("Both client_id and client_secret are required")
         self.client_id = client_id
         self.client_secret = client_secret
 
-        # NOTE: pytype says that self.scopes can be str, not Sequence[str].
-        # That's true but we will check the pattern in the following if statement.
-        # Thus, we ignore the warnings here. This is the same for user_scopes too.
-        self.scopes = (  # type: ignore
-            scopes  # type: ignore
-            if scopes is not None
-            else os.environ.get("SLACK_SCOPES", "").split(",")  # type: ignore
-        )  # type: ignore
+        self.scopes = scopes if scopes is not None else os.environ.get("SLACK_SCOPES", "").split(",")
         if isinstance(self.scopes, str):
             self.scopes = self.scopes.split(",")
-        self.user_scopes = (  # type: ignore
-            user_scopes if user_scopes is not None else os.environ.get("SLACK_USER_SCOPES", "").split(",")  # type: ignore
-        )  # type: ignore
+        self.user_scopes = user_scopes if user_scopes is not None else os.environ.get("SLACK_USER_SCOPES", "").split(",")
         if isinstance(self.user_scopes, str):
             self.user_scopes = self.user_scopes.split(",")
         self.redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI")

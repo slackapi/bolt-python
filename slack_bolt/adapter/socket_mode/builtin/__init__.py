@@ -1,4 +1,5 @@
 """The built-in implementation, which does not have any external dependencies"""
+
 import os
 from logging import Logger
 from time import time
@@ -15,13 +16,13 @@ from slack_bolt.response import BoltResponse
 
 
 class SocketModeHandler(BaseSocketModeHandler):
-    app: App  # type: ignore
+    app: App
     app_token: str
     client: SocketModeClient
 
-    def __init__(  # type: ignore
+    def __init__(
         self,
-        app: App,  # type: ignore
+        app: App,
         app_token: Optional[str] = None,
         logger: Optional[Logger] = None,
         web_client: Optional[WebClient] = None,
@@ -68,9 +69,9 @@ class SocketModeHandler(BaseSocketModeHandler):
             receive_buffer_size=receive_buffer_size,
             concurrency=concurrency,
         )
-        self.client.socket_mode_request_listeners.append(self.handle)
+        self.client.socket_mode_request_listeners.append(self.handle)  # type: ignore[arg-type]
 
-    def handle(self, client: SocketModeClient, req: SocketModeRequest) -> None:
+    def handle(self, client: SocketModeClient, req: SocketModeRequest) -> None:  # type: ignore[override]
         start = time()
         bolt_resp: BoltResponse = run_bolt_app(self.app, req)
         send_response(client, req, bolt_resp, start)

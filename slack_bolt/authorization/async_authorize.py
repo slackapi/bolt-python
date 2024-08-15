@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Optional, Callable, Awaitable, Dict, Any, List
+from typing import Optional, Callable, Awaitable, Dict, Any, Sequence
 
 from slack_sdk.errors import SlackApiError, SlackTokenRotationError
 from slack_sdk.oauth.installation_store import Bot, Installation
@@ -82,9 +82,7 @@ class AsyncCallableAuthorize(AsyncAuthorize):
                 if k not in all_available_args:
                     all_available_args[k] = v
 
-            kwargs: Dict[str, Any] = {  # type: ignore
-                k: v for k, v in all_available_args.items() if k in self.arg_names  # type: ignore
-            }
+            kwargs: Dict[str, Any] = {k: v for k, v in all_available_args.items() if k in self.arg_names}
             found_arg_names = kwargs.keys()
             for name in self.arg_names:
                 if name not in found_arg_names:
@@ -176,8 +174,8 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
 
         bot_token: Optional[str] = None
         user_token: Optional[str] = None
-        bot_scopes: Optional[List[str]] = None
-        user_scopes: Optional[List[str]] = None
+        bot_scopes: Optional[Sequence[str]] = None
+        user_scopes: Optional[Sequence[str]] = None
         latest_bot_installation: Optional[Installation] = None
         this_user_installation: Optional[Installation] = None
 
@@ -303,14 +301,14 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
                         # Token rotation
                         if self.token_rotator is None:
                             raise BoltError(self._config_error_message)
-                        refreshed = await self.token_rotator.perform_bot_token_rotation(
+                        refreshed_bot = await self.token_rotator.perform_bot_token_rotation(
                             bot=bot,
                             minutes_before_expiration=self.token_rotation_expiration_minutes,
                         )
-                        if refreshed is not None:
-                            await self.installation_store.async_save_bot(refreshed)
-                            bot_token = refreshed.bot_token
-                            bot_scopes = refreshed.bot_scopes
+                        if refreshed_bot is not None:
+                            await self.installation_store.async_save_bot(refreshed_bot)
+                            bot_token = refreshed_bot.bot_token
+                            bot_scopes = refreshed_bot.bot_scopes
 
             except SlackTokenRotationError as rotation_error:
                 # When token rotation fails, it is usually unrecoverable
@@ -333,13 +331,13 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
             return self.authorize_result_cache[token]
 
         try:
-            auth_test_api_response = await context.client.auth_test(token=token)
+            auth_test_api_response = await context.client.auth_test(token=token)  # type: ignore[union-attr]
             user_auth_test_response = None
             if user_token is not None and token != user_token:
-                user_auth_test_response = await context.client.auth_test(token=user_token)
+                user_auth_test_response = await context.client.auth_test(token=user_token)  # type: ignore[union-attr]
             authorize_result = AuthorizeResult.from_auth_test_response(
-                auth_test_response=auth_test_api_response,
-                user_auth_test_response=user_auth_test_response,
+                auth_test_response=auth_test_api_response,  # type: ignore[arg-type]
+                user_auth_test_response=user_auth_test_response,  # type: ignore[arg-type]
                 bot_token=bot_token,
                 user_token=user_token,
                 bot_scopes=bot_scopes,

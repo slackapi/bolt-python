@@ -2,7 +2,7 @@ import logging
 from os import getenv
 from typing import Optional
 
-from botocore.client import BaseClient
+from botocore.client import BaseClient  # type: ignore[import-untyped]
 
 from chalice.app import Request, Response, Chalice
 
@@ -29,7 +29,7 @@ class ChaliceSlackRequestHandler:
                     LocalLambdaClient,
                 )
 
-                lambda_client = LocalLambdaClient(self.chalice, None)
+                lambda_client = LocalLambdaClient(self.chalice, None)  # type: ignore[arg-type]
             except ImportError:
                 logging.info("Failed to load LocalLambdaClient for CLI mode.")
                 pass
@@ -50,7 +50,7 @@ class ChaliceSlackRequestHandler:
                 root.removeHandler(handler)
 
     def handle(self, request: Request):
-        body: str = request.raw_body.decode("utf-8") if request.raw_body else ""
+        body: str = request.raw_body.decode("utf-8") if request.raw_body else ""  # type: ignore[union-attr]
         self.logger.debug(f"Incoming request: {request.to_dict()}, body: {body}")
 
         method = request.method
@@ -72,7 +72,7 @@ class ChaliceSlackRequestHandler:
                     bolt_resp = oauth_flow.handle_installation(bolt_req)
                     return to_chalice_response(bolt_resp)
         elif method == "POST":
-            bolt_req: BoltRequest = to_bolt_request(request, body)
+            bolt_req = to_bolt_request(request, body)
             # https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
             aws_lambda_function_name = self.chalice.lambda_context.function_name
             bolt_req.context["aws_lambda_function_name"] = aws_lambda_function_name
@@ -81,7 +81,7 @@ class ChaliceSlackRequestHandler:
             aws_response = to_chalice_response(bolt_resp)
             return aws_response
         elif method == "NONE":
-            bolt_req: BoltRequest = to_bolt_request(request, body)
+            bolt_req = to_bolt_request(request, body)
             bolt_resp = self.app.dispatch(bolt_req)
             aws_response = to_chalice_response(bolt_resp)
             return aws_response
@@ -92,8 +92,8 @@ class ChaliceSlackRequestHandler:
 def to_bolt_request(request: Request, body: str) -> BoltRequest:
     return BoltRequest(
         body=body,
-        query=request.query_params,
-        headers=request.headers,
+        query=request.query_params,  # type: ignore[arg-type]
+        headers=request.headers,  # type: ignore[arg-type]
     )
 
 
@@ -101,7 +101,7 @@ def to_chalice_response(resp: BoltResponse) -> Response:
     return Response(
         status_code=resp.status,
         body=resp.body,
-        headers=resp.first_headers(),
+        headers=resp.first_headers(),  # type: ignore[arg-type]
     )
 
 

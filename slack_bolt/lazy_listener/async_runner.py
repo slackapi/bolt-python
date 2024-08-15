@@ -31,4 +31,4 @@ class AsyncLazyListenerRunner(metaclass=ABCMeta):
             logger=self.logger,
             request=request,
         )
-        return await func()  # type: ignore
+        return await func()  # type: ignore[operator]

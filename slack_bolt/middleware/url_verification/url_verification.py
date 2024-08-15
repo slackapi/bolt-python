@@ -7,7 +7,7 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
-class UrlVerification(Middleware):  # type: ignore
+class UrlVerification(Middleware):
     def __init__(self, base_logger: Optional[Logger] = None):
         """Handles url_verification requests.
 

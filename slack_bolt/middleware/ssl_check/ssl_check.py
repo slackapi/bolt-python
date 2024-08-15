@@ -7,7 +7,7 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
-class SslCheck(Middleware):  # type: ignore
+class SslCheck(Middleware):
     verification_token: Optional[str]
     logger: Logger
 

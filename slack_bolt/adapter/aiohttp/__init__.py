@@ -10,7 +10,7 @@ async def to_bolt_request(request: web.Request) -> AsyncBoltRequest:
     return AsyncBoltRequest(
         body=await request.text(),
         query=request.query_string,
-        headers=request.headers,
+        headers=request.headers,  # type: ignore[arg-type]
     )
 
 
@@ -33,7 +33,7 @@ async def to_aiohttp_response(bolt_resp: BoltResponse) -> web.Response:
                 value=c.value,
                 max_age=c.get("max-age"),
                 expires=c.get("expires"),
-                path=c.get("path"),
+                path=c.get("path"),  # type: ignore[arg-type]
                 domain=c.get("domain"),
                 secure=True,
                 httponly=True,

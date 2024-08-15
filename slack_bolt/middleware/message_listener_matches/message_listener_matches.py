@@ -1,12 +1,12 @@
 import re
-from typing import Callable, Pattern, Union
+from typing import Callable, Optional, Pattern, Sequence, Union
 
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_bolt.middleware.middleware import Middleware
 
 
-class MessageListenerMatches(Middleware):  # type: ignore
+class MessageListenerMatches(Middleware):
     def __init__(self, keyword: Union[str, Pattern]):
         """Captures matched keywords and saves the values in context."""
         self.keyword = keyword
@@ -23,7 +23,7 @@ class MessageListenerMatches(Middleware):  # type: ignore
     ) -> BoltResponse:
         text = req.body.get("event", {}).get("text", "")
         if text:
-            m = re.findall(self.keyword, text)
+            m: Optional[Union[Sequence]] = re.findall(self.keyword, text)
             if m is not None and m != []:
                 if type(m[0]) is not tuple:
                     m = tuple(m)

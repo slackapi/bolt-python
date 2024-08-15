@@ -7,7 +7,6 @@ from slack_bolt.app import App
 from slack_bolt.error import BoltError
 from slack_bolt.lazy_listener import LazyListenerRunner
 from slack_bolt.request import BoltRequest
-from slack_bolt.response import BoltResponse
 
 
 class NoopLazyListenerRunner(LazyListenerRunner):
@@ -20,7 +19,7 @@ class NoopLazyListenerRunner(LazyListenerRunner):
 
 
 class SlackRequestHandler:
-    def __init__(self, app: App):  # type: ignore
+    def __init__(self, app: App):
         self.app = app
         # Note that lazy listener is not supported
         self.app.listener_runner.lazy_listener_runner = NoopLazyListenerRunner()
@@ -37,7 +36,7 @@ class SlackRequestHandler:
                 bolt_resp = self.app.oauth_flow.handle_installation(bolt_req)
                 return to_flask_response(bolt_resp)
         elif req.method == "POST":
-            bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(req))
+            bolt_resp = self.app.dispatch(to_bolt_request(req))
             return to_flask_response(bolt_resp)
 
         return make_response("Not Found", 404)

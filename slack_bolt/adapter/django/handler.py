@@ -3,7 +3,7 @@ from logging import Logger
 from threading import current_thread, Thread
 from typing import Optional, Callable
 
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse  # type: ignore[import-untyped]
 
 from slack_bolt.app import App
 from slack_bolt.error import BoltError
@@ -58,7 +58,7 @@ def to_django_response(bolt_resp: BoltResponse) -> HttpResponse:
     return resp
 
 
-from django.db import close_old_connections
+from django.db import close_old_connections  # type: ignore[import-untyped]
 
 
 def release_thread_local_connections(logger: Logger, execution_timing: str):
@@ -110,7 +110,7 @@ class DjangoThreadLazyListenerRunner(ThreadLazyListenerRunner):
 
 
 class SlackRequestHandler:
-    def __init__(self, app: App):  # type: ignore
+    def __init__(self, app: App):
         self.app = app
         listener_runner = self.app.listener_runner
         # This runner closes all thread-local connections in the thread when an execution completes
@@ -173,7 +173,7 @@ class SlackRequestHandler:
                     bolt_resp = oauth_flow.handle_callback(to_bolt_request(req))
                     return to_django_response(bolt_resp)
         elif req.method == "POST":
-            bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(req))
+            bolt_resp = self.app.dispatch(to_bolt_request(req))
             return to_django_response(bolt_resp)
 
         return HttpResponse(status=404, content=b"Not Found")

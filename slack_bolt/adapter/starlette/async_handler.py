@@ -15,8 +15,8 @@ def to_async_bolt_request(
 ) -> AsyncBoltRequest:
     request = AsyncBoltRequest(
         body=body.decode("utf-8"),
-        query=req.query_params,
-        headers=req.headers,
+        query=req.query_params,  # type: ignore[arg-type]
+        headers=req.headers,  # type: ignore[arg-type]
     )
     if addition_context_properties is not None:
         for k, v in addition_context_properties.items():
@@ -37,7 +37,7 @@ def to_starlette_response(bolt_resp: BoltResponse) -> Response:
                 value=c.value,
                 max_age=c.get("max-age"),
                 expires=c.get("expires"),
-                path=c.get("path"),
+                path=c.get("path"),  # type: ignore[arg-type]
                 domain=c.get("domain"),
                 secure=True,
                 httponly=True,
@@ -46,7 +46,7 @@ def to_starlette_response(bolt_resp: BoltResponse) -> Response:
 
 
 class AsyncSlackRequestHandler:
-    def __init__(self, app: AsyncApp):  # type: ignore
+    def __init__(self, app: AsyncApp):
         self.app = app
 
     async def handle(self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None) -> Response:

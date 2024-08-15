@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Optional
+from typing import Dict, Optional
 
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.installation_store.async_installation_store import (
@@ -9,7 +9,7 @@ from slack_sdk.oauth.installation_store.async_installation_store import (
 from ..logger.messages import warning_installation_store_conflicts
 
 # key: client_id, value: AsyncInstallationStore
-default_installation_stores = {}
+default_installation_stores: Dict[str, AsyncInstallationStore] = {}
 
 
 def get_or_create_default_installation_store(client_id: str) -> AsyncInstallationStore:

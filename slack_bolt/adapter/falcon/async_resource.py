@@ -1,8 +1,8 @@
-from datetime import datetime  # type: ignore
+from datetime import datetime
 from http import HTTPStatus
 
-from falcon import version as falcon_version
-from falcon.asgi import Request, Response
+from falcon import version as falcon_version  # type: ignore[import-untyped]
+from falcon.asgi import Request, Response  # type: ignore[import-untyped]
 from slack_bolt import BoltResponse
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.error import BoltError
@@ -22,7 +22,7 @@ class AsyncSlackAppResource:
     app.add_route("/slack/events", AsyncSlackAppResource(app))
     """
 
-    def __init__(self, app: AsyncApp):  # type: ignore
+    def __init__(self, app: AsyncApp):
         if falcon_version.__version__.startswith("2."):
             raise BoltError("This ASGI compatible adapter requires Falcon version >= 3.0")
 

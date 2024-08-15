@@ -1,4 +1,3 @@
-# pytype: skip-file
 import re
 import sys
 from logging import Logger
@@ -27,7 +26,7 @@ from ..logger.messages import error_message_event_type
 from ..util.utils import get_arg_names_of_callable
 
 if sys.version_info.major == 3 and sys.version_info.minor <= 6:
-    from re import _pattern_type as Pattern
+    from re import _pattern_type as Pattern  # type: ignore[attr-defined]
 else:
     from re import Pattern
 from typing import Callable, Awaitable, Any, Sequence, Optional, Union, Dict
@@ -52,7 +51,7 @@ class BuiltinListenerMatcher(ListenerMatcher):
         self.logger = get_bolt_logger(self.func, base_logger)
 
     def matches(self, req: BoltRequest, resp: BoltResponse) -> bool:
-        return self.func(
+        return self.func(  # type: ignore[return-value]
             **build_required_kwargs(
                 logger=self.logger,
                 required_arg_names=self.arg_names,
@@ -67,7 +66,7 @@ def build_listener_matcher(
     func: Callable[..., bool],
     asyncio: bool,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     if asyncio:
         from .async_builtins import AsyncBuiltinListenerMatcher
 
@@ -91,7 +90,7 @@ def event(
     ],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     if isinstance(constraints, (str, Pattern)):
         event_type: Union[str, Pattern] = constraints
         _verify_message_event_type(event_type)
@@ -102,7 +101,7 @@ def event(
         return build_listener_matcher(func, asyncio, base_logger)
 
     elif "type" in constraints:
-        _verify_message_event_type(constraints["type"])
+        _verify_message_event_type(constraints["type"])  # type: ignore[arg-type]
 
         def func(body: Dict[str, Any]) -> bool:
             if is_event(body):
@@ -122,9 +121,9 @@ def message_event(
     keyword: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     if "type" in constraints and keyword is not None:
-        _verify_message_event_type(constraints["type"])
+        _verify_message_event_type(constraints["type"])  # type: ignore[arg-type]
 
         def func(body: Dict[str, Any]) -> bool:
             if is_event(body):
@@ -181,7 +180,7 @@ def function_executed(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     def func(body: Dict[str, Any]) -> bool:
         return is_function(body) and _matches(callback_id, body.get("event", {}).get("function", {}).get("callback_id", ""))
 
@@ -192,7 +191,7 @@ def workflow_step_execute(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     def func(body: Dict[str, Any]) -> bool:
         return (
             is_event(body)
@@ -212,7 +211,7 @@ def command(
     command: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     def func(body: Dict[str, Any]) -> bool:
         return is_slash_command(body) and _matches(command, body["command"])
 
@@ -227,7 +226,7 @@ def shortcut(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     if isinstance(constraints, (str, Pattern)):
         callback_id: Union[str, Pattern] = constraints
 
@@ -249,7 +248,7 @@ def global_shortcut(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     def func(body: Dict[str, Any]) -> bool:
         return is_global_shortcut(body) and _matches(callback_id, body["callback_id"])
 
@@ -260,7 +259,7 @@ def message_shortcut(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     def func(body: Dict[str, Any]) -> bool:
         return is_message_shortcut(body) and _matches(callback_id, body["callback_id"])
 
@@ -275,7 +274,7 @@ def action(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     if isinstance(constraints, (str, Pattern)):
 
         def func(body: Dict[str, Any]) -> bool:
@@ -321,15 +320,15 @@ def _block_action(
     action = to_action(body)
     if isinstance(constraints, (str, Pattern)):
         action_id = constraints
-        return _matches(action_id, action["action_id"])
+        return _matches(action_id, action["action_id"])  # type: ignore[index]
     elif isinstance(constraints, dict):
         # block_id matching is optional
         block_id: Optional[Union[str, Pattern]] = constraints.get("block_id")
-        action_id: Optional[Union[str, Pattern]] = constraints.get("action_id")
+        action_id = constraints.get("action_id")
         if block_id is None and action_id is None:
             return False
-        block_id_matched = block_id is None or _matches(block_id, action.get("block_id"))
-        action_id_matched = action_id is None or _matches(action_id, action.get("action_id"))
+        block_id_matched = block_id is None or _matches(block_id, action.get("block_id"))  # type: ignore[union-attr]
+        action_id_matched = action_id is None or _matches(action_id, action.get("action_id"))  # type: ignore[union-attr]
         return block_id_matched and action_id_matched
 
 
@@ -337,7 +336,7 @@ def block_action(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     def func(body: Dict[str, Any]) -> bool:
         return _block_action(constraints, body)
 
@@ -355,7 +354,7 @@ def attachment_action(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     def func(body: Dict[str, Any]) -> bool:
         return _attachment_action(callback_id, body)
 
@@ -373,7 +372,7 @@ def dialog_submission(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     def func(body: Dict[str, Any]) -> bool:
         return _dialog_submission(callback_id, body)
 
@@ -391,7 +390,7 @@ def dialog_cancellation(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     def func(body: Dict[str, Any]) -> bool:
         return _dialog_cancellation(callback_id, body)
 
@@ -409,7 +408,7 @@ def workflow_step_edit(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     def func(body: Dict[str, Any]) -> bool:
         return _workflow_step_edit(callback_id, body)
 
@@ -424,7 +423,7 @@ def view(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     if isinstance(constraints, (str, Pattern)):
         return view_submission(constraints, asyncio)
     elif "type" in constraints:
@@ -440,7 +439,7 @@ def view_submission(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     def func(body: Dict[str, Any]) -> bool:
         return is_view_submission(body) and _matches(callback_id, body["view"]["callback_id"])
 
@@ -451,7 +450,7 @@ def view_closed(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     def func(body: Dict[str, Any]) -> bool:
         return is_view_closed(body) and _matches(callback_id, body["view"]["callback_id"])
 
@@ -462,7 +461,7 @@ def workflow_step_save(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     def func(body: Dict[str, Any]) -> bool:
         return is_workflow_step_save(body) and _matches(callback_id, body["view"]["callback_id"])
 
@@ -477,7 +476,7 @@ def options(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     if isinstance(constraints, (str, Pattern)):
 
         def func(body: Dict[str, Any]) -> bool:
@@ -504,7 +503,7 @@ def block_suggestion(
     action_id: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     def func(body: Dict[str, Any]) -> bool:
         return _block_suggestion(action_id, body)
 
@@ -522,7 +521,7 @@ def dialog_suggestion(
     callback_id: Union[str, Pattern],
     asyncio: bool = False,
     base_logger: Optional[Logger] = None,
-) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:
+) -> Union[ListenerMatcher, "AsyncListenerMatcher"]:  # type: ignore[name-defined]
     def func(body: Dict[str, Any]) -> bool:
         return _dialog_suggestion(callback_id, body)
 

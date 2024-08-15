@@ -12,14 +12,14 @@ class AsyncSlackAppServer:
     port: int
     path: str
     host: str
-    bolt_app: "AsyncApp"  # type:ignore
+    bolt_app: "AsyncApp"  # type: ignore[name-defined]
     web_app: web.Application
 
-    def __init__(  # type:ignore
+    def __init__(
         self,
         port: int,
         path: str,
-        app: "AsyncApp",  # type:ignore
+        app: "AsyncApp",  # type: ignore[name-defined]
         host: Optional[str] = None,
     ):
         """Standalone AIOHTTP Web Server.
@@ -34,7 +34,7 @@ class AsyncSlackAppServer:
         self.port = port
         self.path = path
         self.host = host if host is not None else "0.0.0.0"
-        self.bolt_app: "AsyncApp" = app  # type: ignore
+        self.bolt_app: "AsyncApp" = app  # type: ignore[name-defined]
         self.web_app = web.Application()
         self._bolt_oauth_flow = self.bolt_app.oauth_flow
         if self._bolt_oauth_flow:

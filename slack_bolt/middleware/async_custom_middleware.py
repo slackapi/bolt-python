@@ -1,6 +1,6 @@
 import inspect
 from logging import Logger
-from typing import Callable, Awaitable, Any, Sequence, Optional
+from typing import Callable, Awaitable, Any, MutableSequence, Optional
 
 from slack_bolt.kwargs_injection.async_utils import build_async_required_kwargs
 from slack_bolt.logger import get_bolt_app_logger
@@ -13,7 +13,7 @@ from slack_bolt.util.utils import get_name_for_callable, get_arg_names_of_callab
 class AsyncCustomMiddleware(AsyncMiddleware):
     app_name: str
     func: Callable[..., Awaitable[Any]]
-    arg_names: Sequence[str]
+    arg_names: MutableSequence[str]
     logger: Logger
 
     def __init__(
@@ -48,7 +48,7 @@ class AsyncCustomMiddleware(AsyncMiddleware):
                 required_arg_names=self.arg_names,
                 request=req,
                 response=resp,
-                next_func=next,
+                next_func=next,  # type: ignore[arg-type]
                 this_func=self.func,
             )
         )

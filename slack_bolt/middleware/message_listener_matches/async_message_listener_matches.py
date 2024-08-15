@@ -1,5 +1,5 @@
 import re
-from typing import Callable, Awaitable, Union, Pattern
+from typing import Callable, Awaitable, Optional, Sequence, Union, Pattern
 
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
@@ -23,7 +23,7 @@ class AsyncMessageListenerMatches(AsyncMiddleware):
     ) -> BoltResponse:
         text = req.body.get("event", {}).get("text", "")
         if text:
-            m = re.findall(self.keyword, text)
+            m: Optional[Union[Sequence]] = re.findall(self.keyword, text)
             if m is not None and m != []:
                 if type(m[0]) is not tuple:
                     m = tuple(m)

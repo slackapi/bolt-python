@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABCMeta
-from typing import Callable, Awaitable, Tuple, Optional, Sequence
+from typing import Callable, Awaitable, MutableSequence, Tuple, Optional, Sequence
 
 from slack_bolt.listener_matcher.async_listener_matcher import AsyncListenerMatcher
 from slack_bolt.middleware.async_middleware import AsyncMiddleware
@@ -50,7 +50,7 @@ class AsyncListener(metaclass=ABCMeta):
             async def _next():
                 middleware_state["next_called"] = True
 
-            resp = await m.async_process(req=req, resp=resp, next=_next)
+            resp = await m.async_process(req=req, resp=resp, next=_next)  # type: ignore[assignment]
             if not middleware_state["next_called"]:
                 # next() was not called in this middleware
                 return (resp, True)
@@ -82,12 +82,12 @@ from slack_bolt.response import BoltResponse
 
 class AsyncCustomListener(AsyncListener):
     app_name: str
-    ack_function: Callable[..., Awaitable[Optional[BoltResponse]]]
+    ack_function: Callable[..., Awaitable[Optional[BoltResponse]]]  # type: ignore[assignment]
     lazy_functions: Sequence[Callable[..., Awaitable[None]]]
     matchers: Sequence[AsyncListenerMatcher]
     middleware: Sequence[AsyncMiddleware]
     auto_acknowledgement: bool
-    arg_names: Sequence[str]
+    arg_names: MutableSequence[str]
     logger: Logger
 
     def __init__(
