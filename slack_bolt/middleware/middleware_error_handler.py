@@ -48,7 +48,7 @@ class CustomMiddlewareErrorHandler(MiddlewareErrorHandler):
         )
         returned_response = self.func(**kwargs)
         if returned_response is not None and isinstance(returned_response, BoltResponse):
-            assert response is not None
+            assert response is not None, "response should never be 'None' here"
             response.status = returned_response.status
             response.headers = returned_response.headers
             response.body = returned_response.body
