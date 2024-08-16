@@ -42,5 +42,5 @@ else
     black slack_bolt/ tests/ && \
     flake8 slack_bolt/ && flake8 examples/
     pytest && \
-    mypy slack_bolt/
+    mypy --config-file pyproject.toml
 fi

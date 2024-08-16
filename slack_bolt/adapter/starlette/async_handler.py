@@ -37,7 +37,7 @@ def to_starlette_response(bolt_resp: BoltResponse) -> Response:
                 value=c.value,
                 max_age=c.get("max-age"),
                 expires=c.get("expires"),
-                path=c.get("path"),  # type: ignore[arg-type]
+                path=c.get("path"),
                 domain=c.get("domain"),
                 secure=True,
                 httponly=True,

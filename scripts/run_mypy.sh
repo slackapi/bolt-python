@@ -7,4 +7,4 @@ cd ${script_dir}/.. && \
   pip install -r requirements/async.txt && \
   pip install -r requirements/adapter.txt && \
   pip install -r requirements/tools.txt && \
-  mypy slack_bolt/
+  mypy --config-file pyproject.toml

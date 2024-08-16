@@ -336,8 +336,8 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
             if user_token is not None and token != user_token:
                 user_auth_test_response = await context.client.auth_test(token=user_token)  # type: ignore[union-attr]
             authorize_result = AuthorizeResult.from_auth_test_response(
-                auth_test_response=auth_test_api_response,  # type: ignore[arg-type]
-                user_auth_test_response=user_auth_test_response,  # type: ignore[arg-type]
+                auth_test_response=auth_test_api_response,
+                user_auth_test_response=user_auth_test_response,
                 bot_token=bot_token,
                 user_token=user_token,
                 bot_scopes=bot_scopes,
