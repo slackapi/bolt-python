@@ -589,10 +589,7 @@ class AsyncApp:
                 self._framework_logger.debug(debug_checking_listener(listener_name))
                 if await listener.async_matches(req=req, resp=resp):  # type: ignore[arg-type]
                     # run all the middleware attached to this listener first
-                    (
-                        middleware_resp,
-                        next_was_not_called,
-                    ) = await listener.run_async_middleware(
+                    (middleware_resp, next_was_not_called) = await listener.run_async_middleware(
                         req=req, resp=resp  # type: ignore[arg-type]
                     )
                     if next_was_not_called:

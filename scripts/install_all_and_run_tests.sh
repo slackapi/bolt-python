@@ -6,6 +6,10 @@
 script_dir=`dirname $0`
 cd ${script_dir}/..
 rm -rf ./slack_bolt.egg-info
+
+# Update pip to prevent warnings
+pip install -U pip
+
 # The package causes a conflict with moto
 pip uninstall python-lambda
 
