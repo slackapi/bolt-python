@@ -96,8 +96,8 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
                     "Although the app should be installed into this workspace, "
                     "the AuthorizeResult (returned value from authorize) for it was not found."
                 )
-                if req.context.response_url is not None and callable(req.context.respond):
-                    await req.context.respond(self.user_facing_authorize_error_message)
+                if req.context.response_url is not None:
+                    await req.context.respond(self.user_facing_authorize_error_message)  # type: ignore[misc]
                     return BoltResponse(status=200, body="")
                 return _build_user_facing_error_response(self.user_facing_authorize_error_message)
 
