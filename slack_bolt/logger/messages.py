@@ -204,7 +204,7 @@ app.step(ws)
         # @app.action
         action_id_or_callback_id = req.body.get("callback_id")
         if req.body.get("type") == "block_actions":
-            action_id_or_callback_id = req.body.get("actions", [])[0].get("action_id")
+            action_id_or_callback_id = req.body["actions"][0].get("action_id")
         return _build_unhandled_request_suggestion(
             default_message,
             f"""
@@ -218,7 +218,7 @@ app.step(ws)
         # @app.options
         constraints = '"action-id"'
         if req.body.get("action_id") is not None:
-            constraints = '"' + req.body.get("action_id", "") + '"'
+            constraints = '"' + req.body["action_id"] + '"'
         elif req.body.get("type") == "dialog_suggestion":
             constraints = f"""{{"type": "dialog_suggestion", "callback_id": "{req.body.get('callback_id')}"}}"""
         return _build_unhandled_request_suggestion(

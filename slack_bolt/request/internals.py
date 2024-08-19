@@ -112,7 +112,7 @@ def extract_team_id(payload: Dict[str, Any]) -> Optional[str]:
     if payload.get("event") is not None:
         return extract_team_id(payload["event"])
     if payload.get("user") is not None:
-        return payload.get("user", {})["team_id"]
+        return payload["user"]["team_id"]
     if payload.get("view") is not None:
         return payload.get("view", {})["team_id"]
     return None
