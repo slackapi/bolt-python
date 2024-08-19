@@ -426,6 +426,9 @@ class App:
                     user_facing_authorize_error_message=user_facing_authorize_error_message,
                 )
             )
+        else:
+            raise BoltError("OAuthFlow or Authorize must be configured to make a Bolt app")
+
         if ignoring_self_events_enabled is True:
             self._middleware_list.append(IgnoringSelfEvents(base_logger=self._base_logger))
         if url_verification_enabled is True:

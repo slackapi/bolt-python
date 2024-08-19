@@ -425,6 +425,8 @@ class AsyncApp:
                     user_facing_authorize_error_message=user_facing_authorize_error_message,
                 )
             )
+        else:
+            raise BoltError("OAuthFlow or Authorize must be configured to make a Bolt app")
 
         if ignoring_self_events_enabled is True:
             self._async_middleware_list.append(AsyncIgnoringSelfEvents(base_logger=self._base_logger))
