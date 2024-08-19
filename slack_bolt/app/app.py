@@ -109,7 +109,7 @@ class App:
         user_facing_authorize_error_message: Optional[str] = None,
         installation_store: Optional[InstallationStore] = None,
         # for either only bot scope usage or v1.0.x compatibility
-        installation_store_bot_only: bool = False,
+        installation_store_bot_only: Optional[bool] = None,
         # for customizing the built-in middleware
         request_verification_enabled: bool = True,
         ignoring_self_events_enabled: bool = True,
@@ -260,7 +260,7 @@ class App:
                 client_id=settings.client_id if settings is not None else None,
                 client_secret=settings.client_secret if settings is not None else None,
                 logger=self._framework_logger,
-                bot_only=installation_store_bot_only,
+                bot_only=installation_store_bot_only or False,
                 client=self._client,  # for proxy use cases etc.
                 user_token_resolution=(settings.user_token_resolution if settings is not None else "authed_user"),
             )
@@ -315,7 +315,7 @@ class App:
             self._framework_logger.warning(warning_token_skipped())
 
         # after setting bot_only here, __init__ cannot replace authorize function
-        if installation_store_bot_only is not False and self._oauth_flow is not None:
+        if installation_store_bot_only is not None and self._oauth_flow is not None:
             app_bot_only = installation_store_bot_only or False
             oauth_flow_bot_only = self._oauth_flow.settings.installation_store_bot_only
             if app_bot_only != oauth_flow_bot_only:
