@@ -46,7 +46,7 @@ class AsyncRespond:
             text_or_whole_response: Union[str, dict] = text
             if isinstance(text_or_whole_response, str):
                 message = _build_message(
-                    text=text,
+                    text=text,  # type: ignore[arg-type]
                     blocks=blocks,
                     attachments=attachments,
                     response_type=response_type,

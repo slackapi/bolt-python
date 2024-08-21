@@ -123,7 +123,7 @@ class AsyncioListenerRunner:
                             response = BoltResponse(status=500)
                         response.status = 500
                         if ack.response is not None:  # already acknowledged
-                            response = None
+                            response = None  # type: ignore[assignment]
 
                         await self.listener_error_handler.handle(
                             error=e,

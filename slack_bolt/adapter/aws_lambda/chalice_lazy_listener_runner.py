@@ -2,8 +2,8 @@ import json
 from logging import Logger
 from typing import Callable, Optional
 
-import boto3
-from botocore.client import BaseClient
+import boto3  # type: ignore[import-untyped]
+from botocore.client import BaseClient  # type: ignore[import-untyped]
 
 from slack_bolt import BoltRequest
 from slack_bolt.lazy_listener import LazyListenerRunner
@@ -20,7 +20,7 @@ class ChaliceLazyListenerRunner(LazyListenerRunner):
 
         chalice_request: dict = request.context["chalice_request"]
         request.headers["x-slack-bolt-lazy-only"] = ["1"]
-        request.headers["x-slack-bolt-lazy-function-name"] = [request.lazy_function_name]
+        request.headers["x-slack-bolt-lazy-function-name"] = [request.lazy_function_name]  # type: ignore[list-item]
         payload = {
             "method": "NONE",
             "headers": {k: v[0] for k, v in request.headers.items()},

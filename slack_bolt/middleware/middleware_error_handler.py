@@ -14,7 +14,7 @@ class MiddlewareErrorHandler(metaclass=ABCMeta):
         self,
         error: Exception,
         request: BoltRequest,
-        response: Optional[BoltResponse],
+        response: Optional[BoltResponse],  # TODO: why is this optional
     ) -> None:
         """Handles an unhandled exception.
 
@@ -48,9 +48,9 @@ class CustomMiddlewareErrorHandler(MiddlewareErrorHandler):
         )
         returned_response = self.func(**kwargs)
         if returned_response is not None and isinstance(returned_response, BoltResponse):
-            response.status = returned_response.status
-            response.headers = returned_response.headers
-            response.body = returned_response.body
+            response.status = returned_response.status  # type: ignore[union-attr]
+            response.headers = returned_response.headers  # type: ignore[union-attr]
+            response.body = returned_response.body  # type: ignore[union-attr]
 
 
 class DefaultMiddlewareErrorHandler(MiddlewareErrorHandler):

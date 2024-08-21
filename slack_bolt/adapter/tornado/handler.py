@@ -1,4 +1,4 @@
-from datetime import datetime  # type: ignore
+from datetime import datetime
 
 from tornado.httputil import HTTPServerRequest
 from tornado.web import RequestHandler
@@ -10,7 +10,7 @@ from slack_bolt.response import BoltResponse
 
 
 class SlackEventsHandler(RequestHandler):
-    def initialize(self, app: App):  # type: ignore
+    def initialize(self, app: App):
         self.app = app
 
     def post(self):
@@ -20,12 +20,12 @@ class SlackEventsHandler(RequestHandler):
 
 
 class SlackOAuthHandler(RequestHandler):
-    def initialize(self, app: App):  # type: ignore
+    def initialize(self, app: App):
         self.app = app
 
     def get(self):
-        if self.app.oauth_flow is not None:  # type: ignore
-            oauth_flow: OAuthFlow = self.app.oauth_flow  # type: ignore
+        if self.app.oauth_flow is not None:
+            oauth_flow: OAuthFlow = self.app.oauth_flow
             if self.request.path == oauth_flow.install_path:
                 bolt_resp = oauth_flow.handle_installation(to_bolt_request(self.request))
                 set_response(self, bolt_resp)
@@ -41,7 +41,7 @@ def to_bolt_request(req: HTTPServerRequest) -> BoltRequest:
     return BoltRequest(
         body=req.body.decode("utf-8") if req.body else "",
         query=req.query,
-        headers=req.headers,
+        headers=req.headers,  # type: ignore[arg-type]
     )
 
 

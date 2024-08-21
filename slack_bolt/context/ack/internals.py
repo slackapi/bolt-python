@@ -27,7 +27,7 @@ def _set_response(
 ) -> BoltResponse:
     if isinstance(text_or_whole_response, str):
         text: str = text_or_whole_response
-        body = {"text": text}
+        body: Dict[str, Any] = {"text": text}
         if response_type:
             body["response_type"] = response_type
         if unfurl_links is not None:
@@ -54,7 +54,7 @@ def _set_response(
                         status=200,
                         body={
                             "response_action": response_action,
-                            "errors": convert_to_dict(errors),
+                            "errors": convert_to_dict(errors),  # type: ignore[arg-type]
                         },
                     )
                 else:
@@ -66,7 +66,7 @@ def _set_response(
                 self.response = BoltResponse(status=200, body=body)
         elif errors:
             # dialogs: errors without response_action
-            body = {"errors": convert_to_dict_list(errors)}
+            body = {"errors": convert_to_dict_list(errors)}  # type: ignore[arg-type]
             self.response = BoltResponse(status=200, body=body)
         else:
             if len(body) == 1 and "text" in body:

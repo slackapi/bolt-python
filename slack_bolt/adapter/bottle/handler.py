@@ -1,4 +1,4 @@
-from bottle import Request, Response
+from bottle import Request, Response  # type: ignore[import-untyped]
 
 from slack_bolt.app import App
 from slack_bolt.oauth import OAuthFlow
@@ -25,7 +25,7 @@ def set_response(bolt_resp: BoltResponse, resp: Response) -> None:
 
 
 class SlackRequestHandler:
-    def __init__(self, app: App):  # type: ignore
+    def __init__(self, app: App):
         self.app = app
 
     def handle(self, req: Request, resp: Response) -> str:
@@ -41,7 +41,7 @@ class SlackRequestHandler:
                     set_response(bolt_resp, resp)
                     return bolt_resp.body or ""
         elif req.method == "POST":
-            bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(req))
+            bolt_resp = self.app.dispatch(to_bolt_request(req))
             set_response(bolt_resp, resp)
             return bolt_resp.body or ""
 

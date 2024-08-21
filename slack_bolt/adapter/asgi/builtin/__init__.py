@@ -1,4 +1,3 @@
-from slack_bolt.oauth.oauth_flow import OAuthFlow
 from slack_bolt.adapter.asgi.http_request import AsgiHttpRequest
 
 from slack_bolt import App
@@ -10,7 +9,7 @@ from slack_bolt.adapter.asgi.base_handler import BaseSlackRequestHandler
 
 
 class SlackRequestHandler(BaseSlackRequestHandler):
-    def __init__(self, app: App, path: str = "/slack/events"):  # type: ignore
+    def __init__(self, app: App, path: str = "/slack/events"):
         """Setup Bolt as an ASGI web framework, this will make your application compatible with ASGI web servers.
         This can be used for production deployment.
 
@@ -39,13 +38,11 @@ class SlackRequestHandler(BaseSlackRequestHandler):
         )
 
     async def handle_installation(self, request: AsgiHttpRequest) -> BoltResponse:
-        oauth_flow: OAuthFlow = self.app.oauth_flow
-        return oauth_flow.handle_installation(
+        return self.app.oauth_flow.handle_installation(  # type: ignore[union-attr]
             BoltRequest(body=await request.get_raw_body(), query=request.query_string, headers=request.get_headers())
         )
 
     async def handle_callback(self, request: AsgiHttpRequest) -> BoltResponse:
-        oauth_flow: OAuthFlow = self.app.oauth_flow
-        return oauth_flow.handle_callback(
+        return self.app.oauth_flow.handle_callback(  # type: ignore[union-attr]
             BoltRequest(body=await request.get_raw_body(), query=request.query_string, headers=request.get_headers())
         )

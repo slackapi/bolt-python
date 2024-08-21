@@ -46,8 +46,8 @@ class Say:
             text_or_whole_response: Union[str, dict] = text
             if isinstance(text_or_whole_response, str):
                 text = text_or_whole_response
-                return self.client.chat_postMessage(
-                    channel=channel or self.channel,
+                return self.client.chat_postMessage(  # type: ignore[union-attr]
+                    channel=channel or self.channel,  # type: ignore[arg-type]
                     text=text,
                     blocks=blocks,
                     attachments=attachments,
@@ -69,7 +69,7 @@ class Say:
                 message: dict = create_copy(text_or_whole_response)
                 if "channel" not in message:
                     message["channel"] = channel or self.channel
-                return self.client.chat_postMessage(**message)
+                return self.client.chat_postMessage(**message)  # type: ignore[union-attr]
             else:
                 raise ValueError(f"The arg is unexpected type ({type(text_or_whole_response)})")
         else:

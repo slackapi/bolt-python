@@ -11,12 +11,12 @@ from slack_bolt.response import BoltResponse
 
 
 class SuccessArgs:
-    def __init__(  # type: ignore
+    def __init__(
         self,
         *,
         request: BoltRequest,
         installation: Installation,
-        settings: "OAuthSettings",
+        settings: "OAuthSettings",  # type: ignore[name-defined]
         default: "CallbackOptions",
     ):
         """The arguments for a success function.
@@ -34,14 +34,14 @@ class SuccessArgs:
 
 
 class FailureArgs:
-    def __init__(  # type: ignore
+    def __init__(
         self,
         *,
         request: BoltRequest,
         reason: str,
         error: Optional[Exception] = None,
         suggested_status_code: int,
-        settings: "OAuthSettings",
+        settings: "OAuthSettings",  # type: ignore[name-defined]
         default: "CallbackOptions",
     ):
         """The arguments for a failure function.

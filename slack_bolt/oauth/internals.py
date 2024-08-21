@@ -1,6 +1,6 @@
 import html
 from logging import Logger
-from typing import Optional
+from typing import Dict, Optional
 from typing import Union
 
 from slack_sdk.oauth import InstallationStore
@@ -25,16 +25,16 @@ class CallbackResponseBuilder:
         self._state_utils = state_utils
         self._redirect_uri_page_renderer = redirect_uri_page_renderer
 
-    def _build_callback_success_response(  # type: ignore
+    def _build_callback_success_response(
         self,
-        request: Union[BoltRequest, "AsyncBoltRequest"],
+        request: Union[BoltRequest, "AsyncBoltRequest"],  # type: ignore[name-defined]
         installation: Installation,
     ) -> BoltResponse:
         debug_message = f"Handling an OAuth callback success (request: {request.query})"
         self._logger.debug(debug_message)
 
         page_content = self._redirect_uri_page_renderer.render_success_page(
-            app_id=installation.app_id,
+            app_id=installation.app_id,  # type: ignore[arg-type]
             team_id=installation.team_id,
             is_enterprise_install=installation.is_enterprise_install,
             enterprise_url=installation.enterprise_url,
@@ -48,9 +48,9 @@ class CallbackResponseBuilder:
             body=page_content,
         )
 
-    def _build_callback_failure_response(  # type: ignore
+    def _build_callback_failure_response(
         self,
-        request: Union[BoltRequest, "AsyncBoltRequest"],
+        request: Union[BoltRequest, "AsyncBoltRequest"],  # type: ignore[name-defined]
         reason: str,
         status: int = 500,
         error: Optional[Exception] = None,
@@ -92,7 +92,7 @@ body {{
 
 
 # key: client_id, value: InstallationStore
-default_installation_stores = {}
+default_installation_stores: Dict[str, InstallationStore] = {}
 
 
 def get_or_create_default_installation_store(client_id: str) -> InstallationStore:

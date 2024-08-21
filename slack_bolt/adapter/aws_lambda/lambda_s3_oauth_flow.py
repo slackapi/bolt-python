@@ -3,7 +3,7 @@ import os
 from logging import Logger
 from typing import Optional
 
-import boto3
+import boto3  # type: ignore[import-untyped]
 
 from slack_bolt.authorization.authorize import InstallationStoreAuthorize
 from slack_bolt.oauth import OAuthFlow

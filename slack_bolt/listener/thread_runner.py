@@ -45,7 +45,7 @@ class ThreadListenerRunner:
         self.listener_executor = listener_executor
         self.lazy_listener_runner = lazy_listener_runner
 
-    def run(  # type: ignore
+    def run(
         self,
         request: BoltRequest,
         response: BoltResponse,

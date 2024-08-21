@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Callable, Sequence, Optional
+from typing import Callable, MutableSequence, Optional
 
 from slack_bolt.kwargs_injection import build_required_kwargs
 from slack_bolt.logger import get_bolt_app_logger
@@ -12,7 +12,7 @@ from ..util.utils import get_arg_names_of_callable
 class CustomListenerMatcher(ListenerMatcher):
     app_name: str
     func: Callable[..., bool]
-    arg_names: Sequence[str]
+    arg_names: MutableSequence[str]
     logger: Logger
 
     def __init__(self, *, app_name: str, func: Callable[..., bool], base_logger: Optional[Logger] = None):

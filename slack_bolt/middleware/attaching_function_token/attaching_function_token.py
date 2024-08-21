@@ -5,7 +5,7 @@ from slack_bolt.response import BoltResponse
 from slack_bolt.middleware.middleware import Middleware
 
 
-class AttachingFunctionToken(Middleware):  # type: ignore
+class AttachingFunctionToken(Middleware):
     def process(
         self,
         *,
@@ -15,6 +15,6 @@ class AttachingFunctionToken(Middleware):  # type: ignore
         next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         if req.context.function_bot_access_token is not None:
-            req.context.client.token = req.context.function_bot_access_token
+            req.context.client.token = req.context.function_bot_access_token  # type: ignore[union-attr]
 
         return next()

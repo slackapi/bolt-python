@@ -74,6 +74,10 @@ def error_installation_store_required_for_builtin_listeners() -> str:
     )
 
 
+def error_oauth_flow_or_authorize_required() -> str:
+    return "`oauth_flow` or `authorize` must be configured to make a Bolt app"
+
+
 # -------------------------------
 # Warning
 # -------------------------------
@@ -93,9 +97,9 @@ def warning_installation_store_conflicts() -> str:
     return "As you gave both `installation_store` and `oauth_settings`/`auth_flow`, the top level one is unused."
 
 
-def warning_unhandled_by_global_middleware(  # type: ignore
-    name: str, req: Union[BoltRequest, "AsyncBoltRequest"]  # type: ignore
-) -> str:  # type: ignore
+def warning_unhandled_by_global_middleware(
+    name: str, req: Union[BoltRequest, "AsyncBoltRequest"]  # type: ignore[name-defined]
+) -> str:
     return (
         f"A global middleware ({name}) skipped calling either `next()` or `next_()` "
         f"without providing a response for the request ({req.body})"
@@ -175,18 +179,16 @@ def _build_unhandled_request_suggestion(default_message: str, code_snippet: str)
     return f"""{default_message}{_unhandled_request_suggestion_prefix}{code_snippet}"""
 
 
-def warning_unhandled_request(  # type: ignore
-    req: Union[BoltRequest, "AsyncBoltRequest"],  # type: ignore
-) -> str:  # type: ignore
+def warning_unhandled_request(
+    req: Union[BoltRequest, "AsyncBoltRequest"],  # type: ignore[name-defined]
+) -> str:
     filtered_body = _build_filtered_body(req.body)
     default_message = f"Unhandled request ({filtered_body})"
     is_async = type(req) != BoltRequest
     if is_workflow_step_edit(req.body) or is_workflow_step_save(req.body) or is_workflow_step_execute(req.body):
         # @app.step
         callback_id = (
-            filtered_body.get("callback_id")
-            or filtered_body.get("view", {}).get("callback_id")  # type: ignore
-            or "your-callback-id"
+            filtered_body.get("callback_id") or filtered_body.get("view", {}).get("callback_id") or "your-callback-id"
         )
         return _build_unhandled_request_suggestion(
             default_message,
@@ -206,7 +208,7 @@ app.step(ws)
         # @app.action
         action_id_or_callback_id = req.body.get("callback_id")
         if req.body.get("type") == "block_actions":
-            action_id_or_callback_id = req.body.get("actions")[0].get("action_id")
+            action_id_or_callback_id = req.body["actions"][0].get("action_id")
         return _build_unhandled_request_suggestion(
             default_message,
             f"""
@@ -220,7 +222,7 @@ app.step(ws)
         # @app.options
         constraints = '"action-id"'
         if req.body.get("action_id") is not None:
-            constraints = '"' + req.body.get("action_id") + '"'
+            constraints = '"' + req.body["action_id"] + '"'
         elif req.body.get("type") == "dialog_suggestion":
             constraints = f"""{{"type": "dialog_suggestion", "callback_id": "{req.body.get('callback_id')}"}}"""
         return _build_unhandled_request_suggestion(

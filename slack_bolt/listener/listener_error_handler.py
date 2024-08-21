@@ -48,9 +48,9 @@ class CustomListenerErrorHandler(ListenerErrorHandler):
         )
         returned_response = self.func(**kwargs)
         if returned_response is not None and isinstance(returned_response, BoltResponse):
-            response.status = returned_response.status
-            response.headers = returned_response.headers
-            response.body = returned_response.body
+            response.status = returned_response.status  # type: ignore[union-attr]
+            response.headers = returned_response.headers  # type: ignore[union-attr]
+            response.body = returned_response.body  # type: ignore[union-attr]
 
 
 class DefaultListenerErrorHandler(ListenerErrorHandler):

@@ -1,4 +1,5 @@
 """Internal functions"""
+
 import json
 import logging
 from time import time
@@ -12,7 +13,7 @@ from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 
 
-async def run_async_bolt_app(app: AsyncApp, req: SocketModeRequest):  # type: ignore
+async def run_async_bolt_app(app: AsyncApp, req: SocketModeRequest):
     bolt_req: AsyncBoltRequest = AsyncBoltRequest(mode="socket_mode", body=req.payload)
     bolt_resp: BoltResponse = await app.async_dispatch(bolt_req)
     return bolt_resp

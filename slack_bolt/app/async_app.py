@@ -15,10 +15,11 @@ from slack_bolt.listener.async_listener_start_handler import (
 from slack_bolt.listener.async_listener_completion_handler import (
     AsyncDefaultListenerCompletionHandler,
 )
-from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner  # type: ignore
+from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
 from slack_bolt.middleware.async_middleware_error_handler import (
     AsyncCustomMiddlewareErrorHandler,
     AsyncDefaultMiddlewareErrorHandler,
+    AsyncMiddlewareErrorHandler,
 )
 from slack_bolt.middleware.message_listener_matches.async_message_listener_matches import (
     AsyncMessageListenerMatches,
@@ -43,6 +44,7 @@ from slack_bolt.authorization.async_authorize import (
 )
 from slack_bolt.error import BoltError, BoltUnhandledRequestError
 from slack_bolt.logger.messages import (
+    error_oauth_flow_or_authorize_required,
     warning_client_prioritized_and_token_skipped,
     warning_token_skipped,
     error_token_required,
@@ -197,7 +199,8 @@ class AsyncApp:
             oauth_flow: Instantiated `slack_bolt.oauth.AsyncOAuthFlow`. This is always prioritized over oauth_settings.
             verification_token: Deprecated verification mechanism. This can used only for ssl_check requests.
         """
-        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET", "")
+        if signing_secret is None:
+            signing_secret = os.environ.get("SLACK_SIGNING_SECRET", "")
         token = token or os.environ.get("SLACK_BOT_TOKEN")
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
@@ -233,7 +236,7 @@ class AsyncApp:
 
         self._async_before_authorize: Optional[AsyncMiddleware] = None
         if before_authorize is not None:
-            if isinstance(before_authorize, Callable):
+            if callable(before_authorize):
                 self._async_before_authorize = AsyncCustomMiddleware(
                     app_name=self._name,
                     func=before_authorize,
@@ -263,7 +266,7 @@ class AsyncApp:
                 client_id=settings.client_id if settings is not None else None,
                 client_secret=settings.client_secret if settings is not None else None,
                 logger=self._framework_logger,
-                bot_only=installation_store_bot_only,
+                bot_only=installation_store_bot_only or False,
                 client=self._async_client,  # for proxy use cases etc.
                 user_token_resolution=(settings.user_token_resolution if settings is not None else "authed_user"),
             )
@@ -294,7 +297,8 @@ class AsyncApp:
                 logger=self._framework_logger,
             )
             self._async_installation_store = installation_store
-            self._async_oauth_flow.settings.installation_store = installation_store
+            if installation_store is not None:
+                self._async_oauth_flow.settings.installation_store = installation_store
 
             if self._async_oauth_flow._async_client is None:
                 self._async_oauth_flow._async_client = self._async_client
@@ -311,12 +315,13 @@ class AsyncApp:
                 logger=self._framework_logger,
             )
             self._async_installation_store = installation_store
-            oauth_settings.installation_store = installation_store
+            if installation_store is not None:
+                oauth_settings.installation_store = installation_store
 
             self._async_oauth_flow = AsyncOAuthFlow(client=self._async_client, logger=self.logger, settings=oauth_settings)
             if self._async_authorize is None:
                 self._async_authorize = self._async_oauth_flow.settings.authorize
-            self._async_authorize.token_rotation_expiration_minutes = oauth_settings.token_rotation_expiration_minutes
+            self._async_authorize.token_rotation_expiration_minutes = oauth_settings.token_rotation_expiration_minutes  # type: ignore[attr-defined] # noqa: E501
 
         if (self._async_installation_store is not None or self._async_authorize is not None) and self._token is not None:
             self._token = None
@@ -329,7 +334,7 @@ class AsyncApp:
             if app_bot_only != oauth_flow_bot_only:
                 self.logger.warning(warning_bot_only_conflicts())
                 self._async_oauth_flow.settings.installation_store_bot_only = app_bot_only
-                self._async_authorize.bot_only = app_bot_only
+                self._async_authorize.bot_only = app_bot_only  # type: ignore[union-attr]
 
         self._async_tokens_revocation_listeners: Optional[AsyncTokenRevocationListeners] = None
         if self._async_installation_store is not None:
@@ -353,7 +358,7 @@ class AsyncApp:
                 logger=self._framework_logger,
             ),
         )
-        self._async_middleware_error_handler = AsyncDefaultMiddlewareErrorHandler(
+        self._async_middleware_error_handler: AsyncMiddlewareErrorHandler = AsyncDefaultMiddlewareErrorHandler(
             logger=self._framework_logger,
         )
 
@@ -412,7 +417,7 @@ class AsyncApp:
                 )
             else:
                 raise BoltError(error_token_required())
-        else:
+        elif self._async_authorize is not None:
             self._async_middleware_list.append(
                 AsyncMultiTeamsAuthorization(
                     authorize=self._async_authorize,
@@ -421,6 +426,8 @@ class AsyncApp:
                     user_facing_authorize_error_message=user_facing_authorize_error_message,
                 )
             )
+        else:
+            raise BoltError(error_oauth_flow_or_authorize_required())
 
         if ignoring_self_events_enabled is True:
             self._async_middleware_list.append(AsyncIgnoringSelfEvents(base_logger=self._base_logger))
@@ -554,7 +561,9 @@ class AsyncApp:
                 middleware_state["next_called"] = False
                 if self._framework_logger.level <= logging.DEBUG:
                     self._framework_logger.debug(f"Applying {middleware.name}")
-                resp = await middleware.async_process(req=req, resp=resp, next=async_middleware_next)
+                resp = await middleware.async_process(
+                    req=req, resp=resp, next=async_middleware_next  # type: ignore[arg-type]
+                )
                 if not middleware_state["next_called"]:
                     if resp is None:
                         # next() method was not called without providing the response to return to Slack
@@ -581,12 +590,11 @@ class AsyncApp:
             for listener in self._async_listeners:
                 listener_name = get_name_for_callable(listener.ack_function)
                 self._framework_logger.debug(debug_checking_listener(listener_name))
-                if await listener.async_matches(req=req, resp=resp):
+                if await listener.async_matches(req=req, resp=resp):  # type: ignore[arg-type]
                     # run all the middleware attached to this listener first
-                    (
-                        middleware_resp,
-                        next_was_not_called,
-                    ) = await listener.run_async_middleware(req=req, resp=resp)
+                    (middleware_resp, next_was_not_called) = await listener.run_async_middleware(
+                        req=req, resp=resp  # type: ignore[arg-type]
+                    )
                     if next_was_not_called:
                         if middleware_resp is not None:
                             if self._framework_logger.level <= logging.DEBUG:
@@ -608,7 +616,7 @@ class AsyncApp:
                     self._framework_logger.debug(debug_running_listener(listener_name))
                     listener_response: Optional[BoltResponse] = await self._async_listener_runner.run(
                         request=req,
-                        response=resp,
+                        response=resp,  # type: ignore[arg-type]
                         listener_name=listener_name,
                         listener=listener,
                     )
@@ -675,7 +683,7 @@ class AsyncApp:
             if isinstance(middleware_or_callable, AsyncMiddleware):
                 middleware: AsyncMiddleware = middleware_or_callable
                 self._async_middleware_list.append(middleware)
-            elif isinstance(middleware_or_callable, Callable):
+            elif callable(middleware_or_callable):
                 self._async_middleware_list.append(
                     AsyncCustomMiddleware(
                         app_name=self.name,
@@ -743,9 +751,9 @@ class AsyncApp:
         if isinstance(callback_id, (str, Pattern)):
             step = AsyncWorkflowStep(
                 callback_id=callback_id,
-                edit=edit,
-                save=save,
-                execute=execute,
+                edit=edit,  # type: ignore[arg-type]
+                save=save,  # type: ignore[arg-type]
+                execute=execute,  # type: ignore[arg-type]
                 base_logger=self._base_logger,
             )
         elif isinstance(step, AsyncWorkflowStepBuilder):
@@ -1376,9 +1384,9 @@ class AsyncApp:
             trust_env_in_session=self._async_client.trust_env_in_session,
             headers=self._async_client.headers,
             team_id=req.context.team_id,
-            retry_handlers=self._async_client.retry_handlers.copy()
-            if self._async_client.retry_handlers is not None
-            else None,
+            retry_handlers=(
+                self._async_client.retry_handlers.copy() if self._async_client.retry_handlers is not None else None
+            ),
         )
         req.context["client"] = client_per_request
 
@@ -1414,7 +1422,7 @@ class AsyncApp:
                 name = get_name_for_callable(func)
                 raise BoltError(error_listener_function_must_be_coro_func(name))
 
-        listener_matchers = [
+        listener_matchers: List[AsyncListenerMatcher] = [
             AsyncCustomListenerMatcher(app_name=self.name, func=f, base_logger=self._base_logger) for f in (matchers or [])
         ]
         listener_matchers.insert(0, primary_matcher)
@@ -1422,7 +1430,7 @@ class AsyncApp:
         for m in middleware or []:
             if isinstance(m, AsyncMiddleware):
                 listener_middleware.append(m)
-            elif isinstance(m, Callable) and is_coroutine_function(m):
+            elif callable(m) and is_coroutine_function(m):
                 listener_middleware.append(AsyncCustomMiddleware(app_name=self.name, func=m, base_logger=self._base_logger))
             else:
                 raise ValueError(error_unexpected_listener_middleware(type(m)))

@@ -14,8 +14,8 @@ def to_bolt_request(
 ) -> BoltRequest:
     request = BoltRequest(
         body=body.decode("utf-8"),
-        query=req.query_params,
-        headers=req.headers,
+        query=req.query_params,  # type: ignore[arg-type]
+        headers=req.headers,  # type: ignore[arg-type]
     )
     if addition_context_properties is not None:
         for k, v in addition_context_properties.items():
@@ -45,7 +45,7 @@ def to_starlette_response(bolt_resp: BoltResponse) -> Response:
 
 
 class SlackRequestHandler:
-    def __init__(self, app: App):  # type: ignore
+    def __init__(self, app: App):
         self.app = app
 
     async def handle(self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None) -> Response:

@@ -1,7 +1,6 @@
-# pytype: skip-file
 import inspect
 import logging
-from typing import Callable, Dict, Optional, Any, Sequence
+from typing import Callable, Dict, MutableSequence, Optional, Any
 
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
@@ -22,10 +21,10 @@ from ..logger.messages import warning_skip_uncommon_arg_name
 def build_required_kwargs(
     *,
     logger: logging.Logger,
-    required_arg_names: Sequence[str],
+    required_arg_names: MutableSequence[str],
     request: BoltRequest,
     response: Optional[BoltResponse],
-    next_func: Callable[[], None] = None,
+    next_func: Optional[Callable[[], None]] = None,
     this_func: Optional[Callable] = None,
     error: Optional[Exception] = None,  # for error handlers
     next_keys_required: bool = True,  # False for listeners / middleware / error handlers
@@ -98,7 +97,7 @@ def build_required_kwargs(
     for name in required_arg_names:
         if name == "args":
             if isinstance(request, BoltRequest):
-                kwargs[name] = Args(**all_available_args)
+                kwargs[name] = Args(**all_available_args)  # type: ignore[arg-type]
             else:
                 logger.warning(f"Unknown Request object type detected ({type(request)})")
 

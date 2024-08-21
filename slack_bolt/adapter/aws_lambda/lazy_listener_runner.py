@@ -2,7 +2,7 @@ import json
 from logging import Logger
 from typing import Callable, Optional, Any
 
-import boto3
+import boto3  # type: ignore[import-untyped]
 
 from slack_bolt import BoltRequest
 from slack_bolt.lazy_listener import LazyListenerRunner

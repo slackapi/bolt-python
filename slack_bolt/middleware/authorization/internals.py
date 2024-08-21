@@ -15,18 +15,18 @@ from slack_bolt.response import BoltResponse
 #
 
 
-def _is_url_verification(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore
+def _is_url_verification(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore[name-defined]
     return req is not None and req.body is not None and req.body.get("type") == "url_verification"
 
 
-def _is_ssl_check(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore
+def _is_ssl_check(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore[name-defined]
     return req is not None and req.body is not None and req.body.get("type") == "ssl_check"
 
 
 no_auth_test_events = ["app_uninstalled", "tokens_revoked", "team_access_revoked"]
 
 
-def _is_no_auth_test_events(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore
+def _is_no_auth_test_events(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore[name-defined]
     return (
         req is not None
         and req.body is not None
@@ -35,11 +35,11 @@ def _is_no_auth_test_events(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool
     )
 
 
-def _is_no_auth_required(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore
+def _is_no_auth_required(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore[name-defined]
     return _is_url_verification(req) or _is_ssl_check(req)
 
 
-def _is_no_auth_test_call_required(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore
+def _is_no_auth_test_call_required(req: Union[BoltRequest, "AsyncBoltRequest"]) -> bool:  # type: ignore[name-defined]
     return _is_no_auth_test_events(req)
 
 
@@ -62,8 +62,8 @@ def _is_bot_token(token: Optional[str]) -> bool:
     return token is not None and token.startswith("xoxb-")
 
 
-def _to_authorize_result(  # type: ignore
-    auth_test_result: Union[SlackResponse, "AsyncSlackResponse"],
+def _to_authorize_result(
+    auth_test_result: Union[SlackResponse, "AsyncSlackResponse"],  # type: ignore[name-defined]
     token: Optional[str],
     request_user_id: Optional[str],
 ) -> AuthorizeResult:

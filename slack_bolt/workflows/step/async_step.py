@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 from functools import wraps
 from logging import Logger
 from typing import Callable, Union, Optional, Awaitable, Sequence, List, Pattern
@@ -298,7 +299,7 @@ class AsyncWorkflowStepBuilder:
                     _matchers.append(AsyncCustomListenerMatcher(app_name=app_name, func=m))
                 else:
                     raise ValueError(f"Invalid matcher: {type(m)}")
-        return _matchers  # type: ignore
+        return _matchers
 
     @staticmethod
     def to_listener_middleware(
@@ -313,7 +314,7 @@ class AsyncWorkflowStepBuilder:
                     _middleware.append(AsyncCustomMiddleware(app_name=app_name, func=m))
                 else:
                     raise ValueError(f"Invalid middleware: {type(m)}")
-        return _middleware  # type: ignore
+        return _middleware
 
 
 class AsyncWorkflowStep:

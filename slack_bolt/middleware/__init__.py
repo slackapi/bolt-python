@@ -28,7 +28,7 @@ builtin_middleware_classes = [
     AttachingFunctionToken,
 ]
 for cls in builtin_middleware_classes:
-    Middleware.register(cls)
+    Middleware.register(cls)  # type: ignore[arg-type]
 
 __all__ = [
     "SingleTeamAuthorization",

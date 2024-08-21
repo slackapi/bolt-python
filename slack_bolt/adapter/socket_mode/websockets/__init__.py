@@ -1,4 +1,5 @@
 """[`websockets`](https://pypi.org/project/websockets/) based implementation  / asyncio compatible"""
+
 import os
 from logging import Logger
 from time import time
@@ -20,13 +21,13 @@ from slack_bolt.response import BoltResponse
 
 
 class SocketModeHandler(AsyncBaseSocketModeHandler):
-    app: App  # type: ignore
+    app: App
     app_token: str
     client: SocketModeClient
 
-    def __init__(  # type: ignore
+    def __init__(
         self,
-        app: App,  # type: ignore
+        app: App,
         app_token: Optional[str] = None,
         logger: Optional[Logger] = None,
         web_client: Optional[AsyncWebClient] = None,
@@ -50,25 +51,25 @@ class SocketModeHandler(AsyncBaseSocketModeHandler):
         self.client = SocketModeClient(
             app_token=self.app_token,
             logger=logger if logger is not None else app.logger,
-            web_client=web_client if web_client is not None else app.client,
+            web_client=web_client if web_client is not None else app.client,  # type: ignore[arg-type]
             ping_interval=ping_interval,
         )
-        self.client.socket_mode_request_listeners.append(self.handle)
+        self.client.socket_mode_request_listeners.append(self.handle)  # type: ignore[arg-type]
 
-    async def handle(self, client: SocketModeClient, req: SocketModeRequest) -> None:
+    async def handle(self, client: SocketModeClient, req: SocketModeRequest) -> None:  # type: ignore[override]
         start = time()
         bolt_resp: BoltResponse = run_bolt_app(self.app, req)
         await send_async_response(client, req, bolt_resp, start)
 
 
 class AsyncSocketModeHandler(AsyncBaseSocketModeHandler):
-    app: AsyncApp  # type: ignore
+    app: AsyncApp
     app_token: str
     client: SocketModeClient
 
-    def __init__(  # type: ignore
+    def __init__(
         self,
-        app: AsyncApp,  # type: ignore
+        app: AsyncApp,
         app_token: Optional[str] = None,
         logger: Optional[Logger] = None,
         web_client: Optional[AsyncWebClient] = None,
@@ -82,9 +83,9 @@ class AsyncSocketModeHandler(AsyncBaseSocketModeHandler):
             web_client=web_client if web_client is not None else app.client,
             ping_interval=ping_interval,
         )
-        self.client.socket_mode_request_listeners.append(self.handle)
+        self.client.socket_mode_request_listeners.append(self.handle)  # type: ignore[arg-type]
 
-    async def handle(self, client: SocketModeClient, req: SocketModeRequest) -> None:
+    async def handle(self, client: SocketModeClient, req: SocketModeRequest) -> None:  # type: ignore[override]
         start = time()
         bolt_resp: BoltResponse = await run_async_bolt_app(self.app, req)
         await send_async_response(client, req, bolt_resp, start)

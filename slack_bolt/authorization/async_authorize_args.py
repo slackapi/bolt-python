@@ -32,7 +32,7 @@ class AsyncAuthorizeArgs:
         """
         self.context = context
         self.logger = context.logger
-        self.client = context.client
+        self.client = context.client  # type: ignore[assignment]
         self.enterprise_id = enterprise_id
         self.team_id = team_id
         self.user_id = user_id

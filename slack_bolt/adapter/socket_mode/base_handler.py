@@ -1,6 +1,7 @@
 """The base class of Socket Mode client implementation.
 If you want to build asyncio-based ones, use `AsyncBaseSocketModeHandler` instead.
 """
+
 import logging
 import signal
 import sys
@@ -14,7 +15,7 @@ from slack_bolt.util.utils import get_boot_message
 
 
 class BaseSocketModeHandler:
-    app: App  # type: ignore
+    app: App
     client: BaseSocketModeClient
 
     def handle(self, client: BaseSocketModeClient, req: SocketModeRequest) -> None:

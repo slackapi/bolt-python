@@ -71,4 +71,4 @@ class TestAsgiLifespan:
         with pytest.raises(TypeError) as e:
             await asgi_server.websocket()
 
-        assert e.match("Unsupported scope type: websocket")
+        assert e.match("Unsupported scope type: 'websocket'")

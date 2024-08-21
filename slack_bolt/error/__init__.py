@@ -7,16 +7,16 @@ class BoltError(Exception):
 
 
 class BoltUnhandledRequestError(BoltError):
-    request: "BoltRequest"  # type: ignore
+    request: "BoltRequest"  # type: ignore[name-defined]
     body: dict
-    current_response: Optional["BoltResponse"]  # type: ignore
+    current_response: Optional["BoltResponse"]  # type: ignore[name-defined]
     last_global_middleware_name: Optional[str]
 
-    def __init__(  # type: ignore
+    def __init__(
         self,
         *,
-        request: Union["BoltRequest", "AsyncBoltRequest"],  # type: ignore
-        current_response: Optional["BoltResponse"],  # type: ignore
+        request: Union["BoltRequest", "AsyncBoltRequest"],  # type: ignore[name-defined]
+        current_response: Optional["BoltResponse"],  # type: ignore[name-defined]
         last_global_middleware_name: Optional[str] = None,
     ):
         self.request = request

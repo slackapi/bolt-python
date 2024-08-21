@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 from typing import Callable, Optional
 
 from slack_bolt.listener import Listener
@@ -9,7 +10,7 @@ from slack_bolt.util.utils import get_name_for_callable
 from slack_bolt.workflows.step.step import WorkflowStep
 
 
-class WorkflowStepMiddleware(Middleware):  # type:ignore
+class WorkflowStepMiddleware(Middleware):
     """Base middleware for step from app specific ones"""
 
     def __init__(self, step: WorkflowStep, listener_runner: ThreadListenerRunner):

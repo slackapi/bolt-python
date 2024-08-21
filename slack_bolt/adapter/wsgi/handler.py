@@ -3,7 +3,6 @@ from typing import Any, Callable, Dict, Iterable, List, Tuple
 from slack_bolt import App
 from slack_bolt.adapter.wsgi.http_request import WsgiHttpRequest
 from slack_bolt.adapter.wsgi.http_response import WsgiHttpResponse
-from slack_bolt.oauth.oauth_flow import OAuthFlow
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
@@ -41,14 +40,12 @@ class SlackRequestHandler:
         )
 
     def handle_installation(self, request: WsgiHttpRequest) -> BoltResponse:
-        oauth_flow: OAuthFlow = self.app.oauth_flow
-        return oauth_flow.handle_installation(
+        return self.app.oauth_flow.handle_installation(  # type: ignore[union-attr]
             BoltRequest(body=request.get_body(), query=request.query_string, headers=request.get_headers())
         )
 
     def handle_callback(self, request: WsgiHttpRequest) -> BoltResponse:
-        oauth_flow: OAuthFlow = self.app.oauth_flow
-        return oauth_flow.handle_callback(
+        return self.app.oauth_flow.handle_callback(  # type: ignore[union-attr]
             BoltRequest(body=request.get_body(), query=request.query_string, headers=request.get_headers())
         )
 
@@ -56,17 +53,17 @@ class SlackRequestHandler:
         if request.method == "GET":
             if self.app.oauth_flow is not None:
                 if request.path == self.app.oauth_flow.install_path:
-                    bolt_response: BoltResponse = self.handle_installation(request)
+                    bolt_response = self.handle_installation(request)
                     return WsgiHttpResponse(
                         status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body
                     )
-                if request.path == self.app.oauth_flow.redirect_uri_path:
-                    bolt_response: BoltResponse = self.handle_callback(request)
+                elif request.path == self.app.oauth_flow.redirect_uri_path:
+                    bolt_response = self.handle_callback(request)
                     return WsgiHttpResponse(
                         status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body
                     )
         if request.method == "POST" and request.path == self.path:
-            bolt_response: BoltResponse = self.dispatch(request)
+            bolt_response = self.dispatch(request)
             return WsgiHttpResponse(status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body)
         return WsgiHttpResponse(status=404, headers={"content-type": ["text/plain;charset=utf-8"]}, body="Not Found")
 

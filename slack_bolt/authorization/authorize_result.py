@@ -1,4 +1,4 @@
-from typing import Optional, List, Union
+from typing import Optional, Sequence, Union
 
 from slack_sdk.web import SlackResponse
 
@@ -14,12 +14,12 @@ class AuthorizeResult(dict):
     bot_id: Optional[str]
     bot_user_id: Optional[str]
     bot_token: Optional[str]
-    bot_scopes: Optional[List[str]]  # since v1.17
+    bot_scopes: Optional[Sequence[str]]  # since v1.17
 
     user_id: Optional[str]
     user: Optional[str]  # since v1.18
     user_token: Optional[str]
-    user_scopes: Optional[List[str]]  # since v1.17
+    user_scopes: Optional[Sequence[str]]  # since v1.17
 
     def __init__(
         self,
@@ -32,12 +32,12 @@ class AuthorizeResult(dict):
         bot_user_id: Optional[str] = None,
         bot_id: Optional[str] = None,
         bot_token: Optional[str] = None,
-        bot_scopes: Optional[Union[List[str], str]] = None,
+        bot_scopes: Optional[Union[Sequence[str], str]] = None,
         # user
         user_id: Optional[str] = None,
         user: Optional[str] = None,
         user_token: Optional[str] = None,
-        user_scopes: Optional[Union[List[str], str]] = None,
+        user_scopes: Optional[Union[Sequence[str], str]] = None,
     ):
         """
         Args:
@@ -64,14 +64,14 @@ class AuthorizeResult(dict):
         self["bot_token"] = self.bot_token = bot_token
         if bot_scopes is not None and isinstance(bot_scopes, str):
             bot_scopes = [scope.strip() for scope in bot_scopes.split(",")]
-        self["bot_scopes"] = self.bot_scopes = bot_scopes  # type: ignore
+        self["bot_scopes"] = self.bot_scopes = bot_scopes
         # user
         self["user_id"] = self.user_id = user_id
         self["user"] = self.user = user
         self["user_token"] = self.user_token = user_token
         if user_scopes is not None and isinstance(user_scopes, str):
             user_scopes = [scope.strip() for scope in user_scopes.split(",")]
-        self["user_scopes"] = self.user_scopes = user_scopes  # type: ignore
+        self["user_scopes"] = self.user_scopes = user_scopes
 
     @classmethod
     def from_auth_test_response(
@@ -79,21 +79,19 @@ class AuthorizeResult(dict):
         *,
         bot_token: Optional[str] = None,
         user_token: Optional[str] = None,
-        bot_scopes: Optional[Union[List[str], str]] = None,
-        user_scopes: Optional[Union[List[str], str]] = None,
-        auth_test_response: SlackResponse,
-        user_auth_test_response: Optional[SlackResponse] = None,
+        bot_scopes: Optional[Union[Sequence[str], str]] = None,
+        user_scopes: Optional[Union[Sequence[str], str]] = None,
+        auth_test_response: Union[SlackResponse, "AsyncSlackResponse"],  # type: ignore[name-defined]
+        user_auth_test_response: Optional[Union[SlackResponse, "AsyncSlackResponse"]] = None,  # type: ignore[name-defined]
     ) -> "AuthorizeResult":
-        bot_user_id: Optional[str] = (  # type:ignore
+        bot_user_id: Optional[str] = (
             auth_test_response.get("user_id") if auth_test_response.get("bot_id") is not None else None
         )
-        user_id: Optional[str] = (  # type:ignore
-            auth_test_response.get("user_id") if auth_test_response.get("bot_id") is None else None
-        )
-        user_name = auth_test_response.get("user")
+        user_id: Optional[str] = auth_test_response.get("user_id") if auth_test_response.get("bot_id") is None else None
+        user_name: Optional[str] = auth_test_response.get("user")
         if user_id is None and user_auth_test_response is not None:
-            user_id: Optional[str] = user_auth_test_response.get("user_id")  # type:ignore
-            user_name: Optional[str] = user_auth_test_response.get("user")  # type:ignore
+            user_id = user_auth_test_response.get("user_id")
+            user_name = user_auth_test_response.get("user")
 
         return AuthorizeResult(
             enterprise_id=auth_test_response.get("enterprise_id"),

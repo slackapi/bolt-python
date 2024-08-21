@@ -14,17 +14,6 @@ then
   black slack_bolt/ tests/ && \
     pytest -vv $1
 else
-  if [ ${python_version:0:3} == "3.8" ]
-  then
-    # pytype's behavior can be different in older Python versions
-    black slack_bolt/ tests/ \
-      && pytest -vv \
-      && pip install -r requirements/adapter.txt \
-      && pip install -r requirements/adapter_testing.txt \
-      && pip install -U pip setuptools wheel \
-      && pip install -U pytype \
-      && pytype slack_bolt/
-  else
     black slack_bolt/ tests/ && pytest
   fi
 fi

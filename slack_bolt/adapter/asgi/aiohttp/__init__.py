@@ -1,5 +1,3 @@
-from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
-
 from slack_bolt.adapter.asgi.http_request import AsgiHttpRequest
 from slack_bolt.adapter.asgi.builtin import SlackRequestHandler
 
@@ -41,13 +39,11 @@ class AsyncSlackRequestHandler(SlackRequestHandler):
         )
 
     async def handle_installation(self, request: AsgiHttpRequest) -> BoltResponse:
-        oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
-        return await oauth_flow.handle_installation(
+        return await self.app.oauth_flow.handle_installation(  # type: ignore[union-attr]
             AsyncBoltRequest(body=await request.get_raw_body(), query=request.query_string, headers=request.get_headers())
         )
 
     async def handle_callback(self, request: AsgiHttpRequest) -> BoltResponse:
-        oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
-        return await oauth_flow.handle_callback(
+        return await self.app.oauth_flow.handle_callback(  # type: ignore[union-attr]
             AsyncBoltRequest(body=await request.get_raw_body(), query=request.query_string, headers=request.get_headers())
         )

@@ -62,13 +62,13 @@ class SingleTeamAuthorization(Authorization):
 
         try:
             if not self.auth_test_result:
-                self.auth_test_result = req.context.client.auth_test()
+                self.auth_test_result = req.context.client.auth_test()  # type: ignore[union-attr]
 
             if self.auth_test_result:
                 req.context.set_authorize_result(
                     _to_authorize_result(
                         auth_test_result=self.auth_test_result,
-                        token=req.context.client.token,
+                        token=req.context.client.token,  # type: ignore[union-attr]
                         request_user_id=req.context.user_id,
                     )
                 )
@@ -77,7 +77,7 @@ class SingleTeamAuthorization(Authorization):
                 # Just in case
                 self.logger.error("auth.test API call result is unexpectedly None")
                 if req.context.response_url is not None:
-                    req.context.respond(self.user_facing_authorize_error_message)
+                    req.context.respond(self.user_facing_authorize_error_message)  # type: ignore[misc]
                     return BoltResponse(status=200, body="")
                 return _build_user_facing_error_response(self.user_facing_authorize_error_message)
         except SlackApiError as e:

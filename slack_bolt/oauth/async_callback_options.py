@@ -11,12 +11,12 @@ from slack_bolt.response import BoltResponse
 
 
 class AsyncSuccessArgs:
-    def __init__(  # type: ignore
+    def __init__(
         self,
         *,
         request: AsyncBoltRequest,
         installation: Installation,
-        settings: "AsyncOAuthSettings",
+        settings: "AsyncOAuthSettings",  # type: ignore[name-defined]
         default: "AsyncCallbackOptions",
     ):
         """The arguments for a success function.
@@ -34,14 +34,14 @@ class AsyncSuccessArgs:
 
 
 class AsyncFailureArgs:
-    def __init__(  # type: ignore
+    def __init__(
         self,
         *,
         request: AsyncBoltRequest,
         reason: str,
         error: Optional[Exception] = None,
         suggested_status_code: int,
-        settings: "AsyncOAuthSettings",
+        settings: "AsyncOAuthSettings",  # type: ignore[name-defined]
         default: "AsyncCallbackOptions",
     ):
         """The arguments for a failure function.
@@ -91,10 +91,8 @@ class DefaultAsyncCallbackOptions(AsyncCallbackOptions):
             state_utils=state_utils,
             redirect_uri_page_renderer=redirect_uri_page_renderer,
         )
-        # Note that pytype 2021.4.26 misunderstands these assignments.
-        # Thus, we put "type: ignore" for the following two lines
-        self.success = self._success_handler  # type: ignore
-        self.failure = self._failure_handler  # type: ignore
+        self.success = self._success_handler
+        self.failure = self._failure_handler
 
     # --------------------------
     # Internal methods

@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
-from pyramid.request import Request
-from pyramid.response import Response
+from pyramid.request import Request  # type: ignore[import-untyped]
+from pyramid.response import Response  # type: ignore[import-untyped]
 
 from slack_bolt import App, BoltRequest, BoltResponse
 from slack_bolt.oauth import OAuthFlow
@@ -37,7 +37,7 @@ def to_pyramid_response(bolt_resp: BoltResponse) -> Response:
 
 
 class SlackRequestHandler:
-    def __init__(self, app: App):  # type: ignore
+    def __init__(self, app: App):
         self.app = app
 
     def handle(self, request: Request) -> Response:

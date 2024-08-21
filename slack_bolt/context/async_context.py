@@ -120,8 +120,8 @@ class AsyncBoltContext(BaseContext):
         if "respond" not in self:
             self["respond"] = AsyncRespond(
                 response_url=self.response_url,
-                proxy=self.client.proxy,
-                ssl=self.client.ssl,
+                proxy=self.client.proxy,  # type: ignore[union-attr]
+                ssl=self.client.ssl,  # type: ignore[union-attr]
             )
         return self["respond"]
 
@@ -146,7 +146,9 @@ class AsyncBoltContext(BaseContext):
             Callable `complete()` function
         """
         if "complete" not in self:
-            self["complete"] = AsyncComplete(client=self.client, function_execution_id=self.function_execution_id)
+            self["complete"] = AsyncComplete(
+                client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
+            )
         return self["complete"]
 
     @property
@@ -170,5 +172,7 @@ class AsyncBoltContext(BaseContext):
             Callable `fail()` function
         """
         if "fail" not in self:
-            self["fail"] = AsyncFail(client=self.client, function_execution_id=self.function_execution_id)
+            self["fail"] = AsyncFail(
+                client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
+            )
         return self["fail"]

@@ -38,6 +38,7 @@ from slack_bolt.listener_matcher import builtins as builtin_matchers
 from slack_bolt.listener_matcher.listener_matcher import ListenerMatcher
 from slack_bolt.logger import get_bolt_app_logger, get_bolt_logger
 from slack_bolt.logger.messages import (
+    error_oauth_flow_or_authorize_required,
     warning_client_prioritized_and_token_skipped,
     warning_token_skipped,
     error_auth_test_failure,
@@ -69,6 +70,7 @@ from slack_bolt.middleware.message_listener_matches import MessageListenerMatche
 from slack_bolt.middleware.middleware_error_handler import (
     DefaultMiddlewareErrorHandler,
     CustomMiddlewareErrorHandler,
+    MiddlewareErrorHandler,
 )
 from slack_bolt.middleware.url_verification import UrlVerification
 from slack_bolt.oauth import OAuthFlow
@@ -191,7 +193,8 @@ class App:
             listener_executor: Custom executor to run background tasks. If absent, the default `ThreadPoolExecutor` will
                 be used.
         """
-        signing_secret = signing_secret or os.environ.get("SLACK_SIGNING_SECRET", "")
+        if signing_secret is None:
+            signing_secret = os.environ.get("SLACK_SIGNING_SECRET", "")
         token = token or os.environ.get("SLACK_BOT_TOKEN")
 
         self._name: str = name or inspect.stack()[1].filename.split(os.path.sep)[-1]
@@ -228,7 +231,7 @@ class App:
 
         self._before_authorize: Optional[Middleware] = None
         if before_authorize is not None:
-            if isinstance(before_authorize, Callable):
+            if callable(before_authorize):
                 self._before_authorize = CustomMiddleware(
                     app_name=self._name,
                     func=before_authorize,
@@ -258,7 +261,7 @@ class App:
                 client_id=settings.client_id if settings is not None else None,
                 client_secret=settings.client_secret if settings is not None else None,
                 logger=self._framework_logger,
-                bot_only=installation_store_bot_only,
+                bot_only=installation_store_bot_only or False,
                 client=self._client,  # for proxy use cases etc.
                 user_token_resolution=(settings.user_token_resolution if settings is not None else "authed_user"),
             )
@@ -286,7 +289,8 @@ class App:
                 logger=self._framework_logger,
             )
             self._installation_store = installation_store
-            self._oauth_flow.settings.installation_store = installation_store
+            if installation_store is not None:
+                self._oauth_flow.settings.installation_store = installation_store
 
             if self._oauth_flow._client is None:
                 self._oauth_flow._client = self._client
@@ -300,11 +304,12 @@ class App:
                 logger=self._framework_logger,
             )
             self._installation_store = installation_store
-            oauth_settings.installation_store = installation_store
+            if installation_store is not None:
+                oauth_settings.installation_store = installation_store
             self._oauth_flow = OAuthFlow(client=self.client, logger=self.logger, settings=oauth_settings)
             if self._authorize is None:
                 self._authorize = self._oauth_flow.settings.authorize
-            self._authorize.token_rotation_expiration_minutes = oauth_settings.token_rotation_expiration_minutes
+            self._authorize.token_rotation_expiration_minutes = oauth_settings.token_rotation_expiration_minutes  # type: ignore[attr-defined] # noqa: E501
 
         if (self._installation_store is not None or self._authorize is not None) and self._token is not None:
             self._token = None
@@ -317,7 +322,7 @@ class App:
             if app_bot_only != oauth_flow_bot_only:
                 self.logger.warning(warning_bot_only_conflicts())
                 self._oauth_flow.settings.installation_store_bot_only = app_bot_only
-                self._authorize.bot_only = app_bot_only
+                self._authorize.bot_only = app_bot_only  # type: ignore[union-attr]
 
         self._tokens_revocation_listeners: Optional[TokenRevocationListeners] = None
         if self._installation_store is not None:
@@ -346,7 +351,7 @@ class App:
                 executor=listener_executor,
             ),
         )
-        self._middleware_error_handler = DefaultMiddlewareErrorHandler(
+        self._middleware_error_handler: MiddlewareErrorHandler = DefaultMiddlewareErrorHandler(
             logger=self._framework_logger,
         )
 
@@ -413,7 +418,7 @@ class App:
                 )
             else:
                 raise BoltError(error_token_required())
-        else:
+        elif self._authorize is not None:
             self._middleware_list.append(
                 MultiTeamsAuthorization(
                     authorize=self._authorize,
@@ -422,6 +427,9 @@ class App:
                     user_facing_authorize_error_message=user_facing_authorize_error_message,
                 )
             )
+        else:
+            raise BoltError(error_oauth_flow_or_authorize_required())
+
         if ignoring_self_events_enabled is True:
             self._middleware_list.append(IgnoringSelfEvents(base_logger=self._base_logger))
         if url_verification_enabled is True:
@@ -525,7 +533,7 @@ class App:
                 middleware_state["next_called"] = False
                 if self._framework_logger.level <= logging.DEBUG:
                     self._framework_logger.debug(debug_applying_middleware(middleware.name))
-                resp = middleware.process(req=req, resp=resp, next=middleware_next)
+                resp = middleware.process(req=req, resp=resp, next=middleware_next)  # type: ignore[arg-type]
                 if not middleware_state["next_called"]:
                     if resp is None:
                         # next() method was not called without providing the response to return to Slack
@@ -552,9 +560,11 @@ class App:
             for listener in self._listeners:
                 listener_name = get_name_for_callable(listener.ack_function)
                 self._framework_logger.debug(debug_checking_listener(listener_name))
-                if listener.matches(req=req, resp=resp):
+                if listener.matches(req=req, resp=resp):  # type: ignore[arg-type]
                     # run all the middleware attached to this listener first
-                    middleware_resp, next_was_not_called = listener.run_middleware(req=req, resp=resp)
+                    middleware_resp, next_was_not_called = listener.run_middleware(
+                        req=req, resp=resp  # type: ignore[arg-type]
+                    )
                     if next_was_not_called:
                         if middleware_resp is not None:
                             if self._framework_logger.level <= logging.DEBUG:
@@ -576,7 +586,7 @@ class App:
                     self._framework_logger.debug(debug_running_listener(listener_name))
                     listener_response: Optional[BoltResponse] = self._listener_runner.run(
                         request=req,
-                        response=resp,
+                        response=resp,  # type: ignore[arg-type]
                         listener_name=listener_name,
                         listener=listener,
                     )
@@ -646,7 +656,7 @@ class App:
             if isinstance(middleware_or_callable, Middleware):
                 middleware: Middleware = middleware_or_callable
                 self._middleware_list.append(middleware)
-            elif isinstance(middleware_or_callable, Callable):
+            elif callable(middleware_or_callable):
                 self._middleware_list.append(
                     CustomMiddleware(
                         app_name=self.name,
@@ -715,9 +725,9 @@ class App:
         if isinstance(callback_id, (str, Pattern)):
             step = WorkflowStep(
                 callback_id=callback_id,
-                edit=edit,
-                save=save,
-                execute=execute,
+                edit=edit,  # type: ignore[arg-type]
+                save=save,  # type: ignore[arg-type]
+                execute=execute,  # type: ignore[arg-type]
                 base_logger=self._base_logger,
             )
         elif isinstance(step, WorkflowStepBuilder):
@@ -1367,7 +1377,7 @@ class App:
             # the registration should return the original function.
             value_to_return = functions[0]
 
-        listener_matchers = [
+        listener_matchers: List[ListenerMatcher] = [
             CustomListenerMatcher(app_name=self.name, func=f, base_logger=self._base_logger) for f in (matchers or [])
         ]
         listener_matchers.insert(0, primary_matcher)
@@ -1375,7 +1385,7 @@ class App:
         for m in middleware or []:
             if isinstance(m, Middleware):
                 listener_middleware.append(m)
-            elif isinstance(m, Callable):
+            elif callable(m):
                 listener_middleware.append(CustomMiddleware(app_name=self.name, func=m, base_logger=self._base_logger))
             else:
                 raise ValueError(error_unexpected_listener_middleware(type(m)))
@@ -1448,7 +1458,7 @@ class SlackAppDevelopmentServer:
                             body="",
                             query=query,
                             # email.message.Message's mapping interface is dict compatible
-                            headers=self.headers,  # type:ignore
+                            headers=self.headers,
                         )
                         bolt_resp = _bolt_oauth_flow.handle_installation(bolt_req)
                         self._send_bolt_response(bolt_resp)
@@ -1457,7 +1467,7 @@ class SlackAppDevelopmentServer:
                             body="",
                             query=query,
                             # email.message.Message's mapping interface is dict compatible
-                            headers=self.headers,  # type:ignore
+                            headers=self.headers,
                         )
                         bolt_resp = _bolt_oauth_flow.handle_callback(bolt_req)
                         self._send_bolt_response(bolt_resp)
@@ -1478,7 +1488,7 @@ class SlackAppDevelopmentServer:
                     body=request_body,
                     query=query,
                     # email.message.Message's mapping interface is dict compatible
-                    headers=self.headers,  # type:ignore
+                    headers=self.headers,
                 )
                 bolt_resp: BoltResponse = _bolt_app.dispatch(bolt_req)
                 self._send_bolt_response(bolt_resp)

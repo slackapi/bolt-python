@@ -36,18 +36,6 @@ class AsyncOAuthFlow:
     success_handler: Callable[[AsyncSuccessArgs], Awaitable[BoltResponse]]
     failure_handler: Callable[[AsyncFailureArgs], Awaitable[BoltResponse]]
 
-    @property
-    def client(self) -> AsyncWebClient:
-        if self._async_client is None:
-            self._async_client = create_async_web_client(logger=self.logger)
-        return self._async_client
-
-    @property
-    def logger(self) -> Logger:
-        if self._logger is None:
-            self._logger = logging.getLogger(__name__)
-        return self._logger
-
     def __init__(
         self,
         *,
@@ -69,7 +57,8 @@ class AsyncOAuthFlow:
             raise BoltError(error_oauth_settings_invalid_type_async())
         self.settings = settings
 
-        self.settings.logger = self._logger
+        if self._logger is not None:
+            self.settings.logger = self._logger
 
         self.client_id = self.settings.client_id
         self.redirect_uri = self.settings.redirect_uri
@@ -77,7 +66,7 @@ class AsyncOAuthFlow:
         self.redirect_uri_path = self.settings.redirect_uri_path
 
         self.default_callback_options = DefaultAsyncCallbackOptions(
-            logger=logger,
+            logger=logger,  # type: ignore[arg-type]
             state_utils=self.settings.state_utils,
             redirect_uri_page_renderer=self.settings.redirect_uri_page_renderer,
         )
@@ -85,6 +74,18 @@ class AsyncOAuthFlow:
             settings.callback_options = self.default_callback_options
         self.success_handler = settings.callback_options.success
         self.failure_handler = settings.callback_options.failure
+
+    @property
+    def client(self) -> AsyncWebClient:
+        if self._async_client is None:
+            self._async_client = create_async_web_client(logger=self.logger)
+        return self._async_client
+
+    @property
+    def logger(self) -> Logger:
+        if self._logger is None:
+            self._logger = logging.getLogger(__name__)
+        return self._logger
 
     # -----------------------------
     # Factory Methods
@@ -121,6 +122,16 @@ class AsyncOAuthFlow:
         scopes = scopes or os.environ.get("SLACK_SCOPES", "").split(",")
         user_scopes = user_scopes or os.environ.get("SLACK_USER_SCOPES", "").split(",")
         redirect_uri = redirect_uri or os.environ.get("SLACK_REDIRECT_URI")
+        installation_store = (
+            SQLite3InstallationStore(database=database, client_id=client_id)
+            if logger is None
+            else SQLite3InstallationStore(database=database, client_id=client_id, logger=logger)
+        )
+        state_store = (
+            SQLite3OAuthStateStore(database=database, expiration_seconds=state_expiration_seconds)
+            if logger is None
+            else SQLite3OAuthStateStore(database=database, expiration_seconds=state_expiration_seconds, logger=logger)
+        )
         return AsyncOAuthFlow(
             client=client or AsyncWebClient(),
             logger=logger,
@@ -133,24 +144,16 @@ class AsyncOAuthFlow:
                 user_scopes=user_scopes,
                 redirect_uri=redirect_uri,
                 # Handler configuration
-                install_path=install_path,
-                redirect_uri_path=redirect_uri_path,
+                install_path=install_path,  # type: ignore[arg-type]
+                redirect_uri_path=redirect_uri_path,  # type: ignore[arg-type]
                 callback_options=callback_options,
                 success_url=success_url,
                 failure_url=failure_url,
                 # Installation Management
-                installation_store=SQLite3InstallationStore(
-                    database=database,
-                    client_id=client_id,
-                    logger=logger,
-                ),
+                installation_store=installation_store,
                 installation_store_bot_only=installation_store_bot_only,
                 # state parameter related configurations
-                state_store=SQLite3OAuthStateStore(
-                    database=database,
-                    expiration_seconds=state_expiration_seconds,
-                    logger=logger,
-                ),
+                state_store=state_store,
                 state_cookie_name=state_cookie_name,
                 state_expiration_seconds=state_expiration_seconds,
             ),
@@ -220,7 +223,7 @@ class AsyncOAuthFlow:
             return await self.failure_handler(
                 AsyncFailureArgs(
                     request=request,
-                    reason=error,  # type: ignore
+                    reason=error,
                     suggested_status_code=200,
                     settings=self.settings,
                     default=self.default_callback_options,
@@ -241,7 +244,7 @@ class AsyncOAuthFlow:
                     )
                 )
 
-            valid_state_consumed = await self.settings.state_store.async_consume(state)
+            valid_state_consumed = await self.settings.state_store.async_consume(state)  # type: ignore[arg-type]
             if not valid_state_consumed:
                 return await self.failure_handler(
                     AsyncFailureArgs(
@@ -341,14 +344,14 @@ class AsyncOAuthFlow:
                 bot_token=bot_token,
                 bot_id=bot_id,
                 bot_user_id=oauth_response.get("bot_user_id"),
-                bot_scopes=oauth_response.get("scope"),  # comma-separated string
+                bot_scopes=oauth_response.get("scope"),  # type: ignore[arg-type] # comma-separated string
                 bot_refresh_token=oauth_response.get("refresh_token"),  # since v1.7
                 bot_token_expires_in=oauth_response.get("expires_in"),  # since v1.7
-                user_id=installer.get("id"),
+                user_id=installer.get("id"),  # type: ignore[arg-type]
                 user_token=installer.get("access_token"),
-                user_scopes=installer.get("scope"),  # comma-separated string
+                user_scopes=installer.get("scope"),  # type: ignore[arg-type]# comma-separated string
                 user_refresh_token=installer.get("refresh_token"),  # since v1.7
-                user_token_expires_in=installer.get("expires_in"),  # since v1.7
+                user_token_expires_in=installer.get("expires_in"),  # type: ignore[arg-type] # since v1.7
                 incoming_webhook_url=incoming_webhook.get("url"),
                 incoming_webhook_channel=incoming_webhook.get("channel"),
                 incoming_webhook_channel_id=incoming_webhook.get("channel_id"),

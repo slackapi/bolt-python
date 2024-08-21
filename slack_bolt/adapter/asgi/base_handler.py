@@ -1,4 +1,4 @@
-from typing import Callable, Dict
+from typing import Callable, Dict, Union
 
 from .http_request import AsgiHttpRequest
 from .http_response import AsgiHttpResponse
@@ -14,7 +14,7 @@ This handler implements the ASGI standard found here https://asgi.readthedocs.io
 
 
 class BaseSlackRequestHandler:
-    app: App  # type: ignore
+    app: Union[App, "AsyncApp"]  # type: ignore[name-defined]
     path: str
 
     async def dispatch(self, request: AsgiHttpRequest) -> BoltResponse:
@@ -37,13 +37,13 @@ class BaseSlackRequestHandler:
                     return AsgiHttpResponse(
                         status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body
                     )
-                if path == self.app.oauth_flow.redirect_uri_path:
-                    bolt_response: BoltResponse = await self.handle_callback(request)
+                elif path == self.app.oauth_flow.redirect_uri_path:
+                    bolt_response = await self.handle_callback(request)
                     return AsgiHttpResponse(
                         status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body
                     )
         if method == "POST" and path == self.path:
-            bolt_response: BoltResponse = await self.dispatch(request)
+            bolt_response = await self.dispatch(request)
             return AsgiHttpResponse(status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body)
         return AsgiHttpResponse(status=404, headers={"content-type": ["text/plain;charset=utf-8"]}, body="Not Found")
 
@@ -60,7 +60,7 @@ class BaseSlackRequestHandler:
     async def __call__(self, scope: scope_type, receive: Callable, send: Callable) -> None:
         if scope["type"] == "http":
             response: AsgiHttpResponse = await self._get_http_response(
-                scope["method"], scope["path"], AsgiHttpRequest(scope, receive)
+                method=scope["method"], path=scope["path"], request=AsgiHttpRequest(scope, receive)  # type: ignore[arg-type]
             )
             await send(response.get_response_start())
             await send(response.get_response_body())
@@ -68,4 +68,4 @@ class BaseSlackRequestHandler:
         if scope["type"] == "lifespan":
             await send(await self._handle_lifespan(receive))
             return
-        raise TypeError(f"Unsupported scope type: {scope['type']}")
+        raise TypeError(f"Unsupported scope type: {scope['type']!r}")

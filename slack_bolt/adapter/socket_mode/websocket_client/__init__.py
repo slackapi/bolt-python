@@ -1,4 +1,5 @@
 """[`websocket-client`](https://pypi.org/project/websocket-client/) based implementation"""
+
 import os
 from logging import Logger
 from time import time
@@ -15,13 +16,13 @@ from slack_bolt.response import BoltResponse
 
 
 class SocketModeHandler(BaseSocketModeHandler):
-    app: App  # type: ignore
+    app: App
     app_token: str
     client: SocketModeClient
 
-    def __init__(  # type: ignore
+    def __init__(
         self,
-        app: App,  # type: ignore
+        app: App,
         app_token: Optional[str] = None,
         logger: Optional[Logger] = None,
         web_client: Optional[WebClient] = None,
@@ -62,9 +63,9 @@ class SocketModeHandler(BaseSocketModeHandler):
             proxy_type=proxy_type,
             trace_enabled=trace_enabled,
         )
-        self.client.socket_mode_request_listeners.append(self.handle)
+        self.client.socket_mode_request_listeners.append(self.handle)  # type: ignore[arg-type]
 
-    def handle(self, client: SocketModeClient, req: SocketModeRequest) -> None:
+    def handle(self, client: SocketModeClient, req: SocketModeRequest) -> None:  # type: ignore[override]
         start = time()
         bolt_resp: BoltResponse = run_bolt_app(self.app, req)
         send_response(client, req, bolt_resp, start)

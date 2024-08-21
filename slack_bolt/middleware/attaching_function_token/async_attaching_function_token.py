@@ -5,7 +5,7 @@ from slack_bolt.response import BoltResponse
 from slack_bolt.middleware.async_middleware import AsyncMiddleware
 
 
-class AsyncAttachingFunctionToken(AsyncMiddleware):  # type: ignore
+class AsyncAttachingFunctionToken(AsyncMiddleware):
     async def async_process(
         self,
         *,
@@ -15,6 +15,6 @@ class AsyncAttachingFunctionToken(AsyncMiddleware):  # type: ignore
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> BoltResponse:
         if req.context.function_bot_access_token is not None:
-            req.context.client.token = req.context.function_bot_access_token
+            req.context.client.token = req.context.function_bot_access_token  # type: ignore[union-attr]
 
         return await next()

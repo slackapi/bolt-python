@@ -18,7 +18,7 @@ def _build_message(
     thread_ts: Optional[str] = None,
     metadata: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    message = {"text": text}
+    message: Dict[str, Any] = {"text": text}
     if blocks is not None and len(blocks) > 0:
         message["blocks"] = convert_to_dict_list(blocks)
     if attachments is not None and len(attachments) > 0:
