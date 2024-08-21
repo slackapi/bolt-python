@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any, Dict, Optional
 
 from sanic.request import Request
 from sanic.response import HTTPResponse
@@ -8,12 +9,18 @@ from slack_bolt.async_app import AsyncApp, AsyncBoltRequest
 from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
 
 
-def to_async_bolt_request(req: Request) -> AsyncBoltRequest:
-    return AsyncBoltRequest(
+def to_async_bolt_request(req: Request, addition_context_properties: Optional[Dict[str, Any]] = None) -> AsyncBoltRequest:
+    request = AsyncBoltRequest(
         body=req.body.decode("utf-8"),
         query=req.query_string,
         headers=req.headers,  # type: ignore[arg-type]
     )
+
+    if addition_context_properties is not None:
+        for k, v in addition_context_properties.items():
+            request.context[k] = v
+
+    return request
 
 
 def to_sanic_response(bolt_resp: BoltResponse) -> HTTPResponse:
@@ -42,19 +49,19 @@ class AsyncSlackRequestHandler:
     def __init__(self, app: AsyncApp):
         self.app = app
 
-    async def handle(self, req: Request) -> HTTPResponse:
+    async def handle(self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None) -> HTTPResponse:
         if req.method == "GET":
             if self.app.oauth_flow is not None:
                 oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
                 if req.path == oauth_flow.install_path:
-                    bolt_resp = await oauth_flow.handle_installation(to_async_bolt_request(req))
+                    bolt_resp = await oauth_flow.handle_installation(to_async_bolt_request(req, addition_context_properties))
                     return to_sanic_response(bolt_resp)
                 elif req.path == oauth_flow.redirect_uri_path:
-                    bolt_resp = await oauth_flow.handle_callback(to_async_bolt_request(req))
+                    bolt_resp = await oauth_flow.handle_callback(to_async_bolt_request(req, addition_context_properties))
                     return to_sanic_response(bolt_resp)
 
         elif req.method == "POST":
-            bolt_resp = await self.app.async_dispatch(to_async_bolt_request(req))
+            bolt_resp = await self.app.async_dispatch(to_async_bolt_request(req, addition_context_properties))
             return to_sanic_response(bolt_resp)
 
         return HTTPResponse(
