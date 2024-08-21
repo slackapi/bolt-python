@@ -44,6 +44,7 @@ from slack_bolt.authorization.async_authorize import (
 )
 from slack_bolt.error import BoltError, BoltUnhandledRequestError
 from slack_bolt.logger.messages import (
+    error_oauth_flow_or_authorize_required,
     warning_client_prioritized_and_token_skipped,
     warning_token_skipped,
     error_token_required,
@@ -426,7 +427,7 @@ class AsyncApp:
                 )
             )
         else:
-            raise BoltError("OAuthFlow or Authorize must be configured to make a Bolt app")
+            raise BoltError(error_oauth_flow_or_authorize_required())
 
         if ignoring_self_events_enabled is True:
             self._async_middleware_list.append(AsyncIgnoringSelfEvents(base_logger=self._base_logger))

@@ -38,6 +38,7 @@ from slack_bolt.listener_matcher import builtins as builtin_matchers
 from slack_bolt.listener_matcher.listener_matcher import ListenerMatcher
 from slack_bolt.logger import get_bolt_app_logger, get_bolt_logger
 from slack_bolt.logger.messages import (
+    error_oauth_flow_or_authorize_required,
     warning_client_prioritized_and_token_skipped,
     warning_token_skipped,
     error_auth_test_failure,
@@ -427,7 +428,7 @@ class App:
                 )
             )
         else:
-            raise BoltError("OAuthFlow or Authorize must be configured to make a Bolt app")
+            raise BoltError(error_oauth_flow_or_authorize_required())
 
         if ignoring_self_events_enabled is True:
             self._middleware_list.append(IgnoringSelfEvents(base_logger=self._base_logger))

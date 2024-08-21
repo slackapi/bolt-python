@@ -74,6 +74,10 @@ def error_installation_store_required_for_builtin_listeners() -> str:
     )
 
 
+def error_oauth_flow_or_authorize_required() -> str:
+    return "`oauth_flow` or `authorize` must be configured to make a Bolt app"
+
+
 # -------------------------------
 # Warning
 # -------------------------------
