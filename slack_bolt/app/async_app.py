@@ -24,7 +24,7 @@ from slack_bolt.middleware.message_listener_matches.async_message_listener_match
     AsyncMessageListenerMatches,
 )
 from slack_bolt.oauth.async_internals import select_consistent_installation_store
-from slack_bolt.util.utils import get_name_for_callable
+from slack_bolt.util.utils import get_name_for_callable, is_coroutine_function
 from slack_bolt.workflows.step.async_step import (
     AsyncWorkflowStep,
     AsyncWorkflowStepBuilder,
@@ -778,7 +778,7 @@ class AsyncApp:
             func: The function that is supposed to be executed
                 when getting an unhandled error in Bolt app.
         """
-        if not inspect.iscoroutinefunction(func):
+        if not is_coroutine_function(func):
             name = get_name_for_callable(func)
             raise BoltError(error_listener_function_must_be_coro_func(name))
         self._async_listener_runner.listener_error_handler = AsyncCustomListenerErrorHandler(
@@ -1410,7 +1410,7 @@ class AsyncApp:
             value_to_return = functions[0]
 
         for func in functions:
-            if not inspect.iscoroutinefunction(func):
+            if not is_coroutine_function(func):
                 name = get_name_for_callable(func)
                 raise BoltError(error_listener_function_must_be_coro_func(name))
 
@@ -1422,7 +1422,7 @@ class AsyncApp:
         for m in middleware or []:
             if isinstance(m, AsyncMiddleware):
                 listener_middleware.append(m)
-            elif isinstance(m, Callable) and inspect.iscoroutinefunction(m):
+            elif isinstance(m, Callable) and is_coroutine_function(m):
                 listener_middleware.append(AsyncCustomMiddleware(app_name=self.name, func=m, base_logger=self._base_logger))
             else:
                 raise ValueError(error_unexpected_listener_middleware(type(m)))
