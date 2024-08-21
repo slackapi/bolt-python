@@ -1,4 +1,3 @@
-import inspect
 from logging import Logger
 from typing import Callable, Awaitable, Any, Sequence, Optional
 
@@ -7,7 +6,7 @@ from slack_bolt.logger import get_bolt_app_logger
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from .async_middleware import AsyncMiddleware
-from slack_bolt.util.utils import get_name_for_callable, get_arg_names_of_callable
+from slack_bolt.util.utils import get_name_for_callable, get_arg_names_of_callable, is_coroutine_function
 
 
 class AsyncCustomMiddleware(AsyncMiddleware):
@@ -24,7 +23,7 @@ class AsyncCustomMiddleware(AsyncMiddleware):
         base_logger: Optional[Logger] = None,
     ):
         self.app_name = app_name
-        if inspect.iscoroutinefunction(func):
+        if is_coroutine_function(func):
             self.func = func
         else:
             raise ValueError("Async middleware function must be an async function")

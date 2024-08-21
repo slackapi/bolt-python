@@ -150,6 +150,14 @@ class TestAppUsingMethodsInClass:
         await self.run_app_and_verify(app)
 
     @pytest.mark.asyncio
+    async def test_callable_class(self):
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
+        instance = CallableClass("Slackbot")
+        app.use(instance)
+        app.shortcut("test-shortcut")(instance.event_handler)
+        await self.run_app_and_verify(app)
+
+    @pytest.mark.asyncio
     async def test_instance_methods_uncommon_name_1(self):
         app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
         awesome = AwesomeClass("Slackbot")
@@ -223,6 +231,18 @@ class AwesomeClass:
     async def static_method(context: AsyncBoltContext, say: AsyncSay, ack: AsyncAck):
         await ack()
         await say(f"Hello <@{context.user_id}>!")
+
+
+class CallableClass:
+    def __init__(self, name: str):
+        self.name = name
+
+    async def __call__(self, next: Callable):
+        await next()
+
+    async def event_handler(self, context: AsyncBoltContext, say: AsyncSay, ack: AsyncAck):
+        await ack()
+        await say(f"Hello <@{context.user_id}>! My name is {self.name}")
 
 
 async def top_level_function(invalid_arg, ack, say):
