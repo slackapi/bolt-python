@@ -88,3 +88,9 @@ def get_name_for_callable(func: Callable) -> str:
 
 def get_arg_names_of_callable(func: Callable) -> List[str]:
     return inspect.getfullargspec(inspect.unwrap(func)).args
+
+
+def is_coroutine_function(func: Optional[Any]) -> bool:
+    return func is not None and (
+        inspect.iscoroutinefunction(func) or (hasattr(func, "__call__") and inspect.iscoroutinefunction(func.__call__))
+    )
