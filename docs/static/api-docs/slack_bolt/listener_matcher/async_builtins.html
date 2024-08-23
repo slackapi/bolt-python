@@ -47,7 +47,7 @@ hljs.highlightAll();
 </summary>
 <pre><code class="python">class AsyncBuiltinListenerMatcher(BuiltinListenerMatcher, AsyncListenerMatcher):
     async def async_matches(self, req: AsyncBoltRequest, resp: BoltResponse) -&gt; bool:
-        return await self.func(
+        return await self.func(  # type: ignore[misc]
             **build_async_required_kwargs(
                 logger=self.logger,
                 required_arg_names=self.arg_names,

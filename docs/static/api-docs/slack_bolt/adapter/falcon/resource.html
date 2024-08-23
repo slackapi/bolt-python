@@ -59,7 +59,7 @@ api.add_route("/slack/events", SlackAppResource(app))</p></div>
     api.add_route(&#34;/slack/events&#34;, SlackAppResource(app))
     &#34;&#34;&#34;
 
-    def __init__(self, app: App):  # type: ignore
+    def __init__(self, app: App):
         self.app = app
 
     def on_get(self, req: Request, resp: Response):

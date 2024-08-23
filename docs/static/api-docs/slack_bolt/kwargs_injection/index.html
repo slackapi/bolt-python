@@ -56,7 +56,7 @@ For steps from apps, checking <code><a title="slack_bolt.workflows.step.utilitie
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="slack_bolt.kwargs_injection.build_required_kwargs"><code class="name flex">
-<span>def <span class="ident">build_required_kwargs</span></span>(<span>*, logger: logging.Logger, required_arg_names: Sequence[str], request: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>, response: Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>], next_func: Callable[[], None] = None, this_func: Optional[Callable] = None, error: Optional[Exception] = None, next_keys_required: bool = True) ‑> Dict[str, Any]</span>
+<span>def <span class="ident">build_required_kwargs</span></span>(<span>*, logger: logging.Logger, required_arg_names: MutableSequence[str], request: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>, response: Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>], next_func: Optional[Callable[[], None]] = None, this_func: Optional[Callable] = None, error: Optional[Exception] = None, next_keys_required: bool = True) ‑> Dict[str, Any]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>

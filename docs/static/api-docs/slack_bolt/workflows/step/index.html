@@ -601,7 +601,7 @@ Use new custom steps: <a href="https://api.slack.com/automation/functions/custom
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class WorkflowStepMiddleware(Middleware):  # type:ignore
+<pre><code class="python">class WorkflowStepMiddleware(Middleware):
     &#34;&#34;&#34;Base middleware for step from app specific ones&#34;&#34;&#34;
 
     def __init__(self, step: WorkflowStep, listener_runner: ThreadListenerRunner):

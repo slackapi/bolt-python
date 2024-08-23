@@ -187,26 +187,17 @@ channels. Note that actor IDs can be absent in some scenarios.</dd>
             logger: The logger that will be used internally
         &#34;&#34;&#34;
         # OAuth flow parameters/credentials
-        client_id: Optional[str] = client_id or os.environ.get(&#34;SLACK_CLIENT_ID&#34;)
-        client_secret: Optional[str] = client_secret or os.environ.get(&#34;SLACK_CLIENT_SECRET&#34;)
+        client_id = client_id or os.environ.get(&#34;SLACK_CLIENT_ID&#34;)
+        client_secret = client_secret or os.environ.get(&#34;SLACK_CLIENT_SECRET&#34;)
         if client_id is None or client_secret is None:
             raise BoltError(&#34;Both client_id and client_secret are required&#34;)
         self.client_id = client_id
         self.client_secret = client_secret
 
-        # NOTE: pytype says that self.scopes can be str, not Sequence[str].
-        # That&#39;s true but we will check the pattern in the following if statement.
-        # Thus, we ignore the warnings here. This is the same for user_scopes too.
-        self.scopes = (  # type: ignore
-            scopes  # type: ignore
-            if scopes is not None
-            else os.environ.get(&#34;SLACK_SCOPES&#34;, &#34;&#34;).split(&#34;,&#34;)  # type: ignore
-        )  # type: ignore
+        self.scopes = scopes if scopes is not None else os.environ.get(&#34;SLACK_SCOPES&#34;, &#34;&#34;).split(&#34;,&#34;)
         if isinstance(self.scopes, str):
             self.scopes = self.scopes.split(&#34;,&#34;)
-        self.user_scopes = (  # type: ignore
-            user_scopes if user_scopes is not None else os.environ.get(&#34;SLACK_USER_SCOPES&#34;, &#34;&#34;).split(&#34;,&#34;)  # type: ignore
-        )  # type: ignore
+        self.user_scopes = user_scopes if user_scopes is not None else os.environ.get(&#34;SLACK_USER_SCOPES&#34;, &#34;&#34;).split(&#34;,&#34;)
         if isinstance(self.user_scopes, str):
             self.user_scopes = self.user_scopes.split(&#34;,&#34;)
 

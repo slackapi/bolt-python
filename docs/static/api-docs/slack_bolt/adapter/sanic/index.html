@@ -53,22 +53,22 @@ hljs.highlightAll();
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncSlackRequestHandler:
-    def __init__(self, app: AsyncApp):  # type: ignore
+    def __init__(self, app: AsyncApp):
         self.app = app
 
-    async def handle(self, req: Request) -&gt; HTTPResponse:
+    async def handle(self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None) -&gt; HTTPResponse:
         if req.method == &#34;GET&#34;:
             if self.app.oauth_flow is not None:
                 oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
                 if req.path == oauth_flow.install_path:
-                    bolt_resp = await oauth_flow.handle_installation(to_async_bolt_request(req))
+                    bolt_resp = await oauth_flow.handle_installation(to_async_bolt_request(req, addition_context_properties))
                     return to_sanic_response(bolt_resp)
                 elif req.path == oauth_flow.redirect_uri_path:
-                    bolt_resp = await oauth_flow.handle_callback(to_async_bolt_request(req))
+                    bolt_resp = await oauth_flow.handle_callback(to_async_bolt_request(req, addition_context_properties))
                     return to_sanic_response(bolt_resp)
 
         elif req.method == &#34;POST&#34;:
-            bolt_resp = await self.app.async_dispatch(to_async_bolt_request(req))
+            bolt_resp = await self.app.async_dispatch(to_async_bolt_request(req, addition_context_properties))
             return to_sanic_response(bolt_resp)
 
         return HTTPResponse(
@@ -79,7 +79,7 @@ hljs.highlightAll();
 <h3>Methods</h3>
 <dl>
 <dt id="slack_bolt.adapter.sanic.AsyncSlackRequestHandler.handle"><code class="name flex">
-<span>async def <span class="ident">handle</span></span>(<span>self, req: sanic.request.types.Request) ‑> sanic.response.types.HTTPResponse</span>
+<span>async def <span class="ident">handle</span></span>(<span>self, req: sanic.request.types.Request, addition_context_properties: Optional[Dict[str, Any]] = None) ‑> sanic.response.types.HTTPResponse</span>
 </code></dt>
 <dd>
 <div class="desc"></div>

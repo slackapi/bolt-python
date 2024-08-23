@@ -64,7 +64,7 @@ while processing an incoming Slack event.</p>
 <dl>
 <dt id="slack_bolt.authorization.AuthorizeResult"><code class="flex name class">
 <span>class <span class="ident">AuthorizeResult</span></span>
-<span>(</span><span>*, enterprise_id: Optional[str], team_id: Optional[str], team: Optional[str] = None, url: Optional[str] = None, bot_user_id: Optional[str] = None, bot_id: Optional[str] = None, bot_token: Optional[str] = None, bot_scopes: Union[List[str], str, ForwardRef(None)] = None, user_id: Optional[str] = None, user: Optional[str] = None, user_token: Optional[str] = None, user_scopes: Union[List[str], str, ForwardRef(None)] = None)</span>
+<span>(</span><span>*, enterprise_id: Optional[str], team_id: Optional[str], team: Optional[str] = None, url: Optional[str] = None, bot_user_id: Optional[str] = None, bot_id: Optional[str] = None, bot_token: Optional[str] = None, bot_scopes: Union[str, Sequence[str], ForwardRef(None)] = None, user_id: Optional[str] = None, user: Optional[str] = None, user_token: Optional[str] = None, user_scopes: Union[str, Sequence[str], ForwardRef(None)] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Authorize function call result</p>
@@ -110,12 +110,12 @@ while processing an incoming Slack event.</p>
     bot_id: Optional[str]
     bot_user_id: Optional[str]
     bot_token: Optional[str]
-    bot_scopes: Optional[List[str]]  # since v1.17
+    bot_scopes: Optional[Sequence[str]]  # since v1.17
 
     user_id: Optional[str]
     user: Optional[str]  # since v1.18
     user_token: Optional[str]
-    user_scopes: Optional[List[str]]  # since v1.17
+    user_scopes: Optional[Sequence[str]]  # since v1.17
 
     def __init__(
         self,
@@ -128,12 +128,12 @@ while processing an incoming Slack event.</p>
         bot_user_id: Optional[str] = None,
         bot_id: Optional[str] = None,
         bot_token: Optional[str] = None,
-        bot_scopes: Optional[Union[List[str], str]] = None,
+        bot_scopes: Optional[Union[Sequence[str], str]] = None,
         # user
         user_id: Optional[str] = None,
         user: Optional[str] = None,
         user_token: Optional[str] = None,
-        user_scopes: Optional[Union[List[str], str]] = None,
+        user_scopes: Optional[Union[Sequence[str], str]] = None,
     ):
         &#34;&#34;&#34;
         Args:
@@ -160,14 +160,14 @@ while processing an incoming Slack event.</p>
         self[&#34;bot_token&#34;] = self.bot_token = bot_token
         if bot_scopes is not None and isinstance(bot_scopes, str):
             bot_scopes = [scope.strip() for scope in bot_scopes.split(&#34;,&#34;)]
-        self[&#34;bot_scopes&#34;] = self.bot_scopes = bot_scopes  # type: ignore
+        self[&#34;bot_scopes&#34;] = self.bot_scopes = bot_scopes
         # user
         self[&#34;user_id&#34;] = self.user_id = user_id
         self[&#34;user&#34;] = self.user = user
         self[&#34;user_token&#34;] = self.user_token = user_token
         if user_scopes is not None and isinstance(user_scopes, str):
             user_scopes = [scope.strip() for scope in user_scopes.split(&#34;,&#34;)]
-        self[&#34;user_scopes&#34;] = self.user_scopes = user_scopes  # type: ignore
+        self[&#34;user_scopes&#34;] = self.user_scopes = user_scopes
 
     @classmethod
     def from_auth_test_response(
@@ -175,21 +175,19 @@ while processing an incoming Slack event.</p>
         *,
         bot_token: Optional[str] = None,
         user_token: Optional[str] = None,
-        bot_scopes: Optional[Union[List[str], str]] = None,
-        user_scopes: Optional[Union[List[str], str]] = None,
-        auth_test_response: SlackResponse,
-        user_auth_test_response: Optional[SlackResponse] = None,
+        bot_scopes: Optional[Union[Sequence[str], str]] = None,
+        user_scopes: Optional[Union[Sequence[str], str]] = None,
+        auth_test_response: Union[SlackResponse, &#34;AsyncSlackResponse&#34;],  # type: ignore[name-defined]
+        user_auth_test_response: Optional[Union[SlackResponse, &#34;AsyncSlackResponse&#34;]] = None,  # type: ignore[name-defined]
     ) -&gt; &#34;AuthorizeResult&#34;:
-        bot_user_id: Optional[str] = (  # type:ignore
+        bot_user_id: Optional[str] = (
             auth_test_response.get(&#34;user_id&#34;) if auth_test_response.get(&#34;bot_id&#34;) is not None else None
         )
-        user_id: Optional[str] = (  # type:ignore
-            auth_test_response.get(&#34;user_id&#34;) if auth_test_response.get(&#34;bot_id&#34;) is None else None
-        )
-        user_name = auth_test_response.get(&#34;user&#34;)
+        user_id: Optional[str] = auth_test_response.get(&#34;user_id&#34;) if auth_test_response.get(&#34;bot_id&#34;) is None else None
+        user_name: Optional[str] = auth_test_response.get(&#34;user&#34;)
         if user_id is None and user_auth_test_response is not None:
-            user_id: Optional[str] = user_auth_test_response.get(&#34;user_id&#34;)  # type:ignore
-            user_name: Optional[str] = user_auth_test_response.get(&#34;user&#34;)  # type:ignore
+            user_id = user_auth_test_response.get(&#34;user_id&#34;)
+            user_name = user_auth_test_response.get(&#34;user&#34;)
 
         return AuthorizeResult(
             enterprise_id=auth_test_response.get(&#34;enterprise_id&#34;),
@@ -216,7 +214,7 @@ while processing an incoming Slack event.</p>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="slack_bolt.authorization.AuthorizeResult.bot_scopes"><code class="name">var <span class="ident">bot_scopes</span> : Optional[List[str]]</code></dt>
+<dt id="slack_bolt.authorization.AuthorizeResult.bot_scopes"><code class="name">var <span class="ident">bot_scopes</span> : Optional[Sequence[str]]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -252,7 +250,7 @@ while processing an incoming Slack event.</p>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="slack_bolt.authorization.AuthorizeResult.user_scopes"><code class="name">var <span class="ident">user_scopes</span> : Optional[List[str]]</code></dt>
+<dt id="slack_bolt.authorization.AuthorizeResult.user_scopes"><code class="name">var <span class="ident">user_scopes</span> : Optional[Sequence[str]]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -264,7 +262,7 @@ while processing an incoming Slack event.</p>
 <h3>Static methods</h3>
 <dl>
 <dt id="slack_bolt.authorization.AuthorizeResult.from_auth_test_response"><code class="name flex">
-<span>def <span class="ident">from_auth_test_response</span></span>(<span>*, bot_token: Optional[str] = None, user_token: Optional[str] = None, bot_scopes: Union[List[str], str, ForwardRef(None)] = None, user_scopes: Union[List[str], str, ForwardRef(None)] = None, auth_test_response: slack_sdk.web.slack_response.SlackResponse, user_auth_test_response: Optional[slack_sdk.web.slack_response.SlackResponse] = None) ‑> <a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a></span>
+<span>def <span class="ident">from_auth_test_response</span></span>(<span>*, bot_token: Optional[str] = None, user_token: Optional[str] = None, bot_scopes: Union[str, Sequence[str], ForwardRef(None)] = None, user_scopes: Union[str, Sequence[str], ForwardRef(None)] = None, auth_test_response: Union[slack_sdk.web.slack_response.SlackResponse, ForwardRef('AsyncSlackResponse')], user_auth_test_response: Union[slack_sdk.web.slack_response.SlackResponse, ForwardRef('AsyncSlackResponse'), ForwardRef(None)] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>

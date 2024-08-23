@@ -46,7 +46,7 @@ hljs.highlightAll();
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncSlackRequestHandler:
-    def __init__(self, app: AsyncApp):  # type: ignore
+    def __init__(self, app: AsyncApp):
         self.app = app
 
     async def handle(self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None) -&gt; Response:

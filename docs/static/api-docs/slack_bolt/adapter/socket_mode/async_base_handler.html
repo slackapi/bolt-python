@@ -46,7 +46,7 @@ hljs.highlightAll();
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncBaseSocketModeHandler:
-    app: Union[App, AsyncApp]  # type: ignore
+    app: Union[App, AsyncApp]
     client: AsyncBaseSocketModeClient
 
     async def handle(self, client: AsyncBaseSocketModeClient, req: SocketModeRequest) -&gt; None:

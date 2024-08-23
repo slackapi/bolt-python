@@ -192,7 +192,7 @@ hljs.highlightAll();
         self.logger = get_bolt_logger(self.func, base_logger)
 
     def matches(self, req: BoltRequest, resp: BoltResponse) -&gt; bool:
-        return self.func(
+        return self.func(  # type: ignore[return-value]
             **build_required_kwargs(
                 logger=self.logger,
                 required_arg_names=self.arg_names,

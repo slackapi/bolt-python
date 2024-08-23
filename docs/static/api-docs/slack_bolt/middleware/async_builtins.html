@@ -44,7 +44,7 @@ hljs.highlightAll();
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class AsyncAttachingFunctionToken(AsyncMiddleware):  # type: ignore
+<pre><code class="python">class AsyncAttachingFunctionToken(AsyncMiddleware):
     async def async_process(
         self,
         *,
@@ -54,7 +54,7 @@ hljs.highlightAll();
         next: Callable[[], Awaitable[BoltResponse]],
     ) -&gt; BoltResponse:
         if req.context.function_bot_access_token is not None:
-            req.context.client.token = req.context.function_bot_access_token
+            req.context.client.token = req.context.function_bot_access_token  # type: ignore[union-attr]
 
         return await next()</code></pre>
 </details>
@@ -94,7 +94,7 @@ hljs.highlightAll();
         auth_result = req.context.authorize_result
         # message events can have $.event.bot_id while it does not have its user_id
         bot_id = req.body.get(&#34;event&#34;, {}).get(&#34;bot_id&#34;)
-        if self._is_self_event(auth_result, req.context.user_id, bot_id, req.body):
+        if self._is_self_event(auth_result, req.context.user_id, bot_id, req.body):  # type: ignore[arg-type]
             self._debug_log(req.body)
             return await req.context.ack()
         else:
@@ -149,7 +149,7 @@ hljs.highlightAll();
     ) -&gt; BoltResponse:
         text = req.body.get(&#34;event&#34;, {}).get(&#34;text&#34;, &#34;&#34;)
         if text:
-            m = re.findall(self.keyword, text)
+            m: Optional[Union[Sequence]] = re.findall(self.keyword, text)
             if m is not None and m != []:
                 if type(m[0]) is not tuple:
                     m = tuple(m)

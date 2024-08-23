@@ -48,7 +48,7 @@ hljs.highlightAll();
 <pre><code class="python">class AsyncCustomMiddleware(AsyncMiddleware):
     app_name: str
     func: Callable[..., Awaitable[Any]]
-    arg_names: Sequence[str]
+    arg_names: MutableSequence[str]
     logger: Logger
 
     def __init__(
@@ -59,7 +59,7 @@ hljs.highlightAll();
         base_logger: Optional[Logger] = None,
     ):
         self.app_name = app_name
-        if inspect.iscoroutinefunction(func):
+        if is_callable_coroutine(func):
             self.func = func
         else:
             raise ValueError(&#34;Async middleware function must be an async function&#34;)
@@ -83,7 +83,7 @@ hljs.highlightAll();
                 required_arg_names=self.arg_names,
                 request=req,
                 response=resp,
-                next_func=next,
+                next_func=next,  # type: ignore[arg-type]
                 this_func=self.func,
             )
         )
@@ -102,7 +102,7 @@ hljs.highlightAll();
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="slack_bolt.middleware.async_custom_middleware.AsyncCustomMiddleware.arg_names"><code class="name">var <span class="ident">arg_names</span> : Sequence[str]</code></dt>
+<dt id="slack_bolt.middleware.async_custom_middleware.AsyncCustomMiddleware.arg_names"><code class="name">var <span class="ident">arg_names</span> : MutableSequence[str]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>

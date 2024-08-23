@@ -61,14 +61,14 @@ Refer to <a href="https://docs.aiohttp.org/en/stable/web.html">https://docs.aioh
     port: int
     path: str
     host: str
-    bolt_app: &#34;AsyncApp&#34;  # type:ignore
+    bolt_app: &#34;AsyncApp&#34;  # type: ignore[name-defined]
     web_app: web.Application
 
-    def __init__(  # type:ignore
+    def __init__(
         self,
         port: int,
         path: str,
-        app: &#34;AsyncApp&#34;,  # type:ignore
+        app: &#34;AsyncApp&#34;,  # type: ignore[name-defined]
         host: Optional[str] = None,
     ):
         &#34;&#34;&#34;Standalone AIOHTTP Web Server.
@@ -83,7 +83,7 @@ Refer to <a href="https://docs.aiohttp.org/en/stable/web.html">https://docs.aioh
         self.port = port
         self.path = path
         self.host = host if host is not None else &#34;0.0.0.0&#34;
-        self.bolt_app: &#34;AsyncApp&#34; = app  # type: ignore
+        self.bolt_app: &#34;AsyncApp&#34; = app  # type: ignore[name-defined]
         self.web_app = web.Application()
         self._bolt_oauth_flow = self.bolt_app.oauth_flow
         if self._bolt_oauth_flow:

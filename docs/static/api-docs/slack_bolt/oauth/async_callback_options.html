@@ -99,14 +99,14 @@ hljs.highlightAll();
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncFailureArgs:
-    def __init__(  # type: ignore
+    def __init__(
         self,
         *,
         request: AsyncBoltRequest,
         reason: str,
         error: Optional[Exception] = None,
         suggested_status_code: int,
-        settings: &#34;AsyncOAuthSettings&#34;,
+        settings: &#34;AsyncOAuthSettings&#34;,  # type: ignore[name-defined]
         default: &#34;AsyncCallbackOptions&#34;,
     ):
         &#34;&#34;&#34;The arguments for a failure function.
@@ -149,12 +149,12 @@ hljs.highlightAll();
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncSuccessArgs:
-    def __init__(  # type: ignore
+    def __init__(
         self,
         *,
         request: AsyncBoltRequest,
         installation: Installation,
-        settings: &#34;AsyncOAuthSettings&#34;,
+        settings: &#34;AsyncOAuthSettings&#34;,  # type: ignore[name-defined]
         default: &#34;AsyncCallbackOptions&#34;,
     ):
         &#34;&#34;&#34;The arguments for a success function.
@@ -197,10 +197,8 @@ hljs.highlightAll();
             state_utils=state_utils,
             redirect_uri_page_renderer=redirect_uri_page_renderer,
         )
-        # Note that pytype 2021.4.26 misunderstands these assignments.
-        # Thus, we put &#34;type: ignore&#34; for the following two lines
-        self.success = self._success_handler  # type: ignore
-        self.failure = self._failure_handler  # type: ignore
+        self.success = self._success_handler
+        self.failure = self._failure_handler
 
     # --------------------------
     # Internal methods

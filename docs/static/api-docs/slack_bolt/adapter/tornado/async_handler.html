@@ -60,7 +60,7 @@ directly and subclasses should not override <code>__init__</code> (override
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncSlackEventsHandler(RequestHandler):
-    def initialize(self, app: AsyncApp):  # type: ignore
+    def initialize(self, app: AsyncApp):
         self.app = app
 
     async def post(self):
@@ -104,12 +104,12 @@ directly and subclasses should not override <code>__init__</code> (override
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncSlackOAuthHandler(RequestHandler):
-    def initialize(self, app: AsyncApp):  # type: ignore
+    def initialize(self, app: AsyncApp):
         self.app = app
 
     async def get(self):
-        if self.app.oauth_flow is not None:  # type: ignore
-            oauth_flow: AsyncOAuthFlow = self.app.oauth_flow  # type: ignore
+        if self.app.oauth_flow is not None:
+            oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
             if self.request.path == oauth_flow.install_path:
                 bolt_resp = await oauth_flow.handle_installation(to_async_bolt_request(self.request))
                 set_response(self, bolt_resp)

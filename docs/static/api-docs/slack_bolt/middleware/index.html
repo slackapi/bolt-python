@@ -108,7 +108,7 @@ It's also possible to run a middleware only for a particular listener.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class AttachingFunctionToken(Middleware):  # type: ignore
+<pre><code class="python">class AttachingFunctionToken(Middleware):
     def process(
         self,
         *,
@@ -118,7 +118,7 @@ It's also possible to run a middleware only for a particular listener.</p>
         next: Callable[[], BoltResponse],
     ) -&gt; BoltResponse:
         if req.context.function_bot_access_token is not None:
-            req.context.client.token = req.context.function_bot_access_token
+            req.context.client.token = req.context.function_bot_access_token  # type: ignore[union-attr]
 
         return next()</code></pre>
 </details>
@@ -149,7 +149,7 @@ It's also possible to run a middleware only for a particular listener.</p>
 <pre><code class="python">class CustomMiddleware(Middleware):
     app_name: str
     func: Callable[..., Any]
-    arg_names: Sequence[str]
+    arg_names: MutableSequence[str]
     logger: Logger
 
     def __init__(self, *, app_name: str, func: Callable, base_logger: Optional[Logger] = None):
@@ -174,7 +174,7 @@ It's also possible to run a middleware only for a particular listener.</p>
                 required_arg_names=self.arg_names,
                 request=req,
                 response=resp,
-                next_func=next,
+                next_func=next,  # type: ignore[arg-type]
                 this_func=self.func,
             )
         )
@@ -193,7 +193,7 @@ It's also possible to run a middleware only for a particular listener.</p>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="slack_bolt.middleware.CustomMiddleware.arg_names"><code class="name">var <span class="ident">arg_names</span> : Sequence[str]</code></dt>
+<dt id="slack_bolt.middleware.CustomMiddleware.arg_names"><code class="name">var <span class="ident">arg_names</span> : MutableSequence[str]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -242,7 +242,7 @@ It's also possible to run a middleware only for a particular listener.</p>
         auth_result = req.context.authorize_result
         # message events can have $.event.bot_id while it does not have its user_id
         bot_id = req.body.get(&#34;event&#34;, {}).get(&#34;bot_id&#34;)
-        if self._is_self_event(auth_result, req.context.user_id, bot_id, req.body):
+        if self._is_self_event(auth_result, req.context.user_id, bot_id, req.body):  # type: ignore[arg-type]
             self._debug_log(req.body)
             return req.context.ack()
         else:
@@ -513,7 +513,7 @@ def simple_middleware(req, resp, next_):
                 req.context[&#34;token&#34;] = token
                 # As App#_init_context() generates a new WebClient for this request,
                 # it&#39;s safe to modify this instance.
-                req.context.client.token = token
+                req.context.client.token = token  # type: ignore[union-attr]
                 return next()
             else:
                 # This situation can arise if:
@@ -524,7 +524,7 @@ def simple_middleware(req, resp, next_):
                     &#34;the AuthorizeResult (returned value from authorize) for it was not found.&#34;
                 )
                 if req.context.response_url is not None:
-                    req.context.respond(self.user_facing_authorize_error_message)
+                    req.context.respond(self.user_facing_authorize_error_message)  # type: ignore[misc]
                     return BoltResponse(status=200, body=&#34;&#34;)
                 return _build_user_facing_error_response(self.user_facing_authorize_error_message)
 
@@ -578,7 +578,7 @@ def simple_middleware(req, resp, next_):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class RequestVerification(Middleware):  # type: ignore
+<pre><code class="python">class RequestVerification(Middleware):
     def __init__(self, signing_secret: str, base_logger: Optional[Logger] = None):
         &#34;&#34;&#34;Verifies an incoming request by checking the validity of
         `x-slack-signature`, `x-slack-request-timestamp`, and its body data.
@@ -710,13 +710,13 @@ def simple_middleware(req, resp, next_):
 
         try:
             if not self.auth_test_result:
-                self.auth_test_result = req.context.client.auth_test()
+                self.auth_test_result = req.context.client.auth_test()  # type: ignore[union-attr]
 
             if self.auth_test_result:
                 req.context.set_authorize_result(
                     _to_authorize_result(
                         auth_test_result=self.auth_test_result,
-                        token=req.context.client.token,
+                        token=req.context.client.token,  # type: ignore[union-attr]
                         request_user_id=req.context.user_id,
                     )
                 )
@@ -725,7 +725,7 @@ def simple_middleware(req, resp, next_):
                 # Just in case
                 self.logger.error(&#34;auth.test API call result is unexpectedly None&#34;)
                 if req.context.response_url is not None:
-                    req.context.respond(self.user_facing_authorize_error_message)
+                    req.context.respond(self.user_facing_authorize_error_message)  # type: ignore[misc]
                     return BoltResponse(status=200, body=&#34;&#34;)
                 return _build_user_facing_error_response(self.user_facing_authorize_error_message)
         except SlackApiError as e:
@@ -767,7 +767,7 @@ Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://ap
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class SslCheck(Middleware):  # type: ignore
+<pre><code class="python">class SslCheck(Middleware):
     verification_token: Optional[str]
     logger: Logger
 
@@ -867,7 +867,7 @@ Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://ap
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class UrlVerification(Middleware):  # type: ignore
+<pre><code class="python">class UrlVerification(Middleware):
     def __init__(self, base_logger: Optional[Logger] = None):
         &#34;&#34;&#34;Handles url_verification requests.
 

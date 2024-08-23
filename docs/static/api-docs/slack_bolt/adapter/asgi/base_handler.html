@@ -45,7 +45,7 @@ hljs.highlightAll();
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class BaseSlackRequestHandler:
-    app: App  # type: ignore
+    app: Union[App, &#34;AsyncApp&#34;]  # type: ignore[name-defined]
     path: str
 
     async def dispatch(self, request: AsgiHttpRequest) -&gt; BoltResponse:
@@ -68,13 +68,13 @@ hljs.highlightAll();
                     return AsgiHttpResponse(
                         status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body
                     )
-                if path == self.app.oauth_flow.redirect_uri_path:
-                    bolt_response: BoltResponse = await self.handle_callback(request)
+                elif path == self.app.oauth_flow.redirect_uri_path:
+                    bolt_response = await self.handle_callback(request)
                     return AsgiHttpResponse(
                         status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body
                     )
         if method == &#34;POST&#34; and path == self.path:
-            bolt_response: BoltResponse = await self.dispatch(request)
+            bolt_response = await self.dispatch(request)
             return AsgiHttpResponse(status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body)
         return AsgiHttpResponse(status=404, headers={&#34;content-type&#34;: [&#34;text/plain;charset=utf-8&#34;]}, body=&#34;Not Found&#34;)
 
@@ -91,7 +91,7 @@ hljs.highlightAll();
     async def __call__(self, scope: scope_type, receive: Callable, send: Callable) -&gt; None:
         if scope[&#34;type&#34;] == &#34;http&#34;:
             response: AsgiHttpResponse = await self._get_http_response(
-                scope[&#34;method&#34;], scope[&#34;path&#34;], AsgiHttpRequest(scope, receive)
+                method=scope[&#34;method&#34;], path=scope[&#34;path&#34;], request=AsgiHttpRequest(scope, receive)  # type: ignore[arg-type]
             )
             await send(response.get_response_start())
             await send(response.get_response_body())
@@ -99,7 +99,7 @@ hljs.highlightAll();
         if scope[&#34;type&#34;] == &#34;lifespan&#34;:
             await send(await self._handle_lifespan(receive))
             return
-        raise TypeError(f&#34;Unsupported scope type: {scope[&#39;type&#39;]}&#34;)</code></pre>
+        raise TypeError(f&#34;Unsupported scope type: {scope[&#39;type&#39;]!r}&#34;)</code></pre>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
@@ -107,7 +107,7 @@ hljs.highlightAll();
 </ul>
 <h3>Class variables</h3>
 <dl>
-<dt id="slack_bolt.adapter.asgi.base_handler.BaseSlackRequestHandler.app"><code class="name">var <span class="ident">app</span> : <a title="slack_bolt.app.app.App" href="../../app/app.html#slack_bolt.app.app.App">App</a></code></dt>
+<dt id="slack_bolt.adapter.asgi.base_handler.BaseSlackRequestHandler.app"><code class="name">var <span class="ident">app</span> : Union[<a title="slack_bolt.app.app.App" href="../../app/app.html#slack_bolt.app.app.App">App</a>, AsyncApp]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>

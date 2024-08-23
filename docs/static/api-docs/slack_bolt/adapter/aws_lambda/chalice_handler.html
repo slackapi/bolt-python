@@ -67,7 +67,7 @@ hljs.highlightAll();
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ChaliceSlackRequestHandler:
-    def __init__(self, app: App, chalice: Chalice, lambda_client: Optional[BaseClient] = None):  # type: ignore
+    def __init__(self, app: App, chalice: Chalice, lambda_client: Optional[BaseClient] = None):
         self.app = app
         self.chalice = chalice
         self.logger = get_bolt_app_logger(app.name, ChaliceSlackRequestHandler, app.logger)
@@ -78,7 +78,7 @@ hljs.highlightAll();
                     LocalLambdaClient,
                 )
 
-                lambda_client = LocalLambdaClient(self.chalice, None)
+                lambda_client = LocalLambdaClient(self.chalice, None)  # type: ignore[arg-type]
             except ImportError:
                 logging.info(&#34;Failed to load LocalLambdaClient for CLI mode.&#34;)
                 pass
@@ -99,7 +99,7 @@ hljs.highlightAll();
                 root.removeHandler(handler)
 
     def handle(self, request: Request):
-        body: str = request.raw_body.decode(&#34;utf-8&#34;) if request.raw_body else &#34;&#34;
+        body: str = request.raw_body.decode(&#34;utf-8&#34;) if request.raw_body else &#34;&#34;  # type: ignore[union-attr]
         self.logger.debug(f&#34;Incoming request: {request.to_dict()}, body: {body}&#34;)
 
         method = request.method
@@ -121,7 +121,7 @@ hljs.highlightAll();
                     bolt_resp = oauth_flow.handle_installation(bolt_req)
                     return to_chalice_response(bolt_resp)
         elif method == &#34;POST&#34;:
-            bolt_req: BoltRequest = to_bolt_request(request, body)
+            bolt_req = to_bolt_request(request, body)
             # https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
             aws_lambda_function_name = self.chalice.lambda_context.function_name
             bolt_req.context[&#34;aws_lambda_function_name&#34;] = aws_lambda_function_name
@@ -130,7 +130,7 @@ hljs.highlightAll();
             aws_response = to_chalice_response(bolt_resp)
             return aws_response
         elif method == &#34;NONE&#34;:
-            bolt_req: BoltRequest = to_bolt_request(request, body)
+            bolt_req = to_bolt_request(request, body)
             bolt_resp = self.app.dispatch(bolt_req)
             aws_response = to_chalice_response(bolt_resp)
             return aws_response

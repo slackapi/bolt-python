@@ -44,7 +44,7 @@ hljs.highlightAll();
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class AsyncAttachingFunctionToken(AsyncMiddleware):  # type: ignore
+<pre><code class="python">class AsyncAttachingFunctionToken(AsyncMiddleware):
     async def async_process(
         self,
         *,
@@ -54,7 +54,7 @@ hljs.highlightAll();
         next: Callable[[], Awaitable[BoltResponse]],
     ) -&gt; BoltResponse:
         if req.context.function_bot_access_token is not None:
-            req.context.client.token = req.context.function_bot_access_token
+            req.context.client.token = req.context.function_bot_access_token  # type: ignore[union-attr]
 
         return await next()</code></pre>
 </details>

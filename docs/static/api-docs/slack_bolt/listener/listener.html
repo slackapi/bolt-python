@@ -46,7 +46,7 @@ hljs.highlightAll();
 </summary>
 <pre><code class="python">class Listener(metaclass=ABCMeta):
     matchers: Sequence[ListenerMatcher]
-    middleware: Sequence[Middleware]  # type: ignore
+    middleware: Sequence[Middleware]
     ack_function: Callable[..., BoltResponse]
     lazy_functions: Sequence[Callable[..., None]]
     auto_acknowledgement: bool
@@ -85,7 +85,7 @@ hljs.highlightAll();
             def next_():
                 middleware_state[&#34;next_called&#34;] = True
 
-            resp = m.process(req=req, resp=resp, next=next_)
+            resp = m.process(req=req, resp=resp, next=next_)  # type: ignore[assignment]
             if not middleware_state[&#34;next_called&#34;]:
                 # next() was not called in this middleware
                 return (resp, True)

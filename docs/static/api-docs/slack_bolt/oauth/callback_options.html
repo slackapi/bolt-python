@@ -181,14 +181,14 @@ hljs.highlightAll();
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class FailureArgs:
-    def __init__(  # type: ignore
+    def __init__(
         self,
         *,
         request: BoltRequest,
         reason: str,
         error: Optional[Exception] = None,
         suggested_status_code: int,
-        settings: &#34;OAuthSettings&#34;,
+        settings: &#34;OAuthSettings&#34;,  # type: ignore[name-defined]
         default: &#34;CallbackOptions&#34;,
     ):
         &#34;&#34;&#34;The arguments for a failure function.
@@ -231,12 +231,12 @@ hljs.highlightAll();
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class SuccessArgs:
-    def __init__(  # type: ignore
+    def __init__(
         self,
         *,
         request: BoltRequest,
         installation: Installation,
-        settings: &#34;OAuthSettings&#34;,
+        settings: &#34;OAuthSettings&#34;,  # type: ignore[name-defined]
         default: &#34;CallbackOptions&#34;,
     ):
         &#34;&#34;&#34;The arguments for a success function.

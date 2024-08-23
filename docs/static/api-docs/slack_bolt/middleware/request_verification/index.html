@@ -66,7 +66,7 @@ hljs.highlightAll();
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class RequestVerification(Middleware):  # type: ignore
+<pre><code class="python">class RequestVerification(Middleware):
     def __init__(self, signing_secret: str, base_logger: Optional[Logger] = None):
         &#34;&#34;&#34;Verifies an incoming request by checking the validity of
         `x-slack-signature`, `x-slack-request-timestamp`, and its body data.

@@ -63,7 +63,7 @@ hljs.highlightAll();
     ) -&gt; BoltResponse:
         text = req.body.get(&#34;event&#34;, {}).get(&#34;text&#34;, &#34;&#34;)
         if text:
-            m = re.findall(self.keyword, text)
+            m: Optional[Union[Sequence]] = re.findall(self.keyword, text)
             if m is not None and m != []:
                 if type(m[0]) is not tuple:
                     m = tuple(m)
