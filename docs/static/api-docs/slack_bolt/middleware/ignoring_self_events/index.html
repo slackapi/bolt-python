@@ -72,7 +72,7 @@ hljs.highlightAll();
         auth_result = req.context.authorize_result
         # message events can have $.event.bot_id while it does not have its user_id
         bot_id = req.body.get(&#34;event&#34;, {}).get(&#34;bot_id&#34;)
-        if self._is_self_event(auth_result, req.context.user_id, bot_id, req.body):
+        if self._is_self_event(auth_result, req.context.user_id, bot_id, req.body):  # type: ignore[arg-type]
             self._debug_log(req.body)
             return req.context.ack()
         else:

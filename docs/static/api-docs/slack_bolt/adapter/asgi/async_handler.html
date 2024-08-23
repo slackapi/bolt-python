@@ -96,14 +96,12 @@ uvicorn app:api --port 3000 --log-level debug
         )
 
     async def handle_installation(self, request: AsgiHttpRequest) -&gt; BoltResponse:
-        oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
-        return await oauth_flow.handle_installation(
+        return await self.app.oauth_flow.handle_installation(  # type: ignore[union-attr]
             AsyncBoltRequest(body=await request.get_raw_body(), query=request.query_string, headers=request.get_headers())
         )
 
     async def handle_callback(self, request: AsgiHttpRequest) -&gt; BoltResponse:
-        oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
-        return await oauth_flow.handle_callback(
+        return await self.app.oauth_flow.handle_callback(  # type: ignore[union-attr]
             AsyncBoltRequest(body=await request.get_raw_body(), query=request.query_string, headers=request.get_headers())
         )</code></pre>
 </details>

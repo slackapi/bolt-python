@@ -70,16 +70,16 @@ hljs.highlightAll();
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class BoltUnhandledRequestError(BoltError):
-    request: &#34;BoltRequest&#34;  # type: ignore
+    request: &#34;BoltRequest&#34;  # type: ignore[name-defined]
     body: dict
-    current_response: Optional[&#34;BoltResponse&#34;]  # type: ignore
+    current_response: Optional[&#34;BoltResponse&#34;]  # type: ignore[name-defined]
     last_global_middleware_name: Optional[str]
 
-    def __init__(  # type: ignore
+    def __init__(
         self,
         *,
-        request: Union[&#34;BoltRequest&#34;, &#34;AsyncBoltRequest&#34;],  # type: ignore
-        current_response: Optional[&#34;BoltResponse&#34;],  # type: ignore
+        request: Union[&#34;BoltRequest&#34;, &#34;AsyncBoltRequest&#34;],  # type: ignore[name-defined]
+        current_response: Optional[&#34;BoltResponse&#34;],  # type: ignore[name-defined]
         last_global_middleware_name: Optional[str] = None,
     ):
         self.request = request

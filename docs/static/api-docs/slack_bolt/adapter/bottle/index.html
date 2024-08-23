@@ -53,7 +53,7 @@ hljs.highlightAll();
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class SlackRequestHandler:
-    def __init__(self, app: App):  # type: ignore
+    def __init__(self, app: App):
         self.app = app
 
     def handle(self, req: Request, resp: Response) -&gt; str:
@@ -69,7 +69,7 @@ hljs.highlightAll();
                     set_response(bolt_resp, resp)
                     return bolt_resp.body or &#34;&#34;
         elif req.method == &#34;POST&#34;:
-            bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(req))
+            bolt_resp = self.app.dispatch(to_bolt_request(req))
             set_response(bolt_resp, resp)
             return bolt_resp.body or &#34;&#34;
 

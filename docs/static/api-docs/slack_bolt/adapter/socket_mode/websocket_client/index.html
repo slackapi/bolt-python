@@ -72,13 +72,13 @@ hljs.highlightAll();
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class SocketModeHandler(BaseSocketModeHandler):
-    app: App  # type: ignore
+    app: App
     app_token: str
     client: SocketModeClient
 
-    def __init__(  # type: ignore
+    def __init__(
         self,
-        app: App,  # type: ignore
+        app: App,
         app_token: Optional[str] = None,
         logger: Optional[Logger] = None,
         web_client: Optional[WebClient] = None,
@@ -119,9 +119,9 @@ hljs.highlightAll();
             proxy_type=proxy_type,
             trace_enabled=trace_enabled,
         )
-        self.client.socket_mode_request_listeners.append(self.handle)
+        self.client.socket_mode_request_listeners.append(self.handle)  # type: ignore[arg-type]
 
-    def handle(self, client: SocketModeClient, req: SocketModeRequest) -&gt; None:
+    def handle(self, client: SocketModeClient, req: SocketModeRequest) -&gt; None:  # type: ignore[override]
         start = time()
         bolt_resp: BoltResponse = run_bolt_app(self.app, req)
         send_response(client, req, bolt_resp, start)</code></pre>

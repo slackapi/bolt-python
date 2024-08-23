@@ -75,7 +75,7 @@ This interface enables developers to utilize simple predicate functions for addi
 <pre><code class="python">class CustomListenerMatcher(ListenerMatcher):
     app_name: str
     func: Callable[..., bool]
-    arg_names: Sequence[str]
+    arg_names: MutableSequence[str]
     logger: Logger
 
     def __init__(self, *, app_name: str, func: Callable[..., bool], base_logger: Optional[Logger] = None):
@@ -105,7 +105,7 @@ This interface enables developers to utilize simple predicate functions for addi
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="slack_bolt.listener_matcher.CustomListenerMatcher.arg_names"><code class="name">var <span class="ident">arg_names</span> : Sequence[str]</code></dt>
+<dt id="slack_bolt.listener_matcher.CustomListenerMatcher.arg_names"><code class="name">var <span class="ident">arg_names</span> : MutableSequence[str]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>

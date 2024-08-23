@@ -556,7 +556,7 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
                     _matchers.append(AsyncCustomListenerMatcher(app_name=app_name, func=m))
                 else:
                     raise ValueError(f&#34;Invalid matcher: {type(m)}&#34;)
-        return _matchers  # type: ignore
+        return _matchers
 
     @staticmethod
     def to_listener_middleware(
@@ -571,7 +571,7 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
                     _middleware.append(AsyncCustomMiddleware(app_name=app_name, func=m))
                 else:
                     raise ValueError(f&#34;Invalid middleware: {type(m)}&#34;)
-        return _middleware  # type: ignore</code></pre>
+        return _middleware</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>

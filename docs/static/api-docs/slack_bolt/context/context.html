@@ -155,8 +155,8 @@ hljs.highlightAll();
         if &#34;respond&#34; not in self:
             self[&#34;respond&#34;] = Respond(
                 response_url=self.response_url,
-                proxy=self.client.proxy,
-                ssl=self.client.ssl,
+                proxy=self.client.proxy,  # type: ignore[union-attr]
+                ssl=self.client.ssl,  # type: ignore[union-attr]
             )
         return self[&#34;respond&#34;]
 
@@ -181,7 +181,9 @@ hljs.highlightAll();
             Callable `complete()` function
         &#34;&#34;&#34;
         if &#34;complete&#34; not in self:
-            self[&#34;complete&#34;] = Complete(client=self.client, function_execution_id=self.function_execution_id)
+            self[&#34;complete&#34;] = Complete(
+                client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
+            )
         return self[&#34;complete&#34;]
 
     @property
@@ -205,7 +207,9 @@ hljs.highlightAll();
             Callable `fail()` function
         &#34;&#34;&#34;
         if &#34;fail&#34; not in self:
-            self[&#34;fail&#34;] = Fail(client=self.client, function_execution_id=self.function_execution_id)
+            self[&#34;fail&#34;] = Fail(
+                client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
+            )
         return self[&#34;fail&#34;]</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -348,7 +352,9 @@ def complete(self) -&gt; Complete:
         Callable `complete()` function
     &#34;&#34;&#34;
     if &#34;complete&#34; not in self:
-        self[&#34;complete&#34;] = Complete(client=self.client, function_execution_id=self.function_execution_id)
+        self[&#34;complete&#34;] = Complete(
+            client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
+        )
     return self[&#34;complete&#34;]</code></pre>
 </details>
 </dd>
@@ -395,7 +401,9 @@ def fail(self) -&gt; Fail:
         Callable `fail()` function
     &#34;&#34;&#34;
     if &#34;fail&#34; not in self:
-        self[&#34;fail&#34;] = Fail(client=self.client, function_execution_id=self.function_execution_id)
+        self[&#34;fail&#34;] = Fail(
+            client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
+        )
     return self[&#34;fail&#34;]</code></pre>
 </details>
 </dd>
@@ -440,8 +448,8 @@ def respond(self) -&gt; Optional[Respond]:
     if &#34;respond&#34; not in self:
         self[&#34;respond&#34;] = Respond(
             response_url=self.response_url,
-            proxy=self.client.proxy,
-            ssl=self.client.ssl,
+            proxy=self.client.proxy,  # type: ignore[union-attr]
+            ssl=self.client.ssl,  # type: ignore[union-attr]
         )
     return self[&#34;respond&#34;]</code></pre>
 </details>

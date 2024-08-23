@@ -175,7 +175,7 @@ This handler releases the connections every time a ThreadListenerRunner executio
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class SlackRequestHandler:
-    def __init__(self, app: App):  # type: ignore
+    def __init__(self, app: App):
         self.app = app
         listener_runner = self.app.listener_runner
         # This runner closes all thread-local connections in the thread when an execution completes
@@ -238,7 +238,7 @@ This handler releases the connections every time a ThreadListenerRunner executio
                     bolt_resp = oauth_flow.handle_callback(to_bolt_request(req))
                     return to_django_response(bolt_resp)
         elif req.method == &#34;POST&#34;:
-            bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(req))
+            bolt_resp = self.app.dispatch(to_bolt_request(req))
             return to_django_response(bolt_resp)
 
         return HttpResponse(status=404, content=b&#34;Not Found&#34;)</code></pre>

@@ -63,7 +63,7 @@ from the WSGI web server running the application</p>
         self.protocol: str = environ.get(&#34;SERVER_PROTOCOL&#34;, &#34;&#34;)
         self.environ = environ
 
-    def get_headers(self) -&gt; Dict[str, str]:
+    def get_headers(self) -&gt; Dict[str, Union[str, Sequence[str]]]:
         headers = {}
         for key, value in self.environ.items():
             if key in {&#34;CONTENT_LENGTH&#34;, &#34;CONTENT_TYPE&#34;}:
@@ -112,7 +112,7 @@ from the WSGI web server running the application</p>
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.adapter.wsgi.http_request.WsgiHttpRequest.get_headers"><code class="name flex">
-<span>def <span class="ident">get_headers</span></span>(<span>self) ‑> Dict[str, str]</span>
+<span>def <span class="ident">get_headers</span></span>(<span>self) ‑> Dict[str, Union[str, Sequence[str]]]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>

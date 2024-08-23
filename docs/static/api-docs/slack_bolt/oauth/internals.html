@@ -78,16 +78,16 @@ hljs.highlightAll();
         self._state_utils = state_utils
         self._redirect_uri_page_renderer = redirect_uri_page_renderer
 
-    def _build_callback_success_response(  # type: ignore
+    def _build_callback_success_response(
         self,
-        request: Union[BoltRequest, &#34;AsyncBoltRequest&#34;],
+        request: Union[BoltRequest, &#34;AsyncBoltRequest&#34;],  # type: ignore[name-defined]
         installation: Installation,
     ) -&gt; BoltResponse:
         debug_message = f&#34;Handling an OAuth callback success (request: {request.query})&#34;
         self._logger.debug(debug_message)
 
         page_content = self._redirect_uri_page_renderer.render_success_page(
-            app_id=installation.app_id,
+            app_id=installation.app_id,  # type: ignore[arg-type]
             team_id=installation.team_id,
             is_enterprise_install=installation.is_enterprise_install,
             enterprise_url=installation.enterprise_url,
@@ -101,9 +101,9 @@ hljs.highlightAll();
             body=page_content,
         )
 
-    def _build_callback_failure_response(  # type: ignore
+    def _build_callback_failure_response(
         self,
-        request: Union[BoltRequest, &#34;AsyncBoltRequest&#34;],
+        request: Union[BoltRequest, &#34;AsyncBoltRequest&#34;],  # type: ignore[name-defined]
         reason: str,
         status: int = 500,
         error: Optional[Exception] = None,

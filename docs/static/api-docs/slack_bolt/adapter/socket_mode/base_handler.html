@@ -48,7 +48,7 @@ If you want to build asyncio-based ones, use <code>AsyncBaseSocketModeHandler</c
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class BaseSocketModeHandler:
-    app: App  # type: ignore
+    app: App
     client: BaseSocketModeClient
 
     def handle(self, client: BaseSocketModeClient, req: SocketModeRequest) -&gt; None:

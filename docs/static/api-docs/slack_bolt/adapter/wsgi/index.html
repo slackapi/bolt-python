@@ -119,14 +119,12 @@ gunicorn app:api -b 0.0.0.0:3000 --log-level debug
         )
 
     def handle_installation(self, request: WsgiHttpRequest) -&gt; BoltResponse:
-        oauth_flow: OAuthFlow = self.app.oauth_flow
-        return oauth_flow.handle_installation(
+        return self.app.oauth_flow.handle_installation(  # type: ignore[union-attr]
             BoltRequest(body=request.get_body(), query=request.query_string, headers=request.get_headers())
         )
 
     def handle_callback(self, request: WsgiHttpRequest) -&gt; BoltResponse:
-        oauth_flow: OAuthFlow = self.app.oauth_flow
-        return oauth_flow.handle_callback(
+        return self.app.oauth_flow.handle_callback(  # type: ignore[union-attr]
             BoltRequest(body=request.get_body(), query=request.query_string, headers=request.get_headers())
         )
 
@@ -134,17 +132,17 @@ gunicorn app:api -b 0.0.0.0:3000 --log-level debug
         if request.method == &#34;GET&#34;:
             if self.app.oauth_flow is not None:
                 if request.path == self.app.oauth_flow.install_path:
-                    bolt_response: BoltResponse = self.handle_installation(request)
+                    bolt_response = self.handle_installation(request)
                     return WsgiHttpResponse(
                         status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body
                     )
-                if request.path == self.app.oauth_flow.redirect_uri_path:
-                    bolt_response: BoltResponse = self.handle_callback(request)
+                elif request.path == self.app.oauth_flow.redirect_uri_path:
+                    bolt_response = self.handle_callback(request)
                     return WsgiHttpResponse(
                         status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body
                     )
         if request.method == &#34;POST&#34; and request.path == self.path:
-            bolt_response: BoltResponse = self.dispatch(request)
+            bolt_response = self.dispatch(request)
             return WsgiHttpResponse(status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body)
         return WsgiHttpResponse(status=404, headers={&#34;content-type&#34;: [&#34;text/plain;charset=utf-8&#34;]}, body=&#34;Not Found&#34;)
 

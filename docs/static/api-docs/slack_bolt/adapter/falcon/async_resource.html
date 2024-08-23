@@ -62,7 +62,7 @@ app.add_route("/slack/events", AsyncSlackAppResource(app))</p></div>
     app.add_route(&#34;/slack/events&#34;, AsyncSlackAppResource(app))
     &#34;&#34;&#34;
 
-    def __init__(self, app: AsyncApp):  # type: ignore
+    def __init__(self, app: AsyncApp):
         if falcon_version.__version__.startswith(&#34;2.&#34;):
             raise BoltError(&#34;This ASGI compatible adapter requires Falcon version &gt;= 3.0&#34;)
 

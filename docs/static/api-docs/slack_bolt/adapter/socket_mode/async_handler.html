@@ -47,13 +47,13 @@ hljs.highlightAll();
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AsyncSocketModeHandler(AsyncBaseSocketModeHandler):
-    app: AsyncApp  # type: ignore
+    app: AsyncApp
     app_token: str
     client: SocketModeClient
 
-    def __init__(  # type: ignore
+    def __init__(
         self,
-        app: AsyncApp,  # type: ignore
+        app: AsyncApp,
         app_token: Optional[str] = None,
         logger: Optional[Logger] = None,
         web_client: Optional[AsyncWebClient] = None,
@@ -69,9 +69,9 @@ hljs.highlightAll();
             proxy=proxy,
             ping_interval=ping_interval,
         )
-        self.client.socket_mode_request_listeners.append(self.handle)
+        self.client.socket_mode_request_listeners.append(self.handle)  # type: ignore[arg-type]
 
-    async def handle(self, client: SocketModeClient, req: SocketModeRequest) -&gt; None:
+    async def handle(self, client: SocketModeClient, req: SocketModeRequest) -&gt; None:  # type: ignore[override]
         start = time()
         bolt_resp: BoltResponse = await run_async_bolt_app(self.app, req)
         await send_async_response(client, req, bolt_resp, start)</code></pre>

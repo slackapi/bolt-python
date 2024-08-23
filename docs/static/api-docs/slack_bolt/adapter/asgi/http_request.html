@@ -50,10 +50,10 @@ hljs.highlightAll();
 
     def __init__(self, scope: scope_type, receive: Callable):
         self.receive = receive
-        self.query_string = str(scope[&#34;query_string&#34;], ENCODING)
-        self.raw_headers = scope[&#34;headers&#34;]
+        self.query_string = str(scope[&#34;query_string&#34;], ENCODING)  # type: ignore[arg-type]
+        self.raw_headers: Iterable[Tuple[bytes, bytes]] = scope[&#34;headers&#34;]  # type: ignore[assignment]
 
-    def get_headers(self) -&gt; Dict[str, str]:
+    def get_headers(self) -&gt; Dict[str, Union[str, Sequence[str]]]:
         return {str(header[0], ENCODING): str(header[1], (ENCODING)) for header in self.raw_headers}
 
     async def get_raw_body(self) -&gt; str:
@@ -64,7 +64,7 @@ hljs.highlightAll();
             if chunk[&#34;type&#34;] != &#34;http.request&#34;:
                 raise Exception(&#34;Body chunks could not be received from asgi server&#34;)
 
-            chunks.extend(chunk.get(&#34;body&#34;, b&#34;&#34;))
+            chunks.extend(chunk.get(&#34;body&#34;, b&#34;&#34;))  # type: ignore[arg-type]
             if not chunk.get(&#34;more_body&#34;, False):
                 break
         return bytes(chunks).decode(ENCODING)</code></pre>
@@ -87,7 +87,7 @@ hljs.highlightAll();
 <h3>Methods</h3>
 <dl>
 <dt id="slack_bolt.adapter.asgi.http_request.AsgiHttpRequest.get_headers"><code class="name flex">
-<span>def <span class="ident">get_headers</span></span>(<span>self) ‑> Dict[str, str]</span>
+<span>def <span class="ident">get_headers</span></span>(<span>self) ‑> Dict[str, Union[str, Sequence[str]]]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>

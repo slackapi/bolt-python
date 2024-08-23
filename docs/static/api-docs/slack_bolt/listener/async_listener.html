@@ -47,12 +47,12 @@ hljs.highlightAll();
 </summary>
 <pre><code class="python">class AsyncCustomListener(AsyncListener):
     app_name: str
-    ack_function: Callable[..., Awaitable[Optional[BoltResponse]]]
+    ack_function: Callable[..., Awaitable[Optional[BoltResponse]]]  # type: ignore[assignment]
     lazy_functions: Sequence[Callable[..., Awaitable[None]]]
     matchers: Sequence[AsyncListenerMatcher]
     middleware: Sequence[AsyncMiddleware]
     auto_acknowledgement: bool
-    arg_names: Sequence[str]
+    arg_names: MutableSequence[str]
     logger: Logger
 
     def __init__(
@@ -105,7 +105,7 @@ hljs.highlightAll();
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="slack_bolt.listener.async_listener.AsyncCustomListener.arg_names"><code class="name">var <span class="ident">arg_names</span> : Sequence[str]</code></dt>
+<dt id="slack_bolt.listener.async_listener.AsyncCustomListener.arg_names"><code class="name">var <span class="ident">arg_names</span> : MutableSequence[str]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -161,12 +161,12 @@ hljs.highlightAll();
 </summary>
 <pre><code class="python">class AsyncCustomListener(AsyncListener):
     app_name: str
-    ack_function: Callable[..., Awaitable[Optional[BoltResponse]]]
+    ack_function: Callable[..., Awaitable[Optional[BoltResponse]]]  # type: ignore[assignment]
     lazy_functions: Sequence[Callable[..., Awaitable[None]]]
     matchers: Sequence[AsyncListenerMatcher]
     middleware: Sequence[AsyncMiddleware]
     auto_acknowledgement: bool
-    arg_names: Sequence[str]
+    arg_names: MutableSequence[str]
     logger: Logger
 
     def __init__(
@@ -219,7 +219,7 @@ hljs.highlightAll();
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="slack_bolt.listener.async_listener.AsyncCustomListener.arg_names"><code class="name">var <span class="ident">arg_names</span> : Sequence[str]</code></dt>
+<dt id="slack_bolt.listener.async_listener.AsyncCustomListener.arg_names"><code class="name">var <span class="ident">arg_names</span> : MutableSequence[str]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -304,7 +304,7 @@ hljs.highlightAll();
             async def _next():
                 middleware_state[&#34;next_called&#34;] = True
 
-            resp = await m.async_process(req=req, resp=resp, next=_next)
+            resp = await m.async_process(req=req, resp=resp, next=_next)  # type: ignore[assignment]
             if not middleware_state[&#34;next_called&#34;]:
                 # next() was not called in this middleware
                 return (resp, True)

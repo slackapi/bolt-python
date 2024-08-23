@@ -47,12 +47,12 @@ hljs.highlightAll();
 </summary>
 <pre><code class="python">class CustomListener(Listener):
     app_name: str
-    ack_function: Callable[..., Optional[BoltResponse]]
+    ack_function: Callable[..., Optional[BoltResponse]]  # type: ignore[assignment]
     lazy_functions: Sequence[Callable[..., None]]
     matchers: Sequence[ListenerMatcher]
-    middleware: Sequence[Middleware]  # type: ignore
+    middleware: Sequence[Middleware]
     auto_acknowledgement: bool
-    arg_names: Sequence[str]
+    arg_names: MutableSequence[str]
     logger: Logger
 
     def __init__(
@@ -62,7 +62,7 @@ hljs.highlightAll();
         ack_function: Callable[..., Optional[BoltResponse]],
         lazy_functions: Sequence[Callable[..., None]],
         matchers: Sequence[ListenerMatcher],
-        middleware: Sequence[Middleware],  # type: ignore
+        middleware: Sequence[Middleware],
         auto_acknowledgement: bool = False,
         base_logger: Optional[Logger] = None,
     ):
@@ -105,7 +105,7 @@ hljs.highlightAll();
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="slack_bolt.listener.custom_listener.CustomListener.arg_names"><code class="name">var <span class="ident">arg_names</span> : Sequence[str]</code></dt>
+<dt id="slack_bolt.listener.custom_listener.CustomListener.arg_names"><code class="name">var <span class="ident">arg_names</span> : MutableSequence[str]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>

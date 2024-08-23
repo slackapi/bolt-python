@@ -106,12 +106,12 @@ process the request data, and may send response back to Slack.</p>
 </summary>
 <pre><code class="python">class CustomListener(Listener):
     app_name: str
-    ack_function: Callable[..., Optional[BoltResponse]]
+    ack_function: Callable[..., Optional[BoltResponse]]  # type: ignore[assignment]
     lazy_functions: Sequence[Callable[..., None]]
     matchers: Sequence[ListenerMatcher]
-    middleware: Sequence[Middleware]  # type: ignore
+    middleware: Sequence[Middleware]
     auto_acknowledgement: bool
-    arg_names: Sequence[str]
+    arg_names: MutableSequence[str]
     logger: Logger
 
     def __init__(
@@ -121,7 +121,7 @@ process the request data, and may send response back to Slack.</p>
         ack_function: Callable[..., Optional[BoltResponse]],
         lazy_functions: Sequence[Callable[..., None]],
         matchers: Sequence[ListenerMatcher],
-        middleware: Sequence[Middleware],  # type: ignore
+        middleware: Sequence[Middleware],
         auto_acknowledgement: bool = False,
         base_logger: Optional[Logger] = None,
     ):
@@ -164,7 +164,7 @@ process the request data, and may send response back to Slack.</p>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="slack_bolt.listener.CustomListener.arg_names"><code class="name">var <span class="ident">arg_names</span> : Sequence[str]</code></dt>
+<dt id="slack_bolt.listener.CustomListener.arg_names"><code class="name">var <span class="ident">arg_names</span> : MutableSequence[str]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -210,7 +210,7 @@ process the request data, and may send response back to Slack.</p>
 </summary>
 <pre><code class="python">class Listener(metaclass=ABCMeta):
     matchers: Sequence[ListenerMatcher]
-    middleware: Sequence[Middleware]  # type: ignore
+    middleware: Sequence[Middleware]
     ack_function: Callable[..., BoltResponse]
     lazy_functions: Sequence[Callable[..., None]]
     auto_acknowledgement: bool
@@ -249,7 +249,7 @@ process the request data, and may send response back to Slack.</p>
             def next_():
                 middleware_state[&#34;next_called&#34;] = True
 
-            resp = m.process(req=req, resp=resp, next=next_)
+            resp = m.process(req=req, resp=resp, next=next_)  # type: ignore[assignment]
             if not middleware_state[&#34;next_called&#34;]:
                 # next() was not called in this middleware
                 return (resp, True)

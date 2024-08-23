@@ -57,7 +57,7 @@ hljs.highlightAll();
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class MessageListenerMatches(Middleware):  # type: ignore
+<pre><code class="python">class MessageListenerMatches(Middleware):
     def __init__(self, keyword: Union[str, Pattern]):
         &#34;&#34;&#34;Captures matched keywords and saves the values in context.&#34;&#34;&#34;
         self.keyword = keyword
@@ -74,7 +74,7 @@ hljs.highlightAll();
     ) -&gt; BoltResponse:
         text = req.body.get(&#34;event&#34;, {}).get(&#34;text&#34;, &#34;&#34;)
         if text:
-            m = re.findall(self.keyword, text)
+            m: Optional[Union[Sequence]] = re.findall(self.keyword, text)
             if m is not None and m != []:
                 if type(m[0]) is not tuple:
                     m = tuple(m)
