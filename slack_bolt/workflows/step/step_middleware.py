@@ -2,7 +2,6 @@
 from typing import Callable, Optional
 
 from slack_bolt.listener import Listener
-from slack_bolt.listener.thread_runner import ThreadListenerRunner
 from slack_bolt.middleware import Middleware
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
@@ -13,9 +12,8 @@ from slack_bolt.workflows.step.step import WorkflowStep
 class WorkflowStepMiddleware(Middleware):
     """Base middleware for step from app specific ones"""
 
-    def __init__(self, step: WorkflowStep, listener_runner: ThreadListenerRunner):
+    def __init__(self, step: WorkflowStep):
         self.step = step
-        self.listener_runner = listener_runner
 
     def process(
         self,
@@ -43,8 +41,8 @@ class WorkflowStepMiddleware(Middleware):
 
         return next()
 
+    @staticmethod
     def _run(
-        self,
         listener: Listener,
         req: BoltRequest,
         resp: BoltResponse,
@@ -53,7 +51,7 @@ class WorkflowStepMiddleware(Middleware):
         if next_was_not_called:
             return None
 
-        return self.listener_runner.run(
+        return req.context.listener_runner.run(
             request=req,
             response=resp,
             listener_name=get_name_for_callable(listener.ack_function),

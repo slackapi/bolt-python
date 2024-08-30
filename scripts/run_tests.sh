@@ -14,6 +14,5 @@ then
   black slack_bolt/ tests/ && \
     pytest -vv $1
 else
-    black slack_bolt/ tests/ && pytest
-  fi
+  black slack_bolt/ tests/ && pytest
 fi

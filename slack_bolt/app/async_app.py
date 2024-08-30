@@ -761,7 +761,7 @@ class AsyncApp:
         elif not isinstance(step, AsyncWorkflowStep):
             raise BoltError(f"Invalid step object ({type(step)})")
 
-        self.use(AsyncWorkflowStepMiddleware(step, self._async_listener_runner))
+        self.use(AsyncWorkflowStepMiddleware(step))
 
     # -------------------------
     # global error handler
@@ -1389,6 +1389,10 @@ class AsyncApp:
             ),
         )
         req.context["client"] = client_per_request
+
+        # Most apps do not need this "listener_runner" instance.
+        # It is intended for apps that start lazy listeners from their custom global middleware.
+        req.context["listener_runner"] = self.listener_runner
 
     @staticmethod
     def _to_listener_functions(
