@@ -35,8 +35,9 @@ class BoltContext(BaseContext):
                     )
         return BoltContext(new_dict)
 
+    # The return type is intentionally string to avoid circular imports
     @property
-    def listener_runner(self) -> "ThreadListenerRunner":  # to avoid circular imports
+    def listener_runner(self) -> "ThreadListenerRunner":  # type: ignore[name-defined]
         """The properly configured listener_runner that is available for middleware/listeners."""
         return self["listener_runner"]
 
