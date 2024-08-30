@@ -735,7 +735,7 @@ class App:
         elif not isinstance(step, WorkflowStep):
             raise BoltError(f"Invalid step object ({type(step)})")
 
-        self.use(WorkflowStepMiddleware(step, self.listener_runner))
+        self.use(WorkflowStepMiddleware(step))
 
     # -------------------------
     # global error handler
@@ -1349,6 +1349,10 @@ class App:
             retry_handlers=self._client.retry_handlers.copy() if self._client.retry_handlers is not None else None,
         )
         req.context["client"] = client_per_request
+
+        # Most apps do not need this "listener_runner" instance.
+        # It is intended for apps that start lazy listeners from their custom global middleware.
+        req.context["listener_runner"] = self.listener_runner
 
     @staticmethod
     def _to_listener_functions(

@@ -174,12 +174,12 @@ class AsyncioListenerRunner:
         copied_request = self._build_lazy_request(request, func_name)
         self.lazy_listener_runner.start(function=lazy_func, request=copied_request)
 
-    @staticmethod
-    def _build_lazy_request(request: AsyncBoltRequest, lazy_func_name: str) -> AsyncBoltRequest:
-        copied_request = create_copy(request.to_copyable())
+    def _build_lazy_request(self, request: AsyncBoltRequest, lazy_func_name: str) -> AsyncBoltRequest:
+        copied_request: AsyncBoltRequest = create_copy(request.to_copyable())
         copied_request.method = "NONE"
         copied_request.lazy_only = True
         copied_request.lazy_function_name = lazy_func_name
+        copied_request.context["listener_runner"] = self
         return copied_request
 
     def _debug_log_completion(self, starting_time: float, response: BoltResponse) -> None:

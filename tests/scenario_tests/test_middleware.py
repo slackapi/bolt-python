@@ -1,15 +1,23 @@
 import json
-from time import time
+import logging
+from time import time, sleep
+from typing import Callable, Optional
 
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 
+from slack_bolt import BoltResponse, CustomListenerMatcher
 from slack_bolt.app import App
+from slack_bolt.listener import CustomListener
+from slack_bolt.listener.thread_runner import ThreadListenerRunner
+from slack_bolt.middleware import Middleware
 from slack_bolt.request import BoltRequest
+from slack_bolt.request.payload_utils import is_shortcut
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
     assert_auth_test_count,
+    assert_received_request_count,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
@@ -168,6 +176,27 @@ class TestMiddleware:
         assert response.body == "acknowledged!"
         assert_auth_test_count(self, 1)
 
+    def test_lazy_listener_middleware(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        unmatch_middleware = LazyListenerStarter("xxxx")
+        app.use(unmatch_middleware)
+
+        response = app.dispatch(self.build_request())
+        assert response.status == 404
+        assert_auth_test_count(self, 1)
+
+        my_middleware = LazyListenerStarter("test-shortcut")
+        app.use(my_middleware)
+        response = app.dispatch(self.build_request())
+        assert response.status == 200
+        count = 0
+        while count < 20 and my_middleware.lazy_called is False:
+            sleep(0.05)
+        assert my_middleware.lazy_called is True
+
 
 def just_ack(ack):
     ack("acknowledged!")
@@ -183,3 +212,42 @@ def just_next(next):
 
 def just_next_(next_):
     next_()
+
+
+class LazyListenerStarter(Middleware):
+    lazy_called: bool
+    callback_id: str
+
+    def __init__(self, callback_id: str):
+        self.lazy_called = False
+        self.callback_id = callback_id
+
+    def lazy_listener(self):
+        self.lazy_called = True
+
+    def process(self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse]) -> Optional[BoltResponse]:
+        if is_shortcut(req.body):
+            listener = CustomListener(
+                app_name="test-app",
+                ack_function=just_ack,
+                lazy_functions=[self.lazy_listener],
+                matchers=[
+                    CustomListenerMatcher(
+                        app_name="test-app",
+                        func=lambda payload: payload.get("callback_id") == self.callback_id,
+                    )
+                ],
+                middleware=[],
+                base_logger=req.context.logger,
+            )
+            if listener.matches(req=req, resp=resp):
+                listener_runner: ThreadListenerRunner = req.context.listener_runner
+                response = listener_runner.run(
+                    request=req,
+                    response=resp,
+                    listener_name="test",
+                    listener=listener,
+                )
+                if response is not None:
+                    return response
+        next()

@@ -7,7 +7,7 @@ from slack_bolt.authorization import AuthorizeResult
 class BaseContext(dict):
     """Context object associated with a request from Slack."""
 
-    standard_property_names = [
+    copyable_standard_property_names = [
         "logger",
         "token",
         "enterprise_id",
@@ -35,6 +35,11 @@ class BaseContext(dict):
         "complete",
         "fail",
     ]
+    non_copyable_standard_property_names = [
+        "listener_runner",
+    ]
+
+    standard_property_names = copyable_standard_property_names + non_copyable_standard_property_names
 
     @property
     def logger(self) -> Logger:

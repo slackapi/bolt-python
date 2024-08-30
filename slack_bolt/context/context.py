@@ -17,9 +17,12 @@ class BoltContext(BaseContext):
     def to_copyable(self) -> "BoltContext":
         new_dict = {}
         for prop_name, prop_value in self.items():
-            if prop_name in self.standard_property_names:
+            if prop_name in self.copyable_standard_property_names:
                 # all the standard properties are copiable
                 new_dict[prop_name] = prop_value
+            elif prop_name in self.non_copyable_standard_property_names:
+                # Do nothing with this property (e.g., listener_runner)
+                continue
             else:
                 try:
                     copied_value = create_copy(prop_value)
@@ -31,6 +34,11 @@ class BoltContext(BaseContext):
                         f"(error: {te})"
                     )
         return BoltContext(new_dict)
+
+    @property
+    def listener_runner(self) -> "ThreadListenerRunner":  # to avoid circular imports
+        """The properly configured listener_runner that is available for middleware/listeners."""
+        return self["listener_runner"]
 
     @property
     def client(self) -> Optional[WebClient]:

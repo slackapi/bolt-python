@@ -17,19 +17,27 @@ class AsyncBoltContext(BaseContext):
     def to_copyable(self) -> "AsyncBoltContext":
         new_dict = {}
         for prop_name, prop_value in self.items():
-            if prop_name in self.standard_property_names:
+            if prop_name in self.copyable_standard_property_names:
                 # all the standard properties are copiable
                 new_dict[prop_name] = prop_value
+            elif prop_name in self.non_copyable_standard_property_names:
+                # Do nothing with this property (e.g., listener_runner)
+                continue
             else:
                 try:
                     copied_value = create_copy(prop_value)
                     new_dict[prop_name] = copied_value
                 except TypeError as te:
                     self.logger.debug(
-                        f"Skipped settings '{prop_name}' to a copied request for lazy listeners "
+                        f"Skipped setting '{prop_name}' to a copied request for lazy listeners "
                         f"as it's not possible to make a deep copy (error: {te})"
                     )
         return AsyncBoltContext(new_dict)
+
+    @property
+    def listener_runner(self) -> "AsyncioListenerRunner":  # to avoid circular imports
+        """The properly configured listener_runner that is available for middleware/listeners."""
+        return self["listener_runner"]
 
     @property
     def client(self) -> Optional[AsyncWebClient]:

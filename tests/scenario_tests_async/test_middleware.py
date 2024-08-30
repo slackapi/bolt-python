@@ -1,12 +1,20 @@
 import json
+import asyncio
 from time import time
+from typing import Callable, Awaitable, Optional
 
 import pytest
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 
+from slack_bolt import BoltResponse
+from slack_bolt.listener.async_listener import AsyncCustomListener
+from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
+from slack_bolt.listener_matcher.async_listener_matcher import AsyncCustomListenerMatcher
+from slack_bolt.middleware.async_middleware import AsyncMiddleware
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.request.async_request import AsyncBoltRequest
+from slack_bolt.request.payload_utils import is_shortcut
 from tests.mock_web_api_server import (
     cleanup_mock_web_api_server_async,
     assert_auth_test_count_async,
@@ -145,6 +153,27 @@ class TestAsyncMiddleware:
         assert response.body == "acknowledged!"
         await assert_auth_test_count_async(self, 1)
 
+    @pytest.mark.asyncio
+    async def test_lazy_listener_middleware(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        unmatch_middleware = LazyListenerStarter("xxxx")
+        app.use(unmatch_middleware)
+
+        response = await app.async_dispatch(self.build_request())
+        assert response.status == 404
+
+        my_middleware = LazyListenerStarter("test-shortcut")
+        app.use(my_middleware)
+        response = await app.async_dispatch(self.build_request())
+        assert response.status == 200
+        count = 0
+        while count < 20 and my_middleware.lazy_called is False:
+            await asyncio.sleep(0.05)
+        assert my_middleware.lazy_called is True
+
 
 async def just_ack(ack):
     await ack("acknowledged!")
@@ -160,3 +189,47 @@ async def just_next(next):
 
 async def just_next_(next_):
     await next_()
+
+
+class LazyListenerStarter(AsyncMiddleware):
+    lazy_called: bool
+    callback_id: str
+
+    def __init__(self, callback_id: str):
+        self.lazy_called = False
+        self.callback_id = callback_id
+
+    async def lazy_listener(self):
+        self.lazy_called = True
+
+    async def async_process(
+        self, *, req: AsyncBoltRequest, resp: BoltResponse, next: Callable[[], Awaitable[BoltResponse]]
+    ) -> Optional[BoltResponse]:
+        async def is_target(payload: dict):
+            return payload.get("callback_id") == self.callback_id
+
+        if is_shortcut(req.body):
+            listener = AsyncCustomListener(
+                app_name="test-app",
+                ack_function=just_ack,
+                lazy_functions=[self.lazy_listener],
+                matchers=[
+                    AsyncCustomListenerMatcher(
+                        app_name="test-app",
+                        func=is_target,
+                    )
+                ],
+                middleware=[],
+                base_logger=req.context.logger,
+            )
+            if await listener.async_matches(req=req, resp=resp):
+                listener_runner: AsyncioListenerRunner = req.context.listener_runner
+                response = await listener_runner.run(
+                    request=req,
+                    response=resp,
+                    listener_name="test",
+                    listener=listener,
+                )
+                if response is not None:
+                    return response
+        await next()
