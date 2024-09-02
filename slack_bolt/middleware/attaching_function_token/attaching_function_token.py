@@ -15,6 +15,6 @@ class AttachingFunctionToken(Middleware):
         next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         if req.context.function_bot_access_token is not None:
-            req.context.client.token = req.context.function_bot_access_token  # type: ignore[union-attr]
+            req.context.client.token = req.context.function_bot_access_token
 
         return next()

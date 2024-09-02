@@ -42,7 +42,7 @@ class BoltContext(BaseContext):
         return self["listener_runner"]
 
     @property
-    def client(self) -> Optional[WebClient]:
+    def client(self) -> WebClient:
         """The `WebClient` instance available for this request.
 
             @app.event("app_mention")
@@ -130,8 +130,8 @@ class BoltContext(BaseContext):
         if "respond" not in self:
             self["respond"] = Respond(
                 response_url=self.response_url,
-                proxy=self.client.proxy,  # type: ignore[union-attr]
-                ssl=self.client.ssl,  # type: ignore[union-attr]
+                proxy=self.client.proxy,
+                ssl=self.client.ssl,
             )
         return self["respond"]
 
@@ -157,7 +157,7 @@ class BoltContext(BaseContext):
         """
         if "complete" not in self:
             self["complete"] = Complete(
-                client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
+                client=self.client, function_execution_id=self.function_execution_id
             )
         return self["complete"]
 
@@ -183,6 +183,6 @@ class BoltContext(BaseContext):
         """
         if "fail" not in self:
             self["fail"] = Fail(
-                client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
+                client=self.client, function_execution_id=self.function_execution_id
             )
         return self["fail"]

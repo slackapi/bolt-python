@@ -89,7 +89,7 @@ class MultiTeamsAuthorization(Authorization):
                 req.context["token"] = token
                 # As App#_init_context() generates a new WebClient for this request,
                 # it's safe to modify this instance.
-                req.context.client.token = token  # type: ignore[union-attr]
+                req.context.client.token = token
                 return next()
             else:
                 # This situation can arise if:

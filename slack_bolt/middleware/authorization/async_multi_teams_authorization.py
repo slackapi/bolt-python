@@ -86,7 +86,7 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization):
                 req.context["token"] = token
                 # As AsyncApp#_init_context() generates a new AsyncWebClient for this request,
                 # it's safe to modify this instance.
-                req.context.client.token = token  # type: ignore[union-attr]
+                req.context.client.token = token
                 return await next()
             else:
                 # This situation can arise if:

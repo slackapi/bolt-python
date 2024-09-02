@@ -41,7 +41,7 @@ class AsyncBoltContext(BaseContext):
         return self["listener_runner"]
 
     @property
-    def client(self) -> Optional[AsyncWebClient]:
+    def client(self) -> AsyncWebClient:
         """The `AsyncWebClient` instance available for this request.
 
             @app.event("app_mention")
@@ -129,8 +129,8 @@ class AsyncBoltContext(BaseContext):
         if "respond" not in self:
             self["respond"] = AsyncRespond(
                 response_url=self.response_url,
-                proxy=self.client.proxy,  # type: ignore[union-attr]
-                ssl=self.client.ssl,  # type: ignore[union-attr]
+                proxy=self.client.proxy,
+                ssl=self.client.ssl,
             )
         return self["respond"]
 
@@ -156,7 +156,7 @@ class AsyncBoltContext(BaseContext):
         """
         if "complete" not in self:
             self["complete"] = AsyncComplete(
-                client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
+                client=self.client, function_execution_id=self.function_execution_id
             )
         return self["complete"]
 
@@ -182,6 +182,6 @@ class AsyncBoltContext(BaseContext):
         """
         if "fail" not in self:
             self["fail"] = AsyncFail(
-                client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
+                client=self.client, function_execution_id=self.function_execution_id
             )
         return self["fail"]
