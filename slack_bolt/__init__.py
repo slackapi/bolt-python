@@ -5,6 +5,7 @@ A Python framework to build Slack apps in a flash with the latest platform featu
 * GitHub repository: https://github.com/slackapi/bolt-python
 * The class representing a Bolt app: `slack_bolt.app.app`
 """  # noqa: E501
+
 # Don't add async module imports here
 from .app import App
 from .context import BoltContext

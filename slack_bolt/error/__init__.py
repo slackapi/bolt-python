@@ -1,4 +1,5 @@
 """Bolt specific error types."""
+
 from typing import Optional, Union
 
 

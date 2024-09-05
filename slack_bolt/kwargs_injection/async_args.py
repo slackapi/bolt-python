@@ -115,7 +115,7 @@ class AsyncArgs:
         complete: AsyncComplete,
         fail: AsyncFail,
         next: Callable[[], Awaitable[None]],
-        **kwargs  # noqa
+        **kwargs,  # noqa
     ):
         self.logger: Logger = logger
         self.client: AsyncWebClient = client

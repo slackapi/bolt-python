@@ -119,7 +119,7 @@ class Args:
         # the naming conflict with the built-in one affects
         # only the internals of this method
         next: Callable[[], None],
-        **kwargs  # noqa
+        **kwargs,  # noqa
     ):
         self.logger: logging.Logger = logger
         self.client: WebClient = client

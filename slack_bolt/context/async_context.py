@@ -155,9 +155,7 @@ class AsyncBoltContext(BaseContext):
             Callable `complete()` function
         """
         if "complete" not in self:
-            self["complete"] = AsyncComplete(
-                client=self.client, function_execution_id=self.function_execution_id
-            )
+            self["complete"] = AsyncComplete(client=self.client, function_execution_id=self.function_execution_id)
         return self["complete"]
 
     @property
@@ -181,7 +179,5 @@ class AsyncBoltContext(BaseContext):
             Callable `fail()` function
         """
         if "fail" not in self:
-            self["fail"] = AsyncFail(
-                client=self.client, function_execution_id=self.function_execution_id
-            )
+            self["fail"] = AsyncFail(client=self.client, function_execution_id=self.function_execution_id)
         return self["fail"]

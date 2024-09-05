@@ -156,9 +156,7 @@ class BoltContext(BaseContext):
             Callable `complete()` function
         """
         if "complete" not in self:
-            self["complete"] = Complete(
-                client=self.client, function_execution_id=self.function_execution_id
-            )
+            self["complete"] = Complete(client=self.client, function_execution_id=self.function_execution_id)
         return self["complete"]
 
     @property
@@ -182,7 +180,5 @@ class BoltContext(BaseContext):
             Callable `fail()` function
         """
         if "fail" not in self:
-            self["fail"] = Fail(
-                client=self.client, function_execution_id=self.function_execution_id
-            )
+            self["fail"] = Fail(client=self.client, function_execution_id=self.function_execution_id)
         return self["fail"]

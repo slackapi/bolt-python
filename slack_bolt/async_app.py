@@ -44,6 +44,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
 
 Refer to `slack_bolt.app.async_app` for more details.
 """  # noqa: E501
+
 from .app.async_app import AsyncApp
 from .context.ack.async_ack import AsyncAck
 from .context.async_context import AsyncBoltContext
