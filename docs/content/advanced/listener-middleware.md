@@ -8,7 +8,7 @@ Listener middleware is only run for the listener in which it's passed. You can p
 
 If your listener middleware is a quite simple one, you can use a listener matcher, which returns `bool` value (`True` for proceeding) instead of requiring `next()` method call.
 
-Refer to [the module document](https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 
 ```python
 # Listener middleware which filters out messages with "bot_message" subtype

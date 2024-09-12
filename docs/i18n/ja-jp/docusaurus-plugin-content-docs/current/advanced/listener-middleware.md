@@ -8,7 +8,7 @@ slug: /concepts/listener-middleware
 
 非常にシンプルなリスナーミドルウェアの場合であれば、`next()` メソッドを呼び出す代わりに `bool` 値（処理を継続したい場合は `True`）を返すだけで済む「リスナーマッチャー」を使うとよいでしょう。
 
-<span>指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+<span>指定可能な引数の一覧は<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 
 ```python
 # "bot_message" サブタイプのメッセージを抽出するリスナーミドルウェア

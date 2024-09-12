@@ -12,9 +12,9 @@ slug: /concepts/options
 
 オプションのリクエストに応答するときは、有効なオプションを含む `options` または `option_groups` のリストとともに `ack()` を呼び出す必要があります。API サイトにある[外部データを使用する選択メニューに応答するサンプル例](https://api.slack.com/reference/messaging/block-elements#external-select)と、[ダイアログでの応答例](https://api.slack.com/dialogs#dynamic_select_elements_external)を参考にしてください。
 
-さらに、ユーザーが入力したキーワードに基づいたオプションを返すようフィルタリングロジックを適用することもできます。 これは `payload` という引数の ` value` の値に基づいて、それぞれのパターンで異なるオプションの一覧を返すように実装することができます。 Bolt for Python のすべてのリスナーやミドルウェアでは、[多くの有用な引数](https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html)にアクセスすることができますので、チェックしてみてください。
+さらに、ユーザーが入力したキーワードに基づいたオプションを返すようフィルタリングロジックを適用することもできます。 これは `payload` という引数の ` value` の値に基づいて、それぞれのパターンで異なるオプションの一覧を返すように実装することができます。 Bolt for Python のすべてのリスナーやミドルウェアでは、[多くの有用な引数](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html)にアクセスすることができますので、チェックしてみてください。
 
-<span>指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+<span>指定可能な引数の一覧は<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # 外部データを使用する選択メニューオプションに応答するサンプル例
 @app.options("external_action")

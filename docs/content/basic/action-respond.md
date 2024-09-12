@@ -8,7 +8,7 @@ There are two main ways to respond to actions. The first (and most common) way i
 
 The second way to respond to actions is using `respond()`, which is a utility to use the `response_url` associated with the action.
 
-Refer to [the module document](https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
 # Your listener will be called every time an interactive component with the action_id “approve_button” is triggered
 @app.action("approve_button")

@@ -89,7 +89,7 @@ const sidebars = {
     {
       type: 'link',
       label: 'Reference',
-      href: 'https://slack.dev/bolt-python/api-docs/slack_bolt/',
+      href: 'https://tools.slack.dev/bolt-python/api-docs/slack_bolt/',
     },
     { type: 'html', value: '<hr>' },
     {

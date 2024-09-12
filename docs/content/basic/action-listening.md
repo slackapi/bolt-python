@@ -10,7 +10,7 @@ Actions can be filtered on an `action_id` of type `str` or `re.Pattern`. `action
 
 You'll notice in all `action()` examples, `ack()` is used. It is required to call the `ack()` function within an action listener to acknowledge that the request was received from Slack. This is discussed in the [acknowledging requests section](/concepts/acknowledge).
 
-Refer to [the module document](https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
 # Your listener will be called every time a block element with the action_id "approve_button" is triggered
 @app.action("approve_button")
