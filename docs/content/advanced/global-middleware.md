@@ -11,7 +11,7 @@ Both global and listener middleware must call `next()` to pass control of the ex
 
 
 
-Refer to [the module document](https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
 @app.use
 def auth_acme(client, context, logger, payload, next):

@@ -16,7 +16,7 @@ slug: /concepts/shortcuts
 
 ⚠️ グローバルショートカットのペイロードにはチャンネル ID が **含まれません**。アプリでチャンネル ID を取得する必要がある場合は、モーダル内に [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) エレメントを配置します。メッセージショートカットにはチャンネル ID が含まれます。
 
-<span>指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+<span>指定可能な引数の一覧は<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # 'open_modal' という callback_id のショートカットをリッスン
 @app.shortcut("open_modal")

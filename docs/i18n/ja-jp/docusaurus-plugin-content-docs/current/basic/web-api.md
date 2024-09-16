@@ -4,11 +4,11 @@ lang: ja-jp
 slug: /concepts/web-api
 ---
 
-`app.client`、またはミドルウェア・リスナーの引数 `client` として Bolt アプリに提供されている [`WebClient`](https://slack.dev/python-slack-sdk/basic_usage.html) は必要な権限を付与されており、これを利用することで[あらゆる Web API メソッド](https://api.slack.com/methods)を呼び出すことができます。このクライアントのメソッドを呼び出すと `SlackResponse` という Slack からの応答情報を含むオブジェクトが返されます。
+`app.client`、またはミドルウェア・リスナーの引数 `client` として Bolt アプリに提供されている [`WebClient`](https://tools.slack.dev/python-slack-sdk/basic_usage.html) は必要な権限を付与されており、これを利用することで[あらゆる Web API メソッド](https://api.slack.com/methods)を呼び出すことができます。このクライアントのメソッドを呼び出すと `SlackResponse` という Slack からの応答情報を含むオブジェクトが返されます。
 
 Bolt の初期化に使用するトークンは `context` オブジェクトに設定されます。このトークンは、多くの Web API メソッドを呼び出す際に必要となります。
 
-<span>指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+<span>指定可能な引数の一覧は<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 @app.message("wake me up")
 def say_hello(client, message):

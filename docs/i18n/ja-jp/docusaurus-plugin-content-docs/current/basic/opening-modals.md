@@ -10,7 +10,7 @@ slug: /concepts/opening-modals
 
 モーダルの生成方法についての詳細は、<a href="https://api.slack.com/surfaces/modals/using#composing_views">API ドキュメント</a>を参照してください。
 
-<span>指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+<span>指定可能な引数の一覧は<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 
 ```python
 # ショートカットの呼び出しをリッスン
