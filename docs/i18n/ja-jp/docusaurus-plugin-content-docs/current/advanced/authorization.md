@@ -47,8 +47,8 @@ def authorize(enterprise_id, team_id, logger):
     # トークンを取得するためのあなたのロジックをここに記述します
     for team in installations:
         # 一部のチームは enterprise_id を持たない場合があります
-        is_valid_enterprise = True if (("enterprise_id" not in team) or (enterprise_id == team["enterprise_id"])) else False
-        if ((is_valid_enterprise == True) and (team["team_id"] == team_id)):
+        is_valid_enterprise = "enterprise_id" not in team or enterprise_id == team["enterprise_id"]
+        if is_valid_enterprise and team["team_id"] == team_id:
           # AuthorizeResult のインスタンスを返します
           # bot_id と bot_user_id を保存していない場合、bot_token を使って `from_auth_test_response` を呼び出すと、自動的に取得できます
           return AuthorizeResult(
