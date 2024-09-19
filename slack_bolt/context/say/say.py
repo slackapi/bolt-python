@@ -13,14 +13,20 @@ from slack_bolt.util.utils import create_copy
 class Say:
     client: Optional[WebClient]
     channel: Optional[str]
+    thread_ts: Optional[str]
+    metadata: Optional[Union[Dict, Metadata]]
 
     def __init__(
         self,
         client: Optional[WebClient],
         channel: Optional[str],
+        thread_ts: Optional[str] = None,
+        metadata: Optional[Union[Dict, Metadata]] = None,
     ):
         self.client = client
         self.channel = channel
+        self.thread_ts = thread_ts
+        self.metadata = metadata
 
     def __call__(
         self,
@@ -52,7 +58,7 @@ class Say:
                     blocks=blocks,
                     attachments=attachments,
                     as_user=as_user,
-                    thread_ts=thread_ts,
+                    thread_ts=thread_ts or self.thread_ts,
                     reply_broadcast=reply_broadcast,
                     unfurl_links=unfurl_links,
                     unfurl_media=unfurl_media,
@@ -62,13 +68,17 @@ class Say:
                     mrkdwn=mrkdwn,
                     link_names=link_names,
                     parse=parse,
-                    metadata=metadata,
+                    metadata=metadata or self.metadata,
                     **kwargs,
                 )
             elif isinstance(text_or_whole_response, dict):
                 message: dict = create_copy(text_or_whole_response)
                 if "channel" not in message:
                     message["channel"] = channel or self.channel
+                if "thread_ts" not in message:
+                    message["thread_ts"] = thread_ts or self.thread_ts
+                if "metadata" not in message:
+                    message["metadata"] = metadata or self.metadata
                 return self.client.chat_postMessage(**message)  # type: ignore[union-attr]
             else:
                 raise ValueError(f"The arg is unexpected type ({type(text_or_whole_response)})")

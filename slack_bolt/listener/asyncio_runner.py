@@ -179,6 +179,10 @@ class AsyncioListenerRunner:
         copied_request.lazy_only = True
         copied_request.lazy_function_name = lazy_func_name
         copied_request.context["listener_runner"] = self
+        if request.context.get_thread_context is not None:
+            copied_request.context["get_thread_context"] = request.context.get_thread_context
+        if request.context.save_thread_context is not None:
+            copied_request.context["save_thread_context"] = request.context.save_thread_context
         return copied_request
 
     def _debug_log_completion(self, starting_time: float, response: BoltResponse) -> None:
