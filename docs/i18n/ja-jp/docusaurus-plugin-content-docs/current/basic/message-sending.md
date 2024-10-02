@@ -8,7 +8,7 @@ slug: /concepts/message-sending
 
 リスナー関数の外でメッセージを送信したい場合や、より高度な処理（特定のエラーの処理など）を実行したい場合は、[Bolt インスタンスにアタッチされたクライアント](/concepts/web-api)の `client.chat_postMessage` を呼び出します。
 
-<span>指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+<span>指定可能な引数の一覧は<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # 'knock knock' が含まれるメッセージをリッスンし、イタリック体で 'Who's there?' と返信
 @app.message("knock knock")

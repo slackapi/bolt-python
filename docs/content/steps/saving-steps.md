@@ -25,7 +25,7 @@ Within the `save` callback, the `update()` method can be used to save the builde
 
 To learn more about how to structure these parameters, [read the documentation](https://api.slack.com/reference/workflows/workflow_step).
 
-Refer to the module documents (<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">common</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">step-specific</a>) to learn the available arguments.
+Refer to the module documents (<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">common</a> / <a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">step-specific</a>) to learn the available arguments.
 ```python
 def save(ack, view, update):
     ack()

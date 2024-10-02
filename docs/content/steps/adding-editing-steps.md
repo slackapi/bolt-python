@@ -22,7 +22,7 @@ Within the `edit` callback, the `configure()` utility can be used to easily open
 
 To learn more about opening configuration modals, [read the documentation](https://api.slack.com/workflows/steps#handle_config_view).
 
-Refer to the module documents (<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">common</a> / <a href="https://slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">step-specific</a>) to learn the available arguments.
+Refer to the module documents (<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">common</a> / <a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">step-specific</a>) to learn the available arguments.
 
 ```python
 def edit(ack, step, configure):

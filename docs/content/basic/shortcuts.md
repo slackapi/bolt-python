@@ -16,7 +16,7 @@ When setting up shortcuts within your app configuration, as with other URLs, you
 
 ⚠️ Note that global shortcuts do **not** include a channel ID. If your app needs access to a channel ID, you may use a [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) element within a modal. Message shortcuts do include a channel ID.
 
-Refer to [the module document](https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
 # The open_modal shortcut listens to a shortcut with the callback_id "open_modal"
 @app.shortcut("open_modal")

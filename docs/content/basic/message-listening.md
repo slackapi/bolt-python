@@ -10,7 +10,7 @@ To listen to messages that [your app has access to receive](https://api.slack.co
 
 :::info
 
-Refer to [the module document](https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 
 :::
 

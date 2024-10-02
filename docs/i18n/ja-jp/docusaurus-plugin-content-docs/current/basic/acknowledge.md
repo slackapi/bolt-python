@@ -16,7 +16,7 @@ slug: /concepts/acknowledge
 
 
 
-<span>指定可能な引数の一覧は<a href="https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+<span>指定可能な引数の一覧は<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # 外部データを使用する選択メニューオプションに応答するサンプル
 @app.options("menu_selection")

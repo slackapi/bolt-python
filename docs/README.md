@@ -1,4 +1,4 @@
-# slack.dev/bolt-python
+# tools.slack.dev/bolt-python
 
 This website is built using [Docusaurus](https://docusaurus.io/). 'Tis cool.
 

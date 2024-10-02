@@ -16,7 +16,7 @@ When working in a FaaS / serverless environment, our guidelines for when to `ack
 
 :::
 
-Refer to [the module document](https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
 # Example of responding to an external_select options request
 @app.options("menu_selection")
