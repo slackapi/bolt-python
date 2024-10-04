@@ -45,7 +45,8 @@ const sidebars = {
         'basic/options',
         'basic/custom-steps',
         'basic/authenticating-oauth',
-        'basic/socket-mode'
+        'basic/socket-mode',
+        'basic/assistant'
       ],
     },
     {
