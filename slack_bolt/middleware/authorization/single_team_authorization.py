@@ -47,6 +47,7 @@ class SingleTeamAuthorization(Authorization):
         # only the internals of this method
         next: Callable[[], BoltResponse],
     ) -> BoltResponse:
+
         if _is_no_auth_required(req):
             return next()
 

@@ -7,7 +7,12 @@ from slack_bolt.context.base_context import BaseContext
 from slack_bolt.context.complete.async_complete import AsyncComplete
 from slack_bolt.context.fail.async_fail import AsyncFail
 from slack_bolt.context.respond.async_respond import AsyncRespond
+from slack_bolt.context.get_thread_context.async_get_thread_context import AsyncGetThreadContext
+from slack_bolt.context.save_thread_context.async_save_thread_context import AsyncSaveThreadContext
 from slack_bolt.context.say.async_say import AsyncSay
+from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
+from slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts import AsyncSetSuggestedPrompts
+from slack_bolt.context.set_title.async_set_title import AsyncSetTitle
 from slack_bolt.util.utils import create_copy
 
 
@@ -105,7 +110,7 @@ class AsyncBoltContext(BaseContext):
             Callable `say()` function
         """
         if "say" not in self:
-            self["say"] = AsyncSay(client=self.client, channel=self.channel_id)
+            self["say"] = AsyncSay(client=self.client, channel=self.channel_id, thread_ts=self.thread_ts)
         return self["say"]
 
     @property
@@ -181,3 +186,23 @@ class AsyncBoltContext(BaseContext):
         if "fail" not in self:
             self["fail"] = AsyncFail(client=self.client, function_execution_id=self.function_execution_id)
         return self["fail"]
+
+    @property
+    def set_title(self) -> Optional[AsyncSetTitle]:
+        return self.get("set_title")
+
+    @property
+    def set_status(self) -> Optional[AsyncSetStatus]:
+        return self.get("set_status")
+
+    @property
+    def set_suggested_prompts(self) -> Optional[AsyncSetSuggestedPrompts]:
+        return self.get("set_suggested_prompts")
+
+    @property
+    def get_thread_context(self) -> Optional[AsyncGetThreadContext]:
+        return self.get("get_thread_context")
+
+    @property
+    def save_thread_context(self) -> Optional[AsyncSaveThreadContext]:
+        return self.get("save_thread_context")

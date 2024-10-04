@@ -6,8 +6,13 @@ from slack_bolt.context.ack import Ack
 from slack_bolt.context.base_context import BaseContext
 from slack_bolt.context.complete import Complete
 from slack_bolt.context.fail import Fail
+from slack_bolt.context.get_thread_context.get_thread_context import GetThreadContext
 from slack_bolt.context.respond import Respond
+from slack_bolt.context.save_thread_context import SaveThreadContext
 from slack_bolt.context.say import Say
+from slack_bolt.context.set_status import SetStatus
+from slack_bolt.context.set_suggested_prompts import SetSuggestedPrompts
+from slack_bolt.context.set_title import SetTitle
 from slack_bolt.util.utils import create_copy
 
 
@@ -106,7 +111,7 @@ class BoltContext(BaseContext):
             Callable `say()` function
         """
         if "say" not in self:
-            self["say"] = Say(client=self.client, channel=self.channel_id)
+            self["say"] = Say(client=self.client, channel=self.channel_id, thread_ts=self.thread_ts)
         return self["say"]
 
     @property
@@ -182,3 +187,23 @@ class BoltContext(BaseContext):
         if "fail" not in self:
             self["fail"] = Fail(client=self.client, function_execution_id=self.function_execution_id)
         return self["fail"]
+
+    @property
+    def set_title(self) -> Optional[SetTitle]:
+        return self.get("set_title")
+
+    @property
+    def set_status(self) -> Optional[SetStatus]:
+        return self.get("set_status")
+
+    @property
+    def set_suggested_prompts(self) -> Optional[SetSuggestedPrompts]:
+        return self.get("set_suggested_prompts")
+
+    @property
+    def get_thread_context(self) -> Optional[GetThreadContext]:
+        return self.get("get_thread_context")
+
+    @property
+    def save_thread_context(self) -> Optional[SaveThreadContext]:
+        return self.get("save_thread_context")

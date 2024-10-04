@@ -26,6 +26,7 @@ builtin_middleware_classes = [
     IgnoringSelfEvents,
     UrlVerification,
     AttachingFunctionToken,
+    # Assistant,  # to avoid circular imports
 ]
 for cls in builtin_middleware_classes:
     Middleware.register(cls)  # type: ignore[arg-type]

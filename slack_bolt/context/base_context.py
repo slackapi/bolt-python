@@ -18,6 +18,7 @@ class BaseContext(dict):
         "actor_team_id",
         "actor_user_id",
         "channel_id",
+        "thread_ts",
         "response_url",
         "matches",
         "authorize_result",
@@ -34,9 +35,18 @@ class BaseContext(dict):
         "respond",
         "complete",
         "fail",
+        "set_status",
+        "set_title",
+        "set_suggested_prompts",
     ]
+    # Note that these items are not copyable, so when you add new items to this list,
+    # you must modify ThreadListenerRunner/AsyncioListenerRunner's _build_lazy_request method to pass the values.
+    # Other listener runners do not require the change because they invoke a lazy listener over the network,
+    # meaning that the context initialization would be done again.
     non_copyable_standard_property_names = [
         "listener_runner",
+        "get_thread_context",
+        "save_thread_context",
     ]
 
     standard_property_names = copyable_standard_property_names + non_copyable_standard_property_names
@@ -99,6 +109,11 @@ class BaseContext(dict):
     def channel_id(self) -> Optional[str]:
         """The conversation ID associated with this request."""
         return self.get("channel_id")
+
+    @property
+    def thread_ts(self) -> Optional[str]:
+        """The conversation thread's ID associated with this request."""
+        return self.get("thread_ts")
 
     @property
     def response_url(self) -> Optional[str]:

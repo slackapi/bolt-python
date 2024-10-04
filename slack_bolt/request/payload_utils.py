@@ -32,6 +32,73 @@ def is_workflow_step_execute(body: Dict[str, Any]) -> bool:
     return is_event(body) and body["event"]["type"] == "workflow_step_execute" and "workflow_step" in body["event"]
 
 
+def is_assistant_event(body: Dict[str, Any]) -> bool:
+    return is_event(body) and (
+        is_assistant_thread_started_event(body)
+        or is_assistant_thread_context_changed_event(body)
+        or is_user_message_event_in_assistant_thread(body)
+        or is_bot_message_event_in_assistant_thread(body)
+    )
+
+
+def is_assistant_thread_started_event(body: Dict[str, Any]) -> bool:
+    if is_event(body):
+        return body["event"]["type"] == "assistant_thread_started"
+    return False
+
+
+def is_assistant_thread_context_changed_event(body: Dict[str, Any]) -> bool:
+    if is_event(body):
+        return body["event"]["type"] == "assistant_thread_context_changed"
+    return False
+
+
+def is_message_event_in_assistant_thread(body: Dict[str, Any]) -> bool:
+    if is_event(body):
+        return body["event"]["type"] == "message" and body["event"].get("channel_type") == "im"
+    return False
+
+
+def is_user_message_event_in_assistant_thread(body: Dict[str, Any]) -> bool:
+    if is_event(body):
+        return (
+            is_message_event_in_assistant_thread(body)
+            and body["event"].get("subtype") in (None, "file_share")
+            and body["event"].get("thread_ts") is not None
+            and body["event"].get("bot_id") is None
+        )
+    return False
+
+
+def is_bot_message_event_in_assistant_thread(body: Dict[str, Any]) -> bool:
+    if is_event(body):
+        return (
+            is_message_event_in_assistant_thread(body)
+            and body["event"].get("subtype") is None
+            and body["event"].get("thread_ts") is not None
+            and body["event"].get("bot_id") is not None
+        )
+    return False
+
+
+def is_other_message_sub_event_in_assistant_thread(body: Dict[str, Any]) -> bool:
+    # message_changed, message_deleted etc.
+    if is_event(body):
+        return (
+            is_message_event_in_assistant_thread(body)
+            and not is_user_message_event_in_assistant_thread(body)
+            and (
+                _is_other_message_sub_event(body["event"].get("message"))
+                or _is_other_message_sub_event(body["event"].get("previous_message"))
+            )
+        )
+    return False
+
+
+def _is_other_message_sub_event(message: Optional[Dict[str, Any]]) -> bool:
+    return message is not None and (message.get("subtype") == "assistant_app_thread" or message.get("thread_ts") is not None)
+
+
 # -------------------
 # Slash Commands
 # -------------------

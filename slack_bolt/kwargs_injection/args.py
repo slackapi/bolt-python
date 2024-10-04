@@ -6,8 +6,13 @@ from slack_bolt.context import BoltContext
 from slack_bolt.context.ack import Ack
 from slack_bolt.context.complete import Complete
 from slack_bolt.context.fail import Fail
+from slack_bolt.context.get_thread_context.get_thread_context import GetThreadContext
 from slack_bolt.context.respond import Respond
+from slack_bolt.context.save_thread_context import SaveThreadContext
 from slack_bolt.context.say import Say
+from slack_bolt.context.set_status import SetStatus
+from slack_bolt.context.set_suggested_prompts import SetSuggestedPrompts
+from slack_bolt.context.set_title import SetTitle
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk import WebClient
@@ -87,6 +92,16 @@ class Args:
     """`complete()` utility function, signals a successful completion of the custom function"""
     fail: Fail
     """`fail()` utility function, signal that the custom function failed to complete"""
+    set_status: Optional[SetStatus]
+    """`set_status()` utility function for AI Agents & Assistants"""
+    set_title: Optional[SetTitle]
+    """`set_title()` utility function for AI Agents & Assistants"""
+    set_suggested_prompts: Optional[SetSuggestedPrompts]
+    """`set_suggested_prompts()` utility function for AI Agents & Assistants"""
+    get_thread_context: Optional[GetThreadContext]
+    """`get_thread_context()` utility function for AI Agents & Assistants"""
+    save_thread_context: Optional[SaveThreadContext]
+    """`save_thread_context()` utility function for AI Agents & Assistants"""
     # middleware
     next: Callable[[], None]
     """`next()` utility function, which tells the middleware chain that it can continue with the next one"""
@@ -115,6 +130,11 @@ class Args:
         respond: Respond,
         complete: Complete,
         fail: Fail,
+        set_status: Optional[SetStatus] = None,
+        set_title: Optional[SetTitle] = None,
+        set_suggested_prompts: Optional[SetSuggestedPrompts] = None,
+        get_thread_context: Optional[GetThreadContext] = None,
+        save_thread_context: Optional[SaveThreadContext] = None,
         # As this method is not supposed to be invoked by bolt-python users,
         # the naming conflict with the built-in one affects
         # only the internals of this method
@@ -142,5 +162,12 @@ class Args:
         self.respond: Respond = respond
         self.complete: Complete = complete
         self.fail: Fail = fail
+
+        self.set_status = set_status
+        self.set_title = set_title
+        self.set_suggested_prompts = set_suggested_prompts
+        self.get_thread_context = get_thread_context
+        self.save_thread_context = save_thread_context
+
         self.next: Callable[[], None] = next
         self.next_: Callable[[], None] = next

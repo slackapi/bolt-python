@@ -14,6 +14,7 @@ from slack_bolt.request.internals import (
     extract_actor_enterprise_id,
     extract_actor_team_id,
     extract_actor_user_id,
+    extract_thread_ts,
 )
 
 
@@ -44,6 +45,9 @@ def build_async_context(
     channel_id = extract_channel_id(body)
     if channel_id:
         context["channel_id"] = channel_id
+    thread_ts = extract_thread_ts(body)
+    if thread_ts:
+        context["thread_ts"] = thread_ts
     function_execution_id = extract_function_execution_id(body)
     if function_execution_id:
         context["function_execution_id"] = function_execution_id

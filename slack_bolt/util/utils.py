@@ -94,3 +94,15 @@ def is_callable_coroutine(func: Optional[Any]) -> bool:
     return func is not None and (
         inspect.iscoroutinefunction(func) or (hasattr(func, "__call__") and inspect.iscoroutinefunction(func.__call__))
     )
+
+
+def is_used_without_argument(args) -> bool:
+    """Tests if a decorator invocation is without () or (args).
+
+    Args:
+        args: arguments
+
+    Returns:
+        True if it's an invocation without args
+    """
+    return len(args) == 1
