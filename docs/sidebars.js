@@ -29,6 +29,7 @@ const sidebars = {
       type: 'category',
       label: 'Basic concepts',
       items: [
+        'basic/assistant',
         'basic/message-listening',
         'basic/message-sending',
         'basic/event-listening',
@@ -45,8 +46,7 @@ const sidebars = {
         'basic/options',
         'basic/custom-steps',
         'basic/authenticating-oauth',
-        'basic/socket-mode',
-        'basic/assistant'
+        'basic/socket-mode'
       ],
     },
     {
