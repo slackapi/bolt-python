@@ -20,6 +20,19 @@ from .listener_matcher import CustomListenerMatcher
 from .request import BoltRequest
 from .response import BoltResponse
 
+# AI Agents & Assistants
+from .middleware.assistant.assistant import (
+    Assistant,
+)
+from .context.assistant.thread_context import AssistantThreadContext
+from .context.assistant.thread_context_store.store import AssistantThreadContextStore
+from .context.assistant.thread_context_store.file import FileAssistantThreadContextStore
+
+from .context.set_status import SetStatus
+from .context.set_title import SetTitle
+from .context.set_suggested_prompts import SetSuggestedPrompts
+from .context.save_thread_context import SaveThreadContext
+
 __all__ = [
     "App",
     "BoltContext",
@@ -33,4 +46,12 @@ __all__ = [
     "CustomListenerMatcher",
     "BoltRequest",
     "BoltResponse",
+    "Assistant",
+    "AssistantThreadContext",
+    "AssistantThreadContextStore",
+    "FileAssistantThreadContextStore",
+    "SetStatus",
+    "SetTitle",
+    "SetSuggestedPrompts",
+    "SaveThreadContext",
 ]

@@ -3,6 +3,7 @@ from typing import Optional, Dict, Union, Any, Sequence
 from urllib.parse import parse_qsl, parse_qs
 
 from slack_bolt.context import BoltContext
+from slack_bolt.request.payload_utils import is_assistant_event
 
 
 def parse_query(query: Optional[Union[str, Dict[str, str], Dict[str, Sequence[str]]]]) -> Dict[str, Sequence[str]]:
@@ -207,6 +208,31 @@ def extract_channel_id(payload: Dict[str, Any]) -> Optional[str]:
     if payload.get("item") is not None:
         # reaction_added: body["event"]["item"]
         return extract_channel_id(payload["item"])
+    if payload.get("assistant_thread") is not None:
+        # assistant_thread_started
+        return extract_channel_id(payload["assistant_thread"])
+    return None
+
+
+def extract_thread_ts(payload: Dict[str, Any]) -> Optional[str]:
+    # This utility initially supports only the use cases for AI assistants, but it may be fine to add more patterns.
+    # That said, note that thread_ts is always required for assistant threads, but it's not for channels.
+    # Thus, blindly setting this thread_ts to say utility can break existing apps' behaviors.
+    if is_assistant_event(payload):
+        event = payload["event"]
+        if event.get("assistant_thread") is not None:
+            # assistant_thread_started, assistant_thread_context_changed
+            return event["assistant_thread"]["thread_ts"]
+        elif event.get("channel") is not None:
+            if event.get("thread_ts") is not None:
+                # message in an assistant thread
+                return event["thread_ts"]
+            elif event.get("message", {}).get("thread_ts") is not None:
+                # message_changed
+                return event["message"]["thread_ts"]
+            elif event.get("previous_message", {}).get("thread_ts") is not None:
+                # message_deleted
+                return event["previous_message"]["thread_ts"]
     return None
 
 
@@ -260,6 +286,9 @@ def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
     channel_id = extract_channel_id(body)
     if channel_id:
         context["channel_id"] = channel_id
+    thread_ts = extract_thread_ts(body)
+    if thread_ts:
+        context["thread_ts"] = thread_ts
     function_execution_id = extract_function_execution_id(body)
     if function_execution_id is not None:
         context["function_execution_id"] = function_execution_id

@@ -53,6 +53,12 @@ from .context.say.async_say import AsyncSay
 from .listener.async_listener import AsyncListener
 from .listener_matcher.async_listener_matcher import AsyncCustomListenerMatcher
 from .request.async_request import AsyncBoltRequest
+from .middleware.assistant.async_assistant import AsyncAssistant
+from .context.set_status.async_set_status import AsyncSetStatus
+from .context.set_title.async_set_title import AsyncSetTitle
+from .context.set_suggested_prompts.async_set_suggested_prompts import AsyncSetSuggestedPrompts
+from .context.get_thread_context.async_get_thread_context import AsyncGetThreadContext
+from .context.save_thread_context.async_save_thread_context import AsyncSaveThreadContext
 
 __all__ = [
     "AsyncApp",
@@ -63,4 +69,10 @@ __all__ = [
     "AsyncListener",
     "AsyncCustomListenerMatcher",
     "AsyncBoltRequest",
+    "AsyncAssistant",
+    "AsyncSetStatus",
+    "AsyncSetTitle",
+    "AsyncSetSuggestedPrompts",
+    "AsyncGetThreadContext",
+    "AsyncSaveThreadContext",
 ]

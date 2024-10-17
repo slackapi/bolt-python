@@ -6,7 +6,12 @@ from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.context.complete.async_complete import AsyncComplete
 from slack_bolt.context.fail.async_fail import AsyncFail
 from slack_bolt.context.respond.async_respond import AsyncRespond
+from slack_bolt.context.get_thread_context.async_get_thread_context import AsyncGetThreadContext
+from slack_bolt.context.save_thread_context.async_save_thread_context import AsyncSaveThreadContext
 from slack_bolt.context.say.async_say import AsyncSay
+from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
+from slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts import AsyncSetSuggestedPrompts
+from slack_bolt.context.set_title.async_set_title import AsyncSetTitle
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_sdk.web.async_client import AsyncWebClient
@@ -86,6 +91,16 @@ class AsyncArgs:
     """`complete()` utility function, signals a successful completion of the custom function"""
     fail: AsyncFail
     """`fail()` utility function, signal that the custom function failed to complete"""
+    set_status: Optional[AsyncSetStatus]
+    """`set_status()` utility function for AI Agents & Assistants"""
+    set_title: Optional[AsyncSetTitle]
+    """`set_title()` utility function for AI Agents & Assistants"""
+    set_suggested_prompts: Optional[AsyncSetSuggestedPrompts]
+    """`set_suggested_prompts()` utility function for AI Agents & Assistants"""
+    get_thread_context: Optional[AsyncGetThreadContext]
+    """`get_thread_context()` utility function for AI Agents & Assistants"""
+    save_thread_context: Optional[AsyncSaveThreadContext]
+    """`save_thread_context()` utility function for AI Agents & Assistants"""
     # middleware
     next: Callable[[], Awaitable[None]]
     """`next()` utility function, which tells the middleware chain that it can continue with the next one"""
@@ -114,6 +129,11 @@ class AsyncArgs:
         respond: AsyncRespond,
         complete: AsyncComplete,
         fail: AsyncFail,
+        set_status: Optional[AsyncSetStatus] = None,
+        set_title: Optional[AsyncSetTitle] = None,
+        set_suggested_prompts: Optional[AsyncSetSuggestedPrompts] = None,
+        get_thread_context: Optional[AsyncGetThreadContext] = None,
+        save_thread_context: Optional[AsyncSaveThreadContext] = None,
         next: Callable[[], Awaitable[None]],
         **kwargs,  # noqa
     ):
@@ -138,5 +158,12 @@ class AsyncArgs:
         self.respond: AsyncRespond = respond
         self.complete: AsyncComplete = complete
         self.fail: AsyncFail = fail
+
+        self.set_status = set_status
+        self.set_title = set_title
+        self.set_suggested_prompts = set_suggested_prompts
+        self.get_thread_context = get_thread_context
+        self.save_thread_context = save_thread_context
+
         self.next: Callable[[], Awaitable[None]] = next
         self.next_: Callable[[], Awaitable[None]] = next
