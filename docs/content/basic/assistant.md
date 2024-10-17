@@ -37,6 +37,7 @@ def respond_in_assistant_thread(
     logger: logging.Logger,
     context: BoltContext,
     set_status: SetStatus,
+    client: WebClient,
     say: Say,
 ):
     try:

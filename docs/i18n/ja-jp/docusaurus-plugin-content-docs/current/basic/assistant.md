@@ -38,6 +38,7 @@ def respond_in_assistant_thread(
     context: BoltContext,
     set_status: SetStatus,
     say: Say,
+    client: WebClient,
 ):
     try:
         # ユーザーにこのbotがリクエストを受信して作業中であることを伝えます
