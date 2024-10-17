@@ -73,7 +73,7 @@ app.use(assistant)
 
 Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 
-When an user opens an Assistant thread while in a channel, the channel information is stored as the thread's `AssistantThreadContext` data. You can access this information by using the `get_thread_context` utility. The reason Bolt provides this utility is that the most recent thread context information is not included in the subsequent user message event payload data. Therefore, an app must store the context data when it is changed so that the app can refer to the data in message event listeners.
+When a user opens an Assistant thread while in a channel, the channel information is stored as the thread's `AssistantThreadContext` data. You can access this information by using the `get_thread_context` utility. The reason Bolt provides this utility is that the most recent thread context information is not included in the subsequent user message event payload data. Therefore, an app must store the context data when it is changed so that the app can refer to the data in message event listeners.
 
 When the user switches channels, the `assistant_thread_context_changed` event will be sent to your app. If you use the built-in `Assistant` middleware without any custom configuration (like the above code snippet does), the updated context data is automatically saved as message metadata of the first reply from the assistant bot.
 
