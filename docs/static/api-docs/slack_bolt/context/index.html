@@ -38,6 +38,10 @@ like <code>user_id</code>, <code>team_id</code>, <code>channel_id</code>, and <c
 <dd>
 <div class="desc"></div>
 </dd>
+<dt><code class="name"><a title="slack_bolt.context.assistant" href="assistant/index.html">slack_bolt.context.assistant</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt><code class="name"><a title="slack_bolt.context.async_context" href="async_context.html">slack_bolt.context.async_context</a></code></dt>
 <dd>
 <div class="desc"></div>
@@ -58,11 +62,31 @@ like <code>user_id</code>, <code>team_id</code>, <code>channel_id</code>, and <c
 <dd>
 <div class="desc"></div>
 </dd>
+<dt><code class="name"><a title="slack_bolt.context.get_thread_context" href="get_thread_context/index.html">slack_bolt.context.get_thread_context</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt><code class="name"><a title="slack_bolt.context.respond" href="respond/index.html">slack_bolt.context.respond</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
+<dt><code class="name"><a title="slack_bolt.context.save_thread_context" href="save_thread_context/index.html">slack_bolt.context.save_thread_context</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt><code class="name"><a title="slack_bolt.context.say" href="say/index.html">slack_bolt.context.say</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="slack_bolt.context.set_status" href="set_status/index.html">slack_bolt.context.set_status</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="slack_bolt.context.set_suggested_prompts" href="set_suggested_prompts/index.html">slack_bolt.context.set_suggested_prompts</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="slack_bolt.context.set_title" href="set_title/index.html">slack_bolt.context.set_title</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -91,9 +115,12 @@ like <code>user_id</code>, <code>team_id</code>, <code>channel_id</code>, and <c
     def to_copyable(self) -&gt; &#34;BoltContext&#34;:
         new_dict = {}
         for prop_name, prop_value in self.items():
-            if prop_name in self.standard_property_names:
+            if prop_name in self.copyable_standard_property_names:
                 # all the standard properties are copiable
                 new_dict[prop_name] = prop_value
+            elif prop_name in self.non_copyable_standard_property_names:
+                # Do nothing with this property (e.g., listener_runner)
+                continue
             else:
                 try:
                     copied_value = create_copy(prop_value)
@@ -106,8 +133,14 @@ like <code>user_id</code>, <code>team_id</code>, <code>channel_id</code>, and <c
                     )
         return BoltContext(new_dict)
 
+    # The return type is intentionally string to avoid circular imports
     @property
-    def client(self) -&gt; Optional[WebClient]:
+    def listener_runner(self) -&gt; &#34;ThreadListenerRunner&#34;:  # type: ignore[name-defined]
+        &#34;&#34;&#34;The properly configured listener_runner that is available for middleware/listeners.&#34;&#34;&#34;
+        return self[&#34;listener_runner&#34;]
+
+    @property
+    def client(self) -&gt; WebClient:
         &#34;&#34;&#34;The `WebClient` instance available for this request.
 
             @app.event(&#34;app_mention&#34;)
@@ -171,7 +204,7 @@ like <code>user_id</code>, <code>team_id</code>, <code>channel_id</code>, and <c
             Callable `say()` function
         &#34;&#34;&#34;
         if &#34;say&#34; not in self:
-            self[&#34;say&#34;] = Say(client=self.client, channel=self.channel_id)
+            self[&#34;say&#34;] = Say(client=self.client, channel=self.channel_id, thread_ts=self.thread_ts)
         return self[&#34;say&#34;]
 
     @property
@@ -195,8 +228,8 @@ like <code>user_id</code>, <code>team_id</code>, <code>channel_id</code>, and <c
         if &#34;respond&#34; not in self:
             self[&#34;respond&#34;] = Respond(
                 response_url=self.response_url,
-                proxy=self.client.proxy,  # type: ignore[union-attr]
-                ssl=self.client.ssl,  # type: ignore[union-attr]
+                proxy=self.client.proxy,
+                ssl=self.client.ssl,
             )
         return self[&#34;respond&#34;]
 
@@ -221,9 +254,7 @@ like <code>user_id</code>, <code>team_id</code>, <code>channel_id</code>, and <c
             Callable `complete()` function
         &#34;&#34;&#34;
         if &#34;complete&#34; not in self:
-            self[&#34;complete&#34;] = Complete(
-                client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
-            )
+            self[&#34;complete&#34;] = Complete(client=self.client, function_execution_id=self.function_execution_id)
         return self[&#34;complete&#34;]
 
     @property
@@ -247,10 +278,28 @@ like <code>user_id</code>, <code>team_id</code>, <code>channel_id</code>, and <c
             Callable `fail()` function
         &#34;&#34;&#34;
         if &#34;fail&#34; not in self:
-            self[&#34;fail&#34;] = Fail(
-                client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
-            )
-        return self[&#34;fail&#34;]</code></pre>
+            self[&#34;fail&#34;] = Fail(client=self.client, function_execution_id=self.function_execution_id)
+        return self[&#34;fail&#34;]
+
+    @property
+    def set_title(self) -&gt; Optional[SetTitle]:
+        return self.get(&#34;set_title&#34;)
+
+    @property
+    def set_status(self) -&gt; Optional[SetStatus]:
+        return self.get(&#34;set_status&#34;)
+
+    @property
+    def set_suggested_prompts(self) -&gt; Optional[SetSuggestedPrompts]:
+        return self.get(&#34;set_suggested_prompts&#34;)
+
+    @property
+    def get_thread_context(self) -&gt; Optional[GetThreadContext]:
+        return self.get(&#34;get_thread_context&#34;)
+
+    @property
+    def save_thread_context(self) -&gt; Optional[SaveThreadContext]:
+        return self.get(&#34;save_thread_context&#34;)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -298,7 +347,7 @@ def ack(self) -&gt; Ack:
     return self[&#34;ack&#34;]</code></pre>
 </details>
 </dd>
-<dt id="slack_bolt.context.BoltContext.client"><code class="name">prop <span class="ident">client</span> : Optional[slack_sdk.web.client.WebClient]</code></dt>
+<dt id="slack_bolt.context.BoltContext.client"><code class="name">prop <span class="ident">client</span> : slack_sdk.web.client.WebClient</code></dt>
 <dd>
 <div class="desc"><p>The <code>WebClient</code> instance available for this request.</p>
 <pre><code>@app.event("app_mention")
@@ -323,7 +372,7 @@ def handle_events(client, context):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
-def client(self) -&gt; Optional[WebClient]:
+def client(self) -&gt; WebClient:
     &#34;&#34;&#34;The `WebClient` instance available for this request.
 
         @app.event(&#34;app_mention&#34;)
@@ -392,9 +441,7 @@ def complete(self) -&gt; Complete:
         Callable `complete()` function
     &#34;&#34;&#34;
     if &#34;complete&#34; not in self:
-        self[&#34;complete&#34;] = Complete(
-            client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
-        )
+        self[&#34;complete&#34;] = Complete(client=self.client, function_execution_id=self.function_execution_id)
     return self[&#34;complete&#34;]</code></pre>
 </details>
 </dd>
@@ -441,10 +488,33 @@ def fail(self) -&gt; Fail:
         Callable `fail()` function
     &#34;&#34;&#34;
     if &#34;fail&#34; not in self:
-        self[&#34;fail&#34;] = Fail(
-            client=self.client, function_execution_id=self.function_execution_id  # type: ignore[arg-type]
-        )
+        self[&#34;fail&#34;] = Fail(client=self.client, function_execution_id=self.function_execution_id)
     return self[&#34;fail&#34;]</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.context.BoltContext.get_thread_context"><code class="name">prop <span class="ident">get_thread_context</span> : Optional[<a title="slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext" href="get_thread_context/get_thread_context.html#slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext">GetThreadContext</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def get_thread_context(self) -&gt; Optional[GetThreadContext]:
+    return self.get(&#34;get_thread_context&#34;)</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.context.BoltContext.listener_runner"><code class="name">prop <span class="ident">listener_runner</span> : ThreadListenerRunner</code></dt>
+<dd>
+<div class="desc"><p>The properly configured listener_runner that is available for middleware/listeners.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def listener_runner(self) -&gt; &#34;ThreadListenerRunner&#34;:  # type: ignore[name-defined]
+    &#34;&#34;&#34;The properly configured listener_runner that is available for middleware/listeners.&#34;&#34;&#34;
+    return self[&#34;listener_runner&#34;]</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.context.BoltContext.respond"><code class="name">prop <span class="ident">respond</span> : Optional[<a title="slack_bolt.context.respond.respond.Respond" href="respond/respond.html#slack_bolt.context.respond.respond.Respond">Respond</a>]</code></dt>
@@ -488,10 +558,22 @@ def respond(self) -&gt; Optional[Respond]:
     if &#34;respond&#34; not in self:
         self[&#34;respond&#34;] = Respond(
             response_url=self.response_url,
-            proxy=self.client.proxy,  # type: ignore[union-attr]
-            ssl=self.client.ssl,  # type: ignore[union-attr]
+            proxy=self.client.proxy,
+            ssl=self.client.ssl,
         )
     return self[&#34;respond&#34;]</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.context.BoltContext.save_thread_context"><code class="name">prop <span class="ident">save_thread_context</span> : Optional[<a title="slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext" href="save_thread_context/save_thread_context.html#slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext">SaveThreadContext</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def save_thread_context(self) -&gt; Optional[SaveThreadContext]:
+    return self.get(&#34;save_thread_context&#34;)</code></pre>
 </details>
 </dd>
 <dt id="slack_bolt.context.BoltContext.say"><code class="name">prop <span class="ident">say</span> : <a title="slack_bolt.context.say.say.Say" href="say/say.html#slack_bolt.context.say.say.Say">Say</a></code></dt>
@@ -533,8 +615,44 @@ def say(self) -&gt; Say:
         Callable `say()` function
     &#34;&#34;&#34;
     if &#34;say&#34; not in self:
-        self[&#34;say&#34;] = Say(client=self.client, channel=self.channel_id)
+        self[&#34;say&#34;] = Say(client=self.client, channel=self.channel_id, thread_ts=self.thread_ts)
     return self[&#34;say&#34;]</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.context.BoltContext.set_status"><code class="name">prop <span class="ident">set_status</span> : Optional[<a title="slack_bolt.context.set_status.set_status.SetStatus" href="set_status/set_status.html#slack_bolt.context.set_status.set_status.SetStatus">SetStatus</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def set_status(self) -&gt; Optional[SetStatus]:
+    return self.get(&#34;set_status&#34;)</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.context.BoltContext.set_suggested_prompts"><code class="name">prop <span class="ident">set_suggested_prompts</span> : Optional[<a title="slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts" href="set_suggested_prompts/set_suggested_prompts.html#slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts">SetSuggestedPrompts</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def set_suggested_prompts(self) -&gt; Optional[SetSuggestedPrompts]:
+    return self.get(&#34;set_suggested_prompts&#34;)</code></pre>
+</details>
+</dd>
+<dt id="slack_bolt.context.BoltContext.set_title"><code class="name">prop <span class="ident">set_title</span> : Optional[<a title="slack_bolt.context.set_title.set_title.SetTitle" href="set_title/set_title.html#slack_bolt.context.set_title.set_title.SetTitle">SetTitle</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def set_title(self) -&gt; Optional[SetTitle]:
+    return self.get(&#34;set_title&#34;)</code></pre>
 </details>
 </dd>
 </dl>
@@ -568,6 +686,7 @@ def say(self) -&gt; Say:
 <li><code><a title="slack_bolt.context.base_context.BaseContext.matches" href="base_context.html#slack_bolt.context.base_context.BaseContext.matches">matches</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.response_url" href="base_context.html#slack_bolt.context.base_context.BaseContext.response_url">response_url</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.team_id" href="base_context.html#slack_bolt.context.base_context.BaseContext.team_id">team_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.thread_ts" href="base_context.html#slack_bolt.context.base_context.BaseContext.thread_ts">thread_ts</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.token" href="base_context.html#slack_bolt.context.base_context.BaseContext.token">token</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.user_id" href="base_context.html#slack_bolt.context.base_context.BaseContext.user_id">user_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.user_token" href="base_context.html#slack_bolt.context.base_context.BaseContext.user_token">user_token</a></code></li>
@@ -591,26 +710,38 @@ def say(self) -&gt; Say:
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
 <li><code><a title="slack_bolt.context.ack" href="ack/index.html">slack_bolt.context.ack</a></code></li>
+<li><code><a title="slack_bolt.context.assistant" href="assistant/index.html">slack_bolt.context.assistant</a></code></li>
 <li><code><a title="slack_bolt.context.async_context" href="async_context.html">slack_bolt.context.async_context</a></code></li>
 <li><code><a title="slack_bolt.context.base_context" href="base_context.html">slack_bolt.context.base_context</a></code></li>
 <li><code><a title="slack_bolt.context.complete" href="complete/index.html">slack_bolt.context.complete</a></code></li>
 <li><code><a title="slack_bolt.context.context" href="context.html">slack_bolt.context.context</a></code></li>
 <li><code><a title="slack_bolt.context.fail" href="fail/index.html">slack_bolt.context.fail</a></code></li>
+<li><code><a title="slack_bolt.context.get_thread_context" href="get_thread_context/index.html">slack_bolt.context.get_thread_context</a></code></li>
 <li><code><a title="slack_bolt.context.respond" href="respond/index.html">slack_bolt.context.respond</a></code></li>
+<li><code><a title="slack_bolt.context.save_thread_context" href="save_thread_context/index.html">slack_bolt.context.save_thread_context</a></code></li>
 <li><code><a title="slack_bolt.context.say" href="say/index.html">slack_bolt.context.say</a></code></li>
+<li><code><a title="slack_bolt.context.set_status" href="set_status/index.html">slack_bolt.context.set_status</a></code></li>
+<li><code><a title="slack_bolt.context.set_suggested_prompts" href="set_suggested_prompts/index.html">slack_bolt.context.set_suggested_prompts</a></code></li>
+<li><code><a title="slack_bolt.context.set_title" href="set_title/index.html">slack_bolt.context.set_title</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
 <h4><code><a title="slack_bolt.context.BoltContext" href="#slack_bolt.context.BoltContext">BoltContext</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="slack_bolt.context.BoltContext.ack" href="#slack_bolt.context.BoltContext.ack">ack</a></code></li>
 <li><code><a title="slack_bolt.context.BoltContext.client" href="#slack_bolt.context.BoltContext.client">client</a></code></li>
 <li><code><a title="slack_bolt.context.BoltContext.complete" href="#slack_bolt.context.BoltContext.complete">complete</a></code></li>
 <li><code><a title="slack_bolt.context.BoltContext.fail" href="#slack_bolt.context.BoltContext.fail">fail</a></code></li>
+<li><code><a title="slack_bolt.context.BoltContext.get_thread_context" href="#slack_bolt.context.BoltContext.get_thread_context">get_thread_context</a></code></li>
+<li><code><a title="slack_bolt.context.BoltContext.listener_runner" href="#slack_bolt.context.BoltContext.listener_runner">listener_runner</a></code></li>
 <li><code><a title="slack_bolt.context.BoltContext.respond" href="#slack_bolt.context.BoltContext.respond">respond</a></code></li>
+<li><code><a title="slack_bolt.context.BoltContext.save_thread_context" href="#slack_bolt.context.BoltContext.save_thread_context">save_thread_context</a></code></li>
 <li><code><a title="slack_bolt.context.BoltContext.say" href="#slack_bolt.context.BoltContext.say">say</a></code></li>
+<li><code><a title="slack_bolt.context.BoltContext.set_status" href="#slack_bolt.context.BoltContext.set_status">set_status</a></code></li>
+<li><code><a title="slack_bolt.context.BoltContext.set_suggested_prompts" href="#slack_bolt.context.BoltContext.set_suggested_prompts">set_suggested_prompts</a></code></li>
+<li><code><a title="slack_bolt.context.BoltContext.set_title" href="#slack_bolt.context.BoltContext.set_title">set_title</a></code></li>
 <li><code><a title="slack_bolt.context.BoltContext.to_copyable" href="#slack_bolt.context.BoltContext.to_copyable">to_copyable</a></code></li>
 </ul>
 </li>

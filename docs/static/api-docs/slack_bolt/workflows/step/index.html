@@ -593,7 +593,7 @@ Use new custom steps: <a href="https://api.slack.com/automation/functions/custom
 </dd>
 <dt id="slack_bolt.workflows.step.WorkflowStepMiddleware"><code class="flex name class">
 <span>class <span class="ident">WorkflowStepMiddleware</span></span>
-<span>(</span><span>step: <a title="slack_bolt.workflows.step.step.WorkflowStep" href="step.html#slack_bolt.workflows.step.step.WorkflowStep">WorkflowStep</a>, listener_runner: <a title="slack_bolt.listener.thread_runner.ThreadListenerRunner" href="../../listener/thread_runner.html#slack_bolt.listener.thread_runner.ThreadListenerRunner">ThreadListenerRunner</a>)</span>
+<span>(</span><span>step: <a title="slack_bolt.workflows.step.step.WorkflowStep" href="step.html#slack_bolt.workflows.step.step.WorkflowStep">WorkflowStep</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Base middleware for step from app specific ones</p></div>
@@ -604,9 +604,8 @@ Use new custom steps: <a href="https://api.slack.com/automation/functions/custom
 <pre><code class="python">class WorkflowStepMiddleware(Middleware):
     &#34;&#34;&#34;Base middleware for step from app specific ones&#34;&#34;&#34;
 
-    def __init__(self, step: WorkflowStep, listener_runner: ThreadListenerRunner):
+    def __init__(self, step: WorkflowStep):
         self.step = step
-        self.listener_runner = listener_runner
 
     def process(
         self,
@@ -634,8 +633,8 @@ Use new custom steps: <a href="https://api.slack.com/automation/functions/custom
 
         return next()
 
+    @staticmethod
     def _run(
-        self,
         listener: Listener,
         req: BoltRequest,
         resp: BoltResponse,
@@ -644,7 +643,7 @@ Use new custom steps: <a href="https://api.slack.com/automation/functions/custom
         if next_was_not_called:
             return None
 
-        return self.listener_runner.run(
+        return req.context.listener_runner.run(
             request=req,
             response=resp,
             listener_name=get_name_for_callable(listener.ack_function),

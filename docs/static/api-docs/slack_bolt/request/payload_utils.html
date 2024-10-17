@@ -39,6 +39,24 @@ hljs.highlightAll();
 <dd>
 <div class="desc"></div>
 </dd>
+<dt id="slack_bolt.request.payload_utils.is_assistant_event"><code class="name flex">
+<span>def <span class="ident">is_assistant_event</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.request.payload_utils.is_assistant_thread_context_changed_event"><code class="name flex">
+<span>def <span class="ident">is_assistant_thread_context_changed_event</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.request.payload_utils.is_assistant_thread_started_event"><code class="name flex">
+<span>def <span class="ident">is_assistant_thread_started_event</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="slack_bolt.request.payload_utils.is_attachment_action"><code class="name flex">
 <span>def <span class="ident">is_attachment_action</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
 </code></dt>
@@ -53,6 +71,12 @@ hljs.highlightAll();
 </dd>
 <dt id="slack_bolt.request.payload_utils.is_block_suggestion"><code class="name flex">
 <span>def <span class="ident">is_block_suggestion</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.request.payload_utils.is_bot_message_event_in_assistant_thread"><code class="name flex">
+<span>def <span class="ident">is_bot_message_event_in_assistant_thread</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -93,6 +117,12 @@ hljs.highlightAll();
 <dd>
 <div class="desc"></div>
 </dd>
+<dt id="slack_bolt.request.payload_utils.is_message_event_in_assistant_thread"><code class="name flex">
+<span>def <span class="ident">is_message_event_in_assistant_thread</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="slack_bolt.request.payload_utils.is_message_shortcut"><code class="name flex">
 <span>def <span class="ident">is_message_shortcut</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
 </code></dt>
@@ -105,6 +135,12 @@ hljs.highlightAll();
 <dd>
 <div class="desc"></div>
 </dd>
+<dt id="slack_bolt.request.payload_utils.is_other_message_sub_event_in_assistant_thread"><code class="name flex">
+<span>def <span class="ident">is_other_message_sub_event_in_assistant_thread</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="slack_bolt.request.payload_utils.is_shortcut"><code class="name flex">
 <span>def <span class="ident">is_shortcut</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
 </code></dt>
@@ -113,6 +149,12 @@ hljs.highlightAll();
 </dd>
 <dt id="slack_bolt.request.payload_utils.is_slash_command"><code class="name flex">
 <span>def <span class="ident">is_slash_command</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.request.payload_utils.is_user_message_event_in_assistant_thread"><code class="name flex">
+<span>def <span class="ident">is_user_message_event_in_assistant_thread</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -219,19 +261,26 @@ hljs.highlightAll();
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="slack_bolt.request.payload_utils.is_action" href="#slack_bolt.request.payload_utils.is_action">is_action</a></code></li>
+<li><code><a title="slack_bolt.request.payload_utils.is_assistant_event" href="#slack_bolt.request.payload_utils.is_assistant_event">is_assistant_event</a></code></li>
+<li><code><a title="slack_bolt.request.payload_utils.is_assistant_thread_context_changed_event" href="#slack_bolt.request.payload_utils.is_assistant_thread_context_changed_event">is_assistant_thread_context_changed_event</a></code></li>
+<li><code><a title="slack_bolt.request.payload_utils.is_assistant_thread_started_event" href="#slack_bolt.request.payload_utils.is_assistant_thread_started_event">is_assistant_thread_started_event</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_attachment_action" href="#slack_bolt.request.payload_utils.is_attachment_action">is_attachment_action</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_block_actions" href="#slack_bolt.request.payload_utils.is_block_actions">is_block_actions</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_block_suggestion" href="#slack_bolt.request.payload_utils.is_block_suggestion">is_block_suggestion</a></code></li>
+<li><code><a title="slack_bolt.request.payload_utils.is_bot_message_event_in_assistant_thread" href="#slack_bolt.request.payload_utils.is_bot_message_event_in_assistant_thread">is_bot_message_event_in_assistant_thread</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_dialog_cancellation" href="#slack_bolt.request.payload_utils.is_dialog_cancellation">is_dialog_cancellation</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_dialog_submission" href="#slack_bolt.request.payload_utils.is_dialog_submission">is_dialog_submission</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_dialog_suggestion" href="#slack_bolt.request.payload_utils.is_dialog_suggestion">is_dialog_suggestion</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_event" href="#slack_bolt.request.payload_utils.is_event">is_event</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_function" href="#slack_bolt.request.payload_utils.is_function">is_function</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_global_shortcut" href="#slack_bolt.request.payload_utils.is_global_shortcut">is_global_shortcut</a></code></li>
+<li><code><a title="slack_bolt.request.payload_utils.is_message_event_in_assistant_thread" href="#slack_bolt.request.payload_utils.is_message_event_in_assistant_thread">is_message_event_in_assistant_thread</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_message_shortcut" href="#slack_bolt.request.payload_utils.is_message_shortcut">is_message_shortcut</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_options" href="#slack_bolt.request.payload_utils.is_options">is_options</a></code></li>
+<li><code><a title="slack_bolt.request.payload_utils.is_other_message_sub_event_in_assistant_thread" href="#slack_bolt.request.payload_utils.is_other_message_sub_event_in_assistant_thread">is_other_message_sub_event_in_assistant_thread</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_shortcut" href="#slack_bolt.request.payload_utils.is_shortcut">is_shortcut</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_slash_command" href="#slack_bolt.request.payload_utils.is_slash_command">is_slash_command</a></code></li>
+<li><code><a title="slack_bolt.request.payload_utils.is_user_message_event_in_assistant_thread" href="#slack_bolt.request.payload_utils.is_user_message_event_in_assistant_thread">is_user_message_event_in_assistant_thread</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_view" href="#slack_bolt.request.payload_utils.is_view">is_view</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_view_closed" href="#slack_bolt.request.payload_utils.is_view_closed">is_view_closed</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_view_submission" href="#slack_bolt.request.payload_utils.is_view_submission">is_view_submission</a></code></li>

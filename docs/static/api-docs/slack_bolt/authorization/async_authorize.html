@@ -392,10 +392,10 @@ you can expect that the authorize layer should work for you without any customiz
             return self.authorize_result_cache[token]
 
         try:
-            auth_test_api_response = await context.client.auth_test(token=token)  # type: ignore[union-attr]
+            auth_test_api_response = await context.client.auth_test(token=token)
             user_auth_test_response = None
             if user_token is not None and token != user_token:
-                user_auth_test_response = await context.client.auth_test(token=user_token)  # type: ignore[union-attr]
+                user_auth_test_response = await context.client.auth_test(token=user_token)
             authorize_result = AuthorizeResult.from_auth_test_response(
                 auth_test_response=auth_test_api_response,
                 user_auth_test_response=user_auth_test_response,

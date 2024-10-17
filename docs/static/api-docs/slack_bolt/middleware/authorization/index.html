@@ -195,7 +195,7 @@ hljs.highlightAll();
                 req.context[&#34;token&#34;] = token
                 # As App#_init_context() generates a new WebClient for this request,
                 # it&#39;s safe to modify this instance.
-                req.context.client.token = token  # type: ignore[union-attr]
+                req.context.client.token = token
                 return next()
             else:
                 # This situation can arise if:
@@ -288,6 +288,7 @@ hljs.highlightAll();
         # only the internals of this method
         next: Callable[[], BoltResponse],
     ) -&gt; BoltResponse:
+
         if _is_no_auth_required(req):
             return next()
 
@@ -303,13 +304,13 @@ hljs.highlightAll();
 
         try:
             if not self.auth_test_result:
-                self.auth_test_result = req.context.client.auth_test()  # type: ignore[union-attr]
+                self.auth_test_result = req.context.client.auth_test()
 
             if self.auth_test_result:
                 req.context.set_authorize_result(
                     _to_authorize_result(
                         auth_test_result=self.auth_test_result,
-                        token=req.context.client.token,  # type: ignore[union-attr]
+                        token=req.context.client.token,
                         request_user_id=req.context.user_id,
                     )
                 )

@@ -37,7 +37,7 @@ hljs.highlightAll();
 <dl>
 <dt id="slack_bolt.workflows.step.async_step_middleware.AsyncWorkflowStepMiddleware"><code class="flex name class">
 <span>class <span class="ident">AsyncWorkflowStepMiddleware</span></span>
-<span>(</span><span>step: <a title="slack_bolt.workflows.step.async_step.AsyncWorkflowStep" href="async_step.html#slack_bolt.workflows.step.async_step.AsyncWorkflowStep">AsyncWorkflowStep</a>, listener_runner: <a title="slack_bolt.listener.asyncio_runner.AsyncioListenerRunner" href="../../listener/asyncio_runner.html#slack_bolt.listener.asyncio_runner.AsyncioListenerRunner">AsyncioListenerRunner</a>)</span>
+<span>(</span><span>step: <a title="slack_bolt.workflows.step.async_step.AsyncWorkflowStep" href="async_step.html#slack_bolt.workflows.step.async_step.AsyncWorkflowStep">AsyncWorkflowStep</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Base middleware for step from app specific ones</p></div>
@@ -48,9 +48,8 @@ hljs.highlightAll();
 <pre><code class="python">class AsyncWorkflowStepMiddleware(AsyncMiddleware):
     &#34;&#34;&#34;Base middleware for step from app specific ones&#34;&#34;&#34;
 
-    def __init__(self, step: AsyncWorkflowStep, listener_runner: AsyncioListenerRunner):
+    def __init__(self, step: AsyncWorkflowStep):
         self.step = step
-        self.listener_runner = listener_runner
 
     async def async_process(
         self,
@@ -75,8 +74,8 @@ hljs.highlightAll();
 
         return await next()
 
+    @staticmethod
     async def _run(
-        self,
         listener: AsyncListener,
         req: AsyncBoltRequest,
         resp: BoltResponse,
@@ -85,7 +84,7 @@ hljs.highlightAll();
         if next_was_not_called:
             return None
 
-        return await self.listener_runner.run(
+        return await req.context.listener_runner.run(
             request=req,
             response=resp,
             listener_name=get_name_for_callable(listener.ack_function),

@@ -37,7 +37,7 @@ hljs.highlightAll();
 <dl>
 <dt id="slack_bolt.middleware.ignoring_self_events.async_ignoring_self_events.AsyncIgnoringSelfEvents"><code class="flex name class">
 <span>class <span class="ident">AsyncIgnoringSelfEvents</span></span>
-<span>(</span><span>base_logger: Optional[logging.Logger] = None)</span>
+<span>(</span><span>base_logger: Optional[logging.Logger] = None, ignoring_self_assistant_message_events_enabled: bool = True)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
@@ -58,6 +58,11 @@ hljs.highlightAll();
         # message events can have $.event.bot_id while it does not have its user_id
         bot_id = req.body.get(&#34;event&#34;, {}).get(&#34;bot_id&#34;)
         if self._is_self_event(auth_result, req.context.user_id, bot_id, req.body):  # type: ignore[arg-type]
+            if self.ignoring_self_assistant_message_events_enabled is False:
+                if is_bot_message_event_in_assistant_thread(req.body):
+                    # Assistant#bot_message handler acknowledges this pattern
+                    return await next()
+
             self._debug_log(req.body)
             return await req.context.ack()
         else:

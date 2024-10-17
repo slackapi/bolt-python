@@ -48,7 +48,7 @@ hljs.highlightAll();
 <pre><code class="python">class BaseContext(dict):
     &#34;&#34;&#34;Context object associated with a request from Slack.&#34;&#34;&#34;
 
-    standard_property_names = [
+    copyable_standard_property_names = [
         &#34;logger&#34;,
         &#34;token&#34;,
         &#34;enterprise_id&#34;,
@@ -59,6 +59,7 @@ hljs.highlightAll();
         &#34;actor_team_id&#34;,
         &#34;actor_user_id&#34;,
         &#34;channel_id&#34;,
+        &#34;thread_ts&#34;,
         &#34;response_url&#34;,
         &#34;matches&#34;,
         &#34;authorize_result&#34;,
@@ -75,7 +76,21 @@ hljs.highlightAll();
         &#34;respond&#34;,
         &#34;complete&#34;,
         &#34;fail&#34;,
+        &#34;set_status&#34;,
+        &#34;set_title&#34;,
+        &#34;set_suggested_prompts&#34;,
     ]
+    # Note that these items are not copyable, so when you add new items to this list,
+    # you must modify ThreadListenerRunner/AsyncioListenerRunner&#39;s _build_lazy_request method to pass the values.
+    # Other listener runners do not require the change because they invoke a lazy listener over the network,
+    # meaning that the context initialization would be done again.
+    non_copyable_standard_property_names = [
+        &#34;listener_runner&#34;,
+        &#34;get_thread_context&#34;,
+        &#34;save_thread_context&#34;,
+    ]
+
+    standard_property_names = copyable_standard_property_names + non_copyable_standard_property_names
 
     @property
     def logger(self) -&gt; Logger:
@@ -135,6 +150,11 @@ hljs.highlightAll();
     def channel_id(self) -&gt; Optional[str]:
         &#34;&#34;&#34;The conversation ID associated with this request.&#34;&#34;&#34;
         return self.get(&#34;channel_id&#34;)
+
+    @property
+    def thread_ts(self) -&gt; Optional[str]:
+        &#34;&#34;&#34;The conversation thread&#39;s ID associated with this request.&#34;&#34;&#34;
+        return self.get(&#34;thread_ts&#34;)
 
     @property
     def response_url(self) -&gt; Optional[str]:
@@ -218,6 +238,14 @@ hljs.highlightAll();
 </ul>
 <h3>Class variables</h3>
 <dl>
+<dt id="slack_bolt.context.base_context.BaseContext.copyable_standard_property_names"><code class="name">var <span class="ident">copyable_standard_property_names</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.context.base_context.BaseContext.non_copyable_standard_property_names"><code class="name">var <span class="ident">non_copyable_standard_property_names</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="slack_bolt.context.base_context.BaseContext.standard_property_names"><code class="name">var <span class="ident">standard_property_names</span></code></dt>
 <dd>
 <div class="desc"></div>
@@ -470,6 +498,19 @@ def team_id(self) -&gt; Optional[str]:
     return self.get(&#34;team_id&#34;)</code></pre>
 </details>
 </dd>
+<dt id="slack_bolt.context.base_context.BaseContext.thread_ts"><code class="name">prop <span class="ident">thread_ts</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"><p>The conversation thread's ID associated with this request.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def thread_ts(self) -&gt; Optional[str]:
+    &#34;&#34;&#34;The conversation thread&#39;s ID associated with this request.&#34;&#34;&#34;
+    return self.get(&#34;thread_ts&#34;)</code></pre>
+</details>
+</dd>
 <dt id="slack_bolt.context.base_context.BaseContext.token"><code class="name">prop <span class="ident">token</span> : Optional[str]</code></dt>
 <dd>
 <div class="desc"><p>The (bot/user) token resolved for this request.</p></div>
@@ -546,6 +587,7 @@ def user_token(self) -&gt; Optional[str]:
 <li><code><a title="slack_bolt.context.base_context.BaseContext.bot_token" href="#slack_bolt.context.base_context.BaseContext.bot_token">bot_token</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.bot_user_id" href="#slack_bolt.context.base_context.BaseContext.bot_user_id">bot_user_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.channel_id" href="#slack_bolt.context.base_context.BaseContext.channel_id">channel_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.copyable_standard_property_names" href="#slack_bolt.context.base_context.BaseContext.copyable_standard_property_names">copyable_standard_property_names</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.enterprise_id" href="#slack_bolt.context.base_context.BaseContext.enterprise_id">enterprise_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.function_bot_access_token" href="#slack_bolt.context.base_context.BaseContext.function_bot_access_token">function_bot_access_token</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.function_execution_id" href="#slack_bolt.context.base_context.BaseContext.function_execution_id">function_execution_id</a></code></li>
@@ -553,10 +595,12 @@ def user_token(self) -&gt; Optional[str]:
 <li><code><a title="slack_bolt.context.base_context.BaseContext.is_enterprise_install" href="#slack_bolt.context.base_context.BaseContext.is_enterprise_install">is_enterprise_install</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.logger" href="#slack_bolt.context.base_context.BaseContext.logger">logger</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.matches" href="#slack_bolt.context.base_context.BaseContext.matches">matches</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.non_copyable_standard_property_names" href="#slack_bolt.context.base_context.BaseContext.non_copyable_standard_property_names">non_copyable_standard_property_names</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.response_url" href="#slack_bolt.context.base_context.BaseContext.response_url">response_url</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.set_authorize_result" href="#slack_bolt.context.base_context.BaseContext.set_authorize_result">set_authorize_result</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.standard_property_names" href="#slack_bolt.context.base_context.BaseContext.standard_property_names">standard_property_names</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.team_id" href="#slack_bolt.context.base_context.BaseContext.team_id">team_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.thread_ts" href="#slack_bolt.context.base_context.BaseContext.thread_ts">thread_ts</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.token" href="#slack_bolt.context.base_context.BaseContext.token">token</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.user_id" href="#slack_bolt.context.base_context.BaseContext.user_id">user_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.user_token" href="#slack_bolt.context.base_context.BaseContext.user_token">user_token</a></code></li>

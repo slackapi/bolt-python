@@ -37,7 +37,7 @@ hljs.highlightAll();
 <dl>
 <dt id="slack_bolt.context.say.say.Say"><code class="flex name class">
 <span>class <span class="ident">Say</span></span>
-<span>(</span><span>client: Optional[slack_sdk.web.client.WebClient], channel: Optional[str])</span>
+<span>(</span><span>client: Optional[slack_sdk.web.client.WebClient], channel: Optional[str], thread_ts: Optional[str] = None, metadata: Union[Dict, slack_sdk.models.metadata.Metadata, ForwardRef(None)] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -48,14 +48,20 @@ hljs.highlightAll();
 <pre><code class="python">class Say:
     client: Optional[WebClient]
     channel: Optional[str]
+    thread_ts: Optional[str]
+    metadata: Optional[Union[Dict, Metadata]]
 
     def __init__(
         self,
         client: Optional[WebClient],
         channel: Optional[str],
+        thread_ts: Optional[str] = None,
+        metadata: Optional[Union[Dict, Metadata]] = None,
     ):
         self.client = client
         self.channel = channel
+        self.thread_ts = thread_ts
+        self.metadata = metadata
 
     def __call__(
         self,
@@ -87,7 +93,7 @@ hljs.highlightAll();
                     blocks=blocks,
                     attachments=attachments,
                     as_user=as_user,
-                    thread_ts=thread_ts,
+                    thread_ts=thread_ts or self.thread_ts,
                     reply_broadcast=reply_broadcast,
                     unfurl_links=unfurl_links,
                     unfurl_media=unfurl_media,
@@ -97,13 +103,17 @@ hljs.highlightAll();
                     mrkdwn=mrkdwn,
                     link_names=link_names,
                     parse=parse,
-                    metadata=metadata,
+                    metadata=metadata or self.metadata,
                     **kwargs,
                 )
             elif isinstance(text_or_whole_response, dict):
                 message: dict = create_copy(text_or_whole_response)
                 if &#34;channel&#34; not in message:
                     message[&#34;channel&#34;] = channel or self.channel
+                if &#34;thread_ts&#34; not in message:
+                    message[&#34;thread_ts&#34;] = thread_ts or self.thread_ts
+                if &#34;metadata&#34; not in message:
+                    message[&#34;metadata&#34;] = metadata or self.metadata
                 return self.client.chat_postMessage(**message)  # type: ignore[union-attr]
             else:
                 raise ValueError(f&#34;The arg is unexpected type ({type(text_or_whole_response)})&#34;)
@@ -117,6 +127,14 @@ hljs.highlightAll();
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.context.say.say.Say.client"><code class="name">var <span class="ident">client</span> : Optional[slack_sdk.web.client.WebClient]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.context.say.say.Say.metadata"><code class="name">var <span class="ident">metadata</span> : Union[Dict, slack_sdk.models.metadata.Metadata, ForwardRef(None)]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.context.say.say.Say.thread_ts"><code class="name">var <span class="ident">thread_ts</span> : Optional[str]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -142,6 +160,8 @@ hljs.highlightAll();
 <ul class="">
 <li><code><a title="slack_bolt.context.say.say.Say.channel" href="#slack_bolt.context.say.say.Say.channel">channel</a></code></li>
 <li><code><a title="slack_bolt.context.say.say.Say.client" href="#slack_bolt.context.say.say.Say.client">client</a></code></li>
+<li><code><a title="slack_bolt.context.say.say.Say.metadata" href="#slack_bolt.context.say.say.Say.metadata">metadata</a></code></li>
+<li><code><a title="slack_bolt.context.say.say.Say.thread_ts" href="#slack_bolt.context.say.say.Say.thread_ts">thread_ts</a></code></li>
 </ul>
 </li>
 </ul>

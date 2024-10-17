@@ -54,7 +54,7 @@ hljs.highlightAll();
         next: Callable[[], Awaitable[BoltResponse]],
     ) -&gt; BoltResponse:
         if req.context.function_bot_access_token is not None:
-            req.context.client.token = req.context.function_bot_access_token  # type: ignore[union-attr]
+            req.context.client.token = req.context.function_bot_access_token
 
         return await next()</code></pre>
 </details>
@@ -74,7 +74,7 @@ hljs.highlightAll();
 </dd>
 <dt id="slack_bolt.middleware.async_builtins.AsyncIgnoringSelfEvents"><code class="flex name class">
 <span>class <span class="ident">AsyncIgnoringSelfEvents</span></span>
-<span>(</span><span>base_logger: Optional[logging.Logger] = None)</span>
+<span>(</span><span>base_logger: Optional[logging.Logger] = None, ignoring_self_assistant_message_events_enabled: bool = True)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
@@ -95,6 +95,11 @@ hljs.highlightAll();
         # message events can have $.event.bot_id while it does not have its user_id
         bot_id = req.body.get(&#34;event&#34;, {}).get(&#34;bot_id&#34;)
         if self._is_self_event(auth_result, req.context.user_id, bot_id, req.body):  # type: ignore[arg-type]
+            if self.ignoring_self_assistant_message_events_enabled is False:
+                if is_bot_message_event_in_assistant_thread(req.body):
+                    # Assistant#bot_message handler acknowledges this pattern
+                    return await next()
+
             self._debug_log(req.body)
             return await req.context.ack()
         else:
@@ -291,6 +296,17 @@ Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://ap
 <li><a title="slack_bolt.middleware.middleware.Middleware" href="middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a></li>
 <li><a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a></li>
 </ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.middleware.async_builtins.AsyncSslCheck.logger"><code class="name">var <span class="ident">logger</span> : logging.Logger</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.middleware.async_builtins.AsyncSslCheck.verification_token"><code class="name">var <span class="ident">verification_token</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 <h3>Inherited members</h3>
 <ul class="hlist">
 <li><code><b><a title="slack_bolt.middleware.ssl_check.ssl_check.SslCheck" href="ssl_check/ssl_check.html#slack_bolt.middleware.ssl_check.ssl_check.SslCheck">SslCheck</a></b></code>:
@@ -389,6 +405,10 @@ Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://ap
 </li>
 <li>
 <h4><code><a title="slack_bolt.middleware.async_builtins.AsyncSslCheck" href="#slack_bolt.middleware.async_builtins.AsyncSslCheck">AsyncSslCheck</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.middleware.async_builtins.AsyncSslCheck.logger" href="#slack_bolt.middleware.async_builtins.AsyncSslCheck.logger">logger</a></code></li>
+<li><code><a title="slack_bolt.middleware.async_builtins.AsyncSslCheck.verification_token" href="#slack_bolt.middleware.async_builtins.AsyncSslCheck.verification_token">verification_token</a></code></li>
+</ul>
 </li>
 <li>
 <h4><code><a title="slack_bolt.middleware.async_builtins.AsyncUrlVerification" href="#slack_bolt.middleware.async_builtins.AsyncUrlVerification">AsyncUrlVerification</a></code></h4>
