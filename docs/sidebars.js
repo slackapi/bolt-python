@@ -29,6 +29,7 @@ const sidebars = {
       type: 'category',
       label: 'Basic concepts',
       items: [
+        'basic/assistant',
         'basic/message-listening',
         'basic/message-sending',
         'basic/event-listening',
