@@ -97,6 +97,11 @@ class TestAsyncEventsAssistant:
         assert response.status == 200
         await assert_target_called()
 
+        request = AsyncBoltRequest(body=user_message_event_body_with_assistant_thread, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_target_called()
+
         request = AsyncBoltRequest(body=message_changed_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
@@ -174,6 +179,26 @@ user_message_event_body = build_payload(
         "channel": "D111",
         "event_ts": "1726133700.887259",
         "channel_type": "im",
+    }
+)
+
+
+user_message_event_body_with_assistant_thread = build_payload(
+    {
+        "user": "W222",
+        "type": "message",
+        "ts": "1726133700.887259",
+        "text": "When Slack was released?",
+        "team": "T111",
+        "user_team": "T111",
+        "source_team": "T222",
+        "user_profile": {},
+        "thread_ts": "1726133698.626339",
+        "parent_user_id": "W222",
+        "channel": "D111",
+        "event_ts": "1726133700.887259",
+        "channel_type": "im",
+        "assistant_thread": {"XXX": "YYY"},
     }
 )
 

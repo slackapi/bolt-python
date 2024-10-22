@@ -7,6 +7,7 @@ from slack_bolt.context.assistant.thread_context_store.default_store import Defa
 
 from slack_bolt.context.context import BoltContext
 from slack_bolt.context.say import Say
+from .internals import has_channel_id_and_thread_ts
 from ..get_thread_context.get_thread_context import GetThreadContext
 from ..save_thread_context import SaveThreadContext
 from ..set_status import SetStatus
@@ -32,7 +33,7 @@ class AssistantUtilities:
         self.client = context.client
         self.thread_context_store = thread_context_store or DefaultAssistantThreadContextStore(context)
 
-        if self.payload.get("assistant_thread") is not None:
+        if has_channel_id_and_thread_ts(self.payload):
             # assistant_thread_started
             thread = self.payload["assistant_thread"]
             self.channel_id = thread["channel_id"]
