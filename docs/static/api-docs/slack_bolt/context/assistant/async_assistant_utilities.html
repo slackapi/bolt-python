@@ -63,7 +63,7 @@ hljs.highlightAll();
         self.client = context.client
         self.thread_context_store = thread_context_store or DefaultAsyncAssistantThreadContextStore(context)
 
-        if self.payload.get(&#34;assistant_thread&#34;) is not None:
+        if has_channel_id_and_thread_ts(self.payload):
             # assistant_thread_started
             thread = self.payload[&#34;assistant_thread&#34;]
             self.channel_id = thread[&#34;channel_id&#34;]

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.1">
-<title>slack_bolt.context.assistant API documentation</title>
+<title>slack_bolt.context.assistant.internals API documentation</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
@@ -22,38 +22,25 @@ hljs.highlightAll();
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>slack_bolt.context.assistant</code></h1>
+<h1 class="title">Module <code>slack_bolt.context.assistant.internals</code></h1>
 </header>
 <section id="section-intro">
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt><code class="name"><a title="slack_bolt.context.assistant.assistant_utilities" href="assistant_utilities.html">slack_bolt.context.assistant.assistant_utilities</a></code></dt>
+<dt id="slack_bolt.context.assistant.internals.has_channel_id_and_thread_ts"><code class="name flex">
+<span>def <span class="ident">has_channel_id_and_thread_ts</span></span>(<span>payload: dict) ‑> bool</span>
+</code></dt>
 <dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="slack_bolt.context.assistant.async_assistant_utilities" href="async_assistant_utilities.html">slack_bolt.context.assistant.async_assistant_utilities</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="slack_bolt.context.assistant.internals" href="internals.html">slack_bolt.context.assistant.internals</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="slack_bolt.context.assistant.thread_context" href="thread_context/index.html">slack_bolt.context.assistant.thread_context</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="slack_bolt.context.assistant.thread_context_store" href="thread_context_store/index.html">slack_bolt.context.assistant.thread_context_store</a></code></dt>
-<dd>
-<div class="desc"></div>
+<div class="desc"><p>Verifies if the given payload has both channel_id and thread_ts under assistant_thread property.
+This data pattern is available for assistant_* events.</p></div>
 </dd>
 </dl>
-</section>
-<section>
-</section>
-<section>
 </section>
 <section>
 </section>
@@ -65,16 +52,12 @@ hljs.highlightAll();
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="slack_bolt.context" href="../index.html">slack_bolt.context</a></code></li>
+<li><code><a title="slack_bolt.context.assistant" href="index.html">slack_bolt.context.assistant</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
-<ul>
-<li><code><a title="slack_bolt.context.assistant.assistant_utilities" href="assistant_utilities.html">slack_bolt.context.assistant.assistant_utilities</a></code></li>
-<li><code><a title="slack_bolt.context.assistant.async_assistant_utilities" href="async_assistant_utilities.html">slack_bolt.context.assistant.async_assistant_utilities</a></code></li>
-<li><code><a title="slack_bolt.context.assistant.internals" href="internals.html">slack_bolt.context.assistant.internals</a></code></li>
-<li><code><a title="slack_bolt.context.assistant.thread_context" href="thread_context/index.html">slack_bolt.context.assistant.thread_context</a></code></li>
-<li><code><a title="slack_bolt.context.assistant.thread_context_store" href="thread_context_store/index.html">slack_bolt.context.assistant.thread_context_store</a></code></li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="slack_bolt.context.assistant.internals.has_channel_id_and_thread_ts" href="#slack_bolt.context.assistant.internals.has_channel_id_and_thread_ts">has_channel_id_and_thread_ts</a></code></li>
 </ul>
 </li>
 </ul>
