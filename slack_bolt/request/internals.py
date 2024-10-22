@@ -220,8 +220,14 @@ def extract_thread_ts(payload: Dict[str, Any]) -> Optional[str]:
     # Thus, blindly setting this thread_ts to say utility can break existing apps' behaviors.
     if is_assistant_event(payload):
         event = payload["event"]
-        if event.get("assistant_thread") is not None:
+        if (
+            event.get("assistant_thread") is not None
+            and event["assistant_thread"].get("channel_id") is not None
+            and event["assistant_thread"].get("thread_ts") is not None
+        ):
             # assistant_thread_started, assistant_thread_context_changed
+            # "assistant_thread" property can exist for message event without channel_id and thread_ts
+            # Thus, the above if check verifies these properties exist
             return event["assistant_thread"]["thread_ts"]
         elif event.get("channel") is not None:
             if event.get("thread_ts") is not None:
