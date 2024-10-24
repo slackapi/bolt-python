@@ -1,4 +1,4 @@
-from typing import Optional, Union, Dict, Sequence
+from typing import Optional, Union, Dict, Sequence, Callable
 
 from slack_sdk import WebClient
 from slack_sdk.models.attachments import Attachment
@@ -15,6 +15,7 @@ class Say:
     channel: Optional[str]
     thread_ts: Optional[str]
     metadata: Optional[Union[Dict, Metadata]]
+    build_metadata: Optional[Callable[[], Union[Dict, Metadata]]]
 
     def __init__(
         self,
@@ -22,11 +23,13 @@ class Say:
         channel: Optional[str],
         thread_ts: Optional[str] = None,
         metadata: Optional[Union[Dict, Metadata]] = None,
+        build_metadata: Optional[Callable[[], Union[Dict, Metadata]]] = None,
     ):
         self.client = client
         self.channel = channel
         self.thread_ts = thread_ts
         self.metadata = metadata
+        self.build_metadata = build_metadata
 
     def __call__(
         self,
@@ -52,6 +55,8 @@ class Say:
             text_or_whole_response: Union[str, dict] = text
             if isinstance(text_or_whole_response, str):
                 text = text_or_whole_response
+                if metadata is None:
+                    metadata = self.build_metadata() if self.build_metadata is not None else self.metadata
                 return self.client.chat_postMessage(  # type: ignore[union-attr]
                     channel=channel or self.channel,  # type: ignore[arg-type]
                     text=text,
@@ -68,7 +73,7 @@ class Say:
                     mrkdwn=mrkdwn,
                     link_names=link_names,
                     parse=parse,
-                    metadata=metadata or self.metadata,
+                    metadata=metadata,
                     **kwargs,
                 )
             elif isinstance(text_or_whole_response, dict):
@@ -78,7 +83,8 @@ class Say:
                 if "thread_ts" not in message:
                     message["thread_ts"] = thread_ts or self.thread_ts
                 if "metadata" not in message:
-                    message["metadata"] = metadata or self.metadata
+                    metadata = self.build_metadata() if self.build_metadata is not None else self.metadata
+                    message["metadata"] = metadata
                 return self.client.chat_postMessage(**message)  # type: ignore[union-attr]
             else:
                 raise ValueError(f"The arg is unexpected type ({type(text_or_whole_response)})")
