@@ -63,14 +63,17 @@ class AssistantUtilities:
 
     @property
     def say(self) -> Say:
+        def build_metadata() -> Optional[dict]:
+            thread_context = self.get_thread_context()
+            if thread_context is not None:
+                return {"event_type": "assistant_thread_context", "event_payload": thread_context}
+            return None
+
         return Say(
             self.client,
             channel=self.channel_id,
             thread_ts=self.thread_ts,
-            metadata={
-                "event_type": "assistant_thread_context",
-                "event_payload": self.get_thread_context(),
-            },
+            build_metadata=build_metadata,
         )
 
     @property
