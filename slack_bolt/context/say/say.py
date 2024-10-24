@@ -15,7 +15,7 @@ class Say:
     channel: Optional[str]
     thread_ts: Optional[str]
     metadata: Optional[Union[Dict, Metadata]]
-    build_metadata: Optional[Callable[[], Union[Dict, Metadata]]]
+    build_metadata: Optional[Callable[[], Optional[Union[Dict, Metadata]]]]
 
     def __init__(
         self,
@@ -23,7 +23,7 @@ class Say:
         channel: Optional[str],
         thread_ts: Optional[str] = None,
         metadata: Optional[Union[Dict, Metadata]] = None,
-        build_metadata: Optional[Callable[[], Union[Dict, Metadata]]] = None,
+        build_metadata: Optional[Callable[[], Optional[Union[Dict, Metadata]]]] = None,
     ):
         self.client = client
         self.channel = channel
