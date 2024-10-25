@@ -93,14 +93,17 @@ hljs.highlightAll();
 
     @property
     def say(self) -&gt; Say:
+        def build_metadata() -&gt; Optional[dict]:
+            thread_context = self.get_thread_context()
+            if thread_context is not None:
+                return {&#34;event_type&#34;: &#34;assistant_thread_context&#34;, &#34;event_payload&#34;: thread_context}
+            return None
+
         return Say(
             self.client,
             channel=self.channel_id,
             thread_ts=self.thread_ts,
-            metadata={
-                &#34;event_type&#34;: &#34;assistant_thread_context&#34;,
-                &#34;event_payload&#34;: self.get_thread_context(),
-            },
+            build_metadata=build_metadata,
         )
 
     @property
@@ -169,14 +172,17 @@ def save_thread_context(self) -&gt; SaveThreadContext:
 </summary>
 <pre><code class="python">@property
 def say(self) -&gt; Say:
+    def build_metadata() -&gt; Optional[dict]:
+        thread_context = self.get_thread_context()
+        if thread_context is not None:
+            return {&#34;event_type&#34;: &#34;assistant_thread_context&#34;, &#34;event_payload&#34;: thread_context}
+        return None
+
     return Say(
         self.client,
         channel=self.channel_id,
         thread_ts=self.thread_ts,
-        metadata={
-            &#34;event_type&#34;: &#34;assistant_thread_context&#34;,
-            &#34;event_payload&#34;: self.get_thread_context(),
-        },
+        build_metadata=build_metadata,
     )</code></pre>
 </details>
 </dd>
