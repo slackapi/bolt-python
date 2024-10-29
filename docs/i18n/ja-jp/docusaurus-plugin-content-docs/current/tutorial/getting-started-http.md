@@ -97,7 +97,6 @@ export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 
 > 🔒 全てのトークンは安全に保管してください。最低限、パブリックなバージョンコントロールにチェックインすることは避けてください。また、上記の例のように環境変数を介してアクセスするようにしてください。詳細な情報は [best practices for app security](https://api.slack.com/authentication/best-practices).のドキュメントを参照してください。
 
-
 完了したら、アプリを作ってみましょう。以下のコマンドを使って、仮想環境に Python の `slack_bolt` パッケージをインストールします。
 
 ```shell

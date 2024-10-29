@@ -1,9 +1,3 @@
-// @ts-check
-// `@type` JSDoc annotations allow editor autocompletion and type checking
-// (when paired with `@ts-check`).
-// There are various equivalent ways to declare your Docusaurus config.
-// See: https://docusaurus.io/docs/api/docusaurus-config
-
 import { themes as prismThemes } from "prism-react-renderer";
 
 /** @type {import('@docusaurus/types').Config} */
@@ -57,11 +51,28 @@ const config = {
         redirects: [
           {
             to: "/getting-started",
-            from: ["/tutorial/getting-started"],
+            from: ["/tutorial/getting-started", "/tutorial/getting-started-http"],
           },
           {
             to: "/",
             from: ["/concepts", "/concepts/basic", "/concepts/advanced"],
+          },
+          {
+            to: '/concepts/actions',
+            from: [
+              '/concepts/action-listening',
+              '/concepts/action-responding'
+            ],
+          },
+          {
+            to: '/legacy/steps-from-apps',
+            from: [
+              '/concepts/steps',
+              '/concepts/creating-steps',
+              '/concepts/adding-editing-steps',
+              '/concepts/saving-steps',
+              '/concepts/executing-steps'
+            ],
           },
         ],
       },

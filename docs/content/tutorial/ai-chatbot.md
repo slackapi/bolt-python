@@ -12,7 +12,7 @@ In this tutorial, you'll learn how to bring the power of AI into your Slack work
 
 Before getting started, you will need the following:
 
-* a development workspace where you have permissions to install apps. If you don’t have a workspace, go ahead and set that up now&mdash;you can [go here](https://slack.com/get-started#create) to create one, or you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
+* a development workspace where you have permissions to install apps. If you don’t have a workspace, go ahead and set that up now — you can [go here](https://slack.com/get-started#create) to create one, or you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
 * a development environment with [Python 3.6](https://www.python.org/downloads/) or later.
 * an Anthropic or OpenAI account with sufficient credits, and in which you have generated a secret key.
 
@@ -144,7 +144,7 @@ When finished, click **Finish Up**, then click **Publish** to make the workflow 
 
 In order for Bolty to provide summaries of recent conversation in a channel, Bolty _must_ be a member of that channel. 
 
-1. Invite Bolty to a channel that you are able to leave and rejoin (for example, not the **#general** channel or a private channel someone else created) by mentioning the app in the channel&mdash;i.e., tagging **@Bolty** in the channel and sending your message.
+1. Invite Bolty to a channel that you are able to leave and rejoin (for example, not the **#general** channel or a private channel someone else created) by mentioning the app in the channel — i.e., tagging **@Bolty** in the channel and sending your message.
 2. Slackbot will prompt you to either invite Bolty to the channel, or do nothing. Click **Invite Them**. Now when new users join the channel, the workflow you just created will be kicked off.
 
 To test this, leave the channel you just invited Bolty to and rejoin it. This will kick off your workflow and you'll receive a direct message from **Welcome to the channel**. Click the **Yes, give me a summary** button, and Bolty will summarize the recent conversations in the channel you joined.
@@ -166,7 +166,6 @@ Handles the event to summarize a Slack channel's conversation history.
 It retrieves the conversation history, parses it, generates a summary using an AI response,
 and completes the workflow with the summary or fails if an error occurs.
 """
-
 
 def handle_summary_function_callback(
     ack: Ack, inputs: dict, fail: Fail, logger: Logger, client: WebClient, complete: Complete
