@@ -32,7 +32,8 @@ website/
 │   └── theme/ (only contains the 404 page)
 ├── docusaurus.config.js (main config file)
 ├── footerConfig.js (footer. go to main repo to change)
-├── navbarConfig.js (navbar. go to main repo to change)└── sidebar.js (manually set where the docs are in the sidebar.)
+├── navbarConfig.js (navbar. go to main repo to change)
+└── sidebar.js (manually set where the docs are in the sidebar.)
 ```
 
 A cheat-sheet:
