@@ -1,7 +1,7 @@
 from datetime import datetime
 from http import HTTPStatus
 
-from falcon import Request, Response, version as falcon_version  # type: ignore[import-untyped]
+from falcon import Request, Response, version as falcon_version
 
 from slack_bolt import BoltResponse
 from slack_bolt.app import App
@@ -35,7 +35,8 @@ class SlackAppResource:
                 return
 
         resp.status = "404"
-        resp.body = "The page is not found..."
+        # Falcon 4.x w/ mypy fails to correctly infer the str type here
+        resp.body = "The page is not found..."  # type: ignore[assignment]
 
     def on_post(self, req: Request, resp: Response):
         bolt_req = self._to_bolt_request(req)
@@ -51,7 +52,8 @@ class SlackAppResource:
 
     def _write_response(self, bolt_resp: BoltResponse, resp: Response):
         if falcon_version.__version__.startswith("2."):
-            resp.body = bolt_resp.body
+            # Falcon 4.x w/ mypy fails to correctly infer the str type here
+            resp.body = bolt_resp.body  # type: ignore[assignment]
         else:
             resp.text = bolt_resp.body
 
