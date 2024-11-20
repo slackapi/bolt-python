@@ -4,6 +4,7 @@ import os
 from logging import Logger
 from time import time
 from typing import Optional
+from asyncio import AbstractEventLoop
 
 from slack_sdk.socket_mode.aiohttp import SocketModeClient
 from slack_sdk.socket_mode.request import SocketModeRequest
@@ -74,6 +75,7 @@ class AsyncSocketModeHandler(AsyncBaseSocketModeHandler):
         web_client: Optional[AsyncWebClient] = None,
         proxy: Optional[str] = None,
         ping_interval: float = 10,
+        loop: Optional[AbstractEventLoop] = None,
     ):
         self.app = app
         self.app_token = app_token or os.environ["SLACK_APP_TOKEN"]
@@ -83,6 +85,7 @@ class AsyncSocketModeHandler(AsyncBaseSocketModeHandler):
             web_client=web_client if web_client is not None else app.client,
             proxy=proxy,
             ping_interval=ping_interval,
+            loop=loop,
         )
         self.client.socket_mode_request_listeners.append(self.handle)  # type: ignore[arg-type]
 
