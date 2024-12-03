@@ -83,7 +83,8 @@ const sidebars = {
       label: 'Tutorials',
       items: [
         'tutorial/getting-started-http',
-        'tutorial/ai-chatbot'
+        'tutorial/ai-chatbot',
+        `tutorial/custom-steps`
       ],
     },
     { type: 'html', value: '<hr>' },
