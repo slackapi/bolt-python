@@ -24,7 +24,9 @@ def to_async_bolt_request(req: Request, addition_context_properties: Optional[Di
 
 
 def to_sanic_response(bolt_resp: BoltResponse) -> HTTPResponse:
-
+    """
+    Converts a BoltResponse to a Sanic HTTPResponse, ensuring compatibility with Sanic's add_cookie method.
+    """
     # Create the HTTPResponse with BoltResponse attributes
     resp = HTTPResponse(
         status=bolt_resp.status,
@@ -42,13 +44,17 @@ def to_sanic_response(bolt_resp: BoltResponse) -> HTTPResponse:
             # Convert "max-age" if provided
             max_age = int(c["max-age"]) if c.get("max-age") else None
 
+            # Ensure values are of the correct type before passing to add_cookie
+            path = str(c.get("path")) if c.get("path") else "/"
+            domain = str(c.get("domain")) if c.get("domain") else None
+
             # Add cookie with Sanic's add_cookie method
             resp.add_cookie(
                 key=key,
                 value=c.value,
                 expires=expires,
-                path=c.get("path"),
-                domain=c.get("domain"),
+                path=path,
+                domain=domain,
                 max_age=max_age,
                 secure=True,
                 httponly=True,
