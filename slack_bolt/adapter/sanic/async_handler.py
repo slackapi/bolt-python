@@ -24,24 +24,36 @@ def to_async_bolt_request(req: Request, addition_context_properties: Optional[Di
 
 
 def to_sanic_response(bolt_resp: BoltResponse) -> HTTPResponse:
+
+    # Create the HTTPResponse with BoltResponse attributes
     resp = HTTPResponse(
         status=bolt_resp.status,
         body=bolt_resp.body,
         headers=bolt_resp.first_headers_without_set_cookie(),
     )
+
+    # Iterate over cookies and add them using Sanic's add_cookie method
     for cookie in bolt_resp.cookies():
-        for name, c in cookie.items():
-            resp.cookies[name] = c.value
+        for key, c in cookie.items():
+            # Convert "expires" field if provided
             expire_value = c.get("expires")
-            if expire_value is not None and expire_value != "":
-                expire = datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z")
-                resp.cookies[name]["expires"] = expire
-            resp.cookies[name]["path"] = c.get("path")
-            resp.cookies[name]["domain"] = c.get("domain")
-            if c.get("max-age") is not None and len(c.get("max-age")) > 0:  # type: ignore[arg-type]
-                resp.cookies[name]["max-age"] = int(c.get("max-age"))  # type: ignore[arg-type]
-            resp.cookies[name]["secure"] = True
-            resp.cookies[name]["httponly"] = True
+            expires = datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z") if expire_value else None
+
+            # Convert "max-age" if provided
+            max_age = int(c["max-age"]) if c.get("max-age") else None
+
+            # Add cookie with Sanic's add_cookie method
+            resp.add_cookie(
+                key=key,
+                value=c.value,
+                expires=expires,
+                path=c.get("path"),
+                domain=c.get("domain"),
+                max_age=max_age,
+                secure=True,
+                httponly=True,
+            )
+
     return resp
 
 
