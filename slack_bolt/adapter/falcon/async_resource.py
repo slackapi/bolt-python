@@ -1,8 +1,8 @@
 from datetime import datetime
 from http import HTTPStatus
 
-from falcon import version as falcon_version  # type: ignore[import-untyped]
-from falcon.asgi import Request, Response  # type: ignore[import-untyped]
+from falcon import version as falcon_version
+from falcon.asgi import Request, Response
 from slack_bolt import BoltResponse
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.error import BoltError
@@ -41,7 +41,8 @@ class AsyncSlackAppResource:
                 return
 
         resp.status = "404"
-        resp.body = "The page is not found..."
+        # Falcon 4.x w/ mypy fails to correctly infer the str type here
+        resp.body = "The page is not found..."  # type: ignore[assignment]
 
     async def on_post(self, req: Request, resp: Response):
         bolt_req = await self._to_bolt_request(req)

@@ -1,3 +1,3 @@
 # pip install -r requirements/testing_without_asyncio.txt
 pytest>=6.2.5,<8.4        # https://github.com/tornadoweb/tornado/issues/3375
-pytest-cov>=3,<6
+pytest-cov>=3,<7
