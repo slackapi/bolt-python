@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-<meta name="generator" content="pdoc3 0.11.1">
+<meta name="generator" content="pdoc3 0.11.3">
 <title>slack_bolt.kwargs_injection API documentation</title>
 <meta name="description" content="For middleware/listener arguments, Bolt does flexible data injection in accordance with their names …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
@@ -56,7 +56,7 @@ For steps from apps, checking <code><a title="slack_bolt.workflows.step.utilitie
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="slack_bolt.kwargs_injection.build_required_kwargs"><code class="name flex">
-<span>def <span class="ident">build_required_kwargs</span></span>(<span>*, logger: logging.Logger, required_arg_names: MutableSequence[str], request: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>, response: Optional[<a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>], next_func: Optional[Callable[[], None]] = None, this_func: Optional[Callable] = None, error: Optional[Exception] = None, next_keys_required: bool = True) ‑> Dict[str, Any]</span>
+<span>def <span class="ident">build_required_kwargs</span></span>(<span>*,<br>logger: logging.Logger,<br>required_arg_names: MutableSequence[str],<br>request: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>,<br>response: <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None,<br>next_func: Callable[[], None] | None = None,<br>this_func: Callable | None = None,<br>error: Exception | None = None,<br>next_keys_required: bool = True) ‑> Dict[str, Any]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -68,7 +68,7 @@ For steps from apps, checking <code><a title="slack_bolt.workflows.step.utilitie
 <dl>
 <dt id="slack_bolt.kwargs_injection.Args"><code class="flex name class">
 <span>class <span class="ident">Args</span></span>
-<span>(</span><span>*, logger: logging.Logger, client: slack_sdk.web.client.WebClient, req: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>, resp: <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>, context: <a title="slack_bolt.context.context.BoltContext" href="../context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a>, body: Dict[str, Any], payload: Dict[str, Any], options: Optional[Dict[str, Any]] = None, shortcut: Optional[Dict[str, Any]] = None, action: Optional[Dict[str, Any]] = None, view: Optional[Dict[str, Any]] = None, command: Optional[Dict[str, Any]] = None, event: Optional[Dict[str, Any]] = None, message: Optional[Dict[str, Any]] = None, ack: <a title="slack_bolt.context.ack.ack.Ack" href="../context/ack/ack.html#slack_bolt.context.ack.ack.Ack">Ack</a>, say: <a title="slack_bolt.context.say.say.Say" href="../context/say/say.html#slack_bolt.context.say.say.Say">Say</a>, respond: <a title="slack_bolt.context.respond.respond.Respond" href="../context/respond/respond.html#slack_bolt.context.respond.respond.Respond">Respond</a>, complete: <a title="slack_bolt.context.complete.complete.Complete" href="../context/complete/complete.html#slack_bolt.context.complete.complete.Complete">Complete</a>, fail: <a title="slack_bolt.context.fail.fail.Fail" href="../context/fail/fail.html#slack_bolt.context.fail.fail.Fail">Fail</a>, set_status: Optional[<a title="slack_bolt.context.set_status.set_status.SetStatus" href="../context/set_status/set_status.html#slack_bolt.context.set_status.set_status.SetStatus">SetStatus</a>] = None, set_title: Optional[<a title="slack_bolt.context.set_title.set_title.SetTitle" href="../context/set_title/set_title.html#slack_bolt.context.set_title.set_title.SetTitle">SetTitle</a>] = None, set_suggested_prompts: Optional[<a title="slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts" href="../context/set_suggested_prompts/set_suggested_prompts.html#slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts">SetSuggestedPrompts</a>] = None, get_thread_context: Optional[<a title="slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext" href="../context/get_thread_context/get_thread_context.html#slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext">GetThreadContext</a>] = None, save_thread_context: Optional[<a title="slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext" href="../context/save_thread_context/save_thread_context.html#slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext">SaveThreadContext</a>] = None, next: Callable[[], None], **kwargs)</span>
+<span>(</span><span>*,<br>logger: logging.Logger,<br>client: slack_sdk.web.client.WebClient,<br>req: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>,<br>resp: <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>,<br>context: <a title="slack_bolt.context.context.BoltContext" href="../context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a>,<br>body: Dict[str, Any],<br>payload: Dict[str, Any],<br>options: Dict[str, Any] | None = None,<br>shortcut: Dict[str, Any] | None = None,<br>action: Dict[str, Any] | None = None,<br>view: Dict[str, Any] | None = None,<br>command: Dict[str, Any] | None = None,<br>event: Dict[str, Any] | None = None,<br>message: Dict[str, Any] | None = None,<br>ack: <a title="slack_bolt.context.ack.ack.Ack" href="../context/ack/ack.html#slack_bolt.context.ack.ack.Ack">Ack</a>,<br>say: <a title="slack_bolt.context.say.say.Say" href="../context/say/say.html#slack_bolt.context.say.say.Say">Say</a>,<br>respond: <a title="slack_bolt.context.respond.respond.Respond" href="../context/respond/respond.html#slack_bolt.context.respond.respond.Respond">Respond</a>,<br>complete: <a title="slack_bolt.context.complete.complete.Complete" href="../context/complete/complete.html#slack_bolt.context.complete.complete.Complete">Complete</a>,<br>fail: <a title="slack_bolt.context.fail.fail.Fail" href="../context/fail/fail.html#slack_bolt.context.fail.fail.Fail">Fail</a>,<br>set_status: <a title="slack_bolt.context.set_status.set_status.SetStatus" href="../context/set_status/set_status.html#slack_bolt.context.set_status.set_status.SetStatus">SetStatus</a> | None = None,<br>set_title: <a title="slack_bolt.context.set_title.set_title.SetTitle" href="../context/set_title/set_title.html#slack_bolt.context.set_title.set_title.SetTitle">SetTitle</a> | None = None,<br>set_suggested_prompts: <a title="slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts" href="../context/set_suggested_prompts/set_suggested_prompts.html#slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts">SetSuggestedPrompts</a> | None = None,<br>get_thread_context: <a title="slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext" href="../context/get_thread_context/get_thread_context.html#slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext">GetThreadContext</a> | None = None,<br>save_thread_context: <a title="slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext" href="../context/save_thread_context/save_thread_context.html#slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext">SaveThreadContext</a> | None = None,<br>next: Callable[[], None],<br>**kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>All the arguments in this class are available in any middleware / listeners.
@@ -260,7 +260,7 @@ def handle_buttons(args):
 <dd>
 <div class="desc"><p><code>ack()</code> utility function, which returns acknowledgement to the Slack servers</p></div>
 </dd>
-<dt id="slack_bolt.kwargs_injection.Args.action"><code class="name">var <span class="ident">action</span> : Optional[Dict[str, Any]]</code></dt>
+<dt id="slack_bolt.kwargs_injection.Args.action"><code class="name">var <span class="ident">action</span> : Dict[str, Any] | None</code></dt>
 <dd>
 <div class="desc"><p>An alias for payload in an <code>@app.action</code> listener</p></div>
 </dd>
@@ -272,7 +272,7 @@ def handle_buttons(args):
 <dd>
 <div class="desc"><p><code>slack_sdk.web.WebClient</code> instance with a valid token</p></div>
 </dd>
-<dt id="slack_bolt.kwargs_injection.Args.command"><code class="name">var <span class="ident">command</span> : Optional[Dict[str, Any]]</code></dt>
+<dt id="slack_bolt.kwargs_injection.Args.command"><code class="name">var <span class="ident">command</span> : Dict[str, Any] | None</code></dt>
 <dd>
 <div class="desc"><p>An alias for payload in an <code>@app.command</code> listener</p></div>
 </dd>
@@ -284,7 +284,7 @@ def handle_buttons(args):
 <dd>
 <div class="desc"><p>Context data associated with the incoming request</p></div>
 </dd>
-<dt id="slack_bolt.kwargs_injection.Args.event"><code class="name">var <span class="ident">event</span> : Optional[Dict[str, Any]]</code></dt>
+<dt id="slack_bolt.kwargs_injection.Args.event"><code class="name">var <span class="ident">event</span> : Dict[str, Any] | None</code></dt>
 <dd>
 <div class="desc"><p>An alias for payload in an <code>@app.event</code> listener</p></div>
 </dd>
@@ -292,7 +292,7 @@ def handle_buttons(args):
 <dd>
 <div class="desc"><p><code>fail()</code> utility function, signal that the custom function failed to complete</p></div>
 </dd>
-<dt id="slack_bolt.kwargs_injection.Args.get_thread_context"><code class="name">var <span class="ident">get_thread_context</span> : Optional[<a title="slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext" href="../context/get_thread_context/get_thread_context.html#slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext">GetThreadContext</a>]</code></dt>
+<dt id="slack_bolt.kwargs_injection.Args.get_thread_context"><code class="name">var <span class="ident">get_thread_context</span> : <a title="slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext" href="../context/get_thread_context/get_thread_context.html#slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext">GetThreadContext</a> | None</code></dt>
 <dd>
 <div class="desc"><p><code>get_thread_context()</code> utility function for AI Agents &amp; Assistants</p></div>
 </dd>
@@ -300,7 +300,7 @@ def handle_buttons(args):
 <dd>
 <div class="desc"><p>Logger instance</p></div>
 </dd>
-<dt id="slack_bolt.kwargs_injection.Args.message"><code class="name">var <span class="ident">message</span> : Optional[Dict[str, Any]]</code></dt>
+<dt id="slack_bolt.kwargs_injection.Args.message"><code class="name">var <span class="ident">message</span> : Dict[str, Any] | None</code></dt>
 <dd>
 <div class="desc"><p>An alias for payload in an <code>@app.message</code> listener</p></div>
 </dd>
@@ -312,7 +312,7 @@ def handle_buttons(args):
 <dd>
 <div class="desc"><p>An alias of <code>next()</code> for avoiding the Python built-in method overrides in middleware functions</p></div>
 </dd>
-<dt id="slack_bolt.kwargs_injection.Args.options"><code class="name">var <span class="ident">options</span> : Optional[Dict[str, Any]]</code></dt>
+<dt id="slack_bolt.kwargs_injection.Args.options"><code class="name">var <span class="ident">options</span> : Dict[str, Any] | None</code></dt>
 <dd>
 <div class="desc"><p>An alias for payload in an <code>@app.options</code> listener</p></div>
 </dd>
@@ -340,7 +340,7 @@ def handle_buttons(args):
 <dd>
 <div class="desc"><p>Response representation</p></div>
 </dd>
-<dt id="slack_bolt.kwargs_injection.Args.save_thread_context"><code class="name">var <span class="ident">save_thread_context</span> : Optional[<a title="slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext" href="../context/save_thread_context/save_thread_context.html#slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext">SaveThreadContext</a>]</code></dt>
+<dt id="slack_bolt.kwargs_injection.Args.save_thread_context"><code class="name">var <span class="ident">save_thread_context</span> : <a title="slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext" href="../context/save_thread_context/save_thread_context.html#slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext">SaveThreadContext</a> | None</code></dt>
 <dd>
 <div class="desc"><p><code>save_thread_context()</code> utility function for AI Agents &amp; Assistants</p></div>
 </dd>
@@ -348,23 +348,23 @@ def handle_buttons(args):
 <dd>
 <div class="desc"><p><code>say()</code> utility function, which calls <code>chat.postMessage</code> API with the associated channel ID</p></div>
 </dd>
-<dt id="slack_bolt.kwargs_injection.Args.set_status"><code class="name">var <span class="ident">set_status</span> : Optional[<a title="slack_bolt.context.set_status.set_status.SetStatus" href="../context/set_status/set_status.html#slack_bolt.context.set_status.set_status.SetStatus">SetStatus</a>]</code></dt>
+<dt id="slack_bolt.kwargs_injection.Args.set_status"><code class="name">var <span class="ident">set_status</span> : <a title="slack_bolt.context.set_status.set_status.SetStatus" href="../context/set_status/set_status.html#slack_bolt.context.set_status.set_status.SetStatus">SetStatus</a> | None</code></dt>
 <dd>
 <div class="desc"><p><code>set_status()</code> utility function for AI Agents &amp; Assistants</p></div>
 </dd>
-<dt id="slack_bolt.kwargs_injection.Args.set_suggested_prompts"><code class="name">var <span class="ident">set_suggested_prompts</span> : Optional[<a title="slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts" href="../context/set_suggested_prompts/set_suggested_prompts.html#slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts">SetSuggestedPrompts</a>]</code></dt>
+<dt id="slack_bolt.kwargs_injection.Args.set_suggested_prompts"><code class="name">var <span class="ident">set_suggested_prompts</span> : <a title="slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts" href="../context/set_suggested_prompts/set_suggested_prompts.html#slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts">SetSuggestedPrompts</a> | None</code></dt>
 <dd>
 <div class="desc"><p><code>set_suggested_prompts()</code> utility function for AI Agents &amp; Assistants</p></div>
 </dd>
-<dt id="slack_bolt.kwargs_injection.Args.set_title"><code class="name">var <span class="ident">set_title</span> : Optional[<a title="slack_bolt.context.set_title.set_title.SetTitle" href="../context/set_title/set_title.html#slack_bolt.context.set_title.set_title.SetTitle">SetTitle</a>]</code></dt>
+<dt id="slack_bolt.kwargs_injection.Args.set_title"><code class="name">var <span class="ident">set_title</span> : <a title="slack_bolt.context.set_title.set_title.SetTitle" href="../context/set_title/set_title.html#slack_bolt.context.set_title.set_title.SetTitle">SetTitle</a> | None</code></dt>
 <dd>
 <div class="desc"><p><code>set_title()</code> utility function for AI Agents &amp; Assistants</p></div>
 </dd>
-<dt id="slack_bolt.kwargs_injection.Args.shortcut"><code class="name">var <span class="ident">shortcut</span> : Optional[Dict[str, Any]]</code></dt>
+<dt id="slack_bolt.kwargs_injection.Args.shortcut"><code class="name">var <span class="ident">shortcut</span> : Dict[str, Any] | None</code></dt>
 <dd>
 <div class="desc"><p>An alias for payload in an <code>@app.shortcut</code> listener</p></div>
 </dd>
-<dt id="slack_bolt.kwargs_injection.Args.view"><code class="name">var <span class="ident">view</span> : Optional[Dict[str, Any]]</code></dt>
+<dt id="slack_bolt.kwargs_injection.Args.view"><code class="name">var <span class="ident">view</span> : Dict[str, Any] | None</code></dt>
 <dd>
 <div class="desc"><p>An alias for payload in an <code>@app.view</code> listener</p></div>
 </dd>
@@ -437,7 +437,7 @@ def handle_buttons(args):
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.3</a>.</p>
 </footer>
 </body>
 </html>
