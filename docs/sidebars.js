@@ -84,7 +84,7 @@ const sidebars = {
       items: [
         'tutorial/getting-started-http',
         'tutorial/ai-chatbot',
-        `tutorial/custom-steps`
+        `tutorial/custom-steps-for-jira`
       ],
     },
     { type: 'html', value: '<hr>' },
