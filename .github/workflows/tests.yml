@@ -52,7 +52,7 @@ jobs:
       - name: Run tests for HTTP Mode adapters (Django)
         run: |
           pytest tests/adapter_tests/django/
-      - name: Run tests for HTTP Mode adapters (Falcon 3.x)
+      - name: Run tests for HTTP Mode adapters (Falcon)
         run: |
           pytest tests/adapter_tests/falcon/
       - name: Run tests for HTTP Mode adapters (Flask)
