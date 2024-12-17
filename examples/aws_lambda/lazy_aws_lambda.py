@@ -46,5 +46,5 @@ def handler(event, context):
 # export SLACK_BOT_TOKEN=xoxb-***
 
 # rm -rf vendor && cp -pr ../../src/* vendor/
-# pip install python-lambda
+# pip install git+https://github.com/nficano/python-lambda
 # lambda deploy --config-file aws_lambda_config.yaml --requirements requirements.txt
