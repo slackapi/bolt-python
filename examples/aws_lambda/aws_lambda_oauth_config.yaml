@@ -4,7 +4,6 @@ function_name: bolt_py_oauth_function
 handler: aws_lambda_oauth.handler
 description: My first lambda function
 runtime: python3.8
-# role: lambda_basic_execution
 role: bolt_python_s3_storage
 
 # S3 upload requires appropriate role with s3:PutObject permission
