@@ -20,12 +20,11 @@ aws_secret_access_key:
 # timeout: 15
 # memory_size: 512
 # concurrency: 500
-#
 
-# Experimental Environment variables
+# Lambda environment variables
 environment_variables:
-    SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
-    SLACK_SIGNING_SECRET: ${SLACK_SIGNING_SECRET}
+  SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
+  SLACK_SIGNING_SECRET: ${SLACK_SIGNING_SECRET}
 
 # If `tags` is uncommented then tags will be set at creation or update
 # time.  During an update all other tags will be removed except the tags

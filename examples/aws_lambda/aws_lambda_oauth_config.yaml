@@ -20,17 +20,15 @@ aws_secret_access_key:
 # timeout: 15
 # memory_size: 512
 # concurrency: 500
-#
 
-# Experimental Environment variables
+# Lambda environment variables
 environment_variables:
-    SLACK_SIGNING_SECRET: ${SLACK_SIGNING_SECRET}
-    SLACK_CLIENT_ID: ${SLACK_CLIENT_ID}
-    SLACK_CLIENT_SECRET: ${SLACK_CLIENT_SECRET}
-    SLACK_SCOPES: ${SLACK_SCOPES}
-    SLACK_INSTALLATION_S3_BUCKET_NAME: ${SLACK_INSTALLATION_S3_BUCKET_NAME}
-    SLACK_STATE_S3_BUCKET_NAME: ${SLACK_STATE_S3_BUCKET_NAME}
-
+  SLACK_SIGNING_SECRET: ${SLACK_SIGNING_SECRET}
+  SLACK_CLIENT_ID: ${SLACK_CLIENT_ID}
+  SLACK_CLIENT_SECRET: ${SLACK_CLIENT_SECRET}
+  SLACK_SCOPES: ${SLACK_SCOPES}
+  SLACK_INSTALLATION_S3_BUCKET_NAME: ${SLACK_INSTALLATION_S3_BUCKET_NAME}
+  SLACK_STATE_S3_BUCKET_NAME: ${SLACK_STATE_S3_BUCKET_NAME}
 
 # If `tags` is uncommented then tags will be set at creation or update
 # time.  During an update all other tags will be removed except the tags
