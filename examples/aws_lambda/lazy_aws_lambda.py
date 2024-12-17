@@ -47,4 +47,4 @@ def handler(event, context):
 
 # rm -rf vendor && cp -pr ../../src/* vendor/
 # pip install git+https://github.com/nficano/python-lambda
-# lambda deploy --config-file aws_lambda_config.yaml --requirements requirements.txt
+# lambda deploy --config-file lazy_aws_lambda_config.yaml --requirements requirements.txt
