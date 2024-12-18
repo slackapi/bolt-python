@@ -1,6 +1,12 @@
-(Describe the goal of this PR. Mention any related Issue numbers)
+## Summary
 
-### Category (place an `x` in each of the `[ ]`)
+<!-- Describe the goal of this PR. Mention any related issue numbers -->
+
+### Testing
+
+<!-- Describe what steps a reviewer should follow to test your changes. -->
+
+### Category <!-- place an `x` in each of the `[ ]`  -->
 
 * [ ] `slack_bolt.App` and/or its core components
 * [ ] `slack_bolt.async_app.AsyncApp` and/or its core components
@@ -8,7 +14,7 @@
 * [ ] Document pages under `/docs`
 * [ ] Others
 
-## Requirements (place an `x` in each `[ ]`)
+## Requirements <!-- place an `x` in each `[ ]` -->
 
 Please read the [Contributing guidelines](https://github.com/slackapi/bolt-python/blob/main/.github/contributing.md) and [Code of Conduct](https://slackhq.github.io/code-of-conduct) before creating this issue or pull request. By submitting, you are agreeing to those rules.
 
