@@ -15,7 +15,7 @@ $ brew update
 $ brew install pyenv
 ```
 
-Install necessary Python runtimes for development/testing. You can rely on Travis CI builds for testing with various major versions. https://github.com/slackapi/bolt-python/blob/main/.travis.yml
+Install necessary Python runtimes for development/testing. You can rely on Travis CI builds for testing with various major versions. <https://github.com/slackapi/bolt-python/blob/main/.travis.yml>
 
 ```bash
 $ pyenv install -l | grep -v "-e[conda|stackless|pypy]"
@@ -34,7 +34,7 @@ $ pyenv rehash
 
 Then, you can create a new Virtual Environment this way:
 
-```
+```bash
 $ python -m venv env_3.8.5
 $ source env_3.8.5/bin/activate
 ```
@@ -94,8 +94,9 @@ $ ngrok http 3000 --subdomain {your-domain}
 #### Develop Locally
 
 If you want to test the package locally you can.
+
 1. Build the package locally
-   - Run 
+   - Run
      ```bash
      scripts/build_pypi_package.sh
      ```
@@ -106,8 +107,7 @@ If you want to test the package locally you can.
      ```bash
      pip install <project path>/dist/slack_bolt-1.2.3-py2.py3-none-any.whl
      ```
-   - It is also possible to include `<project path>/dist/slack_bolt-1.2.3-py2.py3-none-any.whl` in a [requirements.txt](https://pip.pypa.io/en/stable/user_guide/#requirements-files) file 
-
+   - It is also possible to include `<project path>/dist/slack_bolt-1.2.3-py2.py3-none-any.whl` in a [requirements.txt](https://pip.pypa.io/en/stable/user_guide/#requirements-files) file
 
 ### Releasing
 
@@ -121,19 +121,18 @@ If you want to test the package locally you can.
 
 ##### $HOME/.pypirc
 
-```
+```txt
 [testpypi]
 username: {your username}
 password: {your password}
 ```
-
 
 #### Development Deployment
 
 1. Create a branch in which the development release will live:
     - Bump the version number in adherence to [Semantic Versioning](http://semver.org/) and [Developmental Release](https://peps.python.org/pep-0440/#developmental-releases) in `slack_bolt/version.py`
       - Example the current version is `1.2.3` a proper development bump would be `1.3.0.dev0`
-      - `.dev` will indicate to pip that this is a [Development Release](https://peps.python.org/pep-0440/#developmental-releases) 
+      - `.dev` will indicate to pip that this is a [Development Release](https://peps.python.org/pep-0440/#developmental-releases)
       - Note that the `dev` version can be bumped in development releases: `1.3.0.dev0` -> `1.3.0.dev1`
     - Commit with a message including the new version number. For example `1.3.0.dev0` & Push the commit to a branch where the development release will live (create it if it does not exist)
       - `git checkout -b future-release`
@@ -150,26 +149,34 @@ password: {your password}
 
 3. (Slack Internal) Communicate the release internally
 
-
 #### Production Deployment
 
 1. Create the commit for the release:
    - Bump the version number in adherence to [Semantic Versioning](http://semver.org/) in `slack_bolt/version.py`
    - Build the docs with `./scripts/generate_api_docs.sh`.
    - Commit with a message including the new version number. For example `1.2.3` & Push the commit to a branch and create a PR to sanity check.
-     - `git checkout -b v1.2.3-release`
-     - `git add --all`
-     - `git commit -m 'version 1.2.3'`
-     - `git push {your-fork} v1.2.3-release`
-   - Merge in release PR after getting an approval from at least one maintainer.
-   - Create a git tag for the release. For example `git tag v1.2.3`.
-   - Push the tag up to github with `git push origin --tags`
+     - `git checkout -b v1.2.3`
+     - `git commit -a -m 'version 1.2.3'`
+   - Open a PR and merge after receiving at least one approval from other maintainers.
 
 2. Distribute the release
    - Use the latest stable Python runtime
-   - `python -m venv .venv`
-   - `./scripts/deploy_to_pypi_org.sh`
-   - Create a GitHub release - https://github.com/slackapi/bolt-python/releases
+      - `python -m venv .venv`
+      - `./scripts/deploy_to_pypi_org.sh`
+   - Create a new GitHub Release from the [Releases page](https://github.com/slackapi/bolt-python/releases) by clicking the "Draft a new release" button.
+      - Enter the new version number updated from the commit (e.g. `v1.2.3`) into the "Choose a tag" input.
+      - Ensure the tag `Target` branch is `main` (e.g `Target:main`).
+      - Click the "Create a new tag: x.x.x on publish" button. This won't create your tag immediately.
+      - Name the release after the version number updated from the commit (e.g. `version 1.2.3`)
+      - Auto-generate the release notes by clicking the "Auto-generate release
+      notes" button. This will pull in changes that will be included in your
+      release.
+      - Edit the resulting notes to ensure they have decent messaging that are
+      understandable by non-contributors, but each commit should still have it's
+      own line.
+      - Ensure that this version adheres to [semantic versioning](http://semver.org/). See
+      [Versioning](#versioning-and-tags) for correct version format. Version tags
+      should match the following pattern: `v2.5.0`.
 
    ```markdown
    ## New Features
@@ -232,7 +239,7 @@ reopening is great and better than creating a duplicate issue.
 
 ## Managing Documentation
 
-See the [`/docs/README.md`](../docs/README.md) file for documentation instructions. 
+See the [`/docs/README.md`](../docs/README.md) file for documentation instructions.
 
 ## Everything else
 
