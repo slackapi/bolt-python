@@ -161,6 +161,7 @@ password: {your password}
 
 2. Distribute the release
    - Use the latest stable Python runtime
+      - `python --version`
       - `python -m venv .venv`
       - `./scripts/deploy_to_pypi_org.sh`
    - Create a new GitHub Release from the [Releases page](https://github.com/slackapi/bolt-python/releases) by clicking the "Draft a new release" button.
