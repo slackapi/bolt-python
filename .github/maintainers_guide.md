@@ -15,7 +15,7 @@ $ brew update
 $ brew install pyenv
 ```
 
-Install necessary Python runtimes for development/testing. You can rely on Travis CI builds for testing with various major versions. <https://github.com/slackapi/bolt-python/blob/main/.travis.yml>
+Install necessary Python runtimes for development/testing. You can rely on GitHub Actions workflows for testing with various major versions. <https://github.com/slackapi/bolt-python/tree/main/.github/workflows>
 
 ```bash
 $ pyenv install -l | grep -v "-e[conda|stackless|pypy]"
