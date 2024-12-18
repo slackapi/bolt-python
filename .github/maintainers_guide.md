@@ -121,7 +121,7 @@ If you want to test the package locally you can.
 
 ##### $HOME/.pypirc
 
-```txt
+```toml
 [testpypi]
 username: {your username}
 password: {your password}
