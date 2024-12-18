@@ -3,19 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-<meta name="generator" content="pdoc3 0.11.3">
+<meta name="generator" content="pdoc3 0.11.5">
 <title>slack_bolt API documentation</title>
 <meta name="description" content="A Python framework to build Slack apps in a flash with the latest platform features.Read the [getting started …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
 <script>window.addEventListener('DOMContentLoaded', () => {
 hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
 hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
 })</script>
 </head>
 <body>
@@ -125,7 +136,6 @@ if the execution chain should continue running the following middleware …</p><
 <span>class <span class="ident">Ack</span></span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -167,11 +177,12 @@ if the execution chain should continue running the following middleware …</p><
             view=view,
         )</code></pre>
 </details>
+<div class="desc"></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="slack_bolt.Ack.response"><code class="name">var <span class="ident">response</span> : <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
 </dd>
@@ -180,101 +191,6 @@ if the execution chain should continue running the following middleware …</p><
 <span>(</span><span>*,<br>logger: logging.Logger | None = None,<br>name: str | None = None,<br>process_before_response: bool = False,<br>raise_error_for_unhandled_request: bool = False,<br>signing_secret: str | None = None,<br>token: str | None = None,<br>token_verification_enabled: bool = True,<br>client: slack_sdk.web.client.WebClient | None = None,<br>before_authorize: <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a> | Callable[..., Any] | None = None,<br>authorize: Callable[..., <a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>] | None = None,<br>user_facing_authorize_error_message: str | None = None,<br>installation_store: slack_sdk.oauth.installation_store.installation_store.InstallationStore | None = None,<br>installation_store_bot_only: bool | None = None,<br>request_verification_enabled: bool = True,<br>ignoring_self_events_enabled: bool = True,<br>ignoring_self_assistant_message_events_enabled: bool = True,<br>ssl_check_enabled: bool = True,<br>url_verification_enabled: bool = True,<br>attaching_function_token_enabled: bool = True,<br>oauth_settings: <a title="slack_bolt.oauth.oauth_settings.OAuthSettings" href="oauth/oauth_settings.html#slack_bolt.oauth.oauth_settings.OAuthSettings">OAuthSettings</a> | None = None,<br>oauth_flow: <a title="slack_bolt.oauth.oauth_flow.OAuthFlow" href="oauth/oauth_flow.html#slack_bolt.oauth.oauth_flow.OAuthFlow">OAuthFlow</a> | None = None,<br>verification_token: str | None = None,<br>listener_executor: concurrent.futures._base.Executor | None = None,<br>assistant_thread_context_store: <a title="slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore" href="context/assistant/thread_context_store/store.html#slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore">AssistantThreadContextStore</a> | None = None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Bolt App that provides functionalities to register middleware/listeners.</p>
-<pre><code>import os
-from slack_bolt import App
-
-# Initializes your app with your bot token and signing secret
-app = App(
-    token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
-)
-
-# Listens to incoming messages that contain "hello"
-@app.message("hello")
-def message_hello(message, say):
-    # say() sends a message to the channel where the event was triggered
-    say(f"Hey there &lt;@{message['user']}&gt;!")
-
-# Start your app
-if __name__ == "__main__":
-    app.start(port=int(os.environ.get("PORT", 3000)))
-</code></pre>
-<p>Refer to <a href="https://slack.dev/bolt-python/tutorial/getting-started">https://slack.dev/bolt-python/tutorial/getting-started</a> for details.</p>
-<p>If you would like to build an OAuth app for enabling the app to run with multiple workspaces,
-refer to <a href="https://slack.dev/bolt-python/concepts#authenticating-oauth">https://slack.dev/bolt-python/concepts#authenticating-oauth</a> to learn how to configure the app.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>logger</code></strong></dt>
-<dd>The custom logger that can be used in this app.</dd>
-<dt><strong><code>name</code></strong></dt>
-<dd>The application name that will be used in logging. If absent, the source file name will be used.</dd>
-<dt><strong><code>process_before_response</code></strong></dt>
-<dd>True if this app runs on Function as a Service. (Default: False)</dd>
-<dt><strong><code>raise_error_for_unhandled_request</code></strong></dt>
-<dd>True if you want to raise exceptions for unhandled requests
-and use @app.error listeners instead of
-the built-in handler, which pints warning logs and returns 404 to Slack (Default: False)</dd>
-<dt><strong><code>signing_secret</code></strong></dt>
-<dd>The Signing Secret value used for verifying requests from Slack.</dd>
-<dt><strong><code>token</code></strong></dt>
-<dd>The bot/user access token required only for single-workspace app.</dd>
-<dt><strong><code>token_verification_enabled</code></strong></dt>
-<dd>Verifies the validity of the given token if True.</dd>
-<dt><strong><code>client</code></strong></dt>
-<dd>The singleton <code>slack_sdk.WebClient</code> instance for this app.</dd>
-<dt><strong><code>before_authorize</code></strong></dt>
-<dd>A global middleware that can be executed right before authorize function</dd>
-<dt><strong><code>authorize</code></strong></dt>
-<dd>The function to authorize an incoming request from Slack
-by checking if there is a team/user in the installation data.</dd>
-<dt><strong><code>user_facing_authorize_error_message</code></strong></dt>
-<dd>The user-facing error message to display
-when the app is installed but the installation is not managed by this app's installation store</dd>
-<dt><strong><code>installation_store</code></strong></dt>
-<dd>The module offering save/find operations of installation data</dd>
-<dt><strong><code>installation_store_bot_only</code></strong></dt>
-<dd>Use <code>InstallationStore#find_bot()</code> if True (Default: False)</dd>
-<dt><strong><code>request_verification_enabled</code></strong></dt>
-<dd>False if you would like to disable the built-in middleware (Default: True).
-<code>RequestVerification</code> is a built-in middleware that verifies the signature in HTTP Mode requests.
-Make sure if it's safe enough when you turn a built-in middleware off.
-We strongly recommend using RequestVerification for better security.
-If you have a proxy that verifies request signature in front of the Bolt app,
-it's totally fine to disable RequestVerification to avoid duplication of work.
-Don't turn it off just for easiness of development.</dd>
-<dt><strong><code>ignoring_self_events_enabled</code></strong></dt>
-<dd>False if you would like to disable the built-in middleware (Default: True).
-<code>IgnoringSelfEvents</code> is a built-in middleware that enables Bolt apps to easily skip the events
-generated by this app's bot user (this is useful for avoiding code error causing an infinite loop).</dd>
-<dt><strong><code>ignoring_self_assistant_message_events_enabled</code></strong></dt>
-<dd>False if you would like to disable the built-in middleware.
-<code>IgnoringSelfEvents</code> for this app's bot user message events within an assistant thread
-This is useful for avoiding code error causing an infinite loop; Default: True</dd>
-<dt><strong><code>url_verification_enabled</code></strong></dt>
-<dd>False if you would like to disable the built-in middleware (Default: True).
-<code>UrlVerification</code> is a built-in middleware that handles url_verification requests
-that verify the endpoint for Events API in HTTP Mode requests.</dd>
-<dt><strong><code>attaching_function_token_enabled</code></strong></dt>
-<dd>False if you would like to disable the built-in middleware (Default: True).
-<code>AttachingFunctionToken</code> is a built-in middleware that injects the just-in-time workflow-execution tokens
-when your app receives <code>function_executed</code> or interactivity events scoped to a custom step.</dd>
-<dt><strong><code>ssl_check_enabled</code></strong></dt>
-<dd>bool = False if you would like to disable the built-in middleware (Default: True).
-<code>SslCheck</code> is a built-in middleware that handles ssl_check requests from Slack.</dd>
-<dt><strong><code>oauth_settings</code></strong></dt>
-<dd>The settings related to Slack app installation flow (OAuth flow)</dd>
-<dt><strong><code>oauth_flow</code></strong></dt>
-<dd>Instantiated <code><a title="slack_bolt.oauth.OAuthFlow" href="oauth/index.html#slack_bolt.oauth.OAuthFlow">OAuthFlow</a></code>. This is always prioritized over oauth_settings.</dd>
-<dt><strong><code>verification_token</code></strong></dt>
-<dd>Deprecated verification mechanism. This can be used only for ssl_check requests.</dd>
-<dt><strong><code>listener_executor</code></strong></dt>
-<dd>Custom executor to run background tasks. If absent, the default <code>ThreadPoolExecutor</code> will
-be used.</dd>
-<dt><strong><code>assistant_thread_context_store</code></strong></dt>
-<dd>Custom AssistantThreadContext store (Default: the built-in implementation,
-which uses a parent message's metadata to store the latest context)</dd>
-</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1639,11 +1555,105 @@ which uses a parent message's metadata to store the latest context)</dd>
         )
         return value_to_return</code></pre>
 </details>
+<div class="desc"><p>Bolt App that provides functionalities to register middleware/listeners.</p>
+<pre><code>import os
+from slack_bolt import App
+
+# Initializes your app with your bot token and signing secret
+app = App(
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+)
+
+# Listens to incoming messages that contain "hello"
+@app.message("hello")
+def message_hello(message, say):
+    # say() sends a message to the channel where the event was triggered
+    say(f"Hey there &lt;@{message['user']}&gt;!")
+
+# Start your app
+if __name__ == "__main__":
+    app.start(port=int(os.environ.get("PORT", 3000)))
+</code></pre>
+<p>Refer to <a href="https://slack.dev/bolt-python/tutorial/getting-started">https://slack.dev/bolt-python/tutorial/getting-started</a> for details.</p>
+<p>If you would like to build an OAuth app for enabling the app to run with multiple workspaces,
+refer to <a href="https://slack.dev/bolt-python/concepts#authenticating-oauth">https://slack.dev/bolt-python/concepts#authenticating-oauth</a> to learn how to configure the app.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>logger</code></strong></dt>
+<dd>The custom logger that can be used in this app.</dd>
+<dt><strong><code>name</code></strong></dt>
+<dd>The application name that will be used in logging. If absent, the source file name will be used.</dd>
+<dt><strong><code>process_before_response</code></strong></dt>
+<dd>True if this app runs on Function as a Service. (Default: False)</dd>
+<dt><strong><code>raise_error_for_unhandled_request</code></strong></dt>
+<dd>True if you want to raise exceptions for unhandled requests
+and use @app.error listeners instead of
+the built-in handler, which pints warning logs and returns 404 to Slack (Default: False)</dd>
+<dt><strong><code>signing_secret</code></strong></dt>
+<dd>The Signing Secret value used for verifying requests from Slack.</dd>
+<dt><strong><code>token</code></strong></dt>
+<dd>The bot/user access token required only for single-workspace app.</dd>
+<dt><strong><code>token_verification_enabled</code></strong></dt>
+<dd>Verifies the validity of the given token if True.</dd>
+<dt><strong><code>client</code></strong></dt>
+<dd>The singleton <code>slack_sdk.WebClient</code> instance for this app.</dd>
+<dt><strong><code>before_authorize</code></strong></dt>
+<dd>A global middleware that can be executed right before authorize function</dd>
+<dt><strong><code>authorize</code></strong></dt>
+<dd>The function to authorize an incoming request from Slack
+by checking if there is a team/user in the installation data.</dd>
+<dt><strong><code>user_facing_authorize_error_message</code></strong></dt>
+<dd>The user-facing error message to display
+when the app is installed but the installation is not managed by this app's installation store</dd>
+<dt><strong><code>installation_store</code></strong></dt>
+<dd>The module offering save/find operations of installation data</dd>
+<dt><strong><code>installation_store_bot_only</code></strong></dt>
+<dd>Use <code>InstallationStore#find_bot()</code> if True (Default: False)</dd>
+<dt><strong><code>request_verification_enabled</code></strong></dt>
+<dd>False if you would like to disable the built-in middleware (Default: True).
+<code>RequestVerification</code> is a built-in middleware that verifies the signature in HTTP Mode requests.
+Make sure if it's safe enough when you turn a built-in middleware off.
+We strongly recommend using RequestVerification for better security.
+If you have a proxy that verifies request signature in front of the Bolt app,
+it's totally fine to disable RequestVerification to avoid duplication of work.
+Don't turn it off just for easiness of development.</dd>
+<dt><strong><code>ignoring_self_events_enabled</code></strong></dt>
+<dd>False if you would like to disable the built-in middleware (Default: True).
+<code>IgnoringSelfEvents</code> is a built-in middleware that enables Bolt apps to easily skip the events
+generated by this app's bot user (this is useful for avoiding code error causing an infinite loop).</dd>
+<dt><strong><code>ignoring_self_assistant_message_events_enabled</code></strong></dt>
+<dd>False if you would like to disable the built-in middleware.
+<code>IgnoringSelfEvents</code> for this app's bot user message events within an assistant thread
+This is useful for avoiding code error causing an infinite loop; Default: True</dd>
+<dt><strong><code>url_verification_enabled</code></strong></dt>
+<dd>False if you would like to disable the built-in middleware (Default: True).
+<code>UrlVerification</code> is a built-in middleware that handles url_verification requests
+that verify the endpoint for Events API in HTTP Mode requests.</dd>
+<dt><strong><code>attaching_function_token_enabled</code></strong></dt>
+<dd>False if you would like to disable the built-in middleware (Default: True).
+<code>AttachingFunctionToken</code> is a built-in middleware that injects the just-in-time workflow-execution tokens
+when your app receives <code>function_executed</code> or interactivity events scoped to a custom step.</dd>
+<dt><strong><code>ssl_check_enabled</code></strong></dt>
+<dd>bool = False if you would like to disable the built-in middleware (Default: True).
+<code>SslCheck</code> is a built-in middleware that handles ssl_check requests from Slack.</dd>
+<dt><strong><code>oauth_settings</code></strong></dt>
+<dd>The settings related to Slack app installation flow (OAuth flow)</dd>
+<dt><strong><code>oauth_flow</code></strong></dt>
+<dd>Instantiated <code><a title="slack_bolt.oauth.OAuthFlow" href="oauth/index.html#slack_bolt.oauth.OAuthFlow">OAuthFlow</a></code>. This is always prioritized over oauth_settings.</dd>
+<dt><strong><code>verification_token</code></strong></dt>
+<dd>Deprecated verification mechanism. This can be used only for ssl_check requests.</dd>
+<dt><strong><code>listener_executor</code></strong></dt>
+<dd>Custom executor to run background tasks. If absent, the default <code>ThreadPoolExecutor</code> will
+be used.</dd>
+<dt><strong><code>assistant_thread_context_store</code></strong></dt>
+<dd>Custom AssistantThreadContext store (Default: the built-in implementation,
+which uses a parent message's metadata to store the latest context)</dd>
+</dl></div>
 <h3>Instance variables</h3>
 <dl>
 <dt id="slack_bolt.App.client"><code class="name">prop <span class="ident">client</span> : slack_sdk.web.client.WebClient</code></dt>
 <dd>
-<div class="desc"><p>The singleton <code>slack_sdk.WebClient</code> instance in this app.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1653,10 +1663,10 @@ def client(self) -&gt; WebClient:
     &#34;&#34;&#34;The singleton `slack_sdk.WebClient` instance in this app.&#34;&#34;&#34;
     return self._client</code></pre>
 </details>
+<div class="desc"><p>The singleton <code>slack_sdk.WebClient</code> instance in this app.</p></div>
 </dd>
 <dt id="slack_bolt.App.installation_store"><code class="name">prop <span class="ident">installation_store</span> : slack_sdk.oauth.installation_store.installation_store.InstallationStore | None</code></dt>
 <dd>
-<div class="desc"><p>The <code>slack_sdk.oauth.InstallationStore</code> that can be used in the <code>authorize</code> middleware.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1666,10 +1676,10 @@ def installation_store(self) -&gt; Optional[InstallationStore]:
     &#34;&#34;&#34;The `slack_sdk.oauth.InstallationStore` that can be used in the `authorize` middleware.&#34;&#34;&#34;
     return self._installation_store</code></pre>
 </details>
+<div class="desc"><p>The <code>slack_sdk.oauth.InstallationStore</code> that can be used in the <code>authorize</code> middleware.</p></div>
 </dd>
 <dt id="slack_bolt.App.listener_runner"><code class="name">prop <span class="ident">listener_runner</span> : <a title="slack_bolt.listener.thread_runner.ThreadListenerRunner" href="listener/thread_runner.html#slack_bolt.listener.thread_runner.ThreadListenerRunner">ThreadListenerRunner</a></code></dt>
 <dd>
-<div class="desc"><p>The thread executor for asynchronously running listeners.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1679,10 +1689,10 @@ def listener_runner(self) -&gt; ThreadListenerRunner:
     &#34;&#34;&#34;The thread executor for asynchronously running listeners.&#34;&#34;&#34;
     return self._listener_runner</code></pre>
 </details>
+<div class="desc"><p>The thread executor for asynchronously running listeners.</p></div>
 </dd>
 <dt id="slack_bolt.App.logger"><code class="name">prop <span class="ident">logger</span> : logging.Logger</code></dt>
 <dd>
-<div class="desc"><p>The logger this app uses.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1692,10 +1702,10 @@ def logger(self) -&gt; logging.Logger:
     &#34;&#34;&#34;The logger this app uses.&#34;&#34;&#34;
     return self._framework_logger</code></pre>
 </details>
+<div class="desc"><p>The logger this app uses.</p></div>
 </dd>
 <dt id="slack_bolt.App.name"><code class="name">prop <span class="ident">name</span> : str</code></dt>
 <dd>
-<div class="desc"><p>The name of this app (default: the filename)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1705,10 +1715,10 @@ def name(self) -&gt; str:
     &#34;&#34;&#34;The name of this app (default: the filename)&#34;&#34;&#34;
     return self._name</code></pre>
 </details>
+<div class="desc"><p>The name of this app (default: the filename)</p></div>
 </dd>
 <dt id="slack_bolt.App.oauth_flow"><code class="name">prop <span class="ident">oauth_flow</span> : <a title="slack_bolt.oauth.oauth_flow.OAuthFlow" href="oauth/oauth_flow.html#slack_bolt.oauth.oauth_flow.OAuthFlow">OAuthFlow</a> | None</code></dt>
 <dd>
-<div class="desc"><p>Configured <code>OAuthFlow</code> object if exists.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1718,10 +1728,10 @@ def oauth_flow(self) -&gt; Optional[OAuthFlow]:
     &#34;&#34;&#34;Configured `OAuthFlow` object if exists.&#34;&#34;&#34;
     return self._oauth_flow</code></pre>
 </details>
+<div class="desc"><p>Configured <code>OAuthFlow</code> object if exists.</p></div>
 </dd>
 <dt id="slack_bolt.App.process_before_response"><code class="name">prop <span class="ident">process_before_response</span> : bool</code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1730,6 +1740,7 @@ def oauth_flow(self) -&gt; Optional[OAuthFlow]:
 def process_before_response(self) -&gt; bool:
     return self._process_before_response or False</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -1738,6 +1749,47 @@ def process_before_response(self) -&gt; bool:
 <span>def <span class="ident">action</span></span>(<span>self,<br>constraints: str | Pattern | Dict[str, str | Pattern],<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def action(
+    self,
+    constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new action listener. This method can be used as either a decorator or a method.
+
+        # Use this method as a decorator
+        @app.action(&#34;approve_button&#34;)
+        def update_message(ack):
+            ack()
+
+        # Pass a function to this method
+        app.action(&#34;approve_button&#34;)(update_message)
+
+    * Refer to https://api.slack.com/reference/interaction-payloads/block-actions for actions in `blocks`.
+    * Refer to https://api.slack.com/legacy/message-buttons for actions in `attachments`.
+    * Refer to https://api.slack.com/dialogs for actions in dialogs.
+
+    To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#39;s API document.
+
+    Args:
+        constraints: The conditions that match a request payload
+        matchers: A list of listener matcher functions.
+            Only when all the matchers return True, the listener function can be invoked.
+        middleware: A list of lister middleware functions.
+            Only when all the middleware call `next()` method, the listener function can be invoked.
+    &#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.action(constraints, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new action listener. This method can be used as either a decorator or a method.</p>
 <pre><code># Use this method as a decorator
 @app.action("approve_button")
@@ -1769,12 +1821,39 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 <span>def <span class="ident">assistant</span></span>(<span>self,<br>assistant: <a title="slack_bolt.middleware.assistant.assistant.Assistant" href="middleware/assistant/assistant.html#slack_bolt.middleware.assistant.assistant.Assistant">Assistant</a>) ‑> Callable | None</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def assistant(self, assistant: Assistant) -&gt; Optional[Callable]:
+    return self.middleware(assistant)</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.App.attachment_action"><code class="name flex">
 <span>def <span class="ident">attachment_action</span></span>(<span>self,<br>callback_id: str | Pattern,<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def attachment_action(
+    self,
+    callback_id: Union[str, Pattern],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new `interactive_message` action listener.
+    Refer to https://api.slack.com/legacy/message-buttons for details.&#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.attachment_action(callback_id, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new <code>interactive_message</code> action listener.
 Refer to <a href="https://api.slack.com/legacy/message-buttons">https://api.slack.com/legacy/message-buttons</a> for details.</p></div>
 </dd>
@@ -1782,6 +1861,27 @@ Refer to <a href="https://api.slack.com/legacy/message-buttons">https://api.slac
 <span>def <span class="ident">block_action</span></span>(<span>self,<br>constraints: str | Pattern | Dict[str, str | Pattern],<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def block_action(
+    self,
+    constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new `block_actions` action listener.
+    Refer to https://api.slack.com/reference/interaction-payloads/block-actions for details.
+    &#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.block_action(constraints, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new <code>block_actions</code> action listener.
 Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-actions">https://api.slack.com/reference/interaction-payloads/block-actions</a> for details.</p></div>
 </dd>
@@ -1789,12 +1889,73 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-act
 <span>def <span class="ident">block_suggestion</span></span>(<span>self,<br>action_id: str | Pattern,<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def block_suggestion(
+    self,
+    action_id: Union[str, Pattern],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new `block_suggestion` listener.&#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.block_suggestion(action_id, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new <code>block_suggestion</code> listener.</p></div>
 </dd>
 <dt id="slack_bolt.App.command"><code class="name flex">
 <span>def <span class="ident">command</span></span>(<span>self,<br>command: str | Pattern,<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def command(
+    self,
+    command: Union[str, Pattern],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new slash command listener.
+    This method can be used as either a decorator or a method.
+
+        # Use this method as a decorator
+        @app.command(&#34;/echo&#34;)
+        def repeat_text(ack, say, command):
+            # Acknowledge command request
+            ack()
+            say(f&#34;{command[&#39;text&#39;]}&#34;)
+
+        # Pass a function to this method
+        app.command(&#34;/echo&#34;)(repeat_text)
+
+    Refer to https://api.slack.com/interactivity/slash-commands for details of Slash Commands.
+
+    To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#39;s API document.
+
+    Args:
+        command: The conditions that match a request payload
+        matchers: A list of listener matcher functions.
+            Only when all the matchers return True, the listener function can be invoked.
+        middleware: A list of lister middleware functions.
+            Only when all the middleware call `next()` method, the listener function can be invoked.
+    &#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.command(command, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new slash command listener.
 This method can be used as either a decorator or a method.</p>
 <pre><code># Use this method as a decorator
@@ -1825,18 +1986,60 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 <span>def <span class="ident">default_app_uninstalled_event_listener</span></span>(<span>self) ‑> Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def default_app_uninstalled_event_listener(
+    self,
+) -&gt; Callable[..., Optional[BoltResponse]]:
+    if self._tokens_revocation_listeners is None:
+        raise BoltError(error_installation_store_required_for_builtin_listeners())
+    return self._tokens_revocation_listeners.handle_app_uninstalled_events</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.App.default_tokens_revoked_event_listener"><code class="name flex">
 <span>def <span class="ident">default_tokens_revoked_event_listener</span></span>(<span>self) ‑> Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def default_tokens_revoked_event_listener(
+    self,
+) -&gt; Callable[..., Optional[BoltResponse]]:
+    if self._tokens_revocation_listeners is None:
+        raise BoltError(error_installation_store_required_for_builtin_listeners())
+    return self._tokens_revocation_listeners.handle_tokens_revoked_events</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.App.dialog_cancellation"><code class="name flex">
 <span>def <span class="ident">dialog_cancellation</span></span>(<span>self,<br>callback_id: str | Pattern,<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dialog_cancellation(
+    self,
+    callback_id: Union[str, Pattern],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new `dialog_cancellation` listener.
+    Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.dialog_cancellation(callback_id, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new <code>dialog_cancellation</code> listener.
 Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</a> for details.</p></div>
 </dd>
@@ -1844,6 +2047,26 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 <span>def <span class="ident">dialog_submission</span></span>(<span>self,<br>callback_id: str | Pattern,<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dialog_submission(
+    self,
+    callback_id: Union[str, Pattern],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new `dialog_submission` listener.
+    Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.dialog_submission(callback_id, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new <code>dialog_submission</code> listener.
 Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</a> for details.</p></div>
 </dd>
@@ -1851,6 +2074,26 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 <span>def <span class="ident">dialog_suggestion</span></span>(<span>self,<br>callback_id: str | Pattern,<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dialog_suggestion(
+    self,
+    callback_id: Union[str, Pattern],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new `dialog_suggestion` listener.
+    Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.dialog_suggestion(callback_id, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new <code>dialog_suggestion</code> listener.
 Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</a> for details.</p></div>
 </dd>
@@ -1858,6 +2101,118 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 <span>def <span class="ident">dispatch</span></span>(<span>self,<br>req: <a title="slack_bolt.request.request.BoltRequest" href="request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>) ‑> <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a></span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dispatch(self, req: BoltRequest) -&gt; BoltResponse:
+    &#34;&#34;&#34;Applies all middleware and dispatches an incoming request from Slack to the right code path.
+
+    Args:
+        req: An incoming request from Slack
+
+    Returns:
+        The response generated by this Bolt app
+    &#34;&#34;&#34;
+    starting_time = time.time()
+    self._init_context(req)
+
+    resp: Optional[BoltResponse] = BoltResponse(status=200, body=&#34;&#34;)
+    middleware_state = {&#34;next_called&#34;: False}
+
+    def middleware_next():
+        middleware_state[&#34;next_called&#34;] = True
+
+    try:
+        for middleware in self._middleware_list:
+            middleware_state[&#34;next_called&#34;] = False
+            if self._framework_logger.level &lt;= logging.DEBUG:
+                self._framework_logger.debug(debug_applying_middleware(middleware.name))
+            resp = middleware.process(req=req, resp=resp, next=middleware_next)  # type: ignore[arg-type]
+            if not middleware_state[&#34;next_called&#34;]:
+                if resp is None:
+                    # next() method was not called without providing the response to return to Slack
+                    # This should not be an intentional handling in usual use cases.
+                    resp = BoltResponse(status=404, body={&#34;error&#34;: &#34;no next() calls in middleware&#34;})
+                    if self._raise_error_for_unhandled_request is True:
+                        try:
+                            raise BoltUnhandledRequestError(
+                                request=req,
+                                current_response=resp,
+                                last_global_middleware_name=middleware.name,
+                            )
+                        except BoltUnhandledRequestError as e:
+                            self._listener_runner.listener_error_handler.handle(
+                                error=e,
+                                request=req,
+                                response=resp,
+                            )
+                        return resp
+                    self._framework_logger.warning(warning_unhandled_by_global_middleware(middleware.name, req))
+                    return resp
+                return resp
+
+        for listener in self._listeners:
+            listener_name = get_name_for_callable(listener.ack_function)
+            self._framework_logger.debug(debug_checking_listener(listener_name))
+            if listener.matches(req=req, resp=resp):  # type: ignore[arg-type]
+                # run all the middleware attached to this listener first
+                middleware_resp, next_was_not_called = listener.run_middleware(
+                    req=req, resp=resp  # type: ignore[arg-type]
+                )
+                if next_was_not_called:
+                    if middleware_resp is not None:
+                        if self._framework_logger.level &lt;= logging.DEBUG:
+                            debug_message = debug_return_listener_middleware_response(
+                                listener_name,
+                                middleware_resp.status,
+                                middleware_resp.body,
+                                starting_time,
+                            )
+                            self._framework_logger.debug(debug_message)
+                        return middleware_resp
+                    # The last listener middleware didn&#39;t call next() method.
+                    # This means the listener is not for this incoming request.
+                    continue
+
+                if middleware_resp is not None:
+                    resp = middleware_resp
+
+                self._framework_logger.debug(debug_running_listener(listener_name))
+                listener_response: Optional[BoltResponse] = self._listener_runner.run(
+                    request=req,
+                    response=resp,  # type: ignore[arg-type]
+                    listener_name=listener_name,
+                    listener=listener,
+                )
+                if listener_response is not None:
+                    return listener_response
+
+        if resp is None:
+            resp = BoltResponse(status=404, body={&#34;error&#34;: &#34;unhandled request&#34;})
+        if self._raise_error_for_unhandled_request is True:
+            try:
+                raise BoltUnhandledRequestError(
+                    request=req,
+                    current_response=resp,
+                )
+            except BoltUnhandledRequestError as e:
+                self._listener_runner.listener_error_handler.handle(
+                    error=e,
+                    request=req,
+                    response=resp,
+                )
+            return resp
+        return self._handle_unmatched_requests(req, resp)
+    except Exception as error:
+        resp = BoltResponse(status=500, body=&#34;&#34;)
+        self._middleware_error_handler.handle(
+            error=error,
+            request=req,
+            response=resp,
+        )
+        return resp</code></pre>
+</details>
 <div class="desc"><p>Applies all middleware and dispatches an incoming request from Slack to the right code path.</p>
 <h2 id="args">Args</h2>
 <dl>
@@ -1871,12 +2226,52 @@ Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</
 <span>def <span class="ident">enable_token_revocation_listeners</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def enable_token_revocation_listeners(self) -&gt; None:
+    self.event(&#34;tokens_revoked&#34;)(self.default_tokens_revoked_event_listener())
+    self.event(&#34;app_uninstalled&#34;)(self.default_app_uninstalled_event_listener())</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.App.error"><code class="name flex">
 <span>def <span class="ident">error</span></span>(<span>self,<br>func: Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None]) ‑> Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def error(self, func: Callable[..., Optional[BoltResponse]]) -&gt; Callable[..., Optional[BoltResponse]]:
+    &#34;&#34;&#34;Updates the global error handler. This method can be used as either a decorator or a method.
+
+        # Use this method as a decorator
+        @app.error
+        def custom_error_handler(error, body, logger):
+            logger.exception(f&#34;Error: {error}&#34;)
+            logger.info(f&#34;Request body: {body}&#34;)
+
+        # Pass a function to this method
+        app.error(custom_error_handler)
+
+    To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#39;s API document.
+
+    Args:
+        func: The function that is supposed to be executed
+            when getting an unhandled error in Bolt app.
+    &#34;&#34;&#34;
+    self._listener_runner.listener_error_handler = CustomListenerErrorHandler(
+        logger=self._framework_logger,
+        func=func,
+    )
+    self._middleware_error_handler = CustomMiddlewareErrorHandler(
+        logger=self._framework_logger,
+        func=func,
+    )
+    return func</code></pre>
+</details>
 <div class="desc"><p>Updates the global error handler. This method can be used as either a decorator or a method.</p>
 <pre><code># Use this method as a decorator
 @app.error
@@ -1899,6 +2294,53 @@ when getting an unhandled error in Bolt app.</dd>
 <span>def <span class="ident">event</span></span>(<span>self,<br>event: str | Pattern | Dict[str, str | Sequence[str | Pattern | None] | None],<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def event(
+    self,
+    event: Union[
+        str,
+        Pattern,
+        Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]],
+    ],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new event listener. This method can be used as either a decorator or a method.
+
+        # Use this method as a decorator
+        @app.event(&#34;team_join&#34;)
+        def ask_for_introduction(event, say):
+            welcome_channel_id = &#34;C12345&#34;
+            user_id = event[&#34;user&#34;]
+            text = f&#34;Welcome to the team, &lt;@{user_id}&gt;! :tada: You can introduce yourself in this channel.&#34;
+            say(text=text, channel=welcome_channel_id)
+
+        # Pass a function to this method
+        app.event(&#34;team_join&#34;)(ask_for_introduction)
+
+    Refer to https://api.slack.com/apis/connections/events-api for details of Events API.
+
+    To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#39;s API document.
+
+    Args:
+        event: The conditions that match a request payload.
+            If you pass a dict for this, you can have type, subtype in the constraint.
+        matchers: A list of listener matcher functions.
+            Only when all the matchers return True, the listener function can be invoked.
+        middleware: A list of lister middleware functions.
+            Only when all the middleware call `next()` method, the listener function can be invoked.
+    &#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.event(event, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new event listener. This method can be used as either a decorator or a method.</p>
 <pre><code># Use this method as a decorator
 @app.event("team_join")
@@ -1930,6 +2372,54 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 <span>def <span class="ident">function</span></span>(<span>self,<br>callback_id: str | Pattern,<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None,<br>auto_acknowledge: bool = True) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def function(
+    self,
+    callback_id: Union[str, Pattern],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+    auto_acknowledge: bool = True,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new Function listener.
+    This method can be used as either a decorator or a method.
+
+        # Use this method as a decorator
+        @app.function(&#34;reverse&#34;)
+        def reverse_string(ack: Ack, inputs: dict, complete: Complete, fail: Fail):
+            try:
+                ack()
+                string_to_reverse = inputs[&#34;stringToReverse&#34;]
+                complete(outputs={&#34;reverseString&#34;: string_to_reverse[::-1]})
+            except Exception as e:
+                fail(f&#34;Cannot reverse string (error: {e})&#34;)
+                raise e
+
+        # Pass a function to this method
+        app.function(&#34;reverse&#34;)(reverse_string)
+
+    To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#39;s API document.
+
+    Args:
+        callback_id: The callback id to identify the function
+        matchers: A list of listener matcher functions.
+            Only when all the matchers return True, the listener function can be invoked.
+        middleware: A list of lister middleware functions.
+            Only when all the middleware call `next()` method, the listener function can be invoked.
+    &#34;&#34;&#34;
+
+    matchers = list(matchers) if matchers else []
+    middleware = list(middleware) if middleware else []
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.function_executed(callback_id=callback_id, base_logger=self._base_logger)
+        return self._register_listener(functions, primary_matcher, matchers, middleware, auto_acknowledge)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new Function listener.
 This method can be used as either a decorator or a method.</p>
 <pre><code># Use this method as a decorator
@@ -1963,12 +2453,93 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 <span>def <span class="ident">global_shortcut</span></span>(<span>self,<br>callback_id: str | Pattern,<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def global_shortcut(
+    self,
+    callback_id: Union[str, Pattern],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new global shortcut listener.&#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.global_shortcut(callback_id, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new global shortcut listener.</p></div>
 </dd>
 <dt id="slack_bolt.App.message"><code class="name flex">
 <span>def <span class="ident">message</span></span>(<span>self,<br>keyword: str | Pattern = '',<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def message(
+    self,
+    keyword: Union[str, Pattern] = &#34;&#34;,
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new message event listener. This method can be used as either a decorator or a method.
+    Check the `App#event` method&#39;s docstring for details.
+
+        # Use this method as a decorator
+        @app.message(&#34;:wave:&#34;)
+        def say_hello(message, say):
+            user = message[&#39;user&#39;]
+            say(f&#34;Hi there, &lt;@{user}&gt;!&#34;)
+
+        # Pass a function to this method
+        app.message(&#34;:wave:&#34;)(say_hello)
+
+    Refer to https://api.slack.com/events/message for details of `message` events.
+
+    To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#39;s API document.
+
+    Args:
+        keyword: The keyword to match
+        matchers: A list of listener matcher functions.
+            Only when all the matchers return True, the listener function can be invoked.
+        middleware: A list of lister middleware functions.
+            Only when all the middleware call `next()` method, the listener function can be invoked.
+    &#34;&#34;&#34;
+    matchers = list(matchers) if matchers else []
+    middleware = list(middleware) if middleware else []
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        constraints = {
+            &#34;type&#34;: &#34;message&#34;,
+            &#34;subtype&#34;: (
+                # In most cases, new message events come with no subtype.
+                None,
+                # As of Jan 2021, most bot messages no longer have the subtype bot_message.
+                # By contrast, messages posted using classic app&#39;s bot token still have the subtype.
+                &#34;bot_message&#34;,
+                # If an end-user posts a message with &#34;Also send to #channel&#34; checked,
+                # the message event comes with this subtype.
+                &#34;thread_broadcast&#34;,
+                # If an end-user posts a message with attached files,
+                # the message event comes with this subtype.
+                &#34;file_share&#34;,
+            ),
+        }
+        primary_matcher = builtin_matchers.message_event(
+            keyword=keyword, constraints=constraints, base_logger=self._base_logger
+        )
+        middleware.insert(0, MessageListenerMatches(keyword))
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new message event listener. This method can be used as either a decorator or a method.
 Check the <code>App#event</code> method's docstring for details.</p>
 <pre><code># Use this method as a decorator
@@ -1998,12 +2569,75 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 <span>def <span class="ident">message_shortcut</span></span>(<span>self,<br>callback_id: str | Pattern,<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def message_shortcut(
+    self,
+    callback_id: Union[str, Pattern],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new message shortcut listener.&#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.message_shortcut(callback_id, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new message shortcut listener.</p></div>
 </dd>
 <dt id="slack_bolt.App.middleware"><code class="name flex">
 <span>def <span class="ident">middleware</span></span>(<span>self, *args) ‑> Callable | None</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def middleware(self, *args) -&gt; Optional[Callable]:
+    &#34;&#34;&#34;Registers a new middleware to this app.
+    This method can be used as either a decorator or a method.
+
+        # Use this method as a decorator
+        @app.middleware
+        def middleware_func(logger, body, next):
+            logger.info(f&#34;request body: {body}&#34;)
+            next()
+
+        # Pass a function to this method
+        app.middleware(middleware_func)
+
+    Refer to https://slack.dev/bolt-python/concepts#global-middleware for details.
+
+    To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#39;s API document.
+
+    Args:
+        *args: A function that works as a global middleware.
+    &#34;&#34;&#34;
+    if len(args) &gt; 0:
+        middleware_or_callable = args[0]
+        if isinstance(middleware_or_callable, Middleware):
+            middleware: Middleware = middleware_or_callable
+            self._middleware_list.append(middleware)
+            if isinstance(middleware, Assistant) and middleware.thread_context_store is not None:
+                self._assistant_thread_context_store = middleware.thread_context_store
+        elif callable(middleware_or_callable):
+            self._middleware_list.append(
+                CustomMiddleware(
+                    app_name=self.name,
+                    func=middleware_or_callable,
+                    base_logger=self._base_logger,
+                )
+            )
+            return middleware_or_callable
+        else:
+            raise BoltError(f&#34;Unexpected type for a middleware ({type(middleware_or_callable)})&#34;)
+    return None</code></pre>
+</details>
 <div class="desc"><p>Registers a new middleware to this app.
 This method can be used as either a decorator or a method.</p>
 <pre><code># Use this method as a decorator
@@ -2027,6 +2661,58 @@ app.middleware(middleware_func)
 <span>def <span class="ident">options</span></span>(<span>self,<br>constraints: str | Pattern | Dict[str, str | Pattern],<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def options(
+    self,
+    constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new options listener.
+    This method can be used as either a decorator or a method.
+
+        # Use this method as a decorator
+        @app.options(&#34;menu_selection&#34;)
+        def show_menu_options(ack):
+            options = [
+                {
+                    &#34;text&#34;: {&#34;type&#34;: &#34;plain_text&#34;, &#34;text&#34;: &#34;Option 1&#34;},
+                    &#34;value&#34;: &#34;1-1&#34;,
+                },
+                {
+                    &#34;text&#34;: {&#34;type&#34;: &#34;plain_text&#34;, &#34;text&#34;: &#34;Option 2&#34;},
+                    &#34;value&#34;: &#34;1-2&#34;,
+                },
+            ]
+            ack(options=options)
+
+        # Pass a function to this method
+        app.options(&#34;menu_selection&#34;)(show_menu_options)
+
+    Refer to the following documents for details:
+
+    * https://api.slack.com/reference/block-kit/block-elements#external_select
+    * https://api.slack.com/reference/block-kit/block-elements#external_multi_select
+
+    To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#39;s API document.
+
+    Args:
+        matchers: A list of listener matcher functions.
+            Only when all the matchers return True, the listener function can be invoked.
+        middleware: A list of lister middleware functions.
+            Only when all the middleware call `next()` method, the listener function can be invoked.
+    &#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.options(constraints, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new options listener.
 This method can be used as either a decorator or a method.</p>
 <pre><code># Use this method as a decorator
@@ -2067,6 +2753,54 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 <span>def <span class="ident">shortcut</span></span>(<span>self,<br>constraints: str | Pattern | Dict[str, str | Pattern],<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def shortcut(
+    self,
+    constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new shortcut listener.
+    This method can be used as either a decorator or a method.
+
+        # Use this method as a decorator
+        @app.shortcut(&#34;open_modal&#34;)
+        def open_modal(ack, body, client):
+            # Acknowledge the command request
+            ack()
+            # Call views_open with the built-in client
+            client.views_open(
+                # Pass a valid trigger_id within 3 seconds of receiving it
+                trigger_id=body[&#34;trigger_id&#34;],
+                # View payload
+                view={ ... }
+            )
+
+        # Pass a function to this method
+        app.shortcut(&#34;open_modal&#34;)(open_modal)
+
+    Refer to https://api.slack.com/interactivity/shortcuts for details about Shortcuts.
+
+    To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#39;s API document.
+
+    Args:
+        constraints: The conditions that match a request payload.
+        matchers: A list of listener matcher functions.
+            Only when all the matchers return True, the listener function can be invoked.
+        middleware: A list of lister middleware functions.
+            Only when all the middleware call `next()` method, the listener function can be invoked.
+    &#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.shortcut(constraints, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new shortcut listener.
 This method can be used as either a decorator or a method.</p>
 <pre><code># Use this method as a decorator
@@ -2103,6 +2837,39 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 <span>def <span class="ident">start</span></span>(<span>self,<br>port: int = 3000,<br>path: str = '/slack/events',<br>http_server_logger_enabled: bool = True) ‑> None</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def start(
+    self,
+    port: int = 3000,
+    path: str = &#34;/slack/events&#34;,
+    http_server_logger_enabled: bool = True,
+) -&gt; None:
+    &#34;&#34;&#34;Starts a web server for local development.
+
+        # With the default settings, `http://localhost:3000/slack/events`
+        # is available for handling incoming requests from Slack
+        app.start()
+
+    This method internally starts a Web server process built with the `http.server` module.
+    For production, consider using a production-ready WSGI server such as Gunicorn.
+
+    Args:
+        port: The port to listen on (Default: 3000)
+        path: The path to handle request from Slack (Default: `/slack/events`)
+        http_server_logger_enabled: The flag to enable http.server logging if True (Default: True)
+    &#34;&#34;&#34;
+    self._development_server = SlackAppDevelopmentServer(
+        port=port,
+        path=path,
+        app=self,
+        oauth_flow=self.oauth_flow,
+        http_server_logger_enabled=http_server_logger_enabled,
+    )
+    self._development_server.start()</code></pre>
+</details>
 <div class="desc"><p>Starts a web server for local development.</p>
 <pre><code># With the default settings, `http://localhost:3000/slack/events`
 # is available for handling incoming requests from Slack
@@ -2124,6 +2891,75 @@ For production, consider using a production-ready WSGI server such as Gunicorn.<
 <span>def <span class="ident">step</span></span>(<span>self,<br>callback_id: str | Pattern | <a title="slack_bolt.workflows.step.step.WorkflowStep" href="workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStep">WorkflowStep</a> | <a title="slack_bolt.workflows.step.step.WorkflowStepBuilder" href="workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder">WorkflowStepBuilder</a>,<br>edit: Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | <a title="slack_bolt.listener.listener.Listener" href="listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a> | Sequence[Callable] | None = None,<br>save: Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | <a title="slack_bolt.listener.listener.Listener" href="listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a> | Sequence[Callable] | None = None,<br>execute: Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | <a title="slack_bolt.listener.listener.Listener" href="listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a> | Sequence[Callable] | None = None)</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def step(
+    self,
+    callback_id: Union[str, Pattern, WorkflowStep, WorkflowStepBuilder],
+    edit: Optional[Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]] = None,
+    save: Optional[Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]] = None,
+    execute: Optional[Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]] = None,
+):
+    &#34;&#34;&#34;
+    Deprecated:
+        Steps from apps for legacy workflows are now deprecated.
+        Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+
+    Registers a new step from app listener.
+
+    Unlike others, this method doesn&#39;t behave as a decorator.
+    If you want to register a step from app by a decorator, use `WorkflowStepBuilder`&#39;s methods.
+
+        # Create a new WorkflowStep instance
+        from slack_bolt.workflows.step import WorkflowStep
+        ws = WorkflowStep(
+            callback_id=&#34;add_task&#34;,
+            edit=edit,
+            save=save,
+            execute=execute,
+        )
+        # Pass Step to set up listeners
+        app.step(ws)
+
+    Refer to https://api.slack.com/workflows/steps for details of steps from apps.
+
+    To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#39;s API document.
+
+    For further information about WorkflowStep specific function arguments
+    such as `configure`, `update`, `complete`, and `fail`,
+    refer to `slack_bolt.workflows.step.utilities` API documents.
+
+    Args:
+        callback_id: The Callback ID for this step from app
+        edit: The function for displaying a modal in the Workflow Builder
+        save: The function for handling configuration in the Workflow Builder
+        execute: The function for handling the step execution
+    &#34;&#34;&#34;
+    warnings.warn(
+        (
+            &#34;Steps from apps for legacy workflows are now deprecated. &#34;
+            &#34;Use new custom steps: https://api.slack.com/automation/functions/custom-bolt&#34;
+        ),
+        category=DeprecationWarning,
+    )
+    step = callback_id
+    if isinstance(callback_id, (str, Pattern)):
+        step = WorkflowStep(
+            callback_id=callback_id,
+            edit=edit,  # type: ignore[arg-type]
+            save=save,  # type: ignore[arg-type]
+            execute=execute,  # type: ignore[arg-type]
+            base_logger=self._base_logger,
+        )
+    elif isinstance(step, WorkflowStepBuilder):
+        step = step.build(base_logger=self._base_logger)
+    elif not isinstance(step, WorkflowStep):
+        raise BoltError(f&#34;Invalid step object ({type(step)})&#34;)
+
+    self.use(WorkflowStepMiddleware(step))</code></pre>
+</details>
 <div class="desc"><h2 id="deprecated">Deprecated</h2>
 <p>Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: <a href="https://api.slack.com/automation/functions/custom-bolt">https://api.slack.com/automation/functions/custom-bolt</a></p>
@@ -2162,6 +2998,16 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="workflows/st
 <span>def <span class="ident">use</span></span>(<span>self, *args) ‑> Callable | None</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def use(self, *args) -&gt; Optional[Callable]:
+    &#34;&#34;&#34;Registers a new global middleware to this app. This method can be used as either a decorator or a method.
+
+    Refer to `App#middleware()` method&#39;s docstring for details.&#34;&#34;&#34;
+    return self.middleware(*args)</code></pre>
+</details>
 <div class="desc"><p>Registers a new global middleware to this app. This method can be used as either a decorator or a method.</p>
 <p>Refer to <code>App#middleware()</code> method's docstring for details.</p></div>
 </dd>
@@ -2169,6 +3015,58 @@ refer to <code><a title="slack_bolt.workflows.step.utilities" href="workflows/st
 <span>def <span class="ident">view</span></span>(<span>self,<br>constraints: str | Pattern | Dict[str, str | Pattern],<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def view(
+    self,
+    constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new `view_submission`/`view_closed` event listener.
+    This method can be used as either a decorator or a method.
+
+        # Use this method as a decorator
+        @app.view(&#34;view_1&#34;)
+        def handle_submission(ack, body, client, view):
+            # Assume there&#39;s an input block with `block_c` as the block_id and `dreamy_input`
+            hopes_and_dreams = view[&#34;state&#34;][&#34;values&#34;][&#34;block_c&#34;][&#34;dreamy_input&#34;]
+            user = body[&#34;user&#34;][&#34;id&#34;]
+            # Validate the inputs
+            errors = {}
+            if hopes_and_dreams is not None and len(hopes_and_dreams) &lt;= 5:
+                errors[&#34;block_c&#34;] = &#34;The value must be longer than 5 characters&#34;
+            if len(errors) &gt; 0:
+                ack(response_action=&#34;errors&#34;, errors=errors)
+                return
+            # Acknowledge the view_submission event and close the modal
+            ack()
+            # Do whatever you want with the input data - here we&#39;re saving it to a DB
+
+        # Pass a function to this method
+        app.view(&#34;view_1&#34;)(handle_submission)
+
+    Refer to https://api.slack.com/reference/interaction-payloads/views for details of payloads.
+
+    To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#39;s API document.
+
+    Args:
+        constraints: The conditions that match a request payload
+        matchers: A list of listener matcher functions.
+            Only when all the matchers return True, the listener function can be invoked.
+        middleware: A list of lister middleware functions.
+            Only when all the middleware call `next()` method, the listener function can be invoked.
+    &#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.view(constraints, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new <code>view_submission</code>/<code>view_closed</code> event listener.
 This method can be used as either a decorator or a method.</p>
 <pre><code># Use this method as a decorator
@@ -2209,6 +3107,26 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 <span>def <span class="ident">view_closed</span></span>(<span>self,<br>constraints: str | Pattern,<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def view_closed(
+    self,
+    constraints: Union[str, Pattern],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new `view_closed` listener.
+    Refer to https://api.slack.com/reference/interaction-payloads/views#view_closed for details.&#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.view_closed(constraints, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new <code>view_closed</code> listener.
 Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#view_closed">https://api.slack.com/reference/interaction-payloads/views#view_closed</a> for details.</p></div>
 </dd>
@@ -2216,6 +3134,26 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#vie
 <span>def <span class="ident">view_submission</span></span>(<span>self,<br>constraints: str | Pattern,<br>matchers: Sequence[Callable[..., bool]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None) ‑> Callable[..., Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None] | None]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def view_submission(
+    self,
+    constraints: Union[str, Pattern],
+    matchers: Optional[Sequence[Callable[..., bool]]] = None,
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
+    &#34;&#34;&#34;Registers a new `view_submission` listener.
+    Refer to https://api.slack.com/reference/interaction-payloads/views#view_submission for details.&#34;&#34;&#34;
+
+    def __call__(*args, **kwargs):
+        functions = self._to_listener_functions(kwargs) if kwargs else list(args)
+        primary_matcher = builtin_matchers.view_submission(constraints, base_logger=self._base_logger)
+        return self._register_listener(list(functions), primary_matcher, matchers, middleware)
+
+    return __call__</code></pre>
+</details>
 <div class="desc"><p>Registers a new <code>view_submission</code> listener.
 Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#view_submission">https://api.slack.com/reference/interaction-payloads/views#view_submission</a> for details.</p></div>
 </dd>
@@ -2226,31 +3164,6 @@ Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#vie
 <span>(</span><span>*,<br>logger: logging.Logger,<br>client: slack_sdk.web.client.WebClient,<br>req: <a title="slack_bolt.request.request.BoltRequest" href="request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>,<br>resp: <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>,<br>context: <a title="slack_bolt.context.context.BoltContext" href="context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a>,<br>body: Dict[str, Any],<br>payload: Dict[str, Any],<br>options: Dict[str, Any] | None = None,<br>shortcut: Dict[str, Any] | None = None,<br>action: Dict[str, Any] | None = None,<br>view: Dict[str, Any] | None = None,<br>command: Dict[str, Any] | None = None,<br>event: Dict[str, Any] | None = None,<br>message: Dict[str, Any] | None = None,<br>ack: <a title="slack_bolt.context.ack.ack.Ack" href="context/ack/ack.html#slack_bolt.context.ack.ack.Ack">Ack</a>,<br>say: <a title="slack_bolt.context.say.say.Say" href="context/say/say.html#slack_bolt.context.say.say.Say">Say</a>,<br>respond: <a title="slack_bolt.context.respond.respond.Respond" href="context/respond/respond.html#slack_bolt.context.respond.respond.Respond">Respond</a>,<br>complete: <a title="slack_bolt.context.complete.complete.Complete" href="context/complete/complete.html#slack_bolt.context.complete.complete.Complete">Complete</a>,<br>fail: <a title="slack_bolt.context.fail.fail.Fail" href="context/fail/fail.html#slack_bolt.context.fail.fail.Fail">Fail</a>,<br>set_status: <a title="slack_bolt.context.set_status.set_status.SetStatus" href="context/set_status/set_status.html#slack_bolt.context.set_status.set_status.SetStatus">SetStatus</a> | None = None,<br>set_title: <a title="slack_bolt.context.set_title.set_title.SetTitle" href="context/set_title/set_title.html#slack_bolt.context.set_title.set_title.SetTitle">SetTitle</a> | None = None,<br>set_suggested_prompts: <a title="slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts" href="context/set_suggested_prompts/set_suggested_prompts.html#slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts">SetSuggestedPrompts</a> | None = None,<br>get_thread_context: <a title="slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext" href="context/get_thread_context/get_thread_context.html#slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext">GetThreadContext</a> | None = None,<br>save_thread_context: <a title="slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext" href="context/save_thread_context/save_thread_context.html#slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext">SaveThreadContext</a> | None = None,<br>next: Callable[[], None],<br>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>All the arguments in this class are available in any middleware / listeners.
-You can inject the named variables in the argument list in arbitrary order.</p>
-<pre><code>@app.action("link_button")
-def handle_buttons(ack, respond, logger, context, body, client):
-    logger.info(f"request body: {body}")
-    ack()
-    if context.channel_id is not None:
-        respond("Hi!")
-    client.views_open(
-        trigger_id=body["trigger_id"],
-        view={ ... }
-    )
-</code></pre>
-<p>Alternatively, you can include a parameter named <code>args</code> and it will be injected with an instance of this class.</p>
-<pre><code>@app.action("link_button")
-def handle_buttons(args):
-    args.logger.info(f"request body: {args.body}")
-    args.ack()
-    if args.context.channel_id is not None:
-        args.respond("Hi!")
-    args.client.views_open(
-        trigger_id=args.body["trigger_id"],
-        view={ ... }
-    )
-</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2409,6 +3322,31 @@ def handle_buttons(args):
         self.next: Callable[[], None] = next
         self.next_: Callable[[], None] = next</code></pre>
 </details>
+<div class="desc"><p>All the arguments in this class are available in any middleware / listeners.
+You can inject the named variables in the argument list in arbitrary order.</p>
+<pre><code>@app.action("link_button")
+def handle_buttons(ack, respond, logger, context, body, client):
+    logger.info(f"request body: {body}")
+    ack()
+    if context.channel_id is not None:
+        respond("Hi!")
+    client.views_open(
+        trigger_id=body["trigger_id"],
+        view={ ... }
+    )
+</code></pre>
+<p>Alternatively, you can include a parameter named <code>args</code> and it will be injected with an instance of this class.</p>
+<pre><code>@app.action("link_button")
+def handle_buttons(args):
+    args.logger.info(f"request body: {args.body}")
+    args.ack()
+    if args.context.channel_id is not None:
+        args.respond("Hi!")
+    args.client.views_open(
+        trigger_id=args.body["trigger_id"],
+        view={ ... }
+    )
+</code></pre></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="slack_bolt.Args.ack"><code class="name">var <span class="ident">ack</span> : <a title="slack_bolt.context.ack.ack.Ack" href="context/ack/ack.html#slack_bolt.context.ack.ack.Ack">Ack</a></code></dt>
@@ -2530,7 +3468,6 @@ def handle_buttons(args):
 <span>(</span><span>*,<br>app_name: str = 'assistant',<br>thread_context_store: <a title="slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore" href="context/assistant/thread_context_store/store.html#slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore">AssistantThreadContextStore</a> | None = None,<br>logger: logging.Logger | None = None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2799,6 +3736,7 @@ def handle_buttons(args):
         else:
             raise BoltError(f&#34;Invalid listener: {type(listener_or_functions)} detected&#34;)</code></pre>
 </details>
+<div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a></li>
@@ -2807,11 +3745,11 @@ def handle_buttons(args):
 <dl>
 <dt id="slack_bolt.Assistant.base_logger"><code class="name">var <span class="ident">base_logger</span> : logging.Logger | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.Assistant.thread_context_store"><code class="name">var <span class="ident">thread_context_store</span> : <a title="slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore" href="context/assistant/thread_context_store/store.html#slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore">AssistantThreadContextStore</a> | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
 <h3>Static methods</h3>
@@ -2820,6 +3758,14 @@ def handle_buttons(args):
 <span>def <span class="ident">default_thread_context_changed</span></span>(<span>save_thread_context: <a title="slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext" href="context/save_thread_context/save_thread_context.html#slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext">SaveThreadContext</a>,<br>payload: dict)</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def default_thread_context_changed(save_thread_context: SaveThreadContext, payload: dict):
+    save_thread_context(payload[&#34;assistant_thread&#34;][&#34;context&#34;])</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 </dl>
@@ -2829,30 +3775,248 @@ def handle_buttons(args):
 <span>def <span class="ident">bot_message</span></span>(<span>self,<br>*args,<br>matchers: Callable[..., bool] | <a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher/listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a> | None = None,<br>middleware: Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a> | None = None,<br>lazy: List[Callable[..., None]] | None = None)</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def bot_message(
+    self,
+    *args,
+    matchers: Optional[Union[Callable[..., bool], ListenerMatcher]] = None,
+    middleware: Optional[Union[Callable, Middleware]] = None,
+    lazy: Optional[List[Callable[..., None]]] = None,
+):
+    if self._bot_message_listeners is None:
+        self._bot_message_listeners = []
+    all_matchers = self._merge_matchers(is_bot_message_event_in_assistant_thread, matchers)
+    if is_used_without_argument(args):
+        func = args[0]
+        self._bot_message_listeners.append(
+            self.build_listener(
+                listener_or_functions=func,
+                matchers=all_matchers,
+                middleware=middleware,  # type:ignore[arg-type]
+            )
+        )
+        return func
+
+    def _inner(func):
+        functions = [func] + (lazy if lazy is not None else [])
+        self._bot_message_listeners.append(
+            self.build_listener(
+                listener_or_functions=functions,
+                matchers=all_matchers,
+                middleware=middleware,
+            )
+        )
+
+        @wraps(func)
+        def _wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        return _wrapper
+
+    return _inner</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.Assistant.build_listener"><code class="name flex">
 <span>def <span class="ident">build_listener</span></span>(<span>self,<br>listener_or_functions: <a title="slack_bolt.listener.listener.Listener" href="listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a> | Callable | List[Callable],<br>matchers: List[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher/listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a> | Callable[..., bool]] | None = None,<br>middleware: List[<a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>] | None = None,<br>base_logger: logging.Logger | None = None) ‑> <a title="slack_bolt.listener.listener.Listener" href="listener/listener.html#slack_bolt.listener.listener.Listener">Listener</a></span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_listener(
+    self,
+    listener_or_functions: Union[Listener, Callable, List[Callable]],
+    matchers: Optional[List[Union[ListenerMatcher, Callable[..., bool]]]] = None,
+    middleware: Optional[List[Middleware]] = None,
+    base_logger: Optional[Logger] = None,
+) -&gt; Listener:
+    if isinstance(listener_or_functions, Callable):  # type:ignore[arg-type]
+        listener_or_functions = [listener_or_functions]  # type:ignore[list-item]
+
+    if isinstance(listener_or_functions, Listener):
+        return listener_or_functions
+    elif isinstance(listener_or_functions, list):
+        middleware = middleware if middleware else []
+        functions = listener_or_functions
+        ack_function = functions.pop(0)
+
+        matchers = matchers if matchers else []
+        listener_matchers: List[ListenerMatcher] = []
+        for matcher in matchers:
+            if isinstance(matcher, ListenerMatcher):
+                listener_matchers.append(matcher)
+            elif isinstance(matcher, Callable):  # type:ignore[arg-type]
+                listener_matchers.append(
+                    build_listener_matcher(
+                        func=matcher,
+                        asyncio=False,
+                        base_logger=base_logger,
+                    )
+                )
+        return CustomListener(
+            app_name=self.app_name,
+            matchers=listener_matchers,
+            middleware=middleware,
+            ack_function=ack_function,
+            lazy_functions=functions,
+            auto_acknowledgement=True,
+            base_logger=base_logger or self.base_logger,
+        )
+    else:
+        raise BoltError(f&#34;Invalid listener: {type(listener_or_functions)} detected&#34;)</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.Assistant.thread_context_changed"><code class="name flex">
 <span>def <span class="ident">thread_context_changed</span></span>(<span>self,<br>*args,<br>matchers: Callable[..., bool] | <a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher/listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a> | None = None,<br>middleware: Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a> | None = None,<br>lazy: List[Callable[..., None]] | None = None)</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def thread_context_changed(
+    self,
+    *args,
+    matchers: Optional[Union[Callable[..., bool], ListenerMatcher]] = None,
+    middleware: Optional[Union[Callable, Middleware]] = None,
+    lazy: Optional[List[Callable[..., None]]] = None,
+):
+    if self._thread_context_changed_listeners is None:
+        self._thread_context_changed_listeners = []
+    all_matchers = self._merge_matchers(is_assistant_thread_context_changed_event, matchers)
+    if is_used_without_argument(args):
+        func = args[0]
+        self._thread_context_changed_listeners.append(
+            self.build_listener(
+                listener_or_functions=func,
+                matchers=all_matchers,
+                middleware=middleware,  # type:ignore[arg-type]
+            )
+        )
+        return func
+
+    def _inner(func):
+        functions = [func] + (lazy if lazy is not None else [])
+        self._thread_context_changed_listeners.append(
+            self.build_listener(
+                listener_or_functions=functions,
+                matchers=all_matchers,
+                middleware=middleware,
+            )
+        )
+
+        @wraps(func)
+        def _wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        return _wrapper
+
+    return _inner</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.Assistant.thread_started"><code class="name flex">
 <span>def <span class="ident">thread_started</span></span>(<span>self,<br>*args,<br>matchers: Callable[..., bool] | <a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher/listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a> | None = None,<br>middleware: Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a> | None = None,<br>lazy: List[Callable[..., None]] | None = None)</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def thread_started(
+    self,
+    *args,
+    matchers: Optional[Union[Callable[..., bool], ListenerMatcher]] = None,
+    middleware: Optional[Union[Callable, Middleware]] = None,
+    lazy: Optional[List[Callable[..., None]]] = None,
+):
+    if self._thread_started_listeners is None:
+        self._thread_started_listeners = []
+    all_matchers = self._merge_matchers(is_assistant_thread_started_event, matchers)
+    if is_used_without_argument(args):
+        func = args[0]
+        self._thread_started_listeners.append(
+            self.build_listener(
+                listener_or_functions=func,
+                matchers=all_matchers,
+                middleware=middleware,  # type:ignore[arg-type]
+            )
+        )
+        return func
+
+    def _inner(func):
+        functions = [func] + (lazy if lazy is not None else [])
+        self._thread_started_listeners.append(
+            self.build_listener(
+                listener_or_functions=functions,
+                matchers=all_matchers,
+                middleware=middleware,
+            )
+        )
+
+        @wraps(func)
+        def _wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        return _wrapper
+
+    return _inner</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.Assistant.user_message"><code class="name flex">
 <span>def <span class="ident">user_message</span></span>(<span>self,<br>*args,<br>matchers: Callable[..., bool] | <a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher/listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a> | None = None,<br>middleware: Callable | <a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a> | None = None,<br>lazy: List[Callable[..., None]] | None = None)</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def user_message(
+    self,
+    *args,
+    matchers: Optional[Union[Callable[..., bool], ListenerMatcher]] = None,
+    middleware: Optional[Union[Callable, Middleware]] = None,
+    lazy: Optional[List[Callable[..., None]]] = None,
+):
+    if self._user_message_listeners is None:
+        self._user_message_listeners = []
+    all_matchers = self._merge_matchers(is_user_message_event_in_assistant_thread, matchers)
+    if is_used_without_argument(args):
+        func = args[0]
+        self._user_message_listeners.append(
+            self.build_listener(
+                listener_or_functions=func,
+                matchers=all_matchers,
+                middleware=middleware,  # type:ignore[arg-type]
+            )
+        )
+        return func
+
+    def _inner(func):
+        functions = [func] + (lazy if lazy is not None else [])
+        self._user_message_listeners.append(
+            self.build_listener(
+                listener_or_functions=functions,
+                matchers=all_matchers,
+                middleware=middleware,
+            )
+        )
+
+        @wraps(func)
+        def _wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        return _wrapper
+
+    return _inner</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 </dl>
@@ -2871,17 +4035,6 @@ def handle_buttons(args):
 <span>(</span><span>payload: dict)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>dict() -&gt; new empty dictionary
-dict(mapping) -&gt; new dictionary initialized from a mapping object's
-(key, value) pairs
-dict(iterable) -&gt; new dictionary initialized as if via:
-d = {}
-for k, v in iterable:
-d[k] = v
-dict(**kwargs) -&gt; new dictionary initialized with the name=value pairs
-in the keyword argument list.
-For example:
-dict(one=1, two=2)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2897,6 +4050,17 @@ dict(one=1, two=2)</p></div>
         self.team_id = payload.get(&#34;team_id&#34;)
         self.channel_id = payload[&#34;channel_id&#34;]</code></pre>
 </details>
+<div class="desc"><p>dict() -&gt; new empty dictionary
+dict(mapping) -&gt; new dictionary initialized from a mapping object's
+(key, value) pairs
+dict(iterable) -&gt; new dictionary initialized as if via:
+d = {}
+for k, v in iterable:
+d[k] = v
+dict(**kwargs) -&gt; new dictionary initialized with the name=value pairs
+in the keyword argument list.
+For example:
+dict(one=1, two=2)</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>builtins.dict</li>
@@ -2905,15 +4069,15 @@ dict(one=1, two=2)</p></div>
 <dl>
 <dt id="slack_bolt.AssistantThreadContext.channel_id"><code class="name">var <span class="ident">channel_id</span> : str</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.AssistantThreadContext.enterprise_id"><code class="name">var <span class="ident">enterprise_id</span> : str | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.AssistantThreadContext.team_id"><code class="name">var <span class="ident">team_id</span> : str | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
 </dd>
@@ -2921,7 +4085,6 @@ dict(one=1, two=2)</p></div>
 <span>class <span class="ident">AssistantThreadContextStore</span></span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2933,6 +4096,7 @@ dict(one=1, two=2)</p></div>
     def find(self, *, channel_id: str, thread_ts: str) -&gt; Optional[AssistantThreadContext]:
         raise NotImplementedError()</code></pre>
 </details>
+<div class="desc"></div>
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li><a title="slack_bolt.context.assistant.thread_context_store.default_store.DefaultAssistantThreadContextStore" href="context/assistant/thread_context_store/default_store.html#slack_bolt.context.assistant.thread_context_store.default_store.DefaultAssistantThreadContextStore">DefaultAssistantThreadContextStore</a></li>
@@ -2944,12 +4108,26 @@ dict(one=1, two=2)</p></div>
 <span>def <span class="ident">find</span></span>(<span>self, *, channel_id: str, thread_ts: str) ‑> <a title="slack_bolt.context.assistant.thread_context.AssistantThreadContext" href="context/assistant/thread_context/index.html#slack_bolt.context.assistant.thread_context.AssistantThreadContext">AssistantThreadContext</a> | None</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find(self, *, channel_id: str, thread_ts: str) -&gt; Optional[AssistantThreadContext]:
+    raise NotImplementedError()</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.AssistantThreadContextStore.save"><code class="name flex">
 <span>def <span class="ident">save</span></span>(<span>self, *, channel_id: str, thread_ts: str, context: Dict[str, str]) ‑> None</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save(self, *, channel_id: str, thread_ts: str, context: Dict[str, str]) -&gt; None:
+    raise NotImplementedError()</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 </dl>
@@ -2959,7 +4137,6 @@ dict(one=1, two=2)</p></div>
 <span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Context object associated with a request from Slack.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3156,6 +4333,7 @@ dict(one=1, two=2)</p></div>
     def save_thread_context(self) -&gt; Optional[SaveThreadContext]:
         return self.get(&#34;save_thread_context&#34;)</code></pre>
 </details>
+<div class="desc"><p>Context object associated with a request from Slack.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="slack_bolt.context.base_context.BaseContext" href="context/base_context.html#slack_bolt.context.base_context.BaseContext">BaseContext</a></li>
@@ -3165,18 +4343,6 @@ dict(one=1, two=2)</p></div>
 <dl>
 <dt id="slack_bolt.BoltContext.ack"><code class="name">prop <span class="ident">ack</span> : <a title="slack_bolt.context.ack.ack.Ack" href="context/ack/ack.html#slack_bolt.context.ack.ack.Ack">Ack</a></code></dt>
 <dd>
-<div class="desc"><p><code>ack()</code> function for this request.</p>
-<pre><code>@app.action("button")
-def handle_button_clicks(context):
-    context.ack()
-
-# You can access "ack" this way too.
-@app.action("button")
-def handle_button_clicks(ack):
-    ack()
-</code></pre>
-<h2 id="returns">Returns</h2>
-<p>Callable <code>ack()</code> function</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3201,27 +4367,21 @@ def ack(self) -&gt; Ack:
         self[&#34;ack&#34;] = Ack()
     return self[&#34;ack&#34;]</code></pre>
 </details>
+<div class="desc"><p><code>ack()</code> function for this request.</p>
+<pre><code>@app.action("button")
+def handle_button_clicks(context):
+    context.ack()
+
+# You can access "ack" this way too.
+@app.action("button")
+def handle_button_clicks(ack):
+    ack()
+</code></pre>
+<h2 id="returns">Returns</h2>
+<p>Callable <code>ack()</code> function</p></div>
 </dd>
 <dt id="slack_bolt.BoltContext.client"><code class="name">prop <span class="ident">client</span> : slack_sdk.web.client.WebClient</code></dt>
 <dd>
-<div class="desc"><p>The <code>WebClient</code> instance available for this request.</p>
-<pre><code>@app.event("app_mention")
-def handle_events(context):
-    context.client.chat_postMessage(
-        channel=context.channel_id,
-        text="Thanks!",
-    )
-
-# You can access "client" this way too.
-@app.event("app_mention")
-def handle_events(client, context):
-    client.chat_postMessage(
-        channel=context.channel_id,
-        text="Thanks!",
-    )
-</code></pre>
-<h2 id="returns">Returns</h2>
-<p><code>WebClient</code> instance</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3252,25 +4412,27 @@ def client(self) -&gt; WebClient:
         self[&#34;client&#34;] = WebClient(token=None)
     return self[&#34;client&#34;]</code></pre>
 </details>
+<div class="desc"><p>The <code>WebClient</code> instance available for this request.</p>
+<pre><code>@app.event("app_mention")
+def handle_events(context):
+    context.client.chat_postMessage(
+        channel=context.channel_id,
+        text="Thanks!",
+    )
+
+# You can access "client" this way too.
+@app.event("app_mention")
+def handle_events(client, context):
+    client.chat_postMessage(
+        channel=context.channel_id,
+        text="Thanks!",
+    )
+</code></pre>
+<h2 id="returns">Returns</h2>
+<p><code>WebClient</code> instance</p></div>
 </dd>
 <dt id="slack_bolt.BoltContext.complete"><code class="name">prop <span class="ident">complete</span> : <a title="slack_bolt.context.complete.complete.Complete" href="context/complete/complete.html#slack_bolt.context.complete.complete.Complete">Complete</a></code></dt>
 <dd>
-<div class="desc"><p><code>complete()</code> function for this request. Once a custom function's state is set to complete,
-any outputs the function returns will be passed along to the next step of its housing workflow,
-or complete the workflow if the function is the last step in a workflow. Additionally,
-any interactivity handlers associated to a function invocation will no longer be invocable.</p>
-<pre><code>@app.function("reverse")
-def handle_button_clicks(ack, complete):
-    ack()
-    complete(outputs={"stringReverse":"olleh"})
-
-@app.function("reverse")
-def handle_button_clicks(context):
-    context.ack()
-    context.complete(outputs={"stringReverse":"olleh"})
-</code></pre>
-<h2 id="returns">Returns</h2>
-<p>Callable <code>complete()</code> function</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3299,25 +4461,25 @@ def complete(self) -&gt; Complete:
         self[&#34;complete&#34;] = Complete(client=self.client, function_execution_id=self.function_execution_id)
     return self[&#34;complete&#34;]</code></pre>
 </details>
-</dd>
-<dt id="slack_bolt.BoltContext.fail"><code class="name">prop <span class="ident">fail</span> : <a title="slack_bolt.context.fail.fail.Fail" href="context/fail/fail.html#slack_bolt.context.fail.fail.Fail">Fail</a></code></dt>
-<dd>
-<div class="desc"><p><code>fail()</code> function for this request. Once a custom function's state is set to error,
-its housing workflow will be interrupted and any provided error message will be passed
-on to the end user through SlackBot. Additionally, any interactivity handlers associated
-to a function invocation will no longer be invocable.</p>
+<div class="desc"><p><code>complete()</code> function for this request. Once a custom function's state is set to complete,
+any outputs the function returns will be passed along to the next step of its housing workflow,
+or complete the workflow if the function is the last step in a workflow. Additionally,
+any interactivity handlers associated to a function invocation will no longer be invocable.</p>
 <pre><code>@app.function("reverse")
-def handle_button_clicks(ack, fail):
+def handle_button_clicks(ack, complete):
     ack()
-    fail(error="something went wrong")
+    complete(outputs={"stringReverse":"olleh"})
 
 @app.function("reverse")
 def handle_button_clicks(context):
     context.ack()
-    context.fail(error="something went wrong")
+    context.complete(outputs={"stringReverse":"olleh"})
 </code></pre>
 <h2 id="returns">Returns</h2>
-<p>Callable <code>fail()</code> function</p></div>
+<p>Callable <code>complete()</code> function</p></div>
+</dd>
+<dt id="slack_bolt.BoltContext.fail"><code class="name">prop <span class="ident">fail</span> : <a title="slack_bolt.context.fail.fail.Fail" href="context/fail/fail.html#slack_bolt.context.fail.fail.Fail">Fail</a></code></dt>
+<dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3346,10 +4508,25 @@ def fail(self) -&gt; Fail:
         self[&#34;fail&#34;] = Fail(client=self.client, function_execution_id=self.function_execution_id)
     return self[&#34;fail&#34;]</code></pre>
 </details>
+<div class="desc"><p><code>fail()</code> function for this request. Once a custom function's state is set to error,
+its housing workflow will be interrupted and any provided error message will be passed
+on to the end user through SlackBot. Additionally, any interactivity handlers associated
+to a function invocation will no longer be invocable.</p>
+<pre><code>@app.function("reverse")
+def handle_button_clicks(ack, fail):
+    ack()
+    fail(error="something went wrong")
+
+@app.function("reverse")
+def handle_button_clicks(context):
+    context.ack()
+    context.fail(error="something went wrong")
+</code></pre>
+<h2 id="returns">Returns</h2>
+<p>Callable <code>fail()</code> function</p></div>
 </dd>
 <dt id="slack_bolt.BoltContext.get_thread_context"><code class="name">prop <span class="ident">get_thread_context</span> : <a title="slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext" href="context/get_thread_context/get_thread_context.html#slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext">GetThreadContext</a> | None</code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3358,10 +4535,10 @@ def fail(self) -&gt; Fail:
 def get_thread_context(self) -&gt; Optional[GetThreadContext]:
     return self.get(&#34;get_thread_context&#34;)</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 <dt id="slack_bolt.BoltContext.listener_runner"><code class="name">prop <span class="ident">listener_runner</span> : ThreadListenerRunner</code></dt>
 <dd>
-<div class="desc"><p>The properly configured listener_runner that is available for middleware/listeners.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3371,23 +4548,10 @@ def listener_runner(self) -&gt; &#34;ThreadListenerRunner&#34;:  # type: ignore[
     &#34;&#34;&#34;The properly configured listener_runner that is available for middleware/listeners.&#34;&#34;&#34;
     return self[&#34;listener_runner&#34;]</code></pre>
 </details>
+<div class="desc"><p>The properly configured listener_runner that is available for middleware/listeners.</p></div>
 </dd>
 <dt id="slack_bolt.BoltContext.respond"><code class="name">prop <span class="ident">respond</span> : <a title="slack_bolt.context.respond.respond.Respond" href="context/respond/respond.html#slack_bolt.context.respond.respond.Respond">Respond</a> | None</code></dt>
 <dd>
-<div class="desc"><p><code>respond()</code> function for this request.</p>
-<pre><code>@app.action("button")
-def handle_button_clicks(context):
-    context.ack()
-    context.respond("Hi!")
-
-# You can access "ack" this way too.
-@app.action("button")
-def handle_button_clicks(ack, respond):
-    ack()
-    respond("Hi!")
-</code></pre>
-<h2 id="returns">Returns</h2>
-<p>Callable <code>respond()</code> function</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3418,10 +4582,23 @@ def respond(self) -&gt; Optional[Respond]:
         )
     return self[&#34;respond&#34;]</code></pre>
 </details>
+<div class="desc"><p><code>respond()</code> function for this request.</p>
+<pre><code>@app.action("button")
+def handle_button_clicks(context):
+    context.ack()
+    context.respond("Hi!")
+
+# You can access "ack" this way too.
+@app.action("button")
+def handle_button_clicks(ack, respond):
+    ack()
+    respond("Hi!")
+</code></pre>
+<h2 id="returns">Returns</h2>
+<p>Callable <code>respond()</code> function</p></div>
 </dd>
 <dt id="slack_bolt.BoltContext.save_thread_context"><code class="name">prop <span class="ident">save_thread_context</span> : <a title="slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext" href="context/save_thread_context/save_thread_context.html#slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext">SaveThreadContext</a> | None</code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3430,23 +4607,10 @@ def respond(self) -&gt; Optional[Respond]:
 def save_thread_context(self) -&gt; Optional[SaveThreadContext]:
     return self.get(&#34;save_thread_context&#34;)</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 <dt id="slack_bolt.BoltContext.say"><code class="name">prop <span class="ident">say</span> : <a title="slack_bolt.context.say.say.Say" href="context/say/say.html#slack_bolt.context.say.say.Say">Say</a></code></dt>
 <dd>
-<div class="desc"><p><code>say()</code> function for this request.</p>
-<pre><code>@app.action("button")
-def handle_button_clicks(context):
-    context.ack()
-    context.say("Hi!")
-
-# You can access "ack" this way too.
-@app.action("button")
-def handle_button_clicks(ack, say):
-    ack()
-    say("Hi!")
-</code></pre>
-<h2 id="returns">Returns</h2>
-<p>Callable <code>say()</code> function</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3473,10 +4637,23 @@ def say(self) -&gt; Say:
         self[&#34;say&#34;] = Say(client=self.client, channel=self.channel_id, thread_ts=self.thread_ts)
     return self[&#34;say&#34;]</code></pre>
 </details>
+<div class="desc"><p><code>say()</code> function for this request.</p>
+<pre><code>@app.action("button")
+def handle_button_clicks(context):
+    context.ack()
+    context.say("Hi!")
+
+# You can access "ack" this way too.
+@app.action("button")
+def handle_button_clicks(ack, say):
+    ack()
+    say("Hi!")
+</code></pre>
+<h2 id="returns">Returns</h2>
+<p>Callable <code>say()</code> function</p></div>
 </dd>
 <dt id="slack_bolt.BoltContext.set_status"><code class="name">prop <span class="ident">set_status</span> : <a title="slack_bolt.context.set_status.set_status.SetStatus" href="context/set_status/set_status.html#slack_bolt.context.set_status.set_status.SetStatus">SetStatus</a> | None</code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3485,10 +4662,10 @@ def say(self) -&gt; Say:
 def set_status(self) -&gt; Optional[SetStatus]:
     return self.get(&#34;set_status&#34;)</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 <dt id="slack_bolt.BoltContext.set_suggested_prompts"><code class="name">prop <span class="ident">set_suggested_prompts</span> : <a title="slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts" href="context/set_suggested_prompts/set_suggested_prompts.html#slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts">SetSuggestedPrompts</a> | None</code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3497,10 +4674,10 @@ def set_status(self) -&gt; Optional[SetStatus]:
 def set_suggested_prompts(self) -&gt; Optional[SetSuggestedPrompts]:
     return self.get(&#34;set_suggested_prompts&#34;)</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 <dt id="slack_bolt.BoltContext.set_title"><code class="name">prop <span class="ident">set_title</span> : <a title="slack_bolt.context.set_title.set_title.SetTitle" href="context/set_title/set_title.html#slack_bolt.context.set_title.set_title.SetTitle">SetTitle</a> | None</code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3509,6 +4686,7 @@ def set_suggested_prompts(self) -&gt; Optional[SetSuggestedPrompts]:
 def set_title(self) -&gt; Optional[SetTitle]:
     return self.get(&#34;set_title&#34;)</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -3517,6 +4695,31 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>def <span class="ident">to_copyable</span></span>(<span>self) ‑> <a title="slack_bolt.context.context.BoltContext" href="context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a></span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_copyable(self) -&gt; &#34;BoltContext&#34;:
+    new_dict = {}
+    for prop_name, prop_value in self.items():
+        if prop_name in self.copyable_standard_property_names:
+            # all the standard properties are copiable
+            new_dict[prop_name] = prop_value
+        elif prop_name in self.non_copyable_standard_property_names:
+            # Do nothing with this property (e.g., listener_runner)
+            continue
+        else:
+            try:
+                copied_value = create_copy(prop_value)
+                new_dict[prop_name] = copied_value
+            except TypeError as te:
+                self.logger.warning(
+                    f&#34;Skipped setting &#39;{prop_name}&#39; to a copied request for lazy listeners &#34;
+                    &#34;due to a deep-copy creation error. Consider passing the value not as part of context object &#34;
+                    f&#34;(error: {te})&#34;
+                )
+    return BoltContext(new_dict)</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 </dl>
@@ -3532,6 +4735,7 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <li><code><a title="slack_bolt.context.base_context.BaseContext.bot_token" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.bot_token">bot_token</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.bot_user_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.bot_user_id">bot_user_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.channel_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.channel_id">channel_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.copyable_standard_property_names" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.copyable_standard_property_names">copyable_standard_property_names</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.enterprise_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.enterprise_id">enterprise_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.function_bot_access_token" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.function_bot_access_token">function_bot_access_token</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.function_execution_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.function_execution_id">function_execution_id</a></code></li>
@@ -3539,7 +4743,9 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <li><code><a title="slack_bolt.context.base_context.BaseContext.is_enterprise_install" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.is_enterprise_install">is_enterprise_install</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.logger" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.logger">logger</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.matches" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.matches">matches</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.non_copyable_standard_property_names" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.non_copyable_standard_property_names">non_copyable_standard_property_names</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.response_url" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.response_url">response_url</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.standard_property_names" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.standard_property_names">standard_property_names</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.team_id" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.team_id">team_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.thread_ts" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.thread_ts">thread_ts</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.token" href="context/base_context.html#slack_bolt.context.base_context.BaseContext.token">token</a></code></li>
@@ -3554,20 +4760,6 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>(</span><span>*,<br>body: str | dict,<br>query: str | Dict[str, str] | Dict[str, Sequence[str]] | None = None,<br>headers: Dict[str, str | Sequence[str]] | None = None,<br>context: Dict[str, Any] | None = None,<br>mode: str = 'http')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Request to a Bolt app.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>body</code></strong></dt>
-<dd>The raw request body (only plain text is supported for "http" mode)</dd>
-<dt><strong><code>query</code></strong></dt>
-<dd>The query string data in any data format.</dd>
-<dt><strong><code>headers</code></strong></dt>
-<dd>The request headers.</dd>
-<dt><strong><code>context</code></strong></dt>
-<dd>The context in this request.</dd>
-<dt><strong><code>mode</code></strong></dt>
-<dd>The mode used for this request. (either "http" or "socket_mode")</dd>
-</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3641,43 +4833,57 @@ def set_title(self) -&gt; Optional[SetTitle]:
             mode=self.mode,
         )</code></pre>
 </details>
+<div class="desc"><p>Request to a Bolt app.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>body</code></strong></dt>
+<dd>The raw request body (only plain text is supported for "http" mode)</dd>
+<dt><strong><code>query</code></strong></dt>
+<dd>The query string data in any data format.</dd>
+<dt><strong><code>headers</code></strong></dt>
+<dd>The request headers.</dd>
+<dt><strong><code>context</code></strong></dt>
+<dd>The context in this request.</dd>
+<dt><strong><code>mode</code></strong></dt>
+<dd>The mode used for this request. (either "http" or "socket_mode")</dd>
+</dl></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="slack_bolt.BoltRequest.body"><code class="name">var <span class="ident">body</span> : Dict[str, Any]</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.BoltRequest.content_type"><code class="name">var <span class="ident">content_type</span> : str | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.BoltRequest.context"><code class="name">var <span class="ident">context</span> : <a title="slack_bolt.context.context.BoltContext" href="context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.BoltRequest.headers"><code class="name">var <span class="ident">headers</span> : Dict[str, Sequence[str]]</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.BoltRequest.lazy_function_name"><code class="name">var <span class="ident">lazy_function_name</span> : str | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.BoltRequest.lazy_only"><code class="name">var <span class="ident">lazy_only</span> : bool</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.BoltRequest.mode"><code class="name">var <span class="ident">mode</span> : str</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.BoltRequest.query"><code class="name">var <span class="ident">query</span> : Dict[str, Sequence[str]]</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.BoltRequest.raw_body"><code class="name">var <span class="ident">raw_body</span> : str</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -3686,6 +4892,20 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>def <span class="ident">to_copyable</span></span>(<span>self) ‑> <a title="slack_bolt.request.request.BoltRequest" href="request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a></span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_copyable(self) -&gt; &#34;BoltRequest&#34;:
+    body: Union[str, dict] = self.raw_body if self.mode == &#34;http&#34; else self.body
+    return BoltRequest(
+        body=body,
+        query=self.query,
+        headers=self.headers,
+        context=self.context.to_copyable(),
+        mode=self.mode,
+    )</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 </dl>
@@ -3695,16 +4915,6 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>(</span><span>*,<br>status: int,<br>body: str | dict = '',<br>headers: Dict[str, str | Sequence[str]] | None = None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>The response from a Bolt app.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>status</code></strong></dt>
-<dd>HTTP status code</dd>
-<dt><strong><code>body</code></strong></dt>
-<dd>The response body (dict and str are supported)</dd>
-<dt><strong><code>headers</code></strong></dt>
-<dd>The response headers.</dd>
-</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3764,19 +4974,29 @@ def set_title(self) -&gt; Optional[SetTitle]:
         c.load(header_value)
         return c</code></pre>
 </details>
+<div class="desc"><p>The response from a Bolt app.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>status</code></strong></dt>
+<dd>HTTP status code</dd>
+<dt><strong><code>body</code></strong></dt>
+<dd>The response body (dict and str are supported)</dd>
+<dt><strong><code>headers</code></strong></dt>
+<dd>The response headers.</dd>
+</dl></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="slack_bolt.BoltResponse.body"><code class="name">var <span class="ident">body</span> : str</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.BoltResponse.headers"><code class="name">var <span class="ident">headers</span> : Dict[str, Sequence[str]]</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.BoltResponse.status"><code class="name">var <span class="ident">status</span> : int</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -3785,18 +5005,40 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>def <span class="ident">cookies</span></span>(<span>self) ‑> Sequence[http.cookies.SimpleCookie]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cookies(self) -&gt; Sequence[SimpleCookie]:
+    header_values = self.headers.get(&#34;set-cookie&#34;, [])
+    return [self._to_simple_cookie(v) for v in header_values]</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.BoltResponse.first_headers"><code class="name flex">
 <span>def <span class="ident">first_headers</span></span>(<span>self) ‑> Dict[str, str]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def first_headers(self) -&gt; Dict[str, str]:
+    return {k: list(v)[0] for k, v in self.headers.items()}</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.BoltResponse.first_headers_without_set_cookie"><code class="name flex">
 <span>def <span class="ident">first_headers_without_set_cookie</span></span>(<span>self) ‑> Dict[str, str]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def first_headers_without_set_cookie(self) -&gt; Dict[str, str]:
+    return {k: list(v)[0] for k, v in self.headers.items() if k != &#34;set-cookie&#34;}</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 </dl>
@@ -3806,7 +5048,6 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>(</span><span>client: slack_sdk.web.client.WebClient, function_execution_id: str | None)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3840,15 +5081,16 @@ def set_title(self) -&gt; Optional[SetTitle]:
 
         return self.client.functions_completeSuccess(function_execution_id=self.function_execution_id, outputs=outputs or {})</code></pre>
 </details>
+<div class="desc"></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="slack_bolt.Complete.client"><code class="name">var <span class="ident">client</span> : slack_sdk.web.client.WebClient</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.Complete.function_execution_id"><code class="name">var <span class="ident">function_execution_id</span> : str | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
 </dd>
@@ -3857,7 +5099,6 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>(</span><span>*,<br>app_name: str,<br>func: Callable[..., bool],<br>base_logger: logging.Logger | None = None)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3885,6 +5126,7 @@ def set_title(self) -&gt; Optional[SetTitle]:
             )
         )</code></pre>
 </details>
+<div class="desc"></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher/listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a></li>
@@ -3893,19 +5135,19 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <dl>
 <dt id="slack_bolt.CustomListenerMatcher.app_name"><code class="name">var <span class="ident">app_name</span> : str</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.CustomListenerMatcher.arg_names"><code class="name">var <span class="ident">arg_names</span> : MutableSequence[str]</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.CustomListenerMatcher.func"><code class="name">var <span class="ident">func</span> : Callable[..., bool]</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.CustomListenerMatcher.logger"><code class="name">var <span class="ident">logger</span> : logging.Logger</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -3922,7 +5164,6 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>(</span><span>client: slack_sdk.web.client.WebClient, function_execution_id: str | None)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3956,24 +5197,24 @@ def set_title(self) -&gt; Optional[SetTitle]:
 
         return self.client.functions_completeError(function_execution_id=self.function_execution_id, error=error)</code></pre>
 </details>
+<div class="desc"></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="slack_bolt.Fail.client"><code class="name">var <span class="ident">client</span> : slack_sdk.web.client.WebClient</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.Fail.function_execution_id"><code class="name">var <span class="ident">function_execution_id</span> : str | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
 </dd>
 <dt id="slack_bolt.FileAssistantThreadContextStore"><code class="flex name class">
 <span>class <span class="ident">FileAssistantThreadContextStore</span></span>
-<span>(</span><span>base_dir: str = '/Users/kazuhiro.sera/.bolt-app-assistant-thread-contexts')</span>
+<span>(</span><span>base_dir: str = '/Users/wbergamin/.bolt-app-assistant-thread-contexts')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4009,6 +5250,7 @@ def set_title(self) -&gt; Optional[SetTitle]:
             path = Path(path)
         path.mkdir(parents=True, exist_ok=True)</code></pre>
 </details>
+<div class="desc"></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore" href="context/assistant/thread_context_store/store.html#slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore">AssistantThreadContextStore</a></li>
@@ -4019,12 +5261,36 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>def <span class="ident">find</span></span>(<span>self, *, channel_id: str, thread_ts: str) ‑> <a title="slack_bolt.context.assistant.thread_context.AssistantThreadContext" href="context/assistant/thread_context/index.html#slack_bolt.context.assistant.thread_context.AssistantThreadContext">AssistantThreadContext</a> | None</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find(self, *, channel_id: str, thread_ts: str) -&gt; Optional[AssistantThreadContext]:
+    path = f&#34;{self.base_dir}/{channel_id}-{thread_ts}.json&#34;
+    try:
+        with open(path) as f:
+            data = json.loads(f.read())
+            if data.get(&#34;channel_id&#34;) is not None:
+                return AssistantThreadContext(data)
+    except FileNotFoundError:
+        pass
+    return None</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.FileAssistantThreadContextStore.save"><code class="name flex">
 <span>def <span class="ident">save</span></span>(<span>self, *, channel_id: str, thread_ts: str, context: Dict[str, str]) ‑> None</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save(self, *, channel_id: str, thread_ts: str, context: Dict[str, str]) -&gt; None:
+    path = f&#34;{self.base_dir}/{channel_id}-{thread_ts}.json&#34;
+    with open(path, &#34;w&#34;) as f:
+        f.write(json.dumps(context))</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 </dl>
@@ -4033,7 +5299,6 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>class <span class="ident">Listener</span></span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4098,6 +5363,7 @@ def set_title(self) -&gt; Optional[SetTitle]:
         &#34;&#34;&#34;
         raise NotImplementedError()</code></pre>
 </details>
+<div class="desc"></div>
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li><a title="slack_bolt.listener.custom_listener.CustomListener" href="listener/custom_listener.html#slack_bolt.listener.custom_listener.CustomListener">CustomListener</a></li>
@@ -4106,23 +5372,23 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <dl>
 <dt id="slack_bolt.Listener.ack_function"><code class="name">var <span class="ident">ack_function</span> : Callable[..., <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.Listener.auto_acknowledgement"><code class="name">var <span class="ident">auto_acknowledgement</span> : bool</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.Listener.lazy_functions"><code class="name">var <span class="ident">lazy_functions</span> : Sequence[Callable[..., None]]</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.Listener.matchers"><code class="name">var <span class="ident">matchers</span> : Sequence[<a title="slack_bolt.listener_matcher.listener_matcher.ListenerMatcher" href="listener_matcher/listener_matcher.html#slack_bolt.listener_matcher.listener_matcher.ListenerMatcher">ListenerMatcher</a>]</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.Listener.middleware"><code class="name">var <span class="ident">middleware</span> : Sequence[<a title="slack_bolt.middleware.middleware.Middleware" href="middleware/middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a>]</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -4131,12 +5397,46 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>def <span class="ident">matches</span></span>(<span>self,<br>*,<br>req: <a title="slack_bolt.request.request.BoltRequest" href="request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>,<br>resp: <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>) ‑> bool</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def matches(
+    self,
+    *,
+    req: BoltRequest,
+    resp: BoltResponse,
+) -&gt; bool:
+    is_matched: bool = False
+    for matcher in self.matchers:
+        is_matched = matcher.matches(req, resp)
+        if not is_matched:
+            return is_matched
+    return is_matched</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.Listener.run_ack_function"><code class="name flex">
 <span>def <span class="ident">run_ack_function</span></span>(<span>self,<br>*,<br>request: <a title="slack_bolt.request.request.BoltRequest" href="request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>,<br>response: <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>) ‑> <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@abstractmethod
+def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt; Optional[BoltResponse]:
+    &#34;&#34;&#34;Runs all the registered middleware and then run the listener function.
+
+    Args:
+        request: The incoming request
+        response: The current response
+
+    Returns:
+        The processed response
+    &#34;&#34;&#34;
+    raise NotImplementedError()</code></pre>
+</details>
 <div class="desc"><p>Runs all the registered middleware and then run the listener function.</p>
 <h2 id="args">Args</h2>
 <dl>
@@ -4152,6 +5452,37 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>def <span class="ident">run_middleware</span></span>(<span>self,<br>*,<br>req: <a title="slack_bolt.request.request.BoltRequest" href="request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>,<br>resp: <a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>) ‑> Tuple[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None, bool]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def run_middleware(
+    self,
+    *,
+    req: BoltRequest,
+    resp: BoltResponse,
+) -&gt; Tuple[Optional[BoltResponse], bool]:
+    &#34;&#34;&#34;Runs a middleware.
+
+    Args:
+        req: The incoming request
+        resp: The current response
+
+    Returns:
+        A tuple of the processed response and a flag indicating termination
+    &#34;&#34;&#34;
+    for m in self.middleware:
+        middleware_state = {&#34;next_called&#34;: False}
+
+        def next_():
+            middleware_state[&#34;next_called&#34;] = True
+
+        resp = m.process(req=req, resp=resp, next=next_)  # type: ignore[assignment]
+        if not middleware_state[&#34;next_called&#34;]:
+            # next() was not called in this middleware
+            return (resp, True)
+    return (resp, False)</code></pre>
+</details>
 <div class="desc"><p>Runs a middleware.</p>
 <h2 id="args">Args</h2>
 <dl>
@@ -4170,7 +5501,6 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>(</span><span>*,<br>response_url: str | None,<br>proxy: str | None = None,<br>ssl: ssl.SSLContext | None = None)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4234,19 +5564,20 @@ def set_title(self) -&gt; Optional[SetTitle]:
         else:
             raise ValueError(&#34;respond is unsupported here as there is no response_url&#34;)</code></pre>
 </details>
+<div class="desc"></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="slack_bolt.Respond.proxy"><code class="name">var <span class="ident">proxy</span> : str | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.Respond.response_url"><code class="name">var <span class="ident">response_url</span> : str | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.Respond.ssl"><code class="name">var <span class="ident">ssl</span> : ssl.SSLContext | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
 </dd>
@@ -4255,7 +5586,6 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>(</span><span>thread_context_store: <a title="slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore" href="context/assistant/thread_context_store/store.html#slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore">AssistantThreadContextStore</a>,<br>channel_id: str,<br>thread_ts: str)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4282,19 +5612,20 @@ def set_title(self) -&gt; Optional[SetTitle]:
             context=new_context,
         )</code></pre>
 </details>
+<div class="desc"></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="slack_bolt.SaveThreadContext.channel_id"><code class="name">var <span class="ident">channel_id</span> : str</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.SaveThreadContext.thread_context_store"><code class="name">var <span class="ident">thread_context_store</span> : <a title="slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore" href="context/assistant/thread_context_store/store.html#slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore">AssistantThreadContextStore</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.SaveThreadContext.thread_ts"><code class="name">var <span class="ident">thread_ts</span> : str</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
 </dd>
@@ -4303,7 +5634,6 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>(</span><span>client: slack_sdk.web.client.WebClient | None,<br>channel: str | None,<br>thread_ts: str | None = None,<br>metadata: Dict | slack_sdk.models.metadata.Metadata | None = None,<br>build_metadata: Callable[[], Dict | slack_sdk.models.metadata.Metadata | None] | None = None)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4389,27 +5719,28 @@ def set_title(self) -&gt; Optional[SetTitle]:
         else:
             raise ValueError(&#34;say without channel_id here is unsupported&#34;)</code></pre>
 </details>
+<div class="desc"></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="slack_bolt.Say.build_metadata"><code class="name">var <span class="ident">build_metadata</span> : Callable[[], Dict | slack_sdk.models.metadata.Metadata | None] | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.Say.channel"><code class="name">var <span class="ident">channel</span> : str | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.Say.client"><code class="name">var <span class="ident">client</span> : slack_sdk.web.client.WebClient | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.Say.metadata"><code class="name">var <span class="ident">metadata</span> : Dict | slack_sdk.models.metadata.Metadata | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.Say.thread_ts"><code class="name">var <span class="ident">thread_ts</span> : str | None</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
 </dd>
@@ -4418,7 +5749,6 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>(</span><span>client: slack_sdk.web.client.WebClient, channel_id: str, thread_ts: str)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4445,19 +5775,20 @@ def set_title(self) -&gt; Optional[SetTitle]:
             thread_ts=self.thread_ts,
         )</code></pre>
 </details>
+<div class="desc"></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="slack_bolt.SetStatus.channel_id"><code class="name">var <span class="ident">channel_id</span> : str</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.SetStatus.client"><code class="name">var <span class="ident">client</span> : slack_sdk.web.client.WebClient</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.SetStatus.thread_ts"><code class="name">var <span class="ident">thread_ts</span> : str</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
 </dd>
@@ -4466,7 +5797,6 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>(</span><span>client: slack_sdk.web.client.WebClient, channel_id: str, thread_ts: str)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4505,19 +5835,20 @@ def set_title(self) -&gt; Optional[SetTitle]:
             title=title,
         )</code></pre>
 </details>
+<div class="desc"></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="slack_bolt.SetSuggestedPrompts.channel_id"><code class="name">var <span class="ident">channel_id</span> : str</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.SetSuggestedPrompts.client"><code class="name">var <span class="ident">client</span> : slack_sdk.web.client.WebClient</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.SetSuggestedPrompts.thread_ts"><code class="name">var <span class="ident">thread_ts</span> : str</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
 </dd>
@@ -4526,7 +5857,6 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>(</span><span>client: slack_sdk.web.client.WebClient, channel_id: str, thread_ts: str)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -4553,19 +5883,20 @@ def set_title(self) -&gt; Optional[SetTitle]:
             thread_ts=self.thread_ts,
         )</code></pre>
 </details>
+<div class="desc"></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="slack_bolt.SetTitle.channel_id"><code class="name">var <span class="ident">channel_id</span> : str</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.SetTitle.client"><code class="name">var <span class="ident">client</span> : slack_sdk.web.client.WebClient</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="slack_bolt.SetTitle.thread_ts"><code class="name">var <span class="ident">thread_ts</span> : str</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
 </dd>
@@ -4851,7 +6182,7 @@ def set_title(self) -&gt; Optional[SetTitle]:
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.3</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.5</a>.</p>
 </footer>
 </body>
 </html>
