@@ -10,6 +10,7 @@ lang: ja-jp
 
 :::tip 
 
+REMOVE
 このガイドでは[ソケットモード](https://api.slack.com/apis/connections/socket) を利用します。ソケットモードは、Slack アプリ開発をとりあえず始めてみるときやあなたのチームだけのためのアプリをつくるときにおすすめのやり方です。もしすでに HTTP をアプリのコミュニケーションプロトコルとするとわかっている場合は、HTTP の方式に対応した同様のドキュメントである [Bolt 入門ガイド（HTTP）](/tutorial/getting-started-http) を参照してください。
 
 :::
@@ -21,7 +22,7 @@ lang: ja-jp
 
 :::tip 
 
-通常の業務の妨げにならないよう、別の開発用のワークスペースを使用することをおすすめします。[新しいワークスペースは無料で作成できます](https://slack.com/get-started#create)
+通常の業務の妨げにならないよう、別の開発用のワークスペースを使用することをおすすめします。[新しいワークスペースは無料で作成できます](https://api.slack.com/developer-program)
 
 :::。
 

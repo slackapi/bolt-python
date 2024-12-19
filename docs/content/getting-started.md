@@ -15,8 +15,6 @@ When you're finished, you'll have this ⚡️[Getting Started with Slack app](ht
 
 Before you start developing with Bolt, you'll want to [create a Slack app](https://api.slack.com/apps/new).
 
-[`chat.message`](https://api.slack.com/scopes)
-
 :::tip  
 
 We recommend using a workspace where you won't disrupt real work getting done. Join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
@@ -524,6 +522,7 @@ You can see that we used `app.action()` to listen for the `action_id` that we na
 ---
 
 ## Next steps {#next-steps}
+
 You just built your first [Bolt for Python app](https://github.com/slackapi/bolt-python/tree/main/examples/getting_started)!
 
 Now that you have a basic app up and running, you can start exploring how to make your Bolt app stand out. Here are some ideas about what to explore next:
