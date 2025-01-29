@@ -218,6 +218,8 @@ class TestSanic:
         _, response = await api.asgi_client.get(url="/slack/install")
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
+        assert response.headers.get("set-cookie") is not None
+        assert response.headers.get("set-cookie").endswith("; Path=/; Max-Age=600; SameSite=Lax; Secure; HttpOnly") is True
 
         # NOTE: Although sanic-testing 0.6 does not have this value,
         # Sanic apps properly generate the content-length header

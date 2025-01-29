@@ -3,20 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-<meta name="generator" content="pdoc3 0.11.1">
+<meta name="generator" content="pdoc3 0.11.5">
 <title>slack_bolt.context API documentation</title>
 <meta name="description" content="All listeners have access to a context dictionary, which can be used to enrich events with additional information.
 Bolt automatically attaches …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
 <script>window.addEventListener('DOMContentLoaded', () => {
 hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
 hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
 })</script>
 </head>
 <body>
@@ -104,7 +115,6 @@ like <code>user_id</code>, <code>team_id</code>, <code>channel_id</code>, and <c
 <span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Context object associated with a request from Slack.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -301,6 +311,7 @@ like <code>user_id</code>, <code>team_id</code>, <code>channel_id</code>, and <c
     def save_thread_context(self) -&gt; Optional[SaveThreadContext]:
         return self.get(&#34;save_thread_context&#34;)</code></pre>
 </details>
+<div class="desc"><p>Context object associated with a request from Slack.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="slack_bolt.context.base_context.BaseContext" href="base_context.html#slack_bolt.context.base_context.BaseContext">BaseContext</a></li>
@@ -310,18 +321,6 @@ like <code>user_id</code>, <code>team_id</code>, <code>channel_id</code>, and <c
 <dl>
 <dt id="slack_bolt.context.BoltContext.ack"><code class="name">prop <span class="ident">ack</span> : <a title="slack_bolt.context.ack.ack.Ack" href="ack/ack.html#slack_bolt.context.ack.ack.Ack">Ack</a></code></dt>
 <dd>
-<div class="desc"><p><code><a title="slack_bolt.context.ack" href="ack/index.html">slack_bolt.context.ack</a></code> function for this request.</p>
-<pre><code>@app.action("button")
-def handle_button_clicks(context):
-    context.ack()
-
-# You can access "ack" this way too.
-@app.action("button")
-def handle_button_clicks(ack):
-    ack()
-</code></pre>
-<h2 id="returns">Returns</h2>
-<p>Callable <code><a title="slack_bolt.context.ack" href="ack/index.html">slack_bolt.context.ack</a></code> function</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -346,27 +345,21 @@ def ack(self) -&gt; Ack:
         self[&#34;ack&#34;] = Ack()
     return self[&#34;ack&#34;]</code></pre>
 </details>
+<div class="desc"><p><code><a title="slack_bolt.context.ack" href="ack/index.html">slack_bolt.context.ack</a></code> function for this request.</p>
+<pre><code>@app.action("button")
+def handle_button_clicks(context):
+    context.ack()
+
+# You can access "ack" this way too.
+@app.action("button")
+def handle_button_clicks(ack):
+    ack()
+</code></pre>
+<h2 id="returns">Returns</h2>
+<p>Callable <code><a title="slack_bolt.context.ack" href="ack/index.html">slack_bolt.context.ack</a></code> function</p></div>
 </dd>
 <dt id="slack_bolt.context.BoltContext.client"><code class="name">prop <span class="ident">client</span> : slack_sdk.web.client.WebClient</code></dt>
 <dd>
-<div class="desc"><p>The <code>WebClient</code> instance available for this request.</p>
-<pre><code>@app.event("app_mention")
-def handle_events(context):
-    context.client.chat_postMessage(
-        channel=context.channel_id,
-        text="Thanks!",
-    )
-
-# You can access "client" this way too.
-@app.event("app_mention")
-def handle_events(client, context):
-    client.chat_postMessage(
-        channel=context.channel_id,
-        text="Thanks!",
-    )
-</code></pre>
-<h2 id="returns">Returns</h2>
-<p><code>WebClient</code> instance</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -397,25 +390,27 @@ def client(self) -&gt; WebClient:
         self[&#34;client&#34;] = WebClient(token=None)
     return self[&#34;client&#34;]</code></pre>
 </details>
+<div class="desc"><p>The <code>WebClient</code> instance available for this request.</p>
+<pre><code>@app.event("app_mention")
+def handle_events(context):
+    context.client.chat_postMessage(
+        channel=context.channel_id,
+        text="Thanks!",
+    )
+
+# You can access "client" this way too.
+@app.event("app_mention")
+def handle_events(client, context):
+    client.chat_postMessage(
+        channel=context.channel_id,
+        text="Thanks!",
+    )
+</code></pre>
+<h2 id="returns">Returns</h2>
+<p><code>WebClient</code> instance</p></div>
 </dd>
 <dt id="slack_bolt.context.BoltContext.complete"><code class="name">prop <span class="ident">complete</span> : <a title="slack_bolt.context.complete.complete.Complete" href="complete/complete.html#slack_bolt.context.complete.complete.Complete">Complete</a></code></dt>
 <dd>
-<div class="desc"><p><code><a title="slack_bolt.context.complete" href="complete/index.html">slack_bolt.context.complete</a></code> function for this request. Once a custom function's state is set to complete,
-any outputs the function returns will be passed along to the next step of its housing workflow,
-or complete the workflow if the function is the last step in a workflow. Additionally,
-any interactivity handlers associated to a function invocation will no longer be invocable.</p>
-<pre><code>@app.function("reverse")
-def handle_button_clicks(ack, complete):
-    ack()
-    complete(outputs={"stringReverse":"olleh"})
-
-@app.function("reverse")
-def handle_button_clicks(context):
-    context.ack()
-    context.complete(outputs={"stringReverse":"olleh"})
-</code></pre>
-<h2 id="returns">Returns</h2>
-<p>Callable <code><a title="slack_bolt.context.complete" href="complete/index.html">slack_bolt.context.complete</a></code> function</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -444,25 +439,25 @@ def complete(self) -&gt; Complete:
         self[&#34;complete&#34;] = Complete(client=self.client, function_execution_id=self.function_execution_id)
     return self[&#34;complete&#34;]</code></pre>
 </details>
-</dd>
-<dt id="slack_bolt.context.BoltContext.fail"><code class="name">prop <span class="ident">fail</span> : <a title="slack_bolt.context.fail.fail.Fail" href="fail/fail.html#slack_bolt.context.fail.fail.Fail">Fail</a></code></dt>
-<dd>
-<div class="desc"><p><code><a title="slack_bolt.context.fail" href="fail/index.html">slack_bolt.context.fail</a></code> function for this request. Once a custom function's state is set to error,
-its housing workflow will be interrupted and any provided error message will be passed
-on to the end user through SlackBot. Additionally, any interactivity handlers associated
-to a function invocation will no longer be invocable.</p>
+<div class="desc"><p><code><a title="slack_bolt.context.complete" href="complete/index.html">slack_bolt.context.complete</a></code> function for this request. Once a custom function's state is set to complete,
+any outputs the function returns will be passed along to the next step of its housing workflow,
+or complete the workflow if the function is the last step in a workflow. Additionally,
+any interactivity handlers associated to a function invocation will no longer be invocable.</p>
 <pre><code>@app.function("reverse")
-def handle_button_clicks(ack, fail):
+def handle_button_clicks(ack, complete):
     ack()
-    fail(error="something went wrong")
+    complete(outputs={"stringReverse":"olleh"})
 
 @app.function("reverse")
 def handle_button_clicks(context):
     context.ack()
-    context.fail(error="something went wrong")
+    context.complete(outputs={"stringReverse":"olleh"})
 </code></pre>
 <h2 id="returns">Returns</h2>
-<p>Callable <code><a title="slack_bolt.context.fail" href="fail/index.html">slack_bolt.context.fail</a></code> function</p></div>
+<p>Callable <code><a title="slack_bolt.context.complete" href="complete/index.html">slack_bolt.context.complete</a></code> function</p></div>
+</dd>
+<dt id="slack_bolt.context.BoltContext.fail"><code class="name">prop <span class="ident">fail</span> : <a title="slack_bolt.context.fail.fail.Fail" href="fail/fail.html#slack_bolt.context.fail.fail.Fail">Fail</a></code></dt>
+<dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -491,10 +486,25 @@ def fail(self) -&gt; Fail:
         self[&#34;fail&#34;] = Fail(client=self.client, function_execution_id=self.function_execution_id)
     return self[&#34;fail&#34;]</code></pre>
 </details>
+<div class="desc"><p><code><a title="slack_bolt.context.fail" href="fail/index.html">slack_bolt.context.fail</a></code> function for this request. Once a custom function's state is set to error,
+its housing workflow will be interrupted and any provided error message will be passed
+on to the end user through SlackBot. Additionally, any interactivity handlers associated
+to a function invocation will no longer be invocable.</p>
+<pre><code>@app.function("reverse")
+def handle_button_clicks(ack, fail):
+    ack()
+    fail(error="something went wrong")
+
+@app.function("reverse")
+def handle_button_clicks(context):
+    context.ack()
+    context.fail(error="something went wrong")
+</code></pre>
+<h2 id="returns">Returns</h2>
+<p>Callable <code><a title="slack_bolt.context.fail" href="fail/index.html">slack_bolt.context.fail</a></code> function</p></div>
 </dd>
-<dt id="slack_bolt.context.BoltContext.get_thread_context"><code class="name">prop <span class="ident">get_thread_context</span> : Optional[<a title="slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext" href="get_thread_context/get_thread_context.html#slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext">GetThreadContext</a>]</code></dt>
+<dt id="slack_bolt.context.BoltContext.get_thread_context"><code class="name">prop <span class="ident">get_thread_context</span> : <a title="slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext" href="get_thread_context/get_thread_context.html#slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext">GetThreadContext</a> | None</code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -503,10 +513,10 @@ def fail(self) -&gt; Fail:
 def get_thread_context(self) -&gt; Optional[GetThreadContext]:
     return self.get(&#34;get_thread_context&#34;)</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 <dt id="slack_bolt.context.BoltContext.listener_runner"><code class="name">prop <span class="ident">listener_runner</span> : ThreadListenerRunner</code></dt>
 <dd>
-<div class="desc"><p>The properly configured listener_runner that is available for middleware/listeners.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -516,23 +526,10 @@ def listener_runner(self) -&gt; &#34;ThreadListenerRunner&#34;:  # type: ignore[
     &#34;&#34;&#34;The properly configured listener_runner that is available for middleware/listeners.&#34;&#34;&#34;
     return self[&#34;listener_runner&#34;]</code></pre>
 </details>
+<div class="desc"><p>The properly configured listener_runner that is available for middleware/listeners.</p></div>
 </dd>
-<dt id="slack_bolt.context.BoltContext.respond"><code class="name">prop <span class="ident">respond</span> : Optional[<a title="slack_bolt.context.respond.respond.Respond" href="respond/respond.html#slack_bolt.context.respond.respond.Respond">Respond</a>]</code></dt>
+<dt id="slack_bolt.context.BoltContext.respond"><code class="name">prop <span class="ident">respond</span> : <a title="slack_bolt.context.respond.respond.Respond" href="respond/respond.html#slack_bolt.context.respond.respond.Respond">Respond</a> | None</code></dt>
 <dd>
-<div class="desc"><p><code><a title="slack_bolt.context.respond" href="respond/index.html">slack_bolt.context.respond</a></code> function for this request.</p>
-<pre><code>@app.action("button")
-def handle_button_clicks(context):
-    context.ack()
-    context.respond("Hi!")
-
-# You can access "ack" this way too.
-@app.action("button")
-def handle_button_clicks(ack, respond):
-    ack()
-    respond("Hi!")
-</code></pre>
-<h2 id="returns">Returns</h2>
-<p>Callable <code><a title="slack_bolt.context.respond" href="respond/index.html">slack_bolt.context.respond</a></code> function</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -563,10 +560,23 @@ def respond(self) -&gt; Optional[Respond]:
         )
     return self[&#34;respond&#34;]</code></pre>
 </details>
+<div class="desc"><p><code><a title="slack_bolt.context.respond" href="respond/index.html">slack_bolt.context.respond</a></code> function for this request.</p>
+<pre><code>@app.action("button")
+def handle_button_clicks(context):
+    context.ack()
+    context.respond("Hi!")
+
+# You can access "ack" this way too.
+@app.action("button")
+def handle_button_clicks(ack, respond):
+    ack()
+    respond("Hi!")
+</code></pre>
+<h2 id="returns">Returns</h2>
+<p>Callable <code><a title="slack_bolt.context.respond" href="respond/index.html">slack_bolt.context.respond</a></code> function</p></div>
 </dd>
-<dt id="slack_bolt.context.BoltContext.save_thread_context"><code class="name">prop <span class="ident">save_thread_context</span> : Optional[<a title="slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext" href="save_thread_context/save_thread_context.html#slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext">SaveThreadContext</a>]</code></dt>
+<dt id="slack_bolt.context.BoltContext.save_thread_context"><code class="name">prop <span class="ident">save_thread_context</span> : <a title="slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext" href="save_thread_context/save_thread_context.html#slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext">SaveThreadContext</a> | None</code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -575,23 +585,10 @@ def respond(self) -&gt; Optional[Respond]:
 def save_thread_context(self) -&gt; Optional[SaveThreadContext]:
     return self.get(&#34;save_thread_context&#34;)</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 <dt id="slack_bolt.context.BoltContext.say"><code class="name">prop <span class="ident">say</span> : <a title="slack_bolt.context.say.say.Say" href="say/say.html#slack_bolt.context.say.say.Say">Say</a></code></dt>
 <dd>
-<div class="desc"><p><code><a title="slack_bolt.context.say" href="say/index.html">slack_bolt.context.say</a></code> function for this request.</p>
-<pre><code>@app.action("button")
-def handle_button_clicks(context):
-    context.ack()
-    context.say("Hi!")
-
-# You can access "ack" this way too.
-@app.action("button")
-def handle_button_clicks(ack, say):
-    ack()
-    say("Hi!")
-</code></pre>
-<h2 id="returns">Returns</h2>
-<p>Callable <code><a title="slack_bolt.context.say" href="say/index.html">slack_bolt.context.say</a></code> function</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -618,10 +615,23 @@ def say(self) -&gt; Say:
         self[&#34;say&#34;] = Say(client=self.client, channel=self.channel_id, thread_ts=self.thread_ts)
     return self[&#34;say&#34;]</code></pre>
 </details>
+<div class="desc"><p><code><a title="slack_bolt.context.say" href="say/index.html">slack_bolt.context.say</a></code> function for this request.</p>
+<pre><code>@app.action("button")
+def handle_button_clicks(context):
+    context.ack()
+    context.say("Hi!")
+
+# You can access "ack" this way too.
+@app.action("button")
+def handle_button_clicks(ack, say):
+    ack()
+    say("Hi!")
+</code></pre>
+<h2 id="returns">Returns</h2>
+<p>Callable <code><a title="slack_bolt.context.say" href="say/index.html">slack_bolt.context.say</a></code> function</p></div>
 </dd>
-<dt id="slack_bolt.context.BoltContext.set_status"><code class="name">prop <span class="ident">set_status</span> : Optional[<a title="slack_bolt.context.set_status.set_status.SetStatus" href="set_status/set_status.html#slack_bolt.context.set_status.set_status.SetStatus">SetStatus</a>]</code></dt>
+<dt id="slack_bolt.context.BoltContext.set_status"><code class="name">prop <span class="ident">set_status</span> : <a title="slack_bolt.context.set_status.set_status.SetStatus" href="set_status/set_status.html#slack_bolt.context.set_status.set_status.SetStatus">SetStatus</a> | None</code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -630,10 +640,10 @@ def say(self) -&gt; Say:
 def set_status(self) -&gt; Optional[SetStatus]:
     return self.get(&#34;set_status&#34;)</code></pre>
 </details>
-</dd>
-<dt id="slack_bolt.context.BoltContext.set_suggested_prompts"><code class="name">prop <span class="ident">set_suggested_prompts</span> : Optional[<a title="slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts" href="set_suggested_prompts/set_suggested_prompts.html#slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts">SetSuggestedPrompts</a>]</code></dt>
-<dd>
 <div class="desc"></div>
+</dd>
+<dt id="slack_bolt.context.BoltContext.set_suggested_prompts"><code class="name">prop <span class="ident">set_suggested_prompts</span> : <a title="slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts" href="set_suggested_prompts/set_suggested_prompts.html#slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts">SetSuggestedPrompts</a> | None</code></dt>
+<dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -642,10 +652,10 @@ def set_status(self) -&gt; Optional[SetStatus]:
 def set_suggested_prompts(self) -&gt; Optional[SetSuggestedPrompts]:
     return self.get(&#34;set_suggested_prompts&#34;)</code></pre>
 </details>
-</dd>
-<dt id="slack_bolt.context.BoltContext.set_title"><code class="name">prop <span class="ident">set_title</span> : Optional[<a title="slack_bolt.context.set_title.set_title.SetTitle" href="set_title/set_title.html#slack_bolt.context.set_title.set_title.SetTitle">SetTitle</a>]</code></dt>
-<dd>
 <div class="desc"></div>
+</dd>
+<dt id="slack_bolt.context.BoltContext.set_title"><code class="name">prop <span class="ident">set_title</span> : <a title="slack_bolt.context.set_title.set_title.SetTitle" href="set_title/set_title.html#slack_bolt.context.set_title.set_title.SetTitle">SetTitle</a> | None</code></dt>
+<dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -654,6 +664,7 @@ def set_suggested_prompts(self) -&gt; Optional[SetSuggestedPrompts]:
 def set_title(self) -&gt; Optional[SetTitle]:
     return self.get(&#34;set_title&#34;)</code></pre>
 </details>
+<div class="desc"></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -662,6 +673,31 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <span>def <span class="ident">to_copyable</span></span>(<span>self) ‑> <a title="slack_bolt.context.context.BoltContext" href="context.html#slack_bolt.context.context.BoltContext">BoltContext</a></span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_copyable(self) -&gt; &#34;BoltContext&#34;:
+    new_dict = {}
+    for prop_name, prop_value in self.items():
+        if prop_name in self.copyable_standard_property_names:
+            # all the standard properties are copiable
+            new_dict[prop_name] = prop_value
+        elif prop_name in self.non_copyable_standard_property_names:
+            # Do nothing with this property (e.g., listener_runner)
+            continue
+        else:
+            try:
+                copied_value = create_copy(prop_value)
+                new_dict[prop_name] = copied_value
+            except TypeError as te:
+                self.logger.warning(
+                    f&#34;Skipped setting &#39;{prop_name}&#39; to a copied request for lazy listeners &#34;
+                    &#34;due to a deep-copy creation error. Consider passing the value not as part of context object &#34;
+                    f&#34;(error: {te})&#34;
+                )
+    return BoltContext(new_dict)</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 </dl>
@@ -677,6 +713,7 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <li><code><a title="slack_bolt.context.base_context.BaseContext.bot_token" href="base_context.html#slack_bolt.context.base_context.BaseContext.bot_token">bot_token</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.bot_user_id" href="base_context.html#slack_bolt.context.base_context.BaseContext.bot_user_id">bot_user_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.channel_id" href="base_context.html#slack_bolt.context.base_context.BaseContext.channel_id">channel_id</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.copyable_standard_property_names" href="base_context.html#slack_bolt.context.base_context.BaseContext.copyable_standard_property_names">copyable_standard_property_names</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.enterprise_id" href="base_context.html#slack_bolt.context.base_context.BaseContext.enterprise_id">enterprise_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.function_bot_access_token" href="base_context.html#slack_bolt.context.base_context.BaseContext.function_bot_access_token">function_bot_access_token</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.function_execution_id" href="base_context.html#slack_bolt.context.base_context.BaseContext.function_execution_id">function_execution_id</a></code></li>
@@ -684,7 +721,9 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <li><code><a title="slack_bolt.context.base_context.BaseContext.is_enterprise_install" href="base_context.html#slack_bolt.context.base_context.BaseContext.is_enterprise_install">is_enterprise_install</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.logger" href="base_context.html#slack_bolt.context.base_context.BaseContext.logger">logger</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.matches" href="base_context.html#slack_bolt.context.base_context.BaseContext.matches">matches</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.non_copyable_standard_property_names" href="base_context.html#slack_bolt.context.base_context.BaseContext.non_copyable_standard_property_names">non_copyable_standard_property_names</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.response_url" href="base_context.html#slack_bolt.context.base_context.BaseContext.response_url">response_url</a></code></li>
+<li><code><a title="slack_bolt.context.base_context.BaseContext.standard_property_names" href="base_context.html#slack_bolt.context.base_context.BaseContext.standard_property_names">standard_property_names</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.team_id" href="base_context.html#slack_bolt.context.base_context.BaseContext.team_id">team_id</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.thread_ts" href="base_context.html#slack_bolt.context.base_context.BaseContext.thread_ts">thread_ts</a></code></li>
 <li><code><a title="slack_bolt.context.base_context.BaseContext.token" href="base_context.html#slack_bolt.context.base_context.BaseContext.token">token</a></code></li>
@@ -751,7 +790,7 @@ def set_title(self) -&gt; Optional[SetTitle]:
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.5</a>.</p>
 </footer>
 </body>
 </html>

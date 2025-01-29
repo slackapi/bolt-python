@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "pytest-runner==5.2", "wheel"]
+requires = ["setuptools", "pytest-runner==6.0.1", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -15,6 +15,7 @@ classifiers = [
 	"Programming Language :: Python :: 3.10",
 	"Programming Language :: Python :: 3.11",
 	"Programming Language :: Python :: 3.12",
+	"Programming Language :: Python :: 3.13",
 	"Programming Language :: Python :: Implementation :: CPython",
 	"License :: OSI Approved :: MIT License",
 	"Operating System :: OS Independent",

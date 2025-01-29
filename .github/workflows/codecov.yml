@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        python-version: ["3.11"]
+        python-version: ["3.13"]
     env:
       BOLT_PYTHON_CODECOV_RUNNING: "1"
     steps:
@@ -31,7 +31,7 @@ jobs:
         run: |
           pytest --cov=./slack_bolt/ --cov-report=xml
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
           verbose: true

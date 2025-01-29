@@ -29,19 +29,25 @@ def to_sanic_response(bolt_resp: BoltResponse) -> HTTPResponse:
         body=bolt_resp.body,
         headers=bolt_resp.first_headers_without_set_cookie(),
     )
+
     for cookie in bolt_resp.cookies():
-        for name, c in cookie.items():
-            resp.cookies[name] = c.value
+        for key, c in cookie.items():
             expire_value = c.get("expires")
-            if expire_value is not None and expire_value != "":
-                expire = datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z")
-                resp.cookies[name]["expires"] = expire
-            resp.cookies[name]["path"] = c.get("path")
-            resp.cookies[name]["domain"] = c.get("domain")
-            if c.get("max-age") is not None and len(c.get("max-age")) > 0:  # type: ignore[arg-type]
-                resp.cookies[name]["max-age"] = int(c.get("max-age"))  # type: ignore[arg-type]
-            resp.cookies[name]["secure"] = True
-            resp.cookies[name]["httponly"] = True
+            expires = datetime.strptime(expire_value, "%a, %d %b %Y %H:%M:%S %Z") if expire_value else None
+            max_age = int(c["max-age"]) if c.get("max-age") else None
+            path = str(c.get("path")) if c.get("path") else "/"
+            domain = str(c.get("domain")) if c.get("domain") else None
+            resp.add_cookie(
+                key=key,
+                value=c.value,
+                expires=expires,
+                path=path,
+                domain=domain,
+                max_age=max_age,
+                secure=True,
+                httponly=True,
+            )
+
     return resp
 
 
