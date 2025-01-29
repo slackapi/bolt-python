@@ -215,7 +215,8 @@ class TestStarlette:
             routes=[Route("/slack/install", endpoint=endpoint, methods=["GET"])],
         )
         client = TestClient(api)
-        response = client.get("/slack/install", allow_redirects=False)
+        client.follow_redirects = False
+        response = client.get("/slack/install")
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
         assert "https://slack.com/oauth/v2/authorize?state=" in response.text
