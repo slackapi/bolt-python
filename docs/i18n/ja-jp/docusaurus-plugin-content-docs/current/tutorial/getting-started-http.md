@@ -3,10 +3,41 @@ title: Bolt 入門ガイド（HTTP）
 slug: getting-started-http
 lang: ja-jp
 ---
----
+
+# Bolt 入門ガイド（HTTP）
+
+このガイドでは、**HTTP上で Bolt for Python** を使った Slack アプリの設定と起動する方法について説明します。ここで説明する手順は、新しい Slack アプリを作成し、ローカルの開発環境をセットアップし、Slack ワークスペースからのメッセージをリッスンして応答するアプリを開発するという流れになります。
+
+この手順を全て終わらせたら、あなたはきっと ⚡️[Slack アプリのはじめ方](https://github.com/slackapi/bolt-python/tree/main/examples/getting_started)のサンプルアプリを動作させたり、それに変更を加えたり、自分のアプリを作ったりすることができるようになるでしょう。
 
 ---
 
+### アプリを作成する {#create-an-app}
+最初にやるべきこと : Bolt での開発を始める前に、[Slack アプリを作成](https://api.slack.com/apps/new)します。
+
+:::tip
+
+いつもの仕事のさまたげにならないように、別の開発用のワークスペースを使用することをおすすめします。[新しいワークスペースは無料で作成できます](https://slack.com/get-started#create)。
+
+:::
+
+アプリ名を入力し（_後で変更可能_）、インストール先のワークスペースを選択したら、「`Create App`」ボタンをクリックすると、アプリの **Basic Information** ページが表示されます。
+
+このページでは、アプリの概要を確認できます。また、「**App Credentials**」ヘッダーの下では「`Signing Secret`」などの重要な認証情報も確認できます。これらの認証情報は後で必要になります。
+
+![Basic Information ページ](/img/boltpy/basic-information-page.png "Basic Information ページ")
+
+ひと通り確認し、アプリのアイコンと説明を追加したら、アプリの構成 🔩 を始めましょう。
+
+---
+
+### トークンとアプリのインストール {#tokens-and-installing-apps}
+Slack アプリでは、[Slack API へのアクセスの管理に OAuth を使用します](https://api.slack.com/docs/oauth)。アプリがインストールされると、トークンが発行されます。アプリはそのトークンを使って API メソッドを呼び出すことができます。
+
+Slack アプリで使用できるトークンには、ユーザートークン（`xoxp`）とボットトークン（`xoxb`）、アプリレベルトークン（`xapp`）の 3 種類があります。
+- [ユーザートークン](https://api.slack.com/authentication/token-types#user) を使用すると、ユーザーがアプリをインストールまたは認証した後、アプリがそのユーザーを代理して API メソッドを呼び出すことができます。1 つのワークスペースに複数のユーザートークンが存在する可能性があります。
+- [ボットトークン](https://api.slack.com/authentication/token-types#bot) はボットユーザーに関連づけられ、1 つのワークスペースでは最初に誰かがそのアプリをインストールした際に一度だけ発行されます。どのユーザーがインストールを実行しても、アプリが使用するボットトークンは同じになります。_ほとんど_のアプリで使用されるのは、ボットトークンです。
+- [アプリレベルトークン](https://api.slack.com/authentication/token-types#app) は、組織に渡ってあなたのアプリを表すものです。所属する組織内の全てのワークスペースに、全ての個人ユーザによってインストールされたアプリについても同様です。アプリレベルトークンは WebSocket 通信を行うアプリを作る際に通常使われます。
 
 説明を簡潔にするために、このガイドではボットトークンを使用します。
 
@@ -65,6 +96,7 @@ export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
 
 > 🔒 全てのトークンは安全に保管してください。最低限、パブリックなバージョンコントロールにチェックインすることは避けてください。また、上記の例のように環境変数を介してアクセスするようにしてください。詳細な情報は [best practices for app security](https://api.slack.com/authentication/best-practices).のドキュメントを参照してください。
+
 
 完了したら、アプリを作ってみましょう。以下のコマンドを使って、仮想環境に Python の `slack_bolt` パッケージをインストールします。
 

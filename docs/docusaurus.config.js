@@ -49,7 +49,7 @@ const config = {
         redirects: [
           {
             to: "/getting-started",
-            from: ["/tutorial/getting-started", "/tutorial/getting-started-http"],
+            from: ["/tutorial/getting-started"],
           },
           {
             to: "/",

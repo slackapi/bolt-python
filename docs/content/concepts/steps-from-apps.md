@@ -1,7 +1,7 @@
 ---
 title: Steps from apps
 lang: en
-slug: /concepts/steps-from-apps
+slug: /legacy/steps-from-apps
 ---
 
 :::danger
