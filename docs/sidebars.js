@@ -47,16 +47,22 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Middleware & Adaptors",
+      label: "Middleware & Context",
       items: [
         "concepts/global-middleware",
         "concepts/listener-middleware",
-        'concepts/lazy-listeners',
         'concepts/context',
-        'concepts/adapters',
-        'concepts/custom-adapters',
       ],
     },
+	'concepts/lazy-listeners',
+	{
+		type: "category",
+		label: "Adaptors",
+		items: [
+		  'concepts/adapters',
+		  'concepts/custom-adapters',
+		],
+	  },
     {
       type: "category",
       label: "Authorization & Security",
