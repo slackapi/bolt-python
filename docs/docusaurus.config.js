@@ -55,6 +55,23 @@ const config = {
             to: "/",
             from: ["/concepts", "/concepts/basic", "/concepts/advanced"],
           },
+          {
+            to: '/concepts/actions',
+            from: [
+              '/concepts/action-listening',
+              '/concepts/action-responding'
+            ],
+          },
+          {
+            to: '/legacy/steps-from-apps',
+            from: [
+              '/concepts/steps',
+              '/concepts/creating-steps',
+              '/concepts/adding-editing-steps',
+              '/concepts/saving-steps',
+              '/concepts/executing-steps'
+            ],
+          },
         ],
       },
     ],

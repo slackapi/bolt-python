@@ -71,7 +71,6 @@ Then grab the latest version of Node.
 nvm install node
 ```
 
-
 If you are running this project locally for the first time, you'll need to install the packages with the following command:
 
 ```
