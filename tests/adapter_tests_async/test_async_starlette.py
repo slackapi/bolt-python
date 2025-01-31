@@ -216,7 +216,8 @@ class TestAsyncStarlette:
         )
 
         client = TestClient(api)
-        response = client.get("/slack/install", allow_redirects=False)
+        client.follow_redirects = False
+        response = client.get("/slack/install")
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
         assert response.headers.get("content-length") == "607"
