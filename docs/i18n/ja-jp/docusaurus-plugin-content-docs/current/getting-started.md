@@ -190,8 +190,8 @@ import TabItem from '@theme/TabItem';
 
 次の例では、アプリが参加するチャンネルとダイレクトメッセージに投稿されるすべてのメッセージをリッスンし、「こんにちは」というメッセージに応答を返します。
 
-<Tabs groupId="socket-or-http2">
-<TabItem value="socket-mode2" label="Socket Mode">
+<Tabs groupId="socket-or-http">
+<TabItem value="socket-mode" label="Socket Mode">
 
 ```python
 import os
@@ -215,7 +215,7 @@ if __name__ == "__main__":
 ```
 
   </TabItem>
-  <TabItem value="http2" label="HTTP">
+  <TabItem value="http" label="HTTP">
 
 ```python
 import os
@@ -253,13 +253,13 @@ if __name__ == "__main__":
 
 インタラクティブ機能を有効にすると、ボタン、選択メニュー、日付ピッカー、モーダル、ショートカットなどの機能が利用できるようになります。アプリ設定ページの「**Interactivity & Shortcuts**」にアクセスしてください。
 
-<Tabs groupId="socket-or-http3">
-<TabItem value="socket-mode3" label="Socket Mode">
+<Tabs groupId="socket-or-http">
+<TabItem value="socket-mode" label="Socket Mode">
 
 ソケット モードをオンにすると、基本的な対話機能がデフォルトで有効になるため、それ以上の操作は必要ありません。
 
 </TabItem>
-<TabItem value="http3" label="HTTP">
+<TabItem value="http" label="HTTP">
 
 イベントと同様に、Slack がアクション (*ユーザーがボタンをクリックした* など) を送信するには、URL を指定する必要があります。アプリ構成ページに戻り、左側にある **対話性とショートカット** をクリックします。別の **リクエスト URL** ボックスがあることがわかります。
 
@@ -280,8 +280,8 @@ if __name__ == "__main__":
 
 以下のコードの後の部分を編集し、文字列だけのメッセージの代わりに、ボタンを含んだメッセージを送信するようにしてみます。
 
-<Tabs groupId="socket-or-http4">
-<TabItem value="socket-mode4" label="Socket Mode">
+<Tabs groupId="socket-or-http">
+<TabItem value="socket-mode" label="Socket Mode">
 
 ```python
 import os
@@ -316,7 +316,7 @@ if __name__ == "__main__":
 ```
 
 </TabItem>
-<TabItem value="http4" label="HTTP">
+<TabItem value="http" label="HTTP">
 
 ```python
 import os
@@ -369,8 +369,8 @@ if __name__ == "__main__":
 
 ハンドラーを追加して、ボタンがクリックされたときにフォローアップメッセージを送信するようにしてみましょう。
 
-<Tabs groupId="socket-or-http5">
-<TabItem value="socket-mode5" label="Socket Mode">
+<Tabs groupId="socket-or-http">
+<TabItem value="socket-mode" label="Socket Mode">
 
 ```python
 import os
@@ -412,7 +412,7 @@ if __name__ == "__main__":
 ```
 
 </TabItem>
-<TabItem value="http5" label="HTTP">
+<TabItem value="http" label="HTTP">
 
 ```python
 import os

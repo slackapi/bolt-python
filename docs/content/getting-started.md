@@ -193,8 +193,8 @@ Your app is now ready for some logic. Let's start by using the `message()` metho
 
 The following example listens and responds to all messages in channels/DMs where your app has been added that contain the word "hello":
 
-<Tabs groupId="socket-or-http2">
-<TabItem value="socket-mode2" label="Socket Mode">
+<Tabs groupId="socket-or-http">
+<TabItem value="socket-mode" label="Socket Mode">
 
 ```python
 import os
@@ -218,7 +218,7 @@ if __name__ == "__main__":
 ```
 
   </TabItem>
-  <TabItem value="http2" label="HTTP">
+  <TabItem value="http" label="HTTP">
 
 ```python
 import os
@@ -256,13 +256,13 @@ This is a basic example, but it gives you a place to start customizing your app 
 
 To use features like buttons, select menus, datepickers, modals, and shortcuts, you’ll need to enable interactivity. Head over to **Interactivity & Shortcuts** in your app configuration.
 
-<Tabs groupId="socket-or-http3">
-<TabItem value="socket-mode3" label="Socket Mode">
+<Tabs groupId="socket-or-http">
+<TabItem value="socket-mode" label="Socket Mode">
 
 With Socket Mode on, basic interactivity is enabled by default, so no further action is needed.
 
 </TabItem>
-<TabItem value="http3" label="HTTP">
+<TabItem value="http" label="HTTP">
 
 Similar to events, you'll need to specify a URL for Slack to send the action (such as *user clicked a button*). Back on your app configuration page, click on **Interactivity & Shortcuts** on the left side. You'll see that there's another **Request URL** box.
 
@@ -283,8 +283,8 @@ Now, let's go back to your app's code and add logic to handle those events:
 
 Below, the code from the last section is modified to send a message containing a button rather than just a string:
 
-<Tabs groupId="socket-or-http4">
-<TabItem value="socket-mode4" label="Socket Mode">
+<Tabs groupId="socket-or-http">
+<TabItem value="socket-mode" label="Socket Mode">
 
 ```python
 import os
@@ -323,7 +323,7 @@ if __name__ == "__main__":
 ```
 
 </TabItem>
-<TabItem value="http4" label="HTTP">
+<TabItem value="http" label="HTTP">
 
 ```python
 import os
@@ -376,8 +376,8 @@ Now, if you restart your app and say "hello" in a channel your app is in, you'll
 
 Let's add a handler to send a followup message when someone clicks the button:
 
-<Tabs groupId="socket-or-http5">
-<TabItem value="socket-mode5" label="Socket Mode">
+<Tabs groupId="socket-or-http">
+<TabItem value="socket-mode" label="Socket Mode">
 
 ```python
 import os
@@ -418,7 +418,7 @@ if __name__ == "__main__":
 ```
 
 </TabItem>
-<TabItem value="http5" label="HTTP">
+<TabItem value="http" label="HTTP">
 
 ```python
 import os
