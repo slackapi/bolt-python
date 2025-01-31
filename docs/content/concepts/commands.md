@@ -1,5 +1,5 @@
 ---
-title: Listening and responding to commands
+title: Listening & responding to commands
 lang: en
 slug: /concepts/commands
 ---

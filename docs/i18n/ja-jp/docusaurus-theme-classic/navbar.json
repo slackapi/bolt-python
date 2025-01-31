@@ -54,5 +54,9 @@
   "item.label.Slack Community": {
     "message": "Slack Community",
     "description": "Navbar item with label Slack Community"
+  },
+  "item.label.Slack CLI": {
+    "message": "Slack CLI",
+    "description": "Navbar item with label Slack CLI"
   }
 }

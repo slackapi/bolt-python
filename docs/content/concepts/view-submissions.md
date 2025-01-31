@@ -1,5 +1,5 @@
 ---
-title: Listening for view submissions
+title: Listening to views
 lang: en
 slug: /concepts/view_submissions
 ---

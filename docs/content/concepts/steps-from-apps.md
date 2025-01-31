@@ -6,9 +6,9 @@ slug: /legacy/steps-from-apps
 
 :::danger
 
-Steps from apps are a deprecated feature.
+Steps from Apps is a deprecated feature.
 
-Steps from apps are different than, and not interchangeable with, Slack automation workflows. We encourage those who are currently publishing steps from apps to consider the new [Slack automation features](https://api.slack.com/automation), such as [custom steps for Bolt](https://api.slack.com/automation/functions/custom-bolt),
+Steps from Apps are different than, and not interchangeable with, Slack automation workflows. We encourage those who are currently publishing steps from apps to consider the new [Slack automation features](https://api.slack.com/automation), such as [custom steps for Bolt](https://api.slack.com/automation/functions/custom-bolt).
 
 Please [read the Slack API changelog entry](https://api.slack.com/changelog/2023-08-workflow-steps-from-apps-step-back) for more information.
 
@@ -171,7 +171,7 @@ ws = WorkflowStep(
 app.step(ws)
 ```
 
-## Executing steps from app
+## Executing steps from apps
 
 When your step from app is executed by an end user, your app will receive a [`workflow_step_execute` event](https://api.slack.com/events/workflow_step_execute). The `execute` callback in your `WorkflowStep` configuration will be run when this event is received.
 

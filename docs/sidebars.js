@@ -2,15 +2,17 @@
 const sidebars = {
 	sidebarBoltPy: [
 		{
-			type: "category",
-			label: "Guides",
+			type: 'doc',
+			id: 'index',
+			label: 'Bolt for Python',
+			className: 'sidebar-title',
+		  },
+		  { type: 'html', value: '<hr>' },
+		  {
+			type: 'category',
+			label: 'Guides',
+			collapsed: false,
 			items: [
-				{
-					type: "doc",
-					id: "index",
-					label: "Bolt for Python",
-					className: "sidebar-title",
-				},
 				"getting-started",
 				{
 					type: "category",
@@ -19,7 +21,7 @@ const sidebars = {
 				},
 				{
 					type: "category",
-					label: "Events API",
+					label: "Events",
 					items: ["concepts/message-listening", "concepts/event-listening"],
 				},
 				{
@@ -84,7 +86,7 @@ const sidebars = {
 		{
 			type: "category",
 			label: "Tutorials",
-			items: ["tutorial/ai-chatbot", "tutorial/getting-started-http"],
+			items: ["tutorial/ai-chatbot", "tutorial/custom-steps-for-jira"],
 		},
 		{ type: "html", value: "<hr>" },
 		{
