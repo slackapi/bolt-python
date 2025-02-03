@@ -64,7 +64,7 @@
     "description": "The label for category Legacy in sidebar sidebarBoltPy"
   },
   "sidebar.sidebarBoltPy.link.Reference": {
-    "message": "Reference",
+    "message": "リファレンス",
     "description": "The label for link Reference in sidebar sidebarBoltPy, linking to https://tools.slack.dev/bolt-python/api-docs/slack_bolt/"
   },
   "sidebar.sidebarBoltPy.link.Release notes": {
