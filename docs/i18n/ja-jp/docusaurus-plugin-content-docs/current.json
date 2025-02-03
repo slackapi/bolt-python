@@ -52,7 +52,7 @@
     "description": "The label for category Middleware & Context in sidebar sidebarBoltPy"
   },
   "sidebar.sidebarBoltPy.category.Adaptors": {
-    "message": "Adaptors",
+    "message": "アダプター",
     "description": "The label for category Adaptors in sidebar sidebarBoltPy"
   },
   "sidebar.sidebarBoltPy.category.Authorization & Security": {
