@@ -26,5 +26,53 @@
   "sidebar.sidebarBoltPy.link.Contributors Guide": {
     "message": "貢献",
     "description": "The label for link Contributors Guide in sidebar sidebarBoltPy, linking to https://github.com/SlackAPI/bolt-python/blob/main/.github/contributing.md"
+  },
+  "sidebar.sidebarBoltPy.category.Guides": {
+    "message": "ガイド",
+    "description": "The label for category Guides in sidebar sidebarBoltPy"
+  },
+  "sidebar.sidebarBoltPy.category.Slack API calls": {
+    "message": "Slack API コール",
+    "description": "The label for category Slack API calls in sidebar sidebarBoltPy"
+  },
+  "sidebar.sidebarBoltPy.category.Events": {
+    "message": "イベント API",
+    "description": "The label for category Events in sidebar sidebarBoltPy"
+  },
+  "sidebar.sidebarBoltPy.category.App UI & Interactivity": {
+    "message": "インタラクティビティ & ショートカット",
+    "description": "The label for category App UI & Interactivity in sidebar sidebarBoltPy"
+  },
+  "sidebar.sidebarBoltPy.category.App Configuration": {
+    "message": "App の設定",
+    "description": "The label for category App Configuration in sidebar sidebarBoltPy"
+  },
+  "sidebar.sidebarBoltPy.category.Middleware & Context": {
+    "message": "ミドルウェア & コンテキスト",
+    "description": "The label for category Middleware & Context in sidebar sidebarBoltPy"
+  },
+  "sidebar.sidebarBoltPy.category.Adaptors": {
+    "message": "アダプター",
+    "description": "The label for category Adaptors in sidebar sidebarBoltPy"
+  },
+  "sidebar.sidebarBoltPy.category.Authorization & Security": {
+    "message": "認可 & セキュリティ",
+    "description": "The label for category Authorization & Security in sidebar sidebarBoltPy"
+  },
+  "sidebar.sidebarBoltPy.category.Legacy": {
+    "message": "レガシー（非推奨）",
+    "description": "The label for category Legacy in sidebar sidebarBoltPy"
+  },
+  "sidebar.sidebarBoltPy.link.Reference": {
+    "message": "リファレンス",
+    "description": "The label for link Reference in sidebar sidebarBoltPy, linking to https://tools.slack.dev/bolt-python/api-docs/slack_bolt/"
+  },
+  "sidebar.sidebarBoltPy.link.Release notes": {
+    "message": "リリースノート",
+    "description": "The label for link Release notes in sidebar sidebarBoltPy, linking to https://github.com/slackapi/bolt-python/releases"
+  },
+  "sidebar.sidebarBoltPy.doc.Bolt for Python": {
+    "message": "Bolt for Python",
+    "description": "The label for the doc item Bolt for Python in sidebar sidebarBoltPy, linking to the doc index"
   }
 }
