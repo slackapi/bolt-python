@@ -8,7 +8,7 @@ Your app can use the `command()` method to listen to incoming slash command requ
 
 Commands must be acknowledged with `ack()` to inform Slack your app has received the request.
 
-There are two ways to respond to slash commands. The first way is to use `say()`, which accepts a string or JSON payload. The second is `respond()` which is a utility for the `response_url`. These are explained in more depth in the [responding to actions](/concepts/action-respond) section.
+There are two ways to respond to slash commands. The first way is to use `say()`, which accepts a string or JSON payload. The second is `respond()` which is a utility for the `response_url`. These are explained in more depth in the [responding to actions](/concepts/actions) section.
 
 When setting up commands within your app configuration, you'll append `/slack/events` to your request URL.
 
