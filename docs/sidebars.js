@@ -86,7 +86,7 @@ const sidebars = {
 		{
 			type: "category",
 			label: "Tutorials",
-			items: ["tutorial/ai-chatbot", "tutorial/custom-steps-for-jira"],
+			items: ["tutorial/ai-chatbot", "tutorial/custom-steps-for-jira", "tutorial/modals"],
 		},
 		{ type: "html", value: "<hr>" },
 		{
