@@ -127,21 +127,21 @@ If your app is up and running, you'll see a message noting that the app is start
 2. Select **New Workflow** > **Build Workflow**.
 3. Click **Untitled Workflow** at the top of the pane to rename your workflow. We'll call it **Create Issue**. For the description, enter _Creates a new issue_, then click **Save**.
 
-![Workflow details](/img/custom-steps-jira/1.png)
+![Workflow details](/img/tutorials/custom-steps-jira/1.png)
 
 4. Select **Choose an event** under **Start the workflow...**, and then select **From a link in Slack**. Click **Continue**.
 
-![Start the workflow](/img/custom-steps-jira/2.png)
+![Start the workflow](/img/tutorials/custom-steps-jira/2.png)
 
 5. Under **Then, do these things** click **Add steps** to add the custom step. Your custom step will be the function defined in the [`create_issue.py`](https://github.com/slack-samples/bolt-python-jira-functions/blob/main/listeners/functions/create_issue.py) file. 
 
     Scroll down to the bottom of the list on the right-hand pane and select **Custom**, then **BoltPy Jira Functions** > **Create an issue**. Enter the project details, issue type (optional), summary (optional), and description (optional). Click **Save**.
 
-![Custom function](/img/custom-steps-jira/3.png)
+![Custom function](/img/tutorials/custom-steps-jira/3.png)
 
 6. Add another step and select **Messages** > **Send a message to a channel**. Select **Channel where the workflow was used** from the drop-down list and then select **Insert a variable** and **Issue url**. Click **Save**.
 
-![Insert variable for issue URL](/img/custom-steps-jira/4.png)
+![Insert variable for issue URL](/img/tutorials/custom-steps-jira/4.png)
 
 7. Click **Publish** to make the workflow available to your workspace.
 
@@ -150,16 +150,16 @@ If your app is up and running, you'll see a message noting that the app is start
 1. Copy your workflow link.
 2. Navigate to your app's home tab and click **Connect an Account** to connect your JIRA account to the app. 
 
-![Connect account](/img/custom-steps-jira/5.png)
+![Connect account](/img/tutorials/custom-steps-jira/5.png)
 
 3. Click **Allow** on the screen that appears.
 
-![Allow connection](/img/custom-steps-jira/6.png)
+![Allow connection](/img/tutorials/custom-steps-jira/6.png)
 
 4. In any channel, post the workflow link you copied.
 5. Click **Start Workflow** and observe as the link to a new JIRA ticket is posted in the channel. Click the link to be directed to the newly-created issue within your JIRA project.
 
-![JIRA issue](/img/custom-steps-jira/7.png)
+![JIRA issue](/img/tutorials/custom-steps-jira/7.png)
 
 When finished, you can click the **Disconnect Account** button in the home tab to disconnect your app from your JIRA account.
 
