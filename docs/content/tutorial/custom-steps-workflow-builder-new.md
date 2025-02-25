@@ -276,16 +276,16 @@ def handle_sample_step_event(inputs: dict, say: Say, fail: Fail, logger: logging
 
 #### Anatomy of a `.function()` listener {#function-listener-anatomy}
 
-The function listener registration method (`.function()`) takes two arguments:
+The function decorator (`function()`) accepts an argument of type `str` and is the unique callback ID of the step. For our custom step, we’re using `sample_step`. Every custom step you implement in an app needs to have a unique callback ID.
 
-* The first argument is the unique callback ID of the step. For our custom step, we’re using `sample_step`. Every custom step you implement in an app needs to have a unique callback ID.
-* The second argument is an asynchronous callback function, where we define the logic that will run when Slack tells the app that a user in the Slack client started a workflow that contains the `sample_step` custom step.
+The callback function is where we define the logic that will run when Slack tells the app that a user in the Slack client started a workflow that contains the `sample_step` custom step.
 
-The callback function offers various utilities that can be used to take action when a function execution event is received. The ones we’ll be using here are:
+The callback function offers various utilities that can be used to take action when a step execution event is received. The ones we’ll be using here are:
 
-* `client` provides access to Slack API methods — like the `chat.postMessage` method, which we’ll use later to send a message to a channel
 * `inputs` provides access to the workflow variables passed into the step when the workflow was started
-* `fail` is a utility method for indicating that the step invoked for the current workflow step had an error
+* `fail` indicates when the step invoked for the current workflow step has an error
+* `logger` provides a Python standard logger instance
+* `say` calls the `chat.Postmessage` API method
 
 #### Understanding the function listener's callback logic {#function-listener-callback-logic}
 
