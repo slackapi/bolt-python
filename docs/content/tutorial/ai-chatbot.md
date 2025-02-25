@@ -100,7 +100,7 @@ Navigate to the Bolty **App Home** and select a provider from the drop-down menu
 
 If you don't see Bolty listed under **Apps** in your workspace right away, never fear! You can mention **@Bolty** in a public channel to add the app, then navigate to your **App Home**.
 
-![Choose your AI provider](/img/ai-chatbot/6.png)
+![Choose your AI provider](/img/tutorials/ai-chatbot/6.png)
 
 ## Setting up your workflow {#workflow}
 
@@ -108,11 +108,11 @@ Within your development workspace, open Workflow Builder by clicking on your wor
 
 Click **Untitled Workflow** at the top to rename your workflow. For this tutorial, we'll call the workflow **Welcome to the channel**. Enter a description, such as _Summarizes channels for new members_, and click **Save**.
 
-![Setting up a new workflow](/img/ai-chatbot/1.png)
+![Setting up a new workflow](/img/tutorials/ai-chatbot/1.png)
 
 Select **Choose an event** under **Start the workflow...**, and then choose **When a person joins a channel**. Select the channel name from the drop-down menu and click **Save**.
 
-![Start the workflow](/img/ai-chatbot/2.png)
+![Start the workflow](/img/tutorials/ai-chatbot/2.png)
 
 Under **Then, do these things**, click **Add steps** and complete the following:
 
@@ -121,20 +121,20 @@ Under **Then, do these things**, click **Add steps** and complete the following:
 3. Under **Add a message**, enter a short message, such as _Hi! Welcome to `{}The channel that the user joined`. Would you like a summary of the recent conversation?_ Note that the _`{}The channel that the user joined`_ is a variable; you can insert it by selecting **{}Insert a variable** at the bottom of the message text box.
 4. Select the **Add Button** button, and name the button _Yes, give me a summary_. Click **Done**.
 
-![Send a message](/img/ai-chatbot/3.png)
+![Send a message](/img/tutorials/ai-chatbot/3.png)
 
 We'll add two more steps under the **Then, do these things** section. 
 
 First, scroll to the bottom of the list of steps and choose **Custom**, then choose **Bolty** and **Bolty Custom Function**. In the **Channel** drop-down menu, select **Channel that the user joined**. Click **Save**.
 
-![Bolty custom function](/img/ai-chatbot/4.png)
+![Bolty custom function](/img/tutorials/ai-chatbot/4.png)
 
 For the final step, complete the following:
 
 1. Choose **Messages** and then **Send a message to a person**. Under **Select a member**, choose **Person who clicked the button** from the drop-down menu.
 2. Under **Add a message**, click **Insert a variable** and choose **`{}Summary`** under the **Bolty Custom Function** section in the list that appears. Click **Save**.
 
-![Summary](/img/ai-chatbot/5.png)
+![Summary](/img/tutorials/ai-chatbot/5.png)
 
 When finished, click **Finish Up**, then click **Publish** to make the workflow available in your workspace.
 
@@ -149,7 +149,7 @@ In order for Bolty to provide summaries of recent conversation in a channel, Bol
 
 To test this, leave the channel you just invited Bolty to and rejoin it. This will kick off your workflow and you'll receive a direct message from **Welcome to the channel**. Click the **Yes, give me a summary** button, and Bolty will summarize the recent conversations in the channel you joined.
 
-![Channel summary](/img/ai-chatbot/7.png)
+![Channel summary](/img/tutorials/ai-chatbot/7.png)
 
 The central part of this functionality is shown in the following code snippet. Note the use of the [`user_context`](https://api.slack.com/automation/types#usercontext) object, a Slack type that represents the user who is interacting with our workflow, as well as the `history` of the channel that will be summarized, which includes the ten most recent messages.
 
@@ -191,7 +191,7 @@ To ask Bolty a question, you can chat with Bolty in any channel the app is in. U
 
 You can also navigate to **Bolty** in your **Apps** list and select the **Messages** tab to chat with Bolty directly. 
 
-![Ask Bolty](/img/ai-chatbot/8.png)
+![Ask Bolty](/img/tutorials/ai-chatbot/8.png)
 
 ## Next steps {#next-steps}
 
