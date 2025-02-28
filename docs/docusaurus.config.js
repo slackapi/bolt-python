@@ -72,6 +72,10 @@ const config = {
               '/concepts/executing-steps'
             ],
           },
+          {
+            to: '/concepts/ai-apps',
+            from: '/concepts/assistant'
+          }
         ],
       },
     ],
