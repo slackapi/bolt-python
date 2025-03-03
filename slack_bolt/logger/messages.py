@@ -184,7 +184,7 @@ def warning_unhandled_request(
 ) -> str:
     filtered_body = _build_filtered_body(req.body)
     default_message = f"Unhandled request ({filtered_body})"
-    is_async = type(req) != BoltRequest
+    is_async = not isinstance(req, BoltRequest)
     if is_workflow_step_edit(req.body) or is_workflow_step_save(req.body) or is_workflow_step_execute(req.body):
         # @app.step
         callback_id = (
