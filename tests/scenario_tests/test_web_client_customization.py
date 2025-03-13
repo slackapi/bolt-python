@@ -73,8 +73,6 @@ class TestWebClientCustomization:
 
     def test_web_client_logger_is_default_app_logger(self):
         app = App(token=self.valid_token, signing_secret=self.signing_secret, token_verification_enabled=False)
-        app.client.base_url = self.mock_api_server_base_url
-
         assert app.client.logger == app.logger
 
     def test_web_client_logger_is_app_logger(self):
@@ -84,8 +82,6 @@ class TestWebClientCustomization:
             logger=self.test_logger,
             token_verification_enabled=False,
         )
-        app.client.base_url = self.mock_api_server_base_url
-
         assert app.client.logger == app.logger
         assert app.client.logger == self.test_logger
 

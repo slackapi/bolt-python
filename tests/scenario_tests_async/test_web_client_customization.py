@@ -91,14 +91,10 @@ class TestWebClientCustomization:
 
     def test_web_client_logger_is_default_app_logger(self):
         app = AsyncApp(token=self.valid_token, signing_secret=self.signing_secret)
-        app.client.base_url = self.mock_api_server_base_url
-
         assert app.client.logger == app.logger
 
     def test_web_client_logger_is_app_logger(self):
         app = AsyncApp(token=self.valid_token, signing_secret=self.signing_secret, logger=self.test_logger)
-        app.client.base_url = self.mock_api_server_base_url
-
         assert app.client.logger == app.logger
         assert app.client.logger == self.test_logger
 
