@@ -91,12 +91,12 @@ class TestWebClientCustomization:
 
     def test_web_client_logger_is_default_app_logger(self):
         app = AsyncApp(token=self.valid_token, signing_secret=self.signing_secret)
-        assert app.client.logger == app.logger
+        assert app.client._logger == app.logger  # TODO: use client.logger when available
 
     def test_web_client_logger_is_app_logger(self):
         app = AsyncApp(token=self.valid_token, signing_secret=self.signing_secret, logger=self.test_logger)
-        assert app.client.logger == app.logger
-        assert app.client.logger == self.test_logger
+        assert app.client._logger == app.logger  # TODO: use client.logger when available
+        assert app.client._logger == self.test_logger  # TODO: use client.logger when available
 
 
 block_actions_body = {
