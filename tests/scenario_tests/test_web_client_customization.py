@@ -1,4 +1,5 @@
 import json
+import logging
 from time import time
 from urllib.parse import quote
 
@@ -21,10 +22,8 @@ class TestWebClientCustomization:
     signing_secret = "secret"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
-    web_client = WebClient(
-        token=valid_token,
-        base_url=mock_api_server_base_url,
-    )
+    test_logger = logging.getLogger("test.logger")
+    web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url)
 
     def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()
@@ -61,6 +60,69 @@ class TestWebClientCustomization:
         @app.action("a")
         def listener(ack, client):
             assert len(client.retry_handlers) == 2
+            ack()
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert response.body == ""
+        assert_auth_test_count(self, 1)
+
+    def test_default_app_web_client_logger_is_app_logger(self):
+        app = App(token=self.valid_token, signing_secret=self.signing_secret, token_verification_enabled=False)
+        app.client.base_url = self.mock_api_server_base_url
+
+        assert app.client.logger == app.logger
+
+    def test_default_web_client_uses_bolt_framework_logger(self):
+        app = App(token=self.valid_token, signing_secret=self.signing_secret, token_verification_enabled=False)
+        app.client.base_url = self.mock_api_server_base_url
+
+        @app.action("a")
+        def listener(ack, client: WebClient):
+            assert client.logger == app.logger
+            ack()
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert response.body == ""
+        assert_auth_test_count(self, 1)
+
+    def test_default_web_client_uses_bolt_app_custom_logger(self):
+        app = App(
+            token=self.valid_token,
+            signing_secret=self.signing_secret,
+            token_verification_enabled=False,
+            logger=self.test_logger,
+        )
+        app.client.base_url = self.mock_api_server_base_url
+
+        assert app.client.logger == app.logger
+
+        @app.action("a")
+        def listener(ack, client: WebClient):
+            assert client.logger == app.logger
+            assert client.logger == self.test_logger
+            ack()
+
+        request = self.build_valid_request()
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert response.body == ""
+        assert_auth_test_count(self, 1)
+
+    def test_custom_web_client_logger_is_used_instead_of_bolt_app_logger(self):
+        web_client = WebClient(token=self.valid_token, base_url=self.mock_api_server_base_url, logger=self.test_logger)
+        app = App(
+            client=web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        @app.action("a")
+        def listener(ack, client: WebClient):
+            assert client.logger == self.test_logger
+            assert app.logger != self.test_logger
             ack()
 
         request = self.build_valid_request()
