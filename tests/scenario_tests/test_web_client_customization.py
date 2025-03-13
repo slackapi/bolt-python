@@ -1,4 +1,5 @@
 import json
+import logging
 from time import time
 from urllib.parse import quote
 
@@ -21,6 +22,7 @@ class TestWebClientCustomization:
     signing_secret = "secret"
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
+    test_logger = logging.getLogger("test.logger")
     web_client = WebClient(
         token=valid_token,
         base_url=mock_api_server_base_url,
@@ -68,6 +70,24 @@ class TestWebClientCustomization:
         assert response.status == 200
         assert response.body == ""
         assert_auth_test_count(self, 1)
+
+    def test_web_client_logger_is_default_app_logger(self):
+        app = App(token=self.valid_token, signing_secret=self.signing_secret, token_verification_enabled=False)
+        app.client.base_url = self.mock_api_server_base_url
+
+        assert app.client.logger == app.logger
+
+    def test_web_client_logger_is_app_logger(self):
+        app = App(
+            token=self.valid_token,
+            signing_secret=self.signing_secret,
+            logger=self.test_logger,
+            token_verification_enabled=False,
+        )
+        app.client.base_url = self.mock_api_server_base_url
+
+        assert app.client.logger == app.logger
+        assert app.client.logger == self.test_logger
 
 
 block_actions_body = {
