@@ -103,11 +103,11 @@ If you want to test the package locally you can.
    - This will create a `.whl` file in the `./dist` folder
 2. Use the built package
    - Example `/dist/slack_bolt-1.2.3-py2.py3-none-any.whl` was created
-   - From anywhere on your machine you can install this package to a project with 
+   - From anywhere on your machine you can install this package to a project with
      ```bash
      pip install <project path>/dist/slack_bolt-1.2.3-py2.py3-none-any.whl
      ```
-   - It is also possible to include `<project path>/dist/slack_bolt-1.2.3-py2.py3-none-any.whl` in a [requirements.txt](https://pip.pypa.io/en/stable/user_guide/#requirements-files) file
+   - It is also possible to include `slack_bolt @ file:///<project path>/dist/slack_bolt-1.2.3-py2.py3-none-any.whl` in a [requirements.txt](https://pip.pypa.io/en/stable/user_guide/#requirements-files) file
 
 ### Releasing
 

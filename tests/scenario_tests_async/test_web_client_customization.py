@@ -89,11 +89,14 @@ class TestWebClientCustomization:
         assert response.body == ""
         await assert_auth_test_count_async(self, 1)
 
-    def test_default_app_web_client_logger_is_app_logger(self):
+    def test_web_client_logger_is_default_app_logger(self):
         app = AsyncApp(token=self.valid_token, signing_secret=self.signing_secret)
-        app.client.base_url = self.mock_api_server_base_url
+        assert app.client._logger == app.logger  # TODO: use client.logger when available
 
-        assert app.client.logger == app.logger
+    def test_web_client_logger_is_app_logger(self):
+        app = AsyncApp(token=self.valid_token, signing_secret=self.signing_secret, logger=self.test_logger)
+        assert app.client._logger == app.logger  # TODO: use client.logger when available
+        assert app.client._logger == self.test_logger  # TODO: use client.logger when available
 
     @pytest.mark.asyncio
     async def test_default_web_client_uses_bolt_framework_logger(self):

@@ -23,7 +23,10 @@ class TestWebClientCustomization:
     mock_api_server_base_url = "http://localhost:8888"
     signature_verifier = SignatureVerifier(signing_secret)
     test_logger = logging.getLogger("test.logger")
-    web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url)
+    web_client = WebClient(
+        token=valid_token,
+        base_url=mock_api_server_base_url,
+    )
 
     def setup_method(self):
         self.old_os_env = remove_os_env_temporarily()
@@ -68,11 +71,19 @@ class TestWebClientCustomization:
         assert response.body == ""
         assert_auth_test_count(self, 1)
 
-    def test_default_app_web_client_logger_is_app_logger(self):
+    def test_web_client_logger_is_default_app_logger(self):
         app = App(token=self.valid_token, signing_secret=self.signing_secret, token_verification_enabled=False)
-        app.client.base_url = self.mock_api_server_base_url
+        assert app.client._logger == app.logger  # TODO: use client.logger when available
 
-        assert app.client.logger == app.logger
+    def test_web_client_logger_is_app_logger(self):
+        app = App(
+            token=self.valid_token,
+            signing_secret=self.signing_secret,
+            logger=self.test_logger,
+            token_verification_enabled=False,
+        )
+        assert app.client._logger == app.logger  # TODO: use client.logger when available
+        assert app.client._logger == self.test_logger  # TODO: use client.logger when available
 
     def test_default_web_client_uses_bolt_framework_logger(self):
         app = App(token=self.valid_token, signing_secret=self.signing_secret, token_verification_enabled=False)
