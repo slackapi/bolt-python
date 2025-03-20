@@ -1359,6 +1359,7 @@ you can use <code><a title="slack_bolt.app.async_app" href="async_app.html">slac
             proxy=self._client.proxy,
             headers=self._client.headers,
             team_id=req.context.team_id,
+            logger=self._client.logger,
             retry_handlers=self._client.retry_handlers.copy() if self._client.retry_handlers is not None else None,
         )
         req.context[&#34;client&#34;] = client_per_request
