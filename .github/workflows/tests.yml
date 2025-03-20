@@ -68,6 +68,9 @@ jobs:
       - name: Run tests for HTTP Mode adapters (Tornado)
         run: |
           pytest tests/adapter_tests/tornado/
+      - name: Run tests for HTTP Mode adapters (WSGI)
+        run: |
+          pytest tests/adapter_tests/wsgi/
       - name: Install async dependencies
         run: |
           pip install -r requirements/async.txt
@@ -82,3 +85,10 @@ jobs:
         run: |
           # Requires async test dependencies
           pytest tests/adapter_tests/asgi/
+      - name: Install all dependencies
+        run: |
+          pip install -r requirements/testing.txt
+      - name: Run asynchronous tests
+        run: |
+          pytest tests/slack_bolt_async/
+          pytest tests/scenario_tests_async/
