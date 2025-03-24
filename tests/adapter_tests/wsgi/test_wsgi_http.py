@@ -185,7 +185,7 @@ class TestWsgiHttp:
 
         assert response.status == "200 OK"
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
-        assert "https://slack.com/oauth/v2/authorize?state=" in response.body
+        assert "https://api.slack.com/oauth/v2/authorize?state=" in response.body
 
     def test_url_verification(self):
         app = App(

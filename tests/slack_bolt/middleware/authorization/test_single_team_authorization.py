@@ -40,7 +40,7 @@ class TestSingleTeamAuthorization:
         auth_test_result: SlackResponse = SlackResponse(
             client=client,
             http_verb="POST",
-            api_url="https://slack.com/api/auth.test",
+            api_url="https://api.slack.com/api/auth.test",
             req_args={},
             data={},
             headers={"x-oauth-scopes": "chat:write,commands"},

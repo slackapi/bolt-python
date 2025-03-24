@@ -108,7 +108,7 @@ class TestAsyncOAuthFlow:
         resp = await oauth_flow.handle_installation(req)
         assert resp.status == 200
         assert resp.headers.get("content-type") == ["text/html; charset=utf-8"]
-        assert "https://slack.com/oauth/v2/authorize?state=" in resp.body
+        assert "https://api.slack.com/oauth/v2/authorize?state=" in resp.body
         assert resp.headers.get("set-cookie") is not None
 
     @pytest.mark.asyncio
@@ -127,7 +127,7 @@ class TestAsyncOAuthFlow:
         resp = await oauth_flow.handle_installation(req)
         assert resp.status == 302
         location_header = resp.headers.get("location")[0]
-        assert "https://slack.com/oauth/v2/authorize?state=" in location_header
+        assert "https://api.slack.com/oauth/v2/authorize?state=" in location_header
         assert resp.headers.get("set-cookie") is not None
 
     @pytest.mark.asyncio
@@ -146,7 +146,7 @@ class TestAsyncOAuthFlow:
         resp = await oauth_flow.handle_installation(req)
         assert resp.status == 302
         location_header = resp.headers.get("location")[0]
-        assert "https://slack.com/oauth/v2/authorize?state=" in location_header
+        assert "https://api.slack.com/oauth/v2/authorize?state=" in location_header
         assert "&team=T12345" in location_header
         assert resp.headers.get("set-cookie") is not None
 
@@ -167,7 +167,7 @@ class TestAsyncOAuthFlow:
         resp = await oauth_flow.handle_installation(req)
         assert resp.status == 302
         location_header = resp.headers.get("location")[0]
-        assert "https://slack.com/oauth/v2/authorize?state=" in location_header
+        assert "https://api.slack.com/oauth/v2/authorize?state=" in location_header
         assert resp.headers.get("set-cookie") is None
 
     @pytest.mark.asyncio

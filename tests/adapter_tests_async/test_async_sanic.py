@@ -225,4 +225,4 @@ class TestSanic:
         # Sanic apps properly generate the content-length header
         # assert response.headers.get("content-length") == "607"
 
-        assert "https://slack.com/oauth/v2/authorize?state=" in response.text
+        assert "https://api.slack.com/oauth/v2/authorize?state=" in response.text

@@ -41,7 +41,7 @@ class TestOAuthFlowSQLite3:
         resp = oauth_flow.handle_installation(req)
         assert resp.status == 200
         assert resp.headers.get("content-type") == ["text/html; charset=utf-8"]
-        assert "https://slack.com/oauth/v2/authorize?state=" in resp.body
+        assert "https://api.slack.com/oauth/v2/authorize?state=" in resp.body
 
     def test_handle_callback(self):
         oauth_flow = OAuthFlow.sqlite3(

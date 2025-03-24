@@ -54,7 +54,7 @@ class TestAsyncOAuthFlowSQLite3:
         resp = await oauth_flow.handle_installation(req)
         assert resp.status == 200
         assert resp.headers.get("content-type") == ["text/html; charset=utf-8"]
-        assert "https://slack.com/oauth/v2/authorize?state=" in resp.body
+        assert "https://api.slack.com/oauth/v2/authorize?state=" in resp.body
 
     @pytest.mark.asyncio
     async def test_handle_callback(self):

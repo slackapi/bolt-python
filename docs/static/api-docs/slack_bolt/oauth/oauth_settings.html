@@ -69,7 +69,7 @@ el.replaceWith(d);
     callback_options: Optional[CallbackOptions] = None
     success_url: Optional[str]
     failure_url: Optional[str]
-    authorization_url: str  # default: https://slack.com/oauth/v2/authorize
+    authorization_url: str  # default: https://api.slack.com/oauth/v2/authorize
     # Installation Management
     installation_store: InstallationStore
     installation_store_bot_only: bool
@@ -132,7 +132,8 @@ el.replaceWith(d);
             callback_options: Give success/failure functions f you want to customize callback functions.
             success_url: Set a complete URL if you want to redirect end-users when an installation completes.
             failure_url: Set a complete URL if you want to redirect end-users when an installation fails.
-            authorization_url: Set a URL if you want to customize the URL `https://slack.com/oauth/v2/authorize`
+            authorization_url: Set a URL if you want to customize the URL
+            `https://api.slack.com/oauth/v2/authorize`
             installation_store: Specify the instance of `InstallationStore` (Default: `FileInstallationStore`)
             installation_store_bot_only: Use `InstallationStore#find_bot()` if True (Default: False)
             token_rotation_expiration_minutes: Minutes before refreshing tokens (Default: 2 hours)
@@ -168,7 +169,7 @@ el.replaceWith(d);
         self.callback_options = callback_options
         self.success_url = success_url
         self.failure_url = failure_url
-        self.authorization_url = authorization_url or &#34;https://slack.com/oauth/v2/authorize&#34;
+        self.authorization_url = authorization_url or &#34;https://api.slack.com/oauth/v2/authorize&#34;
         # Installation Management
         self.installation_store = installation_store or get_or_create_default_installation_store(client_id)
         self.user_token_resolution = user_token_resolution or &#34;authed_user&#34;
@@ -236,7 +237,7 @@ el.replaceWith(d);
 <dt><strong><code>failure_url</code></strong></dt>
 <dd>Set a complete URL if you want to redirect end-users when an installation fails.</dd>
 <dt><strong><code>authorization_url</code></strong></dt>
-<dd>Set a URL if you want to customize the URL <code>https://slack.com/oauth/v2/authorize</code></dd>
+<dd>Set a URL if you want to customize the URL <code>https://api.slack.com/oauth/v2/authorize</code></dd>
 <dt><strong><code>installation_store</code></strong></dt>
 <dd>Specify the instance of <code>InstallationStore</code> (Default: <code>FileInstallationStore</code>)</dd>
 <dt><strong><code>installation_store_bot_only</code></strong></dt>

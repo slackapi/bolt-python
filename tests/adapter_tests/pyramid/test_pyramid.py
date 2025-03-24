@@ -186,4 +186,4 @@ class TestPyramid(TestCase):
         request.method = "GET"
         response: Response = SlackRequestHandler(app).handle(request)
         assert response.status_code == 200
-        assert "https://slack.com/oauth/v2/authorize?state=" in response.body.decode("utf-8")
+        assert "https://api.slack.com/oauth/v2/authorize?state=" in response.body.decode("utf-8")

@@ -401,4 +401,4 @@ class TestAwsChalice:
         )
         assert response["statusCode"] == 200
         assert response["headers"]["content-type"] == "text/html; charset=utf-8"
-        assert "https://slack.com/oauth/v2/authorize?state=" in response.get("body")
+        assert "https://api.slack.com/oauth/v2/authorize?state=" in response.get("body")

@@ -211,7 +211,7 @@ class TestFastAPI:
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
         assert response.headers.get("content-length") == "607"
-        assert "https://slack.com/oauth/v2/authorize?state=" in response.text
+        assert "https://api.slack.com/oauth/v2/authorize?state=" in response.text
 
     def test_custom_props(self):
         app = AsyncApp(

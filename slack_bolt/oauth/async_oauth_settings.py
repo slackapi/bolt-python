@@ -37,7 +37,7 @@ class AsyncOAuthSettings:
     callback_options: Optional[AsyncCallbackOptions] = None
     success_url: Optional[str]
     failure_url: Optional[str]
-    authorization_url: str  # default: https://slack.com/oauth/v2/authorize
+    authorization_url: str  # default: https://api.slack.com/oauth/v2/authorize
     # Installation Management
     installation_store: AsyncInstallationStore
     installation_store_bot_only: bool
@@ -100,7 +100,8 @@ class AsyncOAuthSettings:
             callback_options: Give success/failure functions f you want to customize callback functions.
             success_url: Set a complete URL if you want to redirect end-users when an installation completes.
             failure_url: Set a complete URL if you want to redirect end-users when an installation fails.
-            authorization_url: Set a URL if you want to customize the URL `https://slack.com/oauth/v2/authorize`
+            authorization_url: Set a URL if you want to customize the URL
+            `https://api.slack.com/oauth/v2/authorize`
             installation_store: Specify the instance of `InstallationStore` (Default: `FileInstallationStore`)
             installation_store_bot_only: Use `InstallationStore#find_bot()` if True (Default: False)
             token_rotation_expiration_minutes: Minutes before refreshing tokens (Default: 2 hours)
@@ -138,7 +139,7 @@ class AsyncOAuthSettings:
         self.callback_options = callback_options
         self.success_url = success_url
         self.failure_url = failure_url
-        self.authorization_url = authorization_url or "https://slack.com/oauth/v2/authorize"
+        self.authorization_url = authorization_url or "https://api.slack.com/oauth/v2/authorize"
         # Installation Management
         self.installation_store = installation_store or get_or_create_default_installation_store(client_id)
         self.user_token_resolution = user_token_resolution or "authed_user"

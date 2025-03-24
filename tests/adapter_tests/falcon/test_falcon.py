@@ -204,4 +204,4 @@ class TestFalcon:
         client = testing.TestClient(api)
         response = client.simulate_get("/slack/install")
         assert response.status_code == 200
-        assert "https://slack.com/oauth/v2/authorize?state=" in response.text
+        assert "https://api.slack.com/oauth/v2/authorize?state=" in response.text

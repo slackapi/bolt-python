@@ -60,7 +60,7 @@ class TestOAuthFlow:
         assert resp.status == 200
         assert resp.headers.get("content-type") == ["text/html; charset=utf-8"]
         assert resp.headers.get("set-cookie") is not None
-        assert "https://slack.com/oauth/v2/authorize?state=" in resp.body
+        assert "https://api.slack.com/oauth/v2/authorize?state=" in resp.body
 
     # https://github.com/slackapi/bolt-python/issues/183
     # For direct install URL support
@@ -80,7 +80,7 @@ class TestOAuthFlow:
         resp = oauth_flow.handle_installation(req)
         assert resp.status == 302
         location_header = resp.headers.get("location")[0]
-        assert "https://slack.com/oauth/v2/authorize?state=" in location_header
+        assert "https://api.slack.com/oauth/v2/authorize?state=" in location_header
         assert resp.headers.get("set-cookie") is not None
 
     def test_handle_installation_team_param(self):
@@ -99,7 +99,7 @@ class TestOAuthFlow:
         resp = oauth_flow.handle_installation(req)
         assert resp.status == 302
         location_header = resp.headers.get("location")[0]
-        assert "https://slack.com/oauth/v2/authorize?state=" in location_header
+        assert "https://api.slack.com/oauth/v2/authorize?state=" in location_header
         assert "&team=T12345" in location_header
         assert resp.headers.get("set-cookie") is not None
 

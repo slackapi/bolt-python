@@ -33,8 +33,8 @@ class TestOAuthInternals:
     def test_build_default_install_page_html(self):
         test_patterns = [
             {
-                "input": "https://slack.com/oauth/v2/authorize?state=random&client_id=111.222&scope=commands",
-                "expected": "https://slack.com/oauth/v2/authorize?state=random&amp;client_id=111.222&amp;scope=commands",
+                "input": "https://api.slack.com/oauth/v2/authorize?state=random&client_id=111.222&scope=commands",
+                "expected": "https://api.slack.com/oauth/v2/authorize?state=random&amp;client_id=111.222&amp;scope=commands",
             },
             {
                 "input": "<b>test</b>",
