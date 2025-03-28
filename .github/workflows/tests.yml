@@ -35,60 +35,44 @@ jobs:
           pip install -r requirements/testing_without_asyncio.txt
       - name: Run tests without aiohttp
         run: |
-          pytest tests/slack_bolt/
-          pytest tests/scenario_tests/
+          pytest tests/slack_bolt/ --junitxml=reports/test_slack_bolt.xml
+          pytest tests/scenario_tests/ --junitxml=reports/test_scenario.xml
       - name: Install adapter dependencies
         run: |
           pip install -r requirements/adapter.txt
           pip install -r requirements/adapter_testing.txt
-      - name: Run tests for HTTP Mode adapters (AWS)
+      - name: Run tests for HTTP Mode adapters
         run: |
-          pytest tests/adapter_tests/aws/
-      - name: Run tests for HTTP Mode adapters (Bottle)
-        run: |
-          pytest tests/adapter_tests/bottle/
-      - name: Run tests for HTTP Mode adapters (CherryPy)
-        run: |
-          pytest tests/adapter_tests/cherrypy/
-      - name: Run tests for HTTP Mode adapters (Django)
-        run: |
-          pytest tests/adapter_tests/django/
-      - name: Run tests for HTTP Mode adapters (Falcon)
-        run: |
-          pytest tests/adapter_tests/falcon/
-      - name: Run tests for HTTP Mode adapters (Flask)
-        run: |
-          pytest tests/adapter_tests/flask/
-      - name: Run tests for HTTP Mode adapters (Pyramid)
-        run: |
-          pytest tests/adapter_tests/pyramid/
-      - name: Run tests for HTTP Mode adapters (Starlette)
-        run: |
-          pytest tests/adapter_tests/starlette/
-      - name: Run tests for HTTP Mode adapters (Tornado)
-        run: |
-          pytest tests/adapter_tests/tornado/
-      - name: Run tests for HTTP Mode adapters (WSGI)
-        run: |
-          pytest tests/adapter_tests/wsgi/
+          pytest tests/adapter_tests/ \
+          --ignore=tests/adapter_tests/socket_mode/ \
+          --ignore=tests/adapter_tests/asgi/ \
+          --junitxml=reports/test_adapter.xml
       - name: Install async dependencies
         run: |
           pip install -r requirements/async.txt
-      - name: Run tests for Socket Mode adapters
-        run: |
-          # Requires async test dependencies
-          pytest tests/adapter_tests/socket_mode/
-      - name: Run tests for HTTP Mode adapters (asyncio-based libraries)
-        run: |
-          pytest tests/adapter_tests_async/
       - name: Run tests for HTTP Mode adapters (ASGI)
         run: |
           # Requires async test dependencies
-          pytest tests/adapter_tests/asgi/
+          pytest tests/adapter_tests/asgi/ --junitxml=reports/test_adapter_asgi.xml
+      - name: Run tests for Socket Mode adapters
+        run: |
+          # Requires async test dependencies
+          pytest tests/adapter_tests/socket_mode/ --junitxml=reports/test_adapter_socket_mode.xml
+      - name: Run tests for HTTP Mode adapters (asyncio-based libraries)
+        run: |
+          pytest tests/adapter_tests_async/ --junitxml=reports/test_adapter_async.xml
       - name: Install all dependencies
         run: |
           pip install -r requirements/testing.txt
       - name: Run asynchronous tests
         run: |
-          pytest tests/slack_bolt_async/
-          pytest tests/scenario_tests_async/
+          pytest tests/slack_bolt_async/ --junitxml=reports/test_slack_bolt_async.xml
+          pytest tests/scenario_tests_async/ --junitxml=reports/test_scenario_async.xml
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          directory: ./reports/
+          flags: ${{ matrix.python-version }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
