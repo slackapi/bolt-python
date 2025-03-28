@@ -72,8 +72,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
-          directory: ./reports/
-          files: test*.xml
+          files: ./reports/test_*.xml
           flags: ${{ matrix.python-version }}
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
