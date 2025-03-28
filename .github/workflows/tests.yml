@@ -35,8 +35,8 @@ jobs:
           pip install -r requirements/testing_without_asyncio.txt
       - name: Run tests without aiohttp
         run: |
-          pytest tests/slack_bolt/ --junitxml=reports/slack_bolt.xml
-          pytest tests/scenario_tests/ --junitxml=reports/scenario_tests.xml
+          pytest tests/slack_bolt/ --junitxml=reports/test_slack_bolt.xml
+          pytest tests/scenario_tests/ --junitxml=reports/test_scenario.xml
       - name: Install adapter dependencies
         run: |
           pip install -r requirements/adapter.txt
@@ -46,36 +46,34 @@ jobs:
           pytest tests/adapter_tests/ \
           --ignore=tests/adapter_tests/socket_mode/ \
           --ignore=tests/adapter_tests/asgi/ \
-          --junitxml=reports/adapter_tests.xml
+          --junitxml=reports/test_adapter.xml
       - name: Install async dependencies
         run: |
           pip install -r requirements/async.txt
       - name: Run tests for HTTP Mode adapters (ASGI)
         run: |
           # Requires async test dependencies
-          pytest tests/adapter_tests/asgi/ --junitxml=reports/adapter_tests_asgi.xml
+          pytest tests/adapter_tests/asgi/ --junitxml=reports/test_adapter_asgi.xml
       - name: Run tests for Socket Mode adapters
         run: |
           # Requires async test dependencies
-          pytest tests/adapter_tests/socket_mode/ --junitxml=reports/adapter_tests_socket_mode.xml
+          pytest tests/adapter_tests/socket_mode/ --junitxml=reports/test_adapter_socket_mode.xml
       - name: Run tests for HTTP Mode adapters (asyncio-based libraries)
         run: |
-          pytest tests/adapter_tests_async/ --junitxml=reports/adapter_tests_async.xml
+          pytest tests/adapter_tests_async/ --junitxml=reports/test_adapter_async.xml
       - name: Install all dependencies
         run: |
           pip install -r requirements/testing.txt
       - name: Run asynchronous tests
         run: |
-          pytest tests/slack_bolt_async/ --junitxml=reports/slack_bolt_async.xml
-          pytest tests/scenario_tests_async/ --junitxml=reports/scenario_tests_async.xml
-      - name: Merge junit xml testsuite results
-        run: |
-          python scripts/merge_junit_results.py reports/*.xml >&0 | cat > report.xml
+          pytest tests/slack_bolt_async/ --junitxml=reports/test_slack_bolt_async.xml
+          pytest tests/scenario_tests_async/ --junitxml=reports/test_scenario_async.xml
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
           directory: ./reports/
+          files: test*.xml
           flags: ${{ matrix.python-version }}
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
