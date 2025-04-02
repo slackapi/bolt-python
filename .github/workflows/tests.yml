@@ -7,14 +7,12 @@ on:
 
 jobs:
   build:
-    # Avoiding -latest due to https://github.com/actions/setup-python/issues/162
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
         python-version:
-          - "3.6"
           - "3.7"
           - "3.8"
           - "3.9"
