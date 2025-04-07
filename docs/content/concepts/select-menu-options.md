@@ -9,7 +9,7 @@ an `action_id` or constraints object is required. In order to load external data
 
 While it's recommended to use `action_id` for `external_select` menus, dialogs do not support Block Kit so you'll have to use the constraints object to filter on a `callback_id`.
 
-To respond to options requests, you'll need to call `ack()` with a valid `options` or `option_groups` list. Both [external select response examples](https://api.slack.com/reference/messaging/block-elements#external-select) and [dialog response examples](https://api.slack.com/dialogs#dynamic_select_elements_external) can be found on our API site.
+To respond to options requests, you'll need to call `ack()` with a valid `options` or `option_groups` list. Both [external select response examples](https://docs.slack.dev/reference/block-kit/block-elements/multi-select-menu-element#external_multi_select) and [dialog response examples](https://docs.slack.dev/reference/block-kit/block-elements/multi-select-menu-element#conversation_multi_select) can be found on our API site.
 
 Additionally, you may want to apply filtering logic to the returned options based on user input. This can be accomplished by using the `payload` argument to your options listener and checking for the contents of the `value` property within it. Based on the `value` you can return different options. All listeners and middleware handlers in Bolt for Python have access to [many useful arguments](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) - be sure to check them out!
 

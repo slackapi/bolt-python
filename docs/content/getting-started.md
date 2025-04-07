@@ -32,18 +32,18 @@ Look around, add an app icon and description, and then let's start configuring y
 ---
 
 ### Tokens and installing apps {#tokens-and-installing-apps}
-Slack apps use [OAuth to manage access to Slack's APIs](https://api.slack.com/docs/oauth). When an app is installed, you'll receive a token that the app can use to call API methods.
+Slack apps use [OAuth to manage access to Slack's APIs](https://docs.slack.dev/authentication/installing-with-oauth). When an app is installed, you'll receive a token that the app can use to call API methods.
 
 There are three main token types available to a Slack app: user (`xoxp`), bot (`xoxb`), and app-level (`xapp`) tokens. 
-- [User tokens](https://api.slack.com/authentication/token-types#user) allow you to call API methods on behalf of users after they install or authenticate the app. There may be several user tokens for a single workspace. 
-- [Bot tokens](https://api.slack.com/authentication/token-types#bot) are associated with bot users, and are only granted once in a workspace where someone installs the app. The bot token your app uses will be the same no matter which user performed the installation. Bot tokens are the token type that _most_ apps use.
-- [App-level tokens](https://api.slack.com/authentication/token-types#app) represent your app across organizations, including installations by all individual users on all workspaces in a given organization and are commonly used for creating WebSocket connections to your app.
+- [User tokens](https://docs.slack.dev/authentication/tokens#user) allow you to call API methods on behalf of users after they install or authenticate the app. There may be several user tokens for a single workspace. 
+- [Bot tokens](https://docs.slack.dev/authentication/tokens#bot) are associated with bot users, and are only granted once in a workspace where someone installs the app. The bot token your app uses will be the same no matter which user performed the installation. Bot tokens are the token type that _most_ apps use.
+- [App-level tokens](https://docs.slack.dev/authentication/tokens#app-level) represent your app across organizations, including installations by all individual users on all workspaces in a given organization and are commonly used for creating WebSocket connections to your app.
 
 We're going to use bot and app-level tokens for this guide.
 
 1. Navigate to the **OAuth & Permissions** on the left sidebar and scroll down to the **Bot Token Scopes** section. Click **Add an OAuth Scope**.
 
-2. For now, we'll just add one scope: [`chat:write`](https://api.slack.com/scopes/chat:write). This grants your app the permission to post messages in channels it's a member of.
+2. For now, we'll just add one scope: [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write). This grants your app the permission to post messages in channels it's a member of.
 
 3. Scroll up to the top of the **OAuth & Permissions** page and click **Install App to Workspace**. You'll be led through Slack's OAuth UI, where you should allow your app to be installed to your development workspace.
 
@@ -57,7 +57,7 @@ We're going to use bot and app-level tokens for this guide.
 
 :::tip  
 
-Treat your tokens like passwords and [keep them safe](https://api.slack.com/docs/oauth-safety). Your app uses tokens to post and retrieve information from Slack workspaces.
+Treat your tokens like passwords and [keep them safe](https://docs.slack.dev/authentication/best-practices-for-security). Your app uses tokens to post and retrieve information from Slack workspaces.
 
 :::
 
@@ -102,7 +102,7 @@ export SLACK_APP_TOKEN=<your-app-level-token>
 
 :::warning
 
-Remember to keep your tokens secure. At a minimum, you should avoid checking them into public version control, and access them via environment variables as we've done above. Check out the API documentation for more on [best practices for app security](https://api.slack.com/authentication/best-practices).
+Remember to keep your tokens secure. At a minimum, you should avoid checking them into public version control, and access them via environment variables as we've done above. Check out the API documentation for more on [best practices for app security](https://docs.slack.dev/authentication/best-practices-for-security).
 
 :::
 
@@ -140,9 +140,9 @@ Your app should let you know that it's up and running. 🎉
 ### Setting up events {#setting-up-events}
 Your app behaves similarly to people on your team — it can post messages, add emoji reactions, and listen and respond to events. 
 
-To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://api.slack.com/events-api).
+To listen for events happening in a Slack workspace (like when a message is posted or when a reaction is posted to a message) you'll use the [Events API to subscribe to event types](https://docs.slack.dev/apis/events-api/).
 
-For those just starting, we recommend using [Socket Mode](https://api.slack.com/apis/socket-mode). Socket Mode allows your app to use the Events API and interactive features without exposing a public HTTP Request URL. This can be helpful during development, or if you're receiving requests from behind a firewall.
+For those just starting, we recommend using [Socket Mode](https://docs.slack.dev/apis/events-api/using-socket-mode). Socket Mode allows your app to use the Events API and interactive features without exposing a public HTTP Request URL. This can be helpful during development, or if you're receiving requests from behind a firewall.
 
 That being said, you're welcome to set up an app with a public HTTP Request URL. HTTP is more useful for apps being deployed to hosting environments to respond within a large corporate Slack workspaces/organization, or apps intended for distribution via the Slack Marketplace.
 
@@ -167,11 +167,11 @@ When an event occurs, Slack will send your app some information about the event,
 
 1. Go back to your app configuration page (click on the app [from your app management page](https://api.slack.com/apps)). Click **Event Subscriptions** on the left sidebar. Toggle the switch labeled **Enable Events**.
 
-2. Add your Request URL. Slack will send HTTP POST requests corresponding to events to this [Request URL](https://api.slack.com/apis/connections/events-api#the-events-api__subscribing-to-event-types__events-api-request-urls) endpoint. Bolt uses the `/slack/events` path to listen to all incoming requests (whether shortcuts, events, or interactivity payloads). When configuring your Request URL within your app configuration, you'll append `/slack/events`, e.g. `https://<your-domain>/slack/events`. 💡 As long as your Bolt app is still running, your URL should become verified.
+2. Add your Request URL. Slack will send HTTP POST requests corresponding to events to this [Request URL](https://docs.slack.dev/apis/events-api/#subscribing) endpoint. Bolt uses the `/slack/events` path to listen to all incoming requests (whether shortcuts, events, or interactivity payloads). When configuring your Request URL within your app configuration, you'll append `/slack/events`, e.g. `https://<your-domain>/slack/events`. 💡 As long as your Bolt app is still running, your URL should become verified.
 
 :::tip 
 
-For local development, you can use a proxy service like ngrok to create a public URL and tunnel requests to your development environment. Refer to [ngrok's getting started guide](https://ngrok.com/docs#getting-started-expose) on how to create this tunnel. And when you get to hosting your app, we've collected some of the most common hosting providers Slack developers use to host their apps [on our API site](https://api.slack.com/docs/hosting). 
+For local development, you can use a proxy service like ngrok to create a public URL and tunnel requests to your development environment. Refer to [ngrok's getting started guide](https://ngrok.com/docs#getting-started-expose) on how to create this tunnel. And when you get to hosting your app, we've collected some of the most common hosting providers Slack developers use to host their apps [on our API site](https://docs.slack.dev/distribution/hosting-slack-apps/). 
 
 :::
 
@@ -179,10 +179,10 @@ For local development, you can use a proxy service like ngrok to create a public
 </Tabs>
 
 Navigate to **Event Subscriptions** on the left sidebar and toggle to enable. Under **Subscribe to Bot Events**, you can add events for your bot to respond to. There are four events related to messages:
-- [`message.channels`](https://api.slack.com/events/message.channels) listens for messages in public channels that your app is added to
-- [`message.groups`](https://api.slack.com/events/message.groups) listens for messages in 🔒 private channels that your app is added to
-- [`message.im`](https://api.slack.com/events/message.im) listens for messages in your app's DMs with users
-- [`message.mpim`](https://api.slack.com/events/message.mpim) listens for messages in multi-person DMs that your app is added to
+- [`message.channels`](https://docs.slack.dev/reference/events/message.channels) listens for messages in public channels that your app is added to
+- [`message.groups`](https://docs.slack.dev/reference/events/message.groups) listens for messages in 🔒 private channels that your app is added to
+- [`message.im`](https://docs.slack.dev/reference/events/message.im) listens for messages in your app's DMs with users
+- [`message.mpim`](https://docs.slack.dev/reference/events/message.mpim) listens for messages in multi-person DMs that your app is added to
 
 If you want your bot to listen to messages from everywhere it is added to, choose all four message events. After you’ve selected the events you want your bot to listen to, click the green **Save Changes** button.
 
@@ -474,8 +474,8 @@ Now that you have a basic app up and running, you can start exploring how to mak
 
 * Read through the _Basic concepts_ to learn about the different methods and features your Bolt app has access to.
 
-* Explore the different events your bot can listen to with the [`app.event()`](/concepts/event-listening) method. All of the events are listed [on the API site](https://api.slack.com/events).
+* Explore the different events your bot can listen to with the [`app.event()`](/concepts/event-listening) method. All of the events are listed [on the API site](https://docs.slack.dev/reference/events).
 
-* Bolt allows you to [call Web API methods](/concepts/web-api) with the client attached to your app. There are [over 220 methods](https://api.slack.com/methods) on our API site.
+* Bolt allows you to [call Web API methods](/concepts/web-api) with the client attached to your app. There are [over 220 methods](https://docs.slack.dev/reference/methods) on our API site.
 
-* Learn more about the different token types [on our API site](https://api.slack.com/docs/token-types). Your app may need different tokens depending on the actions you want it to perform.
+* Learn more about the different token types [on our API site](https://docs.slack.dev/authentication/tokens). Your app may need different tokens depending on the actions you want it to perform.

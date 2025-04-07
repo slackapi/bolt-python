@@ -4,7 +4,7 @@ lang: en
 slug: /concepts/event-listening
 ---
 
-You can listen to [any Events API event](https://api.slack.com/events) using the `event()` method after subscribing to it in your app configuration. This allows your app to take action when something happens in a workspace where it's installed, like a user reacting to a message or joining a channel.
+You can listen to [any Events API event](https://docs.slack.dev/reference/events) using the `event()` method after subscribing to it in your app configuration. This allows your app to take action when something happens in a workspace where it's installed, like a user reacting to a message or joining a channel.
 
 The `event()` method requires an `eventType` of type `str`.
 
@@ -23,7 +23,7 @@ def ask_for_introduction(event, say):
 
 The `message()` listener is equivalent to `event("message")`.
 
-You can filter on subtypes of events by passing in the additional key `subtype`. Common message subtypes like `bot_message` and `message_replied` can be found [on the message event page](https://api.slack.com/events/message#subtypes).
+You can filter on subtypes of events by passing in the additional key `subtype`. Common message subtypes like `bot_message` and `message_replied` can be found [on the message event page](https://docs.slack.dev/reference/events/message#subtypes).
 You can explicitly filter for events without a subtype by explicitly setting `None`.
 
 ```python

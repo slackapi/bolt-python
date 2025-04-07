@@ -10,9 +10,9 @@ Bolt for Python によって `slack/oauth_redirect` という**リダイレク�
 
 Bolt for Python は `slack/install` というルートも生成します。これはアプリを直接インストールするための「**Add to Slack**」ボタンを表示するために使われます。すでにワークスペースへのアプリのインストールが済んでいる場合に追加で各ユーザーのユーザートークンなどの情報を取得する場合や、カスタムのインストール用の URL を動的に生成したい場合などは、`oauth_settings` の `authorize_url_generator` でカスタムの URL ジェネレーターを指定することができます。
 
-バージョン 1.1.0 以降の Bolt for Python では、[OrG 全体へのインストール](https://api.slack.com/enterprise/apps)がデフォルトでサポートされています。OrG 全体へのインストールは、アプリの設定の「**Org Level Apps**」で有効化できます。
+バージョン 1.1.0 以降の Bolt for Python では、[OrG 全体へのインストール](https://docs.slack.dev/enterprise-grid/)がデフォルトでサポートされています。OrG 全体へのインストールは、アプリの設定の「**Org Level Apps**」で有効化できます。
 
-Slack での OAuth を使ったインストールフローについて詳しくは、[API ドキュメントを参照してください](https://api.slack.com/authentication/oauth-v2)。
+Slack での OAuth を使ったインストールフローについて詳しくは、[API ドキュメントを参照してください](https://docs.slack.dev/authentication/installing-with-oauth)。
 
 ```python
 import os

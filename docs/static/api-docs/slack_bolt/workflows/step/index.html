@@ -103,7 +103,7 @@ el.replaceWith(d);
         app.step(ws)
 
     This utility is a thin wrapper of workflows.stepCompleted API method.
-    Refer to https://api.slack.com/methods/workflows.stepCompleted for details.
+    Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
     &#34;&#34;&#34;
 
     def __init__(self, *, client: WebClient, body: dict):
@@ -135,7 +135,7 @@ ws = WorkflowStep(
 app.step(ws)
 </code></pre>
 <p>This utility is a thin wrapper of workflows.stepCompleted API method.
-Refer to <a href="https://api.slack.com/methods/workflows.stepCompleted">https://api.slack.com/methods/workflows.stepCompleted</a> for details.</p></div>
+Refer to <a href="https://docs.slack.dev/legacy/legacy-steps-from-apps/">https://docs.slack.dev/legacy/legacy-steps-from-apps/</a> for details.</p></div>
 </dd>
 <dt id="slack_bolt.workflows.step.Configure"><code class="flex name class">
 <span>class <span class="ident">Configure</span></span>
@@ -174,7 +174,7 @@ Refer to <a href="https://api.slack.com/methods/workflows.stepCompleted">https:/
         )
         app.step(ws)
 
-    Refer to https://api.slack.com/workflows/steps for details.
+    Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
     &#34;&#34;&#34;
 
     def __init__(self, *, callback_id: str, client: WebClient, body: dict):
@@ -219,7 +219,7 @@ ws = WorkflowStep(
 )
 app.step(ws)
 </code></pre>
-<p>Refer to <a href="https://api.slack.com/workflows/steps">https://api.slack.com/workflows/steps</a> for details.</p></div>
+<p>Refer to <a href="https://docs.slack.dev/legacy/legacy-steps-from-apps/">https://docs.slack.dev/legacy/legacy-steps-from-apps/</a> for details.</p></div>
 </dd>
 <dt id="slack_bolt.workflows.step.Fail"><code class="flex name class">
 <span>class <span class="ident">Fail</span></span>
@@ -248,7 +248,7 @@ app.step(ws)
         app.step(ws)
 
     This utility is a thin wrapper of workflows.stepFailed API method.
-    Refer to https://api.slack.com/methods/workflows.stepFailed for details.
+    Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
     &#34;&#34;&#34;
 
     def __init__(self, *, client: WebClient, body: dict):
@@ -281,7 +281,7 @@ ws = WorkflowStep(
 app.step(ws)
 </code></pre>
 <p>This utility is a thin wrapper of workflows.stepFailed API method.
-Refer to <a href="https://api.slack.com/methods/workflows.stepFailed">https://api.slack.com/methods/workflows.stepFailed</a> for details.</p></div>
+Refer to <a href="https://docs.slack.dev/legacy/legacy-steps-from-apps/">https://docs.slack.dev/legacy/legacy-steps-from-apps/</a> for details.</p></div>
 </dd>
 <dt id="slack_bolt.workflows.step.Update"><code class="flex name class">
 <span>class <span class="ident">Update</span></span>
@@ -329,7 +329,7 @@ Refer to <a href="https://api.slack.com/methods/workflows.stepFailed">https://ap
         app.step(ws)
 
     This utility is a thin wrapper of workflows.stepFailed API method.
-    Refer to https://api.slack.com/methods/workflows.updateStep for details.
+    Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
     &#34;&#34;&#34;
 
     def __init__(self, *, client: WebClient, body: dict):
@@ -377,7 +377,7 @@ ws = WorkflowStep(
 app.step(ws)
 </code></pre>
 <p>This utility is a thin wrapper of workflows.stepFailed API method.
-Refer to <a href="https://api.slack.com/methods/workflows.updateStep">https://api.slack.com/methods/workflows.updateStep</a> for details.</p></div>
+Refer to <a href="https://docs.slack.dev/legacy/legacy-steps-from-apps/">https://docs.slack.dev/legacy/legacy-steps-from-apps/</a> for details.</p></div>
 </dd>
 <dt id="slack_bolt.workflows.step.WorkflowStep"><code class="flex name class">
 <span>class <span class="ident">WorkflowStep</span></span>
@@ -411,7 +411,7 @@ Refer to <a href="https://api.slack.com/methods/workflows.updateStep">https://ap
         &#34;&#34;&#34;
         Deprecated:
             Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps
 
         Args:
             callback_id: The callback_id for this step from app
@@ -453,7 +453,7 @@ Refer to <a href="https://api.slack.com/methods/workflows.updateStep">https://ap
         &#34;&#34;&#34;
         Deprecated:
             Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps
         &#34;&#34;&#34;
         return WorkflowStepBuilder(
             callback_id,
@@ -546,7 +546,7 @@ Refer to <a href="https://api.slack.com/methods/workflows.updateStep">https://ap
 </details>
 <div class="desc"><h2 id="deprecated">Deprecated</h2>
 <p>Steps from apps for legacy workflows are now deprecated.
-Use new custom steps: <a href="https://api.slack.com/automation/functions/custom-bolt">https://api.slack.com/automation/functions/custom-bolt</a></p>
+Use new custom steps: <a href="https://docs.slack.dev/workflows/workflow-steps">https://docs.slack.dev/workflows/workflow-steps</a></p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>callback_id</code></strong></dt>
@@ -598,7 +598,7 @@ When it's a list, the first one is responsible for ack() while the rest are lazy
 <dd>
 <div class="desc"><h2 id="deprecated">Deprecated</h2>
 <p>Steps from apps for legacy workflows are now deprecated.
-Use new custom steps: <a href="https://api.slack.com/automation/functions/custom-bolt">https://api.slack.com/automation/functions/custom-bolt</a></p></div>
+Use new custom steps: <a href="https://docs.slack.dev/workflows/workflow-steps">https://docs.slack.dev/workflows/workflow-steps</a></p></div>
 </dd>
 </dl>
 </dd>

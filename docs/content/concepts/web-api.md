@@ -4,7 +4,7 @@ lang: en
 slug: /concepts/web-api
 ---
 
-You can call [any Web API method](https://api.slack.com/methods) using the [`WebClient`](https://tools.slack.dev/python-slack-sdk/web) provided to your Bolt app as either `app.client` or `client` in middleware/listener arguments (given that your app has the appropriate scopes). When you call one the client's methods, it returns a `SlackResponse` which contains the response from Slack.
+You can call [any Web API method](https://docs.slack.dev/reference/methods) using the [`WebClient`](https://tools.slack.dev/python-slack-sdk/web) provided to your Bolt app as either `app.client` or `client` in middleware/listener arguments (given that your app has the appropriate scopes). When you call one the client's methods, it returns a `SlackResponse` which contains the response from Slack.
 
 The token used to initialize Bolt can be found in the `context` object, which is required to call most Web API methods.
 

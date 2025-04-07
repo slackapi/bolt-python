@@ -10,4 +10,4 @@ Bolt for Python [v1.7.0](https://github.com/slackapi/bolt-python/releases/tag/v1
 
 [Bolt for Python の組み込みの OAuth 機能](/concepts/authenticating-oauth) を使用していれば、Bolt for Python が自動的にトークンローテーションの処理をハンドリングします。
 
-トークンローテーションに関する詳細は [API ドキュメント](https://api.slack.com/authentication/rotation)を参照してください。
+トークンローテーションに関する詳細は [API ドキュメント](https://docs.slack.dev/authentication/using-token-rotation)を参照してください。

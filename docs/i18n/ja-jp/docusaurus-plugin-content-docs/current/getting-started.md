@@ -33,18 +33,18 @@ lang: ja-jp
 ---
 
 ### トークンとアプリのインストール {#tokens-and-installing-apps}
-Slack アプリでは、[Slack API へのアクセスの管理に OAuth を使用します](https://api.slack.com/docs/oauth)。アプリがインストールされると、トークンが発行されます。アプリはそのトークンを使って API メソッドを呼び出すことができます。
+Slack アプリでは、[Slack API へのアクセスの管理に OAuth を使用します](https://docs.slack.dev/authentication/installing-with-oauth)。アプリがインストールされると、トークンが発行されます。アプリはそのトークンを使って API メソッドを呼び出すことができます。
 
 Slack アプリで使用できるトークンには、ユーザートークン（`xoxp`）とボットトークン（`xoxb`）、アプリレベルトークン（`xapp`）の 3 種類があります。
-- [ユーザートークン](https://api.slack.com/authentication/token-types#user) を使用すると、アプリをインストールまたは認証したユーザーに成り代わって API メソッドを呼び出すことができます。1 つのワークスペースに複数のユーザートークンが存在する可能性があります。
-- [ボットトークン](https://api.slack.com/authentication/token-types#bot) はボットユーザーに関連づけられ、1 つのワークスペースでは最初に誰かがそのアプリをインストールした際に一度だけ発行されます。どのユーザーがインストールを実行しても、アプリが使用するボットトークンは同じになります。_ほとんど_のアプリで使用されるのは、ボットトークンです。
-- [アプリレベルトークン](https://api.slack.com/authentication/token-types#app) は、全ての組織（とその配下のワークスペースでの個々のユーザーによるインストール）を横断して、あなたのアプリを代理するものです。アプリレベルトークンは、アプリの WebSocket コネクションを確立するためによく使われます。
+- [ユーザートークン](https://docs.slack.dev/authentication/tokens#user) を使用すると、アプリをインストールまたは認証したユーザーに成り代わって API メソッドを呼び出すことができます。1 つのワークスペースに複数のユーザートークンが存在する可能性があります。
+- [ボットトークン](https://docs.slack.dev/authentication/tokens#bot) はボットユーザーに関連づけられ、1 つのワークスペースでは最初に誰かがそのアプリをインストールした際に一度だけ発行されます。どのユーザーがインストールを実行しても、アプリが使用するボットトークンは同じになります。_ほとんど_のアプリで使用されるのは、ボットトークンです。
+- [アプリレベルトークン](https://docs.slack.dev/authentication/tokens#app-level) は、全ての組織（とその配下のワークスペースでの個々のユーザーによるインストール）を横断して、あなたのアプリを代理するものです。アプリレベルトークンは、アプリの WebSocket コネクションを確立するためによく使われます。
 
 このガイドではボットトークンとアプリレベルトークンを使用します。
 
 1. 左サイドバーの「**OAuth & Permissions**」をクリックし、「**Bot Token Scopes**」セクションまで下にスクロールします。「**Add an OAuth Scope**」をクリックします。
 
-2. ここでは [`chat:write`](https://api.slack.com/scopes/chat:write) というスコープのみを追加します。このスコープはアプリが参加しているチャンネルにメッセージを投稿することを許可します。
+2. ここでは [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) というスコープのみを追加します。このスコープはアプリが参加しているチャンネルにメッセージを投稿することを許可します。
 
 3. OAuth & Permissions ページの一番上までスクロールし、「**Install App to Workspace**」をクリックします。Slack の OAuth 確認画面 が表示されます。この画面で開発用ワークスペースへのアプリのインストールを承認します。
 
@@ -58,7 +58,7 @@ Slack アプリで使用できるトークンには、ユーザートークン�
 
 :::tip
 
-トークンはパスワードと同様に取り扱い、[安全な方法で保管してください](https://api.slack.com/docs/oauth-safety)。アプリはこのトークンを使って Slack ワークスペースで投稿をしたり、情報の取得をしたりします。
+トークンはパスワードと同様に取り扱い、[安全な方法で保管してください](https://docs.slack.dev/authentication/best-practices-for-security)。アプリはこのトークンを使って Slack ワークスペースで投稿をしたり、情報の取得をしたりします。
 
 :::
 
@@ -101,7 +101,7 @@ export SLACK_APP_TOKEN=<アプリレベルトークン>
 ```
 :::warning
 
-🔒 全てのトークンは安全に保管してください。少なくともパブリックなバージョン管理にチェックインするようなことは避けるべきでしょう。また、上にあった例のように環境変数を介してアクセスするようにしてください。詳細な情報は [アプリのセキュリティのベストプラクティス](https://api.slack.com/authentication/best-practices)のドキュメントを参照してください。
+🔒 全てのトークンは安全に保管してください。少なくともパブリックなバージョン管理にチェックインするようなことは避けるべきでしょう。また、上にあった例のように環境変数を介してアクセスするようにしてください。詳細な情報は [アプリのセキュリティのベストプラクティス](https://docs.slack.dev/authentication/best-practices-for-security)のドキュメントを参照してください。
 
 :::
 
@@ -139,7 +139,7 @@ python3 app.py
 ### イベントを設定する {#setting-up-events}
 アプリはワークスペース内の他のメンバーと同じように振る舞い、メッセージを投稿したり、絵文字リアクションを追加したり、イベントをリッスンして返答したりできます。
 
-Slack ワークスペースで発生するイベント（メッセージが投稿されたときや、メッセージに対するリアクションがつけられたときなど）をリッスンするには、[Events API を使って特定の種類のイベントをサブスクライブします](https://api.slack.com/events-api)。
+Slack ワークスペースで発生するイベント（メッセージが投稿されたときや、メッセージに対するリアクションがつけられたときなど）をリッスンするには、[Events API を使って特定の種類のイベントをサブスクライブします](https://docs.slack.dev/apis/events-api/)。
 
 このチュートリアルの序盤でソケットモードを有効にしました。ソケットモードを使うことで、アプリが公開された HTTP エンドポイントを公開せずに Events API やインタラクティブコンポーネントを利用できるようになります。このことは、開発時やファイヤーウォールの裏からのリクエストを受ける際に便利です。HTTP での方式は、ホスティング環境にデプロイするアプリや Slack App Directory で配布されるアプリの開発・運用に適しています。
 
@@ -164,11 +164,11 @@ import TabItem from '@theme/TabItem';
 
 1. アプリ構成ページに戻ります ([アプリ管理ページから](https://api.slack.com/apps) アプリをクリックします)。左側のサイドバーで [**イベント サブスクリプション**] をクリックします。 **イベントを有効にする**というラベルの付いたスイッチを切り替えます。
 
-2. リクエスト URL を追加します。 Slack は、イベントに対応する HTTP POST リクエストをこの [リクエスト URL](https://api.slack.com/apis/connections/events-api#the-events-api__subscribing-to-event-types__events-api-request-) に送信します。 Bolt は、`/slack/events` パスを使用して、すべての受信リクエスト (ショートカット、イベント、対話性ペイロードなど) をリッスンします。アプリ構成内でリクエスト URL を構成する場合は、`/slack/events` を追加します。 「https://あなたのドメイン/slack/events」。 💡 Bolt アプリが実行されている限り、URL は検証されるはずです。
+2. リクエスト URL を追加します。 Slack は、イベントに対応する HTTP POST リクエストをこの [リクエスト URL](https://docs.slack.dev/apis/events-api/#subscribing) に送信します。 Bolt は、`/slack/events` パスを使用して、すべての受信リクエスト (ショートカット、イベント、対話性ペイロードなど) をリッスンします。アプリ構成内でリクエスト URL を構成する場合は、`/slack/events` を追加します。 「https://あなたのドメイン/slack/events」。 💡 Bolt アプリが実行されている限り、URL は検証されるはずです。
 
 :::tip 
 
-ローカル開発の場合、ngrok などのプロキシ サービスを使用してパブリック URL を作成し、リクエストを開発環境にトンネリングできます。このトンネルの作成方法については、[ngrok のスタート ガイド](https://ngrok.com/docs#getting-started-expose) を参照してください。アプリをホスティングする際には、Slack 開発者がアプリをホストするために使用する最も一般的なホスティング プロバイダーを [API サイト](https://api.slack.com/docs/hosting) に集めました。
+ローカル開発の場合、ngrok などのプロキシ サービスを使用してパブリック URL を作成し、リクエストを開発環境にトンネリングできます。このトンネルの作成方法については、[ngrok のスタート ガイド](https://ngrok.com/docs#getting-started-expose) を参照してください。アプリをホスティングする際には、Slack 開発者がアプリをホストするために使用する最も一般的なホスティング プロバイダーを [API サイト](https://docs.slack.dev/distribution/hosting-slack-apps/) に集めました。
 
 :::
 
@@ -176,10 +176,10 @@ import TabItem from '@theme/TabItem';
 </Tabs>
 
 左側のサイドバーから **Event Subscriptions** にアクセスして、機能を有効にしてください。 **Subscribe to Bot Events** 配下で、ボットが受け取れるイベントを追加することができます。4つのメッセージに関するイベントがあります。
-- [`message.channels`](https://api.slack.com/events/message.channels) アプリが参加しているパブリックチャンネルのメッセージをリッスン
-- [`message.groups`](https://api.slack.com/events/message.groups) アプリが参加しているプライベートチャンネルのメッセージをリッスン
-- [`message.im`](https://api.slack.com/events/message.im) あなたのアプリとユーザーのダイレクトメッセージをリッスン
-- [`message.mpim`](https://api.slack.com/events/message.mpim) あなたのアプリが追加されているグループ DM をリッスン
+- [`message.channels`](https://docs.slack.dev/reference/events/message.channels) アプリが参加しているパブリックチャンネルのメッセージをリッスン
+- [`message.groups`](https://docs.slack.dev/reference/events/message.groups) アプリが参加しているプライベートチャンネルのメッセージをリッスン
+- [`message.im`](https://docs.slack.dev/reference/events/message.im) あなたのアプリとユーザーのダイレクトメッセージをリッスン
+- [`message.mpim`](https://docs.slack.dev/reference/events/message.mpim) あなたのアプリが追加されているグループ DM をリッスン
 
 ボットが参加するすべての場所のメッセージをリッスンさせるには、これら 4 つのメッセージイベントをすべて選択します。ボットにリッスンさせるメッセージイベントの種類を選択したら、「**Save Changes**」ボタンをクリックします。
 
@@ -468,6 +468,6 @@ if __name__ == "__main__":
 ここまでで基本的なアプリをセットアップして実行することはできたので、次は自分だけの Bolt アプリを作る方法について調べてみてください。参考になりそうなリソースをいくつかご紹介します。
 
 * 基本的な概念について読んでみてください。Bolt アプリがアクセスできるさまざまメソッドや機能について知ることができます。
-* [`app.event()` メソッド](/concepts/event-listening)でボットがリッスンできるイベントをほかにも試してみましょう。すべてのイベントの一覧は [API サイト](https://api.slack.com/events)で確認できます。
-* Bolt では、アプリにアタッチされたクライアントから [Web API メソッドを呼び出す](/concepts/web-api)ことができます。API サイトに [220 以上のメソッド](https://api.slack.com/methods)を一覧しています。
-* [API サイト](https://api.slack.com/docs/token-types)でほかのタイプのトークンを確認してみてください。アプリで実行したいアクションによって、異なるトークンが必要になる場合があります。
+* [`app.event()` メソッド](/concepts/event-listening)でボットがリッスンできるイベントをほかにも試してみましょう。すべてのイベントの一覧は [API サイト](https://docs.slack.dev/reference/events)で確認できます。
+* Bolt では、アプリにアタッチされたクライアントから [Web API メソッドを呼び出す](/concepts/web-api)ことができます。API サイトに [220 以上のメソッド](https://docs.slack.dev/reference/methods)を一覧しています。
+* [API サイト](https://docs.slack.dev/authentication/tokens)でほかのタイプのトークンを確認してみてください。アプリで実行したいアクションによって、異なるトークンが必要になる場合があります。

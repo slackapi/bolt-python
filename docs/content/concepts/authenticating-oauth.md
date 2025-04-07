@@ -10,9 +10,9 @@ Bolt for Python will create a **Redirect URL** `slack/oauth_redirect`, which Sla
 
 Bolt for Python will also create a `slack/install` route, where you can find an **Add to Slack** button for your app to perform direct installs of your app. If you need any additional authorizations (user tokens) from users inside a team when your app is already installed or a reason to dynamically generate an install URL, you can pass your own custom URL generator to `oauth_settings` as `authorize_url_generator`.
 
-Bolt for Python automatically includes support for [org wide installations](https://api.slack.com/enterprise/apps) in version `1.1.0+`. Org wide installations can be enabled in your app configuration settings under **Org Level Apps**.
+Bolt for Python automatically includes support for [org wide installations](https://docs.slack.dev/enterprise-grid/) in version `1.1.0+`. Org wide installations can be enabled in your app configuration settings under **Org Level Apps**.
 
-To learn more about the OAuth installation flow with Slack, [read the API documentation](https://api.slack.com/authentication/oauth-v2).
+To learn more about the OAuth installation flow with Slack, [read the API documentation](https://docs.slack.dev/authentication/installing-with-oauth).
 
 ```python
 import os

@@ -32,7 +32,7 @@ If you'd rather skip the tutorial and just head straight to the code, you can us
 Before you'll be able to successfully run the app, you'll need to first obtain and set some environment variables.
 
 1. On the **Install App** page, copy your **Bot User OAuth Token**. You will store this in your environment as `SLACK_BOT_TOKEN` (we'll get to that next).
-2. Navigate to **Basic Information** and in the **App-Level Tokens** section , click **Generate Token and Scopes**. Add the [`connections:write`](https://api.slack.com/scopes/connections:write) scope, name the token, and click **Generate**. (For more details, refer to [understanding OAuth scopes for bots](https://api.slack.com/tutorials/tracks/understanding-oauth-scopes-bot)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
+2. Navigate to **Basic Information** and in the **App-Level Tokens** section , click **Generate Token and Scopes**. Add the [`connections:write`](https://docs.slack.dev/reference/scopes/connections.write) scope, name the token, and click **Generate**. (For more details, refer to [understanding OAuth scopes for bots](https://docs.slack.dev/authentication/tokens#bot)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
 
 To store your tokens and environment variables, run the following commands in the terminal. Replace the placeholder values with your bot and app tokens collected above, as well as the key or keys for the AI provider or providers you want to use:
 
@@ -151,7 +151,7 @@ To test this, leave the channel you just invited Bolty to and rejoin it. This wi
 
 ![Channel summary](/img/tutorials/ai-chatbot/7.png)
 
-The central part of this functionality is shown in the following code snippet. Note the use of the [`user_context`](https://api.slack.com/automation/types#usercontext) object, a Slack type that represents the user who is interacting with our workflow, as well as the `history` of the channel that will be summarized, which includes the ten most recent messages.
+The central part of this functionality is shown in the following code snippet. Note the use of the [`user_context`](https://tools.slack.dev/deno-slack-sdk/reference/slack-types#usercontext) object, a Slack type that represents the user who is interacting with our workflow, as well as the `history` of the channel that will be summarized, which includes the ten most recent messages.
 
 ```python
 from ai.providers import get_provider_response
@@ -198,5 +198,5 @@ You can also navigate to **Bolty** in your **Apps** list and select the **Messag
 Congratulations! You've successfully integrated the power of AI into your workspace. Check out these links to take the next steps in your Bolt for Python journey.
 
 * To learn more about Bolt for Python, refer to the [Getting started](../getting-started) documentation.
-* For more details about creating workflow steps using the Bolt SDK, refer to the [workflow steps for Bolt](https://api.slack.com/automation/functions/custom-bolt) guide.
-* To use the Bolt for Python SDK to develop on the automations platform, refer to the [Create a workflow step for Workflow Builder: Bolt for Python](https://api.slack.com/tutorials/tracks/bolt-custom-function) tutorial.
+* For more details about creating workflow steps using the Bolt SDK, refer to the [workflow steps for Bolt](https://docs.slack.dev/workflows/workflow-steps) guide.
+* To use the Bolt for Python SDK to develop on the automations platform, refer to the [Create a workflow step for Workflow Builder: Bolt for Python](/bolt-python/tutorial/custom-steps) tutorial.

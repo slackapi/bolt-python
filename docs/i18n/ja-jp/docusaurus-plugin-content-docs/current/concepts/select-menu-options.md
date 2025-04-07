@@ -10,7 +10,7 @@ slug: /concepts/options
 
 `external_select` メニューでは `action_id` を指定することをおすすめしています。ただし、ダイアログを利用している場合、ダイアログが Block Kit に対応していないため、`callback_id` をフィルタリングするための制約オブジェクトを使用する必要があります。
 
-オプションのリクエストに応答するときは、有効なオプションを含む `options` または `option_groups` のリストとともに `ack()` を呼び出す必要があります。API サイトにある[外部データを使用する選択メニューに応答するサンプル例](https://api.slack.com/reference/messaging/block-elements#external-select)と、[ダイアログでの応答例](https://api.slack.com/dialogs#dynamic_select_elements_external)を参考にしてください。
+オプションのリクエストに応答するときは、有効なオプションを含む `options` または `option_groups` のリストとともに `ack()` を呼び出す必要があります。API サイトにある[外部データを使用する選択メニューに応答するサンプル例](https://docs.slack.dev/reference/block-kit/block-elements/multi-select-menu-element#external_multi_select)と、[ダイアログでの応答例](https://docs.slack.dev/legacy/legacy-dialogs/#dynamic_select_elements_external)を参考にしてください。
 
 さらに、ユーザーが入力したキーワードに基づいたオプションを返すようフィルタリングロジックを適用することもできます。 これは `payload` という引数の ` value` の値に基づいて、それぞれのパターンで異なるオプションの一覧を返すように実装することができます。 Bolt for Python のすべてのリスナーやミドルウェアでは、[多くの有用な引数](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html)にアクセスすることができますので、チェックしてみてください。
 

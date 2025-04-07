@@ -4,7 +4,7 @@ lang: ja-jp
 slug: /concepts/steps-from-apps
 ---
 
-（アプリによる）ワークフローステップでは、処理をアプリ側で行うカスタムのワークフローステップを提供することができます。ユーザーは[ワークフロービルダー](https://api.slack.com/workflows)を使ってこれらのステップをワークフローに追加できます。
+（アプリによる）ワークフローステップでは、処理をアプリ側で行うカスタムのワークフローステップを提供することができます。ユーザーは[ワークフロービルダー](https://docs.slack.dev/workflows/workflow-builder)を使ってこれらのステップをワークフローに追加できます。
 
 ワークフローステップは、次の 3 つのユーザーイベントで構成されます。
 
@@ -14,7 +14,7 @@ slug: /concepts/steps-from-apps
 
 ワークフローステップを機能させるためには、これら 3 つのイベントすべてに対応する必要があります。
 
-アプリを使ったワークフローステップに関する詳細は、[API ドキュメント](https://api.slack.com/workflows/steps)を参照してください。
+アプリを使ったワークフローステップに関する詳細は、[API ドキュメント](https://docs.slack.dev/legacy/legacy-steps-from-apps/)を参照してください。
 
 ## ステップの定義
 
@@ -63,13 +63,13 @@ app.step(ws)
 
 ## ステップの追加・編集
 
-作成したワークフローステップがワークフローに追加またはその設定を変更されるタイミングで、[`workflow_step_edit` イベントがアプリに送信されます](https://api.slack.com/reference/workflows/workflow_step_edit)。このイベントがアプリに届くと、`WorkflowStep` で設定した `edit` コールバックが実行されます。
+作成したワークフローステップがワークフローに追加またはその設定を変更されるタイミングで、[`workflow_step_edit` イベントがアプリに送信されます](https://docs.slack.dev/legacy/legacy-steps-from-apps/legacy-steps-from-apps-workflow_step_edit-payload)。このイベントがアプリに届くと、`WorkflowStep` で設定した `edit` コールバックが実行されます。
 
-ステップの追加と編集のどちらが行われるときも、[ワークフローステップの設定モーダル](https://api.slack.com/reference/workflows/configuration-view)をビルダーに送信する必要があります。このモーダルは、そのステップ独自の設定を選択するための場所です。通常のモーダルより制限が強く、例えば `title`、`submit`、`close` のプロパティを含めることができません。設定モーダルの `callback_id` は、デフォルトではワークフローステップと同じものになります。
+ステップの追加と編集のどちらが行われるときも、[ワークフローステップの設定モーダル](https://docs.slack.dev/legacy/legacy-steps-from-apps/legacy-steps-from-apps-configuration-view-object)をビルダーに送信する必要があります。このモーダルは、そのステップ独自の設定を選択するための場所です。通常のモーダルより制限が強く、例えば `title`、`submit`、`close` のプロパティを含めることができません。設定モーダルの `callback_id` は、デフォルトではワークフローステップと同じものになります。
 
 `edit` コールバック内で `configure()` ユーティリティを使用すると、対応する `blocks` 引数にビューのblocks 部分だけを渡して、ステップの設定モーダルを簡単に表示させることができます。必要な入力内容が揃うまで設定の保存を無効にするには、`True` の値をセットした `submit_disabled` を渡します。
 
-設定モーダルの開き方に関する詳細は、[こちらのドキュメント](https://api.slack.com/workflows/steps#handle_config_view)を参照してください。
+設定モーダルの開き方に関する詳細は、[こちらのドキュメント](https://docs.slack.dev/legacy/legacy-steps-from-apps/legacy-steps-from-apps-configuration-view-object)を参照してください。
 
 指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">共通</a> / <a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">ステップ用</a>
 
@@ -121,7 +121,7 @@ app.step(ws)
 - `step_name` : ステップのデフォルトの名前をオーバーライドします。
 - `step_image_url` : ステップのデフォルトの画像をオーバーライドします。
 
-これらのパラメータの構成方法に関する詳細は、[こちらのドキュメント](https://api.slack.com/reference/workflows/workflow_step)を参照してください。
+これらのパラメータの構成方法に関する詳細は、[こちらのドキュメント](https://docs.slack.dev/legacy/legacy-steps-from-apps/legacy-steps-from-apps-workflow_step-object)を参照してください。
 
 指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">共通</a> / <a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">ステップ用</a>
 
@@ -162,7 +162,7 @@ app.step(ws)
 
 ## ステップの実行
 
-エンドユーザーがワークフローステップを実行すると、アプリに [`workflow_step_execute` イベントが送信されます](https://api.slack.com/events/workflow_step_execute)。このイベントがアプリに届くと、`WorkflowStep` で設定した `execute` コールバックが実行されます。
+エンドユーザーがワークフローステップを実行すると、アプリに [`workflow_step_execute` イベントが送信されます](https://docs.slack.dev/legacy/legacy-steps-from-apps/legacy-steps-from-apps-workflow_step-object)。このイベントがアプリに届くと、`WorkflowStep` で設定した `execute` コールバックが実行されます。
 
 `save` コールバックで取り出した `inputs` を使って、サードパーティの API を呼び出す、情報をデータベースに保存する、ユーザーのホームタブを更新するといった処理を実行することができます。また、ワークフローの後続のステップで利用する出力値を `outputs` オブジェクトに設定します。
 

@@ -4,7 +4,7 @@ lang: ja-jp
 slug: /concepts/socket-mode
 ---
 
-[ソケットモード](https://api.slack.com/apis/connections/socket)は、アプリに WebSocket での接続と、そのコネクション経由でのデータ受信を可能とします。Bolt for Python は、バージョン 1.2.0 からこれに対応しています。
+[ソケットモード](https://docs.slack.dev/apis/events-api/using-socket-mode)は、アプリに WebSocket での接続と、そのコネクション経由でのデータ受信を可能とします。Bolt for Python は、バージョン 1.2.0 からこれに対応しています。
 
 ソケットモードでは、Slack からのペイロード送信を受け付けるエンドポイントをホストする HTTP サーバーを起動する代わりに WebSocket で Slack に接続し、そのコネクション経由でデータを受信します。ソケットモードを使う前に、アプリの管理画面でソケットモードの機能が有効になっていることを確認しておいてください。
 

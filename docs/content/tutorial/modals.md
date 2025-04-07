@@ -6,7 +6,7 @@ Let's take a look at the technologies we'll use in this tutorial:
 
 * Glitch is a online IDE that allows you to collaboratively work on code and host your own server. Glitch should only be used for development purposes and should not be used in production.
 * We'll use Python in conjunction with our [Bolt for Python](https://github.com/SlackAPI/bolt-python) SDK.
-* [Block Kit](https://api.slack.com/block-kit/building) is a UI framework for Slack apps that allows you to create beautiful, interactive messages within Slack. If you've ever seen a message in Slack with buttons or a select menu, that's Block Kit.
+* [Block Kit](https://docs.slack.dev/block-kit/) is a UI framework for Slack apps that allows you to create beautiful, interactive messages within Slack. If you've ever seen a message in Slack with buttons or a select menu, that's Block Kit.
 * Modals are similar to a pop-up window that displays right in Slack. They grab the attention of the user, and are normally used to prompt users to provide some kind of information or input.
 
 ---

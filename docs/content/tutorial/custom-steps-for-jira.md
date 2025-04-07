@@ -35,7 +35,7 @@ https://github.com/slack-samples/bolt-python-jira-functions/blob/main/manifest.j
 Before you'll be able to successfully run the app, you'll need to obtain and set some environment variables.
 
 1. Once you have installed the app to your workspace, copy the **Bot User OAuth Token** from the **Install App** page. You will store this in your environment as `SLACK_BOT_TOKEN` (we'll get to that next).
-2. Navigate to **Basic Information** and in the **App-Level Tokens** section , click **Generate Token and Scopes**. Add the [`connections:write`](https://api.slack.com/scopes/connections:write) scope, name the token, and click **Generate**. (For more details, refer to [understanding OAuth scopes for bots](https://api.slack.com/tutorials/tracks/understanding-oauth-scopes-bot)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
+2. Navigate to **Basic Information** and in the **App-Level Tokens** section , click **Generate Token and Scopes**. Add the [`connections:write`](https://docs.slack.dev/reference/scopes/connections.write) scope, name the token, and click **Generate**. Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
 3. Follow [these instructions](https://confluence.atlassian.com/adminjiraserver0909/configure-an-incoming-link-1251415519.html) to create an external app link and to generate its redirect URL (the base of which will be stored as your APP_BASE_URL variable below), client ID, and client secret.
 4. Run the following commands in your terminal to store your environment variables, client ID, and client secret.
 5. You'll also need to know your team ID (found by opening your Slack instance in a web browser and copying the value within the link that starts with the letter **T**) and your app ID (found under **Basic Information**).
@@ -168,5 +168,5 @@ When finished, you can click the **Disconnect Account** button in the home tab t
 Congratulations! You've successfully customized your workspace with custom steps in Workflow Builder. Check out these links to take the next steps in your journey.
 
 * To learn more about Bolt for Python, refer to the [getting started](/getting-started) documentation.
-* For more details about creating workflow steps using the Bolt SDK, refer to the [workflow steps for Bolt](https://api.slack.com/automation/functions/custom-bolt) guide.
-* For information about custom steps dynamic options, refer to [custom steps dynamic options in Workflow Builder](https://api.slack.com/automation/runonslack/custom-steps-dynamic-options).
+* For more details about creating workflow steps using the Bolt SDK, refer to the [workflow steps for Bolt](https://docs.slack.dev/workflows/workflow-steps) guide.
+* For information about custom steps dynamic options, refer to [custom steps dynamic options in Workflow Builder](https://docs.slack.dev/workflows/creating-custom-steps-dynamic-options).

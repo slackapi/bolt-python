@@ -4,7 +4,7 @@ lang: ja-jp
 slug: /concepts/message-listening
 ---
 
-[あなたのアプリがアクセス権限を持つ](https://api.slack.com/messaging/retrieving#permissions)メッセージの投稿イベントをリッスンするには `message()` メソッドを利用します。このメソッドは `type` が `message` ではないイベントを処理対象から除外します。
+[あなたのアプリがアクセス権限を持つ](https://docs.slack.dev/messaging/retrieving-messages)メッセージの投稿イベントをリッスンするには `message()` メソッドを利用します。このメソッドは `type` が `message` ではないイベントを処理対象から除外します。
 
 `message()` の引数には `str` 型または `re.Pattern` オブジェクトを指定できます。この条件のパターンに一致しないメッセージは除外されます。
 
