@@ -4,7 +4,7 @@ lang: en
 slug: /concepts/shortcuts
 ---
 
-The `shortcut()` method supports both [global shortcuts](https://api.slack.com/interactivity/shortcuts/using#global_shortcuts) and [message shortcuts](https://api.slack.com/interactivity/shortcuts/using#message_shortcuts).
+The `shortcut()` method supports both [global shortcuts](https://docs.slack.dev/interactivity/implementing-shortcuts#global) and [message shortcuts](https://docs.slack.dev/interactivity/implementing-shortcuts#messages).
 
 Shortcuts are invokable entry points to apps. Global shortcuts are available from within search and text composer area in Slack. Message shortcuts are available in the context menus of messages. Your app can use the `shortcut()` method to listen to incoming shortcut requests. The method requires a `callback_id` parameter of type `str` or `re.Pattern`.
 
@@ -14,7 +14,7 @@ Shortcuts include a `trigger_id` which an app can use to [open a modal](/concept
 
 When setting up shortcuts within your app configuration, as with other URLs, you'll append `/slack/events` to your request URL.
 
-⚠️ Note that global shortcuts do **not** include a channel ID. If your app needs access to a channel ID, you may use a [`conversations_select`](https://api.slack.com/reference/block-kit/block-elements#conversation_select) element within a modal. Message shortcuts do include a channel ID.
+⚠️ Note that global shortcuts do **not** include a channel ID. If your app needs access to a channel ID, you may use a [`conversations_select`](https://docs.slack.dev/reference/block-kit/block-elements/multi-select-menu-element#conversation_multi_select) element within a modal. Message shortcuts do include a channel ID.
 
 Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
@@ -36,7 +36,7 @@ def open_modal(ack, shortcut, client):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "About the simplest modal you could conceive of :smile:\n\nMaybe <https://api.slack.com/reference/block-kit/interactive-components|*make the modal interactive*> or <https://api.slack.com/surfaces/modals/using#modifying|*learn more advanced modal use cases*>."
+                        "text": "About the simplest modal you could conceive of :smile:\n\nMaybe <https://docs.slack.dev/block-kit/#making-things-interactive|*make the modal interactive*> or <https://docs.slack.dev/surfaces/modals|*learn more advanced modal use cases*>."
                     }
                 },
                 {
@@ -75,7 +75,7 @@ def open_modal(ack, shortcut, client):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "About the simplest modal you could conceive of :smile:\n\nMaybe <https://api.slack.com/reference/block-kit/interactive-components|*make the modal interactive*> or <https://api.slack.com/surfaces/modals/using#modifying|*learn more advanced modal use cases*>."
+                        "text": "About the simplest modal you could conceive of :smile:\n\nMaybe <https://docs.slack.dev/block-kit/#making-things-interactive|*make the modal interactive*> or <https://docs.slack.dev/surfaces/modals|*learn more advanced modal use cases*>."
                     }
                 },
                 {

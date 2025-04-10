@@ -20,7 +20,7 @@ def ask_who(message, say):
 
 `say()` は、より複雑なメッセージペイロードを受け付けるので、メッセージに機能やリッチな構造を与えることが容易です。
 
-リッチなメッセージレイアウトをアプリに追加する方法については、[API サイトのガイド](https://api.slack.com/messaging/composing/layouts)を参照してください。また、[Block Kit ビルダー](https://api.slack.com/tools/block-kit-builder?template=1)の一般的なアプリフローのテンプレートも見てみてください。
+リッチなメッセージレイアウトをアプリに追加する方法については、[API サイトのガイド](https://docs.slack.dev/messaging/#structure)を参照してください。また、[Block Kit ビルダー](https://api.slack.com/tools/block-kit-builder?template=1)の一般的なアプリフローのテンプレートも見てみてください。
 
 ```python
 # ユーザーが 📅 のリアクションをつけたら、日付ピッカーのついた section ブロックを送信

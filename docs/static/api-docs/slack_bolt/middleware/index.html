@@ -639,7 +639,7 @@ def simple_middleware(req, resp, next_):
         &#34;&#34;&#34;Verifies an incoming request by checking the validity of
         `x-slack-signature`, `x-slack-request-timestamp`, and its body data.
 
-        Refer to https://api.slack.com/authentication/verifying-requests-from-slack for details.
+        Refer to https://docs.slack.dev/authentication/verifying-requests-from-slack for details.
 
         Args:
             signing_secret: The signing secret
@@ -688,7 +688,7 @@ def simple_middleware(req, resp, next_):
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
 <p>Verifies an incoming request by checking the validity of
 <code>x-slack-signature</code>, <code>x-slack-request-timestamp</code>, and its body data.</p>
-<p>Refer to <a href="https://api.slack.com/authentication/verifying-requests-from-slack">https://api.slack.com/authentication/verifying-requests-from-slack</a> for details.</p>
+<p>Refer to <a href="https://docs.slack.dev/authentication/verifying-requests-from-slack">https://docs.slack.dev/authentication/verifying-requests-from-slack</a> for details.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>signing_secret</code></strong></dt>
@@ -834,11 +834,11 @@ def simple_middleware(req, resp, next_):
         base_logger: Optional[Logger] = None,
     ):
         &#34;&#34;&#34;Handles `ssl_check` requests.
-        Refer to https://api.slack.com/interactivity/slash-commands for details.
+        Refer to https://docs.slack.dev/interactivity/implementing-slash-commands for details.
 
         Args:
             verification_token: The verification token to check
-                (optional as it&#39;s already deprecated - https://api.slack.com/authentication/verifying-requests-from-slack#verification_token_deprecation)
+                (optional as it&#39;s already deprecated - https://docs.slack.dev/authentication/verifying-requests-from-slack#verification_token_deprecation)
             base_logger: The base logger
         &#34;&#34;&#34;  # noqa: E501
         self.verification_token = verification_token
@@ -880,12 +880,12 @@ def simple_middleware(req, resp, next_):
 </details>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
 <p>Handles <code><a title="slack_bolt.middleware.ssl_check" href="ssl_check/index.html">slack_bolt.middleware.ssl_check</a></code> requests.
-Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://api.slack.com/interactivity/slash-commands</a> for details.</p>
+Refer to <a href="https://docs.slack.dev/interactivity/implementing-slash-commands">https://docs.slack.dev/interactivity/implementing-slash-commands</a> for details.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>verification_token</code></strong></dt>
 <dd>The verification token to check
-(optional as it's already deprecated - <a href="https://api.slack.com/authentication/verifying-requests-from-slack#verification_token_deprecation">https://api.slack.com/authentication/verifying-requests-from-slack#verification_token_deprecation</a>)</dd>
+(optional as it's already deprecated - <a href="https://docs.slack.dev/authentication/verifying-requests-from-slack#verification_token_deprecation">https://docs.slack.dev/authentication/verifying-requests-from-slack#verification_token_deprecation</a>)</dd>
 <dt><strong><code>base_logger</code></strong></dt>
 <dd>The base logger</dd>
 </dl></div>
@@ -931,7 +931,7 @@ Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://ap
     def __init__(self, base_logger: Optional[Logger] = None):
         &#34;&#34;&#34;Handles url_verification requests.
 
-        Refer to https://api.slack.com/events/url_verification for details.
+        Refer to https://docs.slack.dev/reference/events/url_verification for details.
 
         Args:
             base_logger: The base logger
@@ -965,7 +965,7 @@ Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://ap
 </details>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p>
 <p>Handles url_verification requests.</p>
-<p>Refer to <a href="https://api.slack.com/events/url_verification">https://api.slack.com/events/url_verification</a> for details.</p>
+<p>Refer to <a href="https://docs.slack.dev/reference/events/url_verification">https://docs.slack.dev/reference/events/url_verification</a> for details.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>base_logger</code></strong></dt>

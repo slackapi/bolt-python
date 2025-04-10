@@ -4,11 +4,11 @@ lang: ja-jp
 slug: /concepts/opening-modals
 ---
 
-<a href="https://api.slack.com/block-kit/surfaces/modals">モーダル</a>は、ユーザーからのデータの入力を受け付けたり、動的な情報を表示したりするためのインターフェイスです。組み込みの APIクライアントの <a href="https://api.slack.com/methods/views.open">`views.open`</a> メソッドに、有効な `trigger_id` と<a href="https://api.slack.com/reference/block-kit/views">ビューのペイロード</a>を指定してモーダルを開始します。
+<a href="https://docs.slack.dev/surfaces/modals">モーダル</a>は、ユーザーからのデータの入力を受け付けたり、動的な情報を表示したりするためのインターフェイスです。組み込みの APIクライアントの <a href="https://docs.slack.dev/reference/methods/views.open/">`views.open`</a> メソッドに、有効な `trigger_id` と<a href="https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission">ビューのペイロード</a>を指定してモーダルを開始します。
 
 ショートカットの実行、ボタンを押下、選択メニューの操作などの操作の場合、Request URL に送信されるペイロードには `trigger_id` が含まれます。
 
-モーダルの生成方法についての詳細は、<a href="https://api.slack.com/surfaces/modals/using#composing_views">API ドキュメント</a>を参照してください。
+モーダルの生成方法についての詳細は、<a href="https://docs.slack.dev/surfaces/modals#composing_views">API ドキュメント</a>を参照してください。
 
 <span>指定可能な引数の一覧は<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 

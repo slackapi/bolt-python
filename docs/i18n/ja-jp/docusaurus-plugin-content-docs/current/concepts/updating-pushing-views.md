@@ -4,7 +4,7 @@ lang: ja-jp
 slug: /concepts/updating-pushing-views
 ---
 
-モーダル内では、複数のモーダルをスタックのように重ねることができます。<a href="https://api.slack.com/methods/views.open">`views_open`</a> という APIを呼び出すと、親となるとなるモーダルビューが追加されます。この最初の呼び出しの後、<a href="https://api.slack.com/methods/views.update">`views_update`</a> を呼び出すことでそのビューを更新することができます。また、<a href="https://api.slack.com/methods/views.push">`views_push`</a> を呼び出すと、親のモーダルの上にさらに新しいモーダルビューを重ねることもできます。
+モーダル内では、複数のモーダルをスタックのように重ねることができます。<a href="https://docs.slack.dev/reference/methods/views.open/">`views_open`</a> という APIを呼び出すと、親となるとなるモーダルビューが追加されます。この最初の呼び出しの後、<a href="https://docs.slack.dev/reference/methods/views.update/">`views_update`</a> を呼び出すことでそのビューを更新することができます。また、<a href="https://docs.slack.dev/reference/methods/views.push">`views_push`</a> を呼び出すと、親のモーダルの上にさらに新しいモーダルビューを重ねることもできます。
 
 **`views_update`**
 
@@ -12,9 +12,9 @@ slug: /concepts/updating-pushing-views
 
 **`views_push`**
 
-既存のモーダルの上に新しいモーダルをスタックのように追加する場合は、組み込みのクライアントで `views_push` API を呼び出します。この API 呼び出しでは、有効な `trigger_id` と新しい<a href="https://api.slack.com/reference/block-kit/views">ビューのペイロード</a>を指定します。`views_push` の引数は <a href="#creating-modals">モーダルの開始</a> と同じです。モーダルを開いた後、このモーダルのスタックに追加できるモーダルビューは 2 つまでです。
+既存のモーダルの上に新しいモーダルをスタックのように追加する場合は、組み込みのクライアントで `views_push` API を呼び出します。この API 呼び出しでは、有効な `trigger_id` と新しい<a href="https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission">ビューのペイロード</a>を指定します。`views_push` の引数は <a href="#creating-modals">モーダルの開始</a> と同じです。モーダルを開いた後、このモーダルのスタックに追加できるモーダルビューは 2 つまでです。
 
-モーダルの更新と多重表示に関する詳細は、<a href="https://api.slack.com/surfaces/modals/using#modifying">API ドキュメント</a>を参照してください。
+モーダルの更新と多重表示に関する詳細は、<a href="https://docs.slack.dev/surfaces/modals">API ドキュメント</a>を参照してください。
 
 指定可能な引数の一覧は<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。
 

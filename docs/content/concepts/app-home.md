@@ -4,9 +4,9 @@ lang: en
 slug: /concepts/app-home
 ---
 
-[Home tabs](https://api.slack.com/surfaces/tabs/using) are customizable surfaces accessible via the sidebar and search that allow apps to display views on a per-user basis. After enabling App Home within your app configuration, home tabs can be published and updated by passing a `user_id` and [view payload](https://api.slack.com/reference/block-kit/views) to the [`views.publish`](https://api.slack.com/methods/views.publish) method.
+[Home tabs](https://docs.slack.dev/surfaces/app-home) are customizable surfaces accessible via the sidebar and search that allow apps to display views on a per-user basis. After enabling App Home within your app configuration, home tabs can be published and updated by passing a `user_id` and [view payload](https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission) to the [`views.publish`](https://docs.slack.dev/reference/methods/views.publis) method.
 
-You can subscribe to the [`app_home_opened`](https://api.slack.com/events/app_home_opened) event to listen for when users open your App Home.
+You can subscribe to the [`app_home_opened`](https://docs.slack.dev/reference/events/app_home_opened) event to listen for when users open your App Home.
 
 Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
@@ -32,7 +32,7 @@ def update_home_tab(client, event, logger):
                         "type": "section",
                         "text": {
                           "type": "mrkdwn",
-                          "text": "Learn how home tabs can be more useful and interactive <https://api.slack.com/surfaces/tabs/using|*in the documentation*>."
+                          "text": "Learn how home tabs can be more useful and interactive <https://docs.slack.dev/surfaces/app-home|*in the documentation*>."
                         }
                     }
                 ]
