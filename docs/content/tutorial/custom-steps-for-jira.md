@@ -21,7 +21,7 @@ If you'd rather skip the tutorial and just head straight to the code, you can us
 
 1. Navigate to the [app creation page](https://api.slack.com/apps/new) and select **From a manifest**.
 2. Select the workspace you want to install the application in, then click **Next**.
-3. Copy the contents of the [`manifest.json`](https://github.com/slack-samples/bolt-python-ai-chatbot/blob/main/manifest.json) file below into the text box that says **Paste your manifest code here** (within the **JSON** tab), then click **Next**:
+3. Copy the contents of the [`manifest.json`](https://github.com/slack-samples/bolt-python-jira-functions/blob/main/manifest.json) file below into the text box that says **Paste your manifest code here** (within the **JSON** tab), then click **Next**:
 
 ```js reference title="manifest.json"
 https://github.com/slack-samples/bolt-python-jira-functions/blob/main/manifest.json
