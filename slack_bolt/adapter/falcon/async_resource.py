@@ -42,7 +42,7 @@ class AsyncSlackAppResource:
 
         resp.status = "404"
         # Falcon 4.x w/ mypy fails to correctly infer the str type here
-        resp.body = "The page is not found..."  # type: ignore[assignment]
+        resp.body = "The page is not found..."
 
     async def on_post(self, req: Request, resp: Response):
         bolt_req = await self._to_bolt_request(req)

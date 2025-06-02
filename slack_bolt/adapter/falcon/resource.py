@@ -36,7 +36,7 @@ class SlackAppResource:
 
         resp.status = "404"
         # Falcon 4.x w/ mypy fails to correctly infer the str type here
-        resp.body = "The page is not found..."  # type: ignore[assignment]
+        resp.body = "The page is not found..."
 
     def on_post(self, req: Request, resp: Response):
         bolt_req = self._to_bolt_request(req)
@@ -53,7 +53,7 @@ class SlackAppResource:
     def _write_response(self, bolt_resp: BoltResponse, resp: Response):
         if falcon_version.__version__.startswith("2."):
             # Falcon 4.x w/ mypy fails to correctly infer the str type here
-            resp.body = bolt_resp.body  # type: ignore[assignment]
+            resp.body = bolt_resp.body
         else:
             resp.text = bolt_resp.body
 
