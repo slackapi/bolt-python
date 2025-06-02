@@ -1448,7 +1448,7 @@ class App:
             CustomListener(
                 app_name=self.name,
                 ack_function=functions.pop(0),
-                lazy_functions=functions,
+                lazy_functions=functions,  # type:ignore[arg-type]
                 matchers=listener_matchers,
                 middleware=listener_middleware,
                 auto_acknowledgement=auto_acknowledgement,
