@@ -26,6 +26,9 @@ def start_thread_socket_mode_server(test: TestCase, port: int):
 
     test.reset_server_state = reset_server_state
 
+    async def error(request: web.Request):
+        return web.Response(status=409, text="Unexpected server response: 409")
+
     async def health(request: web.Request):
         wr = web.Response()
         await wr.prepare(request)
@@ -56,6 +59,7 @@ def start_thread_socket_mode_server(test: TestCase, port: int):
     app.add_routes(
         [
             web.get("/link", link),
+            web.get("/error", error),
             web.get("/health", health),
         ]
     )
