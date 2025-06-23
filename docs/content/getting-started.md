@@ -10,7 +10,7 @@ This quickstart guide aims to help you get a Slack app using Bolt for Python up 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-When complete, you'll have a local environment configured with a customized [app](https://github.com/slackapi/bolt-python/tree/main/examples/getting_started) running to modify and make your own.
+When complete, you'll have a local environment configured with a customized [app](https://github.com/slack-samples/bolt-python-getting-started-app) running to modify and make your own.
 
 :::tip[Reference for readers]
 
@@ -20,7 +20,9 @@ In search of the complete guide to building an app from scratch? Check out the [
 
 #### Prerequisites
 
-A few tools are needed for the following steps. We recommend using the [**Slack CLI**](https://tools.slack.dev/slack-cli/) for the smoothest experience, but other options remain available.
+A few tools are needed for the following steps. We recommend using the [**Slack CLI**](https://tools.slack.dev/slack-cli/) for the smoothest experience, but other options remain available. 
+
+You can also begin by installing git and downloading the latest stable version of Python. Refer to [Python's setup and building guide](https://devguide.python.org/getting-started/setup-building/) for more details.
 
 Install the latest version of the Slack CLI to get started:
 
@@ -63,7 +65,7 @@ $ slack create first-bolt-app --template slack-samples/bolt-python-getting-start
 $ cd first-bolt-app
 ```
 
-After a project is created you'll have a `package.json` file for app dependencies and a `.slack` directory for Slack CLI configuration.
+After a project is created you'll have a `requirements.txt` file for app dependencies and a `.slack` directory for Slack CLI configuration.
 
 A few other files exist too, but we'll visit these later.
 
@@ -193,9 +195,17 @@ The defaults included leave opportunities abound, so to personalize this app let
 
 Chat is a common thing apps do and responding to various types of messages can make conversations more interesting.
 
-Using an editor of choice, open the app.py file and add the following message listener after the "hello" handler:
+Using an editor of choice, open the `app.py` file and add the following import to the top of the file, and message listener after the "hello" handler:
 
-// SAMPLE CODE HERE
+```python
+import random
+
+@app.message("goodbye")
+def message_goodbye(say):
+    responses = ["Adios", "Au revoir", "Farewell"]
+    parting = random.choice(responses)
+    say(f"{parting}!")
+```
 
 Once the file is updated, save the changes and then we'll make sure those changes are being used.
 

@@ -40,7 +40,7 @@ There are three main token types available to a Slack app: user (`xoxp`), bot (`
 
 We're going to use bot and app-level tokens for this guide.
 
-1. Navigate to the **OAuth & Permissions** on the left sidebar and scroll down to the **Bot Token Scopes** section. Click **Add an OAuth Scope**.
+1. Navigate to **OAuth & Permissions** on the left sidebar and scroll down to the **Bot Token Scopes** section. Click **Add an OAuth Scope**.
 
 2. For now, we'll just add one scope: [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write). This grants your app the permission to post messages in channels it's a member of.
 
@@ -363,7 +363,7 @@ if __name__ == "__main__":
 
 The value inside of `say()` is now an object that contains an array of `blocks`. Blocks are the building components of a Slack message and can range from text to images to datepickers. In this case, your app will respond with a section block that includes a button as an accessory. Since we're using `blocks`, the `text` is a fallback for notifications and accessibility.
 
-You'll notice in the button `accessory` object, there is an `action_id`. This will act as a unique identifier for the button so your app can specify what action it wants to respond to.
+You'll notice in the button `accessory` object, there is an `action_id`. This will act as a unique identifier for the button so your app can specify which action it wants to respond to.
 
 :::tip[Using Block Kit Builder]
 
@@ -373,7 +373,7 @@ The [Block Kit Builder](https://app.slack.com/block-kit-builder) is an simple wa
 
 Now, if you restart your app and say "hello" in a channel your app is in, you'll see a message with a button. But if you click the button, nothing happens (_yet!_).
 
-Let's add a handler to send a followup message when someone clicks the button:
+Let's add a handler to send a follow-up message when someone clicks the button:
 
 <Tabs groupId="socket-or-http">
 <TabItem value="socket-mode" label="Socket Mode">
