@@ -13,9 +13,14 @@ fastapi>=0.70.0,<1
 Flask>=1,<4
 Werkzeug>=2,<4
 pyramid>=1,<3
+
+# Sanic and its dependencies
+# Note: Sanic imports tracerite with wild card versions
+tracerite<1.1.2; python_version<="3.8"  # older versions of python are not compatible with tracerite>1.1.2
 sanic>=20,<21; python_version=="3.6"
 sanic>=21,<24; python_version>"3.6" and python_version<="3.8"
 sanic>=21,<26; python_version>"3.8"
+
 starlette>=0.19.1,<1
 tornado>=6,<7
 uvicorn<1                                # The oldest version can vary among Python runtime versions
