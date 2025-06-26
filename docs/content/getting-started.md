@@ -22,7 +22,7 @@ In search of the complete guide to building an app from scratch? Check out the [
 
 A few tools are needed for the following steps. We recommend using the [**Slack CLI**](https://tools.slack.dev/slack-cli/) for the smoothest experience, but other options remain available. 
 
-You can also begin by installing git and downloading the latest stable version of Python. Refer to [Python's setup and building guide](https://devguide.python.org/getting-started/setup-building/) for more details.
+You can also begin by installing git and downloading [Python 3.6 or later](https://www.python.org/downloads/), or the latest stable version of Python. Refer to [Python's setup and building guide](https://devguide.python.org/getting-started/setup-building/) for more details.
 
 Install the latest version of the Slack CLI to get started:
 
