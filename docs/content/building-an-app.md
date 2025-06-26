@@ -68,35 +68,38 @@ With the initial configuration handled, it's time to set up a new Bolt project. 
 
 If you don’t already have a project, let’s create a new one. Create an empty directory:
 
-```shell
-mkdir first-bolt-app
-cd first-bolt-app
+```sh
+$ mkdir first-bolt-app
+$ cd first-bolt-app
 ```
 
 Next, we recommend using a [Python virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment) to manage your project's dependencies. This is a great way to prevent conflicts with your system's Python packages. Let's create and activate a new virtual environment with [Python 3.6 or later](https://www.python.org/downloads/):
 
-```shell
-python3 -m venv .venv
-source .venv/bin/activate
+```sh
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+$ pip install -r requirements.txt
 ```
 
 We can confirm that the virtual environment is active by checking that the path to `python3` is _inside_ your project ([a similar command is available on Windows](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#activating-a-virtual-environment)):
 
-```shell
-which python3
+```sh
+$ which python3
 # Output: /path/to/first-bolt-app/.venv/bin/python3
 ```
 
 Before we install the Bolt for Python package to your new project, let's save the **bot token** and **app-level token** that were generated when you configured your app. 
 
 1. **Copy your bot (xoxb) token from the OAuth & Permissions page** and store it in a new environment variable. The following example works on Linux and macOS; but [similar commands are available on Windows](https://superuser.com/questions/212150/how-to-set-env-variable-in-windows-cmd-line/212153#212153).
-```shell
-export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
+
+```sh
+$ export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 ```
 
-2. **Copy your app-level (xapp) token from the Basic Information page** and then store it in a new environment variable. 
-```shell
-export SLACK_APP_TOKEN=<your-app-level-token>
+2. **Copy your app-level (xapp) token from the Basic Information page** and then store it in a new environment variable.
+
+```sh
+$ export SLACK_APP_TOKEN=<your-app-level-token>
 ```
 
 :::warning[Keep it secret. Keep it safe.]
@@ -107,8 +110,8 @@ Remember to keep your tokens secure. At a minimum, you should avoid checking the
 
 Now, let's create your app. Install the `slack_bolt` Python package to your virtual environment using the following command:
 
-```shell
-pip install slack_bolt
+```sh
+$ pip install slack_bolt
 ```
 
 Create a new file called `app.py` in this directory and add the following code:
@@ -128,8 +131,8 @@ if __name__ == "__main__":
 
 Your tokens are enough to create your first Bolt app. Save your `app.py` file then on the command line run the following:
 
-```script
-python3 app.py
+```sh
+$ python3 app.py
 ```
 
 Your app should let you know that it's up and running. 🎉

@@ -77,7 +77,6 @@ A starter template can be cloned to start with project scaffolding:
 ```sh
 $ git clone https://github.com/slack-samples/bolt-python-getting-started-app first-bolt-app
 $ cd first-bolt-app
-$ npm install
 ```
 
 Outlines of a project are taking shape, so we can move on to running the app!
@@ -88,14 +87,15 @@ Outlines of a project are taking shape, so we can move on to running the app!
 We recommend using a [Python virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment) to manage your project's dependencies. This is a great way to prevent conflicts with your system's Python packages. Let's create and activate a new virtual environment with [Python 3.6 or later](https://www.python.org/downloads/):
 
 ```sh
-python3 -m venv .venv
-source .venv/bin/activate
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+$ pip install -r requirements.txt
 ```
 
 Confirm the virtual environment is active by checking that the path to `python3` is _inside_ your project ([a similar command is available on Windows](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#activating-a-virtual-environment)):
 
 ```sh
-which python3
+$ which python3
 # Output: /path/to/first-bolt-app/.venv/bin/python3
 ```
 
@@ -111,7 +111,7 @@ The getting started app template contains a `manifest.json` file with details ab
 ```sh
 $ slack run
 ...
-[INFO]  bolt-app ⚡️ Bolt app is running!
+⚡️ Bolt app is running!
 ```
 
 With the app running, you can test it out with the following steps in Slack:
@@ -169,9 +169,9 @@ $ export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 After saving tokens for the app you created, it is time to run it:
 
 ```sh
-$ npm run start
+$ python3 app.py
 ...
-[INFO]  bolt-app ⚡️ Bolt app is running!
+⚡️ Bolt app is running!
 ```
 
 With the app running, you can test it out with the following steps in Slack:
@@ -217,7 +217,7 @@ Run the following command and select the app created earlier to start, or restar
 ```sh
 $ slack run
 ...
-[INFO]  bolt-app ⚡️ Bolt app is running!
+⚡️ Bolt app is running!
 ```
 
 After finding the above output appears, open Slack to perform these steps:
@@ -234,9 +234,9 @@ Your app can be stopped again by pressing `CTRL+C` in the terminal to end these 
 Run the following command to start, or restart, your app with the latest changes:
 
 ```sh
-$ npm run start
+$ python3 app.py
 ...
-[INFO]  bolt-app ⚡️ Bolt app is running!
+⚡️ Bolt app is running!
 ```
 
 After finding the above output appears, open Slack to perform these steps:
