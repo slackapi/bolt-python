@@ -53,20 +53,20 @@ jobs:
       - name: Install async dependencies
         run: |
           pip install -r requirements/async.txt
-      - name: Run tests for HTTP Mode adapters (ASGI)
-        run: |
-          # Requires async test dependencies
-          pytest tests/adapter_tests/asgi/ --junitxml=reports/test_adapter_asgi.xml
       - name: Run tests for Socket Mode adapters
         run: |
           # Requires async test dependencies
           pytest tests/adapter_tests/socket_mode/ --junitxml=reports/test_adapter_socket_mode.xml
-      - name: Run tests for HTTP Mode adapters (asyncio-based libraries)
-        run: |
-          pytest tests/adapter_tests_async/ --junitxml=reports/test_adapter_async.xml
       - name: Install all dependencies
         run: |
           pip install -r requirements/testing.txt
+      - name: Run tests for HTTP Mode adapters (ASGI)
+        run: |
+          # Requires async test dependencies
+          pytest tests/adapter_tests/asgi/ --junitxml=reports/test_adapter_asgi.xml
+      - name: Run tests for HTTP Mode adapters (asyncio-based libraries)
+        run: |
+          pytest tests/adapter_tests_async/ --junitxml=reports/test_adapter_async.xml
       - name: Run asynchronous tests
         run: |
           pytest tests/slack_bolt_async/ --junitxml=reports/test_slack_bolt_async.xml
