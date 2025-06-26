@@ -61,12 +61,12 @@ jobs:
         run: |
           # Requires async test dependencies
           pytest tests/adapter_tests/socket_mode/ --junitxml=reports/test_adapter_socket_mode.xml
-      - name: Run tests for HTTP Mode adapters (asyncio-based libraries)
-        run: |
-          pytest tests/adapter_tests_async/ --junitxml=reports/test_adapter_async.xml
       - name: Install all dependencies
         run: |
           pip install -r requirements/testing.txt
+      - name: Run tests for HTTP Mode adapters (asyncio-based libraries)
+        run: |
+          pytest tests/adapter_tests_async/ --junitxml=reports/test_adapter_async.xml
       - name: Run asynchronous tests
         run: |
           pytest tests/slack_bolt_async/ --junitxml=reports/test_slack_bolt_async.xml
