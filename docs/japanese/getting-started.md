@@ -26,7 +26,7 @@ lang: ja-jp
 
 このページでは、アプリの概要や重要な認証情報を確認できます。これらの情報は後ほど参照します。
 
-![Basic Information ページ](/img/basic-information-page.png "Basic Information ページ")
+![Basic Information ページ](/img/bolt-python/basic-information-page.png "Basic Information ページ")
 
 ひと通り確認して、アプリのアイコンと説明を追加したら、アプリのプロジェクトの構成 🔩 を始めましょう。
 
@@ -50,7 +50,7 @@ Slack アプリで使用できるトークンには、ユーザートークン�
 
 4. インストールを承認すると **OAuth & Permissions** ページが表示され、**Bot User OAuth Access Token** を確認できるでしょう。
 
-![OAuth トークン](/img/bot-token.png "ボット用 OAuth トークン")
+![OAuth トークン](/img/bolt-python/bot-token.png "ボット用 OAuth トークン")
 
 5. 次に「**Basic Informationのページ**」まで戻り、アプリレベルトークンのセクションまで下にスクロールし「**Generate Token and Scopes**」をクリックしてアプリレベルトークンを作成します。このトークンに `connections:write` のスコープを付与し、作成された `xapp` トークンを保存します。これらのトークンは後ほど利用します。
 

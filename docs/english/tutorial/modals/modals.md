@@ -14,7 +14,7 @@ Let's take a look at the technologies we'll use in this tutorial:
 ## Final product overview {#final_product}
 If you follow through with the extra credit tasks, your final app will look like this:
 
-![Final product](/img/tutorials/modals/final_product.gif)
+![Final product](final_product.gif)
 
 ---
 
@@ -65,21 +65,21 @@ Here's a copy of what the modal payload looks like &mdash; this is what powers t
 
 3. Find the base path to your server by clicking **Share**, then copy the Live site link.
 
-	![Get the base link](/img/tutorials/modals/base_link.gif)
+	![Get the base link](base_link.gif)
 
 4. On your app page, navigate to **Interactivity & Shortcuts**. Append "/slack/events" to your base path URL and enter it into the **Request URL** e.g., `https://festive-harmonious-march.glitch.me/slack/events`.  This allows your server to retrieve information from the modal. You can see the code for this within the Glitch project.
 
-	![Interactivity URL](/img/tutorials/modals/interactivity_url.png)
+	![Interactivity URL](interactivity_url.png)
 
 5. Create the slash command so you can access it within Slack. Navigate to the **Slash Commands** section and create a new command. Note the **Request URL** is the same link as above, e.g. `https://festive-harmonious-march.glitch.me/slack/events` . The code that powers the slash command and opens a modal can be found within the Glitch project.
 
-	![Slash command details](/img/tutorials/modals/slash_command.png)
+	![Slash command details](slash_command.png)
 
 6. Select **Install App**. After you've done this, you'll see a **Bot User OAuth Access Token**, copy this.
 
 7. Navigate to your Glitch project and click the `.env` file where the credentials are stored, and paste your bot token where the `SLACK_BOT_TOKEN` variable is shown. This allows your server to send authenticated requests to the Slack API. You'll also need to head to your app's settings page under **Basic Information** and copy the _Signing secret_ to place into the `SLACK_SIGNING_SECRET` variable. 
 
-	![Environment variables](/img/tutorials/modals/heart_icon.gif)
+	![Environment variables](heart_icon.gif)
 
 8. Test by heading to Slack and typing `/thankyou`.
 

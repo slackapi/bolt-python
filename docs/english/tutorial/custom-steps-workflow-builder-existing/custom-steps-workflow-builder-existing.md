@@ -28,7 +28,7 @@ In order to add custom workflow steps to an app, the app also needs to be org-re
 
 Navigate to **Org Level Apps** in the left nav and click **Opt-In**, then confirm **Yes, Opt-In**.
 
-![Make your app org-ready](/img/tutorials/custom-steps-wfb-existing/org-ready.png)
+![Make your app org-ready](org-ready.png)
 
 ## Adding a new workflow step {#add-step}
 
@@ -54,19 +54,19 @@ Navigate to **App Manifest** in the left nav and add the `function_executed` eve
 
 Navigate to **Workflow Steps** in the left nav and click **Add Step**. This is where we'll configure our step's inputs, outputs, name, and description.
 
-![Add step](/img/tutorials/custom-steps-wfb-existing/add-step.png)
+![Add step](add-step.png)
 
 For illustration purposes in this tutorial, we're going to write a custom step called Request Time Off. When the step is invoked, a message will be sent to the provided manager with an option to approve or deny the time-off request. When the manager takes an action (approves or denies the request), a message is posted with the decision and the manager who made the decision. The step will take two user IDs as inputs, representing the requesting user and their manager, and it will output both of those user IDs as well as the decision made.
 
 Add the pertinent details to the step:
 
-![Define step](/img/tutorials/custom-steps-wfb-existing/define-step.png)
+![Define step](define-step.png)
 
 Remember this `callback_id`. We will use this later when implementing a function listener. Then add the input and output parameters:
 
-![Add inputs](/img/tutorials/custom-steps-wfb-existing/inputs.png)
+![Add inputs](inputs.png)
 
-![Add outputs](/img/tutorials/custom-steps-wfb-existing/outputs.png)
+![Add outputs](outputs.png)
 
 Save your changes.
 
@@ -260,11 +260,11 @@ Click the button to create a **New Workflow**, then **Build Workflow**. Choose t
 
 In the **Steps** pane to the right, search for your app name and locate the **Request time off** step we created.
 
-![Find step](/img/tutorials/custom-steps-wfb-existing/find-step.png)
+![Find step](find-step.png)
 
 Select the step and choose the desired inputs and click **Save**.
 
-![Step inputs](/img/tutorials/custom-steps-wfb-existing/step-inputs.png)
+![Step inputs](step-inputs.png)
 
 Next, click **Finish Up**, give your workflow a name and description, then click **Publish**. Copy the link for your workflow on the next screen, then click **Done**.
 
@@ -272,7 +272,7 @@ Next, click **Finish Up**, give your workflow a name and description, then click
 
 In any channel where your app is installed, paste the link you copied and send it as a message. The link will unfurl into a button to start the workflow. Click the button to start the workflow. If you set yourself up as the manager, you will then see a message from your app. Pressing either button will return a confirmation or denial of your time off request.
 
-![Message](/img/tutorials/custom-steps-wfb-existing/app-message.png)
+![Message](app-message.png)
 
 ## Next steps {#next-steps}
 
