@@ -120,8 +120,7 @@ You'll know the local development server is up and running successfully when it 
 
 With your development server running, continue to the next step.
 
-:::info
-If you need to stop running the local development server, press `<CTRL>` + `c` to end the process.
+:::info[If you need to stop running the local development server, press `<CTRL>` + `c` to end the process.]
 :::
 
 ## Wiring up the sample step in Workflow Builder {#wfb}

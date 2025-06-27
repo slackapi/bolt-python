@@ -16,9 +16,7 @@ lang: ja-jp
 ### アプリを作成する {#create-an-app}
 最初にやるべきこと : Bolt での開発を始める前に、[Slack アプリを作成](https://api.slack.com/apps/new)します。
 
-:::tip 
-
-通常の業務の妨げにならないよう、別の開発用のワークスペースを使用することをおすすめします。[新しいワークスペースは無料で作成できます](https://slack.com/get-started#create)
+:::tip[通常の業務の妨げにならないよう、別の開発用のワークスペースを使用することをおすすめします。[新しいワークスペースは無料で作成できます](https://slack.com/get-started#create)]
 
 :::
 
@@ -56,9 +54,7 @@ Slack アプリで使用できるトークンには、ユーザートークン�
 
 6. 左サイドメニューの「**Socket Mode**」を有効にします。
 
-:::tip
-
-トークンはパスワードと同様に取り扱い、[安全な方法で保管してください](https://docs.slack.dev/authentication/best-practices-for-security)。アプリはこのトークンを使って Slack ワークスペースで投稿をしたり、情報の取得をしたりします。
+:::tip[トークンはパスワードと同様に取り扱い、[安全な方法で保管してください](https://docs.slack.dev/authentication/best-practices-for-security)。アプリはこのトークンを使って Slack ワークスペースで投稿をしたり、情報の取得をしたりします。]
 
 :::
 
@@ -99,9 +95,9 @@ export SLACK_BOT_TOKEN=xoxb-<ボットトークン>
 ```shell
 export SLACK_APP_TOKEN=<アプリレベルトークン>
 ```
-:::warning
+:::warning[🔒 全てのトークンは安全に保管してください。]
 
-🔒 全てのトークンは安全に保管してください。少なくともパブリックなバージョン管理にチェックインするようなことは避けるべきでしょう。また、上にあった例のように環境変数を介してアクセスするようにしてください。詳細な情報は [アプリのセキュリティのベストプラクティス](https://docs.slack.dev/authentication/best-practices-for-security)のドキュメントを参照してください。
+少なくともパブリックなバージョン管理にチェックインするようなことは避けるべきでしょう。また、上にあった例のように環境変数を介してアクセスするようにしてください。詳細な情報は [アプリのセキュリティのベストプラクティス](https://docs.slack.dev/authentication/best-practices-for-security)のドキュメントを参照してください。
 
 :::
 
@@ -359,9 +355,9 @@ if __name__ == "__main__":
 
 ボタンを含む `accessory` オブジェクトでは、`action_id` を指定していることがわかります。これは、ボタンを一意に示す識別子として機能します。これを使って、アプリをどのアクションに応答させるかを指定できます。
 
-:::tip
+:::tip[[Block Kit Builder](https://app.slack.com/block-kit-builder) を使用すると、インタラクティブなメッセージのプロトタイプを簡単に作成できます。]
 
-[Block Kit Builder](https://app.slack.com/block-kit-builder) を使用すると、インタラクティブなメッセージのプロトタイプを簡単に作成できます。自分自身やチームメンバーがメッセージのモックアップを作成し、生成される JSON をアプリに直接貼りつけることができます。
+自分自身やチームメンバーがメッセージのモックアップを作成し、生成される JSON をアプリに直接貼りつけることができます。
 
 :::
 

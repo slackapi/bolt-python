@@ -15,9 +15,7 @@ When you're finished, you'll have this ⚡️[Getting Started with Slack app](ht
 ### Create an app {#create-an-app}
 First thing's first: before you start developing with Bolt, you'll want to [create a Slack app](https://api.slack.com/apps/new).
 
-:::tip  
-
-We recommend using a workspace where you won't disrupt real work getting done — [you can create a new one for free](https://slack.com/get-started#create).
+:::tip[We recommend using a workspace where you won't disrupt real work getting done — [you can create a new one for free](https://slack.com/get-started#create).]
 
 :::
 
@@ -55,9 +53,7 @@ We're going to use bot and app-level tokens for this guide.
 
 6. Navigate to **Socket Mode** on the left side menu and toggle to enable. 
 
-:::tip  
-
-Treat your tokens like passwords and [keep them safe](https://docs.slack.dev/authentication/best-practices-for-security). Your app uses tokens to post and retrieve information from Slack workspaces.
+:::tip[Treat your tokens like passwords and [keep them safe](https://docs.slack.dev/authentication/best-practices-for-security). Your app uses tokens to post and retrieve information from Slack workspaces.]
 
 :::
 
@@ -169,9 +165,9 @@ When an event occurs, Slack will send your app some information about the event,
 
 2. Add your Request URL. Slack will send HTTP POST requests corresponding to events to this [Request URL](https://docs.slack.dev/apis/events-api/#subscribing) endpoint. Bolt uses the `/slack/events` path to listen to all incoming requests (whether shortcuts, events, or interactivity payloads). When configuring your Request URL within your app configuration, you'll append `/slack/events`, e.g. `https://<your-domain>/slack/events`. 💡 As long as your Bolt app is still running, your URL should become verified.
 
-:::tip 
+:::tip[For local development, you can use a proxy service like ngrok to create a public URL and tunnel requests to your development environment.] 
 
-For local development, you can use a proxy service like ngrok to create a public URL and tunnel requests to your development environment. Refer to [ngrok's getting started guide](https://ngrok.com/docs#getting-started-expose) on how to create this tunnel. And when you get to hosting your app, we've collected some of the most common hosting providers Slack developers use to host their apps [on our API site](https://docs.slack.dev/distribution/hosting-slack-apps/). 
+Refer to [ngrok's getting started guide](https://ngrok.com/docs#getting-started-expose) on how to create this tunnel. And when you get to hosting your app, we've collected some of the most common hosting providers Slack developers use to host their apps [on our API site](https://docs.slack.dev/distribution/hosting-slack-apps/). 
 
 :::
 
@@ -266,9 +262,9 @@ With Socket Mode on, basic interactivity is enabled by default, so no further ac
 
 Similar to events, you'll need to specify a URL for Slack to send the action (such as *user clicked a button*). Back on your app configuration page, click on **Interactivity & Shortcuts** on the left side. You'll see that there's another **Request URL** box.
 
-:::tip 
+:::tip[By default, Bolt is configured to use the same endpoint for interactive components that it uses for events] 
 
-By default, Bolt is configured to use the same endpoint for interactive components that it uses for events, so use the same request URL as above (for example, `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up to handle interactivity!
+Use the same request URL as above (for example, `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up to handle interactivity!
 
 :::
 
@@ -366,9 +362,9 @@ The value inside of `say()` is now an object that contains an array of `blocks`.
 
 You'll notice in the button `accessory` object, there is an `action_id`. This will act as a unique identifier for the button so your app can specify what action it wants to respond to.
 
-:::tip  
+:::tip[The [Block Kit Builder](https://app.slack.com/block-kit-builder) is a simple way to prototype your interactive messages.] 
 
-The [Block Kit Builder](https://app.slack.com/block-kit-builder) is an simple way to prototype your interactive messages. The builder lets you (or anyone on your team) mockup messages and generates the corresponding JSON that you can paste directly in your app.
+The builder lets you (or anyone on your team) mockup messages and generates the corresponding JSON that you can paste directly in your app.
 
 :::
 

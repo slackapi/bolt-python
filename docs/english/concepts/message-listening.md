@@ -8,9 +8,7 @@ To listen to messages that [your app has access to receive](https://docs.slack.d
 
 `message()` accepts an argument of type `str` or `re.Pattern` object that filters out any messages that don't match the pattern.
 
-:::info
-
-Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+:::info[Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.]
 
 :::
 

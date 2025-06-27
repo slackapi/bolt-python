@@ -8,9 +8,7 @@ You can call [any Web API method](https://docs.slack.dev/reference/methods) usin
 
 The token used to initialize Bolt can be found in the `context` object, which is required to call most Web API methods.
 
-:::info 
-
-Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+:::info[Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.]
 
 :::
 

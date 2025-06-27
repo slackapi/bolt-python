@@ -10,9 +10,7 @@ Depending on the type of request, your acknowledgement may be different. For exa
 
 We recommend calling `ack()` right away before initiating any time-consuming processes such as fetching information from your database or sending a new message, since you only have 3 seconds to respond before Slack registers a timeout error.
 
-:::info 
-
-When working in a FaaS / serverless environment, our guidelines for when to `ack()` are different. See the section on [Lazy listeners (FaaS)](/concepts/lazy-listeners) for more detail on this.  
+:::info[When working in a FaaS / serverless environment, our guidelines for when to `ack()` are different. See the section on [Lazy listeners (FaaS)](/concepts/lazy-listeners) for more detail on this.]
 
 :::
 
