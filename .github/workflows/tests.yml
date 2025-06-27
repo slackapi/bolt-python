@@ -81,3 +81,12 @@ jobs:
           flags: ${{ matrix.python-version }}
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
+      - name: Send notifications of failing tests
+        if: failure() && github.ref == 'refs/heads/main'
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: webhook-trigger
+          payload: |
+            action_url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            repository: ${{ github.repository }}
