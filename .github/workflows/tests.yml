@@ -73,14 +73,6 @@ jobs:
         run: |
           pytest tests/slack_bolt_async/ --junitxml=reports/test_slack_bolt_async.xml
           pytest tests/scenario_tests_async/ --junitxml=reports/test_scenario_async.xml
-      - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
-        with:
-          directory: ./reports/
-          flags: ${{ matrix.python-version }}
-          token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
       - name: Send notifications of failing tests
         if: failure() && github.ref == 'refs/heads/main'
         uses: slackapi/slack-github-action@v2.1.0
@@ -90,3 +82,11 @@ jobs:
           payload: |
             action_url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             repository: "${{ github.repository }}"
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
+        with:
+          directory: ./reports/
+          flags: ${{ matrix.python-version }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
