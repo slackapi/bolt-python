@@ -1,7 +1,7 @@
 [
 		{
 			"type": "doc",
-			"id": "index",
+			"id": "bolt-python/index",
 			"label": "Bolt for Python",
 			"className": "sidebar-title"
 		},
@@ -11,79 +11,79 @@
 			"label": "Guides",
 			"collapsed": false,
 			"items": [
-				"getting-started",
+				"bolt-python/getting-started",
 				{
 					"type": "category",
 					"label": "Slack API calls",
-					"items": ["concepts/message-sending", "concepts/web-api"]
+					"items": ["bolt-python/concepts/message-sending", "bolt-python/concepts/web-api"]
 				},
 				{
 					"type": "category",
 					"label": "Events",
-					"items": ["concepts/message-listening", "concepts/event-listening"]
+					"items": ["bolt-python/concepts/message-listening", "bolt-python/concepts/event-listening"]
 				},
 				{
 					"type": "category",
 					"label": "App UI & Interactivity",
 					"items": [
-						"concepts/acknowledge",
-						"concepts/shortcuts",
-						"concepts/commands",
-						"concepts/actions",
-						"concepts/opening-modals",
-						"concepts/updating-pushing-views",
-						"concepts/view-submissions",
-						"concepts/select-menu-options",
-						"concepts/app-home"
+						"bolt-python/concepts/acknowledge",
+						"bolt-python/concepts/shortcuts",
+						"bolt-python/concepts/commands",
+						"bolt-python/concepts/actions",
+						"bolt-python/concepts/opening-modals",
+						"bolt-python/concepts/updating-pushing-views",
+						"bolt-python/concepts/view-submissions",
+						"bolt-python/concepts/select-menu-options",
+						"bolt-python/concepts/app-home"
 					]
 				},
-				"concepts/ai-apps",
+				"bolt-python/concepts/ai-apps",
 				{
 					"type": "category",
 					"label": "Custom Steps",
 					"items": [
-						"concepts/custom-steps",
-						"concepts/custom-steps-dynamic-options"
+						"bolt-python/concepts/custom-steps",
+						"bolt-python/concepts/custom-steps-dynamic-options"
 					]
 				},
 				{
 					"type": "category",
 					"label": "App Configuration",
 					"items": [
-						"concepts/socket-mode",
-						"concepts/errors",
-						"concepts/logging",
-						"concepts/async"
+						"bolt-python/concepts/socket-mode",
+						"bolt-python/concepts/errors",
+						"bolt-python/concepts/logging",
+						"bolt-python/concepts/async"
 					]
 				},
 				{
 					"type": "category",
 					"label": "Middleware & Context",
 					"items": [
-						"concepts/global-middleware",
-						"concepts/listener-middleware",
-						"concepts/context"
+						"bolt-python/concepts/global-middleware",
+						"bolt-python/concepts/listener-middleware",
+						"bolt-python/concepts/context"
 					]
 				},
-				"concepts/lazy-listeners",
+				"bolt-python/concepts/lazy-listeners",
 				{
 					"type": "category",
 					"label": "Adaptors",
-					"items": ["concepts/adapters", "concepts/custom-adapters"]
+					"items": ["bolt-python/concepts/adapters", "bolt-python/concepts/custom-adapters"]
 				},
 				{
 					"type": "category",
 					"label": "Authorization & Security",
 					"items": [
-						"concepts/authenticating-oauth",
-						"concepts/authorization",
-						"concepts/token-rotation"
+						"bolt-python/concepts/authenticating-oauth",
+						"bolt-python/concepts/authorization",
+						"bolt-python/concepts/token-rotation"
 					]
 				},
 				{
 					"type": "category",
 					"label": "Legacy",
-					"items": ["legacy/steps-from-apps"]
+					"items": ["bolt-python/legacy/steps-from-apps"]
 				}
 			]
 		},
@@ -92,12 +92,12 @@
 			"type": "category",
 			"label": "Tutorials",
 			"items": [
-				"tutorial/ai-chatbot/ai-chatbot", 
-				"tutorial/custom-steps/custom-steps", 
-				"tutorial/custom-steps-for-jira/custom-steps-for-jira", 
-				"tutorial/custom-steps-workflow-builder-new/custom-steps-workflow-builder-new", 
-				"tutorial/custom-steps-workflow-builder-existing/custom-steps-workflow-builder-existing", 
-				"tutorial/modals/modals"
+				"bolt-python/tutorial/ai-chatbot/ai-chatbot", 
+				"bolt-python/tutorial/custom-steps/custom-steps", 
+				"bolt-python/tutorial/custom-steps-for-jira/custom-steps-for-jira", 
+				"bolt-python/tutorial/custom-steps-workflow-builder-new/custom-steps-workflow-builder-new", 
+				"bolt-python/tutorial/custom-steps-workflow-builder-existing/custom-steps-workflow-builder-existing", 
+				"bolt-python/tutorial/modals/modals"
 			]
 		},
 		{ "type": "html", "value": "<hr>" },
