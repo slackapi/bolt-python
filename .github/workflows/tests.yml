@@ -85,8 +85,8 @@ jobs:
         if: failure() && github.ref == 'refs/heads/main'
         uses: slackapi/slack-github-action@v2.1.0
         with:
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook: ${{ secrets.SLACK_REGRESSION_FAILURES_WEBHOOK_URL }}
           webhook-type: webhook-trigger
           payload: |
             action_url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            repository: ${{ github.repository }}
+            repository: "${{ github.repository }}"
