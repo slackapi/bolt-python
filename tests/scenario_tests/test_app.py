@@ -264,7 +264,7 @@ class TestApp:
 
         req = BoltRequest(body=app_mention_event_body, headers={}, mode="socket_mode")
         response = app.dispatch(req)
-        assert response.status == 418
+        assert response.status == 200
         assert result["called"] is True
 
     def test_argument_logger_propagation(self):
