@@ -1,7 +1,7 @@
 ---
 title: ワークフローステップの概要
 lang: ja-jp
-slug: /concepts/steps-from-apps
+slug: /legacy/steps-from-apps
 ---
 
 （アプリによる）ワークフローステップでは、処理をアプリ側で行うカスタムのワークフローステップを提供することができます。ユーザーは[ワークフロービルダー](https://docs.slack.dev/workflows/workflow-builder)を使ってこれらのステップをワークフローに追加できます。
