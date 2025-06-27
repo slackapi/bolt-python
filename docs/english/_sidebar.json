@@ -93,7 +93,7 @@
 			"label": "Tutorials",
 			"items": [
 				"bolt-python/tutorial/ai-chatbot/ai-chatbot", 
-				"bolt-python/tutorial/custom-steps/custom-steps", 
+				"bolt-python/tutorial/custom-steps", 
 				"bolt-python/tutorial/custom-steps-for-jira/custom-steps-for-jira", 
 				"bolt-python/tutorial/custom-steps-workflow-builder-new/custom-steps-workflow-builder-new", 
 				"bolt-python/tutorial/custom-steps-workflow-builder-existing/custom-steps-workflow-builder-existing", 
