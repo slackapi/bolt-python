@@ -19,7 +19,7 @@ A Python framework to build Slack apps in a flash with the latest platform featu
 ## Setup
 
 ```bash
-# Python 3.7+ required
+# Python 3.6+ required
 python -m venv .venv
 source .venv/bin/activate
 
