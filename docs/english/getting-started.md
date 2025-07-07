@@ -96,9 +96,9 @@ export SLACK_BOT_TOKEN=xoxb-<your-bot-token>
 export SLACK_APP_TOKEN=<your-app-level-token>
 ```
 
-:::warning
+:::warning[Remember to keep your tokens secure.] 
 
-Remember to keep your tokens secure. At a minimum, you should avoid checking them into public version control, and access them via environment variables as we've done above. Check out the API documentation for more on [best practices for app security](https://docs.slack.dev/authentication/best-practices-for-security).
+At a minimum, you should avoid checking them into public version control, and access them via environment variables as we've done above. Check out the API documentation for more on [best practices for app security](https://docs.slack.dev/authentication/best-practices-for-security).
 
 :::
 
