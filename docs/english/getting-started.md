@@ -133,7 +133,7 @@ Navigate to your list of apps and [create a new Slack app](https://api.slack.com
 
 You'll then land on your app's **Basic Information** page, which is an overview of your app and which contains important credentials:
 
-![Basic Information page](/img/boltpy/basic-information-page.png "Basic Information page")
+![Basic Information page](/img/bolt-python/basic-information-page.png "Basic Information page")
 
 To listen for events happening in Slack (such as a new posted message) without opening a port or exposing an endpoint, we will use [Socket Mode](/concepts/socket-mode). This connection requires a specific app token:
 

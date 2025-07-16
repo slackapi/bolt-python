@@ -24,7 +24,7 @@ After you fill out an app name (_you can change it later_) and pick a workspace 
 
 This page contains an overview of your app in addition to important credentials you'll need later. 
 
-![Basic Information page](/img/boltpy/basic-information-page.png "Basic Information page")
+![Basic Information page](/img/bolt-python/basic-information-page.png "Basic Information page")
 
 Look around, add an app icon and description, and then let's start configuring your app 🔩
 
