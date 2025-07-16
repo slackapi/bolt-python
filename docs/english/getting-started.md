@@ -265,7 +265,7 @@ $ slack app settings
 
 This will open the following page in a web browser:
 
-![Basic Information page](/img/boltpy/basic-information-page.png "Basic Information page")
+![Basic Information page](/img/bolt-python/basic-information-page.png "Basic Information page")
 
 </TabItem>
 <TabItem value="terminal" label="Browser">
@@ -274,7 +274,7 @@ Browse to https://api.slack.com/apps and select your app "Getting Started Bolt A
 
 This will open the following page:
 
-![Basic Information page](/img/boltpy/basic-information-page.png "Basic Information page")
+![Basic Information page](/img/bolt-python/basic-information-page.png "Basic Information page")
 
 </TabItem>
 </Tabs>
