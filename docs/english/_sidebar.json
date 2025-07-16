@@ -104,7 +104,7 @@
 		{
 			"type": "link",
 			"label": "Reference",
-			"href": "/bolt-python/reference/index.html"
+			"href": "https://docs.slack.dev/bolt-python/reference/index.html"
 		},
 		{ "type": "html", "value": "<hr>" },
 		{
