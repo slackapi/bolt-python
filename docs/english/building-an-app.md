@@ -48,7 +48,7 @@ We're going to use bot and app-level tokens for this guide.
 
 4. Once you authorize the installation, you'll land on the **OAuth & Permissions** page and see a **Bot User OAuth Access Token**. 
 
-![OAuth Tokens](/img/boltpy/bot-token.png "Bot OAuth Token")
+![OAuth Tokens](/img/bolt-python/bot-token.png "Bot OAuth Token")
 
 5. Head over to **Basic Information** and scroll down under the App Token section and click **Generate Token and Scopes** to generate an app-level token. Add the `connections:write` scope to this token and save the generated `xapp` token.
 

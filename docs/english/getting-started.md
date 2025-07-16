@@ -158,7 +158,7 @@ A bot token is also needed to interact with the Web API methods as your app's bo
 1. Navigate to the **OAuth & Permissions** on the left sidebar and install your app to your workspace to generate a token.
 2. After authorizing the installation, you'll return to the **OAuth & Permissions** page and find a **Bot User OAuth Token**:
 
-![OAuth Tokens](/img/boltpy/bot-token.png "Bot OAuth Token")
+![OAuth Tokens](/img/bolt-python/bot-token.png "Bot OAuth Token")
 
 3. Copy the bot token beginning with `xoxb` from the **OAuth & Permissions page** and then store it in a new environment variable:
 
