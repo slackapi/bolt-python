@@ -1,5 +1,5 @@
 ---
-title: AI Apps
+title: AI in Apps
 lang: en
 slug: /concepts/ai-apps
 ---
@@ -8,7 +8,7 @@ slug: /concepts/ai-apps
 If you don't have a paid workspace for development, you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
 :::
 
-AI apps comprise a new messaging experience for Slack. If you're unfamiliar with using AI apps within Slack, you'll want to read the [API documentation on the subject](https://docs.slack.dev/ai/). Then come back here to implement them with Bolt!
+The Agents & AI Apps feature comprises a unique messaging experience for Slack. If you're unfamiliar with using the Agents & AI Apps feature within Slack, you'll want to read the [API documentation on the subject](https://docs.slack.dev/ai/). Then come back here to implement them with Bolt!
 
 ## Configuring your app to support AI features {#configuring-your-app}
 
@@ -25,12 +25,12 @@ AI apps comprise a new messaging experience for Slack. If you're unfamiliar with
 * [`message.im`](https://docs.slack.dev/reference/events/message.im)
 
 :::info
-You _could_ implement your own AI app by [listening](event-listening) for the `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im` events (see implementation details below). That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
+You _could_ go it alone and [listen](event-listening) for the `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im` events (see implementation details below) in order to implement the AI features in your app. That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
 :::
 
 ## The `Assistant` class instance {#assistant-class}
 
-The `Assistant` class can be used to handle the incoming events expected from a user interacting with an AI app in Slack. A typical flow would look like:
+The `Assistant` class can be used to handle the incoming events expected from a user interacting with an app in Slack that has the Agents & AI Apps feature enabled. A typical flow would look like:
 
 1. [The user starts a thread](#handling-a-new-thread). The `Assistant` class handles the incoming [`assistant_thread_started`](https://docs.slack.dev/reference/events/assistant_thread_started) event.
 2. [The thread context may change at any point](#handling-thread-context-changes). The `Assistant` class can handle any incoming [`assistant_thread_context_changed`](https://docs.slack.dev/reference/events/assistant_thread_context_changed) events. The class also provides a default context store to keep track of thread context changes as the user moves through Slack.
@@ -107,13 +107,13 @@ Refer to the [module document](https://tools.slack.dev/bolt-python/api-docs/slac
 
 ## Handling a new thread {#handling-a-new-thread}
 
-When the user opens a new thread with your AI app, the [`assistant_thread_started`](https://docs.slack.dev/reference/events/assistant_thread_started) event will be sent to your app.
+When the user opens a new thread with your AI feature-enabled app, the [`assistant_thread_started`](https://docs.slack.dev/reference/events/assistant_thread_started) event will be sent to your app.
 
 :::tip
-When a user opens an AI app thread while in a channel, the channel info is stored as the thread's `AssistantThreadContext` data. You can grab that info by using the `get_thread_context` utility, as subsequent user message event payloads won't include the channel info.
+When a user opens an app thread while in a channel, the channel info is stored as the thread's `AssistantThreadContext` data. You can grab that info by using the `get_thread_context` utility, as subsequent user message event payloads won't include the channel info.
 :::
 
-### Block Kit interactions in the AI app thread {#block-kit-interactions}
+### Block Kit interactions in the app thread {#block-kit-interactions}
 
 For advanced use cases, Block Kit buttons may be used instead of suggested prompts, as well as the sending of messages with structured [metadata](https://docs.slack.dev/messaging/message-metadata/) to trigger subsequent interactions with the user.
 
