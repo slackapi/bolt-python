@@ -4,7 +4,7 @@ lang: en
 slug: /concepts/socket-mode
 ---
 
-With the introduction of [Socket Mode](https://docs.slack.dev/apis/events-api/using-socket-mode), Bolt for Python introduced support in version `1.2.0`. With Socket Mode, instead of creating a server with endpoints that Slack sends payloads too, the app will instead connect to Slack via a WebSocket connection and receive data from Slack over the socket connection. Make sure to enable Socket Mode in your app configuration settings. 
+With the introduction of [Socket Mode](/apis/events-api/using-socket-mode), Bolt for Python introduced support in version `1.2.0`. With Socket Mode, instead of creating a server with endpoints that Slack sends payloads too, the app will instead connect to Slack via a WebSocket connection and receive data from Slack over the socket connection. Make sure to enable Socket Mode in your app configuration settings. 
 
 To use the Socket Mode, add `SLACK_APP_TOKEN` as an environment variable. You can get your App Token in your app configuration settings under the **Basic Information** section. 
 
@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
 To use the asyncio-based adapters such as aiohttp, your whole app needs to be compatible with asyncio's async/await programming model. `AsyncSocketModeHandler` is available for running `AsyncApp` and its async middleware and listeners. 
 
-To learn how to use `AsyncApp`, checkout the [using Async](/concepts/async) document and relevant [examples](https://github.com/slackapi/bolt-python/tree/main/examples).
+To learn how to use `AsyncApp`, checkout the [using Async](/bolt-python/concepts/async) document and relevant [examples](https://github.com/slackapi/bolt-python/tree/main/examples).
 
 ```python
 from slack_bolt.app.async_app import AsyncApp

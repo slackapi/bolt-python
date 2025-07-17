@@ -6,13 +6,13 @@ slug: /legacy/steps-from-apps
 
 :::danger[Steps from Apps is a deprecated feature.]
 
-Steps from Apps are different than, and not interchangeable with, Slack automation workflows. We encourage those who are currently publishing steps from apps to consider the new [Slack automation features](https://docs.slack.dev/workflows/), such as [custom steps for Bolt](https://docs.slack.dev/workflows/workflow-steps).
+Steps from Apps are different than, and not interchangeable with, Slack automation workflows. We encourage those who are currently publishing steps from apps to consider the new [Slack automation features](/workflows/), such as [custom steps for Bolt](/workflows/workflow-steps).
 
-Please [read the Slack API changelog entry](https://docs.slack.dev/changelog/2023-08-workflow-steps-from-apps-step-back) for more information.
+Please [read the Slack API changelog entry](/changelog/2023-08-workflow-steps-from-apps-step-back) for more information.
 
 :::
 
-Steps from apps allow your app to create and process steps that users can add using [Workflow Builder](https://docs.slack.dev/workflows/workflow-builder).
+Steps from apps allow your app to create and process steps that users can add using [Workflow Builder](/workflows/workflow-builder).
 
 Steps from apps are made up of three distinct user events:
 
@@ -22,7 +22,7 @@ Steps from apps are made up of three distinct user events:
 
 All three events must be handled for a step from app to function.
 
-Read more about steps from apps in the [API documentation](https://docs.slack.dev/workflows/workflow-steps).
+Read more about steps from apps in the [API documentation](/workflows/workflow-steps).
 
 ## Creating steps from apps
 
@@ -34,9 +34,9 @@ The configuration object contains three keys: `edit`, `save`, and `execute`. Eac
 
 After instantiating a `WorkflowStep`, you can pass it into `app.step()`. Behind the scenes, your app will listen and respond to the step’s events using the callbacks provided in the configuration object.
 
-Alternatively, steps from apps can also be created using the `WorkflowStepBuilder` class alongside a decorator pattern. For more information, including an example of this approach, [refer to the documentation](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder).
+Alternatively, steps from apps can also be created using the `WorkflowStepBuilder` class alongside a decorator pattern. For more information, including an example of this approach, [refer to the documentation](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder).
 
-Refer to the module documents ([common](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) / [step-specific](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html)) to learn the available arguments.
+Refer to the module documents ([common](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) / [step-specific](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html)) to learn the available arguments.
 
 ```python
 import os
@@ -72,15 +72,15 @@ app.step(ws)
 
 ## Adding or editing steps from apps
 
-When a builder adds (or later edits) your step in their workflow, your app will receive a [`workflow_step_edit` event](https://docs.slack.dev/legacy/legacy-steps-from-apps/legacy-steps-from-apps-workflow_step_edit-payload). The `edit` callback in your `WorkflowStep` configuration will be run when this event is received.
+When a builder adds (or later edits) your step in their workflow, your app will receive a [`workflow_step_edit` event](/legacy/legacy-steps-from-apps/legacy-steps-from-apps-workflow_step_edit-payload). The `edit` callback in your `WorkflowStep` configuration will be run when this event is received.
 
-Whether a builder is adding or editing a step, you need to send them a [step from app configuration modal](https://docs.slack.dev/legacy/legacy-steps-from-apps/legacy-steps-from-apps-configuration-view-object). This modal is where step-specific settings are chosen, and it has more restrictions than typical modals—most notably, it cannot include `title`, `submit`, or `close` properties. By default, the configuration modal's `callback_id` will be the same as the step from app.
+Whether a builder is adding or editing a step, you need to send them a [step from app configuration modal](/legacy/legacy-steps-from-apps/legacy-steps-from-apps-configuration-view-object). This modal is where step-specific settings are chosen, and it has more restrictions than typical modals—most notably, it cannot include `title`, `submit`, or `close` properties. By default, the configuration modal's `callback_id` will be the same as the step from app.
 
 Within the `edit` callback, the `configure()` utility can be used to easily open your step's configuration modal by passing in the view's blocks with the corresponding `blocks` argument. To disable saving the configuration before certain conditions are met, you can also pass in `submit_disabled` with a value of `True`.
 
-To learn more about opening configuration modals, [read the documentation](https://docs.slack.dev/legacy/legacy-steps-from-apps/).
+To learn more about opening configuration modals, [read the documentation](/legacy/legacy-steps-from-apps/).
 
-Refer to the module documents ([common](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) / [step-specific](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html)) to learn the available arguments.
+Refer to the module documents ([common](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) / [step-specific](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html)) to learn the available arguments.
 
 ```python
 def edit(ack, step, configure):
@@ -130,9 +130,9 @@ Within the `save` callback, the `update()` method can be used to save the builde
 - `step_name` overrides the default Step name
 - `step_image_url` overrides the default Step image
 
-To learn more about how to structure these parameters, [read the documentation](https://docs.slack.dev/legacy/legacy-steps-from-apps/).
+To learn more about how to structure these parameters, [read the documentation](/legacy/legacy-steps-from-apps/).
 
-Refer to the module documents ([common](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) / [step-specific](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html)) to learn the available arguments.
+Refer to the module documents ([common](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) / [step-specific](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html)) to learn the available arguments.
 
 ```python
 def save(ack, view, update):
@@ -171,13 +171,13 @@ app.step(ws)
 
 ## Executing steps from apps
 
-When your step from app is executed by an end user, your app will receive a [`workflow_step_execute` event](https://docs.slack.dev/legacy/legacy-steps-from-apps/legacy-steps-from-apps-workflow_step-object). The `execute` callback in your `WorkflowStep` configuration will be run when this event is received.
+When your step from app is executed by an end user, your app will receive a [`workflow_step_execute` event](/legacy/legacy-steps-from-apps/legacy-steps-from-apps-workflow_step-object). The `execute` callback in your `WorkflowStep` configuration will be run when this event is received.
 
 Using the `inputs` from the `save` callback, this is where you can make third-party API calls, save information to a database, update the user's Home tab, or decide the outputs that will be available to subsequent steps from apps by mapping values to the `outputs` object.
 
 Within the `execute` callback, your app must either call `complete()` to indicate that the step's execution was successful, or `fail()` to indicate that the step's execution failed.
 
-Refer to the module documents ([common](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) / [step-specific](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html)) to learn the available arguments.
+Refer to the module documents ([common](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) / [step-specific](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html)) to learn the available arguments.
 
 ```python
 def execute(step, complete, fail):

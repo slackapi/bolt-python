@@ -4,7 +4,7 @@ lang: ja-jp
 slug: /concepts/socket-mode
 ---
 
-[ソケットモード](https://docs.slack.dev/apis/events-api/using-socket-mode)は、アプリに WebSocket での接続と、そのコネクション経由でのデータ受信を可能とします。Bolt for Python は、バージョン 1.2.0 からこれに対応しています。
+[ソケットモード](/apis/events-api/using-socket-mode)は、アプリに WebSocket での接続と、そのコネクション経由でのデータ受信を可能とします。Bolt for Python は、バージョン 1.2.0 からこれに対応しています。
 
 ソケットモードでは、Slack からのペイロード送信を受け付けるエンドポイントをホストする HTTP サーバーを起動する代わりに WebSocket で Slack に接続し、そのコネクション経由でデータを受信します。ソケットモードを使う前に、アプリの管理画面でソケットモードの機能が有効になっていることを確認しておいてください。
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
 aiohttp のような asyncio をベースとしたアダプターを使う場合、アプリケーション全体が asyncio の async/await プログラミングモデルで実装されている必要があります。`AsyncApp` を動作させるためには `AsyncSocketModeHandler` とその async なミドルウェアやリスナーを利用します。
 
-`AsyncApp` の使い方についての詳細は、[Async (asyncio) の利用](/concepts/async)や、関連する[サンプルコード例](https://github.com/slackapi/bolt-python/tree/main/examples)を参考にしてください。
+`AsyncApp` の使い方についての詳細は、[Async (asyncio) の利用](/bolt-python/concepts/async)や、関連する[サンプルコード例](https://github.com/slackapi/bolt-python/tree/main/examples)を参考にしてください。
 
 ```python
 from slack_bolt.app.async_app import AsyncApp

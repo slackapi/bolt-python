@@ -13,9 +13,9 @@ At the end of this tutorial, your final app will look like this:
 ![announce](https://github.com/user-attachments/assets/0bf1c2f0-4b22-4c9c-98b3-b21e9bcc14a8)
 
 And will make use of these Slack concepts:
-* [**Block Kit**](https://docs.slack.dev/block-kit/) is a UI framework for Slack apps that allows you to create beautiful, interactive messages within Slack. If you've ever seen a message in Slack with buttons or a select menu, that's Block Kit.
-* [**Modals**](https://docs.slack.dev/surfaces/modals) are a pop-up window that displays right in Slack. They grab the attention of the user, and are normally used to prompt users to provide some kind of information or input in a form.
-* [**Slash Commands**](https://docs.slack.dev/interactivity/implementing-slash-commands) allow you to invoke your app within Slack by just typing into the message composer box. e.g. `/remind`, `/topic`.
+* [**Block Kit**](/block-kit/) is a UI framework for Slack apps that allows you to create beautiful, interactive messages within Slack. If you've ever seen a message in Slack with buttons or a select menu, that's Block Kit.
+* [**Modals**](/surfaces/modals) are a pop-up window that displays right in Slack. They grab the attention of the user, and are normally used to prompt users to provide some kind of information or input in a form.
+* [**Slash Commands**](/interactivity/implementing-slash-commands) allow you to invoke your app within Slack by just typing into the message composer box. e.g. `/remind`, `/topic`.
 
 If you're familiar with using Heroku you can also deploy directly to Heroku with the following button.
 
@@ -66,7 +66,7 @@ You'll need to create an app and configure it properly within App Settings befor
 }
 ```
 
-2. Once your app has been created, scroll down to `App-Level Tokens` and create a token that requests for the [`connections:write`](https://docs.slack.dev/reference/scopes/connections.write) scope, which allows you to use [Socket Mode](https://docs.slack.dev/apis/events-api/using-socket-mode), a secure way to develop on Slack through the use of WebSockets. Copy the value of your app token and keep it for safe-keeping.
+2. Once your app has been created, scroll down to `App-Level Tokens` and create a token that requests for the [`connections:write`](/reference/scopes/connections.write) scope, which allows you to use [Socket Mode](/apis/events-api/using-socket-mode), a secure way to develop on Slack through the use of WebSockets. Copy the value of your app token and keep it for safe-keeping.
 
 3. Install your app by heading to `Install App` in the left sidebar. Hit `Allow`, which means you're agreeing to install your app with the permissions that it is requesting. Be sure to copy the token that you receive, and keep it somewhere secret and safe.
 
@@ -132,4 +132,4 @@ All done! 🎉 You've created your first slash command using Block Kit and modal
 
 ## Next steps {#next-steps}
 
-If you want to learn more about Bolt for Python, refer to the [Getting Started guide](https://tools.slack.dev/bolt-python/getting-started).
+If you want to learn more about Bolt for Python, refer to the [Getting Started guide](https://docs.slack.dev/bolt-python/getting-started).

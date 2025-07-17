@@ -4,14 +4,14 @@ lang: ja-jp
 slug: /concepts/custom-steps
 ---
 
-Your app can use the `function()` method to listen to incoming [custom step requests](https://docs.slack.dev/workflows/workflow-steps). Custom steps are used in Workflow Builder to build workflows. The method requires a step `callback_id` of type `str`. This `callback_id` must also be defined in your [Function](https://docs.slack.dev/reference/app-manifest#functions) definition. Custom steps must be finalized using the `complete()` or `fail()` listener arguments to notify Slack that your app has processed the request.
+Your app can use the `function()` method to listen to incoming [custom step requests](/workflows/workflow-steps). Custom steps are used in Workflow Builder to build workflows. The method requires a step `callback_id` of type `str`. This `callback_id` must also be defined in your [Function](/reference/app-manifest#functions) definition. Custom steps must be finalized using the `complete()` or `fail()` listener arguments to notify Slack that your app has processed the request.
 
 * `complete()` requires **one** argument: `outputs` of type `dict`. It ends your custom step **successfully** and provides a dictionary containing the outputs of your custom step as per its definition.
 * `fail()` requires **one** argument: `error` of type `str`. It ends your custom step **unsuccessfully** and provides a message containing information regarding why your custom step failed.
 
 You can reference your custom step's inputs using the `inputs` listener argument of type `dict`.
 
-Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn about the available listener arguments.
+Refer to [the module document](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn about the available listener arguments.
 
 ```python
 # This sample custom step formats an input and outputs it
@@ -68,13 +68,13 @@ Example app manifest definition
 
 Your app's custom steps may create interactivity points for users, for example: Post a message with a button.
 
-If such interaction points originate from a custom step execution, the events sent to your app representing the end-user interaction with these points are considered to be _function-scoped interactivity events_. These interactivity events can be handled by your app using the same concepts we covered earlier, such as [Listening to actions](/concepts/action-listening).
+If such interaction points originate from a custom step execution, the events sent to your app representing the end-user interaction with these points are considered to be _function-scoped interactivity events_. These interactivity events can be handled by your app using the same concepts we covered earlier, such as [Listening to actions](/bolt-python/concepts/action-listening).
 
 _function-scoped interactivity events_ will contain data related to the custom step (`function_executed` event) they were spawned from, such as custom step `inputs` and access to `complete()` and `fail()` listener arguments.
 
 Your app can skip calling `complete()` or `fail()` in the `function()` handler method if the custom step creates an interaction point that requires user interaction before the step can end. However, in the relevant interactivity handler method, your app must invoke `complete()` or `fail()` to notify Slack that the custom step has been processed.
 
-You’ll notice in all interactivity handler examples, `ack()` is used. It is required to call the `ack()` function within an interactivity listener to acknowledge that the request was received from Slack. This is discussed in the [acknowledging requests section](/concepts/acknowledge).
+You’ll notice in all interactivity handler examples, `ack()` is used. It is required to call the `ack()` function within an interactivity listener to acknowledge that the request was received from Slack. This is discussed in the [acknowledging requests section](/bolt-python/concepts/acknowledge).
 
 ```python
 # This sample custom step posts a message with a button
@@ -150,4 +150,4 @@ Example app manifest definition
 
 </details>
 
-Learn more about responding to interactivity, see the [Slack API documentation](https://docs.slack.dev/interactivity/).
+Learn more about responding to interactivity, see the [Slack API documentation](/interactivity/).

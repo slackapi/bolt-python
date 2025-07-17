@@ -14,20 +14,20 @@ When complete, you'll have a local environment configured with a customized [app
 
 :::tip[Reference for readers]
 
-In search of the complete guide to building an app from scratch? Check out the [building an app](/building-an-app) guide.
+In search of the complete guide to building an app from scratch? Check out the [building an app](/bolt-python/building-an-app) guide.
 
 :::
 
 #### Prerequisites
 
-A few tools are needed for the following steps. We recommend using the [**Slack CLI**](https://tools.slack.dev/slack-cli/) for the smoothest experience, but other options remain available. 
+A few tools are needed for the following steps. We recommend using the [**Slack CLI**](/slack-cli/) for the smoothest experience, but other options remain available. 
 
 You can also begin by installing git and downloading [Python 3.6 or later](https://www.python.org/downloads/), or the latest stable version of Python. Refer to [Python's setup and building guide](https://devguide.python.org/getting-started/setup-building/) for more details.
 
 Install the latest version of the Slack CLI to get started:
 
-- [Slack CLI for macOS & Linux](https://tools.slack.dev/slack-cli/guides/installing-the-slack-cli-for-mac-and-linux)
-- [Slack CLI for Windows](https://tools.slack.dev/slack-cli/guides/installing-the-slack-cli-for-windows)
+- [Slack CLI for macOS & Linux](/slack-cli/guides/installing-the-slack-cli-for-mac-and-linux)
+- [Slack CLI for Windows](/slack-cli/guides/installing-the-slack-cli-for-windows)
 
 Then confirm a successful installation with the following command:
 
@@ -45,7 +45,7 @@ $ slack login
 
 A workspace where development can happen is also needed.
 
-We recommend using [developer sandboxes](https://docs.slack.dev/tools/developer-sandboxes) to avoid disruptions where real work gets done.
+We recommend using [developer sandboxes](/tools/developer-sandboxes) to avoid disruptions where real work gets done.
 
 :::
 
@@ -135,7 +135,7 @@ You'll then land on your app's **Basic Information** page, which is an overview 
 
 ![Basic Information page](/img/bolt-python/basic-information-page.png "Basic Information page")
 
-To listen for events happening in Slack (such as a new posted message) without opening a port or exposing an endpoint, we will use [Socket Mode](/concepts/socket-mode). This connection requires a specific app token:
+To listen for events happening in Slack (such as a new posted message) without opening a port or exposing an endpoint, we will use [Socket Mode](/bolt-python/concepts/socket-mode). This connection requires a specific app token:
 
 1. On the **Basic Information** page, scroll to the **App-Level Tokens** section and click **Generate Token and Scopes**.
 2. Name the token "Development" or something similar and add the `connections:write` scope, then click **Generate**.
@@ -149,7 +149,7 @@ The above command works on Linux and macOS but [similar commands are available o
 
 :::warning[Keep it secret. Keep it safe.]
 
-Treat your tokens like a password and [keep it safe](https://docs.slack.dev/authentication/best-practices-for-security). Your app uses these to retrieve and send information to Slack.
+Treat your tokens like a password and [keep it safe](/authentication/best-practices-for-security). Your app uses these to retrieve and send information to Slack.
 
 :::
 
@@ -252,7 +252,7 @@ Your app can be stopped again by pressing `CTRL+C` in the terminal to end these 
 
 #### Customizing app settings
 
-The created app will have some placeholder values and a small set of [scopes](https://docs.slack.dev/reference/scopes) to start, but we recommend exploring the customizations possible on app settings.
+The created app will have some placeholder values and a small set of [scopes](/reference/scopes) to start, but we recommend exploring the customizations possible on app settings.
 
 <Tabs groupId="cli-or-terminal">
 <TabItem value="cli" label="Slack CLI">
@@ -287,14 +287,14 @@ Congrats once more on getting up and running with this quick start.
 
 :::info[Dive deeper]
 
-Follow along with the steps that went into making this app on the [building an app](/building-an-app) guide for an educational overview.
+Follow along with the steps that went into making this app on the [building an app](/bolt-python/building-an-app) guide for an educational overview.
 
 :::
 
 You can now continue customizing your app with various features to make it right for whatever job's at hand. Here are some ideas about what to explore next:
 
-- Explore the different events your bot can listen to with the [`app.event()`](/concepts/event-listening) method. All of the [events](https://docs.slack.dev/reference/events) are listed on the API docs site.
-- Bolt allows you to call [Web API](/concepts/web-api) methods with the client attached to your app. There are [over 200 methods](https://docs.slack.dev/reference/methods) on the API docs site.
-- Learn more about the different [token types](https://docs.slack.dev/authentication/tokens) and [authentication setups](/concepts/authenticating-oauth). Your app might need different tokens depending on the actions you want to perform or for installations to multiple workspaces.
-- Receive events using HTTP for various deployment methods, such as deploying to [Heroku](/deployments/heroku) or [AWS Lambda](/deployments/aws-lambda).
-- Read on [app design](https://docs.slack.dev/surfaces/app-design) and compose fancy messages with blocks using [Block Kit Builder](https://app.slack.com/block-kit-builder) to prototype messages.
+- Explore the different events your bot can listen to with the [`app.event()`](/bolt-python/concepts/event-listening) method. All of the [events](/reference/events) are listed on the API docs site.
+- Bolt allows you to call [Web API](/bolt-python/concepts/web-api) methods with the client attached to your app. There are [over 200 methods](/reference/methods) on the API docs site.
+- Learn more about the different [token types](/authentication/tokens) and [authentication setups](/bolt-python/concepts/authenticating-oauth). Your app might need different tokens depending on the actions you want to perform or for installations to multiple workspaces.
+- Receive events using HTTP for various deployment methods, such as deploying to [Heroku](/bolt-python/deployments/heroku) or [AWS Lambda](/bolt-python/deployments/aws-lambda).
+- Read on [app design](/surfaces/app-design) and compose fancy messages with blocks using [Block Kit Builder](https://app.slack.com/block-kit-builder) to prototype messages.

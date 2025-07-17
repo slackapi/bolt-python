@@ -9,7 +9,7 @@ order: 8
 
 グローバルミドルウェアでもリスナーミドルウェアでも、次のミドルウェアに実行チェーンの制御をリレーするために、`next()` を呼び出す必要があります。 
 
-<span>指定可能な引数の一覧は<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 
 ```python
 @app.use

@@ -4,9 +4,9 @@ lang: en
 slug: /concepts/assistant
 ---
 
-このページは、Bolt を使ってエージェント・アシスタントを実装するための方法を紹介します。この機能に関する一般的な情報については、[こちらのドキュメントページ（英語）](https://docs.slack.dev/ai/)を参照してください。
+このページは、Bolt を使ってエージェント・アシスタントを実装するための方法を紹介します。この機能に関する一般的な情報については、[こちらのドキュメントページ（英語）](/ai/)を参照してください。
 
-この機能を実装するためには、まず[アプリの設定画面](https://api.slack.com/apps)で **Agents & Assistants** 機能を有効にし、**OAuth & Permissions** のページで [`assistant:write`](https://docs.slack.dev/reference/scopes/assistant.write)、[chat:write](https://docs.slack.dev/reference/scopes/chat.write)、[`im:history`](https://docs.slack.dev/reference/scopes/im.history) を**ボットの**スコープに追加し、**Event Subscriptions** のページで [`assistant_thread_started`](https://docs.slack.dev/reference/events/assistant_thread_started)、[`assistant_thread_context_changed`](https://docs.slack.dev/reference/events/assistant_thread_context_changed)、[`message.im`](https://docs.slack.dev/reference/events/message.im) イベントを有効にしてください。
+この機能を実装するためには、まず[アプリの設定画面](https://api.slack.com/apps)で **Agents & Assistants** 機能を有効にし、**OAuth & Permissions** のページで [`assistant:write`](/reference/scopes/assistant.write)、[chat:write](/reference/scopes/chat.write)、[`im:history`](/reference/scopes/im.history) を**ボットの**スコープに追加し、**Event Subscriptions** のページで [`assistant_thread_started`](/reference/events/assistant_thread_started)、[`assistant_thread_context_changed`](/reference/events/assistant_thread_context_changed)、[`message.im`](/reference/events/message.im) イベントを有効にしてください。
 
 また、この機能は Slack の有料プランでのみ利用可能です。もし開発用の有料プランのワークスペースをお持ちでない場合は、[Developer Program](https://api.slack.com/developer-program) に参加し、全ての有料プラン向け機能を利用可能なサンドボックス環境をつくることができます。
 
@@ -72,7 +72,7 @@ def respond_in_assistant_thread(
 app.use(assistant)
 ```
 
-<span>リスナーに指定可能な引数の一覧は<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+<span>リスナーに指定可能な引数の一覧は<a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 
 ユーザーがチャンネルの横でアシスタントスレッドを開いた場合、そのチャンネルの情報は、そのスレッドの `AssistantThreadContext` データとして保持され、 `get_thread_context` ユーティリティを使ってアクセスすることができます。Bolt がこのユーティリティを提供している理由は、後続のユーザーメッセージ投稿のイベントペイロードに最新のスレッドのコンテキスト情報は含まれないためです。そのため、アプリはコンテキスト情報が変更されたタイミングでそれを何らかの方法で保存し、後続のメッセージイベントのリスナーコードから参照できるようにする必要があります。
 
@@ -92,7 +92,7 @@ assistant = Assistant(thread_context_store=FileAssistantThreadContextStore())
 
 ## アシスタントスレッドでの Block Kit インタラクション
 
-より高度なユースケースでは、上のようなプロンプト例の提案ではなく Block Kit のボタンなどを使いたいという場合があるかもしれません。そして、後続の処理のために[構造化されたメッセージメタデータ](https://docs.slack.dev/messaging/message-metadata/)を含むメッセージを送信したいという場合もあるでしょう。
+より高度なユースケースでは、上のようなプロンプト例の提案ではなく Block Kit のボタンなどを使いたいという場合があるかもしれません。そして、後続の処理のために[構造化されたメッセージメタデータ](/messaging/message-metadata/)を含むメッセージを送信したいという場合もあるでしょう。
 
 例えば、アプリが最初の返信で「参照しているチャンネルを要約」のようなボタンを表示し、ユーザーがそれをクリックして、より詳細な情報（例：要約するメッセージ数・日数、要約の目的など）を送信、アプリがそれを構造化されたメータデータに整理した上でリクエスト内容をボットのメッセージとして送信するようなシナリオです。
 
@@ -107,7 +107,7 @@ app = App(
 
 assistant = Assistant()
 
-# リスナーに指定可能な引数の一覧は https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html を参照してください
+# リスナーに指定可能な引数の一覧は https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html を参照してください
 
 @assistant.thread_started
 def start_assistant_thread(say: Say):

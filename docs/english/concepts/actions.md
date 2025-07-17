@@ -10,9 +10,9 @@ Your app can listen and respond to user actions, like button clicks, and menu se
 
 Actions can be filtered on an `action_id` parameter of type `str` or `re.Pattern`. The `action_id` parameter acts as a unique identifier for interactive components on the Slack platform.
 
-You'll notice in all `action()` examples, `ack()` is used. It is required to call the `ack()` function within an action listener to acknowledge that the request was received from Slack. This is discussed in the [acknowledging requests guide](/concepts/acknowledge).
+You'll notice in all `action()` examples, `ack()` is used. It is required to call the `ack()` function within an action listener to acknowledge that the request was received from Slack. This is discussed in the [acknowledging requests guide](/bolt-python/concepts/acknowledge).
 
-Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 
 ```python
 # Your listener will be called every time a block element with the action_id "approve_button" is triggered
@@ -49,7 +49,7 @@ There are two main ways to respond to actions. The first (and most common) way i
 
 The second way to respond to actions is using `respond()`, which is a utility to use the `response_url` associated with the action.
 
-Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 
 ```python
 # Your listener will be called every time an interactive component with the action_id “approve_button” is triggered
@@ -62,7 +62,7 @@ def approve_request(ack, say):
 
 ### Using `respond()` method
 
-Since `respond()` is a utility for calling the `response_url`, it behaves in the same way. You can pass [all the message payload properties](https://docs.slack.dev/messaging/#payloads) as keyword arguments along with optional properties like `response_type` (which has a value of `"in_channel"` or `"ephemeral"`), `replace_original`, `delete_original`, `unfurl_links`, and `unfurl_media`. With that, your app can send a new message payload that will be published back to the source of the original interaction.
+Since `respond()` is a utility for calling the `response_url`, it behaves in the same way. You can pass [all the message payload properties](/messaging/#payloads) as keyword arguments along with optional properties like `response_type` (which has a value of `"in_channel"` or `"ephemeral"`), `replace_original`, `delete_original`, `unfurl_links`, and `unfurl_media`. With that, your app can send a new message payload that will be published back to the source of the original interaction.
 
 ```python
 # Listens to actions triggered with action_id of “user_select”

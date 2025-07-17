@@ -10,9 +10,9 @@ Bolt アプリは `action` メソッドを用いて、ボタンのクリック�
 
 アクションは `str` 型または `re.Pattern` 型の `action_id` でフィルタリングできます。`action_id` は、Slack プラットフォーム上のインタラクティブコンポーネントを区別する一意の識別子として機能します。
 
-`action()` を使ったすべての例で `ack()` が使用されていることに注目してください。アクションのリスナー内では、Slack からのリクエストを受信したことを確認するために、`ack()` 関数を呼び出す必要があります。これについては、[リクエストの確認](/concepts/acknowledge)セクションで説明しています。
+`action()` を使ったすべての例で `ack()` が使用されていることに注目してください。アクションのリスナー内では、Slack からのリクエストを受信したことを確認するために、`ack()` 関数を呼び出す必要があります。これについては、[リクエストの確認](/bolt-python/concepts/acknowledge)セクションで説明しています。
 
-<span>指定可能な引数の一覧は<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # 'approve_button' という action_id のブロックエレメントがトリガーされるたびに、このリスナーが呼び出させれる
 @app.action("approve_button")
@@ -49,7 +49,7 @@ def update_message(ack, body, client):
 
 2 つ目は、`respond()` を使用する方法です。これは、アクションに関連づけられた `response_url` を使ったメッセージ送信を行うためのユーティリティです。
 
-<span>指定可能な引数の一覧は<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # 'approve_button' という action_id のインタラクティブコンポーネントがトリガーされると、このリスナーが呼ばれる
 @app.action("approve_button")
@@ -61,7 +61,7 @@ def approve_request(ack, say):
 
 ### respond() の利用
 
-`respond()` は `response_url` を使って送信するときに便利なメソッドで、これらと同じような動作をします。投稿するメッセージのペイロードには、全ての[メッセージペイロードのプロパティ](https://docs.slack.dev/messaging/#payloads)とオプションのプロパティとして `response_type`（値は `"in_channel"` または `"ephemeral"`）、`replace_original`、`delete_original`、`unfurl_links`、`unfurl_media` などを指定できます。こうすることによってアプリから送信されるメッセージは、やり取りの発生元に反映されます。
+`respond()` は `response_url` を使って送信するときに便利なメソッドで、これらと同じような動作をします。投稿するメッセージのペイロードには、全ての[メッセージペイロードのプロパティ](/messaging/#payloads)とオプションのプロパティとして `response_type`（値は `"in_channel"` または `"ephemeral"`）、`replace_original`、`delete_original`、`unfurl_links`、`unfurl_media` などを指定できます。こうすることによってアプリから送信されるメッセージは、やり取りの発生元に反映されます。
 
 ```python
 # 'user_select' という action_id を持つアクションのトリガーをリッスン

@@ -4,15 +4,15 @@ lang: ja-jp
 slug: /concepts/authenticating-oauth
 ---
 
-Slack アプリを複数のワークスペースにインストールできるようにするためには、OAuth フローを実装した上で、アクセストークンなどのインストールに関する情報をセキュアな方法で保存する必要があります。アプリを初期化する際に `client_id`、`client_secret`、`scopes`、`installation_store`、`state_store` を指定することで、OAuth のエンドポイントのルート情報や stateパラメーターの検証をBolt for Python にハンドリングさせることができます。カスタムのアダプターを実装する場合は、SDK が提供する組み込みの[OAuth ライブラリ](https://tools.slack.dev/python-slack-sdk/oauth/)を利用するのが便利です。これは Slack が開発したモジュールで、Bolt for Python 内部でも利用しています。
+Slack アプリを複数のワークスペースにインストールできるようにするためには、OAuth フローを実装した上で、アクセストークンなどのインストールに関する情報をセキュアな方法で保存する必要があります。アプリを初期化する際に `client_id`、`client_secret`、`scopes`、`installation_store`、`state_store` を指定することで、OAuth のエンドポイントのルート情報や stateパラメーターの検証をBolt for Python にハンドリングさせることができます。カスタムのアダプターを実装する場合は、SDK が提供する組み込みの[OAuth ライブラリ](/python-slack-sdk/oauth/)を利用するのが便利です。これは Slack が開発したモジュールで、Bolt for Python 内部でも利用しています。
 
 Bolt for Python によって `slack/oauth_redirect` という**リダイレクト URL** が生成されます。Slack はアプリのインストールフローを完了させたユーザーをこの URL にリダイレクトします。この**リダイレクト URL** は、アプリの設定の「**OAuth and Permissions**」であらかじめ追加しておく必要があります。この URL は、後ほど説明するように `OAuthSettings` というコンストラクタの引数で指定することもできます。
 
 Bolt for Python は `slack/install` というルートも生成します。これはアプリを直接インストールするための「**Add to Slack**」ボタンを表示するために使われます。すでにワークスペースへのアプリのインストールが済んでいる場合に追加で各ユーザーのユーザートークンなどの情報を取得する場合や、カスタムのインストール用の URL を動的に生成したい場合などは、`oauth_settings` の `authorize_url_generator` でカスタムの URL ジェネレーターを指定することができます。
 
-バージョン 1.1.0 以降の Bolt for Python では、[OrG 全体へのインストール](https://docs.slack.dev/enterprise-grid/)がデフォルトでサポートされています。OrG 全体へのインストールは、アプリの設定の「**Org Level Apps**」で有効化できます。
+バージョン 1.1.0 以降の Bolt for Python では、[OrG 全体へのインストール](/enterprise-grid/)がデフォルトでサポートされています。OrG 全体へのインストールは、アプリの設定の「**Org Level Apps**」で有効化できます。
 
-Slack での OAuth を使ったインストールフローについて詳しくは、[API ドキュメントを参照してください](https://docs.slack.dev/authentication/installing-with-oauth)。
+Slack での OAuth を使ったインストールフローについて詳しくは、[API ドキュメントを参照してください](/authentication/installing-with-oauth)。
 
 ```python
 import os

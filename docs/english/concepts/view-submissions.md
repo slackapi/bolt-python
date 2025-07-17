@@ -4,7 +4,7 @@ lang: en
 slug: /concepts/view_submissions
 ---
 
-If a [view payload](https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission) contains any input blocks, you must listen to `view_submission` requests to receive their values. To listen to `view_submission` requests, you can use the built-in `view()` method. `view()` requires a `callback_id` of type `str` or `re.Pattern`.
+If a [view payload](/reference/interaction-payloads/view-interactions-payload/#view_submission) contains any input blocks, you must listen to `view_submission` requests to receive their values. To listen to `view_submission` requests, you can use the built-in `view()` method. `view()` requires a `callback_id` of type `str` or `re.Pattern`.
 
 You can access the value of the `input` blocks by accessing the `state` object. `state` contains a `values` object that uses the `block_id` and unique `action_id` to store the input values.
 
@@ -23,9 +23,9 @@ def handle_submission(ack, body):
     # https://app.slack.com/block-kit-builder/#%7B%22type%22:%22modal%22,%22callback_id%22:%22view_1%22,%22title%22:%7B%22type%22:%22plain_text%22,%22text%22:%22My%20App%22,%22emoji%22:true%7D,%22blocks%22:%5B%5D%7D
     ack(response_action="update", view=build_new_view(body))
 ```
-Similarly, there are options for [displaying errors](https://docs.slack.dev/surfaces/modals#displaying_errors) in response to view submissions.
+Similarly, there are options for [displaying errors](/surfaces/modals#displaying_errors) in response to view submissions.
 
-Read more about view submissions in our [API documentation](https://docs.slack.dev/surfaces/modals#interactions)
+Read more about view submissions in our [API documentation](/surfaces/modals#interactions)
 
 ---
 
@@ -33,7 +33,7 @@ Read more about view submissions in our [API documentation](https://docs.slack.d
 
 When listening for `view_closed` requests, you must pass `callback_id` and add a `notify_on_close` property to the view during creation. See below for an example of this:
 
-See the [API documentation](https://docs.slack.dev/surfaces/modals#interactions) for more information about `view_closed`.
+See the [API documentation](/surfaces/modals#interactions) for more information about `view_closed`.
 
 ```python
 
@@ -62,7 +62,7 @@ def handle_view_closed(ack, body, logger):
     logger.info(body)
 ```
 
-Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
 # Handle a view_submission request
 @app.view("view_1")

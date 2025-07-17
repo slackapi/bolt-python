@@ -4,11 +4,11 @@ lang: en
 slug: /concepts/message-listening
 ---
 
-To listen to messages that [your app has access to receive](https://docs.slack.dev/messaging/retrieving-messages), you can use the `message()` method which filters out events that aren't of type `message`.
+To listen to messages that [your app has access to receive](/messaging/retrieving-messages), you can use the `message()` method which filters out events that aren't of type `message`.
 
 `message()` accepts an argument of type `str` or `re.Pattern` object that filters out any messages that don't match the pattern.
 
-:::info[Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.]
+:::info[Refer to [the module document](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.]
 
 :::
 

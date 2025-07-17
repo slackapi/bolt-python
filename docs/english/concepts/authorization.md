@@ -6,7 +6,7 @@ slug: /concepts/authorization
 
 Authorization is the process of determining which Slack credentials should be available while processing an incoming Slack request.
 
-Apps installed on a single workspace can simply pass their bot token into the `App` constructor using the `token` parameter. However, if your app will be installed on multiple workspaces, you have two options. The easier option is to use the built-in OAuth support. This will handle setting up OAuth routes and verifying state. Read the section on [authenticating with OAuth](/concepts/authenticating-oauth) for details.
+Apps installed on a single workspace can simply pass their bot token into the `App` constructor using the `token` parameter. However, if your app will be installed on multiple workspaces, you have two options. The easier option is to use the built-in OAuth support. This will handle setting up OAuth routes and verifying state. Read the section on [authenticating with OAuth](/bolt-python/concepts/authenticating-oauth) for details.
 
 For a more custom solution, you can set the `authorize` parameter to a function upon `App` instantiation. The `authorize` function should return [an instance of `AuthorizeResult`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/authorization/authorize_result.py), which contains information about who and where the request is coming from.
 

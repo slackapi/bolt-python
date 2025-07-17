@@ -4,13 +4,13 @@ lang: en
 slug: /concepts/opening-modals
 ---
 
-[Modals](https://docs.slack.dev/surfaces/modals) are focused surfaces that allow you to collect user data and display dynamic information. You can open a modal by passing a valid `trigger_id` and a [view payload](https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission) to the built-in client's [`views.open`](https://docs.slack.dev/reference/methods/views.open/) method. 
+[Modals](/surfaces/modals) are focused surfaces that allow you to collect user data and display dynamic information. You can open a modal by passing a valid `trigger_id` and a [view payload](/reference/interaction-payloads/view-interactions-payload/#view_submission) to the built-in client's [`views.open`](/reference/methods/views.open/) method. 
 
 Your app receives `trigger_id` parameters in payloads sent to your Request URL triggered user invocation like a slash command, button press, or interaction with a select menu.
 
-Read more about modal composition in the [API documentation](https://docs.slack.dev/surfaces/modals#composing_views).
+Read more about modal composition in the [API documentation](/surfaces/modals#composing_views).
 
-Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 
 ```python
 # Listen for a shortcut invocation

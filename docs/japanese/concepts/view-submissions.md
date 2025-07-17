@@ -4,7 +4,7 @@ lang: ja-jp
 slug: /concepts/view_submissions
 ---
 
-<a href="https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission">モーダルのペイロード</a>に `input` ブロックを含める場合、その入力値を受け取るために`view_submission` リクエストをリッスンする必要があります。`view_submission` リクエストのリッスンには、組み込みの`view()` メソッドを利用することができます。`view()` の引数には、`str` 型または `re.Pattern` 型の `callback_id` を指定します。
+<a href="/reference/interaction-payloads/view-interactions-payload/#view_submission">モーダルのペイロード</a>に `input` ブロックを含める場合、その入力値を受け取るために`view_submission` リクエストをリッスンする必要があります。`view_submission` リクエストのリッスンには、組み込みの`view()` メソッドを利用することができます。`view()` の引数には、`str` 型または `re.Pattern` 型の `callback_id` を指定します。
 
 `input` ブロックの値にアクセスするには `state` オブジェクトを参照します。`state` 内には `values` というオブジェクトがあり、`block_id` と一意の `action_id` に紐づける形で入力値を保持しています。
 
@@ -23,9 +23,9 @@ def handle_submission(ack, body):
     # https://app.slack.com/block-kit-builder/#%7B%22type%22:%22modal%22,%22callback_id%22:%22view_1%22,%22title%22:%7B%22type%22:%22plain_text%22,%22text%22:%22My%20App%22,%22emoji%22:true%7D,%22blocks%22:%5B%5D%7D
     ack(response_action="update", view=build_new_view(body))
 ```
-この例と同様に、モーダルでの送信リクエストに対して、<a href="https://docs.slack.dev/surfaces/modals#displaying_errors">エラーを表示する</a>ためのオプションもあります。
+この例と同様に、モーダルでの送信リクエストに対して、<a href="/surfaces/modals#displaying_errors">エラーを表示する</a>ためのオプションもあります。
 
-モーダルの送信について詳しくは、<a href="https://docs.slack.dev/surfaces/modals#interactions">API ドキュメント</a>を参照してください。
+モーダルの送信について詳しくは、<a href="/surfaces/modals#interactions">API ドキュメント</a>を参照してください。
 
 ---
 
@@ -33,7 +33,7 @@ def handle_submission(ack, body):
 
 `view_closed` リクエストをリッスンするためには `callback_id` を指定して、かつ `notify_on_close` 属性をモーダルのビューに設定する必要があります。以下のコード例をご覧ください。
 
-よく詳しい情報は、<a href="https://docs.slack.dev/surfaces/modals#interactions">API ドキュメント</a>を参照してください。
+よく詳しい情報は、<a href="/surfaces/modals#interactions">API ドキュメント</a>を参照してください。
 
 ```python
 client.views_open(
@@ -60,7 +60,7 @@ def handle_view_closed(ack, body, logger):
     logger.info(body)
 ```
 
-指定可能な引数の一覧は<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。
+指定可能な引数の一覧は<a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。
 
 ```python
 # view_submission リクエストを処理
