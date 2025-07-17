@@ -5,8 +5,8 @@
 		"label": "Bolt for Python",
 		"className": "sidebar-title"
 	},
-	{ "type": "html", "value": "<hr>" },
 	"bolt-python/getting-started",
+	{ "type": "html", "value": "<hr>" },
 	{
 		"type": "category",
 		"label": "Slack API calls",
