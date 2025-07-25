@@ -11,11 +11,10 @@ If your listener middleware is a quite simple one, you can use a listener matche
 Refer to [the module document](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
 
 ```python
-# Listener middleware which filters out messages with "bot_message" subtype
+# Listener middleware which filters out messages from a bot
 def no_bot_messages(message, next):
-    subtype = message.get("subtype")
-    if subtype != "bot_message":
-       next()
+    if "bot_id" not in message:
+        next()
 
 # This listener only receives messages from humans
 @app.event(event="message", middleware=[no_bot_messages])
@@ -24,10 +23,10 @@ def log_message(logger, event):
 
 # Listener matchers: simplified version of listener middleware
 def no_bot_messages(message) -> bool:
-    return message.get("subtype") != "bot_message"
+    return "bot_id" not in message
 
 @app.event(
-    event="message", 
+    event="message",
     matchers=[no_bot_messages]
     # or matchers=[lambda message: message.get("subtype") != "bot_message"]
 )
