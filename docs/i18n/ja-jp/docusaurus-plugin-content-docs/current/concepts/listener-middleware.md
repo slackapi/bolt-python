@@ -11,11 +11,10 @@ slug: /concepts/listener-middleware
 <span>指定可能な引数の一覧は<a href="https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 
 ```python
-# "bot_message" サブタイプのメッセージを抽出するリスナーミドルウェア
+# ボットからのメッセージをフィルタリングするリスナーミドルウェア
 def no_bot_messages(message, next):
-    subtype = message.get("subtype")
-    if subtype != "bot_message":
-       next()
+    if "bot_id" not in message:
+        next()
 
 # このリスナーは人間によって送信されたメッセージのみを受け取ります
 @app.event(event="message", middleware=[no_bot_messages])
@@ -24,10 +23,10 @@ def log_message(logger, event):
 
 # リスナーマッチャー： 簡略化されたバージョンのリスナーミドルウェア
 def no_bot_messages(message) -> bool:
-    return message.get("subtype") != "bot_message"
+    return "bot_id" not in message
 
 @app.event(
-    event="message", 
+    event="message",
     matchers=[no_bot_messages]
     # or matchers=[lambda message: message.get("subtype") != "bot_message"]
 )
