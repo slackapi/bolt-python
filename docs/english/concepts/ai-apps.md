@@ -28,11 +28,8 @@ The Agents & AI Apps feature comprises a unique messaging experience for Slack. 
 
 That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
 
-<<<<<<< HEAD:docs/english/concepts/ai-apps.md
-=======
 :::info
-You _could_ go it alone and [listen](event-listening) for the `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im` events (see implementation details below) in order to implement the AI features in your app. That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
->>>>>>> origin:docs/content/concepts/ai-apps.md
+You _could_ go it alone and [listen](/bolt-python/event-listening) for the `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im` events (see implementation details below) in order to implement the AI features in your app. That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
 :::
 
 ## The `Assistant` class instance {#assistant-class}
@@ -113,16 +110,10 @@ If you do provide your own `threadContextStore` property, it must feature `get` 
 
 ## Handling a new thread {#handling-a-new-thread}
 
-<<<<<<< HEAD:docs/english/concepts/ai-apps.md
-When the user opens a new thread with your AI app, the [`assistant_thread_started`](/reference/events/assistant_thread_started) event will be sent to your app.
-
-:::tip[When a user opens an AI app thread while in a channel, the channel info is stored as the thread's `AssistantThreadContext` data. You can grab that info by using the `get_thread_context` utility, as subsequent user message event payloads won't include the channel info.]
-=======
-When the user opens a new thread with your AI-enabled app, the [`assistant_thread_started`](https://docs.slack.dev/reference/events/assistant_thread_started) event will be sent to your app.
+When the user opens a new thread with your AI-enabled app, the [`assistant_thread_started`](/reference/events/assistant_thread_started) event will be sent to your app.
 
 :::tip
 When a user opens an app thread while in a channel, the channel info is stored as the thread's `AssistantThreadContext` data. You can grab that info by using the `get_thread_context` utility, as subsequent user message event payloads won't include the channel info.
->>>>>>> origin:docs/content/concepts/ai-apps.md
 :::
 
 ### Block Kit interactions in the app thread {#block-kit-interactions}
