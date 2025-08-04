@@ -164,7 +164,7 @@ import TabItem from '@theme/TabItem';
 
 :::tip 
 
-ローカル開発の場合、ngrok などのプロキシ サービスを使用してパブリック URL を作成し、リクエストを開発環境にトンネリングできます。このトンネルの作成方法については、[ngrok のスタート ガイド](https://ngrok.com/docs#getting-started-expose) を参照してください。アプリをホスティングする際には、Slack 開発者がアプリをホストするために使用する最も一般的なホスティング プロバイダーを [API サイト](/distribution/hosting-slack-apps/) に集めました。
+ローカル開発の場合、ngrok などのプロキシ サービスを使用してパブリック URL を作成し、リクエストを開発環境にトンネリングできます。このトンネルの作成方法については、[ngrok のスタート ガイド](https://ngrok.com/docs#getting-started-expose) を参照してください。アプリをホスティングする際には、Slack 開発者がアプリをホストするために使用する最も一般的なホスティング プロバイダーを [API サイト](/app-management/hosting-slack-apps) に集めました。
 
 :::
 

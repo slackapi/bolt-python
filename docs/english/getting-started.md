@@ -296,5 +296,5 @@ You can now continue customizing your app with various features to make it right
 - Explore the different events your bot can listen to with the [`app.event()`](/bolt-python/concepts/event-listening) method. All of the [events](/reference/events) are listed on the API docs site.
 - Bolt allows you to call [Web API](/bolt-python/concepts/web-api) methods with the client attached to your app. There are [over 200 methods](/reference/methods) on the API docs site.
 - Learn more about the different [token types](/authentication/tokens) and [authentication setups](/bolt-python/concepts/authenticating-oauth). Your app might need different tokens depending on the actions you want to perform or for installations to multiple workspaces.
-- Receive events using HTTP for various deployment methods, such as deploying to [Heroku](/bolt-python/deployments/heroku) or [AWS Lambda](/bolt-python/deployments/aws-lambda).
+- Receive events using HTTP for various deployment methods, such as deploying to Heroku or AWS Lambda.
 - Read on [app design](/surfaces/app-design) and compose fancy messages with blocks using [Block Kit Builder](https://app.slack.com/block-kit-builder) to prototype messages.

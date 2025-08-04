@@ -173,7 +173,7 @@ When an event occurs, Slack will send your app some information about the event,
 
 :::tip[Using proxy services]
 
-For local development, you can use a proxy service like ngrok to create a public URL and tunnel requests to your development environment. Refer to [ngrok's getting started guide](https://ngrok.com/docs#getting-started-expose) on how to create this tunnel. And when you get to hosting your app, we've collected some of the most common hosting providers Slack developers use to host their apps [on our API site](/distribution/hosting-slack-apps/). 
+For local development, you can use a proxy service like ngrok to create a public URL and tunnel requests to your development environment. Refer to [ngrok's getting started guide](https://ngrok.com/docs#getting-started-expose) on how to create this tunnel. And when you get to hosting your app, we've collected some of the most common hosting providers Slack developers use to host their apps [on our API site](/app-management/hosting-slack-apps). 
 
 :::
 

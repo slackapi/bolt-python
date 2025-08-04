@@ -12,7 +12,7 @@ To update a view, you can use the built-in client to call `views_update` with th
 
 ## The `views_push` method
 
-To push a new view onto the view stack, you can use the built-in client to call `views_push` with a valid `trigger_id` a new [view payload](/reference/interaction-payloads/view-interactions-payload/#view_submission). The arguments for `views_push` is the same as [opening modals](/bolt-python/concepts/creating-models). After you open a modal, you may only push two additional views onto the view stack.
+To push a new view onto the view stack, you can use the built-in client to call `views_push` with a valid `trigger_id` a new [view payload](/reference/interaction-payloads/view-interactions-payload/#view_submission). The arguments for `views_push` is the same as [opening modals](/bolt-python/concepts/opening-models). After you open a modal, you may only push two additional views onto the view stack.
 
 Learn more about updating and pushing views in our [API documentation](/surfaces/modals)
 

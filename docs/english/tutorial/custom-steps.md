@@ -225,7 +225,7 @@ The second argument is the callback function, or the logic that will run when yo
 
 Field | Description
 ------|------------
-`client` | A `WebClient` instance used to make things happen in Slack. From sending messages to opening modals, `client` makes it all happen. For a full list of available methods, refer to the [Web API methods](/bolt-python/methods). Read more about the `WebClient` for Bolt Python [here](https://docs.slack.dev/bolt-python/concepts/web-api/).
+`client` | A `WebClient` instance used to make things happen in Slack. From sending messages to opening modals, `client` makes it all happen. For a full list of available methods, refer to the [Web API methods](/reference/methods). Read more about the `WebClient` for Bolt Python [here](https://docs.slack.dev/bolt-python/concepts/web-api/).
 `complete` | A utility method that invokes `functions.completeSuccess`. This method indicates to Slack that a step has completed successfully without issue. When called, `complete` requires you include an `outputs` object that matches your step definition in [`output_parameters`](#inputs-outputs).
 `fail` | A utility method that invokes `functions.completeError`. True to its name, this method signals to Slack that a step has failed to complete. The `fail` method requires an argument of `error` to be sent along with it, which is used to help users understand what went wrong.
 `inputs` | An alias for the `input_parameters` that were provided to the step upon execution.
@@ -255,7 +255,7 @@ When you're ready to deploy your steps for wider use, you'll need to decide *whe
 
 ### Control step access {#access}
 
-You can choose who has access to your custom steps. To define this, refer to the [custom function access](/bolt-python/automation/functions/access) page.
+You can choose who has access to your custom steps. To define this, refer to the [custom function access](/deno-slack-sdk/guides/controlling-access-to-custom-functions) page.
 
 ### Distribution {#distribution}
 
@@ -268,5 +268,5 @@ Apps containing custom steps cannot be distributed publicly or submitted to the 
 
 ## Related tutorials {#tutorials}
 
-* [Custom steps for Workflow Builder (new app)](/bolt-python/tutorial/custom-steps-WB-new)
-* [Custom steps for Workflow Builder (existing app)](/bolt-python/tutorial/custom-steps-WB-existing)
+* [Custom steps for Workflow Builder (new app)](/bolt-python/tutorial/custom-steps-workflow-builder-new)
+* [Custom steps for Workflow Builder (existing app)](/bolt-python/tutorial/custom-steps-workflow-builder-existing/)

@@ -4,11 +4,12 @@ lang: ja-jp
 slug: /bolt-python/concepts/app-home
 ---
 
-<a href="/surfaces/app-home">ホームタブ</a>は、サイドバーや検索画面からアクセス可能なサーフェスエリアです。アプリはこのエリアを使ってユーザーごとのビューを表示することができます。アプリ設定ページで App Home の機能を有効にすると、<a href="/reference/methods/views.publis">`views.publish`</a> API メソッドの呼び出しで `user_id` と[ビューのペイロード](/reference/interaction-payloads/view-interactions-payload/#view_submission)を指定して、ホームタブを公開・更新することができるようになります。
+[ホームタブ](/surfaces/app-home)は、サイドバーや検索画面からアクセス可能なサーフェスエリアです。アプリはこのエリアを使ってユーザーごとのビューを表示することができます。アプリ設定ページで App Home の機能を有効にすると、[`views.publish`](/reference/methods/views.publish) API メソッドの呼び出しで `user_id` と[ビューのペイロード](/reference/interaction-payloads/view-interactions-payload/#view_submission)を指定して、ホームタブを公開・更新することができるようになります。
 
-<a href="/reference/events/app_home_opened">`app_home_opened`</a> イベントをサブスクライブすると、ユーザーが App Home を開く操作をリッスンできます。
+[`app_home_opened`](/reference/events/app_home_opened) イベントをサブスクライブすると、ユーザーが App Home を開く操作をリッスンできます。
 
-<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+指定可能な引数の一覧は [モジュールドキュメント](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html)を参考にしてください。
+
 ```python
 @app.event("app_home_opened")
 def update_home_tab(client, event, logger):
