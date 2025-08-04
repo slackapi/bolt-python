@@ -8,7 +8,7 @@ slug: /bolt-python/concepts/message-listening
 
 `message()` の引数には `str` 型または `re.Pattern` オブジェクトを指定できます。この条件のパターンに一致しないメッセージは除外されます。
 
-<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # '👋' が含まれるすべてのメッセージに一致
 @app.message(":wave:")

@@ -12,7 +12,7 @@ slug: /bolt-python/concepts/acknowledge
 
  FaaS / serverless 環境を使う場合、 `ack()` するタイミングが異なります。 これに関する詳細は [Lazy listeners (FaaS)](/bolt-python/concepts/lazy-listeners) を参照してください。 
 
-<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 # 外部データを使用する選択メニューオプションに応答するサンプル
 @app.options("menu_selection")

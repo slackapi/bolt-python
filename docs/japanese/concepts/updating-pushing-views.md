@@ -16,7 +16,7 @@ slug: /bolt-python/concepts/updating-pushing-views
 
 モーダルの更新と多重表示に関する詳細は、<a href="/surfaces/modals">API ドキュメント</a>を参照してください。
 
-指定可能な引数の一覧は<a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。
+指定可能な引数の一覧は<a href="https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。
 
 ```python
 # モーダルに含まれる、`button_abc` という action_id のボタンの呼び出しをリッスン

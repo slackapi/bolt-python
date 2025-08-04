@@ -11,9 +11,9 @@ While it's recommended to use `action_id` for `external_select` menus, dialogs d
 
 To respond to options requests, you'll need to call `ack()` with a valid `options` or `option_groups` list. Both [external select response examples](/reference/block-kit/block-elements/multi-select-menu-element#external_multi_select) and [dialog response examples](/reference/block-kit/block-elements/multi-select-menu-element#conversation_multi_select) can be found on our API site.
 
-Additionally, you may want to apply filtering logic to the returned options based on user input. This can be accomplished by using the `payload` argument to your options listener and checking for the contents of the `value` property within it. Based on the `value` you can return different options. All listeners and middleware handlers in Bolt for Python have access to [many useful arguments](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) - be sure to check them out!
+Additionally, you may want to apply filtering logic to the returned options based on user input. This can be accomplished by using the `payload` argument to your options listener and checking for the contents of the `value` property within it. Based on the `value` you can return different options. All listeners and middleware handlers in Bolt for Python have access to [many useful arguments](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) - be sure to check them out!
 
-Refer to [the module document](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
 # Example of responding to an external_select options request
 @app.options("external_action")

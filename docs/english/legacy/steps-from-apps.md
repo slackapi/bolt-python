@@ -34,9 +34,9 @@ The configuration object contains three keys: `edit`, `save`, and `execute`. Eac
 
 After instantiating a `WorkflowStep`, you can pass it into `app.step()`. Behind the scenes, your app will listen and respond to the step’s events using the callbacks provided in the configuration object.
 
-Alternatively, steps from apps can also be created using the `WorkflowStepBuilder` class alongside a decorator pattern. For more information, including an example of this approach, [refer to the documentation](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder).
+Alternatively, steps from apps can also be created using the `WorkflowStepBuilder` class alongside a decorator pattern. For more information, including an example of this approach, [refer to the documentation](https://docs.slack.dev/bolt-python/reference/workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder).
 
-Refer to the module documents ([common](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) / [step-specific](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html)) to learn the available arguments.
+Refer to the module documents ([common](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) / [step-specific](https://docs.slack.dev/bolt-python/reference/workflows/step/utilities/index.html)) to learn the available arguments.
 
 ```python
 import os
@@ -80,7 +80,7 @@ Within the `edit` callback, the `configure()` utility can be used to easily open
 
 To learn more about opening configuration modals, [read the documentation](/legacy/legacy-steps-from-apps/).
 
-Refer to the module documents ([common](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) / [step-specific](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html)) to learn the available arguments.
+Refer to the module documents ([common](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) / [step-specific](https://docs.slack.dev/bolt-python/reference/workflows/step/utilities/index.html)) to learn the available arguments.
 
 ```python
 def edit(ack, step, configure):
@@ -132,7 +132,7 @@ Within the `save` callback, the `update()` method can be used to save the builde
 
 To learn more about how to structure these parameters, [read the documentation](/legacy/legacy-steps-from-apps/).
 
-Refer to the module documents ([common](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) / [step-specific](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html)) to learn the available arguments.
+Refer to the module documents ([common](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) / [step-specific](https://docs.slack.dev/bolt-python/reference/workflows/step/utilities/index.html)) to learn the available arguments.
 
 ```python
 def save(ack, view, update):
@@ -177,7 +177,7 @@ Using the `inputs` from the `save` callback, this is where you can make third-pa
 
 Within the `execute` callback, your app must either call `complete()` to indicate that the step's execution was successful, or `fail()` to indicate that the step's execution failed.
 
-Refer to the module documents ([common](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) / [step-specific](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html)) to learn the available arguments.
+Refer to the module documents ([common](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) / [step-specific](https://docs.slack.dev/bolt-python/reference/workflows/step/utilities/index.html)) to learn the available arguments.
 
 ```python
 def execute(step, complete, fail):

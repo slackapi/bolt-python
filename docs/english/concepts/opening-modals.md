@@ -10,7 +10,7 @@ Your app receives `trigger_id` parameters in payloads sent to your Request URL t
 
 Read more about modal composition in the [API documentation](/surfaces/modals#composing_views).
 
-Refer to [the module document](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
 
 ```python
 # Listen for a shortcut invocation

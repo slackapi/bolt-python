@@ -8,7 +8,7 @@ Within your listener function, `say()` is available whenever there is an associa
 
 In the case that you'd like to send a message outside of a listener or you want to do something more advanced (like handle specific errors), you can call `client.chat_postMessage` [using the client attached to your Bolt instance](/bolt-python/concepts/web-api).
 
-Refer to [the module document](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
 # Listens for messages containing "knock knock" and responds with an italicized "who's there?"
 @app.message("knock knock")

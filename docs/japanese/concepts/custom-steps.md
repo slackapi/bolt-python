@@ -11,7 +11,7 @@ Your app can use the `function()` method to listen to incoming [custom step requ
 
 You can reference your custom step's inputs using the `inputs` listener argument of type `dict`.
 
-Refer to [the module document](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn about the available listener arguments.
+Refer to [the module document](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) to learn about the available listener arguments.
 
 ```python
 # This sample custom step formats an input and outputs it

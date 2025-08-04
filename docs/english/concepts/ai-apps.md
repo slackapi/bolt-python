@@ -105,7 +105,7 @@ While the `assistant_thread_started` and `assistant_thread_context_changed` even
 
 If you do provide your own `threadContextStore` property, it must feature `get` and `save` methods.
 
-:::tip[Refer to the [module document](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html) to learn the available listener arguments.]
+:::tip[Refer to the [module document](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.]
 :::
 
 ## Handling a new thread {#handling-a-new-thread}
@@ -264,9 +264,9 @@ When the user messages your app, the [`message.im`](/reference/events/message.im
 Messages sent to the app do not contain a [subtype](/reference/events/message#subtypes) and must be deduced based on their shape and any provided [message metadata](/messaging/message-metadata/).
 
 There are three utilities that are particularly useful in curating the user experience:
-* [`say`](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/#slack_bolt.Say)
-* [`setTitle`](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/#slack_bolt.SetTitle)
-* [`setStatus`](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/#slack_bolt.SetStatus)
+* [`say`](https://docs.slack.dev/bolt-python/reference/#slack_bolt.Say)
+* [`setTitle`](https://docs.slack.dev/bolt-python/reference/#slack_bolt.SetTitle)
+* [`setStatus`](https://docs.slack.dev/bolt-python/reference/#slack_bolt.SetStatus)
 
 ```python
 ...

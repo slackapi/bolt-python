@@ -65,7 +65,7 @@
   },
   "sidebar.sidebarBoltPy.link.Reference": {
     "message": "リファレンス",
-    "description": "The label for link Reference in sidebar sidebarBoltPy, linking to https://docs.slack.dev/bolt-python/api-docs/slack_bolt/"
+    "description": "The label for link Reference in sidebar sidebarBoltPy, linking to https://docs.slack.dev/bolt-python/reference/"
   },
   "sidebar.sidebarBoltPy.link.Release notes": {
     "message": "リリースノート",

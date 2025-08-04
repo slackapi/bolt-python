@@ -26,9 +26,9 @@ slug: /bolt-python/legacy/steps-from-apps
 
 `WorkflowStep` のインスタンスを作成したら、それを`app.step()` メソッドに渡します。これによって、アプリがワークフローステップのイベントをリッスンし、設定オブジェクトで指定されたコールバックを使ってそれに応答できるようになります。
 
-また、デコレーターとして利用できる `WorkflowStepBuilder` クラスを使ってワークフローステップを定義することもできます。 詳細は、[こちらのドキュメント](https://docs.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder)のコード例などを参考にしてください。
+また、デコレーターとして利用できる `WorkflowStepBuilder` クラスを使ってワークフローステップを定義することもできます。 詳細は、[こちらのドキュメント](https://docs.slack.dev/bolt-python/reference/workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder)のコード例などを参考にしてください。
 
-指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">共通</a> / <a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">ステップ用</a>
+指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html">共通</a> / <a href="https://docs.slack.dev/bolt-python/reference/workflows/step/utilities/index.html">ステップ用</a>
 
 ```python
 import os
@@ -71,7 +71,7 @@ app.step(ws)
 
 設定モーダルの開き方に関する詳細は、[こちらのドキュメント](/legacy/legacy-steps-from-apps/legacy-steps-from-apps-configuration-view-object)を参照してください。
 
-指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">共通</a> / <a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">ステップ用</a>
+指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html">共通</a> / <a href="https://docs.slack.dev/bolt-python/reference/workflows/step/utilities/index.html">ステップ用</a>
 
 ```python
 def edit(ack, step, configure):
@@ -123,7 +123,7 @@ app.step(ws)
 
 これらのパラメータの構成方法に関する詳細は、[こちらのドキュメント](/legacy/legacy-steps-from-apps/legacy-steps-from-apps-workflow_step-object)を参照してください。
 
-指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">共通</a> / <a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">ステップ用</a>
+指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html">共通</a> / <a href="https://docs.slack.dev/bolt-python/reference/workflows/step/utilities/index.html">ステップ用</a>
 
 ```python
 def save(ack, view, update):
@@ -168,7 +168,7 @@ app.step(ws)
 
 `execute` コールバック内では、`complete()` を呼び出してステップの実行が成功したことを示すか、`fail()` を呼び出してステップの実行が失敗したことを示す必要があります。
 
-<span>指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html">共通</a> / <a href="https://docs.slack.dev/bolt-python/api-docs/slack_bolt/workflows/step/utilities/index.html">ステップ用</a>）</span>
+<span>指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html">共通</a> / <a href="https://docs.slack.dev/bolt-python/reference/workflows/step/utilities/index.html">ステップ用</a>）</span>
 ```python
 def execute(step, complete, fail):
     inputs = step["inputs"]

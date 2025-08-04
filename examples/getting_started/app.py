@@ -10,7 +10,7 @@ app = App(
 
 # Listens to incoming messages that contain "hello"
 # To learn available listener method arguments,
-# visit https://slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html
+# visit https://slack.dev/bolt-python/reference/kwargs_injection/args.html
 @app.message("hello")
 def message_hello(message, say):
     # say() sends a message to the channel where the event was triggered
