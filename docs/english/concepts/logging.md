@@ -1,7 +1,7 @@
 ---
 title: Logging
 lang: en
-slug: /concepts/logging
+slug: /bolt-python/concepts/logging
 ---
 
 By default, Bolt will log information from your app to the output destination. After you've imported the `logging` module, you can customize the root log level by passing the `level` parameter to `basicConfig()`. The available log levels in order of least to most severe are `debug`, `info`, `warning`, `error`, and `critical`.

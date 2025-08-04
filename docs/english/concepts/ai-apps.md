@@ -1,7 +1,7 @@
 ---
 title: Using AI in Apps
 lang: en
-slug: /concepts/ai-apps
+slug: /bolt-python/concepts/ai-apps
 ---
 
 :::info This feature requires a paid plan

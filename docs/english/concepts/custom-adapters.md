@@ -1,7 +1,7 @@
 ---
 title: Custom adapters
 lang: en
-slug: /concepts/custom-adapters
+slug: /bolt-python/concepts/custom-adapters
 ---
 
 [Adapters](/bolt-python/concepts/adapters) are flexible and can be adjusted based on the framework you prefer. There are two necessary components of adapters:

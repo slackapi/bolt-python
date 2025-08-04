@@ -1,7 +1,7 @@
 ---
 title: グローバルミドルウェア
 lang: ja-jp
-slug: /concepts/global-middleware
+slug: /bolt-python/concepts/global-middleware
 order: 8
 ---
 

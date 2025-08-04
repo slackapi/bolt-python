@@ -1,7 +1,7 @@
 ---
 title: モーダルの送信のリスニング
 lang: ja-jp
-slug: /concepts/view_submissions
+slug: /bolt-python/concepts/view_submissions
 ---
 
 <a href="/reference/interaction-payloads/view-interactions-payload/#view_submission">モーダルのペイロード</a>に `input` ブロックを含める場合、その入力値を受け取るために`view_submission` リクエストをリッスンする必要があります。`view_submission` リクエストのリッスンには、組み込みの`view()` メソッドを利用することができます。`view()` の引数には、`str` 型または `re.Pattern` 型の `callback_id` を指定します。

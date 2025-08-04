@@ -1,7 +1,7 @@
 ---
 title: Opening modals
 lang: en
-slug: /concepts/opening-modals
+slug: /bolt-python/concepts/opening-modals
 ---
 
 [Modals](/surfaces/modals) are focused surfaces that allow you to collect user data and display dynamic information. You can open a modal by passing a valid `trigger_id` and a [view payload](/reference/interaction-payloads/view-interactions-payload/#view_submission) to the built-in client's [`views.open`](/reference/methods/views.open/) method. 

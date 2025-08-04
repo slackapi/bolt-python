@@ -1,7 +1,7 @@
 ---
 title: Listening & responding to select menu options
 lang: en
-slug: /concepts/options
+slug: /bolt-python/concepts/options
 ---
 
 The `options()` method listens for incoming option request payloads from Slack. [Similar to `action()`](/bolt-python/concepts/action-listening),

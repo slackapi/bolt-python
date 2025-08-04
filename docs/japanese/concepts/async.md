@@ -1,7 +1,7 @@
 ---
 title: Async（asyncio）の使用
 lang: ja-jp
-slug: /concepts/async
+slug: /bolt-python/concepts/async
 ---
 
 非同期バージョンの Bolt を使用する場合は、`App` の代わりに `AsyncApp` インスタンスをインポートして初期化します。`AsyncApp` では <a href="https://docs.aiohttp.org/">AIOHTTP</a> を使って API リクエストを行うため、`aiohttp` をインストールする必要があります（`requirements.txt` に追記するか、`pip install aiohttp` を実行します）。

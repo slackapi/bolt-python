@@ -1,7 +1,7 @@
 ---
 title: ホームタブの更新
 lang: ja-jp
-slug: /concepts/app-home
+slug: /bolt-python/concepts/app-home
 ---
 
 <a href="/surfaces/app-home">ホームタブ</a>は、サイドバーや検索画面からアクセス可能なサーフェスエリアです。アプリはこのエリアを使ってユーザーごとのビューを表示することができます。アプリ設定ページで App Home の機能を有効にすると、<a href="/reference/methods/views.publis">`views.publish`</a> API メソッドの呼び出しで `user_id` と[ビューのペイロード](/reference/interaction-payloads/view-interactions-payload/#view_submission)を指定して、ホームタブを公開・更新することができるようになります。

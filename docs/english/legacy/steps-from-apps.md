@@ -1,7 +1,7 @@
 ---
 title: Steps from apps
 lang: en
-slug: /legacy/steps-from-apps
+slug: /bolt-python/legacy/steps-from-apps
 ---
 
 :::danger[Steps from Apps is a deprecated feature.]

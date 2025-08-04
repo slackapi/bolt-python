@@ -1,7 +1,7 @@
 ---
 title: Listening & responding to shortcuts
 lang: en
-slug: /concepts/shortcuts
+slug: /bolt-python/concepts/shortcuts
 ---
 
 The `shortcut()` method supports both [global shortcuts](/interactivity/implementing-shortcuts#global) and [message shortcuts](/interactivity/implementing-shortcuts#messages).

@@ -1,7 +1,7 @@
 ---
 title: ソケットモードの利用
 lang: ja-jp
-slug: /concepts/socket-mode
+slug: /bolt-python/concepts/socket-mode
 ---
 
 [ソケットモード](/apis/events-api/using-socket-mode)は、アプリに WebSocket での接続と、そのコネクション経由でのデータ受信を可能とします。Bolt for Python は、バージョン 1.2.0 からこれに対応しています。

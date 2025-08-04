@@ -1,7 +1,7 @@
 ---
 title: Token rotation
 lang: en
-slug: /concepts/token-rotation
+slug: /bolt-python/concepts/token-rotation
 ---
 
 Supported in Bolt for Python as of [v1.7.0](https://github.com/slackapi/bolt-python/releases/tag/v1.7.0), token rotation provides an extra layer of security for your access tokens and is defined by the [OAuth V2 RFC](https://datatracker.ietf.org/doc/html/rfc6749#section-10.4). 

@@ -1,7 +1,7 @@
 ---
 title: Using the Web API
 lang: en
-slug: /concepts/web-api
+slug: /bolt-python/concepts/web-api
 ---
 
 You can call [any Web API method](/reference/methods) using the [`WebClient`](/python-slack-sdk/web) provided to your Bolt app as either `app.client` or `client` in middleware/listener arguments (given that your app has the appropriate scopes). When you call one the client's methods, it returns a `SlackResponse` which contains the response from Slack.

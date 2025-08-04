@@ -1,7 +1,7 @@
 ---
 title: イベントのリスニング
 lang: ja-jp
-slug: /concepts/event-listening
+slug: /bolt-python/concepts/event-listening
 ---
 
 `event()` メソッドを使うと、[Events API](/reference/events) の任意のイベントをリッスンできます。リッスンするイベントは、アプリの設定であらかじめサブスクライブしておく必要があります。これを利用することで、アプリがインストールされたワークスペースで何らかのイベント（例：ユーザーがメッセージにリアクションをつけた、ユーザーがチャンネルに参加した）が発生したときに、アプリに何らかのアクションを実行させることができます。

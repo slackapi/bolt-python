@@ -1,7 +1,7 @@
 ---
 title: エージェント・アシスタント
 lang: en
-slug: /concepts/assistant
+slug: /bolt-python/concepts/assistant
 ---
 
 このページは、Bolt を使ってエージェント・アシスタントを実装するための方法を紹介します。この機能に関する一般的な情報については、[こちらのドキュメントページ（英語）](/ai/)を参照してください。

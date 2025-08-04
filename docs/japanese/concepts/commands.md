@@ -1,7 +1,7 @@
 ---
 title: コマンドのリスニングと応答
 lang: ja-jp
-slug: /concepts/commands
+slug: /bolt-python/concepts/commands
 ---
 
 スラッシュコマンドが実行されたリクエストをリッスンするには、`command()` メソッドを使用します。このメソッドでは `str` 型の `command_name` の指定が必要です。

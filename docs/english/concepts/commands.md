@@ -1,7 +1,7 @@
 ---
 title: Listening & responding to commands
 lang: en
-slug: /concepts/commands
+slug: /bolt-python/concepts/commands
 ---
 
 Your app can use the `command()` method to listen to incoming slash command requests. The method requires a `command_name` of type `str`.

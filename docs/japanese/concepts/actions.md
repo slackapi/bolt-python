@@ -1,7 +1,7 @@
 ---
 title: アクション
 lang: ja-jp
-slug: /concepts/actions
+slug: /bolt-python/concepts/actions
 ---
 
 ## アクションのリスニング

@@ -1,7 +1,7 @@
 ---
 title: Global middleware
 lang: en
-slug: /concepts/global-middleware
+slug: /bolt-python/concepts/global-middleware
 ---
 
 Global middleware is run for all incoming requests, before any listener middleware. You can add any number of global middleware to your app by passing middleware functions to `app.use()`. Middleware functions are called with the same arguments as listeners, with an additional `next()` function.

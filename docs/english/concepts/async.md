@@ -1,7 +1,7 @@
 ---
 title: Using async (asyncio)
 lang: en
-slug: /concepts/async
+slug: /bolt-python/concepts/async
 ---
 
 To use the async version of Bolt, you can import and initialize an `AsyncApp` instance (rather than `App`). `AsyncApp` relies on [AIOHTTP](https://docs.aiohttp.org) to make API requests, which means you'll need to install `aiohttp` (by adding to `requirements.txt` or running `pip install aiohttp`).

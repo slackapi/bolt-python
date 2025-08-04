@@ -1,7 +1,7 @@
 ---
 title: オプションのリスニングと応答
 lang: ja-jp
-slug: /concepts/options
+slug: /bolt-python/concepts/options
 ---
 
 `options()` メソッドは、Slack からのオプション（セレクトメニュー内の動的な選択肢）をリクエストするペイロードをリッスンします。 [`action()` と同様に](/bolt-python/concepts/action-listening)、文字列型の `action_id` または制約付きオブジェクトが必要です。

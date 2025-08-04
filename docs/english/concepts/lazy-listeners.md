@@ -1,7 +1,7 @@
 ---
 title: Lazy listeners (FaaS)
 lang: en
-slug: /concepts/lazy-listeners
+slug: /bolt-python/concepts/lazy-listeners
 ---
 
 Lazy Listeners are a feature which make it easier to deploy Slack apps to FaaS (Function-as-a-Service) environments. Please note that this feature is only available in Bolt for Python, and we are not planning to add the same to other Bolt frameworks.

@@ -1,7 +1,7 @@
 ---
 title: Listener middleware
 lang: en
-slug: /concepts/listener-middleware
+slug: /bolt-python/concepts/listener-middleware
 ---
 
 Listener middleware is only run for the listener in which it's passed. You can pass any number of middleware functions to the listener using the `middleware` parameter, which must be a list that contains one to many middleware functions.

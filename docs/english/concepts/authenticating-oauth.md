@@ -1,7 +1,7 @@
 ---
 title: Authenticating with OAuth
 lang: en
-slug: /concepts/authenticating-oauth
+slug: /bolt-python/concepts/authenticating-oauth
 ---
 
 Slack apps installed on multiple workspaces will need to implement OAuth, then store installation information (like access tokens) securely. By providing `client_id`, `client_secret`, `scopes`, `installation_store`, and `state_store` when initializing App, Bolt for Python will handle the work of setting up OAuth routes and verifying state. If you're implementing a custom adapter, you can make use of our [OAuth library](/python-slack-sdk/oauth/), which is what Bolt for Python uses under the hood.
