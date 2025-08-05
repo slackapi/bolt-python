@@ -7,7 +7,6 @@
 	},
 	"ja-jp/bolt-python/getting-started",
 	{ "type": "html", "value": "<hr>" },
-  	"ja-jp/bolt-python/building-an-app",
 	{
 		"type": "category",
 		"label": "Slack API コール",

@@ -1,83 +1,82 @@
 [
 	{
-		"type": "doc",
-		"id": "ja-jp/bolt-python/index",
+		"type": "category",
 		"label": "Bolt for Python",
-		"className": "sidebar-title"
-	},
-	"ja-jp/bolt-python/getting-started",
-	{ "type": "html", "value": "<hr>" },
-	{
-		"type": "category",
-		"label": "Slack API calls",
 		"items": [
-			"ja-jp/bolt-python/concepts/message-sending",
-			"ja-jp/bolt-python/concepts/web-api"
+			"ja-jp/bolt-python/getting-started",
+			{
+				"type": "category",
+				"label": "Slack API calls",
+				"items": [
+					"ja-jp/bolt-python/concepts/message-sending",
+					"ja-jp/bolt-python/concepts/web-api"
+				]
+			},
+			{
+				"type": "category",
+				"label": "Events",
+				"items": [
+					"ja-jp/bolt-python/concepts/message-listening",
+					"ja-jp/bolt-python/concepts/event-listening"
+				]
+			},
+			{
+				"type": "category",
+				"label": "App UI & Interactivity",
+				"items": [
+					"ja-jp/bolt-python/concepts/acknowledge",
+					"ja-jp/bolt-python/concepts/shortcuts",
+					"ja-jp/bolt-python/concepts/commands",
+					"ja-jp/bolt-python/concepts/actions",
+					"ja-jp/bolt-python/concepts/opening-modals",
+					"ja-jp/bolt-python/concepts/updating-pushing-views",
+					"ja-jp/bolt-python/concepts/view-submissions",
+					"ja-jp/bolt-python/concepts/select-menu-options",
+					"ja-jp/bolt-python/concepts/app-home"
+				]
+			},
+			{
+				"type": "category",
+				"label": "App Configuration",
+				"items": [
+					"ja-jp/bolt-python/concepts/socket-mode",
+					"ja-jp/bolt-python/concepts/errors",
+					"ja-jp/bolt-python/concepts/logging",
+					"ja-jp/bolt-python/concepts/async"
+				]
+			},
+			{
+				"type": "category",
+				"label": "Middleware & Context",
+				"items": [
+					"ja-jp/bolt-python/concepts/global-middleware",
+					"ja-jp/bolt-python/concepts/listener-middleware",
+					"ja-jp/bolt-python/concepts/context"
+				]
+			},
+			"ja-jp/bolt-python/concepts/lazy-listeners",
+			{
+				"type": "category",
+				"label": "Adaptors",
+				"items": [
+					"ja-jp/bolt-python/concepts/adapters",
+					"ja-jp/bolt-python/concepts/custom-adapters"
+				]
+			},
+			{
+				"type": "category",
+				"label": "Authorization & Security",
+				"items": [
+					"ja-jp/bolt-python/concepts/authenticating-oauth",
+					"ja-jp/bolt-python/concepts/authorization",
+					"ja-jp/bolt-python/concepts/token-rotation"
+				]
+			},
+			{
+				"type": "category",
+				"label": "Legacy",
+				"items": ["ja-jp/bolt-python/legacy/steps-from-apps"]
+			}
 		]
-	},
-	{
-		"type": "category",
-		"label": "Events",
-		"items": [
-			"ja-jp/bolt-python/concepts/message-listening",
-			"ja-jp/bolt-python/concepts/event-listening"
-		]
-	},
-	{
-		"type": "category",
-		"label": "App UI & Interactivity",
-		"items": [
-			"ja-jp/bolt-python/concepts/acknowledge",
-			"ja-jp/bolt-python/concepts/shortcuts",
-			"ja-jp/bolt-python/concepts/commands",
-			"ja-jp/bolt-python/concepts/actions",
-			"ja-jp/bolt-python/concepts/opening-modals",
-			"ja-jp/bolt-python/concepts/updating-pushing-views",
-			"ja-jp/bolt-python/concepts/view-submissions",
-			"ja-jp/bolt-python/concepts/select-menu-options",
-			"ja-jp/bolt-python/concepts/app-home"
-		]
-	},
-	{
-		"type": "category",
-		"label": "App Configuration",
-		"items": [
-			"ja-jp/bolt-python/concepts/socket-mode",
-			"ja-jp/bolt-python/concepts/errors",
-			"ja-jp/bolt-python/concepts/logging",
-			"ja-jp/bolt-python/concepts/async"
-		]
-	},
-	{
-		"type": "category",
-		"label": "Middleware & Context",
-		"items": [
-			"ja-jp/bolt-python/concepts/global-middleware",
-			"ja-jp/bolt-python/concepts/listener-middleware",
-			"ja-jp/bolt-python/concepts/context"
-		]
-	},
-	"ja-jp/bolt-python/concepts/lazy-listeners",
-	{
-		"type": "category",
-		"label": "Adaptors",
-		"items": [
-			"ja-jp/bolt-python/concepts/adapters",
-			"ja-jp/bolt-python/concepts/custom-adapters"
-		]
-	},
-	{
-		"type": "category",
-		"label": "Authorization & Security",
-		"items": [
-			"ja-jp/bolt-python/concepts/authenticating-oauth",
-			"ja-jp/bolt-python/concepts/authorization",
-			"ja-jp/bolt-python/concepts/token-rotation"
-		]
-	},
-	{
-		"type": "category",
-		"label": "Legacy",
-		"items": ["ja-jp/bolt-python/legacy/steps-from-apps"]
 	}
 ]
