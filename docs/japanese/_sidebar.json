@@ -6,7 +6,7 @@
 			"ja-jp/bolt-python/getting-started",
 			{
 				"type": "category",
-				"label": "Slack API calls",
+				"label": "Slack API コール",
 				"items": [
 					"ja-jp/bolt-python/concepts/message-sending",
 					"ja-jp/bolt-python/concepts/web-api"
@@ -14,7 +14,7 @@
 			},
 			{
 				"type": "category",
-				"label": "Events",
+				"label": "イベント API",
 				"items": [
 					"ja-jp/bolt-python/concepts/message-listening",
 					"ja-jp/bolt-python/concepts/event-listening"
@@ -22,7 +22,7 @@
 			},
 			{
 				"type": "category",
-				"label": "App UI & Interactivity",
+				"label": "インタラクティビティ & ショートカット",
 				"items": [
 					"ja-jp/bolt-python/concepts/acknowledge",
 					"ja-jp/bolt-python/concepts/shortcuts",
@@ -37,7 +37,7 @@
 			},
 			{
 				"type": "category",
-				"label": "App Configuration",
+				"label": "App の設定",
 				"items": [
 					"ja-jp/bolt-python/concepts/socket-mode",
 					"ja-jp/bolt-python/concepts/errors",
@@ -47,7 +47,7 @@
 			},
 			{
 				"type": "category",
-				"label": "Middleware & Context",
+				"label": "ミドルウェア & コンテキスト",
 				"items": [
 					"ja-jp/bolt-python/concepts/global-middleware",
 					"ja-jp/bolt-python/concepts/listener-middleware",
@@ -57,7 +57,7 @@
 			"ja-jp/bolt-python/concepts/lazy-listeners",
 			{
 				"type": "category",
-				"label": "Adaptors",
+				"label": "アダプター",
 				"items": [
 					"ja-jp/bolt-python/concepts/adapters",
 					"ja-jp/bolt-python/concepts/custom-adapters"
@@ -65,7 +65,7 @@
 			},
 			{
 				"type": "category",
-				"label": "Authorization & Security",
+				"label": "認可 & セキュリティ",
 				"items": [
 					"ja-jp/bolt-python/concepts/authenticating-oauth",
 					"ja-jp/bolt-python/concepts/authorization",
@@ -74,7 +74,7 @@
 			},
 			{
 				"type": "category",
-				"label": "Legacy",
+				"label": "レガシー（非推奨）",
 				"items": ["ja-jp/bolt-python/legacy/steps-from-apps"]
 			}
 		]
