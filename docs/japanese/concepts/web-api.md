@@ -1,8 +1,4 @@
----
-title: Web API の使い方
-lang: ja-jp
-slug: /ja-jp/bolt-python/concepts/web-api
----
+# Web API の使い方
 
 `app.client`、またはミドルウェア・リスナーの引数 `client` として Bolt アプリに提供されている `WebClient` は必要な権限を付与されており、これを利用することで[あらゆる Web API メソッド](/reference/methods)を呼び出すことができます。このクライアントのメソッドを呼び出すと `SlackResponse` という Slack からの応答情報を含むオブジェクトが返されます。
 

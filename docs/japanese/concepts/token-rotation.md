@@ -1,8 +1,4 @@
----
-title: トークンのローテーション
-lang: ja-jp
-slug: /ja-jp/bolt-python/concepts/token-rotation
----
+# トークンのローテーション
 
 Bolt for Python [v1.7.0](https://github.com/slackapi/bolt-python/releases/tag/v1.7.0) から、アクセストークンのさらなるセキュリティ強化のレイヤーであるトークンローテーションの機能に対応しています。トークンローテーションは [OAuth V2 の RFC](https://datatracker.ietf.org/doc/html/rfc6749#section-10.4) で規定されているものです。
 

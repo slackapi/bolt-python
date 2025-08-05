@@ -1,8 +1,4 @@
----
-title: 認可（Authorization）
-lang: ja-jp
-slug: /ja-jp/bolt-python/concepts/authorization
----
+# 認可（Authorization）
 
 認可（Authorization）は、Slack からの受信リクエストを処理するにあたって、どのようなSlack
 クレデンシャル (ボットトークンなど) を使用可能にするかを決定するプロセスです。

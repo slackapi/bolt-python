@@ -1,8 +1,4 @@
----
-title: メッセージのリスニング
-lang: ja-jp
-slug: /ja-jp/bolt-python/concepts/message-listening
----
+# メッセージのリスニング
 
 [あなたのアプリがアクセス権限を持つ](/messaging/retrieving-messages)メッセージの投稿イベントをリッスンするには `message()` メソッドを利用します。このメソッドは `type` が `message` ではないイベントを処理対象から除外します。
 

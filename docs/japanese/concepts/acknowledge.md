@@ -1,8 +1,4 @@
----
-title: リクエストの確認
-lang: ja-jp
-slug: /ja-jp/bolt-python/concepts/acknowledge
----
+# リクエストの確認
 
 アクション（action）、コマンド（command）、ショートカット（shortcut）、オプション（options）、およびモーダルからのデータ送信（view_submission）の各リクエストは、**必ず** `ack()` 関数を使って確認を行う必要があります。これによってリクエストが受信されたことが Slack に認識され、Slack のユーザーインターフェイスが適切に更新されます。
 

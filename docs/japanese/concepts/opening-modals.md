@@ -1,8 +1,4 @@
----
-title: モーダルの開始
-lang: ja-jp
-slug: /ja-jp/bolt-python/concepts/opening-modals
----
+# モーダルの開始
 
 <a href="/surfaces/modals">モーダル</a>は、ユーザーからのデータの入力を受け付けたり、動的な情報を表示したりするためのインターフェイスです。組み込みの APIクライアントの <a href="/reference/methods/views.open/">`views.open`</a> メソッドに、有効な `trigger_id` と<a href="/reference/interaction-payloads/view-interactions-payload/#view_submission">ビューのペイロード</a>を指定してモーダルを開始します。
 

@@ -1,8 +1,4 @@
----
-title: モーダルの更新と多重表示
-lang: ja-jp
-slug: /ja-jp/bolt-python/concepts/updating-pushing-views
----
+# モーダルの更新と多重表示
 
 モーダル内では、複数のモーダルをスタックのように重ねることができます。<a href="/reference/methods/views.open/">`views_open`</a> という APIを呼び出すと、親となるとなるモーダルビューが追加されます。この最初の呼び出しの後、<a href="/reference/methods/views.update/">`views_update`</a> を呼び出すことでそのビューを更新することができます。また、<a href="/reference/methods/views.push">`views_push`</a> を呼び出すと、親のモーダルの上にさらに新しいモーダルビューを重ねることもできます。
 

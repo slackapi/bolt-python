@@ -1,8 +1,4 @@
----
-title: OAuth を使った認証
-lang: ja-jp
-slug: /ja-jp/bolt-python/concepts/authenticating-oauth
----
+# OAuth を使った認証
 
 Slack アプリを複数のワークスペースにインストールできるようにするためには、OAuth フローを実装した上で、アクセストークンなどのインストールに関する情報をセキュアな方法で保存する必要があります。アプリを初期化する際に `client_id`、`client_secret`、`scopes`、`installation_store`、`state_store` を指定することで、OAuth のエンドポイントのルート情報や stateパラメーターの検証をBolt for Python にハンドリングさせることができます。カスタムのアダプターを実装する場合は、SDK が提供する組み込みの[OAuth ライブラリ](/python-slack-sdk/oauth/)を利用するのが便利です。これは Slack が開発したモジュールで、Bolt for Python 内部でも利用しています。
 

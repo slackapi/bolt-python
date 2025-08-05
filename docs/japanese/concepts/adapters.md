@@ -1,8 +1,4 @@
----
-title: アダプター
-lang: ja-jp
-slug: /ja-jp/bolt-python/concepts/adapters
----
+#  アダプター
 
 アダプターは Slack から届く受信リクエストの受付とパーズを担当し、それらのリクエストを <a href="https://github.com/slackapi/bolt-python/blob/main/slack_bolt/request/request.py">`BoltRequest`</a> の形式に変換して Bolt アプリに引き渡します。
 
