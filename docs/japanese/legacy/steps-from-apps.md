@@ -1,7 +1,6 @@
 ---
 title: ワークフローステップの概要
 lang: ja-jp
-slug: /bolt-python/legacy/steps-from-apps
 ---
 
 （アプリによる）ワークフローステップでは、処理をアプリ側で行うカスタムのワークフローステップを提供することができます。ユーザーは[ワークフロービルダー](/workflows/workflow-builder)を使ってこれらのステップをワークフローに追加できます。

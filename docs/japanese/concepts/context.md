@@ -1,7 +1,7 @@
 ---
 title: コンテキストの追加
 lang: ja-jp
-slug: /bolt-python/concepts/context
+slug: /ja-jp/bolt-python/concepts/context
 ---
 
 すべてのリスナーは `context` ディクショナリにアクセスできます。リスナーはこれを使ってリクエストの付加情報を得ることができます。受信リクエストに含まれる `user_id`、`team_id`、`channel_id`、`enterprise_id` などの情報は、Bolt によって自動的に設定されます。

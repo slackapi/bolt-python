@@ -1,7 +1,7 @@
 ---
 title: ショートカットのリスニングと応答
 lang: ja-jp
-slug: /bolt-python/concepts/shortcuts
+slug: /ja-jp/bolt-python/concepts/shortcuts
 ---
 
 `shortcut()` メソッドは、[グローバルショートカット](/interactivity/implementing-shortcuts#global)と[メッセージショートカット](/interactivity/implementing-shortcuts#messages)の 2 つをサポートしています。

@@ -1,7 +1,7 @@
 ---
 title: Lazy リスナー（FaaS）
 lang: ja-jp
-slug: /bolt-python/concepts/lazy-listeners
+slug: /ja-jp/bolt-python/concepts/lazy-listeners
 ---
 
 Lazy リスナー関数は、FaaS 環境への Slack アプリのデプロイを容易にする機能です。この機能は Bolt for Python でのみ利用可能で、他の Bolt フレームワークでこの機能に対応することは予定していません。

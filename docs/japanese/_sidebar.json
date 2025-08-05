@@ -7,10 +7,9 @@
 	},
 	"ja-jp/bolt-python/getting-started",
 	{ "type": "html", "value": "<hr>" },
-  	"ja-jp/bolt-python/building-an-app",
 	{
 		"type": "category",
-		"label": "Slack API コール",
+		"label": "Slack API calls",
 		"items": [
 			"ja-jp/bolt-python/concepts/message-sending",
 			"ja-jp/bolt-python/concepts/web-api"
@@ -18,7 +17,7 @@
 	},
 	{
 		"type": "category",
-		"label": "イベント API",
+		"label": "Events",
 		"items": [
 			"ja-jp/bolt-python/concepts/message-listening",
 			"ja-jp/bolt-python/concepts/event-listening"
@@ -26,7 +25,7 @@
 	},
 	{
 		"type": "category",
-		"label": "インタラクティビティ & ショートカット",
+		"label": "App UI & Interactivity",
 		"items": [
 			"ja-jp/bolt-python/concepts/acknowledge",
 			"ja-jp/bolt-python/concepts/shortcuts",
@@ -39,18 +38,9 @@
 			"ja-jp/bolt-python/concepts/app-home"
 		]
 	},
-	"ja-jp/bolt-python/concepts/ai-apps",
 	{
 		"type": "category",
-		"label": "Custom Steps",
-		"items": [
-			"ja-jp/bolt-python/concepts/custom-steps",
-			"ja-jp/bolt-python/concepts/custom-steps-dynamic-options"
-		]
-	},
-	{
-		"type": "category",
-		"label": "App の設定",
+		"label": "App Configuration",
 		"items": [
 			"ja-jp/bolt-python/concepts/socket-mode",
 			"ja-jp/bolt-python/concepts/errors",
@@ -60,7 +50,7 @@
 	},
 	{
 		"type": "category",
-		"label": "ミドルウェア & コンテキスト",
+		"label": "Middleware & Context",
 		"items": [
 			"ja-jp/bolt-python/concepts/global-middleware",
 			"ja-jp/bolt-python/concepts/listener-middleware",
@@ -70,7 +60,7 @@
 	"ja-jp/bolt-python/concepts/lazy-listeners",
 	{
 		"type": "category",
-		"label": "アダプター",
+		"label": "Adaptors",
 		"items": [
 			"ja-jp/bolt-python/concepts/adapters",
 			"ja-jp/bolt-python/concepts/custom-adapters"
@@ -78,7 +68,7 @@
 	},
 	{
 		"type": "category",
-		"label": "認可 & セキュリティ",
+		"label": "Authorization & Security",
 		"items": [
 			"ja-jp/bolt-python/concepts/authenticating-oauth",
 			"ja-jp/bolt-python/concepts/authorization",
@@ -87,42 +77,7 @@
 	},
 	{
 		"type": "category",
-		"label": "レガシー（非推奨）",
+		"label": "Legacy",
 		"items": ["ja-jp/bolt-python/legacy/steps-from-apps"]
-	},
-	{ "type": "html", "value": "<hr>" },
-	{
-		"type": "category",
-		"label": "チュートリアル",
-		"items": [
-			"ja-jp/bolt-python/tutorial/ai-chatbot/ai-chatbot",
-			"ja-jp/bolt-python/tutorial/custom-steps",
-			"ja-jp/bolt-python/tutorial/custom-steps-for-jira/custom-steps-for-jira",
-			"ja-jp/bolt-python/tutorial/custom-steps-workflow-builder-new/custom-steps-workflow-builder-new",
-			"ja-jp/bolt-python/tutorial/custom-steps-workflow-builder-existing/custom-steps-workflow-builder-existing",
-			"ja-jp/bolt-python/tutorial/modals/modals"
-		]
-	},
-	{ "type": "html", "value": "<hr>" },
-	{
-		"type": "link",
-		"label": "リファレンス",
-		"href": "https://docs.slack.dev/ja-jp/bolt-python/reference/index.html"
-	},
-	{ "type": "html", "value": "<hr>" },
-	{
-		"type": "link",
-		"label": "リリースノート",
-		"href": "https://github.com/slackapi/ja-jp/bolt-python/releases"
-	},
-	{
-		"type": "link",
-		"label": "Code on GitHub",
-		"href": "https://github.com/SlackAPI/bolt-python"
-	},
-	{
-		"type": "link",
-		"label": "貢献",
-		"href": "https://github.com/SlackAPI/ja-jp/bolt-python/blob/main/.github/contributing.md"
 	}
 ]

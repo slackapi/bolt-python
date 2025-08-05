@@ -1,7 +1,7 @@
 ---
 title: ロギング
 lang: ja-jp
-slug: /bolt-python/concepts/logging
+slug: /ja-jp/bolt-python/concepts/logging
 ---
 
 デフォルトでは、アプリからのログ情報は、既定の出力先に出力されます。`logging` モジュールをインポートすれば、`basicConfig()` の `level` パラメーターでrootのログレベルを変更することができます。指定できるログレベルは、重要度の低い方から `debug`、`info`、`warning`、`error`、および `critical` です。 

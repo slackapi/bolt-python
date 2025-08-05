@@ -1,7 +1,7 @@
 ---
 title: 認可（Authorization）
 lang: ja-jp
-slug: /bolt-python/concepts/authorization
+slug: /ja-jp/bolt-python/concepts/authorization
 ---
 
 認可（Authorization）は、Slack からの受信リクエストを処理するにあたって、どのようなSlack

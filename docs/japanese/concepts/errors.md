@@ -1,7 +1,7 @@
 ---
 title: エラーの処理
 lang: ja-jp
-slug: /bolt-python/concepts/errors
+slug: /ja-jp/bolt-python/concepts/errors
 ---
 
 リスナー内でエラーが発生した場合に try/except ブロックを使用して直接エラーを処理することができます。アプリに関連するエラーは、`BoltError` 型です。Slack API の呼び出しに関連するエラーは、`SlackApiError` 型となります。

@@ -1,7 +1,7 @@
 ---
 title: リスナーミドルウェア
 lang: ja-jp
-slug: /bolt-python/concepts/listener-middleware
+slug: /ja-jp/bolt-python/concepts/listener-middleware
 ---
 
 リスナーミドルウェアは、それを渡したリスナーでのみ実行されるミドルウェアです。リスナーには、`middleware` パラメーターを使ってミドルウェア関数をいくつでも渡すことができます。このパラメーターには、1 つまたは複数のミドルウェア関数からなるリストを指定します。

@@ -1,7 +1,7 @@
 ---
 title: カスタムのアダプター
 lang: ja-jp
-slug: /bolt-python/concepts/custom-adapters
+slug: /ja-jp/bolt-python/concepts/custom-adapters
 ---
 
 [アダプター](/bolt-python/concepts/adapters)はフレキシブルで、あなたが使用したいフレームワークに合わせた調整も可能です。アダプターでは、次の 2 つの要素が必須となっています。
