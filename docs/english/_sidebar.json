@@ -109,6 +109,7 @@
 		"label": "Reference",
 		"href": "https://docs.slack.dev/bolt-python/reference/index.html"
 	},
+	{ "type": "html", "value": "<hr>" },
 	{
 		"type": "category",
 		"label": "日本語 (日本)",
