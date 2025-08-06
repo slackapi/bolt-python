@@ -151,7 +151,7 @@ To test this, leave the channel you just invited Bolty to and rejoin it. This wi
 
 ![Channel summary](7.png)
 
-The central part of this functionality is shown in the following code snippet. Note the use of the [`user_context`](/deno-slack-sdk/reference/slack-types#usercontext) object, a Slack type that represents the user who is interacting with our workflow, as well as the `history` of the channel that will be summarized, which includes the ten most recent messages.
+The central part of this functionality is shown in the following code snippet. Note the use of the [`user_context`](/tools/deno-slack-sdk/reference/slack-types#usercontext) object, a Slack type that represents the user who is interacting with our workflow, as well as the `history` of the channel that will be summarized, which includes the ten most recent messages.
 
 ```python
 from ai.providers import get_provider_response

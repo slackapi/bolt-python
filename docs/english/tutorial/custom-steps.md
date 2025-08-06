@@ -9,7 +9,7 @@ If you don't have a paid workspace for development, you can join the [Developer 
 
 With custom steps for Bolt apps, your app can create and process workflow steps that users later add in Workflow Builder. This guide goes through how to build a custom step for your app using the [app settings](https://api.slack.com/apps). 
 
-If you're looking to build a custom step using the Deno Slack SDK, check out our guide on [creating a custom step for Workflow Builder with the Deno Slack SDK](/deno-slack-sdk/tutorials/workflow-builder-custom-step/).
+If you're looking to build a custom step using the Deno Slack SDK, check out our guide on [creating a custom step for Workflow Builder with the Deno Slack SDK](/tools/deno-slack-sdk/tutorials/workflow-builder-custom-step/).
 
 You can also take a look at the template for the [Bolt for Python custom workflow step](https://github.com/slack-samples/bolt-python-custom-step-template) on GitHub.
 
@@ -255,7 +255,7 @@ When you're ready to deploy your steps for wider use, you'll need to decide *whe
 
 ### Control step access {#access}
 
-You can choose who has access to your custom steps. To define this, refer to the [custom function access](/deno-slack-sdk/guides/controlling-access-to-custom-functions) page.
+You can choose who has access to your custom steps. To define this, refer to the [custom function access](/tools/deno-slack-sdk/guides/controlling-access-to-custom-functions) page.
 
 ### Distribution {#distribution}
 
