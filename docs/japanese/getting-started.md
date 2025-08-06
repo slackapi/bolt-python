@@ -156,7 +156,7 @@ import TabItem from '@theme/TabItem';
 
 2. リクエスト URL を追加します。 Slack は、イベントに対応する HTTP POST リクエストをこの [リクエスト URL](/apis/events-api/#subscribing) に送信します。 Bolt は、`/slack/events` パスを使用して、すべての受信リクエスト (ショートカット、イベント、対話性ペイロードなど) をリッスンします。アプリ構成内でリクエスト URL を構成する場合は、`/slack/events` を追加します。 「https://あなたのドメイン/slack/events」。 💡 Bolt アプリが実行されている限り、URL は検証されるはずです。
 
-:::tip 
+:::tip
 
 ローカル開発の場合、ngrok などのプロキシ サービスを使用してパブリック URL を作成し、リクエストを開発環境にトンネリングできます。このトンネルの作成方法については、[ngrok のスタート ガイド](https://ngrok.com/docs#getting-started-expose) を参照してください。アプリをホスティングする際には、Slack 開発者がアプリをホストするために使用する最も一般的なホスティング プロバイダーを [API サイト](/app-management/hosting-slack-apps) に集めました。
 

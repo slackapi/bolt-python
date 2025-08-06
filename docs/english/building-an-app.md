@@ -267,9 +267,9 @@ With Socket Mode on, basic interactivity is enabled by default, so no further ac
 
 Similar to events, you'll need to specify a URL for Slack to send the action (such as _user clicked a button_). Back on your app configuration page, click on **Interactivity & Shortcuts** on the left side. You'll see that there's another **Request URL** box.
 
-:::tip 
+:::tip[By default, Bolt is configured to use the same endpoint for interactive components that it uses for events, so use the same request URL as above (for example, `https://8e8ec2d7.ngrok.io/slack/events`).] 
 
-By default, Bolt is configured to use the same endpoint for interactive components that it uses for events, so use the same request URL as above (for example, `https://8e8ec2d7.ngrok.io/slack/events`). Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up to handle interactivity!
+Press the **Save Changes** button in the lower right hand corner, and that's it. Your app is set up to handle interactivity!
 
 :::
 
