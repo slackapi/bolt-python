@@ -1,5 +1,4 @@
 ---
-title: Building an App with Bolt for Python
 sidebar_label: Building an App
 ---
 

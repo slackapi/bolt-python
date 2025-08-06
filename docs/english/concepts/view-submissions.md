@@ -1,8 +1,4 @@
----
-title: Listening to views
-lang: en
-slug: /bolt-python/concepts/view_submissions
----
+# Listening to views
 
 If a [view payload](/reference/interaction-payloads/view-interactions-payload/#view_submission) contains any input blocks, you must listen to `view_submission` requests to receive their values. To listen to `view_submission` requests, you can use the built-in `view()` method. `view()` requires a `callback_id` of type `str` or `re.Pattern`.
 

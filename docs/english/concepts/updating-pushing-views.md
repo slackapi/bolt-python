@@ -1,8 +1,4 @@
----
-title: Updating & pushing views
-lang: en
-slug: /bolt-python/concepts/updating-pushing-views
----
+# Updating & pushing views
 
 Modals contain a stack of views. When you call [`views_open`](https://api./reference/methods/views.open/slack.com/methods/views.open), you add the root view to the modal. After the initial call, you can dynamically update a view by calling [`views_update`](/reference/methods/views.update/), or stack a new view on top of the root view by calling [`views_push`](/reference/methods/views.push/)
 

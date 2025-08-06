@@ -1,9 +1,8 @@
 ---
-title: Quickstart guide with Bolt for Python
 sidebar_label: Quickstart
 ---
 
-# Getting started with Bolt for Python
+# Quickstart guide with Bolt for Python
 
 This quickstart guide aims to help you get a Slack app using Bolt for Python up and running as soon as possible!
 

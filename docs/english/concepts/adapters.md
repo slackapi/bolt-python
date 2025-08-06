@@ -1,8 +1,4 @@
----
-title: Adapters
-lang: en
-slug: /bolt-python/concepts/adapters
----
+# Adapters
 
 Adapters are responsible for handling and parsing incoming requests from Slack to conform to [`BoltRequest`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/request/request.py), then dispatching those requests to your Bolt app.
 

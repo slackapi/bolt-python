@@ -1,8 +1,4 @@
----
-title: Acknowledging requests
-lang: en
-slug: /bolt-python/concepts/acknowledge
----
+# Acknowledging requests
 
 Actions, commands, shortcuts, options requests, and view submissions must **always** be acknowledged using the `ack()` function. This lets Slack know that the request was received so that it may update the Slack user interface accordingly.
 

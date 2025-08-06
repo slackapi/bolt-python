@@ -1,9 +1,4 @@
----
-title: Listening to messages
-lang: en
-slug: /bolt-python/concepts/message-listening
----
-
+# Listening to messages
 To listen to messages that [your app has access to receive](/messaging/retrieving-messages), you can use the `message()` method which filters out events that aren't of type `message`.
 
 `message()` accepts an argument of type `str` or `re.Pattern` object that filters out any messages that don't match the pattern.

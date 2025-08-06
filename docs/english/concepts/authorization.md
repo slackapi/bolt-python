@@ -1,8 +1,4 @@
----
-title: Authorization
-lang: en
-slug: /bolt-python/concepts/authorization
----
+# Authorization
 
 Authorization is the process of determining which Slack credentials should be available while processing an incoming Slack request.
 

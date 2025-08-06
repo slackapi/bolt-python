@@ -1,8 +1,4 @@
----
-title: Using Socket Mode
-lang: en
-slug: /bolt-python/concepts/socket-mode
----
+# Using Socket Mode
 
 With the introduction of [Socket Mode](/apis/events-api/using-socket-mode), Bolt for Python introduced support in version `1.2.0`. With Socket Mode, instead of creating a server with endpoints that Slack sends payloads too, the app will instead connect to Slack via a WebSocket connection and receive data from Slack over the socket connection. Make sure to enable Socket Mode in your app configuration settings. 
 

@@ -1,4 +1,3 @@
-
 # Modals
 
 If you're learning about Slack apps, modals, or slash commands for the first time, you've come to the right place! In this tutorial, we'll take a look at setting up your very own server using GitHub Codespaces, then using that server to run your Slack app built with the [**Bolt for Python framework**](https://github.com/SlackAPI/bolt-python).

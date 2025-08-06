@@ -1,8 +1,4 @@
----
-title: Handling errors
-lang: en
-slug: /bolt-python/concepts/errors
----
+#  Handling errors
 
 If an error occurs in a listener, you can handle it directly using a try/except block. Errors associated with your app will be of type `BoltError`. Errors associated with calling Slack APIs will be of type `SlackApiError`.
 

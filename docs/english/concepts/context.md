@@ -1,8 +1,4 @@
----
-title: Adding context
-lang: en
-slug: /bolt-python/concepts/context
----
+# Adding context
 
 All listeners have access to a `context` dictionary, which can be used to enrich requests with additional information. Bolt automatically attaches information that is included in the incoming request, like `user_id`, `team_id`, `channel_id`, and `enterprise_id`.
 
