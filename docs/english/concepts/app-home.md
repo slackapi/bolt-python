@@ -1,6 +1,6 @@
 # Publishing views to App Home
 
-[Home tabs](/surfaces/app-home) are customizable surfaces accessible via the sidebar and search that allow apps to display views on a per-user basis. After enabling App Home within your app configuration, home tabs can be published and updated by passing a `user_id` and [view payload](/reference/interaction-payloads/view-interactions-payload/#view_submission) to the [`views.publish`](/reference/methods/views.publis) method.
+[Home tabs](/surfaces/app-home) are customizable surfaces accessible via the sidebar and search that allow apps to display views on a per-user basis. After enabling App Home within your app configuration, home tabs can be published and updated by passing a `user_id` and [view payload](/reference/interaction-payloads/view-interactions-payload/#view_submission) to the [`views.publish`](/reference/methods/views.publish) method.
 
 You can subscribe to the [`app_home_opened`](/reference/events/app_home_opened) event to listen for when users open your App Home.
 

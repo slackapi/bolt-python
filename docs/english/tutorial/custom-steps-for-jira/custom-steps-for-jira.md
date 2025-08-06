@@ -169,4 +169,4 @@ Congratulations! You've successfully customized your workspace with custom steps
 
 * To learn more about Bolt for Python, refer to the [getting started](/tools/bolt-python/getting-started) documentation.
 * For more details about creating workflow steps using the Bolt SDK, refer to the [workflow steps for Bolt](/workflows/workflow-steps) guide.
-* For information about custom steps dynamic options, refer to [custom steps dynamic options in Workflow Builder](/custom-steps-dynamic-options).
+* For information about custom steps dynamic options, refer to [custom steps dynamic options in Workflow Builder](/tools/bolt-python/concepts/custom-steps-dynamic-options).
