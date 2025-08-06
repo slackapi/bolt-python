@@ -10,11 +10,11 @@
     <br>
     <a href="https://pypi.org/project/slack-bolt/">
         <img alt="Python Versions" src="https://img.shields.io/pypi/pyversions/slack-bolt.svg"></a>
-    <a href="https://tools.slack.dev/bolt-python/">
+    <a href="https://docs.slack.dev/tools/bolt-python/">
         <img alt="Documentation" src="https://img.shields.io/badge/dev-docs-yellow"></a>
 </p>
 
-A Python framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://tools.slack.dev/bolt-python/getting-started) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt. The Python module documents are available [here](https://tools.slack.dev/bolt-python/reference/).
+A Python framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://docs.slack.dev/tools/bolt-python/getting-started) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt. The Python module documents are available [here](https://docs.slack.dev/tools/bolt-python/reference/).
 
 ## Setup
 
