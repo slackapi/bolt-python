@@ -56,7 +56,7 @@ def handle_view_closed(ack, body, logger):
     logger.info(body)
 ```
 
-指定可能な引数の一覧は<a href="https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。
+指定可能な引数の一覧は<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。
 
 ```python
 # view_submission リクエストを処理

@@ -4,7 +4,7 @@ You can listen to [any Events API event](/reference/events) using the `event()` 
 
 The `event()` method requires an `eventType` of type `str`.
 
-Refer to [the module document](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
 # When a user joins the workspace, send a message in a predefined channel asking them to introduce themselves
 @app.event("team_join")

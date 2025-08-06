@@ -4,7 +4,7 @@
 
 [`app_home_opened`](/reference/events/app_home_opened) イベントをサブスクライブすると、ユーザーが App Home を開く操作をリッスンできます。
 
-指定可能な引数の一覧は [モジュールドキュメント](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html)を参考にしてください。
+指定可能な引数の一覧は [モジュールドキュメント](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html)を参考にしてください。
 
 ```python
 @app.event("app_home_opened")

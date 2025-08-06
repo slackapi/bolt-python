@@ -10,7 +10,7 @@ We recommend calling `ack()` right away before initiating any time-consuming pro
 
 :::
 
-Refer to [the module document](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
 # Example of responding to an external_select options request
 @app.options("menu_selection")

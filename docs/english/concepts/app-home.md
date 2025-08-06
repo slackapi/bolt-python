@@ -4,7 +4,7 @@
 
 You can subscribe to the [`app_home_opened`](/reference/events/app_home_opened) event to listen for when users open your App Home.
 
-Refer to [the module document](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
 @app.event("app_home_opened")
 def update_home_tab(client, event, logger):

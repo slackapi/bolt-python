@@ -24,10 +24,6 @@ The Agents & AI Apps feature comprises a unique messaging experience for Slack. 
 
 That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
 
-:::info
-You _could_ go it alone and [listen](/tools/bolt-python/concepts/event-listening) for the `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im` events (see implementation details below) in order to implement the AI features in your app. That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
-:::
-
 ## The `Assistant` class instance {#assistant-class}
 
 The `Assistant` class can be used to handle the incoming events expected from a user interacting with an app in Slack that has the Agents & AI Apps feature enabled. A typical flow would look like:
@@ -101,15 +97,16 @@ While the `assistant_thread_started` and `assistant_thread_context_changed` even
 
 If you do provide your own `threadContextStore` property, it must feature `get` and `save` methods.
 
-:::tip[Refer to the [module document](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.]
+:::tip[Refer to the [module document](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.]
 :::
 
 ## Handling a new thread {#handling-a-new-thread}
 
 When the user opens a new thread with your AI-enabled app, the [`assistant_thread_started`](/reference/events/assistant_thread_started) event will be sent to your app.
 
-:::tip
-When a user opens an app thread while in a channel, the channel info is stored as the thread's `AssistantThreadContext` data. You can grab that info by using the `get_thread_context` utility, as subsequent user message event payloads won't include the channel info.
+:::tip[When a user opens an app thread while in a channel, the channel info is stored as the thread's `AssistantThreadContext` data.] 
+
+You can grab that info by using the `get_thread_context` utility, as subsequent user message event payloads won't include the channel info.
 :::
 
 ### Block Kit interactions in the app thread {#block-kit-interactions}
@@ -260,9 +257,9 @@ When the user messages your app, the [`message.im`](/reference/events/message.im
 Messages sent to the app do not contain a [subtype](/reference/events/message#subtypes) and must be deduced based on their shape and any provided [message metadata](/messaging/message-metadata/).
 
 There are three utilities that are particularly useful in curating the user experience:
-* [`say`](https://docs.slack.dev/bolt-python/reference/#slack_bolt.Say)
-* [`setTitle`](https://docs.slack.dev/bolt-python/reference/#slack_bolt.SetTitle)
-* [`setStatus`](https://docs.slack.dev/bolt-python/reference/#slack_bolt.SetStatus)
+* [`say`](https://docs.slack.dev/tools/bolt-python/reference/#slack_bolt.Say)
+* [`setTitle`](https://docs.slack.dev/tools/bolt-python/reference/#slack_bolt.SetTitle)
+* [`setStatus`](https://docs.slack.dev/tools/bolt-python/reference/#slack_bolt.SetStatus)
 
 ```python
 ...

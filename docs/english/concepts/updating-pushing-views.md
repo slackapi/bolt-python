@@ -12,7 +12,7 @@ To push a new view onto the view stack, you can use the built-in client to call 
 
 Learn more about updating and pushing views in our [API documentation](/surfaces/modals)
 
-Refer to [the module document](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
 # Listen for a button invocation with action_id `button_abc` (assume it's inside of a modal)
 @app.action("button_abc")

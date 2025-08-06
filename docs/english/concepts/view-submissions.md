@@ -58,7 +58,7 @@ def handle_view_closed(ack, body, logger):
     logger.info(body)
 ```
 
-Refer to [the module document](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
+Refer to [the module document](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
 ```python
 # Handle a view_submission request
 @app.view("view_1")

@@ -214,7 +214,7 @@ A new `auto_acknowledge` flag allows you more granular control over whether spec
 
 #### Example {#bolt-py}
 
-In [Bolt for Python](https://docs.slack.dev/bolt-python/), you can set `auto_acknowledge=False` on a specific function decorator. This allows you to manually control when the `ack()` event acknowledgement helper function is executed. It flips Bolt to synchronous `function_executed` event handling mode for the specific handler. 
+In [Bolt for Python](https://docs.slack.dev/tools/bolt-python/), you can set `auto_acknowledge=False` on a specific function decorator. This allows you to manually control when the `ack()` event acknowledgement helper function is executed. It flips Bolt to synchronous `function_executed` event handling mode for the specific handler. 
 
 ```py
 @app.function("get-projects", auto_acknowledge=False)

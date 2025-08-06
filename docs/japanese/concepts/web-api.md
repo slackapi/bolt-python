@@ -4,7 +4,7 @@
 
 Bolt の初期化に使用するトークンは `context` オブジェクトに設定されます。このトークンは、多くの Web API メソッドを呼び出す際に必要となります。
 
-<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
 @app.message("wake me up")
 def say_hello(client, message):

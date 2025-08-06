@@ -4,7 +4,7 @@ You can call [any Web API method](/reference/methods) using the `WebClient` prov
 
 The token used to initialize Bolt can be found in the `context` object, which is required to call most Web API methods.
 
-:::info[Refer to [the module document](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.]
+:::info[Refer to [the module document](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.]
 
 :::
 
