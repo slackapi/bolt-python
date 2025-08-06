@@ -4,7 +4,7 @@ lang: en
 slug: /bolt-python/concepts/options
 ---
 
-The `options()` method listens for incoming option request payloads from Slack. [Similar to `action()`](/bolt-python/concepts/actions),
+The `options()` method listens for incoming option request payloads from Slack. [Similar to `action()`](/tools/bolt-python/concepts/actions),
 an `action_id` or constraints object is required. In order to load external data into your select menus, you must provide an options load URL in your app configuration, appended with `/slack/events`.
 
 While it's recommended to use `action_id` for `external_select` menus, dialogs do not support Block Kit so you'll have to use the constraints object to filter on a `callback_id`.

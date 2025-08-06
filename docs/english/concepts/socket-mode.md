@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
 To use the asyncio-based adapters such as aiohttp, your whole app needs to be compatible with asyncio's async/await programming model. `AsyncSocketModeHandler` is available for running `AsyncApp` and its async middleware and listeners. 
 
-To learn how to use `AsyncApp`, checkout the [using Async](/bolt-python/concepts/async) document and relevant [examples](https://github.com/slackapi/bolt-python/tree/main/examples).
+To learn how to use `AsyncApp`, checkout the [using Async](/tools/bolt-python/concepts/async) document and relevant [examples](https://github.com/slackapi/bolt-python/tree/main/examples).
 
 ```python
 from slack_bolt.app.async_app import AsyncApp

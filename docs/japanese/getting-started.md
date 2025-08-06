@@ -458,6 +458,6 @@ if __name__ == "__main__":
 ここまでで基本的なアプリをセットアップして実行することはできたので、次は自分だけの Bolt アプリを作る方法について調べてみてください。参考になりそうなリソースをいくつかご紹介します。
 
 * 基本的な概念について読んでみてください。Bolt アプリがアクセスできるさまざまメソッドや機能について知ることができます。
-* [`app.event()` メソッド](/bolt-python/concepts/event-listening)でボットがリッスンできるイベントをほかにも試してみましょう。すべてのイベントの一覧は [API サイト](/reference/events)で確認できます。
-* Bolt では、アプリにアタッチされたクライアントから [Web API メソッドを呼び出す](/bolt-python/concepts/web-api)ことができます。API サイトに [220 以上のメソッド](/reference/methods)を一覧しています。
+* [`app.event()` メソッド](/tools/bolt-python/concepts/event-listening)でボットがリッスンできるイベントをほかにも試してみましょう。すべてのイベントの一覧は [API サイト](/reference/events)で確認できます。
+* Bolt では、アプリにアタッチされたクライアントから [Web API メソッドを呼び出す](/tools/bolt-python/concepts/web-api)ことができます。API サイトに [220 以上のメソッド](/reference/methods)を一覧しています。
 * [API サイト](/authentication/tokens)でほかのタイプのトークンを確認してみてください。アプリで実行したいアクションによって、異なるトークンが必要になる場合があります。

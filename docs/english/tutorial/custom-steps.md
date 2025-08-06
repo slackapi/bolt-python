@@ -268,5 +268,5 @@ Apps containing custom steps cannot be distributed publicly or submitted to the 
 
 ## Related tutorials {#tutorials}
 
-* [Custom steps for Workflow Builder (new app)](/bolt-python/tutorial/custom-steps-workflow-builder-new)
-* [Custom steps for Workflow Builder (existing app)](/bolt-python/tutorial/custom-steps-workflow-builder-existing/)
+* [Custom steps for Workflow Builder (new app)](/tools/bolt-python/tutorial/custom-steps-workflow-builder-new)
+* [Custom steps for Workflow Builder (existing app)](/tools/bolt-python/tutorial/custom-steps-workflow-builder-existing/)

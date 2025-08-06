@@ -1,6 +1,6 @@
 # カスタムのアダプター
 
-[アダプター](/bolt-python/concepts/adapters)はフレキシブルで、あなたが使用したいフレームワークに合わせた調整も可能です。アダプターでは、次の 2 つの要素が必須となっています。
+[アダプター](/tools/bolt-python/concepts/adapters)はフレキシブルで、あなたが使用したいフレームワークに合わせた調整も可能です。アダプターでは、次の 2 つの要素が必須となっています。
 
 - `__init__(app:App)` : コンストラクター。Bolt の `App` のインスタンスを受け取り、保持します。
 - `handle(req:Request)` : Slack からの受信リクエストを受け取り、解析を行う関数。通常は `handle()` という名前です。リクエストを [`BoltRequest`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/request/request.py) のインスタンスに合った形にして、保持している Bolt アプリに引き渡します。

@@ -1,6 +1,6 @@
 # OAuth を使った認証
 
-Slack アプリを複数のワークスペースにインストールできるようにするためには、OAuth フローを実装した上で、アクセストークンなどのインストールに関する情報をセキュアな方法で保存する必要があります。アプリを初期化する際に `client_id`、`client_secret`、`scopes`、`installation_store`、`state_store` を指定することで、OAuth のエンドポイントのルート情報や stateパラメーターの検証をBolt for Python にハンドリングさせることができます。カスタムのアダプターを実装する場合は、SDK が提供する組み込みの[OAuth ライブラリ](/python-slack-sdk/oauth/)を利用するのが便利です。これは Slack が開発したモジュールで、Bolt for Python 内部でも利用しています。
+Slack アプリを複数のワークスペースにインストールできるようにするためには、OAuth フローを実装した上で、アクセストークンなどのインストールに関する情報をセキュアな方法で保存する必要があります。アプリを初期化する際に `client_id`、`client_secret`、`scopes`、`installation_store`、`state_store` を指定することで、OAuth のエンドポイントのルート情報や stateパラメーターの検証をBolt for Python にハンドリングさせることができます。カスタムのアダプターを実装する場合は、SDK が提供する組み込みの[OAuth ライブラリ](/tools/python-slack-sdk/oauth/)を利用するのが便利です。これは Slack が開発したモジュールで、Bolt for Python 内部でも利用しています。
 
 Bolt for Python によって `slack/oauth_redirect` という**リダイレクト URL** が生成されます。Slack はアプリのインストールフローを完了させたユーザーをこの URL にリダイレクトします。この**リダイレクト URL** は、アプリの設定の「**OAuth and Permissions**」であらかじめ追加しておく必要があります。この URL は、後ほど説明するように `OAuthSettings` というコンストラクタの引数で指定することもできます。
 

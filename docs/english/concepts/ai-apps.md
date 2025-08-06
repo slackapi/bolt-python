@@ -29,7 +29,7 @@ The Agents & AI Apps feature comprises a unique messaging experience for Slack. 
 That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
 
 :::info
-You _could_ go it alone and [listen](/bolt-python/concepts/event-listening) for the `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im` events (see implementation details below) in order to implement the AI features in your app. That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
+You _could_ go it alone and [listen](/tools/bolt-python/concepts/event-listening) for the `assistant_thread_started`, `assistant_thread_context_changed`, and `message.im` events (see implementation details below) in order to implement the AI features in your app. That being said, using the `Assistant` class will streamline the process. And we already wrote this nice guide for you!
 :::
 
 ## The `Assistant` class instance {#assistant-class}

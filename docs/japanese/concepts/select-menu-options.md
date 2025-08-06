@@ -1,6 +1,6 @@
 # オプションのリスニングと応答
 
-`options()` メソッドは、Slack からのオプション（セレクトメニュー内の動的な選択肢）をリクエストするペイロードをリッスンします。 [`action()` と同様に](/bolt-python/concepts/actions)、文字列型の `action_id` または制約付きオブジェクトが必要です。
+`options()` メソッドは、Slack からのオプション（セレクトメニュー内の動的な選択肢）をリクエストするペイロードをリッスンします。 [`action()` と同様に](/tools/bolt-python/concepts/actions)、文字列型の `action_id` または制約付きオブジェクトが必要です。
 
 外部データソースを使って選択メニューをロードするためには、末部に `/slack/events` が付加された URL を Options Load URL として予め設定しておく必要があります。
 

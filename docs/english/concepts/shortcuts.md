@@ -10,7 +10,7 @@ Shortcuts are invokable entry points to apps. Global shortcuts are available fro
 
 Shortcuts must be acknowledged with `ack()` to inform Slack that your app has received the request.
 
-Shortcuts include a `trigger_id` which an app can use to [open a modal](/bolt-python/concepts/opening-modals) that confirms the action the user is taking.
+Shortcuts include a `trigger_id` which an app can use to [open a modal](/tools/bolt-python/concepts/opening-modals) that confirms the action the user is taking.
 
 When setting up shortcuts within your app configuration, as with other URLs, you'll append `/slack/events` to your request URL.
 

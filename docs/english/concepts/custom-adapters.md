@@ -4,7 +4,7 @@ lang: en
 slug: /bolt-python/concepts/custom-adapters
 ---
 
-[Adapters](/bolt-python/concepts/adapters) are flexible and can be adjusted based on the framework you prefer. There are two necessary components of adapters:
+[Adapters](/tools/bolt-python/concepts/adapters) are flexible and can be adjusted based on the framework you prefer. There are two necessary components of adapters:
 
 - `__init__(app: App)`: Constructor that accepts and stores an instance of the Bolt `App`.
 - `handle(req: Request)`: Function (typically named `handle()`) that receives incoming Slack requests, parses them to conform to an instance of [`BoltRequest`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/request/request.py), then dispatches them to the stored Bolt app.

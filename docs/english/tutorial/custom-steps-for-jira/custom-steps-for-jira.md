@@ -167,6 +167,6 @@ When finished, you can click the **Disconnect Account** button in the home tab t
 
 Congratulations! You've successfully customized your workspace with custom steps in Workflow Builder. Check out these links to take the next steps in your journey.
 
-* To learn more about Bolt for Python, refer to the [getting started](/bolt-python/getting-started) documentation.
+* To learn more about Bolt for Python, refer to the [getting started](/tools/bolt-python/getting-started) documentation.
 * For more details about creating workflow steps using the Bolt SDK, refer to the [workflow steps for Bolt](/workflows/workflow-steps) guide.
 * For information about custom steps dynamic options, refer to [custom steps dynamic options in Workflow Builder](/custom-steps-dynamic-options).

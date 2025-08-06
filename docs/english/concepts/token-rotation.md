@@ -8,6 +8,6 @@ Supported in Bolt for Python as of [v1.7.0](https://github.com/slackapi/bolt-pyt
 
 Instead of an access token representing an existing installation of your Slack app indefinitely, with token rotation enabled, access tokens expire. A refresh token acts as a long-lived way to refresh your access tokens.
 
-Bolt for Python supports and will handle token rotation automatically so long as the [built-in OAuth](/bolt-python/concepts/authenticating-oauth) functionality is used.
+Bolt for Python supports and will handle token rotation automatically so long as the [built-in OAuth](/tools/bolt-python/concepts/authenticating-oauth) functionality is used.
 
 For more information about token rotation, please see the [documentation](/authentication/using-token-rotation).

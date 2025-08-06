@@ -3,7 +3,7 @@
 認可（Authorization）は、Slack からの受信リクエストを処理するにあたって、どのようなSlack
 クレデンシャル (ボットトークンなど) を使用可能にするかを決定するプロセスです。
 
-単一のワークスペースにインストールされるアプリでは、`token` パラメーターを使って `App` のコンストラクターにボットトークンを渡すという、シンプルな方法が使えます。それに対して、複数のワークスペースにインストールされるアプリでは、次の 2 つの方法のいずれかを使用する必要があります。簡単なのは、組み込みの OAuth サポートを使用する方法です。OAuth サポートは、OAuth フロー用のURLのセットアップとstateの検証を行います。詳細は「[OAuth を使った認証](/bolt-python/concepts/authenticating-oauth)」セクションを参照してください。
+単一のワークスペースにインストールされるアプリでは、`token` パラメーターを使って `App` のコンストラクターにボットトークンを渡すという、シンプルな方法が使えます。それに対して、複数のワークスペースにインストールされるアプリでは、次の 2 つの方法のいずれかを使用する必要があります。簡単なのは、組み込みの OAuth サポートを使用する方法です。OAuth サポートは、OAuth フロー用のURLのセットアップとstateの検証を行います。詳細は「[OAuth を使った認証](/tools/bolt-python/concepts/authenticating-oauth)」セクションを参照してください。
 
 よりカスタマイズできる方法として、`App` をインスタンス化する関数に`authorize` パラメーターを指定する方法があります。`authorize` 関数から返される [`AuthorizeResult` のインスタンス](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/authorization/authorize_result.py)には、どのユーザーがどこで発生させたリクエストかを示す情報が含まれます。
 

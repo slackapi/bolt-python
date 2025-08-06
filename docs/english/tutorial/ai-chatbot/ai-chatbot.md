@@ -199,4 +199,4 @@ Congratulations! You've successfully integrated the power of AI into your worksp
 
 * To learn more about Bolt for Python, refer to the [Getting started](/getting-started) documentation.
 * For more details about creating workflow steps using the Bolt SDK, refer to the [workflow steps for Bolt](/workflows/workflow-steps) guide.
-* To use the Bolt for Python SDK to develop on the automations platform, refer to the [Create a workflow step for Workflow Builder: Bolt for Python](/bolt-python/tutorial/custom-steps-workflow-builder-new) tutorial.
+* To use the Bolt for Python SDK to develop on the automations platform, refer to the [Create a workflow step for Workflow Builder: Bolt for Python](/tools/bolt-python/tutorial/custom-steps-workflow-builder-new) tutorial.

@@ -4,6 +4,6 @@ Bolt for Python [v1.7.0](https://github.com/slackapi/bolt-python/releases/tag/v1
 
 既存の Slack アプリではアクセストークンが無期限に存在し続けるのに対して、トークンローテーションを有効にしたアプリではアクセストークンが失効するようになります。リフレッシュトークンを利用して、アクセストークンを長期間にわたって更新し続けることができます。
 
-[Bolt for Python の組み込みの OAuth 機能](/bolt-python/concepts/authenticating-oauth) を使用していれば、Bolt for Python が自動的にトークンローテーションの処理をハンドリングします。
+[Bolt for Python の組み込みの OAuth 機能](/tools/bolt-python/concepts/authenticating-oauth) を使用していれば、Bolt for Python が自動的にトークンローテーションの処理をハンドリングします。
 
 トークンローテーションに関する詳細は [API ドキュメント](/authentication/using-token-rotation)を参照してください。

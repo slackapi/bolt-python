@@ -10,7 +10,7 @@ Your app can listen and respond to user actions, like button clicks, and menu se
 
 Actions can be filtered on an `action_id` parameter of type `str` or `re.Pattern`. The `action_id` parameter acts as a unique identifier for interactive components on the Slack platform.
 
-You'll notice in all `action()` examples, `ack()` is used. It is required to call the `ack()` function within an action listener to acknowledge that the request was received from Slack. This is discussed in the [acknowledging requests guide](/bolt-python/concepts/acknowledge).
+You'll notice in all `action()` examples, `ack()` is used. It is required to call the `ack()` function within an action listener to acknowledge that the request was received from Slack. This is discussed in the [acknowledging requests guide](/tools/bolt-python/concepts/acknowledge).
 
 Refer to [the module document](https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
 

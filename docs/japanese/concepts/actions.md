@@ -6,7 +6,7 @@ Bolt アプリは `action` メソッドを用いて、ボタンのクリック�
 
 アクションは `str` 型または `re.Pattern` 型の `action_id` でフィルタリングできます。`action_id` は、Slack プラットフォーム上のインタラクティブコンポーネントを区別する一意の識別子として機能します。
 
-`action()` を使ったすべての例で `ack()` が使用されていることに注目してください。アクションのリスナー内では、Slack からのリクエストを受信したことを確認するために、`ack()` 関数を呼び出す必要があります。これについては、[リクエストの確認](/bolt-python/concepts/acknowledge)セクションで説明しています。
+`action()` を使ったすべての例で `ack()` が使用されていることに注目してください。アクションのリスナー内では、Slack からのリクエストを受信したことを確認するために、`ack()` 関数を呼び出す必要があります。これについては、[リクエストの確認](/tools/bolt-python/concepts/acknowledge)セクションで説明しています。
 
 <span>指定可能な引数の一覧は<a href="https://docs.slack.dev/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
 ```python
