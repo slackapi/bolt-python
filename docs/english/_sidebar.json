@@ -194,16 +194,16 @@
 	{
 		"type": "link",
 		"label": "Release notes",
-		"href": "https://github.com/slackapi/tools/bolt-python/releases"
+		"href": "https://github.com/slackapi/bolt-python/releases"
 	},
 	{
 		"type": "link",
 		"label": "Code on GitHub",
-		"href": "https://github.com/SlackAPI/tools/bolt-python"
+		"href": "https://github.com/SlackAPI/bolt-python"
 	},
 	{
 		"type": "link",
 		"label": "Contributors Guide",
-		"href": "https://github.com/SlackAPI/tools/bolt-python/blob/main/.github/contributing.md"
+		"href": "https://github.com/SlackAPI/bolt-python/blob/main/.github/contributing.md"
 	}
 ]
