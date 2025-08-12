@@ -160,7 +160,9 @@ class ThreadListenerRunner:
                     self._start_lazy_function(lazy_func, request)
 
             # await for the completion of ack() in the async listener execution
-            while ack.response is None and time.time() - starting_time <= 3:
+            print(str(starting_time))
+            while ack.response is None and time.time() - starting_time <= listener.acknowledgement_timeout:
+                print("we are sleeping")
                 time.sleep(0.01)
 
             if response is None and ack.response is None:

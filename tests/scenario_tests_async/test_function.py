@@ -3,6 +3,7 @@ import json
 import time
 
 import pytest
+from unittest.mock import AsyncMock, Mock
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 
@@ -55,6 +56,10 @@ class TestAsyncFunction:
     def build_request_from_body(self, message_body: dict) -> AsyncBoltRequest:
         timestamp, body = str(int(time.time())), json.dumps(message_body)
         return AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
+
+    def setup_time_mocks(self, *, monkeypatch: pytest.MonkeyPatch, time_mock: Mock, sleep_mock: AsyncMock):
+        monkeypatch.setattr(time, "time", time_mock)
+        monkeypatch.setattr(asyncio, "sleep", sleep_mock)
 
     @pytest.mark.asyncio
     async def test_mock_server_is_running(self):
@@ -130,18 +135,46 @@ class TestAsyncFunction:
         await assert_auth_test_count_async(self, 1)
 
     @pytest.mark.asyncio
-    async def test_auto_acknowledge_false_without_acknowledging(self, caplog):
+    async def test_auto_acknowledge_false_without_acknowledging(self, caplog, monkeypatch):
         app = AsyncApp(
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
         app.function("reverse", auto_acknowledge=False)(just_no_ack)
-
         request = self.build_request_from_body(function_body)
+        self.setup_time_mocks(
+            monkeypatch=monkeypatch,
+            time_mock=Mock(side_effect=[current_time for current_time in range(100)]),
+            sleep_mock=AsyncMock(),
+        )
         response = await app.async_dispatch(request)
         assert response.status == 404
         await assert_auth_test_count_async(self, 1)
         assert f"WARNING {just_no_ack.__name__} didn't call ack()" in caplog.text
+
+    @pytest.mark.asyncio
+    async def test_function_handler_timeout(self, monkeypatch):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.function("reverse", auto_acknowledge=False)(just_no_ack)
+        request = self.build_request_from_body(function_body)
+
+        sleep_mock = AsyncMock()
+        self.setup_time_mocks(
+            monkeypatch=monkeypatch,
+            time_mock=Mock(side_effect=[current_time for current_time in range(100)]),
+            sleep_mock=sleep_mock,
+        )
+
+        response = await app.async_dispatch(request)
+
+        assert response.status == 404
+        await assert_auth_test_count_async(self, 1)
+        assert (
+            sleep_mock.call_count == 5
+        ), f"Expected handler to time out after calling time.sleep 5 times, but it was called {sleep_mock.call_count} times"
 
 
 function_body = {

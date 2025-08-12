@@ -976,7 +976,7 @@ class AsyncApp:
             primary_matcher = builtin_matchers.function_executed(
                 callback_id=callback_id, base_logger=self._base_logger, asyncio=True
             )
-            return self._register_listener(functions, primary_matcher, matchers, middleware, auto_acknowledge)
+            return self._register_listener(functions, primary_matcher, matchers, middleware, auto_acknowledge, 5)
 
         return __call__
 
@@ -1456,6 +1456,7 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]],
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]],
         auto_acknowledgement: bool = False,
+        acknowledgement_timeout: int = 3,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         value_to_return = None
         if not isinstance(functions, list):
@@ -1491,6 +1492,7 @@ class AsyncApp:
                 matchers=listener_matchers,
                 middleware=listener_middleware,
                 auto_acknowledgement=auto_acknowledgement,
+                acknowledgement_timeout=acknowledgement_timeout,
                 base_logger=self._base_logger,
             )
         )
