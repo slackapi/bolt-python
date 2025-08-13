@@ -946,7 +946,9 @@ class App:
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.function_executed(callback_id=callback_id, base_logger=self._base_logger)
-            return self._register_listener(functions, primary_matcher, matchers, middleware, auto_acknowledge)
+            return self._register_listener(
+                functions, primary_matcher, matchers, middleware, auto_acknowledge, acknowledgement_timeout=5
+            )
 
         return __call__
 
@@ -1422,6 +1424,7 @@ class App:
         matchers: Optional[Sequence[Callable[..., bool]]],
         middleware: Optional[Sequence[Union[Callable, Middleware]]],
         auto_acknowledgement: bool = False,
+        acknowledgement_timeout: int = 3,
     ) -> Optional[Callable[..., Optional[BoltResponse]]]:
         value_to_return = None
         if not isinstance(functions, list):
@@ -1452,6 +1455,7 @@ class App:
                 matchers=listener_matchers,
                 middleware=listener_middleware,
                 auto_acknowledgement=auto_acknowledgement,
+                acknowledgement_timeout=acknowledgement_timeout,
                 base_logger=self._base_logger,
             )
         )
