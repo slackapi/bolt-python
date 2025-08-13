@@ -976,7 +976,9 @@ class AsyncApp:
             primary_matcher = builtin_matchers.function_executed(
                 callback_id=callback_id, base_logger=self._base_logger, asyncio=True
             )
-            return self._register_listener(functions, primary_matcher, matchers, middleware, auto_acknowledge, acknowledgement_timeout=5)
+            return self._register_listener(
+                functions, primary_matcher, matchers, middleware, auto_acknowledge, acknowledgement_timeout=5
+            )
 
         return __call__
 

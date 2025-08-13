@@ -17,8 +17,10 @@ from tests.mock_web_api_server import (
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
+
 async def fake_sleep(seconds):
     pass
+
 
 class TestAsyncFunction:
     signing_secret = "secret"
@@ -144,7 +146,7 @@ class TestAsyncFunction:
         )
         app.function("reverse", auto_acknowledge=False)(just_no_ack)
         request = self.build_request_from_body(function_body)
-        
+
         self.setup_time_mocks(
             monkeypatch=monkeypatch,
             time_mock=Mock(side_effect=[current_time for current_time in range(100)]),
