@@ -3,7 +3,7 @@ import json
 import time
 
 import pytest
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import Mock, MagicMock
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 
@@ -17,6 +17,8 @@ from tests.mock_web_api_server import (
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
+async def fake_sleep(seconds):
+    pass
 
 class TestAsyncFunction:
     signing_secret = "secret"
@@ -57,7 +59,7 @@ class TestAsyncFunction:
         timestamp, body = str(int(time.time())), json.dumps(message_body)
         return AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
-    def setup_time_mocks(self, *, monkeypatch: pytest.MonkeyPatch, time_mock: Mock, sleep_mock: AsyncMock):
+    def setup_time_mocks(self, *, monkeypatch: pytest.MonkeyPatch, time_mock: Mock, sleep_mock: MagicMock):
         monkeypatch.setattr(time, "time", time_mock)
         monkeypatch.setattr(asyncio, "sleep", sleep_mock)
 
@@ -142,11 +144,13 @@ class TestAsyncFunction:
         )
         app.function("reverse", auto_acknowledge=False)(just_no_ack)
         request = self.build_request_from_body(function_body)
+        
         self.setup_time_mocks(
             monkeypatch=monkeypatch,
             time_mock=Mock(side_effect=[current_time for current_time in range(100)]),
-            sleep_mock=AsyncMock(),
+            sleep_mock=MagicMock(side_effect=fake_sleep),
         )
+
         response = await app.async_dispatch(request)
         assert response.status == 404
         await assert_auth_test_count_async(self, 1)
@@ -161,7 +165,7 @@ class TestAsyncFunction:
         app.function("reverse", auto_acknowledge=False)(just_no_ack)
         request = self.build_request_from_body(function_body)
 
-        sleep_mock = AsyncMock()
+        sleep_mock = MagicMock(side_effect=fake_sleep)
         self.setup_time_mocks(
             monkeypatch=monkeypatch,
             time_mock=Mock(side_effect=[current_time for current_time in range(100)]),
