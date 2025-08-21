@@ -59,6 +59,7 @@ from slack_bolt.logger.messages import (
     info_default_oauth_settings_loaded,
     error_installation_store_required_for_builtin_listeners,
     warning_unhandled_by_global_middleware,
+    warning_ack_timeout_has_no_effect,
 )
 from slack_bolt.middleware import (
     Middleware,
@@ -912,6 +913,7 @@ class App:
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
         auto_acknowledge: bool = True,
+        acknowledgement_timeout: int = 3,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new Function listener.
         This method can be used as either a decorator or a method.
@@ -940,6 +942,10 @@ class App:
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         """
 
+        if auto_acknowledge is True:
+            if acknowledgement_timeout != 3:
+                self._framework_logger.warning(warning_ack_timeout_has_no_effect(callback_id, acknowledgement_timeout))
+
         matchers = list(matchers) if matchers else []
         middleware = list(middleware) if middleware else []
 
@@ -947,7 +953,7 @@ class App:
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.function_executed(callback_id=callback_id, base_logger=self._base_logger)
             return self._register_listener(
-                functions, primary_matcher, matchers, middleware, auto_acknowledge, acknowledgement_timeout=5
+                functions, primary_matcher, matchers, middleware, auto_acknowledge, acknowledgement_timeout
             )
 
         return __call__
