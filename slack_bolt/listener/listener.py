@@ -13,7 +13,7 @@ class Listener(metaclass=ABCMeta):
     ack_function: Callable[..., BoltResponse]
     lazy_functions: Sequence[Callable[..., None]]
     auto_acknowledgement: bool
-    acknowledgement_timeout: int = 3
+    ack_timeout: int = 3
 
     def matches(
         self,

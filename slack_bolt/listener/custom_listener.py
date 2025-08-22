@@ -18,7 +18,7 @@ class CustomListener(Listener):
     matchers: Sequence[ListenerMatcher]
     middleware: Sequence[Middleware]
     auto_acknowledgement: bool
-    acknowledgement_timeout: int = 3
+    ack_timeout: int = 3
     arg_names: MutableSequence[str]
     logger: Logger
 
@@ -31,7 +31,7 @@ class CustomListener(Listener):
         matchers: Sequence[ListenerMatcher],
         middleware: Sequence[Middleware],
         auto_acknowledgement: bool = False,
-        acknowledgement_timeout: int = 3,
+        ack_timeout: int = 3,
         base_logger: Optional[Logger] = None,
     ):
         self.app_name = app_name
@@ -40,7 +40,7 @@ class CustomListener(Listener):
         self.matchers = matchers
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
-        self.acknowledgement_timeout = acknowledgement_timeout
+        self.ack_timeout = ack_timeout
         self.arg_names = get_arg_names_of_callable(ack_function)
         self.logger = get_bolt_app_logger(app_name, self.ack_function, base_logger)
 

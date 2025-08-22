@@ -166,7 +166,7 @@ class TestAsyncFunction:
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.function("reverse", auto_acknowledge=False, acknowledgement_timeout=timeout)(just_no_ack)
+        app.function("reverse", auto_acknowledge=False, ack_timeout=timeout)(just_no_ack)
         request = self.build_request_from_body(function_body)
 
         sleep_mock = MagicMock(side_effect=fake_sleep)
@@ -193,7 +193,7 @@ class TestAsyncFunction:
         app.function("reverse")(just_no_ack)
         assert "WARNING" not in caplog.text
 
-        timeout_argument_name = "acknowledgement_timeout"
+        timeout_argument_name = "ack_timeout"
         kwargs = {timeout_argument_name: 5}
 
         callback_id = "reverse1"

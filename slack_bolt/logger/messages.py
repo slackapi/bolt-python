@@ -332,12 +332,9 @@ def warning_skip_uncommon_arg_name(arg_name: str) -> str:
     )
 
 
-def warning_ack_timeout_has_no_effect(identifier: Union[str, Pattern], acknowledgement_timeout: int) -> str:
+def warning_ack_timeout_has_no_effect(identifier: Union[str, Pattern], ack_timeout: int) -> str:
     handler_example = f'@app.function("{identifier}")' if isinstance(identifier, str) else f"@app.function({identifier})"
-    return (
-        f"On {handler_example}, as `auto_acknowledge` is `True`, "
-        f"`acknowledgement_timeout={acknowledgement_timeout}` you gave will be unused"
-    )
+    return f"On {handler_example}, as `auto_acknowledge` is `True`, " f"`ack_timeout={ack_timeout}` you gave will be unused"
 
 
 # -------------------------------

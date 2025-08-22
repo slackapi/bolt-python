@@ -941,7 +941,7 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
         auto_acknowledge: bool = True,
-        acknowledgement_timeout: int = 3,
+        ack_timeout: int = 3,
     ) -> Callable[..., Optional[Callable[..., Awaitable[BoltResponse]]]]:
         """Registers a new Function listener.
         This method can be used as either a decorator or a method.
@@ -970,8 +970,8 @@ class AsyncApp:
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         """
         if auto_acknowledge is True:
-            if acknowledgement_timeout != 3:
-                self._framework_logger.warning(warning_ack_timeout_has_no_effect(callback_id, acknowledgement_timeout))
+            if ack_timeout != 3:
+                self._framework_logger.warning(warning_ack_timeout_has_no_effect(callback_id, ack_timeout))
 
         matchers = list(matchers) if matchers else []
         middleware = list(middleware) if middleware else []
@@ -981,9 +981,7 @@ class AsyncApp:
             primary_matcher = builtin_matchers.function_executed(
                 callback_id=callback_id, base_logger=self._base_logger, asyncio=True
             )
-            return self._register_listener(
-                functions, primary_matcher, matchers, middleware, auto_acknowledge, acknowledgement_timeout
-            )
+            return self._register_listener(functions, primary_matcher, matchers, middleware, auto_acknowledge, ack_timeout)
 
         return __call__
 
@@ -1463,7 +1461,7 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]],
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]],
         auto_acknowledgement: bool = False,
-        acknowledgement_timeout: int = 3,
+        ack_timeout: int = 3,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         value_to_return = None
         if not isinstance(functions, list):
@@ -1499,7 +1497,7 @@ class AsyncApp:
                 matchers=listener_matchers,
                 middleware=listener_middleware,
                 auto_acknowledgement=auto_acknowledgement,
-                acknowledgement_timeout=acknowledgement_timeout,
+                ack_timeout=ack_timeout,
                 base_logger=self._base_logger,
             )
         )
