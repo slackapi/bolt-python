@@ -1,4 +1,4 @@
-<h1 align="center">Bolt <img src="https://raw.githubusercontent.com/slackapi/bolt-python/main/docs/static/img/bolt-logo.svg" alt="Bolt logo" width="32"/> for Python</h1>
+<h1 align="center">Bolt <img src="https://docs.slack.dev/img/logos/bolt-py-logo.svg" alt="Bolt logo" width="32"/> for Python</h1>
 
 <p align="center">
     <a href="https://pypi.org/project/slack-bolt/">
