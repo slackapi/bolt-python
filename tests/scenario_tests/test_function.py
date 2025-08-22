@@ -1,4 +1,5 @@
 import json
+import re
 import time
 import pytest
 from unittest.mock import Mock
@@ -149,11 +150,12 @@ class TestFunction:
         assert f"WARNING {just_no_ack.__name__} didn't call ack()" in caplog.text
 
     def test_function_handler_timeout(self, monkeypatch):
+        timeout = 5
         app = App(
             client=self.web_client,
             signing_secret=self.signing_secret,
         )
-        app.function("reverse", auto_acknowledge=False)(just_no_ack)
+        app.function("reverse", auto_acknowledge=False, ack_timeout=timeout)(just_no_ack)
         request = self.build_request_from_body(function_body)
 
         sleep_mock = Mock()
@@ -168,8 +170,33 @@ class TestFunction:
         assert response.status == 404
         assert_auth_test_count(self, 1)
         assert (
-            sleep_mock.call_count == 5
+            sleep_mock.call_count == timeout
         ), f"Expected handler to time out after calling time.sleep 5 times, but it was called {sleep_mock.call_count} times"
+
+    def test_warning_when_timeout_improperly_set(self, caplog):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        app.function("reverse")(just_no_ack)
+        assert "WARNING" not in caplog.text
+
+        timeout_argument_name = "ack_timeout"
+        kwargs = {timeout_argument_name: 5}
+
+        callback_id = "reverse1"
+        app.function(callback_id, **kwargs)(just_no_ack)
+        assert (
+            f'WARNING On @app.function("{callback_id}"), as `auto_acknowledge` is `True`, `{timeout_argument_name}={kwargs[timeout_argument_name]}` you gave will be unused'
+            in caplog.text
+        )
+
+        callback_id = re.compile(r"hello \w+")
+        app.function(callback_id, **kwargs)(just_no_ack)
+        assert (
+            f"WARNING On @app.function({callback_id}), as `auto_acknowledge` is `True`, `{timeout_argument_name}={kwargs[timeout_argument_name]}` you gave will be unused"
+            in caplog.text
+        )
 
 
 function_body = {
