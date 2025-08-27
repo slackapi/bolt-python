@@ -162,6 +162,7 @@ password: {your password}
 
 2. Distribute the release
    - Use the latest stable Python runtime
+      - `git checkout main && git pull`
       - `python --version`
       - `python -m venv .venv`
       - `./scripts/deploy_to_pypi_org.sh`
