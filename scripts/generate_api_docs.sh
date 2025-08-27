@@ -6,5 +6,9 @@ cd ${script_dir}/..
 
 pip install -U pdoc3
 rm -rf docs/reference
-pdoc reference --html -o docs
+
+pdoc slack_bolt --html -o docs/reference
+cp -R docs/reference/slack_bolt/* docs/reference/
+rm -rf docs/reference/slack_bolt
+
 open docs/reference/index.html
