@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-<meta name="generator" content="pdoc3 0.11.5">
+<meta name="generator" content="pdoc3 0.11.6">
 <title>slack_bolt.async_app API documentation</title>
 <meta name="description" content="Module for creating asyncio based apps …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
@@ -778,7 +778,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
         &#34;&#34;&#34;
         Deprecated:
             Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps
+            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
         Registers a new step from app listener.
 
@@ -796,7 +796,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
             # Pass Step to set up listeners
             app.step(ws)
 
-        Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details of steps from apps.
+        Refer to https://api.slack.com/workflows/steps for details of steps from apps.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
         For further information about AsyncWorkflowStep specific function arguments
@@ -812,7 +812,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
         warnings.warn(
             (
                 &#34;Steps from apps for legacy workflows are now deprecated. &#34;
-                &#34;Use new custom steps: https://docs.slack.dev/workflows/workflow-steps&#34;
+                &#34;Use new custom steps: https://api.slack.com/automation/functions/custom-bolt&#34;
             ),
             category=DeprecationWarning,
         )
@@ -894,7 +894,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
             # Pass a function to this method
             app.event(&#34;team_join&#34;)(ask_for_introduction)
 
-        Refer to https://docs.slack.dev/apis/events-api/ for details of Events API.
+        Refer to https://api.slack.com/apis/connections/events-api for details of Events API.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
 
@@ -932,7 +932,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
             # Pass a function to this method
             app.message(&#34;:wave:&#34;)(say_hello)
 
-        Refer to https://docs.slack.dev/reference/events/message for details of `message` events.
+        Refer to https://api.slack.com/events/message for details of `message` events.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
 
@@ -981,6 +981,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
         auto_acknowledge: bool = True,
+        ack_timeout: int = 3,
     ) -&gt; Callable[..., Optional[Callable[..., Awaitable[BoltResponse]]]]:
         &#34;&#34;&#34;Registers a new Function listener.
         This method can be used as either a decorator or a method.
@@ -1008,6 +1009,9 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
             middleware: A list of lister middleware functions.
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         &#34;&#34;&#34;
+        if auto_acknowledge is True:
+            if ack_timeout != 3:
+                self._framework_logger.warning(warning_ack_timeout_has_no_effect(callback_id, ack_timeout))
 
         matchers = list(matchers) if matchers else []
         middleware = list(middleware) if middleware else []
@@ -1017,7 +1021,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
             primary_matcher = builtin_matchers.function_executed(
                 callback_id=callback_id, base_logger=self._base_logger, asyncio=True
             )
-            return self._register_listener(functions, primary_matcher, matchers, middleware, auto_acknowledge)
+            return self._register_listener(functions, primary_matcher, matchers, middleware, auto_acknowledge, ack_timeout)
 
         return __call__
 
@@ -1043,7 +1047,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
             # Pass a function to this method
             app.command(&#34;/echo&#34;)(repeat_text)
 
-        Refer to https://docs.slack.dev/interactivity/implementing-slash-commands for details of Slash Commands.
+        Refer to https://api.slack.com/interactivity/slash-commands for details of Slash Commands.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
 
@@ -1090,7 +1094,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
             # Pass a function to this method
             app.shortcut(&#34;open_modal&#34;)(open_modal)
 
-        Refer to https://docs.slack.dev/interactivity/implementing-shortcuts for details about Shortcuts.
+        Refer to https://api.slack.com/interactivity/shortcuts for details about Shortcuts.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
 
@@ -1158,9 +1162,9 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
             # Pass a function to this method
             app.action(&#34;approve_button&#34;)(update_message)
 
-        * Refer to https://docs.slack.dev/reference/interaction-payloads/block_actions-payload for actions in `blocks`.
-        * Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons for actions in `attachments`.
-        * Refer to https://docs.slack.dev/legacy/legacy-dialogs for actions in dialogs.
+        * Refer to https://api.slack.com/reference/interaction-payloads/block-actions for actions in `blocks`.
+        * Refer to https://api.slack.com/legacy/message-buttons for actions in `attachments`.
+        * Refer to https://api.slack.com/dialogs for actions in dialogs.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
 
@@ -1186,7 +1190,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         &#34;&#34;&#34;Registers a new `block_actions` action listener.
-        Refer to https://docs.slack.dev/reference/interaction-payloads/block_actions-payload for details.
+        Refer to https://api.slack.com/reference/interaction-payloads/block-actions for details.
         &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
@@ -1203,7 +1207,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         &#34;&#34;&#34;Registers a new `interactive_message` action listener.
-        Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons for details.&#34;&#34;&#34;
+        Refer to https://api.slack.com/legacy/message-buttons for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1219,7 +1223,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         &#34;&#34;&#34;Registers a new `dialog_submission` listener.
-        Refer to https://docs.slack.dev/legacy/legacy-dialogs for details.&#34;&#34;&#34;
+        Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1235,7 +1239,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         &#34;&#34;&#34;Registers a new `dialog_submission` listener.
-        Refer to https://docs.slack.dev/legacy/legacy-dialogs for details.&#34;&#34;&#34;
+        Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1276,7 +1280,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
             # Pass a function to this method
             app.view(&#34;view_1&#34;)(handle_submission)
 
-        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload for details of payloads.
+        Refer to https://api.slack.com/reference/interaction-payloads/views for details of payloads.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
 
@@ -1302,7 +1306,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         &#34;&#34;&#34;Registers a new `view_submission` listener.
-        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload#view_submission for details.&#34;&#34;&#34;
+        Refer to https://api.slack.com/reference/interaction-payloads/views#view_submission for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1318,7 +1322,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         &#34;&#34;&#34;Registers a new `view_closed` listener.
-        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload#view_closed for details.&#34;&#34;&#34;
+        Refer to https://api.slack.com/reference/interaction-payloads/views#view_closed for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1359,7 +1363,8 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
 
         Refer to the following documents for details:
 
-        * https://docs.slack.dev/reference/block-kit/block-elements/multi-select-menu-element#external_multi_select
+        * https://api.slack.com/reference/block-kit/block-elements#external_select
+        * https://api.slack.com/reference/block-kit/block-elements#external_multi_select
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
 
@@ -1399,7 +1404,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         &#34;&#34;&#34;Registers a new `dialog_suggestion` listener.
-        Refer to https://docs.slack.dev/legacy/legacy-dialogs for details.&#34;&#34;&#34;
+        Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1496,6 +1501,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]],
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]],
         auto_acknowledgement: bool = False,
+        ack_timeout: int = 3,
     ) -&gt; Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         value_to_return = None
         if not isinstance(functions, list):
@@ -1527,10 +1533,11 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
             AsyncCustomListener(
                 app_name=self.name,
                 ack_function=functions.pop(0),
-                lazy_functions=functions,
+                lazy_functions=functions,  # type:ignore[arg-type]
                 matchers=listener_matchers,
                 middleware=listener_middleware,
                 auto_acknowledgement=auto_acknowledgement,
+                ack_timeout=ack_timeout,
                 base_logger=self._base_logger,
             )
         )
@@ -1753,9 +1760,9 @@ def process_before_response(self) -&gt; bool:
         # Pass a function to this method
         app.action(&#34;approve_button&#34;)(update_message)
 
-    * Refer to https://docs.slack.dev/reference/interaction-payloads/block_actions-payload for actions in `blocks`.
-    * Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons for actions in `attachments`.
-    * Refer to https://docs.slack.dev/legacy/legacy-dialogs for actions in dialogs.
+    * Refer to https://api.slack.com/reference/interaction-payloads/block-actions for actions in `blocks`.
+    * Refer to https://api.slack.com/legacy/message-buttons for actions in `attachments`.
+    * Refer to https://api.slack.com/dialogs for actions in dialogs.
 
     To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
 
@@ -1784,9 +1791,9 @@ async def update_message(ack):
 app.action("approve_button")(update_message)
 </code></pre>
 <ul>
-<li>Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/block_actions-payload">https://docs.slack.dev/reference/interaction-payloads/block_actions-payload</a> for actions in <code>blocks</code>.</li>
-<li>Refer to <a href="https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons">https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons</a> for actions in <code>attachments</code>.</li>
-<li>Refer to <a href="https://docs.slack.dev/legacy/legacy-dialogs">https://docs.slack.dev/legacy/legacy-dialogs</a> for actions in dialogs.</li>
+<li>Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-actions">https://api.slack.com/reference/interaction-payloads/block-actions</a> for actions in <code>blocks</code>.</li>
+<li>Refer to <a href="https://api.slack.com/legacy/message-buttons">https://api.slack.com/legacy/message-buttons</a> for actions in <code>attachments</code>.</li>
+<li>Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</a> for actions in dialogs.</li>
 </ul>
 <p>To learn available arguments for middleware/listeners, see <code><a title="slack_bolt.kwargs_injection.async_args" href="kwargs_injection/async_args.html">slack_bolt.kwargs_injection.async_args</a></code>'s API document.</p>
 <h2 id="args">Args</h2>
@@ -1957,7 +1964,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
 ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
     &#34;&#34;&#34;Registers a new `interactive_message` action listener.
-    Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons for details.&#34;&#34;&#34;
+    Refer to https://api.slack.com/legacy/message-buttons for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1967,7 +1974,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     return __call__</code></pre>
 </details>
 <div class="desc"><p>Registers a new <code>interactive_message</code> action listener.
-Refer to <a href="https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons">https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons</a> for details.</p></div>
+Refer to <a href="https://api.slack.com/legacy/message-buttons">https://api.slack.com/legacy/message-buttons</a> for details.</p></div>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.block_action"><code class="name flex">
 <span>def <span class="ident">block_action</span></span>(<span>self,<br>constraints: str | Pattern | Dict[str, str | Pattern],<br>matchers: Sequence[Callable[..., Awaitable[bool]]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>] | None = None) ‑> Callable[..., Callable[..., Awaitable[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None]] | None]</span>
@@ -1984,7 +1991,7 @@ Refer to <a href="https://docs.slack.dev/legacy/legacy-messaging/legacy-message-
     middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
 ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
     &#34;&#34;&#34;Registers a new `block_actions` action listener.
-    Refer to https://docs.slack.dev/reference/interaction-payloads/block_actions-payload for details.
+    Refer to https://api.slack.com/reference/interaction-payloads/block-actions for details.
     &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
@@ -1995,7 +2002,7 @@ Refer to <a href="https://docs.slack.dev/legacy/legacy-messaging/legacy-message-
     return __call__</code></pre>
 </details>
 <div class="desc"><p>Registers a new <code>block_actions</code> action listener.
-Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/block_actions-payload">https://docs.slack.dev/reference/interaction-payloads/block_actions-payload</a> for details.</p></div>
+Refer to <a href="https://api.slack.com/reference/interaction-payloads/block-actions">https://api.slack.com/reference/interaction-payloads/block-actions</a> for details.</p></div>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.block_suggestion"><code class="name flex">
 <span>def <span class="ident">block_suggestion</span></span>(<span>self,<br>action_id: str | Pattern,<br>matchers: Sequence[Callable[..., Awaitable[bool]]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>] | None = None) ‑> Callable[..., Callable[..., Awaitable[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None]] | None]</span>
@@ -2049,7 +2056,7 @@ Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/block_ac
         # Pass a function to this method
         app.command(&#34;/echo&#34;)(repeat_text)
 
-    Refer to https://docs.slack.dev/interactivity/implementing-slash-commands for details of Slash Commands.
+    Refer to https://api.slack.com/interactivity/slash-commands for details of Slash Commands.
 
     To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
 
@@ -2080,7 +2087,7 @@ async def repeat_text(ack, say, command):
 # Pass a function to this method
 app.command("/echo")(repeat_text)
 </code></pre>
-<p>Refer to <a href="https://docs.slack.dev/interactivity/implementing-slash-commands">https://docs.slack.dev/interactivity/implementing-slash-commands</a> for details of Slash Commands.</p>
+<p>Refer to <a href="https://api.slack.com/interactivity/slash-commands">https://api.slack.com/interactivity/slash-commands</a> for details of Slash Commands.</p>
 <p>To learn available arguments for middleware/listeners, see <code><a title="slack_bolt.kwargs_injection.async_args" href="kwargs_injection/async_args.html">slack_bolt.kwargs_injection.async_args</a></code>'s API document.</p>
 <h2 id="args">Args</h2>
 <dl>
@@ -2143,7 +2150,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
 ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
     &#34;&#34;&#34;Registers a new `dialog_submission` listener.
-    Refer to https://docs.slack.dev/legacy/legacy-dialogs for details.&#34;&#34;&#34;
+    Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -2153,7 +2160,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     return __call__</code></pre>
 </details>
 <div class="desc"><p>Registers a new <code>dialog_submission</code> listener.
-Refer to <a href="https://docs.slack.dev/legacy/legacy-dialogs">https://docs.slack.dev/legacy/legacy-dialogs</a> for details.</p></div>
+Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</a> for details.</p></div>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.dialog_submission"><code class="name flex">
 <span>def <span class="ident">dialog_submission</span></span>(<span>self,<br>callback_id: str | Pattern,<br>matchers: Sequence[Callable[..., Awaitable[bool]]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>] | None = None) ‑> Callable[..., Callable[..., Awaitable[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None]] | None]</span>
@@ -2170,7 +2177,7 @@ Refer to <a href="https://docs.slack.dev/legacy/legacy-dialogs">https://docs.sla
     middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
 ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
     &#34;&#34;&#34;Registers a new `dialog_submission` listener.
-    Refer to https://docs.slack.dev/legacy/legacy-dialogs for details.&#34;&#34;&#34;
+    Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -2180,7 +2187,7 @@ Refer to <a href="https://docs.slack.dev/legacy/legacy-dialogs">https://docs.sla
     return __call__</code></pre>
 </details>
 <div class="desc"><p>Registers a new <code>dialog_submission</code> listener.
-Refer to <a href="https://docs.slack.dev/legacy/legacy-dialogs">https://docs.slack.dev/legacy/legacy-dialogs</a> for details.</p></div>
+Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</a> for details.</p></div>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.dialog_suggestion"><code class="name flex">
 <span>def <span class="ident">dialog_suggestion</span></span>(<span>self,<br>callback_id: str | Pattern,<br>matchers: Sequence[Callable[..., Awaitable[bool]]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>] | None = None) ‑> Callable[..., Callable[..., Awaitable[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None]] | None]</span>
@@ -2197,7 +2204,7 @@ Refer to <a href="https://docs.slack.dev/legacy/legacy-dialogs">https://docs.sla
     middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
 ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
     &#34;&#34;&#34;Registers a new `dialog_suggestion` listener.
-    Refer to https://docs.slack.dev/legacy/legacy-dialogs for details.&#34;&#34;&#34;
+    Refer to https://api.slack.com/dialogs for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -2207,7 +2214,7 @@ Refer to <a href="https://docs.slack.dev/legacy/legacy-dialogs">https://docs.sla
     return __call__</code></pre>
 </details>
 <div class="desc"><p>Registers a new <code>dialog_suggestion</code> listener.
-Refer to <a href="https://docs.slack.dev/legacy/legacy-dialogs">https://docs.slack.dev/legacy/legacy-dialogs</a> for details.</p></div>
+Refer to <a href="https://api.slack.com/dialogs">https://api.slack.com/dialogs</a> for details.</p></div>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.enable_token_revocation_listeners"><code class="name flex">
 <span>def <span class="ident">enable_token_revocation_listeners</span></span>(<span>self) ‑> None</span>
@@ -2313,7 +2320,7 @@ when getting an unhandled error in Bolt app.</dd>
         # Pass a function to this method
         app.event(&#34;team_join&#34;)(ask_for_introduction)
 
-    Refer to https://docs.slack.dev/apis/events-api/ for details of Events API.
+    Refer to https://api.slack.com/apis/connections/events-api for details of Events API.
 
     To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
 
@@ -2345,7 +2352,7 @@ async def ask_for_introduction(event, say):
 # Pass a function to this method
 app.event("team_join")(ask_for_introduction)
 </code></pre>
-<p>Refer to <a href="https://docs.slack.dev/apis/events-api/">https://docs.slack.dev/apis/events-api/</a> for details of Events API.</p>
+<p>Refer to <a href="https://api.slack.com/apis/connections/events-api">https://api.slack.com/apis/connections/events-api</a> for details of Events API.</p>
 <p>To learn available arguments for middleware/listeners, see <code><a title="slack_bolt.kwargs_injection.async_args" href="kwargs_injection/async_args.html">slack_bolt.kwargs_injection.async_args</a></code>'s API document.</p>
 <h2 id="args">Args</h2>
 <dl>
@@ -2361,7 +2368,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
 </dl></div>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.function"><code class="name flex">
-<span>def <span class="ident">function</span></span>(<span>self,<br>callback_id: str | Pattern,<br>matchers: Sequence[Callable[..., Awaitable[bool]]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>] | None = None,<br>auto_acknowledge: bool = True) ‑> Callable[..., Callable[..., Awaitable[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]] | None]</span>
+<span>def <span class="ident">function</span></span>(<span>self,<br>callback_id: str | Pattern,<br>matchers: Sequence[Callable[..., Awaitable[bool]]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>] | None = None,<br>auto_acknowledge: bool = True,<br>ack_timeout: int = 3) ‑> Callable[..., Callable[..., Awaitable[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]] | None]</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -2374,6 +2381,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
     middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     auto_acknowledge: bool = True,
+    ack_timeout: int = 3,
 ) -&gt; Callable[..., Optional[Callable[..., Awaitable[BoltResponse]]]]:
     &#34;&#34;&#34;Registers a new Function listener.
     This method can be used as either a decorator or a method.
@@ -2401,6 +2409,9 @@ Only when all the middleware call <code>next()</code> method, the listener funct
         middleware: A list of lister middleware functions.
             Only when all the middleware call `next()` method, the listener function can be invoked.
     &#34;&#34;&#34;
+    if auto_acknowledge is True:
+        if ack_timeout != 3:
+            self._framework_logger.warning(warning_ack_timeout_has_no_effect(callback_id, ack_timeout))
 
     matchers = list(matchers) if matchers else []
     middleware = list(middleware) if middleware else []
@@ -2410,7 +2421,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
         primary_matcher = builtin_matchers.function_executed(
             callback_id=callback_id, base_logger=self._base_logger, asyncio=True
         )
-        return self._register_listener(functions, primary_matcher, matchers, middleware, auto_acknowledge)
+        return self._register_listener(functions, primary_matcher, matchers, middleware, auto_acknowledge, ack_timeout)
 
     return __call__</code></pre>
 </details>
@@ -2494,7 +2505,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
         # Pass a function to this method
         app.message(&#34;:wave:&#34;)(say_hello)
 
-    Refer to https://docs.slack.dev/reference/events/message for details of `message` events.
+    Refer to https://api.slack.com/events/message for details of `message` events.
 
     To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
 
@@ -2548,7 +2559,7 @@ async def say_hello(message, say):
 # Pass a function to this method
 app.message(":wave:")(say_hello)
 </code></pre>
-<p>Refer to <a href="https://docs.slack.dev/reference/events/message">https://docs.slack.dev/reference/events/message</a> for details of <code>message</code> events.</p>
+<p>Refer to <a href="https://api.slack.com/events/message">https://api.slack.com/events/message</a> for details of <code>message</code> events.</p>
 <p>To learn available arguments for middleware/listeners, see <code><a title="slack_bolt.kwargs_injection.async_args" href="kwargs_injection/async_args.html">slack_bolt.kwargs_injection.async_args</a></code>'s API document.</p>
 <h2 id="args">Args</h2>
 <dl>
@@ -2688,7 +2699,8 @@ app.middleware(middleware_func)
 
     Refer to the following documents for details:
 
-    * https://docs.slack.dev/reference/block-kit/block-elements/multi-select-menu-element#external_multi_select
+    * https://api.slack.com/reference/block-kit/block-elements#external_select
+    * https://api.slack.com/reference/block-kit/block-elements#external_multi_select
 
     To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
 
@@ -2728,7 +2740,8 @@ app.options("menu_selection")(show_menu_options)
 </code></pre>
 <p>Refer to the following documents for details:</p>
 <ul>
-<li><a href="https://docs.slack.dev/reference/block-kit/block-elements/multi-select-menu-element#external_multi_select">https://docs.slack.dev/reference/block-kit/block-elements/multi-select-menu-element#external_multi_select</a></li>
+<li><a href="https://api.slack.com/reference/block-kit/block-elements#external_select">https://api.slack.com/reference/block-kit/block-elements#external_select</a></li>
+<li><a href="https://api.slack.com/reference/block-kit/block-elements#external_multi_select">https://api.slack.com/reference/block-kit/block-elements#external_multi_select</a></li>
 </ul>
 <p>To learn available arguments for middleware/listeners, see <code><a title="slack_bolt.kwargs_injection.async_args" href="kwargs_injection/async_args.html">slack_bolt.kwargs_injection.async_args</a></code>'s API document.</p>
 <h2 id="args">Args</h2>
@@ -2817,7 +2830,7 @@ Refer to <a href="https://docs.aiohttp.org/">https://docs.aiohttp.org/</a> for m
         # Pass a function to this method
         app.shortcut(&#34;open_modal&#34;)(open_modal)
 
-    Refer to https://docs.slack.dev/interactivity/implementing-shortcuts for details about Shortcuts.
+    Refer to https://api.slack.com/interactivity/shortcuts for details about Shortcuts.
 
     To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
 
@@ -2854,7 +2867,7 @@ async def open_modal(ack, body, client):
 # Pass a function to this method
 app.shortcut("open_modal")(open_modal)
 </code></pre>
-<p>Refer to <a href="https://docs.slack.dev/interactivity/implementing-shortcuts">https://docs.slack.dev/interactivity/implementing-shortcuts</a> for details about Shortcuts.</p>
+<p>Refer to <a href="https://api.slack.com/interactivity/shortcuts">https://api.slack.com/interactivity/shortcuts</a> for details about Shortcuts.</p>
 <p>To learn available arguments for middleware/listeners, see <code><a title="slack_bolt.kwargs_injection.async_args" href="kwargs_injection/async_args.html">slack_bolt.kwargs_injection.async_args</a></code>'s API document.</p>
 <h2 id="args">Args</h2>
 <dl>
@@ -2917,7 +2930,7 @@ Refer to <a href="https://docs.aiohttp.org/">https://docs.aiohttp.org/</a> for m
     &#34;&#34;&#34;
     Deprecated:
         Steps from apps for legacy workflows are now deprecated.
-        Use new custom steps: https://docs.slack.dev/workflows/workflow-steps
+        Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
 
     Registers a new step from app listener.
 
@@ -2935,7 +2948,7 @@ Refer to <a href="https://docs.aiohttp.org/">https://docs.aiohttp.org/</a> for m
         # Pass Step to set up listeners
         app.step(ws)
 
-    Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details of steps from apps.
+    Refer to https://api.slack.com/workflows/steps for details of steps from apps.
 
     To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
     For further information about AsyncWorkflowStep specific function arguments
@@ -2951,7 +2964,7 @@ Refer to <a href="https://docs.aiohttp.org/">https://docs.aiohttp.org/</a> for m
     warnings.warn(
         (
             &#34;Steps from apps for legacy workflows are now deprecated. &#34;
-            &#34;Use new custom steps: https://docs.slack.dev/workflows/workflow-steps&#34;
+            &#34;Use new custom steps: https://api.slack.com/automation/functions/custom-bolt&#34;
         ),
         category=DeprecationWarning,
     )
@@ -2973,7 +2986,7 @@ Refer to <a href="https://docs.aiohttp.org/">https://docs.aiohttp.org/</a> for m
 </details>
 <div class="desc"><h2 id="deprecated">Deprecated</h2>
 <p>Steps from apps for legacy workflows are now deprecated.
-Use new custom steps: <a href="https://docs.slack.dev/workflows/workflow-steps">https://docs.slack.dev/workflows/workflow-steps</a></p>
+Use new custom steps: <a href="https://api.slack.com/automation/functions/custom-bolt">https://api.slack.com/automation/functions/custom-bolt</a></p>
 <p>Registers a new step from app listener.</p>
 <p>Unlike others, this method doesn't behave as a decorator.
 If you want to register a step from app by a decorator, use <code>AsyncWorkflowStepBuilder</code>'s methods.</p>
@@ -2988,7 +3001,7 @@ ws = AsyncWorkflowStep(
 # Pass Step to set up listeners
 app.step(ws)
 </code></pre>
-<p>Refer to <a href="https://docs.slack.dev/legacy/legacy-steps-from-apps/">https://docs.slack.dev/legacy/legacy-steps-from-apps/</a> for details of steps from apps.</p>
+<p>Refer to <a href="https://api.slack.com/workflows/steps">https://api.slack.com/workflows/steps</a> for details of steps from apps.</p>
 <p>To learn available arguments for middleware/listeners, see <code><a title="slack_bolt.kwargs_injection.async_args" href="kwargs_injection/async_args.html">slack_bolt.kwargs_injection.async_args</a></code>'s API document.
 For further information about AsyncWorkflowStep specific function arguments
 such as <code>configure</code>, <code>update</code>, <code>complete</code>, and <code>fail</code>,
@@ -3056,7 +3069,7 @@ refer to the <code>async</code> prefixed ones in <code><a title="slack_bolt.work
         # Pass a function to this method
         app.view(&#34;view_1&#34;)(handle_submission)
 
-    Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload for details of payloads.
+    Refer to https://api.slack.com/reference/interaction-payloads/views for details of payloads.
 
     To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`&#39;s API document.
 
@@ -3097,7 +3110,7 @@ async def handle_submission(ack, body, client, view):
 # Pass a function to this method
 app.view("view_1")(handle_submission)
 </code></pre>
-<p>Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload">https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload</a> for details of payloads.</p>
+<p>Refer to <a href="https://api.slack.com/reference/interaction-payloads/views">https://api.slack.com/reference/interaction-payloads/views</a> for details of payloads.</p>
 <p>To learn available arguments for middleware/listeners, see <code><a title="slack_bolt.kwargs_injection.async_args" href="kwargs_injection/async_args.html">slack_bolt.kwargs_injection.async_args</a></code>'s API document.</p>
 <h2 id="args">Args</h2>
 <dl>
@@ -3126,7 +3139,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
 ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
     &#34;&#34;&#34;Registers a new `view_closed` listener.
-    Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload#view_closed for details.&#34;&#34;&#34;
+    Refer to https://api.slack.com/reference/interaction-payloads/views#view_closed for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -3136,7 +3149,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
     return __call__</code></pre>
 </details>
 <div class="desc"><p>Registers a new <code>view_closed</code> listener.
-Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload#view_closed">https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload#view_closed</a> for details.</p></div>
+Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#view_closed">https://api.slack.com/reference/interaction-payloads/views#view_closed</a> for details.</p></div>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.view_submission"><code class="name flex">
 <span>def <span class="ident">view_submission</span></span>(<span>self,<br>constraints: str | Pattern,<br>matchers: Sequence[Callable[..., Awaitable[bool]]] | None = None,<br>middleware: Sequence[Callable | <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a>] | None = None) ‑> Callable[..., Callable[..., Awaitable[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None]] | None]</span>
@@ -3153,7 +3166,7 @@ Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-int
     middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
 ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
     &#34;&#34;&#34;Registers a new `view_submission` listener.
-    Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload#view_submission for details.&#34;&#34;&#34;
+    Refer to https://api.slack.com/reference/interaction-payloads/views#view_submission for details.&#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -3163,7 +3176,7 @@ Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-int
     return __call__</code></pre>
 </details>
 <div class="desc"><p>Registers a new <code>view_submission</code> listener.
-Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload#view_submission">https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload#view_submission</a> for details.</p></div>
+Refer to <a href="https://api.slack.com/reference/interaction-payloads/views#view_submission">https://api.slack.com/reference/interaction-payloads/views#view_submission</a> for details.</p></div>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.web_app"><code class="name flex">
 <span>def <span class="ident">web_app</span></span>(<span>self, path: str = '/slack/events', port: int = 3000) ‑> aiohttp.web_app.Application</span>
@@ -4779,6 +4792,7 @@ def set_title(self) -&gt; Optional[AsyncSetTitle]:
     ack_function: Callable[..., Awaitable[BoltResponse]]
     lazy_functions: Sequence[Callable[..., Awaitable[None]]]
     auto_acknowledgement: bool
+    ack_timeout: int
 
     async def async_matches(
         self,
@@ -4841,6 +4855,10 @@ def set_title(self) -&gt; Optional[AsyncSetTitle]:
 <h3>Class variables</h3>
 <dl>
 <dt id="slack_bolt.async_app.AsyncListener.ack_function"><code class="name">var <span class="ident">ack_function</span> : Callable[..., Awaitable[<a title="slack_bolt.response.response.BoltResponse" href="response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>]]</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="slack_bolt.async_app.AsyncListener.ack_timeout"><code class="name">var <span class="ident">ack_timeout</span> : int</code></dt>
 <dd>
 <div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
@@ -5497,6 +5515,7 @@ async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltRes
 <h4><code><a title="slack_bolt.async_app.AsyncListener" href="#slack_bolt.async_app.AsyncListener">AsyncListener</a></code></h4>
 <ul class="">
 <li><code><a title="slack_bolt.async_app.AsyncListener.ack_function" href="#slack_bolt.async_app.AsyncListener.ack_function">ack_function</a></code></li>
+<li><code><a title="slack_bolt.async_app.AsyncListener.ack_timeout" href="#slack_bolt.async_app.AsyncListener.ack_timeout">ack_timeout</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncListener.async_matches" href="#slack_bolt.async_app.AsyncListener.async_matches">async_matches</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncListener.auto_acknowledgement" href="#slack_bolt.async_app.AsyncListener.auto_acknowledgement">auto_acknowledgement</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncListener.lazy_functions" href="#slack_bolt.async_app.AsyncListener.lazy_functions">lazy_functions</a></code></li>
@@ -5561,7 +5580,7 @@ async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltRes
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.5</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
 </footer>
 </body>
 </html>
