@@ -9,7 +9,7 @@ GitHub Codespaces is an online IDE that allows you to work on code and host your
 
 At the end of this tutorial, your final app will look like this:
 
-![announce](https://github.com/user-attachments/assets/0bf1c2f0-4b22-4c9c-98b3-b21e9bcc14a8)
+![announce](/img/bolt-python/announce.gif)
 
 And will make use of these Slack concepts:
 * [**Block Kit**](/block-kit/) is a UI framework for Slack apps that allows you to create beautiful, interactive messages within Slack. If you've ever seen a message in Slack with buttons or a select menu, that's Block Kit.
