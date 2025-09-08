@@ -15,6 +15,7 @@ class AsyncListener(metaclass=ABCMeta):
     ack_function: Callable[..., Awaitable[BoltResponse]]
     lazy_functions: Sequence[Callable[..., Awaitable[None]]]
     auto_acknowledgement: bool
+    ack_timeout: int
 
     async def async_matches(
         self,
@@ -87,6 +88,7 @@ class AsyncCustomListener(AsyncListener):
     matchers: Sequence[AsyncListenerMatcher]
     middleware: Sequence[AsyncMiddleware]
     auto_acknowledgement: bool
+    ack_timeout: int
     arg_names: MutableSequence[str]
     logger: Logger
 
@@ -99,6 +101,7 @@ class AsyncCustomListener(AsyncListener):
         matchers: Sequence[AsyncListenerMatcher],
         middleware: Sequence[AsyncMiddleware],
         auto_acknowledgement: bool = False,
+        ack_timeout: int = 3,
         base_logger: Optional[Logger] = None,
     ):
         self.app_name = app_name
@@ -107,6 +110,7 @@ class AsyncCustomListener(AsyncListener):
         self.matchers = matchers
         self.middleware = middleware
         self.auto_acknowledgement = auto_acknowledgement
+        self.ack_timeout = ack_timeout
         self.arg_names = get_arg_names_of_callable(ack_function)
         self.logger = get_bolt_app_logger(app_name, self.ack_function, base_logger)
 
