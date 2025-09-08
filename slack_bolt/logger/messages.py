@@ -60,7 +60,7 @@ def error_authorize_conflicts() -> str:
     return "`authorize` in the top-level arguments is not allowed when you pass either `oauth_settings` or `oauth_flow`"
 
 
-def error_message_event_type(event_type: str) -> str:
+def error_message_event_type(event_type: Union[str, Pattern]) -> str:
     return (
         f'Although the document mentions "{event_type}", '
         'it is not a valid event type. Use "message" instead. '
