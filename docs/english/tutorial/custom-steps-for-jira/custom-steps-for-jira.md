@@ -12,7 +12,7 @@ In this tutorial, you'll learn how to configure custom steps for use with JIRA. 
 Before getting started, you will need the following:
 
 * a development workspace where you have permissions to install apps. If you don’t have a workspace, go ahead and set that up now—you can [go here](https://slack.com/get-started#create) to create one, or you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
-* a development environment with [Python 3.6](https://www.python.org/downloads/) or later.
+* a development environment with [Python 3.7](https://www.python.org/downloads/) or later.
 
 **Skip to the code**
 If you'd rather skip the tutorial and just head straight to the code, you can use our [Bolt for Python JIRA functions sample](https://github.com/slack-samples/bolt-python-jira-functions) as a template.

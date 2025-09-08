@@ -1,5 +1,4 @@
 import re
-import sys
 from logging import Logger
 
 from slack_bolt.error import BoltError
@@ -25,10 +24,7 @@ from slack_bolt.request.payload_utils import (
 from ..logger.messages import error_message_event_type
 from ..util.utils import get_arg_names_of_callable
 
-if sys.version_info.major == 3 and sys.version_info.minor <= 6:
-    from re import _pattern_type as Pattern  # type: ignore[attr-defined]
-else:
-    from re import Pattern
+from re import Pattern
 from typing import Callable, Awaitable, Any, Sequence, Optional, Union, Dict
 
 from slack_bolt.kwargs_injection import build_required_kwargs

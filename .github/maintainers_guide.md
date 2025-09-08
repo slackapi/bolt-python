@@ -25,8 +25,8 @@ $ pyenv local 3.8.5
 
 $ pyenv versions
   system
-  3.6.10
-  3.7.7
+  3.7.17
+  3.13.7
 * 3.8.5 (set by /path-to-bolt-python/.python-version)
 
 $ pyenv rehash

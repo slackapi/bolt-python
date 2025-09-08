@@ -13,7 +13,7 @@ In this tutorial, you'll learn how to bring the power of AI into your Slack work
 Before getting started, you will need the following:
 
 * a development workspace where you have permissions to install apps. If you don’t have a workspace, go ahead and set that up now — you can [go here](https://slack.com/get-started#create) to create one, or you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
-* a development environment with [Python 3.6](https://www.python.org/downloads/) or later.
+* a development environment with [Python 3.7](https://www.python.org/downloads/) or later.
 * an Anthropic or OpenAI account with sufficient credits, and in which you have generated a secret key.
 
 **Skip to the code**

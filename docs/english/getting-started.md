@@ -21,7 +21,7 @@ In search of the complete guide to building an app from scratch? Check out the [
 
 A few tools are needed for the following steps. We recommend using the [**Slack CLI**](/tools/slack-cli/) for the smoothest experience, but other options remain available. 
 
-You can also begin by installing git and downloading [Python 3.6 or later](https://www.python.org/downloads/), or the latest stable version of Python. Refer to [Python's setup and building guide](https://devguide.python.org/getting-started/setup-building/) for more details.
+You can also begin by installing git and downloading [Python 3.7 or later](https://www.python.org/downloads/), or the latest stable version of Python. Refer to [Python's setup and building guide](https://devguide.python.org/getting-started/setup-building/) for more details.
 
 Install the latest version of the Slack CLI to get started:
 
@@ -83,7 +83,7 @@ Outlines of a project are taking shape, so we can move on to running the app!
 </TabItem>
 </Tabs>
 
-We recommend using a [Python virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment) to manage your project's dependencies. This is a great way to prevent conflicts with your system's Python packages. Let's create and activate a new virtual environment with [Python 3.6 or later](https://www.python.org/downloads/):
+We recommend using a [Python virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment) to manage your project's dependencies. This is a great way to prevent conflicts with your system's Python packages. Let's create and activate a new virtual environment with [Python 3.7 or later](https://www.python.org/downloads/):
 
 ```sh
 $ python3 -m venv .venv
