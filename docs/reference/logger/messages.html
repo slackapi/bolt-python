@@ -208,14 +208,14 @@ el.replaceWith(d);
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.logger.messages.error_message_event_type"><code class="name flex">
-<span>def <span class="ident">error_message_event_type</span></span>(<span>event_type: str) ‑> str</span>
+<span>def <span class="ident">error_message_event_type</span></span>(<span>event_type: str | re.Pattern) ‑> str</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def error_message_event_type(event_type: str) -&gt; str:
+<pre><code class="python">def error_message_event_type(event_type: Union[str, Pattern]) -&gt; str:
     return (
         f&#39;Although the document mentions &#34;{event_type}&#34;, &#39;
         &#39;it is not a valid event type. Use &#34;message&#34; instead. &#39;
