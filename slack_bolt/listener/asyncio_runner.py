@@ -149,7 +149,7 @@ class AsyncioListenerRunner:
                     self._start_lazy_function(lazy_func, request)
 
             # await for the completion of ack() in the async listener execution
-            while ack.response is None and time.time() - starting_time <= 3:
+            while ack.response is None and time.time() - starting_time <= listener.ack_timeout:
                 await asyncio.sleep(0.01)
 
             if response is None and ack.response is None:

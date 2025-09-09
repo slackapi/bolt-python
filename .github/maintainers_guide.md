@@ -25,8 +25,8 @@ $ pyenv local 3.8.5
 
 $ pyenv versions
   system
-  3.6.10
-  3.7.7
+  3.7.17
+  3.13.7
 * 3.8.5 (set by /path-to-bolt-python/.python-version)
 
 $ pyenv rehash
@@ -157,10 +157,12 @@ password: {your password}
    - Commit with a message including the new version number. For example `1.2.3` & Push the commit to a branch and create a PR to sanity check.
      - `git checkout -b v1.2.3`
      - `git commit -a -m 'version 1.2.3'`
+     - `git push -u origin HEAD`
    - Open a PR and merge after receiving at least one approval from other maintainers.
 
 2. Distribute the release
    - Use the latest stable Python runtime
+      - `git checkout main && git pull`
       - `python --version`
       - `python -m venv .venv`
       - `./scripts/deploy_to_pypi_org.sh`

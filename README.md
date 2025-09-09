@@ -1,4 +1,4 @@
-<h1 align="center">Bolt <img src="https://raw.githubusercontent.com/slackapi/bolt-python/main/docs/static/img/bolt-logo.svg" alt="Bolt logo" width="32"/> for Python</h1>
+<h1 align="center">Bolt <img src="https://docs.slack.dev/img/logos/bolt-py-logo.svg" alt="Bolt logo" width="32"/> for Python</h1>
 
 <p align="center">
     <a href="https://pypi.org/project/slack-bolt/">
@@ -10,16 +10,16 @@
     <br>
     <a href="https://pypi.org/project/slack-bolt/">
         <img alt="Python Versions" src="https://img.shields.io/pypi/pyversions/slack-bolt.svg"></a>
-    <a href="https://tools.slack.dev/bolt-python/">
+    <a href="https://docs.slack.dev/tools/bolt-python/">
         <img alt="Documentation" src="https://img.shields.io/badge/dev-docs-yellow"></a>
 </p>
 
-A Python framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://tools.slack.dev/bolt-python/getting-started) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt. The Python module documents are available [here](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/).
+A Python framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://docs.slack.dev/tools/bolt-python/getting-started) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt. The Python module documents are available [here](https://docs.slack.dev/tools/bolt-python/reference/).
 
 ## Setup
 
 ```bash
-# Python 3.6+ required
+# Python 3.7+ required
 python -m venv .venv
 source .venv/bin/activate
 
@@ -153,7 +153,7 @@ Most of the app's functionality will be inside listener functions (the `fn` para
 If you'd prefer to build your app with [asyncio](https://docs.python.org/3/library/asyncio.html), you can import the [AIOHTTP](https://docs.aiohttp.org/en/stable/) library and call the `AsyncApp` constructor. Within async apps, you can use the async/await pattern.
 
 ```bash
-# Python 3.6+ required
+# Python 3.7+ required
 python -m venv .venv
 source .venv/bin/activate
 
@@ -192,7 +192,7 @@ Apps can be run the same way as the syncronous example above. If you'd prefer an
 
 ## Getting Help
 
-[The documentation](https://tools.slack.dev/bolt-python) has more information on basic and advanced concepts for Bolt for Python. Also, all the Python module documents of this library are available [here](https://tools.slack.dev/bolt-python/api-docs/slack_bolt/).
+[The documentation](https://tools.slack.dev/bolt-python) has more information on basic and advanced concepts for Bolt for Python. Also, all the Python module documents of this library are available [here](https://tools.slack.dev/bolt-python/reference/).
 
 If you otherwise get stuck, we're here to help. The following are the best ways to get assistance working through your issue:
 

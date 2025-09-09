@@ -5,7 +5,7 @@
 If you'd prefer to build your app with [asyncio](https://docs.python.org/3/library/asyncio.html), you can import the [AIOHTTP](https://docs.aiohttp.org/en/stable/) library and call the `AsyncApp` constructor. Within async apps, you can use the async/await pattern.
 
 ```bash
-# Python 3.6+ required
+# Python 3.7+ required
 python -m venv .venv
 source .venv/bin/activate
 

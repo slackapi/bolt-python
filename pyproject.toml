@@ -1,14 +1,13 @@
 [build-system]
-requires = ["setuptools", "pytest-runner==6.0.1", "wheel"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "slack_bolt"
-dynamic = ["version", "readme", "dependencies", "authors"]
+dynamic = ["version", "readme", "authors"]
 description = "The Bolt Framework for Python"
 license = { text = "MIT" }
 classifiers = [
-	"Programming Language :: Python :: 3.6",
 	"Programming Language :: Python :: 3.7",
 	"Programming Language :: Python :: 3.8",
 	"Programming Language :: Python :: 3.9",
@@ -20,7 +19,8 @@ classifiers = [
 	"License :: OSI Approved :: MIT License",
 	"Operating System :: OS Independent",
 ]
-requires-python = ">=3.6"
+requires-python = ">=3.7"
+dependencies = ["slack_sdk>=3.35.0,<4"]
 
 
 [project.urls]
@@ -32,7 +32,6 @@ include = ["slack_bolt*"]
 [tool.setuptools.dynamic]
 version = { attr = "slack_bolt.version.__version__" }
 readme = { file = ["README.md"], content-type = "text/markdown" }
-dependencies = { file = ["requirements.txt"] }
 
 [tool.distutils.bdist_wheel]
 universal = true
