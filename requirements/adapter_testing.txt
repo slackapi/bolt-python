@@ -2,4 +2,4 @@
 moto>=3,<6                               # For AWS tests
 docker>=5,<8                             # Used by moto
 boddle>=0.2,<0.3                         # For Bottle app tests
-sanic-testing>=0.7; python_version>"3.6"
+sanic-testing>=0.7

@@ -19,7 +19,7 @@ A Python framework to build Slack apps in a flash with the latest platform featu
 ## Setup
 
 ```bash
-# Python 3.6+ required
+# Python 3.7+ required
 python -m venv .venv
 source .venv/bin/activate
 
@@ -153,7 +153,7 @@ Most of the app's functionality will be inside listener functions (the `fn` para
 If you'd prefer to build your app with [asyncio](https://docs.python.org/3/library/asyncio.html), you can import the [AIOHTTP](https://docs.aiohttp.org/en/stable/) library and call the `AsyncApp` constructor. Within async apps, you can use the async/await pattern.
 
 ```bash
-# Python 3.6+ required
+# Python 3.7+ required
 python -m venv .venv
 source .venv/bin/activate
 
