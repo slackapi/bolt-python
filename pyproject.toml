@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "slack_bolt"
-dynamic = ["version", "readme", "dependencies", "authors"]
+dynamic = ["version", "readme", "authors"]
 description = "The Bolt Framework for Python"
 license = { text = "MIT" }
 classifiers = [
@@ -20,6 +20,7 @@ classifiers = [
 	"Operating System :: OS Independent",
 ]
 requires-python = ">=3.7"
+dependencies = ["slack_sdk>=3.35.0,<4"]
 
 
 [project.urls]
@@ -31,7 +32,6 @@ include = ["slack_bolt*"]
 [tool.setuptools.dynamic]
 version = { attr = "slack_bolt.version.__version__" }
 readme = { file = ["README.md"], content-type = "text/markdown" }
-dependencies = { file = ["requirements.txt"] }
 
 [tool.distutils.bdist_wheel]
 universal = true
