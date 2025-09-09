@@ -15,7 +15,7 @@ pip uninstall python-lambda
 
 test_target="$1"
 
-pip install -e .
+pip install -U -e .
 
 if [[ $test_target != "" ]]
 then
