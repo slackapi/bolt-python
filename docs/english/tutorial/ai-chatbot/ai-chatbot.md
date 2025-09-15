@@ -12,9 +12,9 @@ In this tutorial, you'll learn how to bring the power of AI into your Slack work
 
 Before getting started, you will need the following:
 
-* a development workspace where you have permissions to install apps. If you don’t have a workspace, go ahead and set that up now — you can [go here](https://slack.com/get-started#create) to create one, or you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
-* a development environment with [Python 3.7](https://www.python.org/downloads/) or later.
-* an Anthropic or OpenAI account with sufficient credits, and in which you have generated a secret key.
+- a development workspace where you have permissions to install apps. If you don’t have a workspace, go ahead and set that up now — you can [go here](https://slack.com/get-started#create) to create one, or you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
+- a development environment with [Python 3.7](https://www.python.org/downloads/) or later.
+- an Anthropic or OpenAI account with sufficient credits, and in which you have generated a secret key.
 
 **Skip to the code**
 If you'd rather skip the tutorial and just head straight to the code, you can use our [Bolt for Python AI Chatbot sample](https://github.com/slack-samples/bolt-python-ai-chatbot) as a template.
@@ -234,6 +234,6 @@ You can also navigate to **Bolty** in your **Apps** list and select the **Messag
 
 Congratulations! You've successfully integrated the power of AI into your workspace. Check out these links to take the next steps in your Bolt for Python journey.
 
-* To learn more about Bolt for Python, refer to the [Getting started](/tools/bolt-python/getting-started) documentation.
-* For more details about creating workflow steps using the Bolt SDK, refer to the [workflow steps for Bolt](/workflows/workflow-steps) guide.
-* To use the Bolt for Python SDK to develop on the automations platform, refer to the [Create a workflow step for Workflow Builder: Bolt for Python](/tools/bolt-python/tutorial/custom-steps-workflow-builder-new) tutorial.
+- To learn more about Bolt for Python, refer to the [Getting started](/tools/bolt-python/getting-started) documentation.
+- For more details about creating workflow steps using the Bolt SDK, refer to the [workflow steps for Bolt](/workflows/workflow-steps) guide.
+- To use the Bolt for Python SDK to develop on the automations platform, refer to the [Create a workflow step for Workflow Builder: Bolt for Python](/tools/bolt-python/tutorial/custom-steps-workflow-builder-new) tutorial.
