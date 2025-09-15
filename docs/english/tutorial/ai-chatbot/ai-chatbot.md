@@ -62,7 +62,7 @@ Models from different AI providers are available if the corresponding environmen
 
 To interact with Anthropic models, navigate to your Anthropic account dashboard to [create an API key](https://console.anthropic.com/settings/keys), then export the key as follows:
 
-```zsh
+```bash
 export ANTHROPIC_API_KEY=<your-api-key>
 ```
 
@@ -72,7 +72,7 @@ To use Google Cloud Vertex AI, [follow this quick start](https://cloud.google.co
 
 Once your project and credentials are configured, export environment variables to select from Gemini models:
 
-```zsh
+```bash
 export VERTEX_AI_PROJECT_ID=<your-project-id>
 export VERTEX_AI_LOCATION=<location-to-deploy-model>
 ```
@@ -83,7 +83,7 @@ The project location can be located under the **Region** on the [Vertex AI](http
 
 Unlock the OpenAI models from your OpenAI account dashboard by clicking [create a new secret key](https://platform.openai.com/api-keys), then export the key like so:
 
-```zsh
+```bash
 export OPENAI_API_KEY=<your-api-key>
 ```
 
