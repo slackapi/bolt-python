@@ -49,7 +49,7 @@ export SLACK_APP_TOKEN=<your-app-token>
 
 **For Windows**
 
-```bash
+```pwsh
 set SLACK_BOT_TOKEN=<your-bot-token>
 set SLACK_APP_TOKEN=<your-app-token>
 ```
