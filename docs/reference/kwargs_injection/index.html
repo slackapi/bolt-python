@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>slack_bolt.kwargs_injection API documentation</title>
+<meta name="description" content="For middleware/listener arguments, Bolt does flexible data injection in accordance with their names …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>slack_bolt.kwargs_injection</code></h1>
+</header>
+<section id="section-intro">
+<p>For middleware/listener arguments, Bolt does flexible data injection in accordance with their names.</p>
+<p>To learn the available arguments, check <code><a title="slack_bolt.kwargs_injection.args" href="args.html">slack_bolt.kwargs_injection.args</a></code>'s API document.
+For steps from apps, checking <code><a title="slack_bolt.workflows.step.utilities" href="../workflows/step/utilities/index.html">slack_bolt.workflows.step.utilities</a></code> as well should be helpful.</p>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="slack_bolt.kwargs_injection.args" href="args.html">slack_bolt.kwargs_injection.args</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="slack_bolt.kwargs_injection.async_args" href="async_args.html">slack_bolt.kwargs_injection.async_args</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="slack_bolt.kwargs_injection.async_utils" href="async_utils.html">slack_bolt.kwargs_injection.async_utils</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="slack_bolt.kwargs_injection.utils" href="utils.html">slack_bolt.kwargs_injection.utils</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="slack_bolt.kwargs_injection.build_required_kwargs"><code class="name flex">
+<span>def <span class="ident">build_required_kwargs</span></span>(<span>*,<br>logger: logging.Logger,<br>required_arg_names: MutableSequence[str],<br>request: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>,<br>response: <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a> | None,<br>next_func: Callable[[], None] | None = None,<br>this_func: Callable | None = None,<br>error: Exception | None = None,<br>next_keys_required: bool = True) ‑> Dict[str, Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_required_kwargs(
+    *,
+    logger: logging.Logger,
+    required_arg_names: MutableSequence[str],
+    request: BoltRequest,
+    response: Optional[BoltResponse],
+    next_func: Optional[Callable[[], None]] = None,
+    this_func: Optional[Callable] = None,
+    error: Optional[Exception] = None,  # for error handlers
+    next_keys_required: bool = True,  # False for listeners / middleware / error handlers
+) -&gt; Dict[str, Any]:
+    all_available_args = {
+        &#34;logger&#34;: logger,
+        &#34;client&#34;: request.context.client,
+        &#34;req&#34;: request,
+        &#34;request&#34;: request,
+        &#34;resp&#34;: response,
+        &#34;response&#34;: response,
+        &#34;context&#34;: request.context,
+        # payload
+        &#34;body&#34;: request.body,
+        &#34;options&#34;: to_options(request.body),
+        &#34;shortcut&#34;: to_shortcut(request.body),
+        &#34;action&#34;: to_action(request.body),
+        &#34;view&#34;: to_view(request.body),
+        &#34;command&#34;: to_command(request.body),
+        &#34;event&#34;: to_event(request.body),
+        &#34;message&#34;: to_message(request.body),
+        &#34;step&#34;: to_step(request.body),
+        # utilities
+        &#34;ack&#34;: request.context.ack,
+        &#34;say&#34;: request.context.say,
+        &#34;respond&#34;: request.context.respond,
+        &#34;complete&#34;: request.context.complete,
+        &#34;fail&#34;: request.context.fail,
+        &#34;set_status&#34;: request.context.set_status,
+        &#34;set_title&#34;: request.context.set_title,
+        &#34;set_suggested_prompts&#34;: request.context.set_suggested_prompts,
+        &#34;save_thread_context&#34;: request.context.save_thread_context,
+        # middleware
+        &#34;next&#34;: next_func,
+        &#34;next_&#34;: next_func,  # for the middleware using Python&#39;s built-in `next()` function
+        # error handler
+        &#34;error&#34;: error,  # Exception
+    }
+    if not next_keys_required:
+        all_available_args.pop(&#34;next&#34;)
+        all_available_args.pop(&#34;next_&#34;)
+
+    all_available_args[&#34;payload&#34;] = (
+        all_available_args[&#34;options&#34;]
+        or all_available_args[&#34;shortcut&#34;]
+        or all_available_args[&#34;action&#34;]
+        or all_available_args[&#34;view&#34;]
+        or all_available_args[&#34;command&#34;]
+        or all_available_args[&#34;event&#34;]
+        or all_available_args[&#34;message&#34;]
+        or all_available_args[&#34;step&#34;]
+        or request.body
+    )
+    for k, v in request.context.items():
+        if k not in all_available_args:
+            all_available_args[k] = v
+
+    if len(required_arg_names) &gt; 0:
+        # To support instance/class methods in a class for listeners/middleware,
+        # check if the first argument is either self or cls
+        first_arg_name = required_arg_names[0]
+        if first_arg_name in {&#34;self&#34;, &#34;cls&#34;}:
+            required_arg_names.pop(0)
+        elif first_arg_name not in all_available_args.keys() and first_arg_name != &#34;args&#34;:
+            if this_func is None:
+                logger.warning(warning_skip_uncommon_arg_name(first_arg_name))
+                required_arg_names.pop(0)
+            elif inspect.ismethod(this_func):
+                # We are sure that we should skip manipulating this arg
+                required_arg_names.pop(0)
+
+    kwargs: Dict[str, Any] = {k: v for k, v in all_available_args.items() if k in required_arg_names}
+    found_arg_names = kwargs.keys()
+    for name in required_arg_names:
+        if name == &#34;args&#34;:
+            if isinstance(request, BoltRequest):
+                kwargs[name] = Args(**all_available_args)  # type: ignore[arg-type]
+            else:
+                logger.warning(f&#34;Unknown Request object type detected ({type(request)})&#34;)
+
+        elif name not in found_arg_names:
+            logger.warning(f&#34;{name} is not a valid argument&#34;)
+            kwargs[name] = None
+    return kwargs</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="slack_bolt.kwargs_injection.Args"><code class="flex name class">
+<span>class <span class="ident">Args</span></span>
+<span>(</span><span>*,<br>logger: logging.Logger,<br>client: slack_sdk.web.client.WebClient,<br>req: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>,<br>resp: <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>,<br>context: <a title="slack_bolt.context.context.BoltContext" href="../context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a>,<br>body: Dict[str, Any],<br>payload: Dict[str, Any],<br>options: Dict[str, Any] | None = None,<br>shortcut: Dict[str, Any] | None = None,<br>action: Dict[str, Any] | None = None,<br>view: Dict[str, Any] | None = None,<br>command: Dict[str, Any] | None = None,<br>event: Dict[str, Any] | None = None,<br>message: Dict[str, Any] | None = None,<br>ack: <a title="slack_bolt.context.ack.ack.Ack" href="../context/ack/ack.html#slack_bolt.context.ack.ack.Ack">Ack</a>,<br>say: <a title="slack_bolt.context.say.say.Say" href="../context/say/say.html#slack_bolt.context.say.say.Say">Say</a>,<br>respond: <a title="slack_bolt.context.respond.respond.Respond" href="../context/respond/respond.html#slack_bolt.context.respond.respond.Respond">Respond</a>,<br>complete: <a title="slack_bolt.context.complete.complete.Complete" href="../context/complete/complete.html#slack_bolt.context.complete.complete.Complete">Complete</a>,<br>fail: <a title="slack_bolt.context.fail.fail.Fail" href="../context/fail/fail.html#slack_bolt.context.fail.fail.Fail">Fail</a>,<br>set_status: <a title="slack_bolt.context.set_status.set_status.SetStatus" href="../context/set_status/set_status.html#slack_bolt.context.set_status.set_status.SetStatus">SetStatus</a> | None = None,<br>set_title: <a title="slack_bolt.context.set_title.set_title.SetTitle" href="../context/set_title/set_title.html#slack_bolt.context.set_title.set_title.SetTitle">SetTitle</a> | None = None,<br>set_suggested_prompts: <a title="slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts" href="../context/set_suggested_prompts/set_suggested_prompts.html#slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts">SetSuggestedPrompts</a> | None = None,<br>get_thread_context: <a title="slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext" href="../context/get_thread_context/get_thread_context.html#slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext">GetThreadContext</a> | None = None,<br>save_thread_context: <a title="slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext" href="../context/save_thread_context/save_thread_context.html#slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext">SaveThreadContext</a> | None = None,<br>next: Callable[[], None],<br>**kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Args:
+    &#34;&#34;&#34;All the arguments in this class are available in any middleware / listeners.
+    You can inject the named variables in the argument list in arbitrary order.
+
+        @app.action(&#34;link_button&#34;)
+        def handle_buttons(ack, respond, logger, context, body, client):
+            logger.info(f&#34;request body: {body}&#34;)
+            ack()
+            if context.channel_id is not None:
+                respond(&#34;Hi!&#34;)
+            client.views_open(
+                trigger_id=body[&#34;trigger_id&#34;],
+                view={ ... }
+            )
+
+    Alternatively, you can include a parameter named `args` and it will be injected with an instance of this class.
+
+        @app.action(&#34;link_button&#34;)
+        def handle_buttons(args):
+            args.logger.info(f&#34;request body: {args.body}&#34;)
+            args.ack()
+            if args.context.channel_id is not None:
+                args.respond(&#34;Hi!&#34;)
+            args.client.views_open(
+                trigger_id=args.body[&#34;trigger_id&#34;],
+                view={ ... }
+            )
+
+    &#34;&#34;&#34;
+
+    client: WebClient
+    &#34;&#34;&#34;`slack_sdk.web.WebClient` instance with a valid token&#34;&#34;&#34;
+    logger: Logger
+    &#34;&#34;&#34;Logger instance&#34;&#34;&#34;
+    req: BoltRequest
+    &#34;&#34;&#34;Incoming request from Slack&#34;&#34;&#34;
+    resp: BoltResponse
+    &#34;&#34;&#34;Response representation&#34;&#34;&#34;
+    request: BoltRequest
+    &#34;&#34;&#34;Incoming request from Slack&#34;&#34;&#34;
+    response: BoltResponse
+    &#34;&#34;&#34;Response representation&#34;&#34;&#34;
+    context: BoltContext
+    &#34;&#34;&#34;Context data associated with the incoming request&#34;&#34;&#34;
+    body: Dict[str, Any]
+    &#34;&#34;&#34;Parsed request body data&#34;&#34;&#34;
+    # payload
+    payload: Dict[str, Any]
+    &#34;&#34;&#34;The unwrapped core data in the request body&#34;&#34;&#34;
+    options: Optional[Dict[str, Any]]  # payload alias
+    &#34;&#34;&#34;An alias for payload in an `@app.options` listener&#34;&#34;&#34;
+    shortcut: Optional[Dict[str, Any]]  # payload alias
+    &#34;&#34;&#34;An alias for payload in an `@app.shortcut` listener&#34;&#34;&#34;
+    action: Optional[Dict[str, Any]]  # payload alias
+    &#34;&#34;&#34;An alias for payload in an `@app.action` listener&#34;&#34;&#34;
+    view: Optional[Dict[str, Any]]  # payload alias
+    &#34;&#34;&#34;An alias for payload in an `@app.view` listener&#34;&#34;&#34;
+    command: Optional[Dict[str, Any]]  # payload alias
+    &#34;&#34;&#34;An alias for payload in an `@app.command` listener&#34;&#34;&#34;
+    event: Optional[Dict[str, Any]]  # payload alias
+    &#34;&#34;&#34;An alias for payload in an `@app.event` listener&#34;&#34;&#34;
+    message: Optional[Dict[str, Any]]  # payload alias
+    &#34;&#34;&#34;An alias for payload in an `@app.message` listener&#34;&#34;&#34;
+    # utilities
+    ack: Ack
+    &#34;&#34;&#34;`ack()` utility function, which returns acknowledgement to the Slack servers&#34;&#34;&#34;
+    say: Say
+    &#34;&#34;&#34;`say()` utility function, which calls `chat.postMessage` API with the associated channel ID&#34;&#34;&#34;
+    respond: Respond
+    &#34;&#34;&#34;`respond()` utility function, which utilizes the associated `response_url`&#34;&#34;&#34;
+    complete: Complete
+    &#34;&#34;&#34;`complete()` utility function, signals a successful completion of the custom function&#34;&#34;&#34;
+    fail: Fail
+    &#34;&#34;&#34;`fail()` utility function, signal that the custom function failed to complete&#34;&#34;&#34;
+    set_status: Optional[SetStatus]
+    &#34;&#34;&#34;`set_status()` utility function for AI Agents &amp; Assistants&#34;&#34;&#34;
+    set_title: Optional[SetTitle]
+    &#34;&#34;&#34;`set_title()` utility function for AI Agents &amp; Assistants&#34;&#34;&#34;
+    set_suggested_prompts: Optional[SetSuggestedPrompts]
+    &#34;&#34;&#34;`set_suggested_prompts()` utility function for AI Agents &amp; Assistants&#34;&#34;&#34;
+    get_thread_context: Optional[GetThreadContext]
+    &#34;&#34;&#34;`get_thread_context()` utility function for AI Agents &amp; Assistants&#34;&#34;&#34;
+    save_thread_context: Optional[SaveThreadContext]
+    &#34;&#34;&#34;`save_thread_context()` utility function for AI Agents &amp; Assistants&#34;&#34;&#34;
+    # middleware
+    next: Callable[[], None]
+    &#34;&#34;&#34;`next()` utility function, which tells the middleware chain that it can continue with the next one&#34;&#34;&#34;
+    next_: Callable[[], None]
+    &#34;&#34;&#34;An alias of `next()` for avoiding the Python built-in method overrides in middleware functions&#34;&#34;&#34;
+
+    def __init__(
+        self,
+        *,
+        logger: logging.Logger,
+        client: WebClient,
+        req: BoltRequest,
+        resp: BoltResponse,
+        context: BoltContext,
+        body: Dict[str, Any],
+        payload: Dict[str, Any],
+        options: Optional[Dict[str, Any]] = None,
+        shortcut: Optional[Dict[str, Any]] = None,
+        action: Optional[Dict[str, Any]] = None,
+        view: Optional[Dict[str, Any]] = None,
+        command: Optional[Dict[str, Any]] = None,
+        event: Optional[Dict[str, Any]] = None,
+        message: Optional[Dict[str, Any]] = None,
+        ack: Ack,
+        say: Say,
+        respond: Respond,
+        complete: Complete,
+        fail: Fail,
+        set_status: Optional[SetStatus] = None,
+        set_title: Optional[SetTitle] = None,
+        set_suggested_prompts: Optional[SetSuggestedPrompts] = None,
+        get_thread_context: Optional[GetThreadContext] = None,
+        save_thread_context: Optional[SaveThreadContext] = None,
+        # As this method is not supposed to be invoked by bolt-python users,
+        # the naming conflict with the built-in one affects
+        # only the internals of this method
+        next: Callable[[], None],
+        **kwargs,  # noqa
+    ):
+        self.logger: logging.Logger = logger
+        self.client: WebClient = client
+        self.request = self.req = req
+        self.response = self.resp = resp
+        self.context: BoltContext = context
+
+        self.body: Dict[str, Any] = body
+        self.payload: Dict[str, Any] = payload
+        self.options: Optional[Dict[str, Any]] = options
+        self.shortcut: Optional[Dict[str, Any]] = shortcut
+        self.action: Optional[Dict[str, Any]] = action
+        self.view: Optional[Dict[str, Any]] = view
+        self.command: Optional[Dict[str, Any]] = command
+        self.event: Optional[Dict[str, Any]] = event
+        self.message: Optional[Dict[str, Any]] = message
+
+        self.ack: Ack = ack
+        self.say: Say = say
+        self.respond: Respond = respond
+        self.complete: Complete = complete
+        self.fail: Fail = fail
+
+        self.set_status = set_status
+        self.set_title = set_title
+        self.set_suggested_prompts = set_suggested_prompts
+        self.get_thread_context = get_thread_context
+        self.save_thread_context = save_thread_context
+
+        self.next: Callable[[], None] = next
+        self.next_: Callable[[], None] = next</code></pre>
+</details>
+<div class="desc"><p>All the arguments in this class are available in any middleware / listeners.
+You can inject the named variables in the argument list in arbitrary order.</p>
+<pre><code>@app.action("link_button")
+def handle_buttons(ack, respond, logger, context, body, client):
+    logger.info(f"request body: {body}")
+    ack()
+    if context.channel_id is not None:
+        respond("Hi!")
+    client.views_open(
+        trigger_id=body["trigger_id"],
+        view={ ... }
+    )
+</code></pre>
+<p>Alternatively, you can include a parameter named <code><a title="slack_bolt.kwargs_injection.args" href="args.html">slack_bolt.kwargs_injection.args</a></code> and it will be injected with an instance of this class.</p>
+<pre><code>@app.action("link_button")
+def handle_buttons(args):
+    args.logger.info(f"request body: {args.body}")
+    args.ack()
+    if args.context.channel_id is not None:
+        args.respond("Hi!")
+    args.client.views_open(
+        trigger_id=args.body["trigger_id"],
+        view={ ... }
+    )
+</code></pre></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.kwargs_injection.Args.ack"><code class="name">var <span class="ident">ack</span> : <a title="slack_bolt.context.ack.ack.Ack" href="../context/ack/ack.html#slack_bolt.context.ack.ack.Ack">Ack</a></code></dt>
+<dd>
+<div class="desc"><p><code>ack()</code> utility function, which returns acknowledgement to the Slack servers</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.action"><code class="name">var <span class="ident">action</span> : Dict[str, Any] | None</code></dt>
+<dd>
+<div class="desc"><p>An alias for payload in an <code>@app.action</code> listener</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.body"><code class="name">var <span class="ident">body</span> : Dict[str, Any]</code></dt>
+<dd>
+<div class="desc"><p>Parsed request body data</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.client"><code class="name">var <span class="ident">client</span> : slack_sdk.web.client.WebClient</code></dt>
+<dd>
+<div class="desc"><p><code>slack_sdk.web.WebClient</code> instance with a valid token</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.command"><code class="name">var <span class="ident">command</span> : Dict[str, Any] | None</code></dt>
+<dd>
+<div class="desc"><p>An alias for payload in an <code>@app.command</code> listener</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.complete"><code class="name">var <span class="ident">complete</span> : <a title="slack_bolt.context.complete.complete.Complete" href="../context/complete/complete.html#slack_bolt.context.complete.complete.Complete">Complete</a></code></dt>
+<dd>
+<div class="desc"><p><code>complete()</code> utility function, signals a successful completion of the custom function</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.context"><code class="name">var <span class="ident">context</span> : <a title="slack_bolt.context.context.BoltContext" href="../context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a></code></dt>
+<dd>
+<div class="desc"><p>Context data associated with the incoming request</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.event"><code class="name">var <span class="ident">event</span> : Dict[str, Any] | None</code></dt>
+<dd>
+<div class="desc"><p>An alias for payload in an <code>@app.event</code> listener</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.fail"><code class="name">var <span class="ident">fail</span> : <a title="slack_bolt.context.fail.fail.Fail" href="../context/fail/fail.html#slack_bolt.context.fail.fail.Fail">Fail</a></code></dt>
+<dd>
+<div class="desc"><p><code>fail()</code> utility function, signal that the custom function failed to complete</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.get_thread_context"><code class="name">var <span class="ident">get_thread_context</span> : <a title="slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext" href="../context/get_thread_context/get_thread_context.html#slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext">GetThreadContext</a> | None</code></dt>
+<dd>
+<div class="desc"><p><code>get_thread_context()</code> utility function for AI Agents &amp; Assistants</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.logger"><code class="name">var <span class="ident">logger</span> : logging.Logger</code></dt>
+<dd>
+<div class="desc"><p>Logger instance</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.message"><code class="name">var <span class="ident">message</span> : Dict[str, Any] | None</code></dt>
+<dd>
+<div class="desc"><p>An alias for payload in an <code>@app.message</code> listener</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.next"><code class="name">var <span class="ident">next</span> : Callable[[], None]</code></dt>
+<dd>
+<div class="desc"><p><code>next()</code> utility function, which tells the middleware chain that it can continue with the next one</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.next_"><code class="name">var <span class="ident">next_</span> : Callable[[], None]</code></dt>
+<dd>
+<div class="desc"><p>An alias of <code>next()</code> for avoiding the Python built-in method overrides in middleware functions</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.options"><code class="name">var <span class="ident">options</span> : Dict[str, Any] | None</code></dt>
+<dd>
+<div class="desc"><p>An alias for payload in an <code>@app.options</code> listener</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.payload"><code class="name">var <span class="ident">payload</span> : Dict[str, Any]</code></dt>
+<dd>
+<div class="desc"><p>The unwrapped core data in the request body</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.req"><code class="name">var <span class="ident">req</span> : <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a></code></dt>
+<dd>
+<div class="desc"><p>Incoming request from Slack</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.request"><code class="name">var <span class="ident">request</span> : <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a></code></dt>
+<dd>
+<div class="desc"><p>Incoming request from Slack</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.resp"><code class="name">var <span class="ident">resp</span> : <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a></code></dt>
+<dd>
+<div class="desc"><p>Response representation</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.respond"><code class="name">var <span class="ident">respond</span> : <a title="slack_bolt.context.respond.respond.Respond" href="../context/respond/respond.html#slack_bolt.context.respond.respond.Respond">Respond</a></code></dt>
+<dd>
+<div class="desc"><p><code>respond()</code> utility function, which utilizes the associated <code>response_url</code></p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.response"><code class="name">var <span class="ident">response</span> : <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a></code></dt>
+<dd>
+<div class="desc"><p>Response representation</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.save_thread_context"><code class="name">var <span class="ident">save_thread_context</span> : <a title="slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext" href="../context/save_thread_context/save_thread_context.html#slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext">SaveThreadContext</a> | None</code></dt>
+<dd>
+<div class="desc"><p><code>save_thread_context()</code> utility function for AI Agents &amp; Assistants</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.say"><code class="name">var <span class="ident">say</span> : <a title="slack_bolt.context.say.say.Say" href="../context/say/say.html#slack_bolt.context.say.say.Say">Say</a></code></dt>
+<dd>
+<div class="desc"><p><code>say()</code> utility function, which calls <code>chat.postMessage</code> API with the associated channel ID</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.set_status"><code class="name">var <span class="ident">set_status</span> : <a title="slack_bolt.context.set_status.set_status.SetStatus" href="../context/set_status/set_status.html#slack_bolt.context.set_status.set_status.SetStatus">SetStatus</a> | None</code></dt>
+<dd>
+<div class="desc"><p><code>set_status()</code> utility function for AI Agents &amp; Assistants</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.set_suggested_prompts"><code class="name">var <span class="ident">set_suggested_prompts</span> : <a title="slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts" href="../context/set_suggested_prompts/set_suggested_prompts.html#slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts">SetSuggestedPrompts</a> | None</code></dt>
+<dd>
+<div class="desc"><p><code>set_suggested_prompts()</code> utility function for AI Agents &amp; Assistants</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.set_title"><code class="name">var <span class="ident">set_title</span> : <a title="slack_bolt.context.set_title.set_title.SetTitle" href="../context/set_title/set_title.html#slack_bolt.context.set_title.set_title.SetTitle">SetTitle</a> | None</code></dt>
+<dd>
+<div class="desc"><p><code>set_title()</code> utility function for AI Agents &amp; Assistants</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.shortcut"><code class="name">var <span class="ident">shortcut</span> : Dict[str, Any] | None</code></dt>
+<dd>
+<div class="desc"><p>An alias for payload in an <code>@app.shortcut</code> listener</p></div>
+</dd>
+<dt id="slack_bolt.kwargs_injection.Args.view"><code class="name">var <span class="ident">view</span> : Dict[str, Any] | None</code></dt>
+<dd>
+<div class="desc"><p>An alias for payload in an <code>@app.view</code> listener</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="slack_bolt" href="../index.html">slack_bolt</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="slack_bolt.kwargs_injection.args" href="args.html">slack_bolt.kwargs_injection.args</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.async_args" href="async_args.html">slack_bolt.kwargs_injection.async_args</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.async_utils" href="async_utils.html">slack_bolt.kwargs_injection.async_utils</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.utils" href="utils.html">slack_bolt.kwargs_injection.utils</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="slack_bolt.kwargs_injection.build_required_kwargs" href="#slack_bolt.kwargs_injection.build_required_kwargs">build_required_kwargs</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="slack_bolt.kwargs_injection.Args" href="#slack_bolt.kwargs_injection.Args">Args</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.kwargs_injection.Args.ack" href="#slack_bolt.kwargs_injection.Args.ack">ack</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.action" href="#slack_bolt.kwargs_injection.Args.action">action</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.body" href="#slack_bolt.kwargs_injection.Args.body">body</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.client" href="#slack_bolt.kwargs_injection.Args.client">client</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.command" href="#slack_bolt.kwargs_injection.Args.command">command</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.complete" href="#slack_bolt.kwargs_injection.Args.complete">complete</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.context" href="#slack_bolt.kwargs_injection.Args.context">context</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.event" href="#slack_bolt.kwargs_injection.Args.event">event</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.fail" href="#slack_bolt.kwargs_injection.Args.fail">fail</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.get_thread_context" href="#slack_bolt.kwargs_injection.Args.get_thread_context">get_thread_context</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.logger" href="#slack_bolt.kwargs_injection.Args.logger">logger</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.message" href="#slack_bolt.kwargs_injection.Args.message">message</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.next" href="#slack_bolt.kwargs_injection.Args.next">next</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.next_" href="#slack_bolt.kwargs_injection.Args.next_">next_</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.options" href="#slack_bolt.kwargs_injection.Args.options">options</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.payload" href="#slack_bolt.kwargs_injection.Args.payload">payload</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.req" href="#slack_bolt.kwargs_injection.Args.req">req</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.request" href="#slack_bolt.kwargs_injection.Args.request">request</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.resp" href="#slack_bolt.kwargs_injection.Args.resp">resp</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.respond" href="#slack_bolt.kwargs_injection.Args.respond">respond</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.response" href="#slack_bolt.kwargs_injection.Args.response">response</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.save_thread_context" href="#slack_bolt.kwargs_injection.Args.save_thread_context">save_thread_context</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.say" href="#slack_bolt.kwargs_injection.Args.say">say</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.set_status" href="#slack_bolt.kwargs_injection.Args.set_status">set_status</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.set_suggested_prompts" href="#slack_bolt.kwargs_injection.Args.set_suggested_prompts">set_suggested_prompts</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.set_title" href="#slack_bolt.kwargs_injection.Args.set_title">set_title</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.shortcut" href="#slack_bolt.kwargs_injection.Args.shortcut">shortcut</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.view" href="#slack_bolt.kwargs_injection.Args.view">view</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

@@ -3,8 +3,8 @@
 
 script_dir=$(dirname $0)
 cd ${script_dir}/.. && \
-  pip install .
-  pip install -r requirements/async.txt && \
-  pip install -r requirements/adapter.txt && \
-  pip install -r requirements/tools.txt && \
+  pip install -U .
+  pip install -U -r requirements/async.txt && \
+  pip install -U -r requirements/adapter.txt && \
+  pip install -U -r requirements/tools.txt && \
   mypy --config-file pyproject.toml
