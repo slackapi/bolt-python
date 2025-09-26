@@ -3,10 +3,7 @@ from slack_sdk import WebClient
 from slack_sdk.web import SlackResponse
 
 from slack_bolt import Say
-from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
-)
+from tests.mock_web_api_server import cleanup_mock_web_api_server, setup_mock_web_api_server
 
 
 class TestSay:
@@ -22,6 +19,11 @@ class TestSay:
     def test_say(self):
         say = Say(client=self.web_client, channel="C111")
         response: SlackResponse = say(text="Hi there!")
+        assert response.status_code == 200
+
+    def test_say_markdown_text(self):
+        say = Say(client=self.web_client, channel="C111")
+        response: SlackResponse = say(markdown_text="**Greetings!**")
         assert response.status_code == 200
 
     def test_say_unfurl_options(self):
