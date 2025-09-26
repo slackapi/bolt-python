@@ -1,3 +1,4 @@
+from re import Pattern
 import time
 from typing import Union, Dict, Any, Optional
 
@@ -59,7 +60,7 @@ def error_authorize_conflicts() -> str:
     return "`authorize` in the top-level arguments is not allowed when you pass either `oauth_settings` or `oauth_flow`"
 
 
-def error_message_event_type(event_type: str) -> str:
+def error_message_event_type(event_type: Union[str, Pattern]) -> str:
     return (
         f'Although the document mentions "{event_type}", '
         'it is not a valid event type. Use "message" instead. '
@@ -329,6 +330,11 @@ def warning_skip_uncommon_arg_name(arg_name: str) -> str:
         f"Bolt skips injecting a value to the first keyword argument ({arg_name}). "
         "If it is self/cls of a method, we recommend using the common names."
     )
+
+
+def warning_ack_timeout_has_no_effect(identifier: Union[str, Pattern], ack_timeout: int) -> str:
+    handler_example = f'@app.function("{identifier}")' if isinstance(identifier, str) else f"@app.function({identifier})"
+    return f"On {handler_example}, as `auto_acknowledge` is `True`, " f"`ack_timeout={ack_timeout}` you gave will be unused"
 
 
 # -------------------------------

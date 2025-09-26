@@ -1,5 +1,4 @@
 import re
-import sys
 from logging import Logger
 
 from slack_bolt.error import BoltError
@@ -25,10 +24,7 @@ from slack_bolt.request.payload_utils import (
 from ..logger.messages import error_message_event_type
 from ..util.utils import get_arg_names_of_callable
 
-if sys.version_info.major == 3 and sys.version_info.minor <= 6:
-    from re import _pattern_type as Pattern  # type: ignore[attr-defined]
-else:
-    from re import Pattern
+from re import Pattern
 from typing import Callable, Awaitable, Any, Sequence, Optional, Union, Dict
 
 from slack_bolt.kwargs_injection import build_required_kwargs
@@ -169,7 +165,7 @@ def _check_event_subtype(event_payload: dict, constraints: dict) -> bool:
     return True
 
 
-def _verify_message_event_type(event_type: str) -> None:
+def _verify_message_event_type(event_type: Union[str, Pattern]) -> None:
     if isinstance(event_type, str) and event_type.startswith("message."):
         raise ValueError(error_message_event_type(event_type))
     if isinstance(event_type, Pattern) and "message\\." in event_type.pattern:
@@ -324,7 +320,7 @@ def _block_action(
     elif isinstance(constraints, dict):
         # block_id matching is optional
         block_id: Optional[Union[str, Pattern]] = constraints.get("block_id")
-        action_id = constraints.get("action_id")
+        action_id = constraints.get("action_id")  # type: ignore[assignment]
         if block_id is None and action_id is None:
             return False
         block_id_matched = block_id is None or _matches(block_id, action.get("block_id"))  # type: ignore[union-attr]

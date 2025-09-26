@@ -68,6 +68,7 @@ from slack_bolt.logger.messages import (
     info_default_oauth_settings_loaded,
     error_installation_store_required_for_builtin_listeners,
     warning_unhandled_by_global_middleware,
+    warning_ack_timeout_has_no_effect,
 )
 from slack_bolt.lazy_listener.asyncio_runner import AsyncioLazyListenerRunner
 from slack_bolt.listener.async_listener import AsyncListener, AsyncCustomListener
@@ -940,6 +941,7 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
         auto_acknowledge: bool = True,
+        ack_timeout: int = 3,
     ) -> Callable[..., Optional[Callable[..., Awaitable[BoltResponse]]]]:
         """Registers a new Function listener.
         This method can be used as either a decorator or a method.
@@ -967,6 +969,9 @@ class AsyncApp:
             middleware: A list of lister middleware functions.
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         """
+        if auto_acknowledge is True:
+            if ack_timeout != 3:
+                self._framework_logger.warning(warning_ack_timeout_has_no_effect(callback_id, ack_timeout))
 
         matchers = list(matchers) if matchers else []
         middleware = list(middleware) if middleware else []
@@ -976,7 +981,7 @@ class AsyncApp:
             primary_matcher = builtin_matchers.function_executed(
                 callback_id=callback_id, base_logger=self._base_logger, asyncio=True
             )
-            return self._register_listener(functions, primary_matcher, matchers, middleware, auto_acknowledge)
+            return self._register_listener(functions, primary_matcher, matchers, middleware, auto_acknowledge, ack_timeout)
 
         return __call__
 
@@ -1456,6 +1461,7 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]],
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]],
         auto_acknowledgement: bool = False,
+        ack_timeout: int = 3,
     ) -> Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]:
         value_to_return = None
         if not isinstance(functions, list):
@@ -1491,6 +1497,7 @@ class AsyncApp:
                 matchers=listener_matchers,
                 middleware=listener_middleware,
                 auto_acknowledgement=auto_acknowledgement,
+                ack_timeout=ack_timeout,
                 base_logger=self._base_logger,
             )
         )
