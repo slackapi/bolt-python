@@ -5786,11 +5786,18 @@ def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt
         self.channel_id = channel_id
         self.thread_ts = thread_ts
 
-    def __call__(self, status: str) -&gt; SlackResponse:
+    def __call__(
+        self,
+        status: str,
+        loading_messages: Optional[List[str]] = None,
+        **kwargs,
+    ) -&gt; SlackResponse:
         return self.client.assistant_threads_setStatus(
-            status=status,
             channel_id=self.channel_id,
             thread_ts=self.thread_ts,
+            status=status,
+            loading_messages=loading_messages,
+            **kwargs,
         )</code></pre>
 </details>
 <div class="desc"></div>
