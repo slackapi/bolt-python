@@ -1,8 +1,7 @@
 ---
 sidebar_label: Quickstart
+title: Quickstart guide with Bolt for Python
 ---
-
-# Quickstart guide with Bolt for Python
 
 This quickstart guide aims to help you get a Slack app using Bolt for Python up and running as soon as possible!
 
@@ -292,8 +291,8 @@ Follow along with the steps that went into making this app on the [building an a
 
 You can now continue customizing your app with various features to make it right for whatever job's at hand. Here are some ideas about what to explore next:
 
-- Explore the different events your bot can listen to with the [`app.event()`](/tools/bolt-python/concepts/event-listening) method. All of the [events](/reference/events) are listed on the API docs site.
-- Bolt allows you to call [Web API](/tools/bolt-python/concepts/web-api) methods with the client attached to your app. There are [over 200 methods](/reference/methods) on the API docs site.
+- Explore the different events your bot can listen to with the [`app.event()`](/tools/bolt-python/concepts/event-listening) method. See the full events reference [here](/reference/events).
+- Bolt allows you to call [Web API](/tools/bolt-python/concepts/web-api) methods with the client attached to your app. There are [over 200 methods](/reference/methods) available.
 - Learn more about the different [token types](/authentication/tokens) and [authentication setups](/tools/bolt-python/concepts/authenticating-oauth). Your app might need different tokens depending on the actions you want to perform or for installations to multiple workspaces.
 - Receive events using HTTP for various deployment methods, such as deploying to Heroku or AWS Lambda.
 - Read on [app design](/surfaces/app-design) and compose fancy messages with blocks using [Block Kit Builder](https://app.slack.com/block-kit-builder) to prototype messages.
