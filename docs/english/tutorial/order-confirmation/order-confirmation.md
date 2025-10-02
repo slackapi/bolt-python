@@ -7,7 +7,7 @@ title: Create a Salesforce order confirmation app
     Learn how to use the Bolt for Python template and create a simple order confirmation app that links to systems of record—like Salesforce—in this tutorial.
   </Column>
   <Column> 
-    ![Image of delivery tracker app](/img/delivery-tracker-main.png)
+    ![Image of delivery tracker app](/img/bolt-python/delivery-tracker-main.png)
   </Column>
 </Columns>
 
