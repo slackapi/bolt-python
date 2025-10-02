@@ -4,28 +4,30 @@ title: Create a Salesforce order confirmation app
 
 <Columns> 
   <Column>
-    Learn how to use the Bolt for Python template and create a simple order confirmation app that links to systems of record—like Salesforce—in this tutorial.
+    Use the Bolt for Python starter template to create a simple order confirmation app that links to a system of record—like Salesforce—in this tutorial.
+
+    The scenario: you work for a large e-commerce company that employs many delivery workers. Those delivery workers don’t have access to a laptop when they’re on the go, but they do have access to Slack on their mobile devices. This tutorial teaches you how to create a simple Slack app that is geared towards these workers. Delivery drivers will enter order numbers on their mobile, along with some additional information about the order. That information is then sent to a channel in Slack and to a system of record. In this tutorial, Salesforce is our system of record.
+
+    You’ll also learn how to use the Bolt for Python starter app template and modify it to fit your needs. Note that this app is meant to be used for educational purposes and has not been tested rigorously enough to be used in production.
+
   </Column>
   <Column> 
     ![Image of delivery tracker app](/img/bolt-python/delivery-tracker-main.png)
   </Column>
 </Columns>
 
-The scenario: you work for a large e-commerce company that employs many delivery workers. Those delivery workers don’t have access to a laptop when they’re on the go, but they do have access to Slack on their mobile devices. This tutorial teaches you how to create a simple Slack app that is geared towards these workers. Delivery drivers will enter order numbers on their mobile, along with some additional information about the order, and have that information sent to a channel in Slack and to a system of record. In this tutorial, Salesforce is our system of record.
-
-You’ll also learn how to use the Bolt for Python starter app template and modify it to fit your needs. Note that this app is meant to be used for educational purposes and has not been tested rigorously enough to be used in production.
 
 ## Getting started
 
 ### Installing the Slack CLI
 
-If you don't already have it, install the Slack CLI from your terminal. Navigate to [the installation guide](/slack-cli/guides/installing-the-slack-cli-for-mac-and-linux/) and follow the steps.
+If you don't already have it, install the Slack CLI from your terminal. Navigate to the installation guide ([for Mac and Linux](/tools/slack-cli/guides/installing-the-slack-cli-for-mac-and-linux) or [for Windows](/tools/slack-cli/guides/installing-the-slack-cli-for-windows)) and follow the steps.
 
 ### Cloning the starter app
 
 Once installed, use the command `slack create` in your terminal and find the `bolt-python-starter-template`. Alternatively, you can clone the [Bolt for Python template](https://github.com/slack-samples/bolt-python-starter-template) using git.
 
-Optionally, you can remove the portions from the template that are not used within this tutorial to make things a bit cleaner for yourself. To do this, open your project and delete the commands, events, and shortcuts folders from the `/listeners` folder. You can also do the same to the corresponding folders within the `/listeners/tests` folder as well. Finally, remove the imports of these files from the `/listeners/__init__.py` file.
+You can remove the portions from the template that are not used within this tutorial to make things a bit cleaner for yourself. To do this, open your project and delete the commands, events, and shortcuts folders from the `/listeners` folder. You can also do the same to the corresponding folders within the `/listeners/tests` folder as well. Finally, remove the imports of these files from the `/listeners/__init__.py` file.
 
 ## Creating your app
 
@@ -165,7 +167,7 @@ def register(app: App):
 
 Now, restart your server to bring in the new code and test that your function works by sending an order confirmation ID, like `HWOA-1524`, in your testing channel. Your app should respond with the message you created within Block Kit Builder.
 
-## Handling an incorrect delivery ID
+### Handling an incorrect delivery ID
 
 Notice that if you try to click on either of the buttons within your message, nothing will happen. This is because we have yet to create a function to handle the button click. Let’s start with the `Not correct` button first.
 
@@ -192,7 +194,7 @@ def deny_delivery_callback(ack, body, client, logger: Logger):
         logger.error(e)
 ```
 
-This function will call the [`chat.update`](/methods/chat.update) Web API method, which will update the original message with buttons, to the one that we created previously. This will also prevent the message from being pressed more than once.
+This function will call the [`chat.update`](/reference/methods/chat.update) Web API method, which will update the original message with buttons, to the one that we created previously. This will also prevent the message from being pressed more than once.
 
 3. Make the connection to this function again within the `actions/__init__.py` folder with the following code:
 
@@ -269,7 +271,7 @@ def register(app: App):
 
 Test your app by typing in a confirmation number in channel, click the confirm button and see if the modal comes up and you are able to capture information from the user.
 
-## Submitting the form
+### Submitting the form
 
 Lastly, we’ll handle the submission of the form, which will trigger two things. We want to send the information into the specified channel, which will let the user know that the form was successful, as well as send the information into our system of record, Salesforce.
 
@@ -374,4 +376,4 @@ pip install -r requirements.txt
 
 Test your app one last time, and you’re done!
 
-Congratulations! You’ve built an app using [Bolt for Python](/bolt-python/) that allows you to send information into Slack, as well as into a third-party service. While there are more features you can add to make this a more robust app, we hope that this serves as a good introduction into connecting services like Salesforce using Slack as a conduit.
+Congratulations! You’ve built an app using [Bolt for Python](/tools/bolt-python/) that allows you to send information into Slack, as well as into a third-party service. While there are more features you can add to make this a more robust app, we hope that this serves as a good introduction into connecting services like Salesforce using Slack as a conduit.
