@@ -6,15 +6,15 @@ title: Create a Salesforce order confirmation app
   <Column>
     Use the Bolt for Python starter template to create a simple order confirmation app that links to a system of record—like Salesforce—in this tutorial.
 
-    The scenario: you work for a large e-commerce company that employs many delivery workers. Those delivery workers don’t have access to a laptop when they’re on the go, but they do have access to Slack on their mobile devices. This tutorial teaches you how to create a simple Slack app that is geared towards these workers. Delivery drivers will enter order numbers on their mobile, along with some additional information about the order. That information is then sent to a channel in Slack and to a system of record. In this tutorial, Salesforce is our system of record.
-
-    You’ll also learn how to use the Bolt for Python starter app template and modify it to fit your needs. Note that this app is meant to be used for educational purposes and has not been tested rigorously enough to be used in production.
+    The scenario: you work for a large e-commerce company that employs many delivery workers. Those delivery workers don’t have access to a laptop when they’re on the go, but they do have access to Slack on their mobile devices. This tutorial teaches you how to create a simple Slack app that is geared towards these workers. Delivery drivers will enter order numbers on their mobile, along with some additional information about the order. That information is then sent to a channel in Slack and to a system of record. In this tutorial, Salesforce is our system of record..
 
   </Column>
   <Column> 
     ![Image of delivery tracker app](/img/bolt-python/delivery-tracker-main.png)
   </Column>
 </Columns>
+
+You’ll also learn how to use the Bolt for Python starter app template and modify it to fit your needs. Note that this app is meant to be used for educational purposes and has not been tested rigorously enough to be used in production
 
 
 ## Getting started
@@ -212,7 +212,7 @@ def register(app: App):
 
 Test out your code by sending in a confirmation number into your channel and clicking the `Not correct` button. If the message is updated, then you’re good to go onto the next step.
 
-## Handling a correct delivery ID
+### Handling a correct delivery ID
 
 The next step is to handle the `Confirm` button. In this case, we’re going to pull up a modal instead of just a message.
 
