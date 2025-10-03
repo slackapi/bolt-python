@@ -164,7 +164,7 @@ class TestAttachmentActions:
         assert_auth_test_count(self, 1)
 
 
-# https://api.slack.com/legacy/interactive-messages
+# https://docs.slack.dev/legacy/legacy-messaging/legacy-making-messages-interactive/
 body = {
     "type": "interactive_message",
     "actions": [

@@ -60,7 +60,7 @@ ngrok http 3000
 
 ## Running a Socket Mode app
 
-If you use [Socket Mode](https://api.slack.com/socket-mode) for running your app, `SocketModeHandler` is available for it.
+If you use [Socket Mode](https://docs.slack.dev/apis/events-api/using-socket-mode/) for running your app, `SocketModeHandler` is available for it.
 
 ```python
 import os
@@ -91,7 +91,7 @@ python app.py
 
 ## Listening for events
 
-Apps typically react to a collection of incoming events, which can correspond to [Events API events](https://api.slack.com/events-api), [actions](https://api.slack.com/interactivity/components), [shortcuts](https://api.slack.com/interactivity/shortcuts), [slash commands](https://api.slack.com/interactivity/slash-commands) or [options requests](https://api.slack.com/reference/block-kit/block-elements#external_select). For each type of
+Apps typically react to a collection of incoming events, which can correspond to [Events API events](https://docs.slack.dev/apis/events-api/), [actions](https://docs.slack.dev/block-kit/#making-things-interactive), [shortcuts](https://docs.slack.dev/interactivity/implementing-shortcuts/), [slash commands](https://docs.slack.dev/interactivity/implementing-slash-commands/) or [options requests](https://docs.slack.dev/reference/block-kit/block-elements/select-menu-element#external_select). For each type of
 request, there's a method to build a listener function.
 
 ```python
@@ -138,12 +138,12 @@ Most of the app's functionality will be inside listener functions (the `fn` para
 | Argument  | Description  |
 | :---: | :--- |
 | `body` | Dictionary that contains the entire body of the request (superset of `payload`). Some accessory data is only available outside of the payload (such as `trigger_id` and `authorizations`).
-| `payload` | Contents of the incoming event. The payload structure depends on the listener. For example, for an Events API event, `payload` will be the [event type structure](https://api.slack.com/events-api#event_type_structure). For a block action, it will be the action from within the `actions` list. The `payload` dictionary is also accessible via the alias corresponding to the listener (`message`, `event`, `action`, `shortcut`, `view`, `command`, or `options`). For example, if you were building a `message()` listener, you could use the `payload` and `message` arguments interchangably. **An easy way to understand what's in a payload is to log it**. |
+| `payload` | Contents of the incoming event. The payload structure depends on the listener. For example, for an Events API event, `payload` will be the [event type structure](https://docs.slack.dev/apis/events-api/#event-type-structure). For a block action, it will be the action from within the `actions` list. The `payload` dictionary is also accessible via the alias corresponding to the listener (`message`, `event`, `action`, `shortcut`, `view`, `command`, or `options`). For example, if you were building a `message()` listener, you could use the `payload` and `message` arguments interchangably. **An easy way to understand what's in a payload is to log it**. |
 | `context` | Event context. This dictionary contains data about the event and app, such as the `botId`. Middleware can add additional context before the event is passed to listeners.
-| `ack` | Function that **must** be called to acknowledge that your app received the incoming event. `ack` exists for all actions, shortcuts, view submissions, slash command and options requests. `ack` returns a promise that resolves when complete. Read more in [Acknowledging events](https://tools.slack.dev/bolt-python/concepts/acknowledge).
+| `ack` | Function that **must** be called to acknowledge that your app received the incoming event. `ack` exists for all actions, shortcuts, view submissions, slash command and options requests. `ack` returns a promise that resolves when complete. Read more in [Acknowledging events](https://docs.slack.dev/tools/bolt-python/concepts/acknowledge/).
 | `respond` | Utility function that responds to incoming events **if** it contains a `response_url` (shortcuts, actions, and slash commands).
 | `say` | Utility function to send a message to the channel associated with the incoming event. This argument is only available when the listener is triggered for events that contain a `channel_id` (the most common being `message` events). `say` accepts simple strings (for plain-text messages) and dictionaries (for messages containing blocks).
-| `client` | Web API client that uses the token associated with the event. For single-workspace installations, the token is provided to the constructor. For multi-workspace installations, the token is returned by using [the OAuth library](https://tools.slack.dev/bolt-python/concepts/authenticating-oauth), or manually using the `authorize` function.
+| `client` | Web API client that uses the token associated with the event. For single-workspace installations, the token is provided to the constructor. For multi-workspace installations, the token is returned by using [the OAuth library](https://docs.slack.dev/tools/bolt-python/concepts/authenticating-oauth/), or manually using the `authorize` function.
 | `logger` | The built-in [`logging.Logger`](https://docs.python.org/3/library/logging.html) instance you can use in middleware/listeners.
 | `complete` | Utility function used to signal the successful completion of a custom step execution. This tells Slack to proceed with the next steps in the workflow. This argument is only available with the `.function` and `.action` listener when handling custom workflow step executions.
 | `fail` | Utility function used to signal that a custom step failed to complete. This tells Slack to stop the workflow execution. This argument is only available with the `.function` and `.action` listener when handling custom workflow step executions.
@@ -192,7 +192,7 @@ Apps can be run the same way as the syncronous example above. If you'd prefer an
 
 ## Getting Help
 
-[The documentation](https://tools.slack.dev/bolt-python) has more information on basic and advanced concepts for Bolt for Python. Also, all the Python module documents of this library are available [here](https://tools.slack.dev/bolt-python/reference/).
+[The documentation](https://docs.slack.dev/tools/bolt-python/) has more information on basic and advanced concepts for Bolt for Python. Also, all the Python module documents of this library are available [here](https://docs.slack.dev/tools/bolt-python/reference/).
 
 If you otherwise get stuck, we're here to help. The following are the best ways to get assistance working through your issue:
 

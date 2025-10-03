@@ -159,10 +159,10 @@ class App:
             if __name__ == "__main__":
                 app.start(port=int(os.environ.get("PORT", 3000)))
 
-        Refer to https://slack.dev/bolt-python/tutorial/getting-started for details.
+        Refer to https://docs.slack.dev/tools/bolt-python/building-an-app for details.
 
         If you would like to build an OAuth app for enabling the app to run with multiple workspaces,
-        refer to https://slack.dev/bolt-python/concepts#authenticating-oauth to learn how to configure the app.
+        refer to https://docs.slack.dev/tools/bolt-python/concepts/authenticating-oauth to learn how to configure the app.
 
         Args:
             logger: The custom logger that can be used in this app.
@@ -671,7 +671,7 @@ class App:
             # Pass a function to this method
             app.middleware(middleware_func)
 
-        Refer to https://slack.dev/bolt-python/concepts#global-middleware for details.
+        Refer to https://docs.slack.dev/tools/bolt-python/concepts/global-middleware for details.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
@@ -717,7 +717,7 @@ class App:
         """
         Deprecated:
             Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         Registers a new step from app listener.
 
@@ -735,7 +735,7 @@ class App:
             # Pass Step to set up listeners
             app.step(ws)
 
-        Refer to https://api.slack.com/workflows/steps for details of steps from apps.
+        Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details of steps from apps.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
@@ -752,7 +752,7 @@ class App:
         warnings.warn(
             (
                 "Steps from apps for legacy workflows are now deprecated. "
-                "Use new custom steps: https://api.slack.com/automation/functions/custom-bolt"
+                "Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/"
             ),
             category=DeprecationWarning,
         )
@@ -829,7 +829,7 @@ class App:
             # Pass a function to this method
             app.event("team_join")(ask_for_introduction)
 
-        Refer to https://api.slack.com/apis/connections/events-api for details of Events API.
+        Refer to https://docs.slack.dev/apis/events-api/ for details of Events API.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
@@ -867,7 +867,7 @@ class App:
             # Pass a function to this method
             app.message(":wave:")(say_hello)
 
-        Refer to https://api.slack.com/events/message for details of `message` events.
+        Refer to https://docs.slack.dev/reference/events/message/ for details of `message` events.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
@@ -978,7 +978,7 @@ class App:
             # Pass a function to this method
             app.command("/echo")(repeat_text)
 
-        Refer to https://api.slack.com/interactivity/slash-commands for details of Slash Commands.
+        Refer to https://docs.slack.dev/interactivity/implementing-slash-commands/ for details of Slash Commands.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
@@ -1025,7 +1025,7 @@ class App:
             # Pass a function to this method
             app.shortcut("open_modal")(open_modal)
 
-        Refer to https://api.slack.com/interactivity/shortcuts for details about Shortcuts.
+        Refer to https://docs.slack.dev/interactivity/implementing-shortcuts/ for details about Shortcuts.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
@@ -1093,9 +1093,9 @@ class App:
             # Pass a function to this method
             app.action("approve_button")(update_message)
 
-        * Refer to https://api.slack.com/reference/interaction-payloads/block-actions for actions in `blocks`.
-        * Refer to https://api.slack.com/legacy/message-buttons for actions in `attachments`.
-        * Refer to https://api.slack.com/dialogs for actions in dialogs.
+        * Refer to https://docs.slack.dev/reference/interaction-payloads/block_actions-payload/ for actions in `blocks`.
+        * Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons/ for actions in `attachments`.
+        * Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for actions in dialogs.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
@@ -1121,7 +1121,7 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `block_actions` action listener.
-        Refer to https://api.slack.com/reference/interaction-payloads/block-actions for details.
+        Refer to https://docs.slack.dev/reference/interaction-payloads/block_actions-payload/ for details.
         """
 
         def __call__(*args, **kwargs):
@@ -1138,7 +1138,7 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `interactive_message` action listener.
-        Refer to https://api.slack.com/legacy/message-buttons for details."""
+        Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons/ for details."""
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1154,7 +1154,7 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `dialog_submission` listener.
-        Refer to https://api.slack.com/dialogs for details."""
+        Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details."""
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1170,7 +1170,7 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `dialog_cancellation` listener.
-        Refer to https://api.slack.com/dialogs for details."""
+        Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details."""
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1211,7 +1211,7 @@ class App:
             # Pass a function to this method
             app.view("view_1")(handle_submission)
 
-        Refer to https://api.slack.com/reference/interaction-payloads/views for details of payloads.
+        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload for details of payloads.
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
@@ -1237,7 +1237,9 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `view_submission` listener.
-        Refer to https://api.slack.com/reference/interaction-payloads/views#view_submission for details."""
+        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for
+        details.
+        """
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1253,7 +1255,7 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `view_closed` listener.
-        Refer to https://api.slack.com/reference/interaction-payloads/views#view_closed for details."""
+        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_closed for details."""
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1294,8 +1296,8 @@ class App:
 
         Refer to the following documents for details:
 
-        * https://api.slack.com/reference/block-kit/block-elements#external_select
-        * https://api.slack.com/reference/block-kit/block-elements#external_multi_select
+        * https://docs.slack.dev/reference/block-kit/block-elements/select-menu-element#external_select
+        * https://docs.slack.dev/reference/block-kit/block-elements/multi-select-menu-element#external_multi_select
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
@@ -1335,7 +1337,7 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `dialog_suggestion` listener.
-        Refer to https://api.slack.com/dialogs for details."""
+        Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details."""
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
