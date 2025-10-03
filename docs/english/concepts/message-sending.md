@@ -41,65 +41,35 @@ def show_datepicker(event, say):
         )
 ```
 
-## Streaming messages 
+## Streaming messages {#streaming-messages}
 
-You can have your app's messages stream in for those AI chatbot vibes. This is done through three methods:
+You can have your app's messages stream in to replicate conventional AI chatbot behavior. This is done through three Web API methods:
 
-* `chat_startStream`
-* `chat_appendStream`
-* `chat_stopStream`
+* [`chat_startStream`](/reference/methods/chat.startstream)
+* [`chat_appendStream`](/reference/methods/chat.appendstream)
+* [`chat_stopStream`](/reference/methods/chat.stopstream)
 
-### Starting the message stream
-
-First you need to begin the message stream.
+The Python Slack SDK provides a [`chat_stream()`](https://docss.slack.dev/tools/python-slack-sdk/reference/web/client.html#slack_sdk.web.client.WebClient.chat_stream) helper utility to streamline calling these methods. Here's an excerpt from our [Assistant template app](https://github.com/slack-samples/bolt-python-assistant-template/blob/main/listeners/assistant/assistant.py)
 
 ```python
-# Example: Stream a response to any message
-@app.message()
-def handle_message(message, client):
-    channel_id = payload["channel"]
-    thread_ts = payload["thread_ts"]
-    
-    # Start a new message stream
-    stream_response = client.chat_startStream(
-        channel=channel_id,
-        thread_ts=thread_ts,
-    )
-    stream_ts = stream_response["ts"]
+streamer = client.chat_stream(
+    channel=channel_id,
+    recipient_team_id=team_id,
+    recipient_user_id=user_id,
+    thread_ts=thread_ts,
+)
+
+for event in returned_message:
+    if event.type == "response.output_text.delta":
+        streamer.append(markdown_text=f"{event.delta}")
+    else:
+        continue
+
+feedback_block = create_feedback_block()
+streamer.stop(blocks=feedback_block)
 ```
 
-### Appending content to the message stream
-
-With the stream started, you can then append text to it in chunks to convey a streaming effect.
-
-The structure of the text coming in will depend on your source. The following code snippet uses OpenAI's response structure as an example. 
-
-```python
-# continued from above
-    for event in returned_message:
-        if event.type == "response.output_text.delta":
-            client.chat_appendStream(
-                channel=channel_id, 
-                ts=stream_ts, 
-                markdown_text=f"{event.delta}"
-            )
-        else:
-            continue
-```
-
-### Finishing the message stream
-
-Your app can then end the stream with the `chat_stopStream` method. 
-
-```python
-# continued from above
-    client.chat_stopStream(
-        channel=channel_id, 
-        ts=stream_ts
-    )
-```
-
-The method also provides you an opportunity to request user feedback on your app's responses using the [feedback buttons](/reference/block-kit/block-elements/feedback-buttons-element) block element within the [context actions](/reference/block-kit/blocks/context-actions-block) block. The user will be presented with thumbs up and thumbs down buttons
+In that example, a [feedback buttons](/reference/block-kit/block-elements/feedback-buttons-element) block element is passed to `streamer.stop` — this provides feedback buttons to the user at the bottom of the message.
 
 ```python
 def create_feedback_block() -> List[Block]:
@@ -123,16 +93,6 @@ def create_feedback_block() -> List[Block]:
         )
     ]
     return blocks
-
-@app.message()
-def handle_message(message, client):
-    # ... previous streaming code ...
-    
-    # Stop the stream and add interactive elements
-    feedback_block = create_feedback_block()
-    client.chat_stopStream(
-        channel=channel_id, 
-        ts=stream_ts, 
-        blocks=feedback_block
-    )
 ```
+
+For information on calling the `chat_*Stream` API methods without the helper utility, see the [_Sending streaming messages_](/tools/python-slack-sdk/web#sending-streaming-messages) section of the Python Slack SDK docs.
