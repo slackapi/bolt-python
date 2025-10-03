@@ -1306,7 +1306,9 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         &#34;&#34;&#34;Registers a new `view_submission` listener.
-        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for details.&#34;&#34;&#34;
+        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for
+        details.
+        &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -3166,7 +3168,9 @@ Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-int
     middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
 ) -&gt; Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
     &#34;&#34;&#34;Registers a new `view_submission` listener.
-    Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for details.&#34;&#34;&#34;
+    Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for
+    details.
+    &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -3176,7 +3180,8 @@ Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-int
     return __call__</code></pre>
 </details>
 <div class="desc"><p>Registers a new <code>view_submission</code> listener.
-Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission">https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission</a> for details.</p></div>
+Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission">https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission</a> for
+details.</p></div>
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp.web_app"><code class="name flex">
 <span>def <span class="ident">web_app</span></span>(<span>self, path: str = '/slack/events', port: int = 3000) ‑> aiohttp.web_app.Application</span>
@@ -5307,7 +5312,7 @@ async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltRes
 
     async def __call__(
         self,
-        prompts: List[Union[str, Dict[str, str]]],
+        prompts: Sequence[Union[str, Dict[str, str]]],
         title: Optional[str] = None,
     ) -&gt; AsyncSlackResponse:
         prompts_arg: List[Dict[str, str]] = []
