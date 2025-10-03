@@ -16,13 +16,13 @@ def log_request(logger, body, next):
     return next()
 
 
-# Events API: https://api.slack.com/events-api
+# Events API: https://docs.slack.dev/apis/events-api/
 @app.event("app_mention")
 def event_test(say):
     say("What's up?")
 
 
-# Interactivity: https://api.slack.com/interactivity
+# Interactivity: https://docs.slack.dev/interactivity/
 @app.shortcut("callback-id-here")
 # @app.command("/hello-bolt-python")
 def open_modal(ack, client, logger, body):

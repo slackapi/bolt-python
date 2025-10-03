@@ -1,5 +1,5 @@
 # Getting Started with ⚡️ Bolt for Python
-> Slack app example from 📚 [Getting started with Bolt for Python][1]
+> Slack app example from 📚 [Building an App with Bolt for Python][1]
 
 ## Overview
 
@@ -42,6 +42,6 @@ ngrok http 3000
 python3 app.py
 ```
 
-[1]: https://slack.dev/bolt-python/tutorial/getting-started
-[2]: https://slack.dev/bolt-python/
-[3]: https://slack.dev/bolt-python/tutorial/getting-started#setting-up-events
+[1]: https://docs.slack.dev/tools/bolt-python/building-an-app
+[2]: https://docs.slack.dev/tools/bolt-python/
+[3]: https://docs.slack.dev/tools/bolt-python/building-an-app#setting-up-events

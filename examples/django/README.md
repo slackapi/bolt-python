@@ -4,7 +4,7 @@ This example demonstrates how you can use Bolt for Python in your Django applica
 
 ### `simple_app` - Single-workspace App Example
 
-If you want to run a simple app like the one you've tried in the [Getting Started Guide](https://slack.dev/bolt-python/tutorial/getting-started), this is the right one for you. By default, this Django project runs this application. If you want to switch to OAuth flow supported one, modify `myslackapp/urls.py`.
+If you want to run a simple app like the one you've tried in the [Building an App](https://docs.slack.dev/tools/bolt-python/building-an-app) guide, this is the right one for you. By default, this Django project runs this application. If you want to switch to OAuth flow supported one, modify `myslackapp/urls.py`.
 
 To run this app, all you need to do are:
 
@@ -31,7 +31,7 @@ python manage.py migrate
 python manage.py runserver 0.0.0.0:3000
 ```
 
-As you did at [Getting Started Guide](https://slack.dev/bolt-python/tutorial/getting-started), configure ngrok or something similar to serve a public endpoint. Lastly,
+As you did at [Building an App](https://docs.slack.dev/tools/bolt-python/building-an-app) guide, configure ngrok or something similar to serve a public endpoint. Lastly,
 
 * Go back to the Slack app configuration page
 * Go to "Event Subscriptions"
@@ -54,7 +54,7 @@ To run this app, all you need to do are:
 * Create a new Slack app configuration at https://api.slack.com/apps?new_app=1
 * Go to "OAuth & Permissions"
   * Add `app_mentions:read`, `chat:write` in Scopes > Bot Token Scopes
-* Follow the instructions [here](https://slack.dev/bolt-python/concepts#authenticating-oauth) for configuring OAuth flow supported Slack apps
+* Follow the instructions [here](https://docs.slack.dev/tools/bolt-python/concepts/authenticating-oauth) for configuring OAuth flow supported Slack apps
 
 You can start your Django application this way:
 
@@ -73,7 +73,7 @@ python manage.py migrate
 python manage.py runserver 0.0.0.0:3000
 ```
 
-As you did at [Getting Started Guide](https://slack.dev/bolt-python/tutorial/getting-started), configure ngrok or something similar to serve a public endpoint. Lastly,
+As you did at [Building an App](https://docs.slack.dev/tools/bolt-python/building-an-app) guide, configure ngrok or something similar to serve a public endpoint. Lastly,
 
 * Go back to the Slack app configuration page
 * Go to "Event Subscriptions"
