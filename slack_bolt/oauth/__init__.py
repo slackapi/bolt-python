@@ -1,6 +1,6 @@
 """Slack OAuth flow support for building an app that is installable in any workspaces.
 
-Refer to https://slack.dev/bolt-python/concepts#authenticating-oauth for details.
+Refer to https://docs.slack.dev/tools/bolt-python/concepts/authenticating-oauth for details.
 """
 
 # Don't add async module imports here

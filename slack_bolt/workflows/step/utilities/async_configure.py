@@ -32,7 +32,7 @@ class AsyncConfigure:
         )
         app.step(ws)
 
-    Refer to https://api.slack.com/workflows/steps for details.
+    Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
     """
 
     def __init__(self, *, callback_id: str, client: AsyncWebClient, body: dict):

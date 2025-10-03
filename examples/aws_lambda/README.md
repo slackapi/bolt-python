@@ -32,16 +32,16 @@ Instructions on how to set up and deploy each example are provided below.
       `lazy_aws_lambda_config.yaml`
   - Optionally enter a description for the role, such as "Bolt Python basic
       role"
-3. Ensure you have created an app on api.slack.com/apps as per the [Getting
-   Started Guide](https://slack.dev/bolt-python/tutorial/getting-started).
+3. Ensure you have created an app on api.slack.com/apps as per the
+   [Building an App](https://docs.slack.dev/tools/bolt-python/building-an-app) guide.
    Ensure you have installed it to a workspace.
 4. Ensure you have exported your Slack Bot Token and Slack Signing Secret for your
    apps as the environment variables `SLACK_BOT_TOKEN` and
-   `SLACK_SIGNING_SECRET`, respectively, as per the [Getting
-   Started Guide](https://slack.dev/bolt-python/tutorial/getting-started).
+   `SLACK_SIGNING_SECRET`, respectively, as per the
+   [Building an App](https://docs.slack.dev/tools/bolt-python/building-an-app) guide.
 5. You may want to create a dedicated virtual environment for this example app, as
-   per the "Setting up your project" section of the [Getting
-   Started Guide](https://slack.dev/bolt-python/tutorial/getting-started).
+   per the "Setting up your project" section of the
+   [Building an App](https://docs.slack.dev/tools/bolt-python/building-an-app) guide.
 6. Let's deploy the Lambda! Run `./deploy_lazy.sh`. By default it deploys to the
    us-east-1 region in AWS - you can change this at the top of `lazy_aws_lambda_config.yaml` if you wish.
 7. Load up AWS Lambda inside the AWS Console - make sure you are in the correct
@@ -150,7 +150,7 @@ Let’s create a user role that will use the custom policy we created as well as
     3. "Create Role"
 
 ### Create Slack App and Load your Lambda to AWS
-Ensure you have created an app on [api.slack.com/apps](https://api.slack.com/apps) as per the [Getting Started Guide](https://slack.dev/bolt-python/tutorial/getting-started). You do not need to ensure you have installed it to a workspace, as the OAuth flow will provide your app the ability to be installed by anyone.
+Ensure you have created an app on [api.slack.com/apps](https://api.slack.com/apps) as per the [Building an App](https://docs.slack.dev/tools/bolt-python/building-an-app) guide. You do not need to ensure you have installed it to a workspace, as the OAuth flow will provide your app the ability to be installed by anyone.
 
 1. Remember those S3 buckets we made? You will need the names of these buckets again in the next step.
 2. You need many environment variables exported! Specifically the following from api.slack.com/apps
