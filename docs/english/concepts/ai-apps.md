@@ -1,5 +1,5 @@
 
-# Using AI in Apps
+# Using AI in Apps {#using-ai-in-apps}
 
 The Slack platform offers features tailored for AI agents and assistants. Your apps can [utilize the `Assistant` class](#assistant) for a side-panel view designed with AI in mind, or they can utilize features applicable to messages throughout Slack, like [chat streaming](#text-streaming) and [feedback buttons](#adding-and-handling-feedback).
 
@@ -63,7 +63,7 @@ If you do provide your own `threadContextStore` property, it must feature `get` 
 :::tip[Refer to the [reference docs](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.]
 :::
 
-### Configuring your app to support the `Assistant` class
+### Configuring your app to support the `Assistant` class {#configuring-assistant-class}
 
 1. Within [App Settings](https://api.slack.com/apps), enable the **Agents & AI Apps** feature.
 
@@ -122,7 +122,7 @@ def start_assistant_thread(
 
 You can send more complex messages to the user — see [Sending Block Kit alongside messages](#block-kit-interactions) for more info. 
 
-## Handling thread context changes {#handling-thread-context-changes}
+### Handling thread context changes {#handling-thread-context-changes}
 
 When the user switches channels, the [`assistant_thread_context_changed`](/reference/events/assistant_thread_context_changed) event will be sent to your app. 
 
@@ -137,7 +137,7 @@ from slack_bolt import FileAssistantThreadContextStore
 assistant = Assistant(thread_context_store=FileAssistantThreadContextStore())
 ```
 
-## Handling the user response {#handling-user-response}
+### Handling the user response {#handling-user-response}
 
 When the user messages your app, the [`message.im`](/reference/events/message.im) event will be sent to your app.
 
@@ -205,183 +205,7 @@ def respond_in_assistant_thread(
 app.use(assistant)
 ```
 
-## Text streaming in messages {#text-streaming}
-
-Three Web API methods work together to provide users a text streaming experience: 
-
-* the [`chat.startStream`](/reference/methods/chat.startstream) method starts the text stream, 
-* the [`chat.appendStream`](/reference/methods/chat.appendstream) method appends text to the stream, and 
-* the [`chat.stopStream`](/reference/methods/chat.stopstream) method stops it.
-
-Since you're using Bolt for Python, built upon the Python Slack SDK, you can use the [`chat_stream()`](https://docs.slack.dev/tools/python-slack-sdk/reference/web/client.html#slack_sdk.web.client.WebClient.chat_stream) utility to streamline all three aspects of streaming in your app's messages.
-
-The following example uses OpenAI's streaming API with the new `chat_stream()` functionality, but you can substitute it with the AI client of your choice.
-
-
-```python
-import os
-from typing import List, Dict
-
-import openai
-from openai import Stream
-from openai.types.responses import ResponseStreamEvent
-
-DEFAULT_SYSTEM_CONTENT = """
-You're an assistant in a Slack workspace.
-Users in the workspace will ask you to help them write something or to think better about a specific topic.
-You'll respond to those questions in a professional way.
-When you include markdown text, convert them to Slack compatible ones.
-When a prompt has Slack's special syntax like <@USER_ID> or <#CHANNEL_ID>, you must keep them as-is in your response.
-"""
-
-def call_llm(
-    messages_in_thread: List[Dict[str, str]],
-    system_content: str = DEFAULT_SYSTEM_CONTENT,
-) -> Stream[ResponseStreamEvent]:
-    openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    messages = [{"role": "system", "content": system_content}]
-    messages.extend(messages_in_thread)
-    response = openai_client.responses.create(model="gpt-4o-mini", input=messages, stream=True)
-    return response
-
-@assistant.user_message
-def respond_in_assistant_thread(
-    ...
-):
-    try:
-        ...
-        replies = client.conversations_replies(
-            channel=context.channel_id,
-            ts=context.thread_ts,
-            oldest=context.thread_ts,
-            limit=10,
-        )
-        messages_in_thread: List[Dict[str, str]] = []
-        for message in replies["messages"]:
-            role = "user" if message.get("bot_id") is None else "assistant"
-            messages_in_thread.append({"role": role, "content": message["text"]})
-
-        returned_message = call_llm(messages_in_thread)
-
-        streamer = client.chat_stream(
-            channel=channel_id,
-            recipient_team_id=team_id,
-            recipient_user_id=user_id,
-            thread_ts=thread_ts,
-        )
-
-        # Loop over OpenAI response stream
-        # https://platform.openai.com/docs/api-reference/responses/create
-        for event in returned_message:
-            if event.type == "response.output_text.delta":
-                streamer.append(markdown_text=f"{event.delta}")
-            else:
-                continue
-
-        streamer.stop()
-
-    except Exception as e:
-        logger.exception(f"Failed to handle a user message event: {e}")
-        say(f":warning: Something went wrong! ({e})")
-```
-
-## Adding and handling feedback
-
-Use the [feedback buttons block element](/reference/block-kit/block-elements/feedback-buttons-element/) to allow users to immediately provide feedback regarding your app's responses. Here's a quick example:
-
-```py
-from typing import List
-from slack_sdk.models.blocks import Block, ContextActionsBlock, FeedbackButtonsElement, FeedbackButtonObject
-
-
-def create_feedback_block() -> List[Block]:
-    """
-    Create feedback block with thumbs up/down buttons
-
-    Returns:
-        Block Kit context_actions block
-    """
-    blocks: List[Block] = [
-        ContextActionsBlock(
-            elements=[
-                FeedbackButtonsElement(
-                    action_id="feedback",
-                    positive_button=FeedbackButtonObject(
-                        text="Good Response",
-                        accessibility_label="Submit positive feedback on this response",
-                        value="good-feedback",
-                    ),
-                    negative_button=FeedbackButtonObject(
-                        text="Bad Response",
-                        accessibility_label="Submit negative feedback on this response",
-                        value="bad-feedback",
-                    ),
-                )
-            ]
-        )
-    ]
-    return blocks
-```
-
-Use the `chat_stream` utility to render the feedback block at the bottom of your app's message.
-
-```js
-...
-        streamer = client.chat_stream(
-            channel=channel_id,
-            recipient_team_id=team_id,
-            recipient_user_id=user_id,
-            thread_ts=thread_ts,
-        )
-
-        # Loop over OpenAI response stream
-        # https://platform.openai.com/docs/api-reference/responses/create
-        for event in returned_message:
-            if event.type == "response.output_text.delta":
-                streamer.append(markdown_text=f"{event.delta}")
-            else:
-                continue
-
-        feedback_block = create_feedback_block()
-        streamer.stop(blocks=feedback_block)
-...
-```
-
-Then add a response for when the user provides feedback.
-
-```python
-# Handle feedback buttons (thumbs up/down)
-def handle_feedback(ack, body, client, logger: logging.Logger):
-    try:
-        ack()
-        message_ts = body["message"]["ts"]
-        channel_id = body["channel"]["id"]
-        feedback_type = body["actions"][0]["value"]
-        is_positive = feedback_type == "good-feedback"
-
-        if is_positive:
-            client.chat_postEphemeral(
-                channel=channel_id,
-                user=body["user"]["id"],
-                thread_ts=message_ts,
-                text="We're glad you found this useful.",
-            )
-        else:
-            client.chat_postEphemeral(
-                channel=channel_id,
-                user=body["user"]["id"],
-                thread_ts=message_ts,
-                text="Sorry to hear that response wasn't up to par :slightly_frowning_face: Starting a new chat may help with AI mistakes and hallucinations.",
-            )
-
-        logger.debug(f"Handled feedback: type={feedback_type}, message_ts={message_ts}")
-    except Exception as error:
-        logger.error(f":warning: Something went wrong! {error}")
-```
-
-Keep reading for more Block Kit possibilities for your AI-enabled app. 
-
-## Sending Block Kit alongside messages {#block-kit-interactions}
+### Sending Block Kit alongside messages {#block-kit-interactions}
 
 For advanced use cases, Block Kit buttons may be used instead of suggested prompts, as well as the sending of messages with structured [metadata](/messaging/message-metadata/) to trigger subsequent interactions with the user.
 
@@ -507,6 +331,182 @@ def respond_to_bot_messages(logger: logging.Logger, set_status: SetStatus, say: 
 ...
 ```
 
-## Full example: App Agent Template
+See the [_Adding and handling feedback_](#adding-and-handling-feedback) section for adding feedback buttons with Block Kit. 
+
+## Text streaming in messages {#text-streaming}
+
+Three Web API methods work together to provide users a text streaming experience: 
+
+* the [`chat.startStream`](/reference/methods/chat.startstream) method starts the text stream, 
+* the [`chat.appendStream`](/reference/methods/chat.appendstream) method appends text to the stream, and 
+* the [`chat.stopStream`](/reference/methods/chat.stopstream) method stops it.
+
+Since you're using Bolt for Python, built upon the Python Slack SDK, you can use the [`chat_stream()`](https://docs.slack.dev/tools/python-slack-sdk/reference/web/client.html#slack_sdk.web.client.WebClient.chat_stream) utility to streamline all three aspects of streaming in your app's messages.
+
+The following example uses OpenAI's streaming API with the new `chat_stream()` functionality, but you can substitute it with the AI client of your choice.
+
+
+```python
+import os
+from typing import List, Dict
+
+import openai
+from openai import Stream
+from openai.types.responses import ResponseStreamEvent
+
+DEFAULT_SYSTEM_CONTENT = """
+You're an assistant in a Slack workspace.
+Users in the workspace will ask you to help them write something or to think better about a specific topic.
+You'll respond to those questions in a professional way.
+When you include markdown text, convert them to Slack compatible ones.
+When a prompt has Slack's special syntax like <@USER_ID> or <#CHANNEL_ID>, you must keep them as-is in your response.
+"""
+
+def call_llm(
+    messages_in_thread: List[Dict[str, str]],
+    system_content: str = DEFAULT_SYSTEM_CONTENT,
+) -> Stream[ResponseStreamEvent]:
+    openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    messages = [{"role": "system", "content": system_content}]
+    messages.extend(messages_in_thread)
+    response = openai_client.responses.create(model="gpt-4o-mini", input=messages, stream=True)
+    return response
+
+@assistant.user_message
+def respond_in_assistant_thread(
+    ...
+):
+    try:
+        ...
+        replies = client.conversations_replies(
+            channel=context.channel_id,
+            ts=context.thread_ts,
+            oldest=context.thread_ts,
+            limit=10,
+        )
+        messages_in_thread: List[Dict[str, str]] = []
+        for message in replies["messages"]:
+            role = "user" if message.get("bot_id") is None else "assistant"
+            messages_in_thread.append({"role": role, "content": message["text"]})
+
+        returned_message = call_llm(messages_in_thread)
+
+        streamer = client.chat_stream(
+            channel=channel_id,
+            recipient_team_id=team_id,
+            recipient_user_id=user_id,
+            thread_ts=thread_ts,
+        )
+
+        # Loop over OpenAI response stream
+        # https://platform.openai.com/docs/api-reference/responses/create
+        for event in returned_message:
+            if event.type == "response.output_text.delta":
+                streamer.append(markdown_text=f"{event.delta}")
+            else:
+                continue
+
+        streamer.stop()
+
+    except Exception as e:
+        logger.exception(f"Failed to handle a user message event: {e}")
+        say(f":warning: Something went wrong! ({e})")
+```
+
+## Adding and handling feedback {#adding-and-handling-feedback}
+
+Use the [feedback buttons block element](/reference/block-kit/block-elements/feedback-buttons-element/) to allow users to immediately provide feedback regarding your app's responses. Here's a quick example:
+
+```py
+from typing import List
+from slack_sdk.models.blocks import Block, ContextActionsBlock, FeedbackButtonsElement, FeedbackButtonObject
+
+
+def create_feedback_block() -> List[Block]:
+    """
+    Create feedback block with thumbs up/down buttons
+
+    Returns:
+        Block Kit context_actions block
+    """
+    blocks: List[Block] = [
+        ContextActionsBlock(
+            elements=[
+                FeedbackButtonsElement(
+                    action_id="feedback",
+                    positive_button=FeedbackButtonObject(
+                        text="Good Response",
+                        accessibility_label="Submit positive feedback on this response",
+                        value="good-feedback",
+                    ),
+                    negative_button=FeedbackButtonObject(
+                        text="Bad Response",
+                        accessibility_label="Submit negative feedback on this response",
+                        value="bad-feedback",
+                    ),
+                )
+            ]
+        )
+    ]
+    return blocks
+```
+
+Use the `chat_stream` utility to render the feedback block at the bottom of your app's message.
+
+```js
+...
+        streamer = client.chat_stream(
+            channel=channel_id,
+            recipient_team_id=team_id,
+            recipient_user_id=user_id,
+            thread_ts=thread_ts,
+        )
+
+        # Loop over OpenAI response stream
+        # https://platform.openai.com/docs/api-reference/responses/create
+        for event in returned_message:
+            if event.type == "response.output_text.delta":
+                streamer.append(markdown_text=f"{event.delta}")
+            else:
+                continue
+
+        feedback_block = create_feedback_block()
+        streamer.stop(blocks=feedback_block)
+...
+```
+
+Then add a response for when the user provides feedback.
+
+```python
+# Handle feedback buttons (thumbs up/down)
+def handle_feedback(ack, body, client, logger: logging.Logger):
+    try:
+        ack()
+        message_ts = body["message"]["ts"]
+        channel_id = body["channel"]["id"]
+        feedback_type = body["actions"][0]["value"]
+        is_positive = feedback_type == "good-feedback"
+
+        if is_positive:
+            client.chat_postEphemeral(
+                channel=channel_id,
+                user=body["user"]["id"],
+                thread_ts=message_ts,
+                text="We're glad you found this useful.",
+            )
+        else:
+            client.chat_postEphemeral(
+                channel=channel_id,
+                user=body["user"]["id"],
+                thread_ts=message_ts,
+                text="Sorry to hear that response wasn't up to par :slightly_frowning_face: Starting a new chat may help with AI mistakes and hallucinations.",
+            )
+
+        logger.debug(f"Handled feedback: type={feedback_type}, message_ts={message_ts}")
+    except Exception as error:
+        logger.error(f":warning: Something went wrong! {error}")
+```
+
+## Full example: App Agent Template {#app-agent-template}
 
 Want to see the functionality described throughout this guide in action? We've created a [App Agent Template](https://github.com/slack-samples/bolt-python-assistant-template) repo for you to build off of.
