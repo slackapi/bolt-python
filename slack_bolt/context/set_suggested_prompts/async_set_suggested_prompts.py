@@ -1,4 +1,4 @@
-from typing import List, Dict, Union, Optional
+from typing import Dict, List, Optional, Sequence, Union
 
 from slack_sdk.web.async_client import AsyncWebClient
 from slack_sdk.web.async_slack_response import AsyncSlackResponse
@@ -21,7 +21,7 @@ class AsyncSetSuggestedPrompts:
 
     async def __call__(
         self,
-        prompts: List[Union[str, Dict[str, str]]],
+        prompts: Sequence[Union[str, Dict[str, str]]],
         title: Optional[str] = None,
     ) -> AsyncSlackResponse:
         prompts_arg: List[Dict[str, str]] = []
