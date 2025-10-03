@@ -49,7 +49,7 @@ You can have your app's messages stream in to replicate conventional AI chatbot 
 * [`chat_appendStream`](/reference/methods/chat.appendstream)
 * [`chat_stopStream`](/reference/methods/chat.stopstream)
 
-The Python Slack SDK provides a [`chat_stream()`](/tools/python-slack-sdk/reference/web/client.html#slack_sdk.web.client.WebClient.chat_stream) helper utility to streamline calling these methods. Here's an excerpt from our [Assistant template app](https://github.com/slack-samples/bolt-python-assistant-template)
+The Python Slack SDK provides a [`chat_stream()`](https://docs.slack.dev/tools/python-slack-sdk/reference/web/client.html#slack_sdk.web.client.WebClient.chat_stream) helper utility to streamline calling these methods. Here's an excerpt from our [Assistant template app](https://github.com/slack-samples/bolt-python-assistant-template)
 
 ```python
 streamer = client.chat_stream(
@@ -59,6 +59,7 @@ streamer = client.chat_stream(
     thread_ts=thread_ts,
 )
 
+# response from your LLM of choice; OpenAI is the example here
 for event in returned_message:
     if event.type == "response.output_text.delta":
         streamer.append(markdown_text=f"{event.delta}")
