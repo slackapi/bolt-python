@@ -1237,7 +1237,9 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `view_submission` listener.
-        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for details."""
+        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for
+        details.
+        """
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
