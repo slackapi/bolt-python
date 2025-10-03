@@ -49,7 +49,7 @@ You can have your app's messages stream in to replicate conventional AI chatbot 
 * [`chat_appendStream`](/reference/methods/chat.appendstream)
 * [`chat_stopStream`](/reference/methods/chat.stopstream)
 
-The Python Slack SDK provides a [`chat_stream()`](https://docss.slack.dev/tools/python-slack-sdk/reference/web/client.html#slack_sdk.web.client.WebClient.chat_stream) helper utility to streamline calling these methods. Here's an excerpt from our [Assistant template app](https://github.com/slack-samples/bolt-python-assistant-template/blob/main/listeners/assistant/assistant.py)
+The Python Slack SDK provides a [`chat_stream()`](/tools/python-slack-sdk/reference/web/client.html#slack_sdk.web.client.WebClient.chat_stream) helper utility to streamline calling these methods. Here's an excerpt from our [Assistant template app](https://github.com/slack-samples/bolt-python-assistant-template)
 
 ```python
 streamer = client.chat_stream(
@@ -69,7 +69,7 @@ feedback_block = create_feedback_block()
 streamer.stop(blocks=feedback_block)
 ```
 
-In that example, a [feedback buttons](/reference/block-kit/block-elements/feedback-buttons-element) block element is passed to `streamer.stop` — this provides feedback buttons to the user at the bottom of the message.
+In that example, a [feedback buttons](/reference/block-kit/block-elements/feedback-buttons-element) block element is passed to `streamer.stop` to provide feedback buttons to the user at the bottom of the message. Interaction with these buttons will send a block action event to your app to receive the feedback.
 
 ```python
 def create_feedback_block() -> List[Block]:
