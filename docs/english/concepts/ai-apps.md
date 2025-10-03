@@ -137,7 +137,7 @@ from slack_bolt import FileAssistantThreadContextStore
 assistant = Assistant(thread_context_store=FileAssistantThreadContextStore())
 ```
 
-## Handling the user response {#handling-the-user-response}
+## Handling the user response {#handling-user-response}
 
 When the user messages your app, the [`message.im`](/reference/events/message.im) event will be sent to your app.
 
