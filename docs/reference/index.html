@@ -1335,7 +1335,9 @@ if the execution chain should continue running the following middleware …</p><
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         &#34;&#34;&#34;Registers a new `view_submission` listener.
-        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for details.&#34;&#34;&#34;
+        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for
+        details.
+        &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -3158,7 +3160,9 @@ Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-int
     middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
 ) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
     &#34;&#34;&#34;Registers a new `view_submission` listener.
-    Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for details.&#34;&#34;&#34;
+    Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for
+    details.
+    &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -3168,7 +3172,8 @@ Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-int
     return __call__</code></pre>
 </details>
 <div class="desc"><p>Registers a new <code>view_submission</code> listener.
-Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission">https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission</a> for details.</p></div>
+Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission">https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission</a> for
+details.</p></div>
 </dd>
 </dl>
 </dd>
@@ -5691,6 +5696,7 @@ def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt
         icon_emoji: Optional[str] = None,
         icon_url: Optional[str] = None,
         username: Optional[str] = None,
+        markdown_text: Optional[str] = None,
         mrkdwn: Optional[bool] = None,
         link_names: Optional[bool] = None,
         parse: Optional[str] = None,  # none, full
@@ -5716,6 +5722,7 @@ def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt
                     icon_emoji=icon_emoji,
                     icon_url=icon_url,
                     username=username,
+                    markdown_text=markdown_text,
                     mrkdwn=mrkdwn,
                     link_names=link_names,
                     parse=parse,
@@ -5786,11 +5793,18 @@ def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt
         self.channel_id = channel_id
         self.thread_ts = thread_ts
 
-    def __call__(self, status: str) -&gt; SlackResponse:
+    def __call__(
+        self,
+        status: str,
+        loading_messages: Optional[List[str]] = None,
+        **kwargs,
+    ) -&gt; SlackResponse:
         return self.client.assistant_threads_setStatus(
-            status=status,
             channel_id=self.channel_id,
             thread_ts=self.thread_ts,
+            status=status,
+            loading_messages=loading_messages,
+            **kwargs,
         )</code></pre>
 </details>
 <div class="desc"></div>
@@ -5836,7 +5850,7 @@ def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt
 
     def __call__(
         self,
-        prompts: List[Union[str, Dict[str, str]]],
+        prompts: Sequence[Union[str, Dict[str, str]]],
         title: Optional[str] = None,
     ) -&gt; SlackResponse:
         prompts_arg: List[Dict[str, str]] = []

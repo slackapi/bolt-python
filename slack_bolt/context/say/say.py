@@ -1,4 +1,4 @@
-from typing import Optional, Union, Dict, Sequence, Callable
+from typing import Callable, Dict, Optional, Sequence, Union
 
 from slack_sdk import WebClient
 from slack_sdk.models.attachments import Attachment
@@ -45,6 +45,7 @@ class Say:
         icon_emoji: Optional[str] = None,
         icon_url: Optional[str] = None,
         username: Optional[str] = None,
+        markdown_text: Optional[str] = None,
         mrkdwn: Optional[bool] = None,
         link_names: Optional[bool] = None,
         parse: Optional[str] = None,  # none, full
@@ -70,6 +71,7 @@ class Say:
                     icon_emoji=icon_emoji,
                     icon_url=icon_url,
                     username=username,
+                    markdown_text=markdown_text,
                     mrkdwn=mrkdwn,
                     link_names=link_names,
                     parse=parse,

@@ -1214,7 +1214,9 @@ you can use <code><a title="slack_bolt.app.async_app" href="async_app.html">slac
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         &#34;&#34;&#34;Registers a new `view_submission` listener.
-        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for details.&#34;&#34;&#34;
+        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for
+        details.
+        &#34;&#34;&#34;
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -3037,7 +3039,9 @@ Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-int
     middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
 ) -&gt; Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
     &#34;&#34;&#34;Registers a new `view_submission` listener.
-    Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for details.&#34;&#34;&#34;
+    Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for
+    details.
+    &#34;&#34;&#34;
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -3047,7 +3051,8 @@ Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-int
     return __call__</code></pre>
 </details>
 <div class="desc"><p>Registers a new <code>view_submission</code> listener.
-Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission">https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission</a> for details.</p></div>
+Refer to <a href="https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission">https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission</a> for
+details.</p></div>
 </dd>
 </dl>
 </dd>
