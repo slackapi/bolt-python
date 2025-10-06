@@ -580,6 +580,28 @@ class TestEvents:
         assert_auth_test_count(self, 1)
         assert_received_request_count(self, path="/chat.postMessage", min_count=1)
 
+    def test_retry_headers_http_mode(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+
+        retry_num_received = []
+        retry_reason_received = []
+
+        @app.event("app_mention")
+        def handle_app_mention(context: BoltContext):
+            retry_num_received.append(context.retry_num)
+            retry_reason_received.append(context.retry_reason)
+
+        timestamp, body = str(int(time())), json.dumps(self.valid_event_body)
+        headers = self.build_headers(timestamp, body)
+        headers["x-slack-retry-num"] = ["2"]
+        headers["x-slack-retry-reason"] = ["http_error"]
+
+        request: BoltRequest = BoltRequest(body=body, headers=headers)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert retry_num_received[0] == 2
+        assert retry_reason_received[0] == "http_error"
+
 
 def my_decorator(f):
     @wraps(f)

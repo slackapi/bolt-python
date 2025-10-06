@@ -342,3 +342,27 @@ class TestEventsSocketMode:
 
         assert_auth_test_count(self, 1)
         assert_received_request_count(self, path="/chat.postMessage", min_count=2)
+
+    def test_retry_headers_socket_mode(self):
+        from slack_bolt import BoltContext
+
+        app = App(client=self.web_client)
+
+        retry_num_received = []
+        retry_reason_received = []
+
+        @app.event("app_mention")
+        def handle_app_mention(context: BoltContext):
+            retry_num_received.append(context.retry_num)
+            retry_reason_received.append(context.retry_reason)
+
+        headers = {
+            "X-Slack-Retry-Num": ["3"],
+            "X-Slack-Retry-Reason": ["timeout"],
+        }
+
+        request: BoltRequest = BoltRequest(body=self.valid_event_body, mode="socket_mode", headers=headers)
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert retry_num_received[0] == 3
+        assert retry_reason_received[0] == "timeout"

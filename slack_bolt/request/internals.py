@@ -268,7 +268,9 @@ def extract_function_inputs(payload: Dict[str, Any]) -> Optional[Dict[str, Any]]
     return None
 
 
-def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
+def build_context(
+    context: BoltContext, body: Dict[str, Any], headers: Optional[Dict[str, Sequence[str]]] = None
+) -> BoltContext:
     context["is_enterprise_install"] = extract_is_enterprise_install(body)
     enterprise_id = extract_enterprise_id(body)
     if enterprise_id:
@@ -314,6 +316,19 @@ def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
                 context.logger.debug(debug_multiple_response_urls_detected())
             response_url = response_urls[0].get("response_url")
             context["response_url"] = response_url
+
+    if headers is not None:
+        retry_num_header = headers.get("x-slack-retry-num")
+        if retry_num_header is not None and len(retry_num_header) > 0:
+            try:
+                context["retry_num"] = int(retry_num_header[0])
+            except (ValueError, TypeError):
+                pass
+
+        retry_reason_header = headers.get("x-slack-retry-reason")
+        if retry_reason_header is not None and len(retry_reason_header) > 0:
+            context["retry_reason"] = retry_reason_header[0]
+
     return context
 
 
