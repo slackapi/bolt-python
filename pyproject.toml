@@ -20,7 +20,7 @@ classifiers = [
 	"Operating System :: OS Independent",
 ]
 requires-python = ">=3.7"
-dependencies = ["slack_sdk==3.36.0.dev7"]
+dependencies = ["slack_sdk==3.37.0"]
 
 
 [project.urls]
