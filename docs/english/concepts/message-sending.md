@@ -59,7 +59,8 @@ streamer = client.chat_stream(
     thread_ts=thread_ts,
 )
 
-# response from your LLM of choice; OpenAI is the example here
+# Loop over OpenAI response stream
+# https://platform.openai.com/docs/api-reference/responses/create
 for event in returned_message:
     if event.type == "response.output_text.delta":
         streamer.append(markdown_text=f"{event.delta}")
