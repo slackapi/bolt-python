@@ -72,7 +72,7 @@ el.replaceWith(d);
 
     async def __call__(
         self,
-        prompts: List[Union[str, Dict[str, str]]],
+        prompts: Sequence[Union[str, Dict[str, str]]],
         title: Optional[str] = None,
     ) -&gt; AsyncSlackResponse:
         prompts_arg: List[Dict[str, str]] = []

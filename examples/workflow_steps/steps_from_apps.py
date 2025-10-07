@@ -8,7 +8,7 @@ from slack_bolt.workflows.step import Configure, Update, Complete, Fail
 
 ################################################################################
 # Steps from apps for legacy workflows are now deprecated.                     #
-# Use new custom steps: https://api.slack.com/automation/functions/custom-bolt #
+# Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/       #
 ################################################################################
 
 logging.basicConfig(level=logging.DEBUG)

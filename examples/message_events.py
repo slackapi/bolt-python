@@ -32,7 +32,7 @@ def extract_subtype(body: dict, context: BoltContext, next: Callable):
     next()
 
 
-# https://api.slack.com/events/message
+# https://docs.slack.dev/reference/events/message/
 # Newly posted messages only
 # or @app.event("message")
 @app.event({"type": "message", "subtype": None})
@@ -55,8 +55,8 @@ def detect_deletion(say: Say, body: dict):
     say(f"You've deleted a message: {text}")
 
 
-# https://api.slack.com/events/message/file_share
-# https://api.slack.com/events/message/bot_message
+# https://docs.slack.dev/reference/events/message/file_share
+# https://docs.slack.dev/reference/events/message/bot_message
 @app.event(
     event={"type": "message", "subtype": re.compile("(me_message)|(file_share)")},
     middleware=[extract_subtype],

@@ -20,11 +20,11 @@ classifiers = [
 	"Operating System :: OS Independent",
 ]
 requires-python = ">=3.7"
-dependencies = ["slack_sdk>=3.35.0,<4"]
+dependencies = ["slack_sdk>=3.37.0,<4"]
 
 
 [project.urls]
-Documentation = "https://slack.dev/bolt-python"
+Documentation = "https://docs.slack.dev/tools/bolt-python/"
 
 [tool.setuptools.packages.find]
 include = ["slack_bolt*"]

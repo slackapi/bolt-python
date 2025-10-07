@@ -80,7 +80,7 @@ el.replaceWith(d);
             return dialog_submission(constraints[&#34;callback_id&#34;], asyncio)
         if action_type == &#34;dialog_cancellation&#34;:
             return dialog_cancellation(constraints[&#34;callback_id&#34;], asyncio)
-        # https://api.slack.com/workflows/steps
+        # https://docs.slack.dev/legacy/legacy-steps-from-apps/
         if action_type == &#34;workflow_step_edit&#34;:
             return workflow_step_edit(constraints[&#34;callback_id&#34;], asyncio)
 
