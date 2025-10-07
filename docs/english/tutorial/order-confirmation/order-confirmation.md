@@ -90,28 +90,22 @@ Within a terminal of your choice, set the two tokens from the previous step as e
 
 <Tabs>
 <TabItem value="macOS" label="macOS">
-
     ```bash
     export SLACK_APP_TOKEN=<YOUR-APP-TOKEN-HERE>
     export SLACK_BOT_TOKEN=<YOUR-BOT-TOKEN-HERE>
     ```
-
 </TabItem>
 <TabItem value="windows" label="Windows Command Prompt">
-
     ```
     set SLACK_APP_TOKEN=<YOUR-APP-TOKEN-HERE>
     set SLACK_BOT_TOKEN=<YOUR-BOT-TOKEN-HERE>
     ```
-
 </TabItem>
 <TabItem value="windows_ps" value="Windows PowerShell">
-
     '''
     $env:SLACK_APP_TOKEN="YOUR-APP-TOKEN-HERE"
     $env:SLACK_BOT_TOKEN="YOUR-BOT-TOKEN-HERE"
     ```
-
 </TabItem>
 </Tabs>
 
