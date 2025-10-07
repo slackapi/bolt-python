@@ -88,26 +88,26 @@ Still in the app settings, navigate to the **Install App** page in the left side
 
 Within a terminal of your choice, set the two tokens from the previous step as environment variables using the commands below. Make sure not to mix these two up, `SLACK_APP_TOKEN` will start with “xapp-“ and `SLACK_BOT_TOKEN` will start with “xoxb-“.
 
-<Tabs>
-<TabItem value="macOS" label="macOS">
-    ```bash
-    export SLACK_APP_TOKEN=<YOUR-APP-TOKEN-HERE>
-    export SLACK_BOT_TOKEN=<YOUR-BOT-TOKEN-HERE>
-    ```
-</TabItem>
-<TabItem value="windows" label="Windows Command Prompt">
-    ```
-    set SLACK_APP_TOKEN=<YOUR-APP-TOKEN-HERE>
-    set SLACK_BOT_TOKEN=<YOUR-BOT-TOKEN-HERE>
-    ```
-</TabItem>
-<TabItem value="windows_ps" value="Windows PowerShell">
-    '''
-    $env:SLACK_APP_TOKEN="YOUR-APP-TOKEN-HERE"
-    $env:SLACK_BOT_TOKEN="YOUR-BOT-TOKEN-HERE"
-    ```
-</TabItem>
-</Tabs>
+For macOS:
+
+```bash
+export SLACK_APP_TOKEN=<YOUR-APP-TOKEN-HERE>
+export SLACK_BOT_TOKEN=<YOUR-BOT-TOKEN-HERE>
+```
+
+For Windows Command Prompt:
+
+```cmd
+set SLACK_APP_TOKEN=<YOUR-APP-TOKEN-HERE>
+set SLACK_BOT_TOKEN=<YOUR-BOT-TOKEN-HERE>
+```
+
+For Windows PowerShell:
+
+```powershell
+$env:SLACK_APP_TOKEN="YOUR-APP-TOKEN-HERE"
+$env:SLACK_BOT_TOKEN="YOUR-BOT-TOKEN-HERE"
+```
 
 Run the following commands to activate a virtual environment for your Python packages to be installed, install the dependencies, and start your app.
 
