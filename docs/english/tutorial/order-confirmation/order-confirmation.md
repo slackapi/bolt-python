@@ -134,7 +134,7 @@ We'll make four changes to the app:
 * Handle when the correct delivery IDs are sent and bring up a modal for more information
 * Send the information to all of the places needed when the form is submitted (including third-party locations)
 
-All of these steps require you to use [Block Kit Builder](https://app.slack.com/block-kit-builder), a tool that helps you create messages, modals and other surfaces within Slack. Open [Block Kit Builder](https://app.slack.com/block-kit-builder), take a look and play around! We’ll create some views next.
+For all of these steps, we will use [Block Kit Builder](https://app.slack.com/block-kit-builder), a tool that helps you create messages, modals and other surfaces within Slack. Open [Block Kit Builder](https://app.slack.com/block-kit-builder), take a look, and play around! We’ll create some views next.
 
 ### Updating the "hi" message
 
@@ -170,7 +170,6 @@ def delivery_message_callback(context: BoltContext, say: Say, logger: Logger):
 Next, you’ll need to make some connections so that this function is called when a message is sent in the channel where your app is. Head to `messages/__init__.py` and add the line below to the register function. Don’t forget to add the import to the callback function as well!
 
 ```python
-
 from .sample_message import delivery_message_callback # import the function to this file
 
 def register(app: App):
@@ -178,7 +177,6 @@ def register(app: App):
     # This regex will capture any number letters followed by dash 
     # and then any number of digits, our "confirmation number" e.g. ASDF-1234
     app.message(re.compile(r"[A-Za-z]+-\d+"))(delivery_message_callback) ## add this line!
-
 ```
 
 Now, restart your server to bring in the new code and test that your function works by sending an order confirmation ID, like `HWOA-1524`, in your testing channel. Your app should respond with the message you created within Block Kit Builder.
@@ -190,15 +188,15 @@ Notice that if you try to click on either of the buttons within your message, no
 1. Head to Block Kit Builder once again. We want to build a message that lets the user know that the wrong order ID has been submitted. Here's a [section](/reference/block-kit/blocks/section-block) block to get you started:
 
 ```json
-	"blocks": [
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Delivery *{delivery_id}* was incorrect ❌"
-			}
-		}
-	]
+    "blocks": [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Delivery *{delivery_id}* was incorrect ❌"
+            }
+        }
+    ]
 ```
 
 View this block in Block Kit Builder [here](https://app.slack.com/block-kit-builder/#%7B%22blocks%22:%5B%7B%22type%22:%22section%22,%22text%22:%7B%22type%22:%22mrkdwn%22,%22text%22:%22Delivery%20*%7Bdelivery_id%7D*%20was%20incorrect%20%E2%9D%8C%22%7D%7D%5D%7D).
@@ -229,7 +227,6 @@ This function will call the [`chat.update`](/reference/methods/chat.update) Web 
 3. Make the connection to this function again within the `actions/__init__.py` folder with the following code:
 
 ```python
-
 from slack_bolt import App
 from .sample_action import sample_action_callback # This can be deleted
 from .sample_action import deny_delivery_callback
@@ -237,7 +234,6 @@ from .sample_action import deny_delivery_callback
 def register(app: App):
     app.action("sample_action_id")(sample_action_callback) # This can be deleted
     app.action("deny_delivery")(deny_delivery_callback) # Add this line
-
 ```
 
 Test out your app by sending in a confirmation number into your channel and clicking the `Not correct` button. If the message is updated, then you’re good to go onto the next step.
@@ -250,78 +246,78 @@ The next step is to handle the `Confirm` button. In this case, we’re going to 
 
 ```json
 {
-	"title": {
-		"type": "plain_text",
-		"text": "Approve Delivery"
-	},
-	"submit": {
-		"type": "plain_text",
-		"text": "Approve"
-	},
-	"type": "modal",
-	"callback_id": "approve_delivery_view",
-	"private_metadata": "{delivery_id}",
-	"blocks": [
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Approving delivery *{delivery_id}*"
-			}
-		},
-		{
-			"type": "input",
-			"block_id": "notes",
-			"label": {
-				"type": "plain_text",
-				"text": "Additional delivery notes"
-			},
-			"element": {
-				"type": "plain_text_input",
-				"action_id": "notes_input",
-				"multiline": true,
-				"placeholder": {
-					"type": "plain_text",
-					"text": "Add notes..."
-				}
-			},
-			"optional": true
-		},
-		{
-			"type": "input",
-			"block_id": "location",
-			"label": {
-				"type": "plain_text",
-				"text": "Delivery Location"
-			},
-			"element": {
-				"type": "plain_text_input",
-				"action_id": "location_input",
-				"placeholder": {
-					"type": "plain_text",
-					"text": "Enter the location details..."
-				}
-			},
-			"optional": true
-		},
-		{
-			"type": "input",
-			"block_id": "channel",
-			"label": {
-				"type": "plain_text",
-				"text": "Notification Channel"
-			},
-			"element": {
-				"type": "channels_select",
-				"action_id": "channel_select",
-				"placeholder": {
-					"type": "plain_text",
-					"text": "Select channel for notifications"
-				}
-			},
-			"optional": false
-		}
-	]
+    "title": {
+        "type": "plain_text",
+        "text": "Approve Delivery"
+    },
+    "submit": {
+        "type": "plain_text",
+        "text": "Approve"
+    },
+    "type": "modal",
+    "callback_id": "approve_delivery_view",
+    "private_metadata": "{delivery_id}",
+    "blocks": [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Approving delivery *{delivery_id}*"
+            }
+        },
+        {
+            "type": "input",
+            "block_id": "notes",
+            "label": {
+                "type": "plain_text",
+                "text": "Additional delivery notes"
+            },
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "notes_input",
+                "multiline": true,
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Add notes..."
+                }
+            },
+            "optional": true
+        },
+        {
+            "type": "input",
+            "block_id": "location",
+            "label": {
+                "type": "plain_text",
+                "text": "Delivery Location"
+            },
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "location_input",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Enter the location details..."
+                }
+            },
+            "optional": true
+        },
+        {
+            "type": "input",
+            "block_id": "channel",
+            "label": {
+                "type": "plain_text",
+                "text": "Notification Channel"
+            },
+            "element": {
+                "type": "channels_select",
+                "action_id": "channel_select",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Select channel for notifications"
+                }
+            },
+            "optional": false
+        }
+    ]
 }
 ```
 
@@ -330,7 +326,6 @@ View this modal in Block Kit Builder [here](https://app.slack.com/block-kit-buil
 2. Within the `actions/sample_action.py` file, add the following function, replacing the view with the one you created above. Again, any strings with variables will be updated to f-strings and also any booleans will need to be capitalized.
 
 ```python
-
 def approve_delivery_callback(ack, body, client, logger: Logger):
     try:
         ack()
@@ -360,13 +355,11 @@ def approve_delivery_callback(ack, body, client, logger: Logger):
         logger.info(f"Approval modal opened by user {body['user']['id']}")
     except Exception as e:
         logger.error(e)
-
 ```
 
 Similar to the `deny` button, we need to hook up all the connections.  Your `actions/__init__.py` should look something like this:
 
 ```python
-
 from slack_bolt import App
 from .sample_action import deny_delivery_callback
 from .sample_action import approve_delivery_callback
@@ -375,7 +368,6 @@ from .sample_action import approve_delivery_callback
 def register(app: App):
     app.action("approve_delivery")(approve_delivery_callback)
     app.action("deny_delivery")(deny_delivery_callback)
-
 ```
 
 Test your app by typing in a confirmation number in channel, click the confirm button and see if the modal comes up and you are able to capture information from the user.
@@ -387,35 +379,34 @@ Lastly, we’ll handle the submission of the form, which will trigger two things
 1. Here’s a simple example of a message that you can use to present the information in channel. 
 
 ```json
-	"blocks": [
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "✅ Delivery *{delivery_id}* approved:"
-			}
-		},
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "*Delivery Notes:*\n{notes or 'None'}"
-			}
-		},
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "*Delivery Location:*\n{loc or 'None'}"
-			}
-		}
-	]
+    "blocks": [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "✅ Delivery *{delivery_id}* approved:"
+            }
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Delivery Notes:*\n{notes or 'None'}"
+            }
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Delivery Location:*\n{loc or 'None'}"
+            }
+        }
+    ]
 ```
 
 View this in Block Kit Builder [here](https://app.slack.com/block-kit-builder/?1#%7B%22blocks%22:%5B%7B%22type%22:%22section%22,%22text%22:%7B%22type%22:%22mrkdwn%22,%22text%22:%22%E2%9C%85%20Delivery%20*%7Bdelivery_id%7D*%20approved:%22%7D%7D,%7B%22type%22:%22section%22,%22text%22:%7B%22type%22:%22mrkdwn%22,%22text%22:%22*Delivery%20Notes:*%5Cn%7Bnotes%20or%20'None'%7D%22%7D%7D,%7B%22type%22:%22section%22,%22text%22:%7B%22type%22:%22mrkdwn%22,%22text%22:%22*Delivery%20Location:*%5Cn%7Bloc%20or%20'None'%7D%22%7D%7D%5D%7D). Modify it however you like and then place it within the code below in the `/views/sample_views.py` file.
 
 ```python
-
 def handle_approve_delivery_view(ack, client, view, logger: Logger):
     try:
         ack()
@@ -433,36 +424,30 @@ def handle_approve_delivery_view(ack, client, view, logger: Logger):
 
     except Exception as e:
         logger.error(f"Error in approve_delivery_view: {e}")
-
 ```
 
 2. Making the connections in the `/views/__init__.py `file, we can test that this works by sending a message once again in our test channel.
 
 ```python
-
 from slack_bolt import App
 from .sample_view import handle_approve_delivery_view
 
 def register(app: App):
     app.view("sample_view_id")(sample_view_callback) # This can be deleted
     app.view("approve_delivery_view")(handle_approve_delivery_view) ## Add this line
-
 ```
 
 3. Let’s also send the information to Salesforce. There are [several ways](https://github.com/simple-salesforce/simple-salesforce?tab=readme-ov-file#examples) for you to access Salesforce through its API, but in this example, we’ve utilized `username`, `password` and `token` parameters. If you need help with getting your API token for Salesforce, take a look at [this article](https://help.salesforce.com/s/articleView?id=xcloud.user_security_token.htm&type=5). You’ll need to add these values as environment variables like we did earlier with our Slack tokens. You can use the following commands:
 
 ```bash
-
 export SF_USERNAME=<YOUR-USERNAME>
 export SF_PASSWORD=<YOUR-PASSWORD>
 export SF_TOKEN=<YOUR-SFDC-TOKEN>
-
 ```
 
 4. We’re going to use assume that order information is stored in the Order object and that the confirmation IDs map to the 8-digit Order numbers within Salesforce. Given that assumption, we need to make a query to find the correct object, add the inputted information, and we’re done. Place this functionality before the last excerpt within the `/views/sample_views.py` file.
 
 ```python
-
 # Extract just the numeric portion from delivery_id
         delivery_number = "".join(filter(str.isdigit, delivery_id))
 
@@ -493,7 +478,6 @@ export SF_TOKEN=<YOUR-SFDC-TOKEN>
         except Exception as sf_error:
             logger.error(f"Update failed for order {delivery_id}: {sf_error}")
             # Continue execution even if Salesforce update fails
-
 ```
 
 You’ll also need to add the two imports that are found within this code to the top of the file.
