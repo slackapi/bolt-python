@@ -475,8 +475,8 @@ Now that you have a basic app up and running, you can start exploring how to mak
 
 * Read through the concepts pages to learn about the different methods and features your Bolt app has access to.
 
-* Explore the different events your bot can listen to with the [`app.event()`](/tools/bolt-python/concepts/event-listening) method. All of the events are listed [on the API docs site](/reference/events).
+* Explore the different events your bot can listen to with the [`app.event()`](/tools/bolt-python/concepts/event-listening) method. View the full events reference docs [here](/reference/events).
 
-* Bolt allows you to [call Web API methods](/tools/bolt-python/concepts/web-api) with the client attached to your app. There are [over 200 methods](/reference/methods) on our API site.
+* Bolt allows you to [call Web API methods](/tools/bolt-python/concepts/web-api) with the client attached to your app. There are over 200 methods; view them [here](/reference/methods).
 
-* Learn more about the different token types [on the API docs site](/authentication/tokens). Your app may need different tokens depending on the actions you want it to perform.
+* Learn more about the different token types in the [tokens guide](/authentication/tokens). Your app may need different tokens depending on the actions you want it to perform.
