@@ -30,3 +30,12 @@ class TestFail:
 
         with pytest.raises(ValueError):
             fail(error="there was an error")
+
+    def test_has_been_called_false_initially(self):
+        fail = Fail(client=self.web_client, function_execution_id="fn1111")
+        assert fail.has_been_called() is False
+
+    def test_has_been_called_true_after_fail(self):
+        fail = Fail(client=self.web_client, function_execution_id="fn1111")
+        fail(error="there was an error")
+        assert fail.has_been_called() is True
