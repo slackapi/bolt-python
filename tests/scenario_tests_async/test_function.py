@@ -312,18 +312,22 @@ async def reverse(body, event, client, context, complete, inputs):
     assert context.client.token == "xwfp-valid"
     assert client.token == "xwfp-valid"
     assert complete.client.token == "xwfp-valid"
+    assert complete.has_been_called() is False
     await complete(
         outputs={"reverseString": "olleh"},
     )
+    assert complete.has_been_called() is True
 
 
 async def reverse_error(body, event, fail):
     assert body == function_body
     assert event == function_body["event"]
     assert fail.function_execution_id == "Fx111"
+    assert fail.has_been_called() is False
     await fail(
         error="there was an error",
     )
+    assert fail.has_been_called() is True
 
 
 async def complete_it(body, event, complete):
