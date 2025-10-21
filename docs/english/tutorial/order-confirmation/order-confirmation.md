@@ -27,7 +27,7 @@ If you don't already have the Slack CLI, install it from your terminal: navigate
 
 ### Cloning the starter app
 
-Once installed, use the command `slack create` in your terminal, select the `bolt-python-starter-template`, then choose your preferred language (this tutorial shows Python). Alternatively, you can clone the [Bolt for Python template](https://github.com/slack-samples/bolt-python-starter-template) using git.
+Once installed, use the command `slack create` to get started with the Bolt for Python [starter template](https://github.com/slack-samples/bolt-python-starter-template). Alternatively, you can clone the template using Git.
 
 You can remove the portions from the template that are not used within this tutorial to make things a bit cleaner for yourself. To do this, open your project in VS Code (you can do this from the terminal with the `code .` command) and delete the `commands`, `events`, and `shortcuts` folders from the `/listeners` folder. You can also do the same to the corresponding folders within the `/listeners/tests` folder as well. Finally, remove the imports of these files from the `/listeners/__init__.py` file.
 
@@ -35,7 +35,10 @@ You can remove the portions from the template that are not used within this tuto
 
 We’ll use the contents of the `manifest.json` file below. This file describes the metadata associated with your app, like its name and permissions that it requests.
 
-Copy the contents of the file and [create a new app](https://api.slack.com/apps/new). Next, choose **From a manifest** and follow the prompts, pasting the manifest file contents you copied.
+These values are used to create an app in one of two ways: 
+
+- **With the Slack CLI**: Save the contents of the file to your project's `manifest.json` file then skip ahead to [starting your app](#starting-your-app).
+- **With app settings**: Copy the contents of the file and [create a new app](https://api.slack.com/apps/new). Next, choose **From a manifest** and follow the prompts, pasting the manifest file contents you copied.
 
 ```json
 {
@@ -84,7 +87,7 @@ Once your app has been created, scroll down to **App-Level Tokens** on the **Bas
 
 Still in the app settings, navigate to the **Install App** page in the left sidebar. Install your app. When you press **Allow**, this means you’re agreeing to install your app with the permissions that it’s requesting. Copy the bot token that you receive as well and store this in a safe place as well for subsequent steps.
 
-## Starting your app's server
+## Saving credentials
 
 Within a terminal of your choice, set the two tokens from the previous step as environment variables using the commands below. Make sure not to mix these two up, `SLACK_APP_TOKEN` will start with “xapp-“ and `SLACK_BOT_TOKEN` will start with “xoxb-“.
 
@@ -109,18 +112,26 @@ $env:SLACK_APP_TOKEN="YOUR-APP-TOKEN-HERE"
 $env:SLACK_BOT_TOKEN="YOUR-BOT-TOKEN-HERE"
 ```
 
+## Starting your app {#starting-your-app}
+
 Run the following commands to activate a virtual environment for your Python packages to be installed, install the dependencies, and start your app.
 
 ```bash
 # Setup your python virtual environment
-python3 -m venv .venv
+python -m venv .venv
 source .venv/bin/activate
 
 # Install the dependencies
 pip install -r requirements.txt
 
 # Start your local server
-python3 app.py
+slack run
+```
+
+If you're not using the Slack CLI, a different `python` command can be used to start your app instead:
+	
+```sh
+python app.py
 ```
 
 Now that your app is running, you should be able to see it within Slack. In Slack, create a channel that you can test in and try inviting your bot to it using the `/invite @Your-app-name-here` command. Check that your app works by saying “hi” in the channel where your app is, and you should receive a message back from it. If you don’t, ensure you completed all the steps above.
@@ -138,9 +149,61 @@ For all of these steps, we will use [Block Kit Builder](https://app.slack.com/bl
 
 ### Updating the "hi" message
 
-The first thing we want to do is change the “hi, how are you?” message from our app into something more useful. Here’s something that you can use to start off with, but you can make it your own within Block Kit Builder. Once you have something you like, copy the blocks by clicking the **Copy Payload** button in the top right.
+The first thing we want to do is change the “hi, how are you?” message from our app into something more useful. Here’s a `blocks` object built with Block Kit Builder:
 
-Take the function below and place your blocks within the blocks dictionary `[]`.  Update the payload: 
+```json
+
+    "blocks": [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Confirm *{delivery_id}* is correct?"
+            }
+        },
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Correct",
+                        "emoji": true
+                    },
+                    "style": "primary",
+                    "action_id": "approve_delivery"
+                },
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Not correct",
+                        "emoji": true
+                    },
+                    "style": "danger",
+                    "action_id": "deny_delivery"
+                }
+            ]
+        }
+    ]
+
+```
+
+Take the function below and place your blocks within the blocks dictionary `[]`.
+
+```python
+def delivery_message_callback(context: BoltContext, say: Say, logger: Logger):
+    try:
+        delivery_id = context["matches"][0]
+        say( 
+            blocks=[] # insert your blocks here
+        )
+    except Exception as e:
+        logger.error(e)
+```
+
+Update the payload: 
 * Remove the initial blocks key and convert any boolean true values to `True` to fit with Python conventions.
 * If you see variables within `{}` brackets, this is part of an f-string, which allows you to insert variables within strings in a clean manner. Place the `f` character before these strings like this:
 
@@ -156,24 +219,12 @@ Take the function below and place your blocks within the blocks dictionary `[]`.
 
 Place all of this in the `sample_message.py` file.
 
-```python
-def delivery_message_callback(context: BoltContext, say: Say, logger: Logger):
-    try:
-        delivery_id = context["matches"][0]
-        say( 
-            blocks=[] # insert your blocks here
-        )
-    except Exception as e:
-        logger.error(e)
-```
-
-Next, you’ll need to make some connections so that this function is called when a message is sent in the channel where your app is. Head to `messages/__init__.py` and add the line below to the register function. Don’t forget to add the import to the callback function as well!
+Next, you’ll need to register this listener to respond when a message is sent in the channel with your app. Head to `messages/__init__.py` and overwrite the function there with the one below, which registers the  function. Don’t forget to add the import to the callback function as well!
 
 ```python
 from .sample_message import delivery_message_callback # import the function to this file
 
 def register(app: App):
-    app.message(re.compile("(hi|hello|hey)"))(sample_message_callback) # This can be deleted!
     # This regex will capture any number letters followed by dash 
     # and then any number of digits, our "confirmation number" e.g. ASDF-1234
     app.message(re.compile(r"[A-Za-z]+-\d+"))(delivery_message_callback) ## add this line!
