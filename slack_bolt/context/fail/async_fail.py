@@ -7,6 +7,7 @@ from slack_sdk.web.async_slack_response import AsyncSlackResponse
 class AsyncFail:
     client: AsyncWebClient
     function_execution_id: Optional[str]
+    _called: bool
 
     def __init__(
         self,
@@ -15,6 +16,7 @@ class AsyncFail:
     ):
         self.client = client
         self.function_execution_id = function_execution_id
+        self._called = False
 
     async def __call__(self, error: str) -> AsyncSlackResponse:
         """Signal that the custom function failed to complete.
@@ -31,4 +33,13 @@ class AsyncFail:
         if self.function_execution_id is None:
             raise ValueError("fail is unsupported here as there is no function_execution_id")
 
+        self._called = True
         return await self.client.functions_completeError(function_execution_id=self.function_execution_id, error=error)
+
+    def has_been_called(self) -> bool:
+        """Check if this fail function has been called.
+
+        Returns:
+            bool: True if the fail function has been called, False otherwise.
+        """
+        return self._called

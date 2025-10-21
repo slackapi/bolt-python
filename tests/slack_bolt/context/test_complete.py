@@ -30,3 +30,12 @@ class TestComplete:
 
         with pytest.raises(ValueError):
             complete(outputs={"key": "value"})
+
+    def test_has_been_called_false_initially(self):
+        complete = Complete(client=self.web_client, function_execution_id="fn1111")
+        assert complete.has_been_called() is False
+
+    def test_has_been_called_true_after_complete(self):
+        complete = Complete(client=self.web_client, function_execution_id="fn1111")
+        complete(outputs={"key": "value"})
+        assert complete.has_been_called() is True
