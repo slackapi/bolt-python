@@ -1,0 +1,553 @@
+---
+title: Create a Salesforce order confirmation app
+---
+
+In this tutorial, you'll use the [Bolt for Python](/tools/bolt-python/) framework and [Block Kit Builder](https://app.slack.com/block-kit-builder) to create an order confirmation app that links to a system of record, like Salesforce.
+	
+The Slack app will:
+* allow users to enter order numbers from within Slack, along with some additional order information,
+* post that information to a Slack channel, and
+* send the information to the system of record. 
+	
+End users will be able to enter information across devices, as many will likely be using a mobile device. 
+
+Along the way, you'll learn how to use the Bolt for Python starter app template as a jumping off point for your own custom apps. Let's begin!
+	
+:::warning[Consider the following]
+	
+This tutorial was created for educational purposes within a Slack workshop. As a result, it has not been tested quite as rigorously as our sample apps. Proceed carefully if you'd like to use a similar app in production.
+
+:::
+
+## Getting started
+
+### Installing the Slack CLI
+
+If you don't already have the Slack CLI, install it from your terminal: navigate to the installation guide ([for Mac and Linux](/tools/slack-cli/guides/installing-the-slack-cli-for-mac-and-linux) or [for Windows](/tools/slack-cli/guides/installing-the-slack-cli-for-windows)) and follow the steps.
+
+### Cloning the starter app
+
+Once installed, use the command `slack create` to get started with the Bolt for Python [starter template](https://github.com/slack-samples/bolt-python-starter-template). Alternatively, you can clone the template using Git.
+
+You can remove the portions from the template that are not used within this tutorial to make things a bit cleaner for yourself. To do this, open your project in VS Code (you can do this from the terminal with the `code .` command) and delete the `commands`, `events`, and `shortcuts` folders from the `/listeners` folder. You can also do the same to the corresponding folders within the `/listeners/tests` folder as well. Finally, remove the imports of these files from the `/listeners/__init__.py` file.
+
+## Creating your app
+
+We’ll use the contents of the `manifest.json` file below. This file describes the metadata associated with your app, like its name and permissions that it requests.
+
+These values are used to create an app in one of two ways: 
+
+- **With the Slack CLI**: Save the contents of the file to your project's `manifest.json` file then skip ahead to [starting your app](#starting-your-app).
+- **With app settings**: Copy the contents of the file and [create a new app](https://api.slack.com/apps/new). Next, choose **From a manifest** and follow the prompts, pasting the manifest file contents you copied.
+
+```json
+{
+  "_metadata": {
+      "major_version": 1,
+      "minor_version": 1
+  },
+  "display_information": {
+      "name": "Delivery Tracker App" 
+  },
+  "features": {
+      "bot_user": {
+          "display_name": "Delivery Tracker App",
+          "always_online": false
+      }
+  },
+  "oauth_config": {
+      "scopes": {
+          "bot": [
+              "channels:history",
+              "chat:write"
+          ]
+      }
+  },
+  "settings": {
+      "event_subscriptions": {
+          "bot_events": [
+              "message.channels"
+          ]
+      },
+      "interactivity": {
+          "is_enabled": true
+      },
+      "org_deploy_enabled": false,
+      "socket_mode_enabled": true,
+      "token_rotation_enabled": false
+  }
+}
+```
+
+### Tokens
+
+Once your app has been created, scroll down to **App-Level Tokens** on the **Basic Information** page and create a token that requests the [`connections:write`](/reference/scopes/connections.write) scope. This token will allow you to use [Socket Mode](/apis/events-api/using-socket-mode), which is a secure way to develop on Slack through the use of WebSockets. Save the value of your app token and store it in a safe place (we’ll use it in the next step).
+
+### Install app
+
+Still in the app settings, navigate to the **Install App** page in the left sidebar. Install your app. When you press **Allow**, this means you’re agreeing to install your app with the permissions that it’s requesting. Copy the bot token that you receive as well and store this in a safe place as well for subsequent steps.
+
+## Saving credentials
+
+Within a terminal of your choice, set the two tokens from the previous step as environment variables using the commands below. Make sure not to mix these two up, `SLACK_APP_TOKEN` will start with “xapp-“ and `SLACK_BOT_TOKEN` will start with “xoxb-“.
+
+For macOS:
+
+```bash
+export SLACK_APP_TOKEN=<YOUR-APP-TOKEN-HERE>
+export SLACK_BOT_TOKEN=<YOUR-BOT-TOKEN-HERE>
+```
+
+For Windows Command Prompt:
+
+```cmd
+set SLACK_APP_TOKEN=<YOUR-APP-TOKEN-HERE>
+set SLACK_BOT_TOKEN=<YOUR-BOT-TOKEN-HERE>
+```
+
+For Windows PowerShell:
+
+```powershell
+$env:SLACK_APP_TOKEN="YOUR-APP-TOKEN-HERE"
+$env:SLACK_BOT_TOKEN="YOUR-BOT-TOKEN-HERE"
+```
+
+## Starting your app {#starting-your-app}
+
+Run the following commands to activate a virtual environment for your Python packages to be installed, install the dependencies, and start your app.
+
+```bash
+# Setup your python virtual environment
+python -m venv .venv
+source .venv/bin/activate
+
+# Install the dependencies
+pip install -r requirements.txt
+
+# Start your local server
+slack run
+```
+
+If you're not using the Slack CLI, a different `python` command can be used to start your app instead:
+	
+```sh
+python app.py
+```
+
+Now that your app is running, you should be able to see it within Slack. In Slack, create a channel that you can test in and try inviting your bot to it using the `/invite @Your-app-name-here` command. Check that your app works by saying “hi” in the channel where your app is, and you should receive a message back from it. If you don’t, ensure you completed all the steps above.
+
+## Coding the app
+
+We'll make four changes to the app:
+
+* Update the “hi” message to something more interesting and interactive
+* Handle when the wrong delivery ID button is pressed
+* Handle when the correct delivery IDs are sent and bring up a modal for more information
+* Send the information to all of the places needed when the form is submitted (including third-party locations)
+
+For all of these steps, we will use [Block Kit Builder](https://app.slack.com/block-kit-builder), a tool that helps you create messages, modals and other surfaces within Slack. Open [Block Kit Builder](https://app.slack.com/block-kit-builder), take a look, and play around! We’ll create some views next.
+
+### Updating the "hi" message
+
+The first thing we want to do is change the “hi, how are you?” message from our app into something more useful. Here’s a `blocks` object built with Block Kit Builder:
+
+```json
+
+    "blocks": [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Confirm *{delivery_id}* is correct?"
+            }
+        },
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Correct",
+                        "emoji": true
+                    },
+                    "style": "primary",
+                    "action_id": "approve_delivery"
+                },
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Not correct",
+                        "emoji": true
+                    },
+                    "style": "danger",
+                    "action_id": "deny_delivery"
+                }
+            ]
+        }
+    ]
+
+```
+
+Take the function below and place your blocks within the blocks dictionary `[]`.
+
+```python
+def delivery_message_callback(context: BoltContext, say: Say, logger: Logger):
+    try:
+        delivery_id = context["matches"][0]
+        say( 
+            blocks=[] # insert your blocks here
+        )
+    except Exception as e:
+        logger.error(e)
+```
+
+Update the payload: 
+* Remove the initial blocks key and convert any boolean true values to `True` to fit with Python conventions.
+* If you see variables within `{}` brackets, this is part of an f-string, which allows you to insert variables within strings in a clean manner. Place the `f` character before these strings like this:
+
+```python
+{
+    "type": "section",
+    "text": {
+        "type": "mrkdwn",
+        "text": f"Confirm *{delivery_id}* is correct?", # place the "f" character here at the beginning of the string
+    },
+},
+```
+
+Place all of this in the `sample_message.py` file.
+
+Next, you’ll need to register this listener to respond when a message is sent in the channel with your app. Head to `messages/__init__.py` and overwrite the function there with the one below, which registers the  function. Don’t forget to add the import to the callback function as well!
+
+```python
+from .sample_message import delivery_message_callback # import the function to this file
+
+def register(app: App):
+    # This regex will capture any number letters followed by dash 
+    # and then any number of digits, our "confirmation number" e.g. ASDF-1234
+    app.message(re.compile(r"[A-Za-z]+-\d+"))(delivery_message_callback) ## add this line!
+```
+
+Now, restart your server to bring in the new code and test that your function works by sending an order confirmation ID, like `HWOA-1524`, in your testing channel. Your app should respond with the message you created within Block Kit Builder.
+
+### Handling an incorrect delivery ID
+
+Notice that if you try to click on either of the buttons within your message, nothing will happen. This is because we have yet to create a function to handle the button click. Let’s start with the `Not correct` button first.
+
+1. Head to Block Kit Builder once again. We want to build a message that lets the user know that the wrong order ID has been submitted. Here's a [section](/reference/block-kit/blocks/section-block) block to get you started:
+
+```json
+    "blocks": [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Delivery *{delivery_id}* was incorrect ❌"
+            }
+        }
+    ]
+```
+
+View this block in Block Kit Builder [here](https://app.slack.com/block-kit-builder/#%7B%22blocks%22:%5B%7B%22type%22:%22section%22,%22text%22:%7B%22type%22:%22mrkdwn%22,%22text%22:%22Delivery%20*%7Bdelivery_id%7D*%20was%20incorrect%20%E2%9D%8C%22%7D%7D%5D%7D).
+
+2. Once you have something that you like, add it to the function below and place the function within the `actions/sample_action.py` file. Remember to make any strings with variables into f-strings!
+
+```python
+def deny_delivery_callback(ack, body, client, logger: Logger):
+    try:
+        ack()
+        delivery_id = body["message"]["text"].split("*")[1]
+
+        # Calls the chat.update function to replace the message, 
+        # preventing it from being pressed more than once.
+        client.chat_update(
+            channel=body["container"]["channel_id"],
+            ts=body["container"]["message_ts"],
+            blocks=[], # Add your blocks here!
+        )
+
+        logger.info(f"Delivery denied by user {body['user']['id']}")
+    except Exception as e:
+        logger.error(e)
+```
+
+This function will call the [`chat.update`](/reference/methods/chat.update) Web API method, which will update the original message with buttons, to the one that we created previously. This will also prevent the message from being pressed more than once.
+
+3. Make the connection to this function again within the `actions/__init__.py` folder with the following code:
+
+```python
+from slack_bolt import App
+from .sample_action import sample_action_callback # This can be deleted
+from .sample_action import deny_delivery_callback
+
+def register(app: App):
+    app.action("sample_action_id")(sample_action_callback) # This can be deleted
+    app.action("deny_delivery")(deny_delivery_callback) # Add this line
+```
+
+Test out your app by sending in a confirmation number into your channel and clicking the `Not correct` button. If the message is updated, then you’re good to go onto the next step.
+
+### Handling a correct delivery ID
+
+The next step is to handle the `Confirm` button. In this case, we’re going to pull up a modal instead of just a message.
+
+1. Using the following modal as a base; create a modal that captures the kind of information that you need.
+
+```json
+{
+    "title": {
+        "type": "plain_text",
+        "text": "Approve Delivery"
+    },
+    "submit": {
+        "type": "plain_text",
+        "text": "Approve"
+    },
+    "type": "modal",
+    "callback_id": "approve_delivery_view",
+    "private_metadata": "{delivery_id}",
+    "blocks": [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Approving delivery *{delivery_id}*"
+            }
+        },
+        {
+            "type": "input",
+            "block_id": "notes",
+            "label": {
+                "type": "plain_text",
+                "text": "Additional delivery notes"
+            },
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "notes_input",
+                "multiline": true,
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Add notes..."
+                }
+            },
+            "optional": true
+        },
+        {
+            "type": "input",
+            "block_id": "location",
+            "label": {
+                "type": "plain_text",
+                "text": "Delivery Location"
+            },
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "location_input",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Enter the location details..."
+                }
+            },
+            "optional": true
+        },
+        {
+            "type": "input",
+            "block_id": "channel",
+            "label": {
+                "type": "plain_text",
+                "text": "Notification Channel"
+            },
+            "element": {
+                "type": "channels_select",
+                "action_id": "channel_select",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Select channel for notifications"
+                }
+            },
+            "optional": false
+        }
+    ]
+}
+```
+
+View this modal in Block Kit Builder [here](https://app.slack.com/block-kit-builder/#%7B%22type%22:%22modal%22,%22callback_id%22:%22approve_delivery_view%22,%22title%22:%7B%22type%22:%22plain_text%22,%22text%22:%22Approve%20Delivery%22%7D,%22private_metadata%22:%22%7Bdelivery_id%7D%22,%22blocks%22:%5B%7B%22type%22:%22section%22,%22text%22:%7B%22type%22:%22mrkdwn%22,%22text%22:%22Approving%20delivery%20*%7Bdelivery_id%7D*%22%7D%7D,%7B%22type%22:%22input%22,%22block_id%22:%22notes%22,%22label%22:%7B%22type%22:%22plain_text%22,%22text%22:%22Additional%20delivery%20notes%22%7D,%22element%22:%7B%22type%22:%22plain_text_input%22,%22action_id%22:%22notes_input%22,%22multiline%22:true,%22placeholder%22:%7B%22type%22:%22plain_text%22,%22text%22:%22Add%20notes...%22%7D%7D,%22optional%22:true%7D,%7B%22type%22:%22input%22,%22block_id%22:%22location%22,%22label%22:%7B%22type%22:%22plain_text%22,%22text%22:%22Delivery%20Location%22%7D,%22element%22:%7B%22type%22:%22plain_text_input%22,%22action_id%22:%22location_input%22,%22placeholder%22:%7B%22type%22:%22plain_text%22,%22text%22:%22Enter%20the%20location%20details...%22%7D%7D,%22optional%22:true%7D,%7B%22type%22:%22input%22,%22block_id%22:%22channel%22,%22label%22:%7B%22type%22:%22plain_text%22,%22text%22:%22Notification%20Channel%22%7D,%22element%22:%7B%22type%22:%22channels_select%22,%22action_id%22:%22channel_select%22,%22placeholder%22:%7B%22type%22:%22plain_text%22,%22text%22:%22Select%20channel%20for%20notifications%22%7D%7D,%22optional%22:false%7D%5D,%22submit%22:%7B%22type%22:%22plain_text%22,%22text%22:%22Approve%22%7D%7D).
+
+2. Within the `actions/sample_action.py` file, add the following function, replacing the view with the one you created above. Again, any strings with variables will be updated to f-strings and also any booleans will need to be capitalized.
+
+```python
+def approve_delivery_callback(ack, body, client, logger: Logger):
+    try:
+        ack()
+
+        delivery_id = body["message"]["text"].split("*")[1]
+        # Updates the original message so you can't press it twice
+        client.chat_update(
+            channel=body["container"]["channel_id"],
+            ts=body["container"]["message_ts"],
+            blocks=[
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"Processed delivery *{delivery_id}*...",
+                    },
+                }
+            ],
+        )
+
+        # Open a modal to gather information from the user
+        client.views_open(
+            trigger_id=body["trigger_id"],
+            view={} # Add your view here
+        )
+
+        logger.info(f"Approval modal opened by user {body['user']['id']}")
+    except Exception as e:
+        logger.error(e)
+```
+
+Similar to the `deny` button, we need to hook up all the connections.  Your `actions/__init__.py` should look something like this:
+
+```python
+from slack_bolt import App
+from .sample_action import deny_delivery_callback
+from .sample_action import approve_delivery_callback
+
+
+def register(app: App):
+    app.action("approve_delivery")(approve_delivery_callback)
+    app.action("deny_delivery")(deny_delivery_callback)
+```
+
+Test your app by typing in a confirmation number in channel, click the confirm button and see if the modal comes up and you are able to capture information from the user.
+
+### Submitting the form
+
+Lastly, we’ll handle the submission of the form, which will trigger two things. We want to send the information into the specified channel, which will let the user know that the form was successful, as well as send the information into our system of record, Salesforce.
+
+1. Here’s a simple example of a message that you can use to present the information in channel. 
+
+```json
+    "blocks": [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "✅ Delivery *{delivery_id}* approved:"
+            }
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Delivery Notes:*\n{notes or 'None'}"
+            }
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Delivery Location:*\n{loc or 'None'}"
+            }
+        }
+    ]
+```
+
+View this in Block Kit Builder [here](https://app.slack.com/block-kit-builder/?1#%7B%22blocks%22:%5B%7B%22type%22:%22section%22,%22text%22:%7B%22type%22:%22mrkdwn%22,%22text%22:%22%E2%9C%85%20Delivery%20*%7Bdelivery_id%7D*%20approved:%22%7D%7D,%7B%22type%22:%22section%22,%22text%22:%7B%22type%22:%22mrkdwn%22,%22text%22:%22*Delivery%20Notes:*%5Cn%7Bnotes%20or%20'None'%7D%22%7D%7D,%7B%22type%22:%22section%22,%22text%22:%7B%22type%22:%22mrkdwn%22,%22text%22:%22*Delivery%20Location:*%5Cn%7Bloc%20or%20'None'%7D%22%7D%7D%5D%7D). Modify it however you like and then place it within the code below in the `/views/sample_views.py` file.
+
+```python
+def handle_approve_delivery_view(ack, client, view, logger: Logger):
+    try:
+        ack()
+
+        delivery_id = view["private_metadata"]
+        values = view["state"]["values"]
+        notes = values["notes"]["notes_input"]["value"]
+        loc = values["location"]["location_input"]["value"]
+        channel = values["channel"]["channel_select"]["selected_channel"]
+
+        client.chat_postMessage(
+            channel=channel,
+            blocks=[], ## Add your message here
+        )
+
+    except Exception as e:
+        logger.error(f"Error in approve_delivery_view: {e}")
+```
+
+2. Making the connections in the `/views/__init__.py `file, we can test that this works by sending a message once again in our test channel.
+
+```python
+from slack_bolt import App
+from .sample_view import handle_approve_delivery_view
+
+def register(app: App):
+    app.view("sample_view_id")(sample_view_callback) # This can be deleted
+    app.view("approve_delivery_view")(handle_approve_delivery_view) ## Add this line
+```
+
+3. Let’s also send the information to Salesforce. There are [several ways](https://github.com/simple-salesforce/simple-salesforce?tab=readme-ov-file#examples) for you to access Salesforce through its API, but in this example, we’ve utilized `username`, `password` and `token` parameters. If you need help with getting your API token for Salesforce, take a look at [this article](https://help.salesforce.com/s/articleView?id=xcloud.user_security_token.htm&type=5). You’ll need to add these values as environment variables like we did earlier with our Slack tokens. You can use the following commands:
+
+```bash
+export SF_USERNAME=<YOUR-USERNAME>
+export SF_PASSWORD=<YOUR-PASSWORD>
+export SF_TOKEN=<YOUR-SFDC-TOKEN>
+```
+
+4. We’re going to use assume that order information is stored in the Order object and that the confirmation IDs map to the 8-digit Order numbers within Salesforce. Given that assumption, we need to make a query to find the correct object, add the inputted information, and we’re done. Place this functionality before the last excerpt within the `/views/sample_views.py` file.
+
+```python
+# Extract just the numeric portion from delivery_id
+        delivery_number = "".join(filter(str.isdigit, delivery_id))
+
+        # Update Salesforce order object
+        try:
+            sf = Salesforce(
+                username=os.environ.get("SF_USERNAME"),
+                password=os.environ.get("SF_PASSWORD"),
+                security_token=os.environ.get("SF_TOKEN"),
+            )
+
+            # Assuming delivery_id maps to Salesforce Order number
+            order = sf.query(f"SELECT Id FROM Order WHERE OrderNumber = '{delivery_number}'")  # noqa: E501
+            if order["records"]:
+                order_id = order["records"][0]["Id"]
+                sf.Order.update(
+                    order_id,
+                    {
+                        "Status": "Delivered",
+                        "Description": notes,
+                        "Shipping_Location__c": loc,
+                    },
+                )
+                logger.info(f"Updated order {delivery_id}")
+            else:
+                logger.warning(f"No order found for {delivery_id}")
+
+        except Exception as sf_error:
+            logger.error(f"Update failed for order {delivery_id}: {sf_error}")
+            # Continue execution even if Salesforce update fails
+```
+
+You’ll also need to add the two imports that are found within this code to the top of the file.
+
+```python
+import os
+from simple_salesforce import Salesforce
+```
+
+With these imports, add `simple_salesforce` to your `requirements.txt` file, then install that package with the following command once again.
+
+```bash
+pip install -r requirements.txt
+```
+
+![Image of delivery tracker app](/img/bolt-python/delivery-tracker-main.png)
+
+## Testing your app
+
+Test your app one last time, and you’re done!
+
+Congratulations! You’ve built an app using [Bolt for Python](/tools/bolt-python/) that allows you to send information into Slack, as well as into a third-party service. While there are more features you can add to make this a more robust app, we hope that this serves as a good introduction into connecting services like Salesforce using Slack as a conduit.
