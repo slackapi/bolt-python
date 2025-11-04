@@ -192,7 +192,7 @@ landed, then [run the tests](#run-all-the-unit-tests).
 7. Select "Set as a pre-release"
 8. Publish the release by clicking the "Publish release" button!
 9. After a few minutes, the corresponding version will be available on
-   <https://github.com/slackapi/bolt-python/>.
+   <https://pypi.org/project/slack-bolt>.
 10. (Slack Internal) Communicate the release internally
 
 #### Production Deployment
