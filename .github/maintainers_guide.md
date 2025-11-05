@@ -154,7 +154,7 @@ landed, then [run the tests](#run-all-the-unit-tests).
    2. Build the docs with `./scripts/generate_api_docs.sh`.
    3. Commit with a message including the new version number. For example `1.2.4.dev0` & push the commit to a branch where the development release will live (create it if it does not exist)
       1. `git checkout -b future-release`
-      2. `git commit -m 'version 1.2.4.dev0'`
+      2. `git commit -m 'chore(release): version 1.2.4.dev0'`
       3. `git push -u origin future-release`
 2. Create a new GitHub Release
    1. Navigate to the [Releases page](https://github.com/slackapi/bolt-python/releases).
@@ -183,7 +183,7 @@ the last tag is in a releasable state! At a minimum, [run the tests](#run-all-th
    2. Build the docs with `./scripts/generate_api_docs.sh`.
    3. Commit with a message including the new version number. For example `1.2.3` & push the commit to a branch and create a PR to sanity check.
       1. `git checkout -b 1.2.3-release`
-      2. `git commit -m 'chore(release): tag version 1.2.3'`
+      2. `git commit -m 'chore(release): version 1.2.3'`
       3. `git push -u origin 1.2.3-release`
    4. Add relevant labels to the PR and add the PR to a GitHub Milestone.
    5. Merge in release PR after getting an approval from at least one maintainer.
