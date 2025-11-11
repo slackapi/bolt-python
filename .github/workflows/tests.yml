@@ -76,10 +76,12 @@ jobs:
           pytest tests/scenario_tests_async/ --junitxml=reports/test_scenario_async.xml
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
         with:
           directory: ./reports/
+          fail_ci_if_error: true
           flags: ${{ matrix.python-version }}
+          report_type: test_results
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
   notifications:
