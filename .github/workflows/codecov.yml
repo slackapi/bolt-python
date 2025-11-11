@@ -39,6 +39,6 @@ jobs:
         uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
         with:
           fail_ci_if_error: true
-          report-type: coverage
+          report_type: coverage
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
