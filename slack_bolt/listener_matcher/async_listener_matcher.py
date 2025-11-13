@@ -25,8 +25,6 @@ from typing import Callable, Awaitable, Sequence, Optional
 
 from slack_bolt.kwargs_injection.async_utils import build_async_required_kwargs
 from slack_bolt.logger import get_bolt_app_logger
-from slack_bolt.request.async_request import AsyncBoltRequest
-from slack_bolt.response import BoltResponse
 
 
 class AsyncCustomListenerMatcher(AsyncListenerMatcher):
