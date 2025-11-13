@@ -75,7 +75,7 @@ while processing an incoming Slack event.</p>
 <dl>
 <dt id="slack_bolt.authorization.AuthorizeResult"><code class="flex name class">
 <span>class <span class="ident">AuthorizeResult</span></span>
-<span>(</span><span>*,<br>enterprise_id: str | None,<br>team_id: str | None,<br>team: str | None = None,<br>url: str | None = None,<br>bot_user_id: str | None = None,<br>bot_id: str | None = None,<br>bot_token: str | None = None,<br>bot_scopes: str | Sequence[str] | None = None,<br>user_id: str | None = None,<br>user: str | None = None,<br>user_token: str | None = None,<br>user_scopes: str | Sequence[str] | None = None)</span>
+<span>(</span><span>*,<br>enterprise_id: str | None,<br>team_id: str | None,<br>team: str | None = None,<br>url: str | None = None,<br>bot_user_id: str | None = None,<br>bot_id: str | None = None,<br>bot_token: str | None = None,<br>bot_scopes: Sequence[str] | str | None = None,<br>user_id: str | None = None,<br>user: str | None = None,<br>user_token: str | None = None,<br>user_scopes: Sequence[str] | str | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -273,7 +273,7 @@ while processing an incoming Slack event.</p>
 <h3>Static methods</h3>
 <dl>
 <dt id="slack_bolt.authorization.AuthorizeResult.from_auth_test_response"><code class="name flex">
-<span>def <span class="ident">from_auth_test_response</span></span>(<span>*,<br>bot_token: str | None = None,<br>user_token: str | None = None,<br>bot_scopes: str | Sequence[str] | None = None,<br>user_scopes: str | Sequence[str] | None = None,<br>auth_test_response: slack_sdk.web.slack_response.SlackResponse | ForwardRef('AsyncSlackResponse'),<br>user_auth_test_response: slack_sdk.web.slack_response.SlackResponse | ForwardRef('AsyncSlackResponse') | None = None)</span>
+<span>def <span class="ident">from_auth_test_response</span></span>(<span>*,<br>bot_token: str | None = None,<br>user_token: str | None = None,<br>bot_scopes: Sequence[str] | str | None = None,<br>user_scopes: Sequence[str] | str | None = None,<br>auth_test_response: slack_sdk.web.slack_response.SlackResponse | AsyncSlackResponse,<br>user_auth_test_response: slack_sdk.web.slack_response.SlackResponse | AsyncSlackResponse | None = None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>

@@ -5073,6 +5073,7 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <pre><code class="python">class Complete:
     client: WebClient
     function_execution_id: Optional[str]
+    _called: bool
 
     def __init__(
         self,
@@ -5081,6 +5082,7 @@ def set_title(self) -&gt; Optional[SetTitle]:
     ):
         self.client = client
         self.function_execution_id = function_execution_id
+        self._called = False
 
     def __call__(self, outputs: Optional[Dict[str, Any]] = None) -&gt; SlackResponse:
         &#34;&#34;&#34;Signal the successful completion of the custom function.
@@ -5097,7 +5099,16 @@ def set_title(self) -&gt; Optional[SetTitle]:
         if self.function_execution_id is None:
             raise ValueError(&#34;complete is unsupported here as there is no function_execution_id&#34;)
 
-        return self.client.functions_completeSuccess(function_execution_id=self.function_execution_id, outputs=outputs or {})</code></pre>
+        self._called = True
+        return self.client.functions_completeSuccess(function_execution_id=self.function_execution_id, outputs=outputs or {})
+
+    def has_been_called(self) -&gt; bool:
+        &#34;&#34;&#34;Check if this complete function has been called.
+
+        Returns:
+            bool: True if the complete function has been called, False otherwise.
+        &#34;&#34;&#34;
+        return self._called</code></pre>
 </details>
 <div class="desc"></div>
 <h3>Class variables</h3>
@@ -5109,6 +5120,32 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <dt id="slack_bolt.Complete.function_execution_id"><code class="name">var <span class="ident">function_execution_id</span> : str | None</code></dt>
 <dd>
 <div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="slack_bolt.Complete.has_been_called"><code class="name flex">
+<span>def <span class="ident">has_been_called</span></span>(<span>self) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def has_been_called(self) -&gt; bool:
+    &#34;&#34;&#34;Check if this complete function has been called.
+
+    Returns:
+        bool: True if the complete function has been called, False otherwise.
+    &#34;&#34;&#34;
+    return self._called</code></pre>
+</details>
+<div class="desc"><p>Check if this complete function has been called.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if the complete function has been called, False otherwise.</dd>
+</dl></div>
 </dd>
 </dl>
 </dd>
@@ -5189,6 +5226,7 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <pre><code class="python">class Fail:
     client: WebClient
     function_execution_id: Optional[str]
+    _called: bool
 
     def __init__(
         self,
@@ -5197,6 +5235,7 @@ def set_title(self) -&gt; Optional[SetTitle]:
     ):
         self.client = client
         self.function_execution_id = function_execution_id
+        self._called = False
 
     def __call__(self, error: str) -&gt; SlackResponse:
         &#34;&#34;&#34;Signal that the custom function failed to complete.
@@ -5213,7 +5252,16 @@ def set_title(self) -&gt; Optional[SetTitle]:
         if self.function_execution_id is None:
             raise ValueError(&#34;fail is unsupported here as there is no function_execution_id&#34;)
 
-        return self.client.functions_completeError(function_execution_id=self.function_execution_id, error=error)</code></pre>
+        self._called = True
+        return self.client.functions_completeError(function_execution_id=self.function_execution_id, error=error)
+
+    def has_been_called(self) -&gt; bool:
+        &#34;&#34;&#34;Check if this fail function has been called.
+
+        Returns:
+            bool: True if the fail function has been called, False otherwise.
+        &#34;&#34;&#34;
+        return self._called</code></pre>
 </details>
 <div class="desc"></div>
 <h3>Class variables</h3>
@@ -5227,10 +5275,36 @@ def set_title(self) -&gt; Optional[SetTitle]:
 <div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 </dl>
+<h3>Methods</h3>
+<dl>
+<dt id="slack_bolt.Fail.has_been_called"><code class="name flex">
+<span>def <span class="ident">has_been_called</span></span>(<span>self) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def has_been_called(self) -&gt; bool:
+    &#34;&#34;&#34;Check if this fail function has been called.
+
+    Returns:
+        bool: True if the fail function has been called, False otherwise.
+    &#34;&#34;&#34;
+    return self._called</code></pre>
+</details>
+<div class="desc"><p>Check if this fail function has been called.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if the fail function has been called, False otherwise.</dd>
+</dl></div>
+</dd>
+</dl>
 </dd>
 <dt id="slack_bolt.FileAssistantThreadContextStore"><code class="flex name class">
 <span>class <span class="ident">FileAssistantThreadContextStore</span></span>
-<span>(</span><span>base_dir: str = '/Users/eden.zimbelman/.bolt-app-assistant-thread-contexts')</span>
+<span>(</span><span>base_dir: str = '/Users/wbergamin/.bolt-app-assistant-thread-contexts')</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -6120,6 +6194,7 @@ def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt
 <ul class="">
 <li><code><a title="slack_bolt.Complete.client" href="#slack_bolt.Complete.client">client</a></code></li>
 <li><code><a title="slack_bolt.Complete.function_execution_id" href="#slack_bolt.Complete.function_execution_id">function_execution_id</a></code></li>
+<li><code><a title="slack_bolt.Complete.has_been_called" href="#slack_bolt.Complete.has_been_called">has_been_called</a></code></li>
 </ul>
 </li>
 <li>
@@ -6136,6 +6211,7 @@ def run_ack_function(self, *, request: BoltRequest, response: BoltResponse) -&gt
 <ul class="">
 <li><code><a title="slack_bolt.Fail.client" href="#slack_bolt.Fail.client">client</a></code></li>
 <li><code><a title="slack_bolt.Fail.function_execution_id" href="#slack_bolt.Fail.function_execution_id">function_execution_id</a></code></li>
+<li><code><a title="slack_bolt.Fail.has_been_called" href="#slack_bolt.Fail.has_been_called">has_been_called</a></code></li>
 </ul>
 </li>
 <li>
