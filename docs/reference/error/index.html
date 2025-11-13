@@ -72,7 +72,7 @@ el.replaceWith(d);
 </dd>
 <dt id="slack_bolt.error.BoltUnhandledRequestError"><code class="flex name class">
 <span>class <span class="ident">BoltUnhandledRequestError</span></span>
-<span>(</span><span>*,<br>request: ForwardRef('BoltRequest') | ForwardRef('AsyncBoltRequest'),<br>current_response: ForwardRef('BoltResponse') | None,<br>last_global_middleware_name: str | None = None)</span>
+<span>(</span><span>*,<br>request: BoltRequest | AsyncBoltRequest,<br>current_response: BoltResponse | None,<br>last_global_middleware_name: str | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
