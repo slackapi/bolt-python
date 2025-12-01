@@ -348,7 +348,7 @@ def info_default_oauth_settings_loaded() -> str:
         "Bolt has enabled the file-based InstallationStore/OAuthStateStore for you. "
         "Note that these file-based stores are for local development. "
         "If you'd like to use a different data store, set the oauth_settings argument in the App constructor. "
-        "Please refer to https://slack.dev/bolt-python/concepts#authenticating-oauth for more details."
+        "Please refer to https://docs.slack.dev/tools/bolt-python/concepts/authenticating-oauth for more details."
     )
 
 

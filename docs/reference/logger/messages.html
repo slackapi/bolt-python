@@ -208,14 +208,14 @@ el.replaceWith(d);
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.logger.messages.error_message_event_type"><code class="name flex">
-<span>def <span class="ident">error_message_event_type</span></span>(<span>event_type: str) ‑> str</span>
+<span>def <span class="ident">error_message_event_type</span></span>(<span>event_type: str | re.Pattern) ‑> str</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def error_message_event_type(event_type: str) -&gt; str:
+<pre><code class="python">def error_message_event_type(event_type: Union[str, Pattern]) -&gt; str:
     return (
         f&#39;Although the document mentions &#34;{event_type}&#34;, &#39;
         &#39;it is not a valid event type. Use &#34;message&#34; instead. &#39;
@@ -303,7 +303,7 @@ el.replaceWith(d);
         &#34;Bolt has enabled the file-based InstallationStore/OAuthStateStore for you. &#34;
         &#34;Note that these file-based stores are for local development. &#34;
         &#34;If you&#39;d like to use a different data store, set the oauth_settings argument in the App constructor. &#34;
-        &#34;Please refer to https://slack.dev/bolt-python/concepts#authenticating-oauth for more details.&#34;
+        &#34;Please refer to https://docs.slack.dev/tools/bolt-python/concepts/authenticating-oauth for more details.&#34;
     )</code></pre>
 </details>
 <div class="desc"></div>
@@ -409,7 +409,7 @@ el.replaceWith(d);
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.logger.messages.warning_unhandled_by_global_middleware"><code class="name flex">
-<span>def <span class="ident">warning_unhandled_by_global_middleware</span></span>(<span>name: str,<br>req: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a> | ForwardRef('AsyncBoltRequest')) ‑> str</span>
+<span>def <span class="ident">warning_unhandled_by_global_middleware</span></span>(<span>name: str,<br>req: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a> | AsyncBoltRequest) ‑> str</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -427,7 +427,7 @@ el.replaceWith(d);
 <div class="desc"></div>
 </dd>
 <dt id="slack_bolt.logger.messages.warning_unhandled_request"><code class="name flex">
-<span>def <span class="ident">warning_unhandled_request</span></span>(<span>req: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a> | ForwardRef('AsyncBoltRequest')) ‑> str</span>
+<span>def <span class="ident">warning_unhandled_request</span></span>(<span>req: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a> | AsyncBoltRequest) ‑> str</span>
 </code></dt>
 <dd>
 <details class="source">

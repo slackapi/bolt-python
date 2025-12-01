@@ -72,13 +72,7 @@ class AsyncListener(metaclass=ABCMeta):
 
 
 from logging import Logger
-from typing import Callable, Awaitable
-
-from slack_bolt.listener_matcher.async_listener_matcher import AsyncListenerMatcher
 from slack_bolt.logger import get_bolt_app_logger
-from slack_bolt.middleware.async_middleware import AsyncMiddleware
-from slack_bolt.request.async_request import AsyncBoltRequest
-from slack_bolt.response import BoltResponse
 
 
 class AsyncCustomListener(AsyncListener):

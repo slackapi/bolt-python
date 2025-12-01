@@ -2,12 +2,9 @@ import pytest
 from slack_sdk.web.async_client import AsyncWebClient
 from slack_sdk.web.async_slack_response import AsyncSlackResponse
 
-from tests.utils import get_event_loop
 from slack_bolt.context.say.async_say import AsyncSay
-from tests.mock_web_api_server import (
-    cleanup_mock_web_api_server_async,
-    setup_mock_web_api_server_async,
-)
+from tests.mock_web_api_server import cleanup_mock_web_api_server_async, setup_mock_web_api_server_async
+from tests.utils import get_event_loop
 
 
 class TestAsyncSay:
@@ -27,6 +24,12 @@ class TestAsyncSay:
     async def test_say(self):
         say = AsyncSay(client=self.web_client, channel="C111")
         response: AsyncSlackResponse = await say(text="Hi there!")
+        assert response.status_code == 200
+
+    @pytest.mark.asyncio
+    async def test_say_markdown_text(self):
+        say = AsyncSay(client=self.web_client, channel="C111")
+        response: AsyncSlackResponse = await say(markdown_text="**Greetings!**")
         assert response.status_code == 200
 
     @pytest.mark.asyncio

@@ -1,8 +1,7 @@
 ---
 sidebar_label: Quickstart
+title: Quickstart guide with Bolt for Python
 ---
-
-# Quickstart guide with Bolt for Python
 
 This quickstart guide aims to help you get a Slack app using Bolt for Python up and running as soon as possible!
 
@@ -280,6 +279,41 @@ This will open the following page:
 
 On these pages you're free to make changes such as updating your app icon, configuring app features, and perhaps even distributing your app!
 
+## Adding AI features {#ai-features}
+
+Now that you're familiar with a basic app setup, try it out again, this time using the AI agent template!
+
+<Tabs groupId="cli-or-terminal">
+<TabItem value="cli" label="Slack CLI">
+
+Get started with the agent template:
+
+```sh
+$ slack create ai-app --template slack-samples/bolt-python-assistant-template
+$ cd ai-app
+```
+
+</TabItem>
+<TabItem value="terminal" label="Terminal">
+
+Get started with the agent template:
+
+```sh
+$ git clone https://github.com/slack-samples/bolt-python-assistant-template ai-app
+$ cd ai-app
+```
+
+Using this method, be sure to set the app and bot tokens as we did in the [Running the app](#running-the-app) section above.
+
+</TabItem>
+</Tabs>
+
+Once the project is created, update the `.env.sample` file by setting the `OPENAI_API_KEY` with the value of your key and removing the `.sample` from the file name.
+
+In the `ai` folder of this app, you'll find default instructions for the LLM and an OpenAI client setup. 
+
+The `listeners` include utilities intended for messaging with an LLM. Those are outlined in detail in the guide to [Using AI in apps](/tools/bolt-python/concepts/ai-apps) and [Sending messages](/tools/bolt-python/concepts/message-sending).
+
 ## Next steps {#next-steps}
 
 Congrats once more on getting up and running with this quick start.
@@ -292,8 +326,8 @@ Follow along with the steps that went into making this app on the [building an a
 
 You can now continue customizing your app with various features to make it right for whatever job's at hand. Here are some ideas about what to explore next:
 
-- Explore the different events your bot can listen to with the [`app.event()`](/tools/bolt-python/concepts/event-listening) method. All of the [events](/reference/events) are listed on the API docs site.
-- Bolt allows you to call [Web API](/tools/bolt-python/concepts/web-api) methods with the client attached to your app. There are [over 200 methods](/reference/methods) on the API docs site.
+- Explore the different events your bot can listen to with the [`app.event()`](/tools/bolt-python/concepts/event-listening) method. See the full events reference [here](/reference/events).
+- Bolt allows you to call [Web API](/tools/bolt-python/concepts/web-api) methods with the client attached to your app. There are [over 200 methods](/reference/methods) available.
 - Learn more about the different [token types](/authentication/tokens) and [authentication setups](/tools/bolt-python/concepts/authenticating-oauth). Your app might need different tokens depending on the actions you want to perform or for installations to multiple workspaces.
 - Receive events using HTTP for various deployment methods, such as deploying to Heroku or AWS Lambda.
 - Read on [app design](/surfaces/app-design) and compose fancy messages with blocks using [Block Kit Builder](https://app.slack.com/block-kit-builder) to prototype messages.

@@ -28,13 +28,13 @@ async def log_request(logger, body, next):
     return await next()
 
 
-# Events API: https://api.slack.com/events-api
+# Events API: https://docs.slack.dev/apis/events-api/
 @app.event("app_mention")
 async def event_test(say):
     await say("What's up?")
 
 
-# Interactivity: https://api.slack.com/interactivity
+# Interactivity: https://docs.slack.dev/interactivity/
 @app.shortcut("callback-id-here")
 # @app.command("/hello-bolt-python")
 async def open_modal(ack, client, logger, body):

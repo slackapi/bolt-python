@@ -1,13 +1,13 @@
-from typing import Optional, Union, Dict, Sequence, Callable, Awaitable
+from typing import Awaitable, Callable, Dict, Optional, Sequence, Union
 
+from slack_sdk.models.attachments import Attachment
+from slack_sdk.models.blocks import Block
 from slack_sdk.models.metadata import Metadata
+from slack_sdk.web.async_client import AsyncWebClient
+from slack_sdk.web.async_slack_response import AsyncSlackResponse
 
 from slack_bolt.context.say.internals import _can_say
 from slack_bolt.util.utils import create_copy
-from slack_sdk.models.attachments import Attachment
-from slack_sdk.models.blocks import Block
-from slack_sdk.web.async_client import AsyncWebClient
-from slack_sdk.web.async_slack_response import AsyncSlackResponse
 
 
 class AsyncSay:
@@ -42,6 +42,7 @@ class AsyncSay:
         icon_emoji: Optional[str] = None,
         icon_url: Optional[str] = None,
         username: Optional[str] = None,
+        markdown_text: Optional[str] = None,
         mrkdwn: Optional[bool] = None,
         link_names: Optional[bool] = None,
         parse: Optional[str] = None,  # none, full
@@ -67,6 +68,7 @@ class AsyncSay:
                     icon_emoji=icon_emoji,
                     icon_url=icon_url,
                     username=username,
+                    markdown_text=markdown_text,
                     mrkdwn=mrkdwn,
                     link_names=link_names,
                     parse=parse,

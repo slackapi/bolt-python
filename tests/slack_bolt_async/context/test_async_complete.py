@@ -36,3 +36,14 @@ class TestAsyncComplete:
 
         with pytest.raises(ValueError):
             await complete(outputs={"key": "value"})
+
+    @pytest.mark.asyncio
+    async def test_has_been_called_false_initially(self):
+        complete = AsyncComplete(client=self.web_client, function_execution_id="fn1111")
+        assert complete.has_been_called() is False
+
+    @pytest.mark.asyncio
+    async def test_has_been_called_true_after_complete(self):
+        complete = AsyncComplete(client=self.web_client, function_execution_id="fn1111")
+        await complete(outputs={"key": "value"})
+        assert complete.has_been_called() is True

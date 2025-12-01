@@ -36,3 +36,14 @@ class TestAsyncFail:
 
         with pytest.raises(ValueError):
             await fail(error="there was an error")
+
+    @pytest.mark.asyncio
+    async def test_has_been_called_false_initially(self):
+        fail = AsyncFail(client=self.web_client, function_execution_id="fn1111")
+        assert fail.has_been_called() is False
+
+    @pytest.mark.asyncio
+    async def test_has_been_called_true_after_fail(self):
+        fail = AsyncFail(client=self.web_client, function_execution_id="fn1111")
+        await fail(error="there was an error")
+        assert fail.has_been_called() is True

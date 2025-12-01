@@ -1,6 +1,6 @@
 """Incoming request from Slack through either HTTP request or Socket Mode connection.
 
-Refer to https://api.slack.com/apis/connections for the two types of connections.
+Refer to https://docs.slack.dev/apis/events-api/ for the two types of connections.
 This interface encapsulates the difference between the two.
 """
 

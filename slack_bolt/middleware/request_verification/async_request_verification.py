@@ -10,7 +10,7 @@ class AsyncRequestVerification(RequestVerification, AsyncMiddleware):
     """Verifies an incoming request by checking the validity of
     `x-slack-signature`, `x-slack-request-timestamp`, and its body data.
 
-    Refer to https://api.slack.com/authentication/verifying-requests-from-slack for details.
+    Refer to https://docs.slack.dev/authentication/verifying-requests-from-slack/ for details.
     """
 
     async def async_process(
