@@ -7,20 +7,23 @@ from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
 )
+from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
 class TestAsyncComplete:
-    @pytest.fixture
-    def event_loop(self):
+
+    @pytest.fixture(scope="function", autouse=True)
+    def setup_teardown(self):
+        old_os_env = remove_os_env_temporarily()
         setup_mock_web_api_server(self)
         valid_token = "xoxb-valid"
         mock_api_server_base_url = "http://localhost:8888"
-        self.web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url)
-
-        loop = asyncio.get_event_loop()
-        yield loop
-        loop.close()
-        cleanup_mock_web_api_server(self)
+        try:
+            self.web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url)
+            yield  # run the test here
+        finally:
+            cleanup_mock_web_api_server(self)
+            restore_os_env(old_os_env)
 
     @pytest.mark.asyncio
     async def test_complete(self):
