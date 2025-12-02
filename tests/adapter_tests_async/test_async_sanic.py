@@ -17,7 +17,7 @@ from tests.mock_web_api_server import (
     cleanup_mock_web_api_server,
     assert_auth_test_count,
 )
-from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
+from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
 class TestSanic:
@@ -34,16 +34,14 @@ class TestSanic:
     def unique_sanic_app_name() -> str:
         return f"awesome-slack-app-{str(time()).replace('.', '-')}"
 
-    @pytest.fixture
-    def event_loop(self):
+    @pytest.fixture(scope="function", autouse=True)
+    def setup_teardown(self):
         old_os_env = remove_os_env_temporarily()
+        setup_mock_web_api_server(self)
         try:
-            setup_mock_web_api_server(self)
-            loop = get_event_loop()
-            yield loop
-            loop.close()
-            cleanup_mock_web_api_server(self)
+            yield  # run the test here
         finally:
+            cleanup_mock_web_api_server(self)
             restore_os_env(old_os_env)
 
     def generate_signature(self, body: str, timestamp: str):

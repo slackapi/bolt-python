@@ -18,7 +18,7 @@ from tests.mock_web_api_server import (
     assert_auth_test_count_async,
     setup_mock_web_api_server_async,
 )
-from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
+from tests.utils import remove_os_env_temporarily, restore_os_env
 
 valid_token = "xoxb-valid"
 valid_user_token = "xoxp-valid"
@@ -63,16 +63,14 @@ class TestAsyncInstallationStoreAuthorize:
         base_url=mock_api_server_base_url,
     )
 
-    @pytest.fixture
-    def event_loop(self):
+    @pytest.fixture(scope="function", autouse=True)
+    def setup_teardown(self):
         old_os_env = remove_os_env_temporarily()
+        setup_mock_web_api_server_async(self)
         try:
-            setup_mock_web_api_server_async(self)
-            loop = get_event_loop()
-            yield loop
-            loop.close()
-            cleanup_mock_web_api_server_async(self)
+            yield  # run the test here
         finally:
+            cleanup_mock_web_api_server_async(self)
             restore_os_env(old_os_env)
 
     def generate_signature(self, body: str, timestamp: str):
