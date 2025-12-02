@@ -1,7 +1,6 @@
 import pytest
 from slack_sdk.web.async_client import AsyncWebClient
 
-from tests.utils import get_event_loop
 from slack_bolt import BoltResponse
 from slack_bolt.oauth.async_callback_options import (
     AsyncFailureArgs,
@@ -17,15 +16,15 @@ from tests.mock_web_api_server import (
 
 
 class TestAsyncOAuthFlowSQLite3:
-    mock_api_server_base_url = "http://localhost:8888"
 
-    @pytest.fixture
-    def event_loop(self):
+    @pytest.fixture(scope="function", autouse=True)
+    def setup_teardown(self):
         setup_mock_web_api_server_async(self)
-        loop = get_event_loop()
-        yield loop
-        loop.close()
-        cleanup_mock_web_api_server_async(self)
+        try:
+            self.mock_api_server_base_url = "http://localhost:8888"
+            yield  # run the test here
+        finally:
+            cleanup_mock_web_api_server_async(self)
 
     def next(self):
         pass

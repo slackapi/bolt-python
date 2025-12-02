@@ -28,8 +28,8 @@ def start_thread_socket_mode_server(test: TestCase, port: int):
 
     async def health(request: web.Request):
         wr = web.Response()
-        await wr.prepare(request)
         wr.set_status(200)
+        await wr.prepare(request)
         return wr
 
     async def link(request: web.Request):

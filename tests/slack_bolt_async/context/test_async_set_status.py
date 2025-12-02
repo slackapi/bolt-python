@@ -4,21 +4,23 @@ from slack_sdk.web.async_slack_response import AsyncSlackResponse
 
 from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
 from tests.mock_web_api_server import cleanup_mock_web_api_server_async, setup_mock_web_api_server_async
-from tests.utils import get_event_loop
+from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
 class TestAsyncSetStatus:
-    @pytest.fixture
-    def event_loop(self):
+
+    @pytest.fixture(scope="function", autouse=True)
+    def setup_teardown(self):
+        old_os_env = remove_os_env_temporarily()
         setup_mock_web_api_server_async(self)
         valid_token = "xoxb-valid"
         mock_api_server_base_url = "http://localhost:8888"
-        self.web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url)
-
-        loop = get_event_loop()
-        yield loop
-        loop.close()
-        cleanup_mock_web_api_server_async(self)
+        try:
+            self.web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url)
+            yield  # run the test here
+        finally:
+            cleanup_mock_web_api_server_async(self)
+            restore_os_env(old_os_env)
 
     @pytest.mark.asyncio
     async def test_set_status(self):
