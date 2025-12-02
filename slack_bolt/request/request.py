@@ -66,7 +66,7 @@ class BoltRequest:
         else:
             self.body = {}
 
-        self.context = build_context(BoltContext(context if context else {}), self.body)
+        self.context = build_context(BoltContext(context if context else {}), self.body, self.headers)
         self.lazy_only = bool(self.headers.get("x-slack-bolt-lazy-only", [False])[0])
         self.lazy_function_name = self.headers.get("x-slack-bolt-lazy-function-name", [None])[0]
         self.mode = mode

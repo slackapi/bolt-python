@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, Optional, Sequence
 
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.request.internals import (
@@ -21,6 +21,7 @@ from slack_bolt.request.internals import (
 def build_async_context(
     context: AsyncBoltContext,
     body: Dict[str, Any],
+    headers: Optional[Dict[str, Sequence[str]]] = None,
 ) -> AsyncBoltContext:
     context["is_enterprise_install"] = extract_is_enterprise_install(body)
     enterprise_id = extract_enterprise_id(body)
@@ -67,4 +68,17 @@ def build_async_context(
                 context.logger.debug(debug_multiple_response_urls_detected())
             response_url = response_urls[0].get("response_url")
             context["response_url"] = response_url
+
+    if headers is not None:
+        retry_num_header = headers.get("x-slack-retry-num")
+        if retry_num_header is not None and len(retry_num_header) > 0:
+            try:
+                context["retry_num"] = int(retry_num_header[0])
+            except (ValueError, TypeError):
+                pass
+
+        retry_reason_header = headers.get("x-slack-retry-reason")
+        if retry_reason_header is not None and len(retry_reason_header) > 0:
+            context["retry_reason"] = retry_reason_header[0]
+
     return context
