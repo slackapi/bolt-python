@@ -1,4 +1,4 @@
-from typing import List, Dict, Union, Optional
+from typing import Dict, List, Optional, Sequence, Union
 
 from slack_sdk import WebClient
 from slack_sdk.web import SlackResponse
@@ -21,7 +21,7 @@ class SetSuggestedPrompts:
 
     def __call__(
         self,
-        prompts: List[Union[str, Dict[str, str]]],
+        prompts: Sequence[Union[str, Dict[str, str]]],
         title: Optional[str] = None,
     ) -> SlackResponse:
         prompts_arg: List[Dict[str, str]] = []

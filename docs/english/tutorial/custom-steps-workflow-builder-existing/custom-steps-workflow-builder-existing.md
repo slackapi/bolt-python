@@ -9,7 +9,7 @@ If you followed along with our [create a custom step for Workflow Builder: new a
 In this tutorial we will:
 - Start with an existing Bolt app
 - Add a custom **workflow step** in the [app settings](https://api.slack.com/apps)
-- Wire up the new step to a **function listener** in our project, using the [Bolt for Python](https://slack.dev/bolt-python/) framework
+- Wire up the new step to a **function listener** in our project, using the [Bolt for Python](https://docs.slack.dev/tools/bolt-python/) framework
 - See the step as a custom workflow step in Workflow Builder
 
 ## Prerequisites {#prereqs}

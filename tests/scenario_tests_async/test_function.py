@@ -33,16 +33,14 @@ class TestAsyncFunction:
         base_url=mock_api_server_base_url,
     )
 
-    @pytest.fixture
-    def event_loop(self):
+    @pytest.fixture(scope="function", autouse=True)
+    def setup_teardown(self):
         old_os_env = remove_os_env_temporarily()
+        setup_mock_web_api_server_async(self)
         try:
-            setup_mock_web_api_server_async(self)
-            loop = asyncio.get_event_loop()
-            yield loop
-            loop.close()
-            cleanup_mock_web_api_server_async(self)
+            yield  # run the test here
         finally:
+            cleanup_mock_web_api_server_async(self)
             restore_os_env(old_os_env)
 
     def generate_signature(self, body: str, timestamp: str):
@@ -312,18 +310,22 @@ async def reverse(body, event, client, context, complete, inputs):
     assert context.client.token == "xwfp-valid"
     assert client.token == "xwfp-valid"
     assert complete.client.token == "xwfp-valid"
+    assert complete.has_been_called() is False
     await complete(
         outputs={"reverseString": "olleh"},
     )
+    assert complete.has_been_called() is True
 
 
 async def reverse_error(body, event, fail):
     assert body == function_body
     assert event == function_body["event"]
     assert fail.function_execution_id == "Fx111"
+    assert fail.has_been_called() is False
     await fail(
         error="there was an error",
     )
+    assert fail.has_been_called() is True
 
 
 async def complete_it(body, event, complete):

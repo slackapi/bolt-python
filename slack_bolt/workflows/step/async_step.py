@@ -29,7 +29,7 @@ from ...middleware.async_middleware import AsyncMiddleware
 
 class AsyncWorkflowStepBuilder:
     """Steps from apps
-    Refer to https://api.slack.com/workflows/steps for details.
+    Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
     """
 
     callback_id: Union[str, Pattern]
@@ -47,7 +47,7 @@ class AsyncWorkflowStepBuilder:
         """
         Deprecated:
             Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         This builder is supposed to be used as decorator.
 
@@ -89,7 +89,7 @@ class AsyncWorkflowStepBuilder:
         """
         Deprecated:
             Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         Registers a new edit listener with details.
 
@@ -142,7 +142,7 @@ class AsyncWorkflowStepBuilder:
         """
         Deprecated:
             Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         Registers a new save listener with details.
 
@@ -195,7 +195,7 @@ class AsyncWorkflowStepBuilder:
         """
         Deprecated:
             Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         Registers a new execute listener with details.
 
@@ -242,7 +242,7 @@ class AsyncWorkflowStepBuilder:
         """
         Deprecated:
             Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         Constructs a WorkflowStep object. This method may raise an exception
         if the builder doesn't have enough configurations to build the object.
@@ -340,7 +340,7 @@ class AsyncWorkflowStep:
         """
         Deprecated:
             Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         Args:
             callback_id: The callback_id for this step from app
@@ -386,7 +386,7 @@ class AsyncWorkflowStep:
         """
         Deprecated:
             Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://api.slack.com/automation/functions/custom-bolt
+            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
         """
         return AsyncWorkflowStepBuilder(callback_id, base_logger=base_logger)
 

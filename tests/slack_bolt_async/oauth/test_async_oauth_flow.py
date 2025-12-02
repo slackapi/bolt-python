@@ -3,7 +3,7 @@ from time import time
 from urllib.parse import quote
 
 import pytest
-from tests.utils import get_event_loop
+from tests.utils import remove_os_env_temporarily, restore_os_env
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 from slack_sdk.oauth.state_store.async_state_store import AsyncOAuthStateStore
@@ -30,15 +30,17 @@ from tests.mock_web_api_server import (
 
 
 class TestAsyncOAuthFlow:
-    mock_api_server_base_url = "http://localhost:8888"
 
-    @pytest.fixture
-    def event_loop(self):
+    @pytest.fixture(scope="function", autouse=True)
+    def setup_teardown(self):
+        old_os_env = remove_os_env_temporarily()
         setup_mock_web_api_server_async(self)
-        loop = get_event_loop()
-        yield loop
-        loop.close()
-        cleanup_mock_web_api_server_async(self)
+        try:
+            self.mock_api_server_base_url = "http://localhost:8888"
+            yield  # run the test here
+        finally:
+            cleanup_mock_web_api_server_async(self)
+            restore_os_env(old_os_env)
 
     def next(self):
         pass

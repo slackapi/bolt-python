@@ -19,7 +19,7 @@
         lazy=[run_long_process]
     )
 
-Refer to https://slack.dev/bolt-python/concepts#lazy-listeners for more details.
+Refer to https://docs.slack.dev/tools/bolt-python/concepts/lazy-listeners for more details.
 """
 
 # Don't add async module imports here

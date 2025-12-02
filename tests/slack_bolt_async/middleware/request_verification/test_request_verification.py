@@ -1,7 +1,6 @@
 from time import time
 
 import pytest
-from tests.utils import get_event_loop
 from slack_sdk.signature import SignatureVerifier
 
 from slack_bolt.middleware.request_verification.async_request_verification import (
@@ -31,12 +30,6 @@ class TestAsyncRequestVerification:
             "x-slack-signature": [self.generate_signature(body, timestamp)],
             "x-slack-request-timestamp": [timestamp],
         }
-
-    @pytest.fixture
-    def event_loop(self):
-        loop = get_event_loop()
-        yield loop
-        loop.close()
 
     @pytest.mark.asyncio
     async def test_valid(self):

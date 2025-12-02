@@ -11,7 +11,7 @@ class UrlVerification(Middleware):
     def __init__(self, base_logger: Optional[Logger] = None):
         """Handles url_verification requests.
 
-        Refer to https://api.slack.com/events/url_verification for details.
+        Refer to https://docs.slack.dev/reference/events/url_verification/ for details.
 
         Args:
             base_logger: The base logger

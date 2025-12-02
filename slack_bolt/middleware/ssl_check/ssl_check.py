@@ -17,11 +17,11 @@ class SslCheck(Middleware):
         base_logger: Optional[Logger] = None,
     ):
         """Handles `ssl_check` requests.
-        Refer to https://api.slack.com/interactivity/slash-commands for details.
+        Refer to https://docs.slack.dev/interactivity/implementing-slash-commands/ for details.
 
         Args:
             verification_token: The verification token to check
-                (optional as it's already deprecated - https://api.slack.com/authentication/verifying-requests-from-slack#verification_token_deprecation)
+                (optional as it's already deprecated - https://docs.slack.dev/authentication/verifying-requests-from-slack/#deprecation)
             base_logger: The base logger
         """  # noqa: E501
         self.verification_token = verification_token

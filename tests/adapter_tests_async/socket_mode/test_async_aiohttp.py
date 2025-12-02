@@ -9,7 +9,7 @@ from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
 )
-from tests.utils import remove_os_env_temporarily, restore_os_env, get_event_loop
+from tests.utils import remove_os_env_temporarily, restore_os_env
 from ...adapter_tests.socket_mode.mock_socket_mode_server import (
     start_socket_mode_server,
     stop_socket_mode_server,
@@ -24,16 +24,14 @@ class TestSocketModeAiohttp:
         base_url=mock_api_server_base_url,
     )
 
-    @pytest.fixture
-    def event_loop(self):
+    @pytest.fixture(scope="function", autouse=True)
+    def setup_teardown(self):
         old_os_env = remove_os_env_temporarily()
+        setup_mock_web_api_server(self)
         try:
-            setup_mock_web_api_server(self)
-            loop = get_event_loop()
-            yield loop
-            loop.close()
-            cleanup_mock_web_api_server(self)
+            yield  # run the test here
         finally:
+            cleanup_mock_web_api_server(self)
             restore_os_env(old_os_env)
 
     @pytest.mark.asyncio
