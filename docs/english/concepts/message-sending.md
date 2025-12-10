@@ -45,9 +45,9 @@ def show_datepicker(event, say):
 
 You can have your app's messages stream in to replicate conventional AI chatbot behavior. This is done through three Web API methods:
 
-* [`chat_startStream`](/reference/methods/chat.startstream)
-* [`chat_appendStream`](/reference/methods/chat.appendstream)
-* [`chat_stopStream`](/reference/methods/chat.stopstream)
+* [`chat_startStream`](/reference/methods/chat.startStream)
+* [`chat_appendStream`](/reference/methods/chat.appendStream)
+* [`chat_stopStream`](/reference/methods/chat.stopStream)
 
 The Python Slack SDK provides a [`chat_stream()`](https://docs.slack.dev/tools/python-slack-sdk/reference/web/client.html#slack_sdk.web.client.WebClient.chat_stream) helper utility to streamline calling these methods. Here's an excerpt from our [Assistant template app](https://github.com/slack-samples/bolt-python-assistant-template):
 
