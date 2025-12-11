@@ -1,12 +1,12 @@
 # モーダルの開始
 
-<a href="/surfaces/modals">モーダル</a>は、ユーザーからのデータの入力を受け付けたり、動的な情報を表示したりするためのインターフェイスです。組み込みの APIクライアントの <a href="/reference/methods/views.open/">`views.open`</a> メソッドに、有効な `trigger_id` と<a href="/reference/interaction-payloads/view-interactions-payload/#view_submission">ビューのペイロード</a>を指定してモーダルを開始します。
+[モーダル](/surfaces/modals)は、ユーザーからのデータの入力を受け付けたり、動的な情報を表示したりするためのインターフェイスです。組み込みの APIクライアントの [`views.open`](/reference/methods/views.open/) メソッドに、有効な `trigger_id` と[ビューのペイロード](/reference/interaction-payloads/view-interactions-payload/#view_submission)を指定してモーダルを開始します。
 
 ショートカットの実行、ボタンを押下、選択メニューの操作などの操作の場合、Request URL に送信されるペイロードには `trigger_id` が含まれます。
 
-モーダルの生成方法についての詳細は、<a href="/surfaces/modals#composing_views">API ドキュメント</a>を参照してください。
+モーダルの生成方法についての詳細は、[API ドキュメント](/surfaces/modals#composing_views)を参照してください。
 
-<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+指定可能な引数の一覧は[モジュールドキュメント](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html)を参考にしてください。
 
 ```python
 # ショートカットの呼び出しをリッスン

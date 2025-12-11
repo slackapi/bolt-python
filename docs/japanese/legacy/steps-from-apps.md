@@ -22,7 +22,7 @@
 
 また、デコレーターとして利用できる `WorkflowStepBuilder` クラスを使ってワークフローステップを定義することもできます。 詳細は、[こちらのドキュメント](https://docs.slack.dev/tools/bolt-python/reference/workflows/step/step.html#slack_bolt.workflows.step.step.WorkflowStepBuilder)のコード例などを参考にしてください。
 
-指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">共通</a> / <a href="https://docs.slack.dev/tools/bolt-python/reference/workflows/step/utilities/index.html">ステップ用</a>
+指定可能な引数の一覧はモジュールドキュメントを参考にしてください（[共通](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) / [ステップ用](https://docs.slack.dev/tools/bolt-python/reference/workflows/step/utilities/index.html)）
 
 ```python
 import os
@@ -63,9 +63,7 @@ app.step(ws)
 
 `edit` コールバック内で `configure()` ユーティリティを使用すると、対応する `blocks` 引数にビューのblocks 部分だけを渡して、ステップの設定モーダルを簡単に表示させることができます。必要な入力内容が揃うまで設定の保存を無効にするには、`True` の値をセットした `submit_disabled` を渡します。
 
-設定モーダルの開き方に関する詳細は、こちらのドキュメントを参照してください。
-
-指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">共通</a> / <a href="https://docs.slack.dev/tools/bolt-python/reference/workflows/step/utilities/index.html">ステップ用</a>
+指定可能な引数の一覧はモジュールドキュメントを参考にしてください（[共通](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) / [ステップ用](https://docs.slack.dev/tools/bolt-python/reference/workflows/step/utilities/index.html)）
 
 ```python
 def edit(ack, step, configure):
@@ -115,9 +113,7 @@ app.step(ws)
 - `step_name` : ステップのデフォルトの名前をオーバーライドします。
 - `step_image_url` : ステップのデフォルトの画像をオーバーライドします。
 
-これらのパラメータの構成方法に関する詳細は、こちらのドキュメントを参照してください。
-
-指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">共通</a> / <a href="https://docs.slack.dev/tools/bolt-python/reference/workflows/step/utilities/index.html">ステップ用</a>
+指定可能な引数の一覧はモジュールドキュメントを参考にしてください（[共通](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) / [ステップ用](https://docs.slack.dev/tools/bolt-python/reference/workflows/step/utilities/index.html)）
 
 ```python
 def save(ack, view, update):
@@ -162,7 +158,8 @@ app.step(ws)
 
 `execute` コールバック内では、`complete()` を呼び出してステップの実行が成功したことを示すか、`fail()` を呼び出してステップの実行が失敗したことを示す必要があります。
 
-<span>指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">共通</a> / <a href="https://docs.slack.dev/tools/bolt-python/reference/workflows/step/utilities/index.html">ステップ用</a>）</span>
+指定可能な引数の一覧はモジュールドキュメントを参考にしてください（[共通](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) / [ステップ用](https://docs.slack.dev/tools/bolt-python/reference/workflows/step/utilities/index.html)）
+
 ```python
 def execute(step, complete, fail):
     inputs = step["inputs"]

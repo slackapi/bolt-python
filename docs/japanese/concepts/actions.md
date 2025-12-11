@@ -8,7 +8,8 @@ Bolt アプリは `action` メソッドを用いて、ボタンのクリック�
 
 `action()` を使ったすべての例で `ack()` が使用されていることに注目してください。アクションのリスナー内では、Slack からのリクエストを受信したことを確認するために、`ack()` 関数を呼び出す必要があります。これについては、[リクエストの確認](/tools/bolt-python/concepts/acknowledge)セクションで説明しています。
 
-<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+指定可能な引数の一覧は[モジュールドキュメント](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html)を参考にしてください。
+
 ```python
 # 'approve_button' という action_id のブロックエレメントがトリガーされるたびに、このリスナーが呼び出させれる
 @app.action("approve_button")
@@ -45,7 +46,8 @@ def update_message(ack, body, client):
 
 2 つ目は、`respond()` を使用する方法です。これは、アクションに関連づけられた `response_url` を使ったメッセージ送信を行うためのユーティリティです。
 
-<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+指定可能な引数の一覧は[モジュールドキュメント](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html)を参考にしてください。
+
 ```python
 # 'approve_button' という action_id のインタラクティブコンポーネントがトリガーされると、このリスナーが呼ばれる
 @app.action("approve_button")

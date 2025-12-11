@@ -8,7 +8,7 @@
 
 アプリの設定でコマンドを登録するときは、リクエスト URL の末尾に `/slack/events` をつけます。
 
-<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+指定可能な引数の一覧は[モジュールドキュメント](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html)を参考にしてください。
 ```python
 # echoコマンドは受け取ったコマンドをそのまま返す
 @app.command("/echo")

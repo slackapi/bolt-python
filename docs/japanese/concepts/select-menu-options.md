@@ -10,7 +10,7 @@
 
 さらに、ユーザーが入力したキーワードに基づいたオプションを返すようフィルタリングロジックを適用することもできます。 これは `payload` という引数の ` value` の値に基づいて、それぞれのパターンで異なるオプションの一覧を返すように実装することができます。 Bolt for Python のすべてのリスナーやミドルウェアでは、[多くの有用な引数](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html)にアクセスすることができますので、チェックしてみてください。
 
-<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+指定可能な引数の一覧は[モジュールドキュメント](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html)を参考にしてください。
 ```python
 # 外部データを使用する選択メニューオプションに応答するサンプル例
 @app.options("external_action")

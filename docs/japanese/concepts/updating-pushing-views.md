@@ -1,6 +1,6 @@
 # モーダルの更新と多重表示
 
-モーダル内では、複数のモーダルをスタックのように重ねることができます。<a href="/reference/methods/views.open/">`views_open`</a> という APIを呼び出すと、親となるとなるモーダルビューが追加されます。この最初の呼び出しの後、<a href="/reference/methods/views.update/">`views_update`</a> を呼び出すことでそのビューを更新することができます。また、<a href="/reference/methods/views.push">`views_push`</a> を呼び出すと、親のモーダルの上にさらに新しいモーダルビューを重ねることもできます。
+モーダル内では、複数のモーダルをスタックのように重ねることができます。[`views_open`](/reference/methods/views.open/) という APIを呼び出すと、親となるとなるモーダルビューが追加されます。この最初の呼び出しの後、[`views_update`](/reference/methods/views.update/) を呼び出すことでそのビューを更新することができます。また、[`views_push`](/reference/methods/views.push) を呼び出すと、親のモーダルの上にさらに新しいモーダルビューを重ねることもできます。
 
 **`views_update`**
 
@@ -8,11 +8,11 @@
 
 **`views_push`**
 
-既存のモーダルの上に新しいモーダルをスタックのように追加する場合は、組み込みのクライアントで `views_push` API を呼び出します。この API 呼び出しでは、有効な `trigger_id` と新しい<a href="/reference/interaction-payloads/view-interactions-payload/#view_submission">ビューのペイロード</a>を指定します。`views_push` の引数は <a href="#creating-modals">モーダルの開始</a> と同じです。モーダルを開いた後、このモーダルのスタックに追加できるモーダルビューは 2 つまでです。
+既存のモーダルの上に新しいモーダルをスタックのように追加する場合は、組み込みのクライアントで `views_push` API を呼び出します。この API 呼び出しでは、有効な `trigger_id` と新しい[ビューのペイロード](/reference/interaction-payloads/view-interactions-payload/#view_submission)を指定します。`views_push` の引数は [モーダルの開始](#creating-modals) と同じです。モーダルを開いた後、このモーダルのスタックに追加できるモーダルビューは 2 つまでです。
 
-モーダルの更新と多重表示に関する詳細は、<a href="/surfaces/modals">API ドキュメント</a>を参照してください。
+モーダルの更新と多重表示に関する詳細は、[API ドキュメント](/surfaces/modals)を参照してください。
 
-指定可能な引数の一覧は<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。
+指定可能な引数の一覧は[モジュールドキュメント](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html)を参考にしてください。
 
 ```python
 # モーダルに含まれる、`button_abc` という action_id のボタンの呼び出しをリッスン
