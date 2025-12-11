@@ -4,7 +4,7 @@
 
 `event()` メソッドには `str` 型の `eventType` を指定する必要があります。
 
-<span>指定可能な引数の一覧は<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+指定可能な引数の一覧は[モジュールドキュメント](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html)を参考にしてください。
 ```python
 # ユーザーがワークスペースに参加した際に、自己紹介を促すメッセージを指定のチャンネルに送信
 @app.event("team_join")

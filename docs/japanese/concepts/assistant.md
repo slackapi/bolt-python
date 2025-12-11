@@ -68,7 +68,7 @@ def respond_in_assistant_thread(
 app.use(assistant)
 ```
 
-<span>リスナーに指定可能な引数の一覧は<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">モジュールドキュメント</a>を参考にしてください。</span>
+リスナーに指定可能な引数の一覧は[モジュールドキュメント](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html)を参考にしてください。
 
 ユーザーがチャンネルの横でアシスタントスレッドを開いた場合、そのチャンネルの情報は、そのスレッドの `AssistantThreadContext` データとして保持され、 `get_thread_context` ユーティリティを使ってアクセスすることができます。Bolt がこのユーティリティを提供している理由は、後続のユーザーメッセージ投稿のイベントペイロードに最新のスレッドのコンテキスト情報は含まれないためです。そのため、アプリはコンテキスト情報が変更されたタイミングでそれを何らかの方法で保存し、後続のメッセージイベントのリスナーコードから参照できるようにする必要があります。
 
