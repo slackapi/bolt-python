@@ -55,7 +55,7 @@ We're going to use bot and app-level tokens for this guide.
 
 :::tip[Not sharing is sometimes caring]
 
-Treat your tokens like passwords and [keep them safe](/authentication/best-practices-for-security). Your app uses tokens to post and retrieve information from Slack workspaces.
+Treat your tokens like passwords and [keep them safe](/security). Your app uses tokens to post and retrieve information from Slack workspaces.
 
 :::
 
@@ -103,7 +103,7 @@ $ export SLACK_APP_TOKEN=<your-app-level-token>
 
 :::warning[Keep it secret. Keep it safe.]
 
-Remember to keep your tokens secure. At a minimum, you should avoid checking them into public version control, and access them via environment variables as we've done above. Check out the API documentation for more on [best practices for app security](/authentication/best-practices-for-security).
+Remember to keep your tokens secure. At a minimum, you should avoid checking them into public version control, and access them via environment variables as we've done above. Check out the API documentation for more on [best practices for app security](/security).
 
 :::
 

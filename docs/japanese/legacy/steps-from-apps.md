@@ -10,8 +10,6 @@
 
 ワークフローステップを機能させるためには、これら 3 つのイベントすべてに対応する必要があります。
 
-アプリを使ったワークフローステップに関する詳細は、[API ドキュメント](/legacy/legacy-steps-from-apps/)を参照してください。
-
 ## ステップの定義
 
 ワークフローステップの作成には、Bolt が提供する `WorkflowStep` クラスを利用します。
@@ -59,13 +57,13 @@ app.step(ws)
 
 ## ステップの追加・編集
 
-作成したワークフローステップがワークフローに追加またはその設定を変更されるタイミングで、[`workflow_step_edit` イベントがアプリに送信されます](/legacy/legacy-steps-from-apps/legacy-steps-from-apps-workflow_step_edit-payload)。このイベントがアプリに届くと、`WorkflowStep` で設定した `edit` コールバックが実行されます。
+作成したワークフローステップがワークフローに追加またはその設定を変更されるタイミングで、`workflow_step_edit` イベントがアプリに送信されます。このイベントがアプリに届くと、`WorkflowStep` で設定した `edit` コールバックが実行されます。
 
-ステップの追加と編集のどちらが行われるときも、[ワークフローステップの設定モーダル](/legacy/legacy-steps-from-apps/legacy-steps-from-apps-configuration-view-object)をビルダーに送信する必要があります。このモーダルは、そのステップ独自の設定を選択するための場所です。通常のモーダルより制限が強く、例えば `title`、`submit`、`close` のプロパティを含めることができません。設定モーダルの `callback_id` は、デフォルトではワークフローステップと同じものになります。
+ステップの追加と編集のどちらが行われるときも、ワークフローステップの設定モーダルをビルダーに送信する必要があります。このモーダルは、そのステップ独自の設定を選択するための場所です。通常のモーダルより制限が強く、例えば `title`、`submit`、`close` のプロパティを含めることができません。設定モーダルの `callback_id` は、デフォルトではワークフローステップと同じものになります。
 
 `edit` コールバック内で `configure()` ユーティリティを使用すると、対応する `blocks` 引数にビューのblocks 部分だけを渡して、ステップの設定モーダルを簡単に表示させることができます。必要な入力内容が揃うまで設定の保存を無効にするには、`True` の値をセットした `submit_disabled` を渡します。
 
-設定モーダルの開き方に関する詳細は、[こちらのドキュメント](/legacy/legacy-steps-from-apps/legacy-steps-from-apps-configuration-view-object)を参照してください。
+設定モーダルの開き方に関する詳細は、こちらのドキュメントを参照してください。
 
 指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">共通</a> / <a href="https://docs.slack.dev/tools/bolt-python/reference/workflows/step/utilities/index.html">ステップ用</a>
 
@@ -117,7 +115,7 @@ app.step(ws)
 - `step_name` : ステップのデフォルトの名前をオーバーライドします。
 - `step_image_url` : ステップのデフォルトの画像をオーバーライドします。
 
-これらのパラメータの構成方法に関する詳細は、[こちらのドキュメント](/legacy/legacy-steps-from-apps/legacy-steps-from-apps-workflow_step-object)を参照してください。
+これらのパラメータの構成方法に関する詳細は、こちらのドキュメントを参照してください。
 
 指定可能な引数の一覧はモジュールドキュメントを参考にしてください（<a href="https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html">共通</a> / <a href="https://docs.slack.dev/tools/bolt-python/reference/workflows/step/utilities/index.html">ステップ用</a>
 
@@ -158,7 +156,7 @@ app.step(ws)
 
 ## ステップの実行
 
-エンドユーザーがワークフローステップを実行すると、アプリに [`workflow_step_execute` イベントが送信されます](/legacy/legacy-steps-from-apps/legacy-steps-from-apps-workflow_step-object)。このイベントがアプリに届くと、`WorkflowStep` で設定した `execute` コールバックが実行されます。
+エンドユーザーがワークフローステップを実行すると、アプリに `workflow_step_execute` イベントが送信されます。このイベントがアプリに届くと、`WorkflowStep` で設定した `execute` コールバックが実行されます。
 
 `save` コールバックで取り出した `inputs` を使って、サードパーティの API を呼び出す、情報をデータベースに保存する、ユーザーのホームタブを更新するといった処理を実行することができます。また、ワークフローの後続のステップで利用する出力値を `outputs` オブジェクトに設定します。
 
