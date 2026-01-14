@@ -16,25 +16,20 @@ pip uninstall python-lambda
 test_target="$1"
 
 pip install -U -e .
+pip install -U -r requirements/testing.txt
+pip install -U -r requirements/adapter.txt
+pip install -U -r requirements/adapter_testing.txt
+pip install -U -r requirements/tools.txt
+# To avoid errors due to the old versions of click forced by Chalice
+pip install -U pip click
 
 if [[ $test_target != "" ]]
 then
-    pip install -U -r requirements/testing.txt && \
-    pip install -U -r requirements/adapter.txt && \
-    pip install -U -r requirements/adapter_testing.txt && \
-    # To avoid errors due to the old versions of click forced by Chalice
-    pip install -U pip click && \
-    black slack_bolt/ tests/ && \
+    ./scripts/format.sh --no-install
     pytest $1
 else
-    pip install -U -r requirements/testing.txt && \
-    pip install -U -r requirements/adapter.txt && \
-    pip install -U -r requirements/adapter_testing.txt && \
-    pip install -r requirements/tools.txt && \
-    # To avoid errors due to the old versions of click forced by Chalice
-    pip install -U pip click && \
-    black slack_bolt/ tests/ && \
-    flake8 slack_bolt/ && flake8 examples/
-    pytest && \
-    mypy --config-file pyproject.toml
+    ./scripts/format.sh --no-install
+    ./scripts/lint.sh --no-install
+    pytest
+    ./scripts/run_mypy.sh --no-install
 fi
