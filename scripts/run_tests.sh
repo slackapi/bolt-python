@@ -7,12 +7,12 @@ script_dir=`dirname $0`
 cd ${script_dir}/..
 
 test_target="$1"
-python_version=`python --version | awk '{print $2}'`
+
+./scripts/format.sh --no-install
 
 if [[ $test_target != "" ]]
 then
-  black slack_bolt/ tests/ && \
-    pytest -vv $1
+  pytest -vv $1
 else
-  black slack_bolt/ tests/ && pytest
+  pytest
 fi
