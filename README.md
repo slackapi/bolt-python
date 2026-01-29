@@ -158,8 +158,7 @@ python -m venv .venv
 source .venv/bin/activate
 
 pip install -U pip
-# aiohttp is required
-pip install slack_bolt aiohttp
+pip install "slack_bolt[async]"
 ```
 
 In async apps, all middleware/listeners must be async functions. When calling utility methods (like `ack` and `say`) within these functions, it's required to use the `await` keyword.
