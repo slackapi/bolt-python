@@ -23,7 +23,7 @@ class TestToolRegistry:
 
     def test_register_tool_with_explicit_params(self):
         registry = AgentToolRegistry()
-        registry.register(
+        registry.add(
             "search",
             lambda query: f"results for {query}",
             description="Search for documents",
@@ -41,7 +41,7 @@ class TestToolRegistry:
             return f"results for {query}"
 
         registry = AgentToolRegistry()
-        tool_def = registry.register("search_docs", search_docs)
+        tool_def = registry.add("search_docs", search_docs)
 
         assert tool_def.name == "search_docs"
         assert tool_def.description == "Search company documentation."
@@ -75,7 +75,7 @@ class TestToolRegistry:
 
     def test_openai_schema(self):
         registry = AgentToolRegistry()
-        registry.register(
+        registry.add(
             "search_confluence",
             lambda query: "results",
             description="Search company docs",
@@ -94,7 +94,7 @@ class TestToolRegistry:
 
     def test_anthropic_schema(self):
         registry = AgentToolRegistry()
-        registry.register(
+        registry.add(
             "search_confluence",
             lambda query: "results",
             description="Search company docs",
@@ -144,7 +144,7 @@ class TestToolRegistry:
 
     def test_execute_tool(self):
         registry = AgentToolRegistry()
-        registry.register(
+        registry.add(
             "greet",
             lambda name: f"Hello, {name}!",
             description="Greet someone",
@@ -170,7 +170,7 @@ class TestToolRegistry:
 
     def test_execute_tool_with_title(self):
         registry = AgentToolRegistry()
-        registry.register(
+        registry.add(
             "search",
             lambda query: "results",
             description="Search",
@@ -208,7 +208,7 @@ class TestToolRegistry:
             raise RuntimeError("Tool failed")
 
         registry = AgentToolRegistry()
-        registry.register(
+        registry.add(
             "failing",
             failing_tool,
             description="A tool that fails",
@@ -255,14 +255,42 @@ class TestToolRegistry:
     def test_add_invalid_type(self):
         registry = AgentToolRegistry()
         try:
-            registry.add("not a tool or mcp")
+            registry.add(12345)
             assert False, "Should have raised TypeError"
-        except TypeError:
-            pass
+        except TypeError as e:
+            assert "int" in str(e)
+
+    def test_add_with_name_and_handler(self):
+        def greet(name: str) -> str:
+            """Say hello."""
+            return f"Hello, {name}!"
+
+        registry = AgentToolRegistry()
+        tool_def = registry.add("greet", greet)
+        assert tool_def is not None
+        assert tool_def.name == "greet"
+        assert tool_def.description == "Say hello."
+        assert "greet" in registry._tools
+
+    def test_add_name_without_handler_raises(self):
+        registry = AgentToolRegistry()
+        try:
+            registry.add("my_tool")
+            assert False, "Should have raised TypeError"
+        except TypeError as e:
+            assert "handler is required" in str(e)
+
+    def test_add_handler_with_mcp_raises(self):
+        registry = AgentToolRegistry()
+        try:
+            registry.add(SlackMCPServer("xoxb-token"), lambda: "nope")
+            assert False, "Should have raised TypeError"
+        except TypeError as e:
+            assert "handler cannot be provided" in str(e)
 
     def test_copy_isolation(self):
         registry = AgentToolRegistry()
-        registry.register(
+        registry.add(
             "global_tool",
             lambda: "result",
             description="A global tool",
@@ -271,7 +299,7 @@ class TestToolRegistry:
         )
 
         copied = registry.copy()
-        copied.register(
+        copied.add(
             "local_tool",
             lambda: "local result",
             description="A local tool",
@@ -297,7 +325,7 @@ class TestToolRegistry:
 
     def test_schema_with_mcp(self):
         registry = AgentToolRegistry()
-        registry.register(
+        registry.add(
             "local_tool",
             lambda: "result",
             description="A local tool",
@@ -429,7 +457,7 @@ class TestAppAgentIntegration:
         @app.event("app_mention")
         def handle_app_mention(agent):
             # Add a local tool
-            agent.tools.register(
+            agent.tools.add(
                 "local_tool",
                 lambda: "local",
                 description="A local tool",

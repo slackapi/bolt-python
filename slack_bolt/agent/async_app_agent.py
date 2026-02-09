@@ -61,7 +61,7 @@ class AsyncAppAgent:
         name = name_or_mcp
 
         def decorator(func: Callable) -> Callable:
-            self.tools.register(
+            self.tools.add(
                 name,
                 func,
                 description=description,

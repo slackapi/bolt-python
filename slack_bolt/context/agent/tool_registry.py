@@ -157,7 +157,7 @@ class AgentToolRegistry:
         self._tools: Dict[str, ToolDefinition] = {}
         self._mcp_servers: List[SlackMCPServer] = []
 
-    def register(
+    def _register(
         self,
         name: str,
         handler: Callable,
@@ -167,7 +167,7 @@ class AgentToolRegistry:
         required: Optional[List[str]] = None,
         title: Optional[str] = None,
     ) -> ToolDefinition:
-        """Register a tool with the registry.
+        """Internal: register a tool by name and handler.
 
         If ``parameters`` and ``required`` are not provided, they are introspected
         from the handler's type annotations. If ``description`` is not provided,
@@ -205,18 +205,72 @@ class AgentToolRegistry:
         self._tools[name] = tool_def
         return tool_def
 
-    def add(self, tool_or_mcp: Union[ToolDefinition, SlackMCPServer]) -> None:
-        """Add a ``ToolDefinition`` or ``SlackMCPServer`` to the registry.
+    def add(
+        self,
+        name_or_obj: Union[str, ToolDefinition, SlackMCPServer],
+        handler: Optional[Callable] = None,
+        *,
+        description: Optional[str] = None,
+        parameters: Optional[Dict[str, dict]] = None,
+        required: Optional[List[str]] = None,
+        title: Optional[str] = None,
+    ) -> Optional[ToolDefinition]:
+        """Unified public API for adding tools and MCP servers to the registry.
+
+        Supports three call signatures:
+
+        1. **Register a tool by name and handler**::
+
+               registry.add("search", search_handler, description="Search docs")
+
+        2. **Add a pre-built ToolDefinition**::
+
+               registry.add(ToolDefinition(...))
+
+        3. **Add an MCP server**::
+
+               registry.add(SlackMCPServer("xoxb-token"))
 
         Args:
-            tool_or_mcp: A tool definition or MCP server to add.
+            name_or_obj: A tool name (str), ``ToolDefinition``, or ``SlackMCPServer``.
+            handler: Callable implementing the tool (only when ``name_or_obj`` is a str).
+            description: Human-readable description. Falls back to the handler's docstring.
+            parameters: JSON Schema properties dict. Falls back to type introspection.
+            required: List of required parameter names. Falls back to introspection.
+            title: Optional display title for Slack UI during execution.
+
+        Returns:
+            The registered ``ToolDefinition`` when adding a tool, or ``None`` for MCP servers.
+
+        Raises:
+            TypeError: If arguments are invalid (e.g., handler with MCP server,
+                missing handler with string name).
         """
-        if isinstance(tool_or_mcp, SlackMCPServer):
-            self._mcp_servers.append(tool_or_mcp)
-        elif isinstance(tool_or_mcp, ToolDefinition):
-            self._tools[tool_or_mcp.name] = tool_or_mcp
+        if isinstance(name_or_obj, str):
+            if handler is None:
+                raise TypeError("handler is required when adding a tool by name")
+            return self._register(
+                name_or_obj,
+                handler,
+                description=description,
+                parameters=parameters,
+                required=required,
+                title=title,
+            )
+        elif isinstance(name_or_obj, SlackMCPServer):
+            if handler is not None:
+                raise TypeError("handler cannot be provided when adding a SlackMCPServer")
+            self._mcp_servers.append(name_or_obj)
+            return None
+        elif isinstance(name_or_obj, ToolDefinition):
+            if handler is not None:
+                raise TypeError("handler cannot be provided when adding a ToolDefinition")
+            self._tools[name_or_obj.name] = name_or_obj
+            return name_or_obj
         else:
-            raise TypeError(f"Expected ToolDefinition or SlackMCPServer, got {type(tool_or_mcp)}")
+            raise TypeError(
+                f"Expected str, ToolDefinition, or SlackMCPServer, got {type(name_or_obj)}"
+            )
 
     def schema(self, provider: str) -> List[dict]:
         """Generate provider-specific tool schemas for all registered tools and MCP servers.
