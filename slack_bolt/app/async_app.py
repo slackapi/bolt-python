@@ -9,6 +9,8 @@ from aiohttp import web
 
 from slack_bolt.app.async_server import AsyncSlackAppServer
 from slack_bolt.context.assistant.async_assistant_utilities import AsyncAssistantUtilities
+from slack_bolt.context.agent.async_agent_utilities import AsyncAgentUtilities
+from slack_bolt.agent.async_app_agent import AsyncAppAgent
 from slack_bolt.context.assistant.thread_context_store.async_store import (
     AsyncAssistantThreadContextStore,
 )
@@ -363,6 +365,7 @@ class AsyncApp:
         self._async_listeners: List[AsyncListener] = []
 
         self._assistant_thread_context_store = assistant_thread_context_store
+        self._app_agent = AsyncAppAgent(logger=self._framework_logger)
 
         self._process_before_response = process_before_response
         self._async_listener_runner = AsyncioListenerRunner(
@@ -497,6 +500,20 @@ class AsyncApp:
     @property
     def process_before_response(self) -> bool:
         return self._process_before_response or False
+
+    @property
+    def agent(self) -> AsyncAppAgent:
+        """Experimental: The app-level agent for registering tools and MCP servers.
+
+            @app.agent.tool("search_docs")
+            async def search_docs(query: str) -> str:
+                \"\"\"Search company documentation.\"\"\"
+                return results
+
+        Returns:
+            ``AsyncAppAgent`` instance
+        """
+        return self._app_agent
 
     # -------------------------
     # standalone server
@@ -1444,6 +1461,17 @@ class AsyncApp:
             req.context["set_suggested_prompts"] = assistant.set_suggested_prompts
             req.context["get_thread_context"] = assistant.get_thread_context
             req.context["save_thread_context"] = assistant.save_thread_context
+
+        # Agent Kit: available for all requests
+        agent = AsyncAgentUtilities(
+            client=req.context["client"],
+            channel_id=req.context.channel_id,
+            thread_ts=req.context.thread_ts,
+            team_id=req.context.team_id,
+            user_id=req.context.get("user_id"),
+            tool_registry=self._app_agent.tools.copy(),
+        )
+        req.context["agent"] = agent
 
     @staticmethod
     def _to_listener_functions(

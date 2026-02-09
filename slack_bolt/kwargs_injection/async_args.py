@@ -2,6 +2,7 @@ from logging import Logger
 from typing import Callable, Awaitable, Dict, Any, Optional
 
 from slack_bolt.context.ack.async_ack import AsyncAck
+from slack_bolt.context.agent.async_agent_utilities import AsyncAgentUtilities
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.context.complete.async_complete import AsyncComplete
 from slack_bolt.context.fail.async_fail import AsyncFail
@@ -101,6 +102,8 @@ class AsyncArgs:
     """`get_thread_context()` utility function for AI Agents & Assistants"""
     save_thread_context: Optional[AsyncSaveThreadContext]
     """`save_thread_context()` utility function for AI Agents & Assistants"""
+    agent: Optional[AsyncAgentUtilities]
+    """Experimental: `agent` utility for AI Agent Kit — tool registry, schema generation, and chat streaming"""
     # middleware
     next: Callable[[], Awaitable[None]]
     """`next()` utility function, which tells the middleware chain that it can continue with the next one"""
@@ -134,6 +137,7 @@ class AsyncArgs:
         set_suggested_prompts: Optional[AsyncSetSuggestedPrompts] = None,
         get_thread_context: Optional[AsyncGetThreadContext] = None,
         save_thread_context: Optional[AsyncSaveThreadContext] = None,
+        agent: Optional[AsyncAgentUtilities] = None,
         next: Callable[[], Awaitable[None]],
         **kwargs,  # noqa
     ):
@@ -164,6 +168,7 @@ class AsyncArgs:
         self.set_suggested_prompts = set_suggested_prompts
         self.get_thread_context = get_thread_context
         self.save_thread_context = save_thread_context
+        self.agent = agent
 
         self.next: Callable[[], Awaitable[None]] = next
         self.next_: Callable[[], Awaitable[None]] = next

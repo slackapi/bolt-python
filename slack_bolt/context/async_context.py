@@ -3,6 +3,7 @@ from typing import Optional
 from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.context.ack.async_ack import AsyncAck
+from slack_bolt.context.agent.async_agent_utilities import AsyncAgentUtilities
 from slack_bolt.context.base_context import BaseContext
 from slack_bolt.context.complete.async_complete import AsyncComplete
 from slack_bolt.context.fail.async_fail import AsyncFail
@@ -206,3 +207,8 @@ class AsyncBoltContext(BaseContext):
     @property
     def save_thread_context(self) -> Optional[AsyncSaveThreadContext]:
         return self.get("save_thread_context")
+
+    @property
+    def agent(self) -> Optional[AsyncAgentUtilities]:
+        """Experimental: Agent utilities for AI Agent Kit."""
+        return self.get("agent")

@@ -23,6 +23,8 @@ from slack_bolt.authorization.authorize import (
 from slack_bolt.context.assistant.thread_context_store.store import AssistantThreadContextStore
 
 from slack_bolt.context.assistant.assistant_utilities import AssistantUtilities
+from slack_bolt.context.agent.agent_utilities import AgentUtilities
+from slack_bolt.agent.app_agent import AppAgent
 from slack_bolt.error import BoltError, BoltUnhandledRequestError
 from slack_bolt.lazy_listener.thread_runner import ThreadLazyListenerRunner
 from slack_bolt.listener.builtins import TokenRevocationListeners
@@ -357,6 +359,7 @@ class App:
             listener_executor = ThreadPoolExecutor(max_workers=5)
 
         self._assistant_thread_context_store = assistant_thread_context_store
+        self._app_agent = AppAgent(logger=self._framework_logger)
 
         self._process_before_response = process_before_response
         self._listener_runner = ThreadListenerRunner(
@@ -501,6 +504,20 @@ class App:
     @property
     def process_before_response(self) -> bool:
         return self._process_before_response or False
+
+    @property
+    def agent(self) -> AppAgent:
+        """Experimental: The app-level agent for registering tools and MCP servers.
+
+            @app.agent.tool("search_docs")
+            def search_docs(query: str) -> str:
+                \"\"\"Search company documentation.\"\"\"
+                return results
+
+        Returns:
+            ``AppAgent`` instance
+        """
+        return self._app_agent
 
     # -------------------------
     # standalone server
@@ -1411,6 +1428,17 @@ class App:
             req.context["set_suggested_prompts"] = assistant.set_suggested_prompts
             req.context["get_thread_context"] = assistant.get_thread_context
             req.context["save_thread_context"] = assistant.save_thread_context
+
+        # Agent Kit: available for all requests
+        agent = AgentUtilities(
+            client=req.context["client"],
+            channel_id=req.context.channel_id,
+            thread_ts=req.context.thread_ts,
+            team_id=req.context.team_id,
+            user_id=req.context.get("user_id"),
+            tool_registry=self._app_agent.tools.copy(),
+        )
+        req.context["agent"] = agent
 
     @staticmethod
     def _to_listener_functions(

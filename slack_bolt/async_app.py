@@ -59,6 +59,9 @@ from .context.set_title.async_set_title import AsyncSetTitle
 from .context.set_suggested_prompts.async_set_suggested_prompts import AsyncSetSuggestedPrompts
 from .context.get_thread_context.async_get_thread_context import AsyncGetThreadContext
 from .context.save_thread_context.async_save_thread_context import AsyncSaveThreadContext
+from .context.agent.async_agent_utilities import AsyncAgentUtilities
+from .context.agent.tool_registry import AgentToolRegistry
+from .context.agent.mcp import SlackMCPServer
 
 __all__ = [
     "AsyncApp",
@@ -75,4 +78,7 @@ __all__ = [
     "AsyncSetSuggestedPrompts",
     "AsyncGetThreadContext",
     "AsyncSaveThreadContext",
+    "AsyncAgentUtilities",
+    "AgentToolRegistry",
+    "SlackMCPServer",
 ]

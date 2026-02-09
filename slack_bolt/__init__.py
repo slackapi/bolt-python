@@ -33,6 +33,11 @@ from .context.set_title import SetTitle
 from .context.set_suggested_prompts import SetSuggestedPrompts
 from .context.save_thread_context import SaveThreadContext
 
+# Agent Kit
+from .context.agent.agent_utilities import AgentUtilities
+from .context.agent.tool_registry import AgentToolRegistry
+from .context.agent.mcp import SlackMCPServer
+
 __all__ = [
     "App",
     "BoltContext",
@@ -54,4 +59,7 @@ __all__ = [
     "SetTitle",
     "SetSuggestedPrompts",
     "SaveThreadContext",
+    "AgentUtilities",
+    "AgentToolRegistry",
+    "SlackMCPServer",
 ]

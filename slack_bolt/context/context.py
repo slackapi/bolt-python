@@ -8,6 +8,7 @@ from slack_bolt.context.complete import Complete
 from slack_bolt.context.fail import Fail
 from slack_bolt.context.get_thread_context.get_thread_context import GetThreadContext
 from slack_bolt.context.respond import Respond
+from slack_bolt.context.agent.agent_utilities import AgentUtilities
 from slack_bolt.context.save_thread_context import SaveThreadContext
 from slack_bolt.context.say import Say
 from slack_bolt.context.set_status import SetStatus
@@ -207,3 +208,8 @@ class BoltContext(BaseContext):
     @property
     def save_thread_context(self) -> Optional[SaveThreadContext]:
         return self.get("save_thread_context")
+
+    @property
+    def agent(self) -> Optional[AgentUtilities]:
+        """Experimental: Agent utilities for AI Agent Kit."""
+        return self.get("agent")
