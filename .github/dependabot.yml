@@ -8,6 +8,10 @@ updates:
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 5
+    ignore:
+      # setuptools is pinned due to pyramid's dependency on deprecated pkg_resources
+      # See: https://github.com/Pylons/pyramid/issues/3731
+      - dependency-name: "setuptools"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
