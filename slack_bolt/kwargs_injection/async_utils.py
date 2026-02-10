@@ -29,7 +29,7 @@ def build_async_required_kwargs(
     error: Optional[Exception] = None,  # for error handlers
     next_keys_required: bool = True,  # False for listeners / middleware / error handlers
 ) -> Dict[str, Any]:
-    all_available_args = {
+    all_available_args: Dict[str, Any] = {
         "logger": logger,
         "client": request.context.client,
         "req": request,
@@ -58,6 +58,7 @@ def build_async_required_kwargs(
         "set_suggested_prompts": request.context.set_suggested_prompts,
         "get_thread_context": request.context.get_thread_context,
         "save_thread_context": request.context.save_thread_context,
+        "agent": request.context.agent,
         # middleware
         "next": next_func,
         "next_": next_func,  # for the middleware using Python's built-in `next()` function
@@ -102,7 +103,7 @@ def build_async_required_kwargs(
     for name in required_arg_names:
         if name == "args":
             if isinstance(request, AsyncBoltRequest):
-                kwargs[name] = AsyncArgs(**all_available_args)  # type: ignore[arg-type]
+                kwargs[name] = AsyncArgs(**all_available_args)
             else:
                 logger.warning(f"Unknown Request object type detected ({type(request)})")
 
