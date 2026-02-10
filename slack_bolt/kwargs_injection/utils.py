@@ -57,7 +57,6 @@ def build_required_kwargs(
         "set_title": request.context.set_title,
         "set_suggested_prompts": request.context.set_suggested_prompts,
         "save_thread_context": request.context.save_thread_context,
-        "agent": request.context.agent,
         # middleware
         "next": next_func,
         "next_": next_func,  # for the middleware using Python's built-in `next()` function
@@ -82,6 +81,10 @@ def build_required_kwargs(
     for k, v in request.context.items():
         if k not in all_available_args:
             all_available_args[k] = v
+
+    # Defer agent creation to avoid constructing BoltAgent on every request
+    if "agent" in required_arg_names or "args" in required_arg_names:
+        all_available_args["agent"] = request.context.agent
 
     if len(required_arg_names) > 0:
         # To support instance/class methods in a class for listeners/middleware,
