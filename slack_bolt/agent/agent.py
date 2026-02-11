@@ -10,6 +10,9 @@ class BoltAgent:
     Experimental:
         This API is experimental and may change in future releases.
 
+        FIXME: chat_stream() only works when thread_ts is available (DMs and threaded replies).
+        It does not work on channel messages because ts is not provided to BoltAgent yet.
+
         @app.event("app_mention")
         def handle_mention(agent):
             stream = agent.chat_stream()
