@@ -1,9 +1,6 @@
 import asyncio
 import json
-try:
-    from unittest.mock import AsyncMock, MagicMock
-except ImportError:
-    from mock import AsyncMock, MagicMock  # type: ignore
+from unittest.mock import MagicMock
 
 import pytest
 from slack_sdk.web.async_client import AsyncWebClient
@@ -18,6 +15,17 @@ from tests.mock_web_api_server import (
     setup_mock_web_api_server_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
+
+
+def _make_async_chat_stream_mock():
+    mock_stream = MagicMock(spec=AsyncChatStream)
+    call_tracker = MagicMock()
+
+    async def fake_chat_stream(**kwargs):
+        call_tracker(**kwargs)
+        return mock_stream
+
+    return fake_chat_stream, call_tracker, mock_stream
 
 
 class TestAsyncEventsAgent:
@@ -68,7 +76,7 @@ class TestAsyncEventsAgent:
     async def test_agent_chat_stream_uses_context_defaults(self):
         """AsyncBoltAgent.chat_stream() passes context defaults to AsyncWebClient.chat_stream()."""
         client = MagicMock(spec=AsyncWebClient)
-        client.chat_stream = AsyncMock(return_value=MagicMock(spec=AsyncChatStream))
+        client.chat_stream, call_tracker, _ = _make_async_chat_stream_mock()
 
         agent = AsyncBoltAgent(
             client=client,
@@ -79,7 +87,7 @@ class TestAsyncEventsAgent:
         )
         stream = await agent.chat_stream()
 
-        client.chat_stream.assert_called_once_with(
+        call_tracker.assert_called_once_with(
             channel="C111",
             thread_ts="1234567890.123456",
             recipient_team_id="T111",
@@ -91,7 +99,7 @@ class TestAsyncEventsAgent:
     async def test_agent_chat_stream_overrides_context_defaults(self):
         """Explicit kwargs to chat_stream() override context defaults."""
         client = MagicMock(spec=AsyncWebClient)
-        client.chat_stream = AsyncMock(return_value=MagicMock(spec=AsyncChatStream))
+        client.chat_stream, call_tracker, _ = _make_async_chat_stream_mock()
 
         agent = AsyncBoltAgent(
             client=client,
@@ -107,7 +115,7 @@ class TestAsyncEventsAgent:
             recipient_user_id="U999",
         )
 
-        client.chat_stream.assert_called_once_with(
+        call_tracker.assert_called_once_with(
             channel="C999",
             thread_ts="9999999999.999999",
             recipient_team_id="T999",
@@ -119,7 +127,7 @@ class TestAsyncEventsAgent:
     async def test_agent_chat_stream_passes_extra_kwargs(self):
         """Extra kwargs are forwarded to AsyncWebClient.chat_stream()."""
         client = MagicMock(spec=AsyncWebClient)
-        client.chat_stream = AsyncMock(return_value=MagicMock(spec=AsyncChatStream))
+        client.chat_stream, call_tracker, _ = _make_async_chat_stream_mock()
 
         agent = AsyncBoltAgent(
             client=client,
@@ -130,7 +138,7 @@ class TestAsyncEventsAgent:
         )
         await agent.chat_stream(buffer_size=512)
 
-        client.chat_stream.assert_called_once_with(
+        call_tracker.assert_called_once_with(
             channel="C111",
             thread_ts="1234567890.123456",
             recipient_team_id="T111",
