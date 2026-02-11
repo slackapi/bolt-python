@@ -1,4 +1,4 @@
-from slack_bolt.agent.agent import BoltAgent
+from .agent import BoltAgent
 
 __all__ = [
     "BoltAgent",
