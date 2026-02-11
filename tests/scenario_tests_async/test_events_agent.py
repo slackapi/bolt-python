@@ -1,6 +1,9 @@
 import asyncio
 import json
-from unittest.mock import AsyncMock, MagicMock
+try:
+    from unittest.mock import AsyncMock, MagicMock
+except ImportError:
+    from mock import AsyncMock, MagicMock  # type: ignore
 
 import pytest
 from slack_sdk.web.async_client import AsyncWebClient
