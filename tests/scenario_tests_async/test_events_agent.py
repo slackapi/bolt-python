@@ -125,6 +125,20 @@ class TestAsyncEventsAgent:
         assert stream is not None
 
     @pytest.mark.asyncio
+    async def test_agent_chat_stream_rejects_partial_overrides(self):
+        """Passing only some of the four context args raises ValueError."""
+        client = MagicMock(spec=AsyncWebClient)
+        agent = AsyncBoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        with pytest.raises(ValueError, match="Either provide all of"):
+            await agent.chat_stream(channel="C999")
+
+    @pytest.mark.asyncio
     async def test_agent_chat_stream_passes_extra_kwargs(self):
         """Extra kwargs are forwarded to AsyncWebClient.chat_stream()."""
         client = MagicMock(spec=AsyncWebClient)

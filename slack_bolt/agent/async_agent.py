@@ -55,6 +55,11 @@ class AsyncBoltAgent:
         Returns:
             A new ``AsyncChatStream`` instance.
         """
+        provided = [arg for arg in (channel, thread_ts, recipient_team_id, recipient_user_id) if arg is not None]
+        if provided and len(provided) < 4:
+            raise ValueError(
+                "Either provide all of channel, thread_ts, recipient_team_id, and recipient_user_id, or none of them"
+            )
         resolved_channel = channel or self._channel_id
         resolved_thread_ts = thread_ts or self._thread_ts
         if resolved_channel is None:
