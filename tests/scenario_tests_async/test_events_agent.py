@@ -10,6 +10,7 @@ from slack_bolt.agent.async_agent import AsyncBoltAgent
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.request.async_request import AsyncBoltRequest
+from slack_bolt.warning import ExperimentalWarning
 from tests.mock_web_api_server import (
     cleanup_mock_web_api_server_async,
     setup_mock_web_api_server_async,
@@ -205,6 +206,30 @@ class TestAsyncEventsAgent:
         from slack_bolt.agent.async_agent import AsyncBoltAgent as ImportedAsyncBoltAgent
 
         assert ImportedAsyncBoltAgent is AsyncBoltAgent
+
+    @pytest.mark.asyncio
+    async def test_agent_kwarg_emits_experimental_warning(self):
+        app = AsyncApp(client=self.web_client)
+
+        state = {"called": False}
+
+        async def assert_target_called():
+            count = 0
+            while state["called"] is False and count < 20:
+                await asyncio.sleep(0.1)
+                count += 1
+            assert state["called"] is True
+            state["called"] = False
+
+        @app.event("app_mention")
+        async def handle_mention(agent: AsyncBoltAgent):
+            state["called"] = True
+
+        request = AsyncBoltRequest(body=app_mention_event_body, mode="socket_mode")
+        with pytest.warns(ExperimentalWarning, match="agent listener argument is experimental"):
+            response = await app.async_dispatch(request)
+            assert response.status == 200
+            await assert_target_called()
 
 
 # ---- Test event bodies ----

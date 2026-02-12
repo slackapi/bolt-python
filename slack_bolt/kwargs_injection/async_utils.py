@@ -1,9 +1,11 @@
 import inspect
 import logging
+import warnings
 from typing import Callable, Dict, MutableSequence, Optional, Any
 
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
+from slack_bolt.warning import ExperimentalWarning
 from .async_args import AsyncArgs
 from slack_bolt.request.payload_utils import (
     to_options,
@@ -86,6 +88,12 @@ def build_async_required_kwargs(
     # Defer agent creation to avoid constructing AsyncBoltAgent on every request
     if "agent" in required_arg_names or "args" in required_arg_names:
         all_available_args["agent"] = request.context.agent
+        if "agent" in required_arg_names:
+            warnings.warn(
+                "The agent listener argument is experimental and may change in future versions.",
+                category=ExperimentalWarning,
+                stacklevel=2,  # Point to the caller, not this internal helper
+            )
 
     if len(required_arg_names) > 0:
         # To support instance/class methods in a class for listeners/middleware,
