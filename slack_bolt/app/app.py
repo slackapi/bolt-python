@@ -9,6 +9,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from typing import List, Union, Pattern, Callable, Dict, Optional, Sequence, Any
 
+from slack_bolt.agent.agent import BoltAgent
 from slack_sdk.errors import SlackApiError
 from slack_sdk.oauth.installation_store import InstallationStore
 from slack_sdk.web import WebClient
@@ -703,6 +704,9 @@ class App:
 
     def assistant(self, assistant: Assistant) -> Optional[Callable]:
         return self.middleware(assistant)
+    
+    def agent(self, agent: BoltAgent) -> Optional[Callable]:
+        return self.middleware(agent)
 
     # -------------------------
     # Workflows: Steps from apps
