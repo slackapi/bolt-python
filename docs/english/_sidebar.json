@@ -87,6 +87,11 @@
 	},
 	{
 		"type": "category",
+		"label": "Experiments",
+		"items": ["tools/bolt-python/experiments"]
+	},
+	{
+		"type": "category",
 		"label": "Legacy",
 		"items": ["tools/bolt-python/legacy/steps-from-apps"]
 	},

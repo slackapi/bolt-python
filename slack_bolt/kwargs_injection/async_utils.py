@@ -1,9 +1,11 @@
 import inspect
 import logging
+import warnings
 from typing import Callable, Dict, MutableSequence, Optional, Any
 
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
+from slack_bolt.warning import ExperimentalWarning
 from .async_args import AsyncArgs
 from slack_bolt.request.payload_utils import (
     to_options,
@@ -29,7 +31,7 @@ def build_async_required_kwargs(
     error: Optional[Exception] = None,  # for error handlers
     next_keys_required: bool = True,  # False for listeners / middleware / error handlers
 ) -> Dict[str, Any]:
-    all_available_args = {
+    all_available_args: Dict[str, Any] = {
         "logger": logger,
         "client": request.context.client,
         "req": request,
@@ -83,6 +85,16 @@ def build_async_required_kwargs(
         if k not in all_available_args:
             all_available_args[k] = v
 
+    # Defer agent creation to avoid constructing AsyncBoltAgent on every request
+    if "agent" in required_arg_names or "args" in required_arg_names:
+        all_available_args["agent"] = request.context.agent
+        if "agent" in required_arg_names:
+            warnings.warn(
+                "The agent listener argument is experimental and may change in future versions.",
+                category=ExperimentalWarning,
+                stacklevel=2,  # Point to the caller, not this internal helper
+            )
+
     if len(required_arg_names) > 0:
         # To support instance/class methods in a class for listeners/middleware,
         # check if the first argument is either self or cls
@@ -102,7 +114,7 @@ def build_async_required_kwargs(
     for name in required_arg_names:
         if name == "args":
             if isinstance(request, AsyncBoltRequest):
-                kwargs[name] = AsyncArgs(**all_available_args)  # type: ignore[arg-type]
+                kwargs[name] = AsyncArgs(**all_available_args)
             else:
                 logger.warning(f"Unknown Request object type detected ({type(request)})")
 

@@ -21,6 +21,8 @@ from .request import BoltRequest
 from .response import BoltResponse
 
 # AI Agents & Assistants
+from .agent import BoltAgent
+from .agent import Tools
 from .middleware.assistant.assistant import (
     Assistant,
 )
@@ -46,6 +48,8 @@ __all__ = [
     "CustomListenerMatcher",
     "BoltRequest",
     "BoltResponse",
+    "BoltAgent",
+    "Tools",
     "Assistant",
     "AssistantThreadContext",
     "AssistantThreadContextStore",
