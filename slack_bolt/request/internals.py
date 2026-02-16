@@ -215,9 +215,14 @@ def extract_channel_id(payload: Dict[str, Any]) -> Optional[str]:
 
 
 def extract_thread_ts(payload: Dict[str, Any]) -> Optional[str]:
-    # This utility initially supports only the use cases for AI assistants, but it may be fine to add more patterns.
-    # That said, note that thread_ts is always required for assistant threads, but it's not for channels.
-    # Thus, blindly setting this thread_ts to say utility can break existing apps' behaviors.
+    # This utility only extracts thread_ts for assistant events to avoid breaking existing say() behavior.
+    # For non-assistant events, thread_ts is intentionally NOT extracted into context because:
+    # - say() uses context.thread_ts to decide where to post messages
+    # - Existing apps may expect say() to post to the channel, not the thread
+    # - Changing this would be a breaking change for existing apps
+    #
+    # The BoltAgent class handles non-assistant thread_ts separately by reading from the event directly,
+    # allowing it to work correctly without affecting say() behavior.
     if is_assistant_event(payload):
         event = payload["event"]
         if (
@@ -239,6 +244,18 @@ def extract_thread_ts(payload: Dict[str, Any]) -> Optional[str]:
             elif event.get("previous_message", {}).get("thread_ts") is not None:
                 # message_deleted
                 return event["previous_message"]["thread_ts"]
+    return None
+
+
+def extract_ts(payload: Dict[str, Any]) -> Optional[str]:
+    """Extract the message timestamp from an event payload."""
+    event = payload.get("event", {})
+    # Direct ts on the event (e.g., app_mention, message)
+    if event.get("ts") is not None:
+        return event["ts"]
+    # message_changed events have ts in the message
+    if event.get("message", {}).get("ts") is not None:
+        return event["message"]["ts"]
     return None
 
 
@@ -292,6 +309,9 @@ def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
     channel_id = extract_channel_id(body)
     if channel_id:
         context["channel_id"] = channel_id
+    ts = extract_ts(body)
+    if ts:
+        context["ts"] = ts
     thread_ts = extract_thread_ts(body)
     if thread_ts:
         context["thread_ts"] = thread_ts

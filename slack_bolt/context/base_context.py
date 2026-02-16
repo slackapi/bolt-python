@@ -18,6 +18,7 @@ class BaseContext(dict):
         "actor_team_id",
         "actor_user_id",
         "channel_id",
+        "ts",
         "thread_ts",
         "response_url",
         "matches",
@@ -109,6 +110,11 @@ class BaseContext(dict):
     def channel_id(self) -> Optional[str]:
         """The conversation ID associated with this request."""
         return self.get("channel_id")
+
+    @property
+    def ts(self) -> Optional[str]:
+        """The message timestamp associated with this request."""
+        return self.get("ts")
 
     @property
     def thread_ts(self) -> Optional[str]:
