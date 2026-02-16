@@ -86,7 +86,7 @@ def build_async_required_kwargs(
             all_available_args[k] = v
 
     # Defer agent creation to avoid constructing AsyncBoltAgent on every request
-    if "agent" in required_arg_names or "args" in required_arg_names:
+    if "agent" in required_arg_names:
         from slack_bolt.agent.async_agent import AsyncBoltAgent
 
         all_available_args["agent"] = AsyncBoltAgent(
@@ -96,12 +96,11 @@ def build_async_required_kwargs(
             team_id=request.context.team_id,
             user_id=request.context.user_id,
         )
-        if "agent" in required_arg_names:
-            warnings.warn(
-                "The agent listener argument is experimental and may change in future versions.",
-                category=ExperimentalWarning,
-                stacklevel=2,  # Point to the caller, not this internal helper
-            )
+        warnings.warn(
+            "The agent listener argument is experimental and may change in future versions.",
+            category=ExperimentalWarning,
+            stacklevel=2,  # Point to the caller, not this internal helper
+        )
 
     if len(required_arg_names) > 0:
         # To support instance/class methods in a class for listeners/middleware,
