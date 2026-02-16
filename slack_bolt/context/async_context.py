@@ -207,6 +207,8 @@ class AsyncBoltContext(BaseContext):
             `AsyncBoltAgent` instance
         """
         if "agent" not in self:
+            # Deferred import: AsyncBoltAgent is only imported at runtime when accessed,
+            # avoiding unnecessary loading when the agent property is never used.
             from slack_bolt.agent.async_agent import AsyncBoltAgent
 
             self["agent"] = AsyncBoltAgent(
