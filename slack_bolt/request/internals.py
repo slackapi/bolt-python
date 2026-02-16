@@ -245,18 +245,6 @@ def extract_thread_ts(payload: Dict[str, Any]) -> Optional[str]:
     return None
 
 
-def extract_ts(payload: Dict[str, Any]) -> Optional[str]:
-    """Extract the message timestamp from an event payload."""
-    event = payload.get("event", {})
-    # Direct ts on the event (e.g., app_mention, message)
-    if event.get("ts") is not None:
-        return event["ts"]
-    # message_changed events have ts in the message
-    if event.get("message", {}).get("ts") is not None:
-        return event["message"]["ts"]
-    return None
-
-
 def extract_function_execution_id(payload: Dict[str, Any]) -> Optional[str]:
     if payload.get("function_execution_id") is not None:
         return payload.get("function_execution_id")
@@ -307,9 +295,6 @@ def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
     channel_id = extract_channel_id(body)
     if channel_id:
         context["channel_id"] = channel_id
-    ts = extract_ts(body)
-    if ts:
-        context["ts"] = ts
     thread_ts = extract_thread_ts(body)
     if thread_ts:
         context["thread_ts"] = thread_ts
