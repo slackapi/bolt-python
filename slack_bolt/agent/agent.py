@@ -63,19 +63,9 @@ class BoltAgent:
             raise ValueError(
                 "Either provide all of channel, thread_ts, recipient_team_id, and recipient_user_id, or none of them"
             )
-        resolved_channel = channel or self._channel_id
-        resolved_thread_ts = thread_ts or self._thread_ts
-        if resolved_channel is None:
-            raise ValueError(
-                "channel is required: provide it as an argument or ensure channel_id is set in the event context"
-            )
-        if resolved_thread_ts is None:
-            raise ValueError(
-                "thread_ts is required: provide it as an argument or ensure thread_ts is set in the event context"
-            )
         return self._client.chat_stream(
-            channel=resolved_channel,
-            thread_ts=resolved_thread_ts,
+            channel=channel or self._channel_id,
+            thread_ts=thread_ts or self._thread_ts,
             recipient_team_id=recipient_team_id or self._team_id,
             recipient_user_id=recipient_user_id or self._user_id,
             **kwargs,
