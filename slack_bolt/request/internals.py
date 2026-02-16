@@ -215,11 +215,9 @@ def extract_channel_id(payload: Dict[str, Any]) -> Optional[str]:
 
 
 def extract_thread_ts(payload: Dict[str, Any]) -> Optional[str]:
-    # This utility only extracts thread_ts for assistant events to avoid breaking existing say() behavior.
-    # For non-assistant events, thread_ts is intentionally NOT extracted into context because:
-    # - say() uses context.thread_ts to decide where to post messages
-    # - Existing apps may expect say() to post to the channel, not the thread
-    # - Changing this would be a breaking change for existing apps
+    # This utility initially supports only the use cases for AI assistants, but it may be fine to add more patterns.
+    # That said, note that thread_ts is always required for assistant threads, but it's not for channels.
+    # Thus, blindly setting this thread_ts to say utility can break existing apps' behaviors.
     #
     # The BoltAgent class handles non-assistant thread_ts separately by reading from the event directly,
     # allowing it to work correctly without affecting say() behavior.
