@@ -1,7 +1,6 @@
 from typing import Dict, List, Optional, Sequence, Union
 
-from slack_sdk.web import SlackResponse
-from slack_sdk.web.async_client import AsyncWebClient
+from slack_sdk.web.async_client import AsyncSlackResponse, AsyncWebClient
 from slack_sdk.web.async_chat_stream import AsyncChatStream
 
 
@@ -78,7 +77,7 @@ class AsyncBoltAgent:
         channel: Optional[str] = None,
         thread_ts: Optional[str] = None,
         **kwargs,
-    ) -> SlackResponse:
+    ) -> AsyncSlackResponse:
         """Sets the status of an assistant thread.
 
         Args:
@@ -89,7 +88,7 @@ class AsyncBoltAgent:
             **kwargs: Additional arguments passed to ``AsyncWebClient.assistant_threads_setStatus()``.
 
         Returns:
-            ``SlackResponse`` from the API call.
+            ``AsyncSlackResponse`` from the API call.
         """
         return await self._client.assistant_threads_setStatus(
             channel_id=channel or self._channel_id,  # type: ignore[arg-type]
@@ -107,7 +106,7 @@ class AsyncBoltAgent:
         channel: Optional[str] = None,
         thread_ts: Optional[str] = None,
         **kwargs,
-    ) -> SlackResponse:
+    ) -> AsyncSlackResponse:
         """Sets suggested prompts for an assistant thread.
 
         Args:
@@ -119,7 +118,7 @@ class AsyncBoltAgent:
             **kwargs: Additional arguments passed to ``AsyncWebClient.assistant_threads_setSuggestedPrompts()``.
 
         Returns:
-            ``SlackResponse`` from the API call.
+            ``AsyncSlackResponse`` from the API call.
         """
         prompts_arg: List[Dict[str, str]] = []
         for prompt in prompts:
