@@ -87,34 +87,6 @@ class TestAsyncEventsAgent:
         await assert_target_called()
 
     @pytest.mark.asyncio
-    async def test_agent_accessible_via_context(self):
-        app = AsyncApp(client=self.web_client)
-
-        state = {"called": False}
-
-        async def assert_target_called():
-            count = 0
-            while state["called"] is False and count < 20:
-                await asyncio.sleep(0.1)
-                count += 1
-            assert state["called"] is True
-            state["called"] = False
-
-        @app.event("app_mention")
-        async def handle_mention(context: AsyncBoltContext):
-            agent = context.agent
-            assert agent is not None
-            assert isinstance(agent, AsyncBoltAgent)
-            # Verify the same instance is returned on subsequent access
-            assert context.agent is agent
-            state["called"] = True
-
-        request = AsyncBoltRequest(body=app_mention_event_body, mode="socket_mode")
-        response = await app.async_dispatch(request)
-        assert response.status == 200
-        await assert_target_called()
-
-    @pytest.mark.asyncio
     async def test_agent_kwarg_emits_experimental_warning(self):
         app = AsyncApp(client=self.web_client)
 

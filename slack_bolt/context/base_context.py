@@ -38,7 +38,6 @@ class BaseContext(dict):
         "set_status",
         "set_title",
         "set_suggested_prompts",
-        "agent",
     ]
     # Note that these items are not copyable, so when you add new items to this list,
     # you must modify ThreadListenerRunner/AsyncioListenerRunner's _build_lazy_request method to pass the values.

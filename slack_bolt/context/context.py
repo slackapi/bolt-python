@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from slack_sdk import WebClient
 
@@ -14,9 +14,6 @@ from slack_bolt.context.set_status import SetStatus
 from slack_bolt.context.set_suggested_prompts import SetSuggestedPrompts
 from slack_bolt.context.set_title import SetTitle
 from slack_bolt.util.utils import create_copy
-
-if TYPE_CHECKING:
-    from slack_bolt.agent.agent import BoltAgent
 
 
 class BoltContext(BaseContext):
@@ -190,36 +187,6 @@ class BoltContext(BaseContext):
         if "fail" not in self:
             self["fail"] = Fail(client=self.client, function_execution_id=self.function_execution_id)
         return self["fail"]
-
-    @property
-    def agent(self) -> "BoltAgent":
-        """`agent` listener argument for building AI-powered Slack agents.
-
-        Experimental:
-            This API is experimental and may change in future releases.
-
-            @app.event("app_mention")
-            def handle_mention(agent):
-                stream = agent.chat_stream()
-                stream.append(markdown_text="Hello!")
-                stream.stop()
-
-        Returns:
-            `BoltAgent` instance
-        """
-        if "agent" not in self:
-            # Deferred import: BoltAgent is only imported at runtime when accessed,
-            # avoiding unnecessary loading when the agent property is never used.
-            from slack_bolt.agent.agent import BoltAgent
-
-            self["agent"] = BoltAgent(
-                client=self.client,
-                channel_id=self.channel_id,
-                thread_ts=self.thread_ts,
-                team_id=self.team_id,
-                user_id=self.user_id,
-            )
-        return self["agent"]
 
     @property
     def set_title(self) -> Optional[SetTitle]:

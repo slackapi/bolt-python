@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from slack_sdk.web.async_client import AsyncWebClient
 
@@ -14,9 +14,6 @@ from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
 from slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts import AsyncSetSuggestedPrompts
 from slack_bolt.context.set_title.async_set_title import AsyncSetTitle
 from slack_bolt.util.utils import create_copy
-
-if TYPE_CHECKING:
-    from slack_bolt.agent.async_agent import AsyncBoltAgent
 
 
 class AsyncBoltContext(BaseContext):
@@ -189,36 +186,6 @@ class AsyncBoltContext(BaseContext):
         if "fail" not in self:
             self["fail"] = AsyncFail(client=self.client, function_execution_id=self.function_execution_id)
         return self["fail"]
-
-    @property
-    def agent(self) -> "AsyncBoltAgent":
-        """`agent` listener argument for building AI-powered Slack agents.
-
-        Experimental:
-            This API is experimental and may change in future releases.
-
-            @app.event("app_mention")
-            async def handle_mention(agent):
-                stream = await agent.chat_stream()
-                await stream.append(markdown_text="Hello!")
-                await stream.stop()
-
-        Returns:
-            `AsyncBoltAgent` instance
-        """
-        if "agent" not in self:
-            # Deferred import: AsyncBoltAgent is only imported at runtime when accessed,
-            # avoiding unnecessary loading when the agent property is never used.
-            from slack_bolt.agent.async_agent import AsyncBoltAgent
-
-            self["agent"] = AsyncBoltAgent(
-                client=self.client,
-                channel_id=self.channel_id,
-                thread_ts=self.thread_ts,
-                team_id=self.team_id,
-                user_id=self.user_id,
-            )
-        return self["agent"]
 
     @property
     def set_title(self) -> Optional[AsyncSetTitle]:

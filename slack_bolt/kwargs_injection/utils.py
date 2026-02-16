@@ -86,7 +86,15 @@ def build_required_kwargs(
 
     # Defer agent creation to avoid constructing BoltAgent on every request
     if "agent" in required_arg_names or "args" in required_arg_names:
-        all_available_args["agent"] = request.context.agent
+        from slack_bolt.agent.agent import BoltAgent
+
+        all_available_args["agent"] = BoltAgent(
+            client=request.context.client,
+            channel_id=request.context.channel_id,
+            thread_ts=request.context.thread_ts,
+            team_id=request.context.team_id,
+            user_id=request.context.user_id,
+        )
         if "agent" in required_arg_names:
             warnings.warn(
                 "The agent listener argument is experimental and may change in future versions.",

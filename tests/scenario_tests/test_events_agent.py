@@ -80,33 +80,6 @@ class TestEventsAgent:
         assert response.status == 200
         assert_target_called()
 
-    def test_agent_accessible_via_context(self):
-        app = App(client=self.web_client)
-
-        state = {"called": False}
-
-        def assert_target_called():
-            count = 0
-            while state["called"] is False and count < 20:
-                sleep(0.1)
-                count += 1
-            assert state["called"] is True
-            state["called"] = False
-
-        @app.event("app_mention")
-        def handle_mention(context: BoltContext):
-            agent = context.agent
-            assert agent is not None
-            assert isinstance(agent, BoltAgentDirect)
-            # Verify the same instance is returned on subsequent access
-            assert context.agent is agent
-            state["called"] = True
-
-        request = BoltRequest(body=app_mention_event_body, mode="socket_mode")
-        response = app.dispatch(request)
-        assert response.status == 200
-        assert_target_called()
-
     def test_agent_kwarg_emits_experimental_warning(self):
         app = App(client=self.web_client)
 
