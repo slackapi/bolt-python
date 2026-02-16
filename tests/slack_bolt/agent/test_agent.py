@@ -197,6 +197,118 @@ class TestBoltAgent:
         with pytest.raises(TypeError):
             agent.set_status()
 
+    def test_set_suggested_prompts_uses_context_defaults(self):
+        """BoltAgent.set_suggested_prompts() passes context defaults to WebClient.assistant_threads_setSuggestedPrompts()."""
+        client = MagicMock(spec=WebClient)
+        client.assistant_threads_setSuggestedPrompts.return_value = MagicMock()
+
+        agent = BoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        agent.set_suggested_prompts(prompts=["What can you do?", "Help me write code"])
+
+        client.assistant_threads_setSuggestedPrompts.assert_called_once_with(
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            prompts=[
+                {"title": "What can you do?", "message": "What can you do?"},
+                {"title": "Help me write code", "message": "Help me write code"},
+            ],
+            title=None,
+        )
+
+    def test_set_suggested_prompts_with_dict_prompts(self):
+        """BoltAgent.set_suggested_prompts() accepts dict prompts with title and message."""
+        client = MagicMock(spec=WebClient)
+        client.assistant_threads_setSuggestedPrompts.return_value = MagicMock()
+
+        agent = BoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        agent.set_suggested_prompts(
+            prompts=[
+                {"title": "Short title", "message": "A much longer message for this prompt"},
+            ],
+            title="Suggestions",
+        )
+
+        client.assistant_threads_setSuggestedPrompts.assert_called_once_with(
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            prompts=[
+                {"title": "Short title", "message": "A much longer message for this prompt"},
+            ],
+            title="Suggestions",
+        )
+
+    def test_set_suggested_prompts_overrides_context_defaults(self):
+        """Explicit channel/thread_ts override context defaults."""
+        client = MagicMock(spec=WebClient)
+        client.assistant_threads_setSuggestedPrompts.return_value = MagicMock()
+
+        agent = BoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        agent.set_suggested_prompts(
+            prompts=["Hello"],
+            channel="C999",
+            thread_ts="9999999999.999999",
+        )
+
+        client.assistant_threads_setSuggestedPrompts.assert_called_once_with(
+            channel_id="C999",
+            thread_ts="9999999999.999999",
+            prompts=[{"title": "Hello", "message": "Hello"}],
+            title=None,
+        )
+
+    def test_set_suggested_prompts_passes_extra_kwargs(self):
+        """Extra kwargs are forwarded to WebClient.assistant_threads_setSuggestedPrompts()."""
+        client = MagicMock(spec=WebClient)
+        client.assistant_threads_setSuggestedPrompts.return_value = MagicMock()
+
+        agent = BoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        agent.set_suggested_prompts(prompts=["Hello"], token="xoxb-override")
+
+        client.assistant_threads_setSuggestedPrompts.assert_called_once_with(
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            prompts=[{"title": "Hello", "message": "Hello"}],
+            title=None,
+            token="xoxb-override",
+        )
+
+    def test_set_suggested_prompts_requires_prompts(self):
+        """set_suggested_prompts() raises TypeError when prompts is not provided."""
+        client = MagicMock(spec=WebClient)
+        agent = BoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        with pytest.raises(TypeError):
+            agent.set_suggested_prompts()
+
     def test_import_from_slack_bolt(self):
         from slack_bolt import BoltAgent as ImportedBoltAgent
 

@@ -229,6 +229,123 @@ class TestAsyncBoltAgent:
             await agent.set_status()
 
     @pytest.mark.asyncio
+    async def test_set_suggested_prompts_uses_context_defaults(self):
+        """AsyncBoltAgent.set_suggested_prompts() passes context defaults to AsyncWebClient.assistant_threads_setSuggestedPrompts()."""
+        client = MagicMock(spec=AsyncWebClient)
+        client.assistant_threads_setSuggestedPrompts, call_tracker, _ = _make_async_api_mock()
+
+        agent = AsyncBoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        await agent.set_suggested_prompts(prompts=["What can you do?", "Help me write code"])
+
+        call_tracker.assert_called_once_with(
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            prompts=[
+                {"title": "What can you do?", "message": "What can you do?"},
+                {"title": "Help me write code", "message": "Help me write code"},
+            ],
+            title=None,
+        )
+
+    @pytest.mark.asyncio
+    async def test_set_suggested_prompts_with_dict_prompts(self):
+        """AsyncBoltAgent.set_suggested_prompts() accepts dict prompts with title and message."""
+        client = MagicMock(spec=AsyncWebClient)
+        client.assistant_threads_setSuggestedPrompts, call_tracker, _ = _make_async_api_mock()
+
+        agent = AsyncBoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        await agent.set_suggested_prompts(
+            prompts=[
+                {"title": "Short title", "message": "A much longer message for this prompt"},
+            ],
+            title="Suggestions",
+        )
+
+        call_tracker.assert_called_once_with(
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            prompts=[
+                {"title": "Short title", "message": "A much longer message for this prompt"},
+            ],
+            title="Suggestions",
+        )
+
+    @pytest.mark.asyncio
+    async def test_set_suggested_prompts_overrides_context_defaults(self):
+        """Explicit channel/thread_ts override context defaults."""
+        client = MagicMock(spec=AsyncWebClient)
+        client.assistant_threads_setSuggestedPrompts, call_tracker, _ = _make_async_api_mock()
+
+        agent = AsyncBoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        await agent.set_suggested_prompts(
+            prompts=["Hello"],
+            channel="C999",
+            thread_ts="9999999999.999999",
+        )
+
+        call_tracker.assert_called_once_with(
+            channel_id="C999",
+            thread_ts="9999999999.999999",
+            prompts=[{"title": "Hello", "message": "Hello"}],
+            title=None,
+        )
+
+    @pytest.mark.asyncio
+    async def test_set_suggested_prompts_passes_extra_kwargs(self):
+        """Extra kwargs are forwarded to AsyncWebClient.assistant_threads_setSuggestedPrompts()."""
+        client = MagicMock(spec=AsyncWebClient)
+        client.assistant_threads_setSuggestedPrompts, call_tracker, _ = _make_async_api_mock()
+
+        agent = AsyncBoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        await agent.set_suggested_prompts(prompts=["Hello"], token="xoxb-override")
+
+        call_tracker.assert_called_once_with(
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            prompts=[{"title": "Hello", "message": "Hello"}],
+            title=None,
+            token="xoxb-override",
+        )
+
+    @pytest.mark.asyncio
+    async def test_set_suggested_prompts_requires_prompts(self):
+        """set_suggested_prompts() raises TypeError when prompts is not provided."""
+        client = MagicMock(spec=AsyncWebClient)
+        agent = AsyncBoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        with pytest.raises(TypeError):
+            await agent.set_suggested_prompts()
+
+    @pytest.mark.asyncio
     async def test_import_from_agent_module(self):
         from slack_bolt.agent.async_agent import AsyncBoltAgent as ImportedAsyncBoltAgent
 
