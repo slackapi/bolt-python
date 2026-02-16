@@ -60,9 +60,10 @@ class AsyncBoltAgent:
             raise ValueError(
                 "Either provide all of channel, thread_ts, recipient_team_id, and recipient_user_id, or none of them"
             )
+        # Argument validation is delegated to chat_stream() and the API
         return await self._client.chat_stream(
-            channel=channel or self._channel_id,
-            thread_ts=thread_ts or self._thread_ts,
+            channel=channel or self._channel_id,  # type: ignore[arg-type]
+            thread_ts=thread_ts or self._thread_ts,  # type: ignore[arg-type]
             recipient_team_id=recipient_team_id or self._team_id,
             recipient_user_id=recipient_user_id or self._user_id,
             **kwargs,
