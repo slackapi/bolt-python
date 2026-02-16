@@ -4,6 +4,8 @@ All listeners have access to a `context` dictionary, which can be used to enrich
 
 `context` is just a dictionary, so you can directly modify it.
 
+## Example
+
 ```python
 # Listener middleware to fetch tasks from external system using user ID
 def fetch_tasks(context, event, next):

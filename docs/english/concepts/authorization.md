@@ -12,6 +12,8 @@ For a more custom solution, you can set the `authorize` parameter to a function 
 - **`enterprise_id`** and **`team_id`**, which can be found in requests sent to your app.
 - **`user_id`** only when using `user_token`.
 
+## Example
+
 ```python
 import os
 from slack_bolt import App
