@@ -88,7 +88,7 @@ class AsyncBoltAgent:
             **kwargs: Additional arguments passed to ``AsyncWebClient.assistant_threads_setStatus()``.
 
         Returns:
-            ``SlackResponse`` from the API call.
+            ``AsyncSlackResponse`` from the API call.
         """
         return await self._client.assistant_threads_setStatus(
             channel_id=channel or self._channel_id,  # type: ignore[arg-type]
