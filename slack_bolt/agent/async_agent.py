@@ -77,7 +77,7 @@ class AsyncBoltAgent:
         channel: Optional[str] = None,
         thread_ts: Optional[str] = None,
         **kwargs,
-    ) -> SlackResponse:
+    ) -> AsyncSlackResponse:
         """Sets the status of an assistant thread.
 
         Args:
