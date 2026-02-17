@@ -23,12 +23,14 @@ class AsyncBoltAgent:
         client: AsyncWebClient,
         channel_id: Optional[str] = None,
         thread_ts: Optional[str] = None,
+        ts: Optional[str] = None,
         team_id: Optional[str] = None,
         user_id: Optional[str] = None,
     ):
         self._client = client
         self._channel_id = channel_id
         self._thread_ts = thread_ts
+        self._ts = ts
         self._team_id = team_id
         self._user_id = user_id
 
@@ -63,7 +65,7 @@ class AsyncBoltAgent:
         # Argument validation is delegated to chat_stream() and the API
         return await self._client.chat_stream(
             channel=channel or self._channel_id,  # type: ignore[arg-type]
-            thread_ts=thread_ts or self._thread_ts,  # type: ignore[arg-type]
+            thread_ts=thread_ts or self._thread_ts or self._ts,  # type: ignore[arg-type]
             recipient_team_id=recipient_team_id or self._team_id,
             recipient_user_id=recipient_user_id or self._user_id,
             **kwargs,
@@ -92,7 +94,7 @@ class AsyncBoltAgent:
         """
         return await self._client.assistant_threads_setStatus(
             channel_id=channel or self._channel_id,  # type: ignore[arg-type]
-            thread_ts=thread_ts or self._thread_ts,  # type: ignore[arg-type]
+            thread_ts=thread_ts or self._thread_ts or self._ts,  # type: ignore[arg-type]
             status=status,
             loading_messages=loading_messages,
             **kwargs,
@@ -129,7 +131,7 @@ class AsyncBoltAgent:
 
         return await self._client.assistant_threads_setSuggestedPrompts(
             channel_id=channel or self._channel_id,  # type: ignore[arg-type]
-            thread_ts=thread_ts or self._thread_ts,  # type: ignore[arg-type]
+            thread_ts=thread_ts or self._thread_ts or self._ts,  # type: ignore[arg-type]
             prompts=prompts_arg,
             title=title,
             **kwargs,

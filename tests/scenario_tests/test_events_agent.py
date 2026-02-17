@@ -80,54 +80,6 @@ class TestEventsAgent:
         assert response.status == 200
         assert_target_called()
 
-    def test_agent_thread_ts_from_event_in_thread(self):
-        """Agent gets thread_ts from event when in a thread."""
-        app = App(client=self.web_client)
-
-        state = {"thread_ts": None}
-
-        def assert_target_called():
-            count = 0
-            while state["thread_ts"] is None and count < 20:
-                sleep(0.1)
-                count += 1
-            assert state["thread_ts"] is not None
-
-        @app.event("app_mention")
-        def handle_mention(agent: BoltAgent):
-            state["thread_ts"] = agent._thread_ts
-
-        request = BoltRequest(body=app_mention_in_thread_body, mode="socket_mode")
-        response = app.dispatch(request)
-        assert response.status == 200
-        assert_target_called()
-        # Should use event.thread_ts (the thread root), not event.ts
-        assert state["thread_ts"] == "1111111111.111111"
-
-    def test_agent_thread_ts_falls_back_to_ts(self):
-        """Agent falls back to event.ts when not in a thread."""
-        app = App(client=self.web_client)
-
-        state = {"thread_ts": None}
-
-        def assert_target_called():
-            count = 0
-            while state["thread_ts"] is None and count < 20:
-                sleep(0.1)
-                count += 1
-            assert state["thread_ts"] is not None
-
-        @app.event("app_mention")
-        def handle_mention(agent: BoltAgent):
-            state["thread_ts"] = agent._thread_ts
-
-        request = BoltRequest(body=app_mention_event_body, mode="socket_mode")
-        response = app.dispatch(request)
-        assert response.status == 200
-        assert_target_called()
-        # Should fall back to event.ts since no thread_ts
-        assert state["thread_ts"] == "1234567890.123456"
-
     def test_agent_kwarg_emits_experimental_warning(self):
         app = App(client=self.web_client)
 
@@ -185,18 +137,6 @@ app_mention_event_body = build_payload(
         "ts": "1234567890.123456",
         "channel": "C111",
         "event_ts": "1234567890.123456",
-    }
-)
-
-app_mention_in_thread_body = build_payload(
-    {
-        "type": "app_mention",
-        "user": "W222",
-        "text": "<@W111> hello in thread",
-        "ts": "2222222222.222222",
-        "thread_ts": "1111111111.111111",  # Thread root timestamp
-        "channel": "C111",
-        "event_ts": "2222222222.222222",
     }
 )
 

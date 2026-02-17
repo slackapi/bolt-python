@@ -89,14 +89,13 @@ def build_async_required_kwargs(
     if "agent" in required_arg_names:
         from slack_bolt.agent.async_agent import AsyncBoltAgent
 
-        # Resolve thread_ts: assistant events set context.thread_ts, otherwise read from event
         event = request.body.get("event", {})
-        thread_ts = request.context.thread_ts or event.get("thread_ts") or event.get("ts")
 
         all_available_args["agent"] = AsyncBoltAgent(
             client=request.context.client,
             channel_id=request.context.channel_id,
-            thread_ts=thread_ts,
+            thread_ts=request.context.thread_ts or event.get("thread_ts"),
+            ts=event.get("ts"),
             team_id=request.context.team_id,
             user_id=request.context.user_id,
         )
