@@ -1,7 +1,6 @@
 from typing import List, Optional
 
-from slack_sdk.web import SlackResponse
-from slack_sdk.web.async_client import AsyncWebClient
+from slack_sdk.web.async_client import AsyncSlackResponse, AsyncWebClient
 from slack_sdk.web.async_chat_stream import AsyncChatStream
 
 
