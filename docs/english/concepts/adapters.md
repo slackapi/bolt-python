@@ -8,6 +8,8 @@ To use an adapter, you'll create an app with the framework of your choosing and 
 
 The full list adapters, as well as configuration and sample usage, can be found within the repository's [`examples`](https://github.com/slackapi/bolt-python/tree/main/examples)
 
+## Example
+
 ```python
 from slack_bolt import App
 app = App(
