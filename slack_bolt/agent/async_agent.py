@@ -1,6 +1,6 @@
-from typing import Optional
+from typing import List, Optional
 
-from slack_sdk.web.async_client import AsyncWebClient
+from slack_sdk.web.async_client import AsyncSlackResponse, AsyncWebClient
 from slack_sdk.web.async_chat_stream import AsyncChatStream
 
 
@@ -66,5 +66,34 @@ class AsyncBoltAgent:
             thread_ts=thread_ts or self._thread_ts,  # type: ignore[arg-type]
             recipient_team_id=recipient_team_id or self._team_id,
             recipient_user_id=recipient_user_id or self._user_id,
+            **kwargs,
+        )
+
+    async def set_status(
+        self,
+        *,
+        status: str,
+        loading_messages: Optional[List[str]] = None,
+        channel: Optional[str] = None,
+        thread_ts: Optional[str] = None,
+        **kwargs,
+    ) -> AsyncSlackResponse:
+        """Sets the status of an assistant thread.
+
+        Args:
+            status: The status text to display.
+            loading_messages: Optional list of loading messages to cycle through.
+            channel: Channel ID. Defaults to the channel from the event context.
+            thread_ts: Thread timestamp. Defaults to the thread_ts from the event context.
+            **kwargs: Additional arguments passed to ``AsyncWebClient.assistant_threads_setStatus()``.
+
+        Returns:
+            ``AsyncSlackResponse`` from the API call.
+        """
+        return await self._client.assistant_threads_setStatus(
+            channel_id=channel or self._channel_id,  # type: ignore[arg-type]
+            thread_ts=thread_ts or self._thread_ts,  # type: ignore[arg-type]
+            status=status,
+            loading_messages=loading_messages,
             **kwargs,
         )

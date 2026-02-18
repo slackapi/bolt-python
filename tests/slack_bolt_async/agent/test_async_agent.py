@@ -18,6 +18,17 @@ def _make_async_chat_stream_mock():
     return fake_chat_stream, call_tracker, mock_stream
 
 
+def _make_async_api_mock():
+    mock_response = MagicMock()
+    call_tracker = MagicMock()
+
+    async def fake_api_call(**kwargs):
+        call_tracker(**kwargs)
+        return mock_response
+
+    return fake_api_call, call_tracker, mock_response
+
+
 class TestAsyncBoltAgent:
     @pytest.mark.asyncio
     async def test_chat_stream_uses_context_defaults(self):
@@ -106,6 +117,116 @@ class TestAsyncBoltAgent:
             recipient_user_id="W222",
             buffer_size=512,
         )
+
+    @pytest.mark.asyncio
+    async def test_set_status_uses_context_defaults(self):
+        """AsyncBoltAgent.set_status() passes context defaults to AsyncWebClient.assistant_threads_setStatus()."""
+        client = MagicMock(spec=AsyncWebClient)
+        client.assistant_threads_setStatus, call_tracker, _ = _make_async_api_mock()
+
+        agent = AsyncBoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        await agent.set_status(status="Thinking...")
+
+        call_tracker.assert_called_once_with(
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            status="Thinking...",
+            loading_messages=None,
+        )
+
+    @pytest.mark.asyncio
+    async def test_set_status_with_loading_messages(self):
+        """AsyncBoltAgent.set_status() forwards loading_messages."""
+        client = MagicMock(spec=AsyncWebClient)
+        client.assistant_threads_setStatus, call_tracker, _ = _make_async_api_mock()
+
+        agent = AsyncBoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        await agent.set_status(
+            status="Thinking...",
+            loading_messages=["Sitting...", "Waiting..."],
+        )
+
+        call_tracker.assert_called_once_with(
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            status="Thinking...",
+            loading_messages=["Sitting...", "Waiting..."],
+        )
+
+    @pytest.mark.asyncio
+    async def test_set_status_overrides_context_defaults(self):
+        """Explicit channel/thread_ts override context defaults."""
+        client = MagicMock(spec=AsyncWebClient)
+        client.assistant_threads_setStatus, call_tracker, _ = _make_async_api_mock()
+
+        agent = AsyncBoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        await agent.set_status(
+            status="Thinking...",
+            channel="C999",
+            thread_ts="9999999999.999999",
+        )
+
+        call_tracker.assert_called_once_with(
+            channel_id="C999",
+            thread_ts="9999999999.999999",
+            status="Thinking...",
+            loading_messages=None,
+        )
+
+    @pytest.mark.asyncio
+    async def test_set_status_passes_extra_kwargs(self):
+        """Extra kwargs are forwarded to AsyncWebClient.assistant_threads_setStatus()."""
+        client = MagicMock(spec=AsyncWebClient)
+        client.assistant_threads_setStatus, call_tracker, _ = _make_async_api_mock()
+
+        agent = AsyncBoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        await agent.set_status(status="Thinking...", token="xoxb-override")
+
+        call_tracker.assert_called_once_with(
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            status="Thinking...",
+            loading_messages=None,
+            token="xoxb-override",
+        )
+
+    @pytest.mark.asyncio
+    async def test_set_status_requires_status(self):
+        """set_status() raises TypeError when status is not provided."""
+        client = MagicMock(spec=AsyncWebClient)
+        agent = AsyncBoltAgent(
+            client=client,
+            channel_id="C111",
+            thread_ts="1234567890.123456",
+            team_id="T111",
+            user_id="W222",
+        )
+        with pytest.raises(TypeError):
+            await agent.set_status()
 
     @pytest.mark.asyncio
     async def test_import_from_agent_module(self):
