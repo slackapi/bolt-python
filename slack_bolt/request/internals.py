@@ -218,6 +218,9 @@ def extract_thread_ts(payload: Dict[str, Any]) -> Optional[str]:
     # This utility initially supports only the use cases for AI assistants, but it may be fine to add more patterns.
     # That said, note that thread_ts is always required for assistant threads, but it's not for channels.
     # Thus, blindly setting this thread_ts to say utility can break existing apps' behaviors.
+    #
+    # The BoltAgent class handles non-assistant thread_ts separately by reading from the event directly,
+    # allowing it to work correctly without affecting say() behavior.
     if is_assistant_event(payload):
         event = payload["event"]
         if (

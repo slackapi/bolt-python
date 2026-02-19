@@ -92,6 +92,51 @@ class TestBoltAgent:
             buffer_size=512,
         )
 
+    def test_chat_stream_falls_back_to_ts(self):
+        """When thread_ts is not set, chat_stream() falls back to ts."""
+        client = MagicMock(spec=WebClient)
+        client.chat_stream.return_value = MagicMock(spec=ChatStream)
+
+        agent = BoltAgent(
+            client=client,
+            channel_id="C111",
+            team_id="T111",
+            ts="1111111111.111111",
+            user_id="W222",
+        )
+        stream = agent.chat_stream()
+
+        client.chat_stream.assert_called_once_with(
+            channel="C111",
+            thread_ts="1111111111.111111",
+            recipient_team_id="T111",
+            recipient_user_id="W222",
+        )
+        assert stream is not None
+
+    def test_chat_stream_prefers_thread_ts_over_ts(self):
+        """thread_ts takes priority over ts."""
+        client = MagicMock(spec=WebClient)
+        client.chat_stream.return_value = MagicMock(spec=ChatStream)
+
+        agent = BoltAgent(
+            client=client,
+            channel_id="C111",
+            team_id="T111",
+            thread_ts="1234567890.123456",
+            ts="1111111111.111111",
+            user_id="W222",
+        )
+        stream = agent.chat_stream()
+
+        client.chat_stream.assert_called_once_with(
+            channel="C111",
+            thread_ts="1234567890.123456",
+            recipient_team_id="T111",
+            recipient_user_id="W222",
+        )
+        assert stream is not None
+
     def test_set_status_uses_context_defaults(self):
         """BoltAgent.set_status() passes context defaults to WebClient.assistant_threads_setStatus()."""
         client = MagicMock(spec=WebClient)

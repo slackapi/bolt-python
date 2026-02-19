@@ -88,10 +88,13 @@ def build_required_kwargs(
     if "agent" in required_arg_names:
         from slack_bolt.agent.agent import BoltAgent
 
+        event = request.body.get("event", {})
+
         all_available_args["agent"] = BoltAgent(
             client=request.context.client,
             channel_id=request.context.channel_id,
-            thread_ts=request.context.thread_ts,
+            thread_ts=request.context.thread_ts or event.get("thread_ts"),
+            ts=event.get("ts"),
             team_id=request.context.team_id,
             user_id=request.context.user_id,
         )
