@@ -183,7 +183,7 @@ class TestBoltAgent:
         )
 
     def test_set_status_overrides_context_defaults(self):
-        """Explicit channel/thread_ts override context defaults."""
+        """Explicit channel_id/thread_ts override context defaults."""
         client = MagicMock(spec=WebClient)
         client.assistant_threads_setStatus.return_value = MagicMock()
 
@@ -196,7 +196,7 @@ class TestBoltAgent:
         )
         agent.set_status(
             status="Thinking...",
-            channel="C999",
+            channel_id="C999",
             thread_ts="9999999999.999999",
         )
 
@@ -295,7 +295,7 @@ class TestBoltAgent:
         )
 
     def test_set_suggested_prompts_overrides_context_defaults(self):
-        """Explicit channel/thread_ts override context defaults."""
+        """Explicit channel_id/thread_ts override context defaults."""
         client = MagicMock(spec=WebClient)
         client.assistant_threads_setSuggestedPrompts.return_value = MagicMock()
 
@@ -308,7 +308,7 @@ class TestBoltAgent:
         )
         agent.set_suggested_prompts(
             prompts=["Hello"],
-            channel="C999",
+            channel_id="C999",
             thread_ts="9999999999.999999",
         )
 
