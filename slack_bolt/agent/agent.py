@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Dict, List, Optional, Sequence, Union
 
 from slack_sdk import WebClient
 from slack_sdk.web import SlackResponse
@@ -99,5 +99,42 @@ class BoltAgent:
             thread_ts=thread_ts or self._thread_ts,  # type: ignore[arg-type]
             status=status,
             loading_messages=loading_messages,
+            **kwargs,
+        )
+
+    def set_suggested_prompts(
+        self,
+        *,
+        prompts: Sequence[Union[str, Dict[str, str]]],
+        title: Optional[str] = None,
+        channel: Optional[str] = None,
+        thread_ts: Optional[str] = None,
+        **kwargs,
+    ) -> SlackResponse:
+        """Sets suggested prompts for an assistant thread.
+
+        Args:
+            prompts: A sequence of prompts. Each prompt can be either a string
+                (used as both title and message) or a dict with 'title' and 'message' keys.
+            title: Optional title for the suggested prompts section.
+            channel: Channel ID. Defaults to the channel from the event context.
+            thread_ts: Thread timestamp. Defaults to the thread_ts from the event context.
+            **kwargs: Additional arguments passed to ``WebClient.assistant_threads_setSuggestedPrompts()``.
+
+        Returns:
+            ``SlackResponse`` from the API call.
+        """
+        prompts_arg: List[Dict[str, str]] = []
+        for prompt in prompts:
+            if isinstance(prompt, str):
+                prompts_arg.append({"title": prompt, "message": prompt})
+            else:
+                prompts_arg.append(prompt)
+
+        return self._client.assistant_threads_setSuggestedPrompts(
+            channel_id=channel or self._channel_id,  # type: ignore[arg-type]
+            thread_ts=thread_ts or self._thread_ts,  # type: ignore[arg-type]
+            prompts=prompts_arg,
+            title=title,
             **kwargs,
         )
