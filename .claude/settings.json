@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./scripts/build_pypi_package.sh:*)",
+      "Bash(./scripts/format.sh:*)",
+      "Bash(./scripts/install_all_and_run_tests.sh:*)",
+      "Bash(./scripts/lint.sh:*)",
+      "Bash(./scripts/run_mypy.sh:*)",
+      "Bash(./scripts/run_tests.sh:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh label list:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr status:*)",
+      "Bash(gh pr update-branch:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh search code:*)",
+      "Bash(git diff:*)",
+      "Bash(git grep:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git status:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(tree:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.slack.dev)"
+    ]
+  }
+}
