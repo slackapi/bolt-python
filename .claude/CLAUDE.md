@@ -13,6 +13,8 @@ A virtual environment (`.venv`) should be activated before running any commands.
 ## Common Commands
 
 ### Testing
+
+Always use the project scripts instead of calling `pytest` directly:
 ```bash
 # Run all tests (installs deps, formats, lints, tests, typechecks)
 ./scripts/install_all_and_run_tests.sh
@@ -20,11 +22,8 @@ A virtual environment (`.venv`) should be activated before running any commands.
 # Run a single test file
 ./scripts/run_tests.sh tests/scenario_tests/test_app.py
 
-# Run a single test directly (skip formatting)
-pytest -vv tests/scenario_tests/test_app.py
-
 # Run a single test function
-pytest -vv tests/scenario_tests/test_app.py::TestApp::test_name
+./scripts/run_tests.sh tests/scenario_tests/test_app.py::TestApp::test_name
 ```
 
 ### Formatting, Linting, Type Checking
