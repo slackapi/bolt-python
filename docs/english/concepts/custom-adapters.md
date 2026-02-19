@@ -18,6 +18,8 @@ Your adapter will return [an instance of `BoltResponse`](https://github.com/slac
 
 For more in-depth examples of custom adapters, look at the implementations of the [built-in adapters](https://github.com/slackapi/bolt-python/tree/main/slack_bolt/adapter).
 
+## Example
+
 ```python
 # Necessary imports for Flask
 from flask import Request, Response, make_response

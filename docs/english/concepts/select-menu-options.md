@@ -10,6 +10,9 @@ To respond to options requests, you'll need to call `ack()` with a valid `option
 Additionally, you may want to apply filtering logic to the returned options based on user input. This can be accomplished by using the `payload` argument to your options listener and checking for the contents of the `value` property within it. Based on the `value` you can return different options. All listeners and middleware handlers in Bolt for Python have access to [many useful arguments](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) - be sure to check them out!
 
 Refer to [the module document](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
+
+## Example
+
 ```python
 # Example of responding to an external_select options request
 @app.options("external_action")

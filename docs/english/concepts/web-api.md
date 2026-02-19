@@ -8,6 +8,8 @@ The token used to initialize Bolt can be found in the `context` object, which is
 
 :::
 
+## Example
+
 ```python
 @app.message("wake me up")
 def say_hello(client, message):
