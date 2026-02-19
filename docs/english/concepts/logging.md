@@ -4,6 +4,8 @@ By default, Bolt will log information from your app to the output destination. A
 
 Outside of a global context, you can also log a single message corresponding to a specific level. Because Bolt uses Python’s [standard logging module](https://docs.python.org/3/library/logging.html), you can use any its features.
 
+## Example
+
 ```python
 import logging
 

@@ -8,6 +8,8 @@ Read more about modal composition in the [API documentation](/surfaces/modals#co
 
 Refer to [the module document](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
 
+## Example
+
 ```python
 # Listen for a shortcut invocation
 @app.shortcut("open_modal")

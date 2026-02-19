@@ -9,6 +9,9 @@ There are two ways to respond to slash commands. The first way is to use `say()`
 When setting up commands within your app configuration, you'll append `/slack/events` to your request URL.
 
 Refer to [the module document](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
+
+## Example
+
 ```python
 # The echo command simply echoes on command
 @app.command("/echo")

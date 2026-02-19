@@ -6,6 +6,8 @@ If your listener middleware is a quite simple one, you can use a listener matche
 
 Refer to [the module document](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.
 
+## Example
+
 ```python
 # Listener middleware which filters out messages from a bot
 def no_bot_messages(message, next):
