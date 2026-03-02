@@ -3,6 +3,7 @@
 import json
 import logging
 from time import time
+from typing import Dict, Union, Sequence
 
 from slack_sdk.socket_mode.async_client import AsyncBaseSocketModeClient
 from slack_sdk.socket_mode.request import SocketModeRequest
@@ -14,7 +15,13 @@ from slack_bolt.response import BoltResponse
 
 
 async def run_async_bolt_app(app: AsyncApp, req: SocketModeRequest):
-    bolt_req: AsyncBoltRequest = AsyncBoltRequest(mode="socket_mode", body=req.payload)
+    headers: Dict[str, Union[str, Sequence[str]]] = {}
+    if req.retry_attempt is not None:
+        headers["X-Slack-Retry-Num"] = str(req.retry_attempt)
+    if req.retry_reason is not None:
+        headers["X-Slack-Retry-Reason"] = req.retry_reason
+
+    bolt_req: AsyncBoltRequest = AsyncBoltRequest(mode="socket_mode", body=req.payload, headers=headers)
     bolt_resp: BoltResponse = await app.async_dispatch(bolt_req)
     return bolt_resp
 

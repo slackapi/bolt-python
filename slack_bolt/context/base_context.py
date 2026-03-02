@@ -38,6 +38,8 @@ class BaseContext(dict):
         "set_status",
         "set_title",
         "set_suggested_prompts",
+        "retry_num",
+        "retry_reason",
     ]
     # Note that these items are not copyable, so when you add new items to this list,
     # you must modify ThreadListenerRunner/AsyncioListenerRunner's _build_lazy_request method to pass the values.
@@ -172,6 +174,16 @@ class BaseContext(dict):
     def user_token(self) -> Optional[str]:
         """The user token resolved for this request."""
         return self.get("user_token")
+
+    @property
+    def retry_num(self) -> Optional[int]:
+        """The retry number for this request (X-Slack-Retry-Num header in HTTP mode, retry_attempt in Socket Mode)."""
+        return self.get("retry_num")
+
+    @property
+    def retry_reason(self) -> Optional[str]:
+        """The retry reason for this request (X-Slack-Retry-Reason header in HTTP mode, retry_reason in Socket Mode)."""
+        return self.get("retry_reason")
 
     def set_authorize_result(self, authorize_result: AuthorizeResult):
         self["authorize_result"] = authorize_result
