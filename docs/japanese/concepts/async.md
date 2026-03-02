@@ -1,11 +1,11 @@
 # Async（asyncio）の使用
 
-非同期バージョンの Bolt を使用する場合は、`App` の代わりに `AsyncApp` インスタンスをインポートして初期化します。`AsyncApp` では [AIOHTTP](https://docs.aiohttp.org/) を使って API リクエストを行うため、`aiohttp` をインストールする必要があります（`requirements.txt` に追記するか、`pip install aiohttp` を実行します）。
+非同期バージョンの Bolt を使用する場合は、`App` の代わりに `AsyncApp` インスタンスをインポートして初期化します。`AsyncApp` では [AIOHTTP](https://docs.aiohttp.org/) を使って API リクエストを行うため、async extras のインストールが必要です（`pip install "slack-bolt[async]"` を実行します）。
 
 非同期バージョンのプロジェクトのサンプルは、リポジトリの [`examples` フォルダ](https://github.com/slackapi/bolt-python/tree/main/examples)にあります。
 
 ```python
-# aiohttp のインストールが必要です
+# pip install "slack-bolt[async]" が必要です
 from slack_bolt.async_app import AsyncApp
 app = AsyncApp()
 
