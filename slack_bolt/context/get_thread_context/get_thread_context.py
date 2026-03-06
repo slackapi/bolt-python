@@ -31,14 +31,10 @@ class GetThreadContext:
         if self.thread_context_loaded is True:
             return self._thread_context
 
-        if self.payload.get("assistant_thread") is not None:
+        thread = self.payload.get("assistant_thread")
+        if thread is not None and thread.get("context", {}).get("channel_id") is not None:
             # assistant_thread_started
-            thread = self.payload["assistant_thread"]
-            self._thread_context = (
-                AssistantThreadContext(thread["context"])
-                if thread.get("context", {}).get("channel_id") is not None
-                else None
-            )
+            self._thread_context = AssistantThreadContext(thread["context"])
             # for this event, the context will never be changed
             self.thread_context_loaded = True
         elif self.payload.get("channel") is not None and self.payload.get("thread_ts") is not None:

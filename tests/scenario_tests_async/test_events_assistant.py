@@ -200,7 +200,7 @@ user_message_event_body_with_assistant_thread = build_payload(
         "channel": "D111",
         "event_ts": "1726133700.887259",
         "channel_type": "im",
-        "assistant_thread": {"XXX": "YYY"},
+        "assistant_thread": {"action_token": "10647138185092.960436384805.afce3599"},
     }
 )
 
