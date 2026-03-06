@@ -17,9 +17,6 @@ venv/
 .venv*
 .env/
 
-# claude
-.claude/*.local.json
-
 # codecov / coverage
 .coverage
 cov_*
