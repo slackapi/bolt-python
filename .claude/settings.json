@@ -7,6 +7,8 @@
       "Bash(./scripts/lint.sh:*)",
       "Bash(./scripts/run_mypy.sh:*)",
       "Bash(./scripts/run_tests.sh:*)",
+      "Bash(./scripts/install.sh:*)",
+      "Bash(echo $VIRTUAL_ENV)",
       "Bash(gh issue view:*)",
       "Bash(gh label list:*)",
       "Bash(gh pr checks:*)",
@@ -25,7 +27,8 @@
       "Bash(ls:*)",
       "Bash(tree:*)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:docs.slack.dev)"
+      "WebFetch(domain:docs.slack.dev)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }
