@@ -77,7 +77,7 @@ class BoltAgent:
         *,
         status: str,
         loading_messages: Optional[List[str]] = None,
-        channel: Optional[str] = None,
+        channel_id: Optional[str] = None,
         thread_ts: Optional[str] = None,
         **kwargs,
     ) -> SlackResponse:
@@ -86,7 +86,7 @@ class BoltAgent:
         Args:
             status: The status text to display.
             loading_messages: Optional list of loading messages to cycle through.
-            channel: Channel ID. Defaults to the channel from the event context.
+            channel_id: Channel ID. Defaults to the channel from the event context.
             thread_ts: Thread timestamp. Defaults to the thread_ts from the event context.
             **kwargs: Additional arguments passed to ``WebClient.assistant_threads_setStatus()``.
 
@@ -94,7 +94,7 @@ class BoltAgent:
             ``SlackResponse`` from the API call.
         """
         return self._client.assistant_threads_setStatus(
-            channel_id=channel or self._channel_id,  # type: ignore[arg-type]
+            channel_id=channel_id or self._channel_id,  # type: ignore[arg-type]
             thread_ts=thread_ts or self._thread_ts or self._ts,  # type: ignore[arg-type]
             status=status,
             loading_messages=loading_messages,
@@ -106,7 +106,7 @@ class BoltAgent:
         *,
         prompts: Sequence[Union[str, Dict[str, str]]],
         title: Optional[str] = None,
-        channel: Optional[str] = None,
+        channel_id: Optional[str] = None,
         thread_ts: Optional[str] = None,
         **kwargs,
     ) -> SlackResponse:
@@ -116,7 +116,7 @@ class BoltAgent:
             prompts: A sequence of prompts. Each prompt can be either a string
                 (used as both title and message) or a dict with 'title' and 'message' keys.
             title: Optional title for the suggested prompts section.
-            channel: Channel ID. Defaults to the channel from the event context.
+            channel_id: Channel ID. Defaults to the channel from the event context.
             thread_ts: Thread timestamp. Defaults to the thread_ts from the event context.
             **kwargs: Additional arguments passed to ``WebClient.assistant_threads_setSuggestedPrompts()``.
 
@@ -131,7 +131,7 @@ class BoltAgent:
                 prompts_arg.append(prompt)
 
         return self._client.assistant_threads_setSuggestedPrompts(
-            channel_id=channel or self._channel_id,  # type: ignore[arg-type]
+            channel_id=channel_id or self._channel_id,  # type: ignore[arg-type]
             thread_ts=thread_ts or self._thread_ts or self._ts,  # type: ignore[arg-type]
             prompts=prompts_arg,
             title=title,

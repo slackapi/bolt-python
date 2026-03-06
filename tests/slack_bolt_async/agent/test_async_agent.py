@@ -214,7 +214,7 @@ class TestAsyncBoltAgent:
 
     @pytest.mark.asyncio
     async def test_set_status_overrides_context_defaults(self):
-        """Explicit channel/thread_ts override context defaults."""
+        """Explicit channel_id/thread_ts override context defaults."""
         client = MagicMock(spec=AsyncWebClient)
         client.assistant_threads_setStatus, call_tracker, _ = _make_async_api_mock()
 
@@ -227,7 +227,7 @@ class TestAsyncBoltAgent:
         )
         await agent.set_status(
             status="Thinking...",
-            channel="C999",
+            channel_id="C999",
             thread_ts="9999999999.999999",
         )
 
@@ -331,7 +331,7 @@ class TestAsyncBoltAgent:
 
     @pytest.mark.asyncio
     async def test_set_suggested_prompts_overrides_context_defaults(self):
-        """Explicit channel/thread_ts override context defaults."""
+        """Explicit channel_id/thread_ts override context defaults."""
         client = MagicMock(spec=AsyncWebClient)
         client.assistant_threads_setSuggestedPrompts, call_tracker, _ = _make_async_api_mock()
 
@@ -344,7 +344,7 @@ class TestAsyncBoltAgent:
         )
         await agent.set_suggested_prompts(
             prompts=["Hello"],
-            channel="C999",
+            channel_id="C999",
             thread_ts="9999999999.999999",
         )
 
