@@ -5,31 +5,19 @@
 
 script_dir=`dirname $0`
 cd ${script_dir}/..
-rm -rf ./slack_bolt.egg-info
 
-# Update pip to prevent warnings
-pip install -U pip
+test_target="${1:-tests/}"
 
-# The package causes a conflict with moto
-pip uninstall python-lambda
+# keep in sync with LATEST_SUPPORTED_PY in .github/workflows/ci-build.yml
+LATEST_SUPPORTED_PY="3.14"
+current_py=$(python --version | sed -E 's/Python ([0-9]+\.[0-9]+).*/\1/')
 
-test_target="$1"
+./scripts/install.sh
 
-pip install -U -e .
-pip install -U -r requirements/testing.txt
-pip install -U -r requirements/adapter.txt
-pip install -U -r requirements/adapter_testing.txt
-pip install -U -r requirements/tools.txt
-# To avoid errors due to the old versions of click forced by Chalice
-pip install -U pip click
+./scripts/format.sh --no-install
+./scripts/lint.sh --no-install
+pytest $test_target
 
-if [[ $test_target != "" ]]
-then
-    ./scripts/format.sh --no-install
-    pytest $1
-else
-    ./scripts/format.sh --no-install
-    ./scripts/lint.sh --no-install
-    pytest
+if [[ "$current_py" == "$LATEST_SUPPORTED_PY" ]]; then
     ./scripts/run_mypy.sh --no-install
 fi
