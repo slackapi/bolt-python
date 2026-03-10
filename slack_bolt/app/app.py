@@ -844,15 +844,15 @@ class App:
             middleware: A list of lister middleware functions.
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         """
-
-        mw = list(middleware) if middleware else []
+        matchers = list(matchers) if matchers else []
+        middleware = list(middleware) if middleware else []
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.event(event, base_logger=self._base_logger)
             if self._attaching_agent_kwargs_enabled:
-                mw.insert(0, AttachingAgentKwargs())
-            return self._register_listener(list(functions), primary_matcher, matchers, mw, True)
+                middleware.insert(0, AttachingAgentKwargs())
+            return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
         return __call__
 
