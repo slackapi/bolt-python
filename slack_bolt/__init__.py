@@ -21,7 +21,7 @@ from .request import BoltRequest
 from .response import BoltResponse
 
 # AI Agents & Assistants
-from .agent import BoltAgent
+from .context.say_stream import SayStream
 from .middleware.assistant.assistant import (
     Assistant,
 )
@@ -47,7 +47,7 @@ __all__ = [
     "CustomListenerMatcher",
     "BoltRequest",
     "BoltResponse",
-    "BoltAgent",
+    "SayStream",
     "Assistant",
     "AssistantThreadContext",
     "AssistantThreadContextStore",

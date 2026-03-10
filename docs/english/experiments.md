@@ -1,34 +1,32 @@
 # Experiments
 
-Bolt for Python includes experimental features still under active development. These features may be fleeting, may not be perfectly polished, and should be thought of as available for use "at your own risk." 
+Bolt for Python includes experimental features still under active development. These features may be fleeting, may not be perfectly polished, and should be thought of as available for use "at your own risk."
 
 Experimental features are categorized as `semver:patch` until the experimental status is removed.
 
 We love feedback from our community, so we encourage you to explore and interact with the [GitHub repo](https://github.com/slackapi/bolt-python). Contributions, bug reports, and any feedback are all helpful; let us nurture the Slack CLI together to help make building Slack apps more pleasant for everyone.
 
 ## Available experiments
-* [Agent listener argument](#agent)
+* [say_stream listener argument](#say-stream)
 
-## Agent listener argument {#agent}
+## say_stream listener argument {#say-stream}
 
-The `agent: BoltAgent` listener argument provides access to AI agent-related features.
+The `say_stream: SayStream` listener argument provides access to streaming chat for AI agents.
 
-The `BoltAgent` and `AsyncBoltAgent` classes offer a `chat_stream()` method that comes pre-configured with event context defaults: `channel_id`, `thread_ts`, `team_id`, and `user_id` fields. 
-
-The listener argument is wired into the Bolt `kwargs` injection system, so listeners can declare it as a parameter or access it via the `context.agent` property.
+`SayStream` and `AsyncSayStream` are callable context utilities pre-configured with event context defaults: `channel_id`, `thread_ts`, `team_id`, and `user_id`.
 
 ### Example
 
 ```python
-from slack_bolt import BoltAgent
+from slack_bolt import SayStream
 
 @app.event("app_mention")
-def handle_mention(agent: BoltAgent):
-    stream = agent.chat_stream()
+def handle_mention(say_stream: SayStream):
+    stream = say_stream()
     stream.append(markdown_text="Hello!")
     stream.stop()
 ```
 
 ### Limitations
 
-The `chat_stream()` method currently only works when the `thread_ts` field is available in the event context (DMs and threaded replies). Top-level channel messages do not have a `thread_ts` field, and the `ts` field is not yet provided to `BoltAgent`.
+`say_stream()` requires either `thread_ts` or `event.ts` in the event context. It works in DMs, threaded replies, and top-level messages with a `ts` field.

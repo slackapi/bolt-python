@@ -58,6 +58,7 @@ def build_required_kwargs(
         "set_status": request.context.set_status,
         "set_title": request.context.set_title,
         "set_suggested_prompts": request.context.set_suggested_prompts,
+        "say_stream": request.context.say_stream,
         "save_thread_context": request.context.save_thread_context,
         # middleware
         "next": next_func,
@@ -84,26 +85,6 @@ def build_required_kwargs(
         if k not in all_available_args:
             all_available_args[k] = v
 
-    # Defer agent creation to avoid constructing BoltAgent on every request
-    if "agent" in required_arg_names:
-        from slack_bolt.agent.agent import BoltAgent
-
-        event = request.body.get("event", {})
-
-        all_available_args["agent"] = BoltAgent(
-            client=request.context.client,
-            channel_id=request.context.channel_id,
-            thread_ts=request.context.thread_ts or event.get("thread_ts"),
-            ts=event.get("ts"),
-            team_id=request.context.team_id,
-            user_id=request.context.user_id,
-        )
-        warnings.warn(
-            "The agent listener argument is experimental and may change in future versions.",
-            category=ExperimentalWarning,
-            stacklevel=2,  # Point to the caller, not this internal helper
-        )
-
     if len(required_arg_names) > 0:
         # To support instance/class methods in a class for listeners/middleware,
         # check if the first argument is either self or cls
@@ -117,6 +98,13 @@ def build_required_kwargs(
             elif inspect.ismethod(this_func):
                 # We are sure that we should skip manipulating this arg
                 required_arg_names.pop(0)
+
+    if "say_stream" in required_arg_names:
+        warnings.warn(
+            "The say_stream listener argument is experimental and may change in future versions.",
+            category=ExperimentalWarning,
+            stacklevel=2,  # Point to the caller, not this internal helper
+        )
 
     kwargs: Dict[str, Any] = {k: v for k, v in all_available_args.items() if k in required_arg_names}
     found_arg_names = kwargs.keys()

@@ -88,6 +88,7 @@ from slack_bolt.middleware.async_builtins import (
     AsyncIgnoringSelfEvents,
     AsyncUrlVerification,
     AsyncAttachingFunctionToken,
+    AsyncAttachingAgentKwargs,
 )
 from slack_bolt.middleware.async_custom_middleware import (
     AsyncMiddleware,
@@ -136,6 +137,7 @@ class AsyncApp:
         ssl_check_enabled: bool = True,
         url_verification_enabled: bool = True,
         attaching_function_token_enabled: bool = True,
+        attaching_agent_kwargs_enabled: bool = True,
         # for the OAuth flow
         oauth_settings: Optional[AsyncOAuthSettings] = None,
         oauth_flow: Optional[AsyncOAuthFlow] = None,
@@ -363,6 +365,7 @@ class AsyncApp:
         self._async_listeners: List[AsyncListener] = []
 
         self._assistant_thread_context_store = assistant_thread_context_store
+        self._attaching_agent_kwargs_enabled = attaching_agent_kwargs_enabled
 
         self._process_before_response = process_before_response
         self._async_listener_runner = AsyncioListenerRunner(
@@ -866,10 +869,14 @@ class AsyncApp:
             middleware: A list of lister middleware functions.
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         """
+        matchers = list(matchers) if matchers else []
+        middleware = list(middleware) if middleware else []
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.event(event, True, base_logger=self._base_logger)
+            if self._attaching_agent_kwargs_enabled:
+                middleware.insert(0, AsyncAttachingAgentKwargs())
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
         return __call__
@@ -930,6 +937,8 @@ class AsyncApp:
                 asyncio=True,
                 base_logger=self._base_logger,
             )
+            if self._attaching_agent_kwargs_enabled:
+                middleware.insert(0, AsyncAttachingAgentKwargs())
             middleware.insert(0, AsyncMessageListenerMatches(keyword))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 

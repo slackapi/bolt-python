@@ -17,6 +17,7 @@ from .request_verification import RequestVerification
 from .ssl_check import SslCheck
 from .url_verification import UrlVerification
 from .attaching_function_token import AttachingFunctionToken
+from .attaching_agent_kwargs import AttachingAgentKwargs
 
 builtin_middleware_classes = [
     SslCheck,
@@ -26,6 +27,7 @@ builtin_middleware_classes = [
     IgnoringSelfEvents,
     UrlVerification,
     AttachingFunctionToken,
+    AttachingAgentKwargs,
     # Assistant,  # to avoid circular imports
 ]
 for cls in builtin_middleware_classes:
@@ -41,5 +43,6 @@ __all__ = [
     "SslCheck",
     "UrlVerification",
     "AttachingFunctionToken",
+    "AttachingAgentKwargs",
     "builtin_middleware_classes",
 ]

@@ -1,12 +1,10 @@
 import json
 from time import sleep
 
-import pytest
 from slack_sdk.web import WebClient
 
-from slack_bolt import App, BoltRequest, BoltContext, BoltAgent
-from slack_bolt.agent.agent import BoltAgent as BoltAgentDirect
-from slack_bolt.warning import ExperimentalWarning
+from slack_bolt import App, BoltRequest, BoltContext, SayStream
+from slack_bolt.context.say_stream.say_stream import SayStream as SayStreamDirect
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -14,6 +12,8 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
+# TODO: VALIDATE THIS AI SLOP IS CORRECT
+# TODO: REMANE THIS FILE AND CLASS NAME
 class TestEventsAgent:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -30,7 +30,7 @@ class TestEventsAgent:
         cleanup_mock_web_api_server(self)
         restore_os_env(self.old_os_env)
 
-    def test_agent_injected_for_app_mention(self):
+    def test_say_stream_injected_for_app_mention(self):
         app = App(client=self.web_client)
 
         state = {"called": False}
@@ -44,9 +44,9 @@ class TestEventsAgent:
             state["called"] = False
 
         @app.event("app_mention")
-        def handle_mention(agent: BoltAgent, context: BoltContext):
-            assert agent is not None
-            assert isinstance(agent, BoltAgentDirect)
+        def handle_mention(say_stream: SayStream, context: BoltContext):
+            assert say_stream is not None
+            assert isinstance(say_stream, SayStreamDirect)
             assert context.channel_id == "C111"
             state["called"] = True
 
@@ -55,7 +55,7 @@ class TestEventsAgent:
         assert response.status == 200
         assert_target_called()
 
-    def test_agent_available_in_action_listener(self):
+    def test_say_stream_not_available_in_action_listener(self):
         app = App(client=self.web_client)
 
         state = {"called": False}
@@ -69,37 +69,13 @@ class TestEventsAgent:
             state["called"] = False
 
         @app.action("test_action")
-        def handle_action(ack, agent: BoltAgent):
+        def handle_action(ack, say_stream: SayStream):
             ack()
-            assert agent is not None
-            assert isinstance(agent, BoltAgentDirect)
+            assert say_stream is None
             state["called"] = True
 
         request = BoltRequest(body=json.dumps(action_event_body), mode="socket_mode")
         response = app.dispatch(request)
-        assert response.status == 200
-        assert_target_called()
-
-    def test_agent_kwarg_emits_experimental_warning(self):
-        app = App(client=self.web_client)
-
-        state = {"called": False}
-
-        def assert_target_called():
-            count = 0
-            while state["called"] is False and count < 20:
-                sleep(0.1)
-                count += 1
-            assert state["called"] is True
-            state["called"] = False
-
-        @app.event("app_mention")
-        def handle_mention(agent: BoltAgent):
-            state["called"] = True
-
-        request = BoltRequest(body=app_mention_event_body, mode="socket_mode")
-        with pytest.warns(ExperimentalWarning, match="agent listener argument is experimental"):
-            response = app.dispatch(request)
         assert response.status == 200
         assert_target_called()
 

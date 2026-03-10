@@ -123,7 +123,7 @@ slack_bolt/adapter/flask/handler.py                # sync-only (no async Flask a
 
 ### AI Agents & Assistants
 
-`BoltAgent` (`slack_bolt/agent/`) provides `chat_stream()`, `set_status()`, and `set_suggested_prompts()` for AI-powered agents. `Assistant` middleware (`slack_bolt/middleware/assistant/`) handles assistant thread events.
+`SayStream` (`slack_bolt/context/say_stream/`) provides `chat_stream()` for AI-powered agents (experimental). `Assistant` middleware (`slack_bolt/middleware/assistant/`) handles assistant thread events. `set_status` and `set_suggested_prompts` are available as context utilities for assistant events.
 
 ## Key Development Patterns
 

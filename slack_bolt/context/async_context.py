@@ -10,6 +10,7 @@ from slack_bolt.context.respond.async_respond import AsyncRespond
 from slack_bolt.context.get_thread_context.async_get_thread_context import AsyncGetThreadContext
 from slack_bolt.context.save_thread_context.async_save_thread_context import AsyncSaveThreadContext
 from slack_bolt.context.say.async_say import AsyncSay
+from slack_bolt.context.say_stream.async_say_stream import AsyncSayStream
 from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
 from slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts import AsyncSetSuggestedPrompts
 from slack_bolt.context.set_title.async_set_title import AsyncSetTitle
@@ -186,6 +187,10 @@ class AsyncBoltContext(BaseContext):
         if "fail" not in self:
             self["fail"] = AsyncFail(client=self.client, function_execution_id=self.function_execution_id)
         return self["fail"]
+
+    @property
+    def say_stream(self) -> Optional[AsyncSayStream]:
+        return self.get("say_stream")
 
     @property
     def set_title(self) -> Optional[AsyncSetTitle]:

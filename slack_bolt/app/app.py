@@ -70,6 +70,7 @@ from slack_bolt.middleware import (
     IgnoringSelfEvents,
     CustomMiddleware,
     AttachingFunctionToken,
+    AttachingAgentKwargs,
 )
 from slack_bolt.middleware.assistant import Assistant
 from slack_bolt.middleware.message_listener_matches import MessageListenerMatches
@@ -128,6 +129,7 @@ class App:
         ssl_check_enabled: bool = True,
         url_verification_enabled: bool = True,
         attaching_function_token_enabled: bool = True,
+        attaching_agent_kwargs_enabled: bool = True,
         # for the OAuth flow
         oauth_settings: Optional[OAuthSettings] = None,
         oauth_flow: Optional[OAuthFlow] = None,
@@ -357,6 +359,7 @@ class App:
             listener_executor = ThreadPoolExecutor(max_workers=5)
 
         self._assistant_thread_context_store = assistant_thread_context_store
+        self._attaching_agent_kwargs_enabled = attaching_agent_kwargs_enabled
 
         self._process_before_response = process_before_response
         self._listener_runner = ThreadListenerRunner(
@@ -842,10 +845,14 @@ class App:
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         """
 
+        mw = list(middleware) if middleware else []
+
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.event(event, base_logger=self._base_logger)
-            return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
+            if self._attaching_agent_kwargs_enabled:
+                mw.insert(0, AttachingAgentKwargs())
+            return self._register_listener(list(functions), primary_matcher, matchers, mw, True)
 
         return __call__
 
@@ -902,6 +909,8 @@ class App:
             primary_matcher = builtin_matchers.message_event(
                 keyword=keyword, constraints=constraints, base_logger=self._base_logger
             )
+            if self._attaching_agent_kwargs_enabled:
+                middleware.insert(0, AttachingAgentKwargs())
             middleware.insert(0, MessageListenerMatches(keyword))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
