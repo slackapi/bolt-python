@@ -21,6 +21,7 @@ class AsyncAttachingAgentKwargs(AsyncMiddleware):
         channel_id = req.context.channel_id
         # TODO: improve the logic around extracting thread_ts and event ts
         event = req.body.get("event", {})
+        req.context.thread_ts
         thread_ts = event.get("thread_ts") or event.get("ts")
 
         if channel_id and thread_ts:
@@ -28,13 +29,12 @@ class AsyncAttachingAgentKwargs(AsyncMiddleware):
             req.context["set_status"] = AsyncSetStatus(client, channel_id, thread_ts)
             req.context["set_title"] = AsyncSetTitle(client, channel_id, thread_ts)
             req.context["set_suggested_prompts"] = AsyncSetSuggestedPrompts(client, channel_id, thread_ts)
-
-        req.context["say_stream"] = AsyncSayStream(
-            client=req.context.client,
-            channel_id=channel_id,
-            thread_ts=thread_ts,
-            team_id=req.context.team_id,
-            user_id=req.context.user_id,
-        )
+            req.context["say_stream"] = AsyncSayStream(
+                client=req.context.client,
+                channel_id=channel_id,
+                thread_ts=thread_ts,
+                team_id=req.context.team_id,
+                user_id=req.context.user_id,
+            )
 
         return await next()

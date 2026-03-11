@@ -240,6 +240,16 @@ def extract_thread_ts(payload: Dict[str, Any]) -> Optional[str]:
             elif event.get("previous_message", {}).get("thread_ts") is not None:
                 # message_deleted
                 return event["previous_message"]["thread_ts"]
+        return None
+    thread_ts = payload.get("thread_ts")
+    if thread_ts is not None:
+        return thread_ts
+    if payload.get("event") is not None:
+        return extract_thread_ts(payload["event"])
+    if isinstance(payload.get("message"), dict):
+        return extract_thread_ts(payload["message"])
+    if isinstance(payload.get("previous_message"), dict):
+        return extract_thread_ts(payload["previous_message"])
     return None
 
 

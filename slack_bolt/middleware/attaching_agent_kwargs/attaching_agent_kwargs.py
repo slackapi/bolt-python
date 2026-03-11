@@ -28,13 +28,12 @@ class AttachingAgentKwargs(Middleware):
             req.context["set_status"] = SetStatus(client, channel_id, thread_ts)
             req.context["set_title"] = SetTitle(client, channel_id, thread_ts)
             req.context["set_suggested_prompts"] = SetSuggestedPrompts(client, channel_id, thread_ts)
-
-        req.context["say_stream"] = SayStream(
-            client=req.context.client,
-            channel_id=channel_id,
-            thread_ts=thread_ts,
-            team_id=req.context.team_id,
-            user_id=req.context.user_id,
-        )
+            req.context["say_stream"] = SayStream(
+                client=req.context.client,
+                channel_id=channel_id,
+                thread_ts=thread_ts,
+                team_id=req.context.team_id,
+                user_id=req.context.user_id,
+            )
 
         return next()

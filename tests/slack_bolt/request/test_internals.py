@@ -13,6 +13,7 @@ from slack_bolt.request.internals import (
     extract_actor_team_id,
     extract_actor_user_id,
     extract_function_execution_id,
+    extract_thread_ts,
 )
 
 
@@ -109,6 +110,143 @@ class TestRequestInternals:
             "function_data": {"execution_id": "Fx111", "inputs": {"customer_id": "Ux111"}},
             "interactivity": {"interactivity_pointer": "111.222.xxx"},
         },
+    ]
+
+    thread_ts_event_requests = [
+        {
+            "event": {
+                "type": "app_mention",
+                "channel": "C111",
+                "user": "U111",
+                "ts": "123.420",
+                "thread_ts": "123.456",
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "channel": "C111",
+                "user": "U111",
+                "ts": "123.420",
+                "thread_ts": "123.456",
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "subtype": "bot_message",
+                "channel": "C111",
+                "bot_id": "B111",
+                "ts": "123.420",
+                "thread_ts": "123.456",
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "subtype": "file_share",
+                "channel": "C111",
+                "user": "U111",
+                "ts": "123.420",
+                "thread_ts": "123.456",
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "subtype": "thread_broadcast",
+                "channel": "C111",
+                "user": "U111",
+                "ts": "123.420",
+                "thread_ts": "123.456",
+                "root": {"thread_ts": "123.420"},
+            },
+        },
+        {
+            "event": {
+                "type": "link_shared",
+                "channel": "C111",
+                "user": "U111",
+                "thread_ts": "123.456",
+                "links": [{"url": "https://example.com"}],
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "subtype": "message_changed",
+                "channel": "C111",
+                "message": {
+                    "type": "message",
+                    "user": "U111",
+                    "text": "edited",
+                    "ts": "123.420",
+                    "thread_ts": "123.456",
+                },
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "subtype": "message_changed",
+                "channel": "C111",
+                "message": {
+                    "type": "message",
+                    "user": "U111",
+                    "text": "edited",
+                    "ts": "123.420",
+                    "thread_ts": "123.456",
+                },
+                "previous_message": {
+                    "type": "message",
+                    "user": "U111",
+                    "text": "deleted",
+                    "ts": "123.420",
+                    "thread_ts": "123.420",
+                },
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "subtype": "message_deleted",
+                "channel": "C111",
+                "previous_message": {
+                    "type": "message",
+                    "user": "U111",
+                    "text": "deleted",
+                    "ts": "123.420",
+                    "thread_ts": "123.456",
+                },
+            },
+        },
+    ]
+
+    no_thread_ts_requests = [
+        {
+            "event": {
+                "type": "reaction_added",
+                "user": "U111",
+                "reaction": "thumbsup",
+                "item": {"type": "message", "channel": "C111", "ts": "123.420"},
+            },
+        },
+        {
+            "event": {
+                "type": "channel_created",
+                "channel": {"id": "C222", "name": "test", "created": 1678455198},
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "channel": "C111",
+                "user": "U111",
+                "text": "hello",
+                "ts": "123.420",
+            },
+        },
+        {},
     ]
 
     slack_connect_authorizations = [
@@ -223,10 +361,10 @@ class TestRequestInternals:
                 "type": "message",
                 "text": "<@INSTALLED_BOT_USER_ID> Hey!",
                 "user": "USER_ID_ACTOR",
-                "ts": "1678455198.838499",
+                "ts": "123.456",
                 "team": "TEAM_ID_ACTOR",
                 "channel": "C111",
-                "event_ts": "1678455198.838499",
+                "event_ts": "123.456",
                 "channel_type": "channel",
             },
             "type": "event_callback",
@@ -336,6 +474,47 @@ class TestRequestInternals:
         for req in self.function_event_requests:
             inputs = extract_function_inputs(req)
             assert inputs == {"customer_id": "Ux111"}
+
+    def test_extract_thread_ts(self):
+        for req in self.thread_ts_event_requests:
+            thread_ts = extract_thread_ts(req)
+            assert thread_ts == "123.456", f"Expected thread_ts for {req}"
+
+    def test_extract_thread_ts_fail(self):
+        for req in self.no_thread_ts_requests:
+            thread_ts = extract_thread_ts(req)
+            assert thread_ts is None, f"Expected None for {req}"
+
+    def test_extract_thread_ts_edge_cases(self):
+        # message_changed where only previous_message has thread_ts (no message key)
+        req = {
+            "event": {
+                "type": "message",
+                "subtype": "message_deleted",
+                "channel": "C111",
+                "previous_message": {
+                    "type": "message",
+                    "ts": "1678455205.000000",
+                    "thread_ts": "123.456",
+                },
+            },
+        }
+        assert extract_thread_ts(req) == "123.456"
+
+        # Payload with thread_ts directly at root level (non-event payload)
+        req = {"thread_ts": "123.456"}
+        assert extract_thread_ts(req) == "123.456"
+
+        # Event with thread_ts as empty string (truthy check: empty string is falsy)
+        req = {
+            "event": {
+                "type": "message",
+                "channel": "C111",
+                "thread_ts": "",
+            },
+        }
+        # Empty string is falsy, so .get() returns "" but `is not None` is True
+        assert extract_thread_ts(req) == ""
 
     def test_is_enterprise_install_extraction(self):
         for req in self.requests:
