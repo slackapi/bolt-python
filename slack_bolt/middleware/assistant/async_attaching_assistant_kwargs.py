@@ -1,0 +1,38 @@
+from typing import Optional, Callable, Awaitable
+
+from slack_bolt.context.assistant.async_assistant_utilities import AsyncAssistantUtilities
+from slack_bolt.context.assistant.thread_context_store.async_store import AsyncAssistantThreadContextStore
+from slack_bolt.middleware.async_middleware import AsyncMiddleware
+from slack_bolt.request.async_request import AsyncBoltRequest
+from slack_bolt.request.payload_utils import to_event
+from slack_bolt.response import BoltResponse
+
+
+class AsyncAttachingAssistantKwargs(AsyncMiddleware):
+
+    thread_context_store: Optional[AsyncAssistantThreadContextStore]
+
+    def __init__(self, thread_context_store: Optional[AsyncAssistantThreadContextStore]):
+        self.thread_context_store = thread_context_store
+
+    async def async_process(
+        self,
+        *,
+        req: AsyncBoltRequest,
+        resp: BoltResponse,
+        next: Callable[[], Awaitable[BoltResponse]],
+    ) -> Optional[BoltResponse]:
+        event = to_event(req.body)
+        if event is not None:
+            assistant = AsyncAssistantUtilities(
+                payload=event,
+                context=req.context,
+                thread_context_store=self.thread_context_store,
+            )
+            req.context["say"] = assistant.say
+            req.context["set_status"] = assistant.set_status
+            req.context["set_title"] = assistant.set_title
+            req.context["set_suggested_prompts"] = assistant.set_suggested_prompts
+            req.context["get_thread_context"] = assistant.get_thread_context
+            req.context["save_thread_context"] = assistant.save_thread_context
+        return await next()

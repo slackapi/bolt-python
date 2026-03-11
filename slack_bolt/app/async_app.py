@@ -8,7 +8,6 @@ import warnings
 from aiohttp import web
 
 from slack_bolt.app.async_server import AsyncSlackAppServer
-from slack_bolt.context.assistant.async_assistant_utilities import AsyncAssistantUtilities
 from slack_bolt.context.assistant.thread_context_store.async_store import (
     AsyncAssistantThreadContextStore,
 )
@@ -30,7 +29,6 @@ from slack_bolt.middleware.message_listener_matches.async_message_listener_match
     AsyncMessageListenerMatches,
 )
 from slack_bolt.oauth.async_internals import select_consistent_installation_store
-from slack_bolt.request.payload_utils import is_assistant_event, to_event
 from slack_bolt.util.utils import get_name_for_callable, is_callable_coroutine
 from slack_bolt.workflows.step.async_step import (
     AsyncWorkflowStep,
@@ -1430,20 +1428,6 @@ class AsyncApp:
         # Most apps do not need this "listener_runner" instance.
         # It is intended for apps that start lazy listeners from their custom global middleware.
         req.context["listener_runner"] = self.listener_runner
-
-        # For AI Agents & Assistants
-        if is_assistant_event(req.body):
-            assistant = AsyncAssistantUtilities(
-                payload=to_event(req.body),  # type:ignore[arg-type]
-                context=req.context,
-                thread_context_store=self._assistant_thread_context_store,
-            )
-            req.context["say"] = assistant.say
-            req.context["set_status"] = assistant.set_status
-            req.context["set_title"] = assistant.set_title
-            req.context["set_suggested_prompts"] = assistant.set_suggested_prompts
-            req.context["get_thread_context"] = assistant.get_thread_context
-            req.context["save_thread_context"] = assistant.save_thread_context
 
     @staticmethod
     def _to_listener_functions(

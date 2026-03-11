@@ -1,4 +1,5 @@
 import asyncio
+from typing import Callable, Awaitable, Optional
 
 import pytest
 from slack_sdk.web.async_client import AsyncWebClient
@@ -9,7 +10,9 @@ from slack_bolt.context.say.async_say import AsyncSay
 from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
 from slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts import AsyncSetSuggestedPrompts
 from slack_bolt.middleware.assistant.async_assistant import AsyncAssistant
+from slack_bolt.middleware.async_middleware import AsyncMiddleware
 from slack_bolt.request.async_request import AsyncBoltRequest
+from slack_bolt.response import BoltResponse
 from tests.mock_web_api_server import (
     cleanup_mock_web_api_server_async,
     setup_mock_web_api_server_async,
@@ -55,6 +58,7 @@ class TestAsyncEventsAssistant:
         async def start_thread(say: AsyncSay, set_suggested_prompts: AsyncSetSuggestedPrompts, context: AsyncBoltContext):
             assert context.channel_id == "D111"
             assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == context.thread_ts
             await say("Hi, how can I help you today?")
             await set_suggested_prompts(
                 prompts=[{"title": "What does SLACK stand for?", "message": "What does SLACK stand for?"}]
@@ -75,6 +79,7 @@ class TestAsyncEventsAssistant:
         async def handle_user_message(say: AsyncSay, set_status: AsyncSetStatus, context: AsyncBoltContext):
             assert context.channel_id == "D111"
             assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == context.thread_ts
             try:
                 await set_status("is typing...")
                 await say("Here you are!")
@@ -115,6 +120,102 @@ class TestAsyncEventsAssistant:
         request = AsyncBoltRequest(body=channel_message_changed_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 404
+
+    @pytest.mark.asyncio
+    async def test_assistant_with_custom_listener_middleware(self):
+        app = AsyncApp(client=self.web_client)
+        assistant = AsyncAssistant()
+
+        state = {"called": False, "middleware_called": False}
+
+        async def assert_target_called():
+            count = 0
+            while state["called"] is False and count < 20:
+                await asyncio.sleep(0.1)
+                count += 1
+            assert state["called"] is True
+            state["called"] = False
+
+        class TestAsyncMiddleware(AsyncMiddleware):
+            async def async_process(
+                self,
+                *,
+                req: AsyncBoltRequest,
+                resp: BoltResponse,
+                next: Callable[[], Awaitable[BoltResponse]],
+            ) -> Optional[BoltResponse]:
+                state["middleware_called"] = True
+                # Verify assistant utilities are available (set by _AsyncAssistantMiddleware before this)
+                assert req.context.get("set_status") is not None
+                assert req.context.get("set_title") is not None
+                assert req.context.get("set_suggested_prompts") is not None
+                assert req.context.get("get_thread_context") is not None
+                assert req.context.get("save_thread_context") is not None
+                return await next()
+
+        @assistant.thread_started(middleware=[TestAsyncMiddleware()])
+        async def start_thread(say: AsyncSay, set_suggested_prompts: AsyncSetSuggestedPrompts, context: AsyncBoltContext):
+            assert context.channel_id == "D111"
+            assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == context.thread_ts
+            await say("Hi, how can I help you today?")
+            await set_suggested_prompts(
+                prompts=[{"title": "What does SLACK stand for?", "message": "What does SLACK stand for?"}]
+            )
+            state["called"] = True
+
+        @assistant.user_message(middleware=[TestAsyncMiddleware()])
+        async def handle_user_message(say: AsyncSay, set_status: AsyncSetStatus, context: AsyncBoltContext):
+            assert context.channel_id == "D111"
+            assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == context.thread_ts
+            await set_status("is typing...")
+            await say("Here you are!")
+            state["called"] = True
+
+        app.assistant(assistant)
+
+        request = AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_target_called()
+        assert state["middleware_called"] is True
+        state["middleware_called"] = False
+
+        request = AsyncBoltRequest(body=user_message_event_body, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_target_called()
+        assert state["middleware_called"] is True
+
+    @pytest.mark.asyncio
+    async def test_assistant_custom_middleware_can_short_circuit(self):
+        app = AsyncApp(client=self.web_client)
+        assistant = AsyncAssistant()
+
+        state = {"handler_called": False}
+
+        class BlockingAsyncMiddleware(AsyncMiddleware):
+            async def async_process(
+                self,
+                *,
+                req: AsyncBoltRequest,
+                resp: BoltResponse,
+                next: Callable[[], Awaitable[BoltResponse]],
+            ) -> Optional[BoltResponse]:
+                # Intentionally not calling next() to short-circuit
+                return BoltResponse(status=200)
+
+        @assistant.thread_started(middleware=[BlockingAsyncMiddleware()])
+        async def start_thread(say: AsyncSay, context: AsyncBoltContext):
+            state["handler_called"] = True
+
+        app.assistant(assistant)
+
+        request = AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert state["handler_called"] is False
 
 
 def build_payload(event: dict) -> dict:

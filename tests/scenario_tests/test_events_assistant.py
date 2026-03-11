@@ -1,8 +1,12 @@
 from time import sleep
+from typing import Callable
 
 from slack_sdk.web import WebClient
 
 from slack_bolt import App, BoltRequest, Assistant, Say, SetSuggestedPrompts, SetStatus, BoltContext
+from slack_bolt.middleware import Middleware
+from slack_bolt.request import BoltRequest as BoltRequestType
+from slack_bolt.response import BoltResponse
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -44,6 +48,7 @@ class TestEventsAssistant:
         def start_thread(say: Say, set_suggested_prompts: SetSuggestedPrompts, context: BoltContext):
             assert context.channel_id == "D111"
             assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == context.thread_ts
             say("Hi, how can I help you today?")
             set_suggested_prompts(prompts=[{"title": "What does SLACK stand for?", "message": "What does SLACK stand for?"}])
             set_suggested_prompts(
@@ -61,6 +66,7 @@ class TestEventsAssistant:
         def handle_user_message(say: Say, set_status: SetStatus, context: BoltContext):
             assert context.channel_id == "D111"
             assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == context.thread_ts
             try:
                 set_status("is typing...")
                 say("Here you are!")
@@ -101,6 +107,86 @@ class TestEventsAssistant:
         request = BoltRequest(body=channel_message_changed_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 404
+
+    def test_assistant_threads_with_custom_listener_middleware(self):
+        app = App(client=self.web_client)
+        assistant = Assistant()
+
+        state = {"called": False, "middleware_called": False}
+
+        def assert_target_called():
+            count = 0
+            while state["called"] is False and count < 20:
+                sleep(0.1)
+                count += 1
+            assert state["called"] is True
+            state["called"] = False
+
+        class TestMiddleware(Middleware):
+            def process(self, *, req: BoltRequestType, resp: BoltResponse, next: Callable[[], BoltResponse]):
+                state["middleware_called"] = True
+                # Verify assistant utilities are available
+                assert req.context.get("set_status") is not None
+                assert req.context.get("set_title") is not None
+                assert req.context.get("set_suggested_prompts") is not None
+                assert req.context.get("get_thread_context") is not None
+                assert req.context.get("save_thread_context") is not None
+                return next()
+
+        @assistant.thread_started(middleware=[TestMiddleware()])
+        def start_thread(say: Say, set_suggested_prompts: SetSuggestedPrompts, context: BoltContext):
+            assert context.channel_id == "D111"
+            assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == context.thread_ts
+            say("Hi, how can I help you today?")
+            set_suggested_prompts(prompts=[{"title": "What does SLACK stand for?", "message": "What does SLACK stand for?"}])
+            state["called"] = True
+
+        @assistant.user_message(middleware=[TestMiddleware()])
+        def handle_user_message(say: Say, set_status: SetStatus, context: BoltContext):
+            assert context.channel_id == "D111"
+            assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == context.thread_ts
+            set_status("is typing...")
+            say("Here you are!")
+            state["called"] = True
+
+        app.assistant(assistant)
+
+        request = BoltRequest(body=thread_started_event_body, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_target_called()
+        assert state["middleware_called"] is True
+        state["middleware_called"] = False
+
+        request = BoltRequest(body=user_message_event_body, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_target_called()
+        assert state["middleware_called"] is True
+
+    def test_assistant_threads_custom_middleware_can_short_circuit(self):
+        app = App(client=self.web_client)
+        assistant = Assistant()
+
+        state = {"handler_called": False}
+
+        class BlockingMiddleware(Middleware):
+            def process(self, *, req: BoltRequestType, resp: BoltResponse, next: Callable[[], BoltResponse]):
+                # Intentionally not calling next() to short-circuit
+                return BoltResponse(status=200)
+
+        @assistant.thread_started(middleware=[BlockingMiddleware()])
+        def start_thread(say: Say, context: BoltContext):
+            state["handler_called"] = True
+
+        app.assistant(assistant)
+
+        request = BoltRequest(body=thread_started_event_body, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert state["handler_called"] is False
 
 
 def build_payload(event: dict) -> dict:
