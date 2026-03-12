@@ -107,30 +107,23 @@ slack_bolt/listener/async_listener.py              # async
 
 ### Prefer the Middleware Pattern
 
-Middleware is the project's preferred approach for cross-cutting concerns. Before adding logic to individual listeners or utility functions, consider whether it belongs in the middleware chain.
+Middleware is the project's preferred approach for cross-cutting concerns. Before adding logic to individual listeners or utility functions, consider whether it belongs as a built-in middleware in the framework.
 
-**When to use middleware:**
+**When to add built-in middleware:**
 
 - Cross-cutting concerns that apply to many or all requests (logging, metrics, observability)
 - Request validation, transformation, or enrichment
 - Authorization extensions beyond the built-in `SingleTeamAuthorization`/`MultiTeamsAuthorization`
 - Feature-level request handling (the `Assistant` middleware in `slack_bolt/middleware/assistant/assistant.py` is the canonical example -- it intercepts assistant thread events and dispatches them to registered sub-listeners)
 
-**How to implement middleware:**
+**How to add built-in middleware:**
 
 1. Subclass `Middleware` (sync) and implement `process(self, *, req, resp, next)`. Call `next()` to continue the chain.
 2. Subclass `AsyncMiddleware` (async) and implement `async_process(self, *, req, resp, next)`. Call `await next()` to continue.
 3. Export from `slack_bolt/middleware/__init__.py` (sync) and `slack_bolt/middleware/async_builtins.py` (async).
-4. Register via `App(middleware=[...])` or the `@app.middleware` decorator.
+4. Register the middleware in `App.__init__()` (`slack_bolt/app/app.py`) and `AsyncApp.__init__()` (`slack_bolt/app/async_app.py`) where the default middleware chain is assembled.
 
-**Simple example using the decorator:**
-
-```python
-@app.middleware
-def log_request(logger, body, next):
-    logger.debug(f"Incoming request: {body.get('type')}")
-    return next()
-```
+**Canonical example:** `AttachingFunctionToken` (`slack_bolt/middleware/attaching_function_token/`) is a good small middleware to follow -- it has a clean sync/async pair, a focused `process()` method, and is properly exported and registered in the app's middleware chain.
 
 ### Single Runtime Dependency Rule
 
