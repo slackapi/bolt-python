@@ -7,7 +7,7 @@ from slack_bolt.context.save_thread_context import SaveThreadContext
 from slack_bolt.context.assistant.thread_context_store.store import AssistantThreadContextStore
 from slack_bolt.listener_matcher.builtins import build_listener_matcher
 
-from slack_bolt.middleware.assistant.attaching_assistant_kwargs import AttachingAssistantKwargs
+from slack_bolt.middleware.attaching_agent_kwargs import AttachingAgentKwargs
 from slack_bolt.request.request import BoltRequest
 from slack_bolt.response.response import BoltResponse
 from slack_bolt.listener_matcher import CustomListenerMatcher
@@ -272,7 +272,7 @@ class Assistant(Middleware):
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
             middleware = middleware if middleware else []
-            middleware.insert(0, AttachingAssistantKwargs(self.thread_context_store))
+            middleware.insert(0, AttachingAgentKwargs(self.thread_context_store))
             functions = listener_or_functions
             ack_function = functions.pop(0)
 

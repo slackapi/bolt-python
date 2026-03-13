@@ -166,6 +166,80 @@ class TestEventsAssistant:
         assert_target_called()
         assert state["middleware_called"] is True
 
+    def test_assistant_events_without_assistant_middleware(self):
+        app = App(client=self.web_client)
+
+        state = {"called": False}
+
+        def assert_target_called():
+            count = 0
+            while state["called"] is False and count < 20:
+                sleep(0.1)
+                count += 1
+            assert state["called"] is True
+            state["called"] = False
+
+        @app.event("assistant_thread_started")
+        def start_thread(say: Say, set_suggested_prompts: SetSuggestedPrompts, set_status: SetStatus, context: BoltContext):
+            assert context.channel_id == "D111"
+            assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == context.thread_ts
+            assert set_status is not None
+            assert set_suggested_prompts is not None
+            assert context.get("set_title") is not None
+            assert context.get("get_thread_context") is not None
+            assert context.get("save_thread_context") is not None
+            say("Hi, how can I help you today?")
+            state["called"] = True
+
+        @app.event("message")
+        def handle_message(say: Say, context: BoltContext, body: dict):
+            if context.get("set_status") is not None:
+                assert say.thread_ts == context.thread_ts
+                state["called"] = True
+
+        request = BoltRequest(body=thread_started_event_body, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_target_called()
+
+        request = BoltRequest(body=user_message_event_body, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_target_called()
+
+        # Non-assistant events should not get kwargs injected
+        request = BoltRequest(body=channel_user_message_event_body, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+
+    def test_assistant_events_kwargs_disabled(self):
+        app = App(client=self.web_client, attaching_agent_kwargs_enabled=False)
+
+        state = {"called": False}
+
+        def assert_target_called():
+            count = 0
+            while state["called"] is False and count < 20:
+                sleep(0.1)
+                count += 1
+            assert state["called"] is True
+            state["called"] = False
+
+        @app.event("assistant_thread_started")
+        def start_thread(context: BoltContext):
+            assert context.get("set_status") is None
+            assert context.get("set_title") is None
+            assert context.get("set_suggested_prompts") is None
+            assert context.get("get_thread_context") is None
+            assert context.get("save_thread_context") is None
+            state["called"] = True
+
+        request = BoltRequest(body=thread_started_event_body, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_target_called()
+
     def test_assistant_threads_custom_middleware_can_short_circuit(self):
         app = App(client=self.web_client)
         assistant = Assistant()

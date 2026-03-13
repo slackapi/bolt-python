@@ -8,7 +8,7 @@ from slack_bolt.context.assistant.thread_context_store.async_store import AsyncA
 
 from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
 from slack_bolt.listener_matcher.builtins import build_listener_matcher
-from slack_bolt.middleware.assistant.async_attaching_assistant_kwargs import AsyncAttachingAssistantKwargs
+from slack_bolt.middleware.attaching_agent_kwargs.async_attaching_agent_kwargs import AsyncAttachingAgentKwargs
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_bolt.error import BoltError
@@ -301,7 +301,7 @@ class AsyncAssistant(AsyncMiddleware):
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
             middleware = middleware if middleware else []
-            middleware.insert(0, AsyncAttachingAssistantKwargs(self.thread_context_store))
+            middleware.insert(0, AsyncAttachingAgentKwargs(self.thread_context_store))
             functions = listener_or_functions
             ack_function = functions.pop(0)
 

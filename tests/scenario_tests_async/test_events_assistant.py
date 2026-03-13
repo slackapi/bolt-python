@@ -122,6 +122,87 @@ class TestAsyncEventsAssistant:
         assert response.status == 404
 
     @pytest.mark.asyncio
+    async def test_assistant_events_without_assistant_middleware(self):
+        app = AsyncApp(client=self.web_client)
+
+        state = {"called": False}
+
+        async def assert_target_called():
+            count = 0
+            while state["called"] is False and count < 20:
+                await asyncio.sleep(0.1)
+                count += 1
+            assert state["called"] is True
+            state["called"] = False
+
+        @app.event("assistant_thread_started")
+        async def start_thread(
+            say: AsyncSay,
+            set_suggested_prompts: AsyncSetSuggestedPrompts,
+            set_status: AsyncSetStatus,
+            context: AsyncBoltContext,
+        ):
+            assert context.channel_id == "D111"
+            assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == context.thread_ts
+            assert set_status is not None
+            assert set_suggested_prompts is not None
+            assert context.get("set_title") is not None
+            assert context.get("get_thread_context") is not None
+            assert context.get("save_thread_context") is not None
+            await say("Hi, how can I help you today?")
+            state["called"] = True
+
+        @app.event("message")
+        async def handle_message(say: AsyncSay, context: AsyncBoltContext):
+            if context.get("set_status") is not None:
+                assert say.thread_ts == context.thread_ts
+                state["called"] = True
+
+        request = AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_target_called()
+
+        request = AsyncBoltRequest(body=user_message_event_body, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_target_called()
+
+        # Non-assistant events should not get kwargs injected
+        request = AsyncBoltRequest(body=channel_user_message_event_body, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+
+    @pytest.mark.asyncio
+    async def test_assistant_events_kwargs_disabled(self):
+        app = AsyncApp(client=self.web_client, attaching_agent_kwargs_enabled=False)
+
+        state = {"called": False}
+
+        async def assert_target_called():
+            count = 0
+            while state["called"] is False and count < 20:
+                await asyncio.sleep(0.1)
+                count += 1
+            assert state["called"] is True
+            state["called"] = False
+
+        @app.event("assistant_thread_started")
+        async def start_thread(context: AsyncBoltContext):
+            assert context.get("set_status") is None
+            assert context.get("set_title") is None
+            assert context.get("set_suggested_prompts") is None
+            assert context.get("get_thread_context") is None
+            assert context.get("save_thread_context") is None
+            state["called"] = True
+
+        request = AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_target_called()
+
+    @pytest.mark.asyncio
     async def test_assistant_with_custom_listener_middleware(self):
         app = AsyncApp(client=self.web_client)
         assistant = AsyncAssistant()
