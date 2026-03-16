@@ -22,8 +22,7 @@ class TestUnmatchedPatternSuggestions:
             "block_id": "b",
             "action_id": "action-id-value",
         }
-        assert (
-            f"""Unhandled request ({filtered_body})
+        assert f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -31,9 +30,7 @@ class TestUnmatchedPatternSuggestions:
 async def handle_some_action(ack, body, logger):
     await ack()
     logger.info(body)
-"""
-            == message
-        )
+""" == message
 
     def test_attachment_actions(self):
         req: AsyncBoltRequest = AsyncBoltRequest(body=attachment_actions, mode="socket_mode")
@@ -49,8 +46,7 @@ async def handle_some_action(ack, body, logger):
                 }
             ],
         }
-        assert (
-            f"""Unhandled request ({filtered_body})
+        assert f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -58,9 +54,7 @@ async def handle_some_action(ack, body, logger):
 async def handle_some_action(ack, body, logger):
     await ack()
     logger.info(body)
-"""
-            == message
-        )
+""" == message
 
     def test_app_mention_event(self):
         req: AsyncBoltRequest = AsyncBoltRequest(body=app_mention_event, mode="socket_mode")
@@ -69,17 +63,14 @@ async def handle_some_action(ack, body, logger):
             "event": {"type": "app_mention"},
         }
         message = warning_unhandled_request(req)
-        assert (
-            f"""Unhandled request ({filtered_body})
+        assert f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
 @app.event("app_mention")
 async def handle_app_mention_events(body, logger):
     logger.info(body)
-"""
-            == message
-        )
+""" == message
 
     def test_function_event(self):
         req: AsyncBoltRequest = AsyncBoltRequest(body=function_event, mode="socket_mode")
@@ -88,8 +79,7 @@ async def handle_app_mention_events(body, logger):
             "event": {"type": "function_executed"},
         }
         message = warning_unhandled_request(req)
-        assert (
-            f"""Unhandled request ({filtered_body})
+        assert f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -104,9 +94,7 @@ async def handle_some_function(ack, body, complete, fail, logger):
     except Exception as e:
         error = f"Failed to handle a function request (error: {{e}})"
         await fail(error=error)
-"""
-            == message
-        )
+""" == message
 
     def test_commands(self):
         req: AsyncBoltRequest = AsyncBoltRequest(body=slash_command, mode="socket_mode")
@@ -115,8 +103,7 @@ async def handle_some_function(ack, body, complete, fail, logger):
             "type": None,
             "command": "/start-conv",
         }
-        assert (
-            f"""Unhandled request ({filtered_body})
+        assert f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -124,9 +111,7 @@ async def handle_some_function(ack, body, complete, fail, logger):
 async def handle_some_command(ack, body, logger):
     await ack()
     logger.info(body)
-"""
-            == message
-        )
+""" == message
 
     def test_shortcut(self):
         req: AsyncBoltRequest = AsyncBoltRequest(body=global_shortcut, mode="socket_mode")
@@ -135,8 +120,7 @@ async def handle_some_command(ack, body, logger):
             "type": "shortcut",
             "callback_id": "test-shortcut",
         }
-        assert (
-            f"""Unhandled request ({filtered_body})
+        assert f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -144,9 +128,7 @@ async def handle_some_command(ack, body, logger):
 async def handle_shortcuts(ack, body, logger):
     await ack()
     logger.info(body)
-"""
-            == message
-        )
+""" == message
 
         req: AsyncBoltRequest = AsyncBoltRequest(body=message_shortcut, mode="socket_mode")
         message = warning_unhandled_request(req)
@@ -154,8 +136,7 @@ async def handle_shortcuts(ack, body, logger):
             "type": "message_action",
             "callback_id": "test-shortcut",
         }
-        assert (
-            f"""Unhandled request ({filtered_body})
+        assert f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -163,9 +144,7 @@ async def handle_shortcuts(ack, body, logger):
 async def handle_shortcuts(ack, body, logger):
     await ack()
     logger.info(body)
-"""
-            == message
-        )
+""" == message
 
     def test_view(self):
         req: AsyncBoltRequest = AsyncBoltRequest(body=view_submission, mode="socket_mode")
@@ -174,8 +153,7 @@ async def handle_shortcuts(ack, body, logger):
             "type": "view_submission",
             "view": {"type": "modal", "callback_id": "view-id"},
         }
-        assert (
-            f"""Unhandled request ({filtered_body})
+        assert f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -183,9 +161,7 @@ async def handle_shortcuts(ack, body, logger):
 async def handle_view_submission_events(ack, body, logger):
     await ack()
     logger.info(body)
-"""
-            == message
-        )
+""" == message
 
         req: AsyncBoltRequest = AsyncBoltRequest(body=view_closed, mode="socket_mode")
         message = warning_unhandled_request(req)
@@ -193,8 +169,7 @@ async def handle_view_submission_events(ack, body, logger):
             "type": "view_closed",
             "view": {"type": "modal", "callback_id": "view-id"},
         }
-        assert (
-            f"""Unhandled request ({filtered_body})
+        assert f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -202,9 +177,7 @@ async def handle_view_submission_events(ack, body, logger):
 async def handle_view_closed_events(ack, body, logger):
     await ack()
     logger.info(body)
-"""
-            == message
-        )
+""" == message
 
     def test_block_suggestion(self):
         req: AsyncBoltRequest = AsyncBoltRequest(body=block_suggestion, mode="socket_mode")
@@ -216,17 +189,14 @@ async def handle_view_closed_events(ack, body, logger):
             "action_id": "the-id",
             "value": "search word",
         }
-        assert (
-            f"""Unhandled request ({filtered_body})
+        assert f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
 @app.options("the-id")
 async def handle_some_options(ack):
     await ack(options=[ ... ])
-"""
-            == message
-        )
+""" == message
 
     def test_dialog_suggestion(self):
         req: AsyncBoltRequest = AsyncBoltRequest(body=dialog_suggestion, mode="socket_mode")
@@ -236,17 +206,14 @@ async def handle_some_options(ack):
             "callback_id": "the-id",
             "value": "search keyword",
         }
-        assert (
-            f"""Unhandled request ({filtered_body})
+        assert f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
 @app.options({{"type": "dialog_suggestion", "callback_id": "the-id"}})
 async def handle_some_options(ack):
     await ack(options=[ ... ])
-"""
-            == message
-        )
+""" == message
 
     def test_step(self):
         req: AsyncBoltRequest = AsyncBoltRequest(body=step_edit_payload, mode="socket_mode")
@@ -255,8 +222,7 @@ async def handle_some_options(ack):
             "type": "workflow_step_edit",
             "callback_id": "copy_review",
         }
-        assert (
-            f"""Unhandled request ({filtered_body})
+        assert f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -269,17 +235,14 @@ ws = AsyncWorkflowStep(
 )
 # Pass Step to set up listeners
 app.step(ws)
-"""
-            == message
-        )
+""" == message
         req: AsyncBoltRequest = AsyncBoltRequest(body=step_save_payload, mode="socket_mode")
         message = warning_unhandled_request(req)
         filtered_body = {
             "type": "view_submission",
             "view": {"type": "workflow_step", "callback_id": "copy_review"},
         }
-        assert (
-            f"""Unhandled request ({filtered_body})
+        assert f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -292,17 +255,14 @@ ws = AsyncWorkflowStep(
 )
 # Pass Step to set up listeners
 app.step(ws)
-"""
-            == message
-        )
+""" == message
         req: AsyncBoltRequest = AsyncBoltRequest(body=step_execute_payload, mode="socket_mode")
         message = warning_unhandled_request(req)
         filtered_body = {
             "type": "event_callback",
             "event": {"type": "workflow_step_execute"},
         }
-        assert (
-            f"""Unhandled request ({filtered_body})
+        assert f"""Unhandled request ({filtered_body})
 ---
 [Suggestion] You can handle this type of event with the following listener function:
 
@@ -315,9 +275,7 @@ ws = AsyncWorkflowStep(
 )
 # Pass Step to set up listeners
 app.step(ws)
-"""
-            == message
-        )
+""" == message
 
 
 block_actions = {
