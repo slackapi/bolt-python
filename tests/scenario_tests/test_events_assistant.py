@@ -10,11 +10,11 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-def assert_target_called(called: dict, timeout: float = 2.0):
+def assert_target_called(called: dict, expected: bool = True, timeout: float = 0.5):
     deadline = time.time() + timeout
-    while called["value"] is False and time.time() < deadline:
+    while called["value"] is not expected and time.time() < deadline:
         time.sleep(0.1)
-    assert called["value"] is True
+    assert called["value"] is expected
 
 
 class TestEventsAssistant:
@@ -91,7 +91,7 @@ class TestEventsAssistant:
                 say("Here you are!")
                 called["value"] = True
             except Exception as e:
-                say(f"Oops, something went wrong (error: {e}")
+                say(f"Oops, something went wrong (error: {e})")
 
         app.assistant(assistant)
 
@@ -115,7 +115,7 @@ class TestEventsAssistant:
                 say("Here you are!")
                 called["value"] = True
             except Exception as e:
-                say(f"Oops, something went wrong (error: {e}")
+                say(f"Oops, something went wrong (error: {e})")
 
         app.assistant(assistant)
 
@@ -127,56 +127,63 @@ class TestEventsAssistant:
     def test_message_changed(self):
         app = App(client=self.web_client)
         assistant = Assistant()
+        called = {"value": False}
 
         @assistant.user_message
         def handle_user_message():
-            assert False, "This handler should not be called"
+            called["value"] = True
 
         @assistant.bot_message
         def handle_bot_message():
-            assert False, "This handler should not be called"
+            called["value"] = True
 
         app.assistant(assistant)
 
         request = BoltRequest(body=message_changed_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
+        assert_target_called(called, key="user_message", expected=False)
+        assert_target_called(called, key="bot_message", expected=False)
 
     def test_channel_user_message_ignored(self):
         app = App(client=self.web_client)
         assistant = Assistant()
+        called = {"value": False}
 
         @assistant.user_message
         def handle_user_message():
-            assert False, "This handler should not be called"
+            called["value"] = True
 
         @assistant.bot_message
         def handle_bot_message():
-            assert False, "This handler should not be called"
+            called["value"] = True
 
         app.assistant(assistant)
 
         request = BoltRequest(body=channel_user_message_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 404
+        assert_target_called(called, expected=False)
 
     def test_channel_message_changed_ignored(self):
         app = App(client=self.web_client)
         assistant = Assistant()
+        called = {"value": False}
 
         @assistant.user_message
         def handle_user_message():
-            assert False, "This handler should not be called"
+            called["value"] = True
 
         @assistant.bot_message
         def handle_bot_message():
-            assert False, "This handler should not be called"
+            called["value"] = True
 
         app.assistant(assistant)
 
         request = BoltRequest(body=channel_message_changed_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 404
+        assert_target_called(called, expected=False)
 
 
 def build_payload(event: dict) -> dict:

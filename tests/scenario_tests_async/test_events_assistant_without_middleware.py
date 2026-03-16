@@ -1,6 +1,3 @@
-import asyncio
-import time
-
 import pytest
 from slack_sdk.web.async_client import AsyncWebClient
 
@@ -26,14 +23,8 @@ from tests.scenario_tests_async.test_events_assistant import (
     user_message_event_body,
     user_message_event_body_with_assistant_thread,
 )
+from tests.scenario_tests_async.test_events_assistant import assert_target_called
 from tests.utils import remove_os_env_temporarily, restore_os_env
-
-
-async def assert_target_called(called: dict, timeout: float = 2.0):
-    deadline = time.time() + timeout
-    while called["value"] is False and time.time() < deadline:
-        await asyncio.sleep(0.1)
-    assert called["value"] is True
 
 
 class TestAsyncEventsAssistantWithoutMiddleware:
@@ -106,7 +97,7 @@ class TestAsyncEventsAssistantWithoutMiddleware:
         ):
             assert context.channel_id == "D111"
             assert context.thread_ts == "1726133698.626339"
-            assert say is not None
+            assert say.thread_ts == context.thread_ts
             assert set_status is not None
             assert set_title is not None
             assert set_suggested_prompts is not None
@@ -137,6 +128,7 @@ class TestAsyncEventsAssistantWithoutMiddleware:
             assert context.channel_id == "D111"
             assert context.thread_ts == "1726133698.626339"
             assert say.thread_ts == context.thread_ts
+            assert set_status is not None
             assert set_title is not None
             assert set_suggested_prompts is not None
             assert get_thread_context is not None
@@ -146,7 +138,7 @@ class TestAsyncEventsAssistantWithoutMiddleware:
                 await say("Here you are!")
                 called["value"] = True
             except Exception as e:
-                await say(f"Oops, something went wrong (error: {e}")
+                await say(f"Oops, something went wrong (error: {e})")
 
         request = AsyncBoltRequest(body=user_message_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
@@ -171,6 +163,7 @@ class TestAsyncEventsAssistantWithoutMiddleware:
             assert context.channel_id == "D111"
             assert context.thread_ts == "1726133698.626339"
             assert say.thread_ts == context.thread_ts
+            assert set_status is not None
             assert set_title is not None
             assert set_suggested_prompts is not None
             assert get_thread_context is not None
@@ -180,7 +173,7 @@ class TestAsyncEventsAssistantWithoutMiddleware:
                 await say("Here you are!")
                 called["value"] = True
             except Exception as e:
-                await say(f"Oops, something went wrong (error: {e}")
+                await say(f"Oops, something went wrong (error: {e})")
 
         request = AsyncBoltRequest(body=user_message_event_body_with_assistant_thread, mode="socket_mode")
         response = await app.async_dispatch(request)
@@ -190,6 +183,7 @@ class TestAsyncEventsAssistantWithoutMiddleware:
     @pytest.mark.asyncio
     async def test_message_changed(self):
         app = AsyncApp(client=self.web_client)
+        called = {"value": False}
 
         @app.event("message")
         async def handle_message_event(
@@ -208,14 +202,17 @@ class TestAsyncEventsAssistantWithoutMiddleware:
             assert set_suggested_prompts is not None
             assert get_thread_context is not None
             assert save_thread_context is not None
+            called["value"] = True
 
         request = AsyncBoltRequest(body=message_changed_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
+        await assert_target_called(called)
 
     @pytest.mark.asyncio
     async def test_channel_user_message(self):
         app = AsyncApp(client=self.web_client)
+        called = {"value": False}
 
         @app.event("message")
         async def handle_message_event(
@@ -234,14 +231,17 @@ class TestAsyncEventsAssistantWithoutMiddleware:
             assert set_suggested_prompts is not None
             assert get_thread_context is not None
             assert save_thread_context is not None
+            called["value"] = True
 
         request = AsyncBoltRequest(body=channel_user_message_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
+        await assert_target_called(called)
 
     @pytest.mark.asyncio
     async def test_channel_message_changed(self):
         app = AsyncApp(client=self.web_client)
+        called = {"value": False}
 
         @app.event("message")
         async def handle_message_event(
@@ -260,7 +260,9 @@ class TestAsyncEventsAssistantWithoutMiddleware:
             assert set_suggested_prompts is not None
             assert get_thread_context is not None
             assert save_thread_context is not None
+            called["value"] = True
 
         request = AsyncBoltRequest(body=channel_message_changed_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
+        await assert_target_called(called)

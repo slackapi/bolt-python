@@ -1,5 +1,3 @@
-import time
-
 from slack_sdk.web import WebClient
 
 from slack_bolt import App, BoltRequest, Say, SetStatus, SetTitle, SaveThreadContext, BoltContext
@@ -18,14 +16,8 @@ from tests.scenario_tests.test_events_assistant import (
     user_message_event_body,
     user_message_event_body_with_assistant_thread,
 )
+from tests.scenario_tests.test_events_assistant import assert_target_called
 from tests.utils import remove_os_env_temporarily, restore_os_env
-
-
-def assert_target_called(called: dict, timeout: float = 2.0):
-    deadline = time.time() + timeout
-    while called["value"] is False and time.time() < deadline:
-        time.sleep(0.1)
-    assert called["value"] is True
 
 
 class TestEventsAssistantWithoutMiddleware:
@@ -91,7 +83,7 @@ class TestEventsAssistantWithoutMiddleware:
         ):
             assert context.channel_id == "D111"
             assert context.thread_ts == "1726133698.626339"
-            assert say is not None
+            assert say.thread_ts == context.thread_ts
             assert set_status is not None
             assert set_title is not None
             assert set_suggested_prompts is not None
@@ -121,6 +113,7 @@ class TestEventsAssistantWithoutMiddleware:
             assert context.channel_id == "D111"
             assert context.thread_ts == "1726133698.626339"
             assert say.thread_ts == context.thread_ts
+            assert set_status is not None
             assert set_title is not None
             assert set_suggested_prompts is not None
             assert get_thread_context is not None
@@ -130,7 +123,7 @@ class TestEventsAssistantWithoutMiddleware:
                 say("Here you are!")
                 called["value"] = True
             except Exception as e:
-                say(f"Oops, something went wrong (error: {e}")
+                say(f"Oops, something went wrong (error: {e})")
 
         request = BoltRequest(body=user_message_event_body, mode="socket_mode")
         response = app.dispatch(request)
@@ -154,6 +147,7 @@ class TestEventsAssistantWithoutMiddleware:
             assert context.channel_id == "D111"
             assert context.thread_ts == "1726133698.626339"
             assert say.thread_ts == context.thread_ts
+            assert set_status is not None
             assert set_title is not None
             assert set_suggested_prompts is not None
             assert get_thread_context is not None
@@ -163,7 +157,7 @@ class TestEventsAssistantWithoutMiddleware:
                 say("Here you are!")
                 called["value"] = True
             except Exception as e:
-                say(f"Oops, something went wrong (error: {e}")
+                say(f"Oops, something went wrong (error: {e})")
 
         request = BoltRequest(body=user_message_event_body_with_assistant_thread, mode="socket_mode")
         response = app.dispatch(request)
@@ -172,6 +166,7 @@ class TestEventsAssistantWithoutMiddleware:
 
     def test_message_changed(self):
         app = App(client=self.web_client)
+        called = {"value": False}
 
         @app.event("message")
         def handle_message_event(
@@ -190,13 +185,16 @@ class TestEventsAssistantWithoutMiddleware:
             assert set_suggested_prompts is not None
             assert get_thread_context is not None
             assert save_thread_context is not None
+            called["value"] = True
 
         request = BoltRequest(body=message_changed_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
+        assert_target_called(called)
 
     def test_channel_user_message(self):
         app = App(client=self.web_client)
+        called = {"value": False}
 
         @app.event("message")
         def handle_message_event(
@@ -215,13 +213,16 @@ class TestEventsAssistantWithoutMiddleware:
             assert set_suggested_prompts is not None
             assert get_thread_context is not None
             assert save_thread_context is not None
+            called["value"] = True
 
         request = BoltRequest(body=channel_user_message_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
+        assert_target_called(called)
 
     def test_channel_message_changed(self):
         app = App(client=self.web_client)
+        called = {"value": False}
 
         @app.event("message")
         def handle_message_event(
@@ -240,7 +241,9 @@ class TestEventsAssistantWithoutMiddleware:
             assert set_suggested_prompts is not None
             assert get_thread_context is not None
             assert save_thread_context is not None
+            called["value"] = True
 
         request = BoltRequest(body=channel_message_changed_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
+        assert_target_called(called)

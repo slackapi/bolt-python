@@ -18,11 +18,11 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-async def assert_target_called(called: dict, timeout: float = 2.0):
+async def assert_target_called(called: dict, expected: bool = True, timeout: float = 0.5):
     deadline = time.time() + timeout
-    while called["value"] is False and time.time() < deadline:
+    while called["value"] is not expected and time.time() < deadline:
         await asyncio.sleep(0.1)
-    assert called["value"] is True
+    assert called["value"] is expected
 
 
 class TestAsyncEventsAssistant:
@@ -51,9 +51,15 @@ class TestAsyncEventsAssistant:
         called = {"value": False}
 
         @assistant.thread_started
-        async def start_thread(say: AsyncSay, set_suggested_prompts: AsyncSetSuggestedPrompts, context: AsyncBoltContext):
+        async def start_thread(
+            say: AsyncSay,
+            set_suggested_prompts: AsyncSetSuggestedPrompts,
+            set_status: AsyncSetStatus,
+            context: AsyncBoltContext,
+        ):
             assert context.channel_id == "D111"
             assert context.thread_ts == "1726133698.626339"
+            assert set_status.thread_ts == context.thread_ts
             assert say.thread_ts == context.thread_ts
             await say("Hi, how can I help you today?")
             await set_suggested_prompts(
@@ -107,7 +113,7 @@ class TestAsyncEventsAssistant:
                 await say("Here you are!")
                 called["value"] = True
             except Exception as e:
-                await say(f"Oops, something went wrong (error: {e}")
+                await say(f"Oops, something went wrong (error: {e})")
 
         app.assistant(assistant)
 
@@ -132,7 +138,7 @@ class TestAsyncEventsAssistant:
                 await say("Here you are!")
                 called["value"] = True
             except Exception as e:
-                await say(f"Oops, something went wrong (error: {e}")
+                await say(f"Oops, something went wrong (error: {e})")
 
         app.assistant(assistant)
 
@@ -145,58 +151,64 @@ class TestAsyncEventsAssistant:
     async def test_message_changed(self):
         app = AsyncApp(client=self.web_client)
         assistant = AsyncAssistant()
+        called = {"value": False}
 
         @assistant.user_message
         async def handle_user_message():
-            assert False, "This handler should not be called"
+            called["value"] = True
 
         @assistant.bot_message
         async def handle_bot_message():
-            assert False, "This handler should not be called"
+            called["value"] = True
 
         app.assistant(assistant)
 
         request = AsyncBoltRequest(body=message_changed_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
+        await assert_target_called(called, expected=False)
 
     @pytest.mark.asyncio
     async def test_channel_user_message_ignored(self):
         app = AsyncApp(client=self.web_client)
         assistant = AsyncAssistant()
+        called = {"value": False}
 
         @assistant.user_message
         async def handle_user_message():
-            assert False, "This handler should not be called"
+            called["value"] = True
 
         @assistant.bot_message
         async def handle_bot_message():
-            assert False, "This handler should not be called"
+            called["value"] = True
 
         app.assistant(assistant)
 
         request = AsyncBoltRequest(body=channel_user_message_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 404
+        await assert_target_called(called, expected=False)
 
     @pytest.mark.asyncio
     async def test_channel_message_changed_ignored(self):
         app = AsyncApp(client=self.web_client)
         assistant = AsyncAssistant()
+        called = {"value": False}
 
         @assistant.user_message
         async def handle_user_message():
-            assert False, "This handler should not be called"
+            called["value"] = True
 
         @assistant.bot_message
         async def handle_bot_message():
-            assert False, "This handler should not be called"
+            called["value"] = True
 
         app.assistant(assistant)
 
         request = AsyncBoltRequest(body=channel_message_changed_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 404
+        await assert_target_called(called, expected=False)
 
 
 def build_payload(event: dict) -> dict:
