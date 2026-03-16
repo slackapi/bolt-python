@@ -1401,7 +1401,7 @@ class App:
         # For AI Agents & Assistants
         if is_assistant_event(req.body):
             assistant = AssistantUtilities(
-                payload=to_event(req.body),  # type:ignore[arg-type]
+                payload=to_event(req.body),  # type: ignore[arg-type]
                 context=req.context,
                 thread_context_store=self._assistant_thread_context_store,
             )
@@ -1457,7 +1457,7 @@ class App:
             CustomListener(
                 app_name=self.name,
                 ack_function=functions.pop(0),
-                lazy_functions=functions,  # type:ignore[arg-type]
+                lazy_functions=functions,  # type: ignore[arg-type]
                 matchers=listener_matchers,
                 middleware=listener_middleware,
                 auto_acknowledgement=auto_acknowledgement,
