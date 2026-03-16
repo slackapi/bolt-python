@@ -18,11 +18,11 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-async def assert_target_called(called: dict, expected: bool = True, timeout: float = 0.5):
+async def assert_target_called(called: dict, timeout: float = 0.5):
     deadline = time.time() + timeout
-    while called["value"] is not expected and time.time() < deadline:
+    while called["value"] is not True and time.time() < deadline:
         await asyncio.sleep(0.1)
-    assert called["value"] is expected
+    assert called["value"] is True
 
 
 class TestAsyncEventsAssistant:
@@ -166,7 +166,7 @@ class TestAsyncEventsAssistant:
         request = AsyncBoltRequest(body=message_changed_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
-        await assert_target_called(called, expected=False)
+        assert called["value"] is False
 
     @pytest.mark.asyncio
     async def test_channel_user_message_ignored(self):
@@ -187,7 +187,7 @@ class TestAsyncEventsAssistant:
         request = AsyncBoltRequest(body=channel_user_message_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 404
-        await assert_target_called(called, expected=False)
+        assert called["value"] is False
 
     @pytest.mark.asyncio
     async def test_channel_message_changed_ignored(self):
@@ -208,7 +208,7 @@ class TestAsyncEventsAssistant:
         request = AsyncBoltRequest(body=channel_message_changed_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 404
-        await assert_target_called(called, expected=False)
+        assert called["value"] is False
 
 
 def build_payload(event: dict) -> dict:

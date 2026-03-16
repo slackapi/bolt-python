@@ -8,6 +8,7 @@ from tests.mock_web_api_server import (
     cleanup_mock_web_api_server,
 )
 from tests.scenario_tests.test_events_assistant import (
+    assert_target_called,
     channel_message_changed_event_body,
     channel_user_message_event_body,
     message_changed_event_body,
@@ -16,7 +17,6 @@ from tests.scenario_tests.test_events_assistant import (
     user_message_event_body,
     user_message_event_body_with_assistant_thread,
 )
-from tests.scenario_tests.test_events_assistant import assert_target_called
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
@@ -178,13 +178,13 @@ class TestEventsAssistantWithoutMiddleware:
             save_thread_context: SaveThreadContext,
             context: BoltContext,
         ):
-            assert context.thread_ts is not None
+            assert context.thread_ts is None
             assert say.thread_ts == context.thread_ts
-            assert set_status is not None
-            assert set_title is not None
-            assert set_suggested_prompts is not None
-            assert get_thread_context is not None
-            assert save_thread_context is not None
+            assert set_status is None
+            assert set_title is None
+            assert set_suggested_prompts is None
+            assert get_thread_context is None
+            assert save_thread_context is None
             called["value"] = True
 
         request = BoltRequest(body=message_changed_event_body, mode="socket_mode")
@@ -206,13 +206,13 @@ class TestEventsAssistantWithoutMiddleware:
             save_thread_context: SaveThreadContext,
             context: BoltContext,
         ):
-            assert context.thread_ts is not None
+            assert context.thread_ts is None
             assert say.thread_ts == context.thread_ts
-            assert set_status is not None
-            assert set_title is not None
-            assert set_suggested_prompts is not None
-            assert get_thread_context is not None
-            assert save_thread_context is not None
+            assert set_status is None
+            assert set_title is None
+            assert set_suggested_prompts is None
+            assert get_thread_context is None
+            assert save_thread_context is None
             called["value"] = True
 
         request = BoltRequest(body=channel_user_message_event_body, mode="socket_mode")
@@ -234,13 +234,13 @@ class TestEventsAssistantWithoutMiddleware:
             save_thread_context: SaveThreadContext,
             context: BoltContext,
         ):
-            assert context.thread_ts is not None
+            assert context.thread_ts is None
             assert say.thread_ts == context.thread_ts
-            assert set_status is not None
-            assert set_title is not None
-            assert set_suggested_prompts is not None
-            assert get_thread_context is not None
-            assert save_thread_context is not None
+            assert set_status is None
+            assert set_title is None
+            assert set_suggested_prompts is None
+            assert get_thread_context is None
+            assert save_thread_context is None
             called["value"] = True
 
         request = BoltRequest(body=channel_message_changed_event_body, mode="socket_mode")

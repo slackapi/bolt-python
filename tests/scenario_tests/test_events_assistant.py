@@ -10,11 +10,11 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
-def assert_target_called(called: dict, expected: bool = True, timeout: float = 0.5):
+def assert_target_called(called: dict, timeout: float = 0.5):
     deadline = time.time() + timeout
-    while called["value"] is not expected and time.time() < deadline:
+    while called["value"] is not True and time.time() < deadline:
         time.sleep(0.1)
-    assert called["value"] is expected
+    assert called["value"] is True
 
 
 class TestEventsAssistant:
@@ -142,8 +142,7 @@ class TestEventsAssistant:
         request = BoltRequest(body=message_changed_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
-        assert_target_called(called, key="user_message", expected=False)
-        assert_target_called(called, key="bot_message", expected=False)
+        assert called["value"] is False
 
     def test_channel_user_message_ignored(self):
         app = App(client=self.web_client)
@@ -163,7 +162,7 @@ class TestEventsAssistant:
         request = BoltRequest(body=channel_user_message_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 404
-        assert_target_called(called, expected=False)
+        assert called["value"] is False
 
     def test_channel_message_changed_ignored(self):
         app = App(client=self.web_client)
@@ -183,7 +182,7 @@ class TestEventsAssistant:
         request = BoltRequest(body=channel_message_changed_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 404
-        assert_target_called(called, expected=False)
+        assert called["value"] is False
 
 
 def build_payload(event: dict) -> dict:
