@@ -192,11 +192,17 @@ class TestEventsAssistant:
             say("Hi, how can I help you today?")
             state["called"] = True
 
-        @app.event("message")
-        def handle_message(say: Say, context: BoltContext, body: dict):
-            if context.get("set_status") is not None:
-                assert say.thread_ts == context.thread_ts
+        @app.message()
+        def handle_user_message(say: Say, set_status: SetStatus, context: BoltContext):
+            assert context.channel_id == "D111"
+            assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == context.thread_ts
+            try:
+                set_status("is typing...")
+                say("Here you are!")
                 state["called"] = True
+            except Exception as e:
+                say(f"Oops, something went wrong (error: {e}")
 
         request = BoltRequest(body=thread_started_event_body, mode="socket_mode")
         response = app.dispatch(request)

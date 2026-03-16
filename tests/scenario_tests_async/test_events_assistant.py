@@ -153,7 +153,7 @@ class TestAsyncEventsAssistant:
             await say("Hi, how can I help you today?")
             state["called"] = True
 
-        @app.event("message")
+        @app.message()
         async def handle_message(say: AsyncSay, context: AsyncBoltContext):
             if context.get("set_status") is not None:
                 assert say.thread_ts == context.thread_ts
