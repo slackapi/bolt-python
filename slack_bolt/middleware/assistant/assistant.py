@@ -242,7 +242,7 @@ class Assistant(Middleware):
                             if middleware_resp is not None:
                                 return middleware_resp
                             # The listener middleware didn't call next().
-                            # This means the listener is not for this incoming request.
+                            # Skip this listener and try the next one.
                             continue
                         if middleware_resp is not None:
                             resp = middleware_resp
