@@ -1,5 +1,5 @@
 import asyncio
-from typing import Callable, Awaitable, Optional
+import time
 
 import pytest
 from slack_sdk.web.async_client import AsyncWebClient
@@ -20,6 +20,13 @@ from tests.mock_web_api_server import (
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
+async def assert_target_called(called: dict, timeout: float = 0.5):
+    deadline = time.time() + timeout
+    while called["value"] is not True and time.time() < deadline:
+        await asyncio.sleep(0.1)
+    assert called["value"] is True
+
+
 class TestAsyncEventsAssistant:
     valid_token = "xoxb-valid"
     mock_api_server_base_url = "http://localhost:8888"
@@ -32,6 +39,7 @@ class TestAsyncEventsAssistant:
     def setup_teardown(self):
         old_os_env = remove_os_env_temporarily()
         setup_mock_web_api_server_async(self)
+
         try:
             yield  # run the test here
         finally:
@@ -39,25 +47,21 @@ class TestAsyncEventsAssistant:
             restore_os_env(old_os_env)
 
     @pytest.mark.asyncio
-    async def test_assistant_events(self):
+    async def test_thread_started(self):
         app = AsyncApp(client=self.web_client)
-
         assistant = AsyncAssistant()
-
-        state = {"called": False}
-
-        async def assert_target_called():
-            count = 0
-            while state["called"] is False and count < 20:
-                await asyncio.sleep(0.1)
-                count += 1
-            assert state["called"] is True
-            state["called"] = False
+        called = {"value": False}
 
         @assistant.thread_started
-        async def start_thread(say: AsyncSay, set_suggested_prompts: AsyncSetSuggestedPrompts, context: AsyncBoltContext):
+        async def start_thread(
+            say: AsyncSay,
+            set_suggested_prompts: AsyncSetSuggestedPrompts,
+            set_status: AsyncSetStatus,
+            context: AsyncBoltContext,
+        ):
             assert context.channel_id == "D111"
             assert context.thread_ts == "1726133698.626339"
+            assert set_status.thread_ts == context.thread_ts
             assert say.thread_ts == context.thread_ts
             await say("Hi, how can I help you today?")
             await set_suggested_prompts(
@@ -67,13 +71,39 @@ class TestAsyncEventsAssistant:
                 prompts=[{"title": "What does SLACK stand for?", "message": "What does SLACK stand for?"}],
                 title="foo",
             )
-            state["called"] = True
+            called["value"] = True
+
+        app.assistant(assistant)
+
+        request = AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_target_called(called)
+
+    @pytest.mark.asyncio
+    async def test_thread_context_changed(self):
+        app = AsyncApp(client=self.web_client)
+        assistant = AsyncAssistant()
+        called = {"value": False}
 
         @assistant.thread_context_changed
-        async def handle_user_message(context: AsyncBoltContext):
+        async def handle_thread_context_changed(context: AsyncBoltContext):
             assert context.channel_id == "D111"
             assert context.thread_ts == "1726133698.626339"
-            state["called"] = True
+            called["value"] = True
+
+        app.assistant(assistant)
+
+        request = AsyncBoltRequest(body=thread_context_changed_event_body, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_target_called(called)
+
+    @pytest.mark.asyncio
+    async def test_user_message(self):
+        app = AsyncApp(client=self.web_client)
+        assistant = AsyncAssistant()
+        called = {"value": False}
 
         @assistant.user_message
         async def handle_user_message(say: AsyncSay, set_status: AsyncSetStatus, context: AsyncBoltContext):
@@ -83,43 +113,104 @@ class TestAsyncEventsAssistant:
             try:
                 await set_status("is typing...")
                 await say("Here you are!")
-                state["called"] = True
+                called["value"] = True
             except Exception as e:
-                await say(f"Oops, something went wrong (error: {e}")
+                await say(f"Oops, something went wrong (error: {e})")
 
         app.assistant(assistant)
-
-        request = AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode")
-        response = await app.async_dispatch(request)
-        assert response.status == 200
-        await assert_target_called()
-
-        request = AsyncBoltRequest(body=thread_context_changed_event_body, mode="socket_mode")
-        response = await app.async_dispatch(request)
-        assert response.status == 200
-        await assert_target_called()
 
         request = AsyncBoltRequest(body=user_message_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
-        await assert_target_called()
+        await assert_target_called(called)
+
+    @pytest.mark.asyncio
+    async def test_user_message_with_assistant_thread(self):
+        app = AsyncApp(client=self.web_client)
+        assistant = AsyncAssistant()
+        called = {"value": False}
+
+        @assistant.user_message
+        async def handle_user_message(say: AsyncSay, set_status: AsyncSetStatus, context: AsyncBoltContext):
+            assert context.channel_id == "D111"
+            assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == context.thread_ts
+            try:
+                await set_status("is typing...")
+                await say("Here you are!")
+                called["value"] = True
+            except Exception as e:
+                await say(f"Oops, something went wrong (error: {e})")
+
+        app.assistant(assistant)
 
         request = AsyncBoltRequest(body=user_message_event_body_with_assistant_thread, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
-        await assert_target_called()
+        await assert_target_called(called)
+
+    @pytest.mark.asyncio
+    async def test_message_changed(self):
+        app = AsyncApp(client=self.web_client)
+        assistant = AsyncAssistant()
+        called = {"value": False}
+
+        @assistant.user_message
+        async def handle_user_message():
+            called["value"] = True
+
+        @assistant.bot_message
+        async def handle_bot_message():
+            called["value"] = True
+
+        app.assistant(assistant)
 
         request = AsyncBoltRequest(body=message_changed_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
+        assert called["value"] is False
+
+    @pytest.mark.asyncio
+    async def test_channel_user_message_ignored(self):
+        app = AsyncApp(client=self.web_client)
+        assistant = AsyncAssistant()
+        called = {"value": False}
+
+        @assistant.user_message
+        async def handle_user_message():
+            called["value"] = True
+
+        @assistant.bot_message
+        async def handle_bot_message():
+            called["value"] = True
+
+        app.assistant(assistant)
 
         request = AsyncBoltRequest(body=channel_user_message_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 404
+        assert called["value"] is False
+
+    @pytest.mark.asyncio
+    async def test_channel_message_changed_ignored(self):
+        app = AsyncApp(client=self.web_client)
+        assistant = AsyncAssistant()
+        called = {"value": False}
+
+        @assistant.user_message
+        async def handle_user_message():
+            called["value"] = True
+
+        @assistant.bot_message
+        async def handle_bot_message():
+            called["value"] = True
+
+        app.assistant(assistant)
 
         request = AsyncBoltRequest(body=channel_message_changed_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 404
+        assert called["value"] is False
 
     @pytest.mark.asyncio
     async def test_assistant_events_without_assistant_middleware(self):

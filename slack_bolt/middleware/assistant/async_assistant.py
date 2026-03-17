@@ -64,7 +64,7 @@ class AsyncAssistant(AsyncMiddleware):
                 func=is_assistant_thread_started_event,
                 asyncio=True,
                 base_logger=self.base_logger,
-            ),  # type:ignore[arg-type]
+            ),  # type: ignore[arg-type]
             matchers,
         )
         if is_used_without_argument(args):
@@ -73,7 +73,7 @@ class AsyncAssistant(AsyncMiddleware):
                 self.build_listener(
                     listener_or_functions=func,
                     matchers=all_matchers,
-                    middleware=middleware,  # type:ignore[arg-type]
+                    middleware=middleware,  # type: ignore[arg-type]
                 )
             )
             return func
@@ -110,7 +110,7 @@ class AsyncAssistant(AsyncMiddleware):
                 func=is_user_message_event_in_assistant_thread,
                 asyncio=True,
                 base_logger=self.base_logger,
-            ),  # type:ignore[arg-type]
+            ),  # type: ignore[arg-type]
             matchers,
         )
         if is_used_without_argument(args):
@@ -119,7 +119,7 @@ class AsyncAssistant(AsyncMiddleware):
                 self.build_listener(
                     listener_or_functions=func,
                     matchers=all_matchers,
-                    middleware=middleware,  # type:ignore[arg-type]
+                    middleware=middleware,  # type: ignore[arg-type]
                 )
             )
             return func
@@ -156,7 +156,7 @@ class AsyncAssistant(AsyncMiddleware):
                 func=is_bot_message_event_in_assistant_thread,
                 asyncio=True,
                 base_logger=self.base_logger,
-            ),  # type:ignore[arg-type]
+            ),  # type: ignore[arg-type]
             matchers,
         )
         if is_used_without_argument(args):
@@ -165,7 +165,7 @@ class AsyncAssistant(AsyncMiddleware):
                 self.build_listener(
                     listener_or_functions=func,
                     matchers=all_matchers,
-                    middleware=middleware,  # type:ignore[arg-type]
+                    middleware=middleware,  # type: ignore[arg-type]
                 )
             )
             return func
@@ -202,7 +202,7 @@ class AsyncAssistant(AsyncMiddleware):
                 func=is_assistant_thread_context_changed_event,
                 asyncio=True,
                 base_logger=self.base_logger,
-            ),  # type:ignore[arg-type]
+            ),  # type: ignore[arg-type]
             matchers,
         )
         if is_used_without_argument(args):
@@ -211,7 +211,7 @@ class AsyncAssistant(AsyncMiddleware):
                 self.build_listener(
                     listener_or_functions=func,
                     matchers=all_matchers,
-                    middleware=middleware,  # type:ignore[arg-type]
+                    middleware=middleware,  # type: ignore[arg-type]
                 )
             )
             return func
@@ -239,14 +239,14 @@ class AsyncAssistant(AsyncMiddleware):
         primary_matcher: Union[Callable[..., bool], AsyncListenerMatcher],
         custom_matchers: Optional[Union[Callable[..., bool], AsyncListenerMatcher]],
     ):
-        return [primary_matcher] + (custom_matchers or [])  # type:ignore[operator]
+        return [primary_matcher] + (custom_matchers or [])  # type: ignore[operator]
 
     @staticmethod
     async def default_thread_context_changed(save_thread_context: AsyncSaveThreadContext, payload: dict):
         new_context: dict = payload["assistant_thread"]["context"]
         await save_thread_context(new_context)
 
-    async def async_process(  # type:ignore[return]
+    async def async_process(  # type: ignore[return]
         self,
         *,
         req: AsyncBoltRequest,
@@ -294,8 +294,8 @@ class AsyncAssistant(AsyncMiddleware):
         middleware: Optional[List[AsyncMiddleware]] = None,
         base_logger: Optional[Logger] = None,
     ) -> AsyncListener:
-        if isinstance(listener_or_functions, Callable):  # type:ignore[arg-type]
-            listener_or_functions = [listener_or_functions]  # type:ignore[list-item]
+        if isinstance(listener_or_functions, Callable):  # type: ignore[arg-type]
+            listener_or_functions = [listener_or_functions]  # type: ignore[list-item]
 
         if isinstance(listener_or_functions, AsyncListener):
             return listener_or_functions
@@ -313,7 +313,7 @@ class AsyncAssistant(AsyncMiddleware):
                 else:
                     listener_matchers.append(
                         build_listener_matcher(
-                            func=matcher,  # type:ignore[arg-type]
+                            func=matcher,  # type: ignore[arg-type]
                             asyncio=True,
                             base_logger=base_logger,
                         )

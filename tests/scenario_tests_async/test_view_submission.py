@@ -15,7 +15,6 @@ from tests.mock_web_api_server import (
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
-
 body = {
     "type": "view_submission",
     "team": {

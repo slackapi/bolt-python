@@ -617,7 +617,7 @@ class AsyncApp:
                 self._framework_logger.debug(debug_checking_listener(listener_name))
                 if await listener.async_matches(req=req, resp=resp):  # type: ignore[arg-type]
                     # run all the middleware attached to this listener first
-                    (middleware_resp, next_was_not_called) = await listener.run_async_middleware(
+                    middleware_resp, next_was_not_called = await listener.run_async_middleware(
                         req=req, resp=resp  # type: ignore[arg-type]
                     )
                     if next_was_not_called:
@@ -1487,7 +1487,7 @@ class AsyncApp:
             AsyncCustomListener(
                 app_name=self.name,
                 ack_function=functions.pop(0),
-                lazy_functions=functions,  # type:ignore[arg-type]
+                lazy_functions=functions,  # type: ignore[arg-type]
                 matchers=listener_matchers,
                 middleware=listener_middleware,
                 auto_acknowledgement=auto_acknowledgement,
