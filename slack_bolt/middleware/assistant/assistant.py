@@ -7,6 +7,7 @@ from slack_bolt.context.save_thread_context import SaveThreadContext
 from slack_bolt.context.assistant.thread_context_store.store import AssistantThreadContextStore
 from slack_bolt.listener_matcher.builtins import build_listener_matcher
 
+from slack_bolt.middleware.attaching_agent_kwargs import AttachingAgentKwargs
 from slack_bolt.request.request import BoltRequest
 from slack_bolt.response.response import BoltResponse
 from slack_bolt.listener_matcher import CustomListenerMatcher
@@ -236,6 +237,15 @@ class Assistant(Middleware):
             if listeners is not None:
                 for listener in listeners:
                     if listener.matches(req=req, resp=resp):
+                        middleware_resp, next_was_not_called = listener.run_middleware(req=req, resp=resp)
+                        if next_was_not_called:
+                            if middleware_resp is not None:
+                                return middleware_resp
+                            # The listener middleware didn't call next().
+                            # Skip this listener and try the next one.
+                            continue
+                        if middleware_resp is not None:
+                            resp = middleware_resp
                         return listener_runner.run(
                             request=req,
                             response=resp,
@@ -262,6 +272,7 @@ class Assistant(Middleware):
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
             middleware = middleware if middleware else []
+            middleware.insert(0, AttachingAgentKwargs(self.thread_context_store))
             functions = listener_or_functions
             ack_function = functions.pop(0)
 

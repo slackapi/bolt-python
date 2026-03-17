@@ -17,6 +17,7 @@ from .request_verification import RequestVerification
 from .ssl_check import SslCheck
 from .url_verification import UrlVerification
 from .attaching_function_token import AttachingFunctionToken
+from .attaching_agent_kwargs import AttachingAgentKwargs
 
 builtin_middleware_classes = [
     SslCheck,
@@ -41,5 +42,6 @@ __all__ = [
     "SslCheck",
     "UrlVerification",
     "AttachingFunctionToken",
+    "AttachingAgentKwargs",
     "builtin_middleware_classes",
 ]

@@ -3,7 +3,6 @@ from typing import Optional, Dict, Union, Any, Sequence
 from urllib.parse import parse_qsl, parse_qs
 
 from slack_bolt.context import BoltContext
-from slack_bolt.request.payload_utils import is_assistant_event
 
 
 def parse_query(query: Optional[Union[str, Dict[str, str], Dict[str, Sequence[str]]]]) -> Dict[str, Sequence[str]]:
@@ -215,33 +214,17 @@ def extract_channel_id(payload: Dict[str, Any]) -> Optional[str]:
 
 
 def extract_thread_ts(payload: Dict[str, Any]) -> Optional[str]:
-    # This utility initially supports only the use cases for AI assistants, but it may be fine to add more patterns.
-    # That said, note that thread_ts is always required for assistant threads, but it's not for channels.
-    # Thus, blindly setting this thread_ts to say utility can break existing apps' behaviors.
-    #
-    # The BoltAgent class handles non-assistant thread_ts separately by reading from the event directly,
-    # allowing it to work correctly without affecting say() behavior.
-    if is_assistant_event(payload):
-        event = payload["event"]
-        if (
-            event.get("assistant_thread") is not None
-            and event["assistant_thread"].get("channel_id") is not None
-            and event["assistant_thread"].get("thread_ts") is not None
-        ):
-            # assistant_thread_started, assistant_thread_context_changed
-            # "assistant_thread" property can exist for message event without channel_id and thread_ts
-            # Thus, the above if check verifies these properties exist
-            return event["assistant_thread"]["thread_ts"]
-        elif event.get("channel") is not None:
-            if event.get("thread_ts") is not None:
-                # message in an assistant thread
-                return event["thread_ts"]
-            elif event.get("message", {}).get("thread_ts") is not None:
-                # message_changed
-                return event["message"]["thread_ts"]
-            elif event.get("previous_message", {}).get("thread_ts") is not None:
-                # message_deleted
-                return event["previous_message"]["thread_ts"]
+    thread_ts = payload.get("thread_ts")
+    if thread_ts is not None:
+        return thread_ts
+    if payload.get("event") is not None:
+        return extract_thread_ts(payload["event"])
+    if isinstance(payload.get("assistant_thread"), dict):
+        return extract_thread_ts(payload["assistant_thread"])
+    if isinstance(payload.get("message"), dict):
+        return extract_thread_ts(payload["message"])
+    if isinstance(payload.get("previous_message"), dict):
+        return extract_thread_ts(payload["previous_message"])
     return None
 
 

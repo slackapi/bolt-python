@@ -178,8 +178,8 @@ class TestEventsAssistantWithoutMiddleware:
             save_thread_context: SaveThreadContext,
             context: BoltContext,
         ):
-            assert context.thread_ts is None
-            assert say.thread_ts == context.thread_ts
+            assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == None
             assert set_status is None
             assert set_title is None
             assert set_suggested_prompts is None
@@ -206,8 +206,8 @@ class TestEventsAssistantWithoutMiddleware:
             save_thread_context: SaveThreadContext,
             context: BoltContext,
         ):
-            assert context.thread_ts is None
-            assert say.thread_ts == context.thread_ts
+            assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == None
             assert set_status is None
             assert set_title is None
             assert set_suggested_prompts is None
@@ -234,8 +234,8 @@ class TestEventsAssistantWithoutMiddleware:
             save_thread_context: SaveThreadContext,
             context: BoltContext,
         ):
-            assert context.thread_ts is None
-            assert say.thread_ts == context.thread_ts
+            assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == None
             assert set_status is None
             assert set_title is None
             assert set_suggested_prompts is None
@@ -244,6 +244,25 @@ class TestEventsAssistantWithoutMiddleware:
             called["value"] = True
 
         request = BoltRequest(body=channel_message_changed_event_body, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_target_called(called)
+
+    def test_assistant_events_agent_kwargs_disabled(self):
+        app = App(client=self.web_client, attaching_agent_kwargs_enabled=False)
+
+        called = {"value": False}
+
+        @app.event("assistant_thread_started")
+        def start_thread(context: BoltContext):
+            assert context.get("set_status") is None
+            assert context.get("set_title") is None
+            assert context.get("set_suggested_prompts") is None
+            assert context.get("get_thread_context") is None
+            assert context.get("save_thread_context") is None
+            called["value"] = True
+
+        request = BoltRequest(body=thread_started_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
         assert_target_called(called)

@@ -1,8 +1,13 @@
 import time
+from time import sleep
+from typing import Callable
 
 from slack_sdk.web import WebClient
 
 from slack_bolt import App, BoltRequest, Assistant, Say, SetSuggestedPrompts, SetStatus, BoltContext
+from slack_bolt.middleware import Middleware
+from slack_bolt.request import BoltRequest as BoltRequestType
+from slack_bolt.response import BoltResponse
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -183,6 +188,72 @@ class TestEventsAssistant:
         response = app.dispatch(request)
         assert response.status == 404
         assert called["value"] is False
+
+    def test_assistant_with_custom_listener_middleware(self):
+        app = App(client=self.web_client)
+        assistant = Assistant()
+        handler_called = {"value": False}
+        middleware_called = {"value": False}
+
+        class TestMiddleware(Middleware):
+            def process(self, *, req: BoltRequestType, resp: BoltResponse, next: Callable[[], BoltResponse]):
+                middleware_called["value"] = True
+                # Verify assistant utilities are available
+                assert req.context.get("set_status") is not None
+                assert req.context.get("set_title") is not None
+                assert req.context.get("set_suggested_prompts") is not None
+                assert req.context.get("get_thread_context") is not None
+                assert req.context.get("save_thread_context") is not None
+                return next()
+
+        @assistant.thread_started(middleware=[TestMiddleware()])
+        def start_thread():
+            handler_called["value"] = True
+
+        @assistant.user_message(middleware=[TestMiddleware()])
+        def handle_user_message():
+            handler_called["value"] = True
+
+        app.assistant(assistant)
+
+        request = BoltRequest(body=thread_started_event_body, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_target_called(handler_called)
+        assert_target_called(middleware_called)
+
+        handler_called = {"value": False}
+        middleware_called = {"value": False}
+
+        request = BoltRequest(body=user_message_event_body, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_target_called(handler_called)
+        assert_target_called(middleware_called)
+
+    def test_assistant_custom_middleware_can_short_circuit(self):
+        app = App(client=self.web_client)
+        assistant = Assistant()
+        handler_called = {"value": False}
+        middleware_called = {"value": False}
+
+        class BlockingMiddleware(Middleware):
+            def process(self, *, req: BoltRequestType, resp: BoltResponse, next: Callable[[], BoltResponse]):
+                middleware_called["value"] = True
+                # Intentionally not calling next() to short-circuit
+                return BoltResponse(status=200)
+
+        @assistant.thread_started(middleware=[BlockingMiddleware()])
+        def start_thread(say: Say, context: BoltContext):
+            handler_called["value"] = True
+
+        app.assistant(assistant)
+
+        request = BoltRequest(body=thread_started_event_body, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_target_called(middleware_called)
+        assert handler_called["value"] is False
 
 
 def build_payload(event: dict) -> dict:

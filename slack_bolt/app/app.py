@@ -22,7 +22,6 @@ from slack_bolt.authorization.authorize import (
 
 from slack_bolt.context.assistant.thread_context_store.store import AssistantThreadContextStore
 
-from slack_bolt.context.assistant.assistant_utilities import AssistantUtilities
 from slack_bolt.error import BoltError, BoltUnhandledRequestError
 from slack_bolt.lazy_listener.thread_runner import ThreadLazyListenerRunner
 from slack_bolt.listener.builtins import TokenRevocationListeners
@@ -70,6 +69,7 @@ from slack_bolt.middleware import (
     IgnoringSelfEvents,
     CustomMiddleware,
     AttachingFunctionToken,
+    AttachingAgentKwargs,
 )
 from slack_bolt.middleware.assistant import Assistant
 from slack_bolt.middleware.message_listener_matches import MessageListenerMatches
@@ -83,10 +83,6 @@ from slack_bolt.oauth import OAuthFlow
 from slack_bolt.oauth.internals import select_consistent_installation_store
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_bolt.request import BoltRequest
-from slack_bolt.request.payload_utils import (
-    is_assistant_event,
-    to_event,
-)
 from slack_bolt.response import BoltResponse
 from slack_bolt.util.utils import (
     create_web_client,
@@ -137,6 +133,7 @@ class App:
         listener_executor: Optional[Executor] = None,
         # for AI Agents & Assistants
         assistant_thread_context_store: Optional[AssistantThreadContextStore] = None,
+        attaching_agent_kwargs_enabled: bool = True,
     ):
         """Bolt App that provides functionalities to register middleware/listeners.
 
@@ -357,6 +354,7 @@ class App:
             listener_executor = ThreadPoolExecutor(max_workers=5)
 
         self._assistant_thread_context_store = assistant_thread_context_store
+        self._attaching_agent_kwargs_enabled = attaching_agent_kwargs_enabled
 
         self._process_before_response = process_before_response
         self._listener_runner = ThreadListenerRunner(
@@ -841,10 +839,13 @@ class App:
             middleware: A list of lister middleware functions.
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         """
+        middleware = list(middleware) if middleware else []
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.event(event, base_logger=self._base_logger)
+            if self._attaching_agent_kwargs_enabled:
+                middleware.insert(0, AttachingAgentKwargs(self._assistant_thread_context_store))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
         return __call__
@@ -902,6 +903,8 @@ class App:
             primary_matcher = builtin_matchers.message_event(
                 keyword=keyword, constraints=constraints, base_logger=self._base_logger
             )
+            if self._attaching_agent_kwargs_enabled:
+                middleware.insert(0, AttachingAgentKwargs(self._assistant_thread_context_store))
             middleware.insert(0, MessageListenerMatches(keyword))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
@@ -1397,20 +1400,6 @@ class App:
         # Most apps do not need this "listener_runner" instance.
         # It is intended for apps that start lazy listeners from their custom global middleware.
         req.context["listener_runner"] = self.listener_runner
-
-        # For AI Agents & Assistants
-        if is_assistant_event(req.body):
-            assistant = AssistantUtilities(
-                payload=to_event(req.body),  # type: ignore[arg-type]
-                context=req.context,
-                thread_context_store=self._assistant_thread_context_store,
-            )
-            req.context["say"] = assistant.say
-            req.context["set_status"] = assistant.set_status
-            req.context["set_title"] = assistant.set_title
-            req.context["set_suggested_prompts"] = assistant.set_suggested_prompts
-            req.context["get_thread_context"] = assistant.get_thread_context
-            req.context["save_thread_context"] = assistant.save_thread_context
 
     @staticmethod
     def _to_listener_functions(

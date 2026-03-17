@@ -8,7 +8,6 @@ import warnings
 from aiohttp import web
 
 from slack_bolt.app.async_server import AsyncSlackAppServer
-from slack_bolt.context.assistant.async_assistant_utilities import AsyncAssistantUtilities
 from slack_bolt.context.assistant.thread_context_store.async_store import (
     AsyncAssistantThreadContextStore,
 )
@@ -30,7 +29,6 @@ from slack_bolt.middleware.message_listener_matches.async_message_listener_match
     AsyncMessageListenerMatches,
 )
 from slack_bolt.oauth.async_internals import select_consistent_installation_store
-from slack_bolt.request.payload_utils import is_assistant_event, to_event
 from slack_bolt.util.utils import get_name_for_callable, is_callable_coroutine
 from slack_bolt.workflows.step.async_step import (
     AsyncWorkflowStep,
@@ -88,6 +86,7 @@ from slack_bolt.middleware.async_builtins import (
     AsyncIgnoringSelfEvents,
     AsyncUrlVerification,
     AsyncAttachingFunctionToken,
+    AsyncAttachingAgentKwargs,
 )
 from slack_bolt.middleware.async_custom_middleware import (
     AsyncMiddleware,
@@ -143,6 +142,7 @@ class AsyncApp:
         verification_token: Optional[str] = None,
         # for AI Agents & Assistants
         assistant_thread_context_store: Optional[AsyncAssistantThreadContextStore] = None,
+        attaching_agent_kwargs_enabled: bool = True,
     ):
         """Bolt App that provides functionalities to register middleware/listeners.
 
@@ -363,6 +363,7 @@ class AsyncApp:
         self._async_listeners: List[AsyncListener] = []
 
         self._assistant_thread_context_store = assistant_thread_context_store
+        self._attaching_agent_kwargs_enabled = attaching_agent_kwargs_enabled
 
         self._process_before_response = process_before_response
         self._async_listener_runner = AsyncioListenerRunner(
@@ -866,10 +867,13 @@ class AsyncApp:
             middleware: A list of lister middleware functions.
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         """
+        middleware = list(middleware) if middleware else []
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.event(event, True, base_logger=self._base_logger)
+            if self._attaching_agent_kwargs_enabled:
+                middleware.insert(0, AsyncAttachingAgentKwargs(self._assistant_thread_context_store))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
         return __call__
@@ -930,6 +934,8 @@ class AsyncApp:
                 asyncio=True,
                 base_logger=self._base_logger,
             )
+            if self._attaching_agent_kwargs_enabled:
+                middleware.insert(0, AsyncAttachingAgentKwargs(self._assistant_thread_context_store))
             middleware.insert(0, AsyncMessageListenerMatches(keyword))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
@@ -1430,20 +1436,6 @@ class AsyncApp:
         # Most apps do not need this "listener_runner" instance.
         # It is intended for apps that start lazy listeners from their custom global middleware.
         req.context["listener_runner"] = self.listener_runner
-
-        # For AI Agents & Assistants
-        if is_assistant_event(req.body):
-            assistant = AsyncAssistantUtilities(
-                payload=to_event(req.body),  # type: ignore[arg-type]
-                context=req.context,
-                thread_context_store=self._assistant_thread_context_store,
-            )
-            req.context["say"] = assistant.say
-            req.context["set_status"] = assistant.set_status
-            req.context["set_title"] = assistant.set_title
-            req.context["set_suggested_prompts"] = assistant.set_suggested_prompts
-            req.context["get_thread_context"] = assistant.get_thread_context
-            req.context["save_thread_context"] = assistant.save_thread_context
 
     @staticmethod
     def _to_listener_functions(

@@ -110,7 +110,7 @@ class AsyncBoltContext(BaseContext):
             Callable `say()` function
         """
         if "say" not in self:
-            self["say"] = AsyncSay(client=self.client, channel=self.channel_id, thread_ts=self.thread_ts)
+            self["say"] = AsyncSay(client=self.client, channel=self.channel_id)
         return self["say"]
 
     @property
