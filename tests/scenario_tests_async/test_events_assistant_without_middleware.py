@@ -195,8 +195,8 @@ class TestAsyncEventsAssistantWithoutMiddleware:
             save_thread_context: AsyncSaveThreadContext,
             context: AsyncBoltContext,
         ):
-            assert context.thread_ts is None
-            assert say.thread_ts == context.thread_ts
+            assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == None
             assert set_status is None
             assert set_title is None
             assert set_suggested_prompts is None
@@ -224,8 +224,8 @@ class TestAsyncEventsAssistantWithoutMiddleware:
             save_thread_context: AsyncSaveThreadContext,
             context: AsyncBoltContext,
         ):
-            assert context.thread_ts is None
-            assert say.thread_ts == context.thread_ts
+            assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == None
             assert set_status is None
             assert set_title is None
             assert set_suggested_prompts is None
@@ -253,8 +253,8 @@ class TestAsyncEventsAssistantWithoutMiddleware:
             save_thread_context: AsyncSaveThreadContext,
             context: AsyncBoltContext,
         ):
-            assert context.thread_ts is None
-            assert say.thread_ts == context.thread_ts
+            assert context.thread_ts == "1726133698.626339"
+            assert say.thread_ts == None
             assert set_status is None
             assert set_title is None
             assert set_suggested_prompts is None
@@ -263,6 +263,26 @@ class TestAsyncEventsAssistantWithoutMiddleware:
             called["value"] = True
 
         request = AsyncBoltRequest(body=channel_message_changed_event_body, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_target_called(called)
+
+    @pytest.mark.asyncio
+    async def test_assistant_events_agent_kwargs_disabled(self):
+        app = AsyncApp(client=self.web_client, attaching_agent_kwargs_enabled=False)
+
+        called = {"value": False}
+
+        @app.event("assistant_thread_started")
+        async def start_thread(context: AsyncBoltContext):
+            assert context.get("set_status") is None
+            assert context.get("set_title") is None
+            assert context.get("set_suggested_prompts") is None
+            assert context.get("get_thread_context") is None
+            assert context.get("save_thread_context") is None
+            called["value"] = True
+
+        request = AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_target_called(called)
