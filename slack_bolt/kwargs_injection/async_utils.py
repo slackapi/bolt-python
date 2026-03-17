@@ -60,6 +60,7 @@ def build_async_required_kwargs(
         "set_suggested_prompts": request.context.set_suggested_prompts,
         "get_thread_context": request.context.get_thread_context,
         "save_thread_context": request.context.save_thread_context,
+        "say_stream": request.context.say_stream,
         # middleware
         "next": next_func,
         "next_": next_func,  # for the middleware using Python's built-in `next()` function

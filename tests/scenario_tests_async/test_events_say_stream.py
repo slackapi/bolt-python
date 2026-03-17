@@ -1,5 +1,7 @@
 import asyncio
+import json
 import time
+from urllib.parse import quote
 
 import pytest
 from slack_sdk.web.async_client import AsyncWebClient
@@ -18,6 +20,7 @@ from tests.scenario_tests_async.test_app import app_mention_event_body
 from tests.scenario_tests_async.test_events_assistant import user_message_event_body as threaded_user_message_event_body
 from tests.scenario_tests_async.test_events_assistant import thread_started_event_body, user_message_event_body
 from tests.scenario_tests_async.test_message_bot import bot_message_event_payload, user_message_event_payload
+from tests.scenario_tests_async.test_view_submission import body as view_submission_body
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
@@ -176,6 +179,25 @@ class TestAsyncEventsSayStream:
         app.assistant(assistant)
 
         request = AsyncBoltRequest(body=user_message_event_body, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_target_called(called)
+
+    @pytest.mark.asyncio
+    async def test_say_stream_is_none_for_view_submission(self):
+        app = AsyncApp(client=self.web_client, request_verification_enabled=False)
+        called = {"value": False}
+
+        @app.view("view-id")
+        async def handle_view(ack, say_stream, context: AsyncBoltContext):
+            await ack()
+            assert say_stream is None
+            assert context.say_stream is None
+            called["value"] = True
+
+        request = AsyncBoltRequest(
+            body=f"payload={quote(json.dumps(view_submission_body))}",
+        )
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_target_called(called)

@@ -1,4 +1,6 @@
+import json
 import time
+from urllib.parse import quote
 
 import pytest
 from slack_sdk.web import WebClient
@@ -17,6 +19,7 @@ from tests.scenario_tests.test_events_assistant import (
     user_message_event_body as threaded_user_message_event_body,
 )
 from tests.scenario_tests.test_message_bot import bot_message_event_payload, user_message_event_payload
+from tests.scenario_tests.test_view_submission import body as view_submission_body
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
@@ -166,6 +169,24 @@ class TestEventsSayStream:
         app.assistant(assistant)
 
         request = BoltRequest(body=threaded_user_message_event_body, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert_target_called(called)
+
+    def test_say_stream_is_none_for_view_submission(self):
+        app = App(client=self.web_client, request_verification_enabled=False)
+        called = {"value": False}
+
+        @app.view("view-id")
+        def handle_view(ack, say_stream, context: BoltContext):
+            ack()
+            assert say_stream is None
+            assert context.say_stream is None
+            called["value"] = True
+
+        request = BoltRequest(
+            body=f"payload={quote(json.dumps(view_submission_body))}",
+        )
         response = app.dispatch(request)
         assert response.status == 200
         assert_target_called(called)
