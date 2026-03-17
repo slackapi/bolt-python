@@ -32,7 +32,6 @@ class SayStream:
     def __call__(
         self,
         *,
-        buffer_size: Optional[int] = None,
         channel: Optional[str] = None,
         thread_ts: Optional[str] = None,
         recipient_team_id: Optional[str] = None,
@@ -51,16 +50,6 @@ class SayStream:
             raise ValueError("say_stream without channel here is unsupported")
         if thread_ts is None:
             raise ValueError("say_stream without thread_ts here is unsupported")
-
-        if buffer_size:
-            return self.client.chat_stream(
-                buffer_size=buffer_size,
-                channel=channel,
-                thread_ts=thread_ts,
-                recipient_team_id=recipient_team_id or self.team_id,
-                recipient_user_id=recipient_user_id or self.user_id,
-                **kwargs,
-            )
 
         return self.client.chat_stream(
             channel=channel,
