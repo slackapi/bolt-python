@@ -10,6 +10,7 @@ from slack_bolt.context.respond.async_respond import AsyncRespond
 from slack_bolt.context.get_thread_context.async_get_thread_context import AsyncGetThreadContext
 from slack_bolt.context.save_thread_context.async_save_thread_context import AsyncSaveThreadContext
 from slack_bolt.context.say.async_say import AsyncSay
+from slack_bolt.context.say_stream.async_say_stream import AsyncSayStream
 from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
 from slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts import AsyncSetSuggestedPrompts
 from slack_bolt.context.set_title.async_set_title import AsyncSetTitle
@@ -104,6 +105,8 @@ class AsyncArgs:
     """`save_thread_context()` utility function for AI Agents & Assistants"""
     agent: Optional[AsyncBoltAgent]
     """`agent` listener argument for AI Agents & Assistants"""
+    say_stream: Optional[AsyncSayStream]
+    """`say_stream()` utility function for AI Agents & Assistants"""
     # middleware
     next: Callable[[], Awaitable[None]]
     """`next()` utility function, which tells the middleware chain that it can continue with the next one"""
@@ -138,6 +141,7 @@ class AsyncArgs:
         get_thread_context: Optional[AsyncGetThreadContext] = None,
         save_thread_context: Optional[AsyncSaveThreadContext] = None,
         agent: Optional[AsyncBoltAgent] = None,
+        say_stream: Optional[AsyncSayStream] = None,
         next: Callable[[], Awaitable[None]],
         **kwargs,  # noqa
     ):
@@ -169,6 +173,7 @@ class AsyncArgs:
         self.get_thread_context = get_thread_context
         self.save_thread_context = save_thread_context
         self.agent = agent
+        self.say_stream = say_stream
 
         self.next: Callable[[], Awaitable[None]] = next
         self.next_: Callable[[], Awaitable[None]] = next

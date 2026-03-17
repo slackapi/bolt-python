@@ -2,6 +2,7 @@ from typing import Optional, Callable, Awaitable
 
 from slack_bolt.context.assistant.async_assistant_utilities import AsyncAssistantUtilities
 from slack_bolt.context.assistant.thread_context_store.async_store import AsyncAssistantThreadContextStore
+from slack_bolt.context.say_stream.async_say_stream import AsyncSayStream
 from slack_bolt.middleware.async_middleware import AsyncMiddleware
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.request.payload_utils import is_assistant_event, to_event
@@ -36,4 +37,15 @@ class AsyncAttachingAgentKwargs(AsyncMiddleware):
                 req.context["set_suggested_prompts"] = assistant.set_suggested_prompts
                 req.context["get_thread_context"] = assistant.get_thread_context
                 req.context["save_thread_context"] = assistant.save_thread_context
+
+            # TODO: in the future we might want to introduce a "proper" extract_ts utility
+            thread_ts = req.context.thread_ts or event.get("ts")
+            if req.context.channel_id and thread_ts:
+                req.context["say_stream"] = AsyncSayStream(
+                    client=req.context.client,
+                    channel_id=req.context.channel_id,
+                    thread_ts=thread_ts,
+                    team_id=req.context.team_id,
+                    user_id=req.context.user_id,
+                )
         return await next()

@@ -10,6 +10,7 @@ from slack_bolt.context.get_thread_context.get_thread_context import GetThreadCo
 from slack_bolt.context.respond import Respond
 from slack_bolt.context.save_thread_context import SaveThreadContext
 from slack_bolt.context.say import Say
+from slack_bolt.context.say_stream import SayStream
 from slack_bolt.context.set_status import SetStatus
 from slack_bolt.context.set_suggested_prompts import SetSuggestedPrompts
 from slack_bolt.context.set_title import SetTitle
@@ -203,6 +204,10 @@ class BoltContext(BaseContext):
     @property
     def get_thread_context(self) -> Optional[GetThreadContext]:
         return self.get("get_thread_context")
+
+    @property
+    def say_stream(self) -> Optional[SayStream]:
+        return self.get("say_stream")
 
     @property
     def save_thread_context(self) -> Optional[SaveThreadContext]:
