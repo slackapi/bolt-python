@@ -37,9 +37,9 @@ class AttachingAgentKwargs(Middleware):
             if req.context.channel_id and thread_ts:
                 req.context["say_stream"] = SayStream(
                     client=req.context.client,
-                    channel_id=req.context.channel_id,
+                    channel=req.context.channel_id,
                     thread_ts=thread_ts,
-                    team_id=req.context.team_id,
-                    user_id=req.context.user_id,
+                    recipient_team_id=req.context.team_id,
+                    recipient_user_id=req.context.user_id,
                 )
         return next()

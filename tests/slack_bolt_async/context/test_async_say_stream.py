@@ -26,14 +26,14 @@ class TestAsyncSayStream:
 
     @pytest.mark.asyncio
     async def test_missing_channel_raises(self):
-        say_stream = AsyncSayStream(client=self.web_client, channel_id=None, thread_ts="111.222")
+        say_stream = AsyncSayStream(client=self.web_client, channel=None, thread_ts="111.222")
         with pytest.warns(ExperimentalWarning):
             with pytest.raises(ValueError, match="channel"):
                 await say_stream()
 
     @pytest.mark.asyncio
     async def test_missing_thread_ts_raises(self):
-        say_stream = AsyncSayStream(client=self.web_client, channel_id="C111", thread_ts=None)
+        say_stream = AsyncSayStream(client=self.web_client, channel="C111", thread_ts=None)
         with pytest.warns(ExperimentalWarning):
             with pytest.raises(ValueError, match="thread_ts"):
                 await say_stream()
@@ -42,10 +42,10 @@ class TestAsyncSayStream:
     async def test_default_params(self):
         say_stream = AsyncSayStream(
             client=self.web_client,
-            channel_id="C111",
+            channel="C111",
             thread_ts="111.222",
-            team_id="T111",
-            user_id="U111",
+            recipient_team_id="T111",
+            recipient_user_id="U111",
         )
         stream = await say_stream()
         assert stream._stream_args == {
@@ -60,10 +60,10 @@ class TestAsyncSayStream:
     async def test_parameter_overrides(self):
         say_stream = AsyncSayStream(
             client=self.web_client,
-            channel_id="C111",
+            channel="C111",
             thread_ts="111.222",
-            team_id="T111",
-            user_id="U111",
+            recipient_team_id="T111",
+            recipient_user_id="U111",
         )
         stream = await say_stream(channel="C222", thread_ts="333.444", recipient_team_id="T222", recipient_user_id="U222")
 
@@ -79,7 +79,7 @@ class TestAsyncSayStream:
     async def test_buffer_size_passthrough(self):
         say_stream = AsyncSayStream(
             client=self.web_client,
-            channel_id="C111",
+            channel="C111",
             thread_ts="111.222",
         )
         stream = await say_stream(buffer_size=100)
@@ -90,7 +90,7 @@ class TestAsyncSayStream:
     async def test_experimental_warning(self):
         say_stream = AsyncSayStream(
             client=self.web_client,
-            channel_id="C111",
+            channel="C111",
             thread_ts="111.222",
         )
         with pytest.warns(ExperimentalWarning, match="say_stream is experimental"):

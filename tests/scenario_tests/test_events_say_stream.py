@@ -54,10 +54,11 @@ class TestEventsSayStream:
         def handle_mention(say_stream: SayStream, context: BoltContext):
             assert say_stream is not None
             assert isinstance(say_stream, SayStream)
-            assert say_stream.channel_id == "C111"
+            assert say_stream == context.say_stream
+            assert say_stream.channel == "C111"
             assert say_stream.thread_ts == "1595926230.009600"
-            assert say_stream.team_id == context.team_id
-            assert say_stream.user_id == context.user_id
+            assert say_stream.recipient_team_id == context.team_id
+            assert say_stream.recipient_user_id == context.user_id
             called["value"] = True
 
         request = BoltRequest(body=app_mention_event_body, mode="socket_mode")
@@ -73,10 +74,11 @@ class TestEventsSayStream:
         def handle_message(say_stream: SayStream, context: BoltContext):
             assert say_stream is not None
             assert isinstance(say_stream, SayStream)
-            assert say_stream.channel_id == "D111"
+            assert say_stream == context.say_stream
+            assert say_stream.channel == "D111"
             assert say_stream.thread_ts == "1726133698.626339"
-            assert say_stream.team_id == context.team_id
-            assert say_stream.user_id == context.user_id
+            assert say_stream.recipient_team_id == context.team_id
+            assert say_stream.recipient_user_id == context.user_id
             called["value"] = True
 
         request = BoltRequest(body=threaded_user_message_event_body, mode="socket_mode")
@@ -92,7 +94,7 @@ class TestEventsSayStream:
         def handle_user_message(say_stream: SayStream):
             assert say_stream is not None
             assert isinstance(say_stream, SayStream)
-            assert say_stream.channel_id == "C111"
+            assert say_stream.channel == "C111"
             assert say_stream.thread_ts == "1610261659.001400"
             called["value"] = True
 
@@ -109,7 +111,7 @@ class TestEventsSayStream:
         def handle_bot_message(say_stream: SayStream):
             assert say_stream is not None
             assert isinstance(say_stream, SayStream)
-            assert say_stream.channel_id == "C111"
+            assert say_stream.channel == "C111"
             assert say_stream.thread_ts == "1610261539.000900"
             called["value"] = True
 
@@ -142,7 +144,7 @@ class TestEventsSayStream:
         def start_thread(say_stream: SayStream):
             assert say_stream is not None
             assert isinstance(say_stream, SayStream)
-            assert say_stream.channel_id == "D111"
+            assert say_stream.channel == "D111"
             assert say_stream.thread_ts == "1726133698.626339"
             called["value"] = True
 
@@ -162,7 +164,7 @@ class TestEventsSayStream:
         def handle_user_message(say_stream: SayStream):
             assert say_stream is not None
             assert isinstance(say_stream, SayStream)
-            assert say_stream.channel_id == "D111"
+            assert say_stream.channel == "D111"
             assert say_stream.thread_ts == "1726133698.626339"
             called["value"] = True
 

@@ -9,25 +9,25 @@ from slack_bolt.warning import ExperimentalWarning
 
 class AsyncSayStream:
     client: AsyncWebClient
-    channel_id: Optional[str]
+    channel: Optional[str]
     thread_ts: Optional[str]
-    team_id: Optional[str]
-    user_id: Optional[str]
+    recipient_team_id: Optional[str]
+    recipient_user_id: Optional[str]
 
     def __init__(
         self,
         *,
         client: AsyncWebClient,
-        channel_id: Optional[str] = None,
+        channel: Optional[str] = None,
         thread_ts: Optional[str] = None,
-        team_id: Optional[str] = None,
-        user_id: Optional[str] = None,
+        recipient_team_id: Optional[str] = None,
+        recipient_user_id: Optional[str] = None,
     ):
         self.client = client
-        self.channel_id = channel_id
+        self.channel = channel
         self.thread_ts = thread_ts
-        self.team_id = team_id
-        self.user_id = user_id
+        self.recipient_team_id = recipient_team_id
+        self.recipient_user_id = recipient_user_id
 
     async def __call__(
         self,
@@ -44,7 +44,7 @@ class AsyncSayStream:
             stacklevel=2,
         )
 
-        channel = channel or self.channel_id
+        channel = channel or self.channel
         thread_ts = thread_ts or self.thread_ts
         if channel is None:
             raise ValueError("say_stream without channel here is unsupported")
@@ -54,7 +54,7 @@ class AsyncSayStream:
         return await self.client.chat_stream(
             channel=channel,
             thread_ts=thread_ts,
-            recipient_team_id=recipient_team_id or self.team_id,
-            recipient_user_id=recipient_user_id or self.user_id,
+            recipient_team_id=recipient_team_id or self.recipient_team_id,
+            recipient_user_id=recipient_user_id or self.recipient_user_id,
             **kwargs,
         )
