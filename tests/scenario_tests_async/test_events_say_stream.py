@@ -70,6 +70,25 @@ class TestAsyncEventsSayStream:
         await assert_target_called(called)
 
     @pytest.mark.asyncio
+    async def test_say_stream_with_org_level_install(self):
+        app = AsyncApp(client=self.web_client)
+        called = {"value": False}
+
+        @app.event("app_mention")
+        async def handle_mention(say_stream: AsyncSayStream, context: AsyncBoltContext):
+            assert context.team_id is None
+            assert context.enterprise_id == "E111"
+            assert say_stream is not None
+            assert isinstance(say_stream, AsyncSayStream)
+            assert say_stream.recipient_team_id == "E111"
+            called["value"] = True
+
+        request = AsyncBoltRequest(body=org_app_mention_event_body, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await assert_target_called(called)
+
+    @pytest.mark.asyncio
     async def test_say_stream_injected_for_threaded_message(self):
         app = AsyncApp(client=self.web_client)
         called = {"value": False}
@@ -198,3 +217,34 @@ class TestAsyncEventsSayStream:
         response = await app.async_dispatch(request)
         assert response.status == 200
         await assert_target_called(called)
+
+
+org_app_mention_event_body = {
+    "token": "verification_token",
+    "team_id": "T111",
+    "enterprise_id": "E111",
+    "api_app_id": "A111",
+    "event": {
+        "client_msg_id": "9cbd4c5b-7ddf-4ede-b479-ad21fca66d63",
+        "type": "app_mention",
+        "text": "<@W111> Hi there!",
+        "user": "W222",
+        "ts": "1595926230.009600",
+        "team": "T111",
+        "channel": "C111",
+        "event_ts": "1595926230.009600",
+    },
+    "type": "event_callback",
+    "event_id": "Ev111",
+    "event_time": 1595926230,
+    "authorizations": [
+        {
+            "enterprise_id": "E111",
+            "team_id": None,
+            "user_id": "W111",
+            "is_bot": True,
+            "is_enterprise_install": True,
+        }
+    ],
+    "is_ext_shared_channel": False,
+}
