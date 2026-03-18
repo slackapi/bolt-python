@@ -7,6 +7,8 @@ from tests.mock_web_api_server import cleanup_mock_web_api_server, setup_mock_we
 
 
 class TestSayStream:
+    default_chat_stream_buffer_size = WebClient.chat_stream.__kwdefaults__["buffer_size"]
+
     def setup_method(self):
         setup_mock_web_api_server(self)
         valid_token = "xoxb-valid"
@@ -38,6 +40,7 @@ class TestSayStream:
         )
         stream = say_stream()
 
+        assert stream._buffer_size == self.default_chat_stream_buffer_size
         assert stream._stream_args == {
             "channel": "C111",
             "thread_ts": "111.222",
@@ -56,6 +59,7 @@ class TestSayStream:
         )
         stream = say_stream(channel="C222", thread_ts="333.444", recipient_team_id="T222", recipient_user_id="U222")
 
+        assert stream._buffer_size == self.default_chat_stream_buffer_size
         assert stream._stream_args == {
             "channel": "C222",
             "thread_ts": "333.444",
@@ -64,15 +68,30 @@ class TestSayStream:
             "task_display_mode": None,
         }
 
-    def test_buffer_size_passthrough(self):
+    def test_buffer_size_overrides(self):
         say_stream = SayStream(
             client=self.web_client,
             channel="C111",
             thread_ts="111.222",
+            recipient_team_id="T111",
+            recipient_user_id="U111",
         )
-        stream = say_stream(buffer_size=100)
+        stream = say_stream(
+            buffer_size=100,
+            channel="C222",
+            thread_ts="333.444",
+            recipient_team_id="T222",
+            recipient_user_id="U222",
+        )
 
         assert stream._buffer_size == 100
+        assert stream._stream_args == {
+            "channel": "C222",
+            "thread_ts": "333.444",
+            "recipient_team_id": "T222",
+            "recipient_user_id": "U222",
+            "task_display_mode": None,
+        }
 
     def test_experimental_warning(self):
         say_stream = SayStream(

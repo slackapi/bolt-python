@@ -11,6 +11,8 @@ from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
 class TestAsyncSayStream:
+    default_chat_stream_buffer_size = AsyncWebClient.chat_stream.__kwdefaults__["buffer_size"]
+
     @pytest.fixture(scope="function", autouse=True)
     def setup_teardown(self):
         old_os_env = remove_os_env_temporarily()
@@ -48,6 +50,8 @@ class TestAsyncSayStream:
             recipient_user_id="U111",
         )
         stream = await say_stream()
+
+        assert stream._buffer_size == self.default_chat_stream_buffer_size
         assert stream._stream_args == {
             "channel": "C111",
             "thread_ts": "111.222",
@@ -67,6 +71,7 @@ class TestAsyncSayStream:
         )
         stream = await say_stream(channel="C222", thread_ts="333.444", recipient_team_id="T222", recipient_user_id="U222")
 
+        assert stream._buffer_size == self.default_chat_stream_buffer_size
         assert stream._stream_args == {
             "channel": "C222",
             "thread_ts": "333.444",
@@ -76,15 +81,30 @@ class TestAsyncSayStream:
         }
 
     @pytest.mark.asyncio
-    async def test_buffer_size_passthrough(self):
+    async def test_buffer_size_overrides(self):
         say_stream = AsyncSayStream(
             client=self.web_client,
             channel="C111",
             thread_ts="111.222",
+            recipient_team_id="T111",
+            recipient_user_id="U111",
         )
-        stream = await say_stream(buffer_size=100)
+        stream = await say_stream(
+            buffer_size=100,
+            channel="C222",
+            thread_ts="333.444",
+            recipient_team_id="T222",
+            recipient_user_id="U222",
+        )
 
         assert stream._buffer_size == 100
+        assert stream._stream_args == {
+            "channel": "C222",
+            "thread_ts": "333.444",
+            "recipient_team_id": "T222",
+            "recipient_user_id": "U222",
+            "task_display_mode": None,
+        }
 
     @pytest.mark.asyncio
     async def test_experimental_warning(self):

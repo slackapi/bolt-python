@@ -32,10 +32,11 @@ class SayStream:
     def __call__(
         self,
         *,
+        buffer_size: Optional[int] = None,
         channel: Optional[str] = None,
-        thread_ts: Optional[str] = None,
         recipient_team_id: Optional[str] = None,
         recipient_user_id: Optional[str] = None,
+        thread_ts: Optional[str] = None,
         **kwargs,
     ) -> ChatStream:
         warnings.warn(
@@ -51,6 +52,15 @@ class SayStream:
         if thread_ts is None:
             raise ValueError("say_stream without thread_ts here is unsupported")
 
+        if buffer_size is not None:
+            return self.client.chat_stream(
+                channel=channel,
+                thread_ts=thread_ts,
+                buffer_size=buffer_size,
+                recipient_team_id=recipient_team_id or self.recipient_team_id,
+                recipient_user_id=recipient_user_id or self.recipient_user_id,
+                **kwargs,
+            )
         return self.client.chat_stream(
             channel=channel,
             thread_ts=thread_ts,
