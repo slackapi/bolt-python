@@ -106,7 +106,7 @@ class TestEventsSayStream:
         called = {"value": False}
 
         @app.message("")
-        def handle_user_message(say_stream: SayStream):
+        def handle_bot_message(say_stream: SayStream):
             assert say_stream is not None
             assert isinstance(say_stream, SayStream)
             assert say_stream.channel_id == "C111"
