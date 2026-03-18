@@ -45,9 +45,9 @@ class TestAsyncSayStream:
         say_stream = AsyncSayStream(
             client=self.web_client,
             channel="C111",
-            thread_ts="111.222",
             recipient_team_id="T111",
             recipient_user_id="U111",
+            thread_ts="111.222",
         )
         stream = await say_stream()
 
@@ -65,9 +65,9 @@ class TestAsyncSayStream:
         say_stream = AsyncSayStream(
             client=self.web_client,
             channel="C111",
-            thread_ts="111.222",
             recipient_team_id="T111",
             recipient_user_id="U111",
+            thread_ts="111.222",
         )
         stream = await say_stream(channel="C222", thread_ts="333.444", recipient_team_id="T222", recipient_user_id="U222")
 
@@ -85,9 +85,9 @@ class TestAsyncSayStream:
         say_stream = AsyncSayStream(
             client=self.web_client,
             channel="C111",
-            thread_ts="111.222",
             recipient_team_id="T111",
             recipient_user_id="U111",
+            thread_ts="111.222",
         )
         stream = await say_stream(
             buffer_size=100,

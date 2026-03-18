@@ -10,24 +10,24 @@ from slack_bolt.warning import ExperimentalWarning
 class SayStream:
     client: WebClient
     channel: Optional[str]
-    thread_ts: Optional[str]
     recipient_team_id: Optional[str]
     recipient_user_id: Optional[str]
+    thread_ts: Optional[str]
 
     def __init__(
         self,
         *,
         client: WebClient,
         channel: Optional[str] = None,
-        thread_ts: Optional[str] = None,
         recipient_team_id: Optional[str] = None,
         recipient_user_id: Optional[str] = None,
+        thread_ts: Optional[str] = None,
     ):
         self.client = client
         self.channel = channel
-        self.thread_ts = thread_ts
         self.recipient_team_id = recipient_team_id
         self.recipient_user_id = recipient_user_id
+        self.thread_ts = thread_ts
 
     def __call__(
         self,
@@ -54,17 +54,17 @@ class SayStream:
 
         if buffer_size is not None:
             return self.client.chat_stream(
-                channel=channel,
-                thread_ts=thread_ts,
                 buffer_size=buffer_size,
+                channel=channel,
                 recipient_team_id=recipient_team_id or self.recipient_team_id,
                 recipient_user_id=recipient_user_id or self.recipient_user_id,
+                thread_ts=thread_ts,
                 **kwargs,
             )
         return self.client.chat_stream(
             channel=channel,
-            thread_ts=thread_ts,
             recipient_team_id=recipient_team_id or self.recipient_team_id,
             recipient_user_id=recipient_user_id or self.recipient_user_id,
+            thread_ts=thread_ts,
             **kwargs,
         )

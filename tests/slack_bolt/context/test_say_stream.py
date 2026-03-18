@@ -34,9 +34,9 @@ class TestSayStream:
         say_stream = SayStream(
             client=self.web_client,
             channel="C111",
-            thread_ts="111.222",
             recipient_team_id="T111",
             recipient_user_id="U111",
+            thread_ts="111.222",
         )
         stream = say_stream()
 
@@ -53,9 +53,9 @@ class TestSayStream:
         say_stream = SayStream(
             client=self.web_client,
             channel="C111",
-            thread_ts="111.222",
             recipient_team_id="T111",
             recipient_user_id="U111",
+            thread_ts="111.222",
         )
         stream = say_stream(channel="C222", thread_ts="333.444", recipient_team_id="T222", recipient_user_id="U222")
 
@@ -72,9 +72,9 @@ class TestSayStream:
         say_stream = SayStream(
             client=self.web_client,
             channel="C111",
-            thread_ts="111.222",
             recipient_team_id="T111",
             recipient_user_id="U111",
+            thread_ts="111.222",
         )
         stream = say_stream(
             buffer_size=100,
