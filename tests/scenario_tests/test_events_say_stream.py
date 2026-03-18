@@ -2,13 +2,11 @@ import json
 import time
 from urllib.parse import quote
 
-import pytest
 from slack_sdk.web import WebClient
 
 from slack_bolt import App, BoltRequest, BoltContext
 from slack_bolt.context.say_stream.say_stream import SayStream
 from slack_bolt.middleware.assistant import Assistant
-from slack_bolt.warning import ExperimentalWarning
 from tests.mock_web_api_server import (
     setup_mock_web_api_server,
     cleanup_mock_web_api_server,
@@ -91,11 +89,14 @@ class TestEventsSayStream:
         called = {"value": False}
 
         @app.message("")
-        def handle_user_message(say_stream: SayStream):
+        def handle_user_message(say_stream: SayStream, context: BoltContext):
             assert say_stream is not None
             assert isinstance(say_stream, SayStream)
+            assert say_stream == context.say_stream
             assert say_stream.channel == "C111"
             assert say_stream.thread_ts == "1610261659.001400"
+            assert say_stream.recipient_team_id == context.team_id
+            assert say_stream.recipient_user_id == context.user_id
             called["value"] = True
 
         request = BoltRequest(body=user_message_event_payload, mode="socket_mode")
@@ -108,29 +109,17 @@ class TestEventsSayStream:
         called = {"value": False}
 
         @app.message("")
-        def handle_bot_message(say_stream: SayStream):
+        def handle_bot_message(say_stream: SayStream, context: BoltContext):
             assert say_stream is not None
             assert isinstance(say_stream, SayStream)
+            assert say_stream == context.say_stream
             assert say_stream.channel == "C111"
             assert say_stream.thread_ts == "1610261539.000900"
+            assert say_stream.recipient_team_id == context.team_id
+            assert say_stream.recipient_user_id == context.user_id
             called["value"] = True
 
         request = BoltRequest(body=bot_message_event_payload, mode="socket_mode")
-        response = app.dispatch(request)
-        assert response.status == 200
-        assert_target_called(called)
-
-    def test_say_stream_kwarg_emits_experimental_warning(self):
-        app = App(client=self.web_client)
-        called = {"value": False}
-
-        @app.event("app_mention")
-        def handle_mention(say_stream: SayStream):
-            with pytest.warns(ExperimentalWarning, match="say_stream is experimental"):
-                say_stream()
-            called["value"] = True
-
-        request = BoltRequest(body=app_mention_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
         assert_target_called(called)
@@ -141,11 +130,14 @@ class TestEventsSayStream:
         called = {"value": False}
 
         @assistant.thread_started
-        def start_thread(say_stream: SayStream):
+        def start_thread(say_stream: SayStream, context: BoltContext):
             assert say_stream is not None
             assert isinstance(say_stream, SayStream)
+            assert say_stream == context.say_stream
             assert say_stream.channel == "D111"
             assert say_stream.thread_ts == "1726133698.626339"
+            assert say_stream.recipient_team_id == context.team_id
+            assert say_stream.recipient_user_id == context.user_id
             called["value"] = True
 
         app.assistant(assistant)
@@ -161,11 +153,14 @@ class TestEventsSayStream:
         called = {"value": False}
 
         @assistant.user_message
-        def handle_user_message(say_stream: SayStream):
+        def handle_user_message(say_stream: SayStream, context: BoltContext):
             assert say_stream is not None
             assert isinstance(say_stream, SayStream)
+            assert say_stream == context.say_stream
             assert say_stream.channel == "D111"
             assert say_stream.thread_ts == "1726133698.626339"
+            assert say_stream.recipient_team_id == context.team_id
+            assert say_stream.recipient_user_id == context.user_id
             called["value"] = True
 
         app.assistant(assistant)
