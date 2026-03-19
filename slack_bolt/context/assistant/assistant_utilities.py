@@ -1,3 +1,4 @@
+import warnings
 from typing import Optional
 
 from slack_sdk.web import WebClient
@@ -51,6 +52,13 @@ class AssistantUtilities:
 
     @property
     def set_status(self) -> SetStatus:
+        warnings.warn(
+            "AssistantUtilities.set_status is deprecated. "
+            "Use the set_status argument directly in your listener function "
+            "or access it via context.set_status instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return SetStatus(self.client, self.channel_id, self.thread_ts)
 
     @property
