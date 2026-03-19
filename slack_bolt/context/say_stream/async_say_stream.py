@@ -39,6 +39,10 @@ class AsyncSayStream:
         thread_ts: Optional[str] = None,
         **kwargs,
     ) -> AsyncChatStream:
+        """Starts a new chat stream with context.
+
+        Warning: This is an experimental feature and may change in future versions.
+        """
         warnings.warn(
             "say_stream is experimental and may change in future versions.",
             category=ExperimentalWarning,
