@@ -180,7 +180,7 @@ class TestEventsAssistantWithoutMiddleware:
         ):
             assert context.thread_ts == "1726133698.626339"
             assert say.thread_ts == None
-            assert set_status is None
+            assert set_status is not None
             assert set_title is None
             assert set_suggested_prompts is None
             assert get_thread_context is None
@@ -208,7 +208,7 @@ class TestEventsAssistantWithoutMiddleware:
         ):
             assert context.thread_ts == "1726133698.626339"
             assert say.thread_ts == None
-            assert set_status is None
+            assert set_status is not None
             assert set_title is None
             assert set_suggested_prompts is None
             assert get_thread_context is None
@@ -236,7 +236,7 @@ class TestEventsAssistantWithoutMiddleware:
         ):
             assert context.thread_ts == "1726133698.626339"
             assert say.thread_ts == None
-            assert set_status is None
+            assert set_status is not None
             assert set_title is None
             assert set_suggested_prompts is None
             assert get_thread_context is None

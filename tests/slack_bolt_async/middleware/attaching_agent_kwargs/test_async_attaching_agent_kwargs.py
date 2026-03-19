@@ -15,7 +15,7 @@ async def next():
     return BoltResponse(status=200)
 
 
-AGENT_KWARGS = ("say", "set_status", "set_title", "set_suggested_prompts", "get_thread_context", "save_thread_context")
+ASSISTANT_KWARGS = ("say", "set_title", "set_suggested_prompts", "get_thread_context", "save_thread_context")
 
 
 class TestAsyncAttachingAgentKwargs:
@@ -28,9 +28,11 @@ class TestAsyncAttachingAgentKwargs:
         resp = await middleware.async_process(req=req, resp=BoltResponse(status=404), next=next)
 
         assert resp.status == 200
-        for key in AGENT_KWARGS:
+        for key in ASSISTANT_KWARGS:
             assert key in req.context, f"{key} should be set on context"
         assert req.context["say"].thread_ts == "1726133698.626339"
+        assert "say_stream" in req.context
+        assert "set_status" in req.context
 
     @pytest.mark.asyncio
     async def test_user_message_event_attaches_kwargs(self):
@@ -41,9 +43,11 @@ class TestAsyncAttachingAgentKwargs:
         resp = await middleware.async_process(req=req, resp=BoltResponse(status=404), next=next)
 
         assert resp.status == 200
-        for key in AGENT_KWARGS:
+        for key in ASSISTANT_KWARGS:
             assert key in req.context, f"{key} should be set on context"
         assert req.context["say"].thread_ts == "1726133698.626339"
+        assert "say_stream" in req.context
+        assert "set_status" in req.context
 
     @pytest.mark.asyncio
     async def test_non_assistant_event_does_not_attach_kwargs(self):
@@ -54,8 +58,10 @@ class TestAsyncAttachingAgentKwargs:
         resp = await middleware.async_process(req=req, resp=BoltResponse(status=404), next=next)
 
         assert resp.status == 200
-        for key in AGENT_KWARGS:
+        for key in ASSISTANT_KWARGS:
             assert key not in req.context, f"{key} should not be set on context"
+        assert "say_stream" in req.context
+        assert "set_status" in req.context
 
     @pytest.mark.asyncio
     async def test_non_event_does_not_attach_kwargs(self):
@@ -65,5 +71,7 @@ class TestAsyncAttachingAgentKwargs:
         resp = await middleware.async_process(req=req, resp=BoltResponse(status=404), next=next)
 
         assert resp.status == 200
-        for key in AGENT_KWARGS:
+        for key in ASSISTANT_KWARGS:
             assert key not in req.context, f"{key} should not be set on context"
+        assert "say_stream" not in req.context
+        assert "set_status" not in req.context
