@@ -1,3 +1,4 @@
+import warnings
 from typing import Optional
 
 from slack_sdk.web.async_client import AsyncWebClient
@@ -54,6 +55,13 @@ class AsyncAssistantUtilities:
 
     @property
     def set_status(self) -> AsyncSetStatus:
+        warnings.warn(
+            "AsyncAssistantUtilities.set_status is deprecated. "
+            "Use the set_status argument directly in your listener function "
+            "or access it via context.set_status instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return AsyncSetStatus(self.client, self.channel_id, self.thread_ts)
 
     @property
