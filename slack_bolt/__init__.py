@@ -14,6 +14,7 @@ from .context.complete import Complete
 from .context.fail import Fail
 from .context.respond import Respond
 from .context.say import Say
+from .context.say_stream import SayStream
 from .kwargs_injection import Args
 from .listener import Listener
 from .listener_matcher import CustomListenerMatcher
@@ -42,6 +43,7 @@ __all__ = [
     "Fail",
     "Respond",
     "Say",
+    "SayStream",
     "Args",
     "Listener",
     "CustomListenerMatcher",
