@@ -94,7 +94,7 @@ class TestFastAPI:
         client = TestClient(api)
         response = client.post(
             "/slack/events",
-            data=body,
+            content=body,
             headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
@@ -138,7 +138,7 @@ class TestFastAPI:
         client = TestClient(api)
         response = client.post(
             "/slack/events",
-            data=body,
+            content=body,
             headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
@@ -182,7 +182,7 @@ class TestFastAPI:
         client = TestClient(api)
         response = client.post(
             "/slack/events",
-            data=body,
+            content=body,
             headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
@@ -254,7 +254,7 @@ class TestFastAPI:
         client = TestClient(api)
         response = client.post(
             "/slack/events",
-            data=body,
+            content=body,
             headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
