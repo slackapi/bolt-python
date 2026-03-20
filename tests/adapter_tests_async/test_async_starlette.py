@@ -97,7 +97,7 @@ class TestAsyncStarlette:
         client = TestClient(api)
         response = client.post(
             "/slack/events",
-            content=body,
+            data=body,
             headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
@@ -143,7 +143,7 @@ class TestAsyncStarlette:
         client = TestClient(api)
         response = client.post(
             "/slack/events",
-            content=body,
+            data=body,
             headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
@@ -189,7 +189,7 @@ class TestAsyncStarlette:
         client = TestClient(api)
         response = client.post(
             "/slack/events",
-            content=body,
+            data=body,
             headers=self.build_headers(timestamp, body),
         )
         assert response.status_code == 200
