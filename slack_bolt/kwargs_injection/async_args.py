@@ -1,7 +1,6 @@
 from logging import Logger
 from typing import Callable, Awaitable, Dict, Any, Optional
 
-from slack_bolt.agent.async_agent import AsyncBoltAgent
 from slack_bolt.context.ack.async_ack import AsyncAck
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.context.complete.async_complete import AsyncComplete
@@ -103,8 +102,6 @@ class AsyncArgs:
     """`get_thread_context()` utility function for AI Agents & Assistants"""
     save_thread_context: Optional[AsyncSaveThreadContext]
     """`save_thread_context()` utility function for AI Agents & Assistants"""
-    agent: Optional[AsyncBoltAgent]
-    """`agent` listener argument for AI Agents & Assistants"""
     say_stream: Optional[AsyncSayStream]
     """`say_stream()` utility function for AI Agents & Assistants"""
     # middleware
@@ -140,7 +137,6 @@ class AsyncArgs:
         set_suggested_prompts: Optional[AsyncSetSuggestedPrompts] = None,
         get_thread_context: Optional[AsyncGetThreadContext] = None,
         save_thread_context: Optional[AsyncSaveThreadContext] = None,
-        agent: Optional[AsyncBoltAgent] = None,
         say_stream: Optional[AsyncSayStream] = None,
         next: Callable[[], Awaitable[None]],
         **kwargs,  # noqa
@@ -172,7 +168,6 @@ class AsyncArgs:
         self.set_suggested_prompts = set_suggested_prompts
         self.get_thread_context = get_thread_context
         self.save_thread_context = save_thread_context
-        self.agent = agent
         self.say_stream = say_stream
 
         self.next: Callable[[], Awaitable[None]] = next
