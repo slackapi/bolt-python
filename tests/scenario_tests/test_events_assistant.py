@@ -1,25 +1,14 @@
-import time
-from time import sleep
+from threading import Event
 from typing import Callable
 
 from slack_sdk.web import WebClient
 
-from slack_bolt import App, BoltRequest, Assistant, Say, SetSuggestedPrompts, SetStatus, BoltContext
+from slack_bolt import App, Assistant, BoltContext, BoltRequest, Say, SetStatus, SetSuggestedPrompts
 from slack_bolt.middleware import Middleware
 from slack_bolt.request import BoltRequest as BoltRequestType
 from slack_bolt.response import BoltResponse
-from tests.mock_web_api_server import (
-    setup_mock_web_api_server,
-    cleanup_mock_web_api_server,
-)
+from tests.mock_web_api_server import cleanup_mock_web_api_server, setup_mock_web_api_server
 from tests.utils import remove_os_env_temporarily, restore_os_env
-
-
-def assert_target_called(called: dict, timeout: float = 0.5):
-    deadline = time.time() + timeout
-    while called["value"] is not True and time.time() < deadline:
-        time.sleep(0.1)
-    assert called["value"] is True
 
 
 class TestEventsAssistant:
@@ -41,7 +30,7 @@ class TestEventsAssistant:
     def test_thread_started(self):
         app = App(client=self.web_client)
         assistant = Assistant()
-        called = {"value": False}
+        listener_called = Event()
 
         @assistant.thread_started
         def start_thread(say: Say, set_suggested_prompts: SetSuggestedPrompts, set_status: SetStatus, context: BoltContext):
@@ -54,37 +43,37 @@ class TestEventsAssistant:
             set_suggested_prompts(
                 prompts=[{"title": "What does SLACK stand for?", "message": "What does SLACK stand for?"}], title="foo"
             )
-            called["value"] = True
+            listener_called.set()
 
         app.assistant(assistant)
 
         request = BoltRequest(body=thread_started_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
-        assert_target_called(called)
+        assert listener_called.wait(timeout=0.1) is True
 
     def test_thread_context_changed(self):
         app = App(client=self.web_client)
         assistant = Assistant()
-        called = {"value": False}
+        listener_called = Event()
 
         @assistant.thread_context_changed
         def handle_thread_context_changed(context: BoltContext):
             assert context.channel_id == "D111"
             assert context.thread_ts == "1726133698.626339"
-            called["value"] = True
+            listener_called.set()
 
         app.assistant(assistant)
 
         request = BoltRequest(body=thread_context_changed_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
-        assert_target_called(called)
+        assert listener_called.wait(timeout=0.1) is True
 
     def test_user_message(self):
         app = App(client=self.web_client)
         assistant = Assistant()
-        called = {"value": False}
+        listener_called = Event()
 
         @assistant.user_message
         def handle_user_message(say: Say, set_status: SetStatus, context: BoltContext):
@@ -94,7 +83,7 @@ class TestEventsAssistant:
             try:
                 set_status("is typing...")
                 say("Here you are!")
-                called["value"] = True
+                listener_called.set()
             except Exception as e:
                 say(f"Oops, something went wrong (error: {e})")
 
@@ -103,12 +92,12 @@ class TestEventsAssistant:
         request = BoltRequest(body=user_message_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
-        assert_target_called(called)
+        assert listener_called.wait(timeout=0.1) is True
 
     def test_user_message_with_assistant_thread(self):
         app = App(client=self.web_client)
         assistant = Assistant()
-        called = {"value": False}
+        listener_called = Event()
 
         @assistant.user_message
         def handle_user_message(say: Say, set_status: SetStatus, context: BoltContext):
@@ -118,7 +107,7 @@ class TestEventsAssistant:
             try:
                 set_status("is typing...")
                 say("Here you are!")
-                called["value"] = True
+                listener_called.set()
             except Exception as e:
                 say(f"Oops, something went wrong (error: {e})")
 
@@ -127,77 +116,77 @@ class TestEventsAssistant:
         request = BoltRequest(body=user_message_event_body_with_assistant_thread, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
-        assert_target_called(called)
+        assert listener_called.wait(timeout=0.1) is True
 
     def test_message_changed(self):
         app = App(client=self.web_client)
         assistant = Assistant()
-        called = {"value": False}
+        listener_called = Event()
 
         @assistant.user_message
         def handle_user_message():
-            called["value"] = True
+            listener_called.set()
 
         @assistant.bot_message
         def handle_bot_message():
-            called["value"] = True
+            listener_called.set()
 
         app.assistant(assistant)
 
         request = BoltRequest(body=message_changed_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
-        assert called["value"] is False
+        assert listener_called.wait(timeout=0.1) is False
 
     def test_channel_user_message_ignored(self):
         app = App(client=self.web_client)
         assistant = Assistant()
-        called = {"value": False}
+        listener_called = Event()
 
         @assistant.user_message
         def handle_user_message():
-            called["value"] = True
+            listener_called.set()
 
         @assistant.bot_message
         def handle_bot_message():
-            called["value"] = True
+            listener_called.set()
 
         app.assistant(assistant)
 
         request = BoltRequest(body=channel_user_message_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 404
-        assert called["value"] is False
+        assert listener_called.wait(timeout=0.1) is False
 
     def test_channel_message_changed_ignored(self):
         app = App(client=self.web_client)
         assistant = Assistant()
-        called = {"value": False}
+        listener_called = Event()
 
         @assistant.user_message
         def handle_user_message():
-            called["value"] = True
+            listener_called.set()
 
         @assistant.bot_message
         def handle_bot_message():
-            called["value"] = True
+            listener_called.set()
 
         app.assistant(assistant)
 
         request = BoltRequest(body=channel_message_changed_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 404
-        assert called["value"] is False
+        assert listener_called.wait(timeout=0.1) is False
 
     def test_assistant_with_custom_listener_middleware(self):
         app = App(client=self.web_client)
         assistant = Assistant()
-        handler_called = {"value": False}
-        middleware_called = {"value": False}
+        listener_called = Event()
+        middleware_called = Event()
 
         class TestMiddleware(Middleware):
             def process(self, *, req: BoltRequestType, resp: BoltResponse, next: Callable[[], BoltResponse]):
-                middleware_called["value"] = True
+                middleware_called.set()
                 # Verify assistant utilities are available
                 assert req.context.get("set_status") is not None
                 assert req.context.get("set_title") is not None
@@ -208,52 +197,52 @@ class TestEventsAssistant:
 
         @assistant.thread_started(middleware=[TestMiddleware()])
         def start_thread():
-            handler_called["value"] = True
+            listener_called.set()
 
         @assistant.user_message(middleware=[TestMiddleware()])
         def handle_user_message():
-            handler_called["value"] = True
+            listener_called.set()
 
         app.assistant(assistant)
 
         request = BoltRequest(body=thread_started_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
-        assert_target_called(handler_called)
-        assert_target_called(middleware_called)
+        assert listener_called.wait(timeout=0.1) is True
+        assert middleware_called.wait(timeout=0.1) is True
 
-        handler_called = {"value": False}
-        middleware_called = {"value": False}
+        listener_called.clear()
+        middleware_called.clear()
 
         request = BoltRequest(body=user_message_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
-        assert_target_called(handler_called)
-        assert_target_called(middleware_called)
+        assert listener_called.wait(timeout=0.1) is True
+        assert middleware_called.wait(timeout=0.1) is True
 
     def test_assistant_custom_middleware_can_short_circuit(self):
         app = App(client=self.web_client)
         assistant = Assistant()
-        handler_called = {"value": False}
-        middleware_called = {"value": False}
+        listener_called = Event()
+        middleware_called = Event()
 
         class BlockingMiddleware(Middleware):
             def process(self, *, req: BoltRequestType, resp: BoltResponse, next: Callable[[], BoltResponse]):
-                middleware_called["value"] = True
+                middleware_called.set()
                 # Intentionally not calling next() to short-circuit
                 return BoltResponse(status=200)
 
         @assistant.thread_started(middleware=[BlockingMiddleware()])
         def start_thread(say: Say, context: BoltContext):
-            handler_called["value"] = True
+            listener_called.set()
 
         app.assistant(assistant)
 
         request = BoltRequest(body=thread_started_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
-        assert_target_called(middleware_called)
-        assert handler_called["value"] is False
+        assert middleware_called.wait(timeout=0.1) is True
+        assert listener_called.wait(timeout=0.1) is False
 
 
 def build_payload(event: dict) -> dict:
