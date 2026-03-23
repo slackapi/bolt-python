@@ -160,7 +160,9 @@ class TestAsyncEventsAssistant:
         request = AsyncBoltRequest(body=user_message_event_body_with_action_token, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
-        await assert_target_called()
+        await asyncio.sleep(0.1)
+        assert listener_called.is_set()
+        listener_called.clear()
 
         request = AsyncBoltRequest(body=message_changed_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)

@@ -136,7 +136,8 @@ class TestEventsAssistant:
         request = BoltRequest(body=user_message_event_body_with_action_token, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
-        assert_target_called()
+        assert listener_called.wait(timeout=0.1) is True
+        listener_called.clear()
 
         request = BoltRequest(body=message_changed_event_body, mode="socket_mode")
         response = app.dispatch(request)
