@@ -1,31 +1,22 @@
 import asyncio
-import time
 from typing import Awaitable, Callable, Optional
 
 import pytest
 from slack_sdk.web.async_client import AsyncWebClient
 
-from slack_bolt.app.async_app import AsyncApp
-from slack_bolt.context.async_context import AsyncBoltContext
-from slack_bolt.context.say.async_say import AsyncSay
-from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
-from slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts import AsyncSetSuggestedPrompts
-from slack_bolt.middleware.assistant.async_assistant import AsyncAssistant
-from slack_bolt.middleware.async_middleware import AsyncMiddleware
-from slack_bolt.request.async_request import AsyncBoltRequest
-from slack_bolt.response import BoltResponse
-from tests.mock_web_api_server import (
-    cleanup_mock_web_api_server_async,
-    setup_mock_web_api_server_async,
+from slack_bolt.async_app import (
+    AsyncApp,
+    AsyncAssistant,
+    AsyncBoltContext,
+    AsyncBoltRequest,
+    AsyncSay,
+    AsyncSetStatus,
+    AsyncSetSuggestedPrompts,
 )
+from slack_bolt.middleware.async_middleware import AsyncMiddleware
+from slack_bolt.response import BoltResponse
+from tests.mock_web_api_server import cleanup_mock_web_api_server_async, setup_mock_web_api_server_async
 from tests.utils import remove_os_env_temporarily, restore_os_env
-
-
-async def assert_target_called(called: dict, timeout: float = 0.5):
-    deadline = time.time() + timeout
-    while called["value"] is not True and time.time() < deadline:
-        await asyncio.sleep(0.1)
-    assert called["value"] is True
 
 
 class TestAsyncEventsAssistant:
@@ -51,7 +42,7 @@ class TestAsyncEventsAssistant:
     async def test_thread_started(self):
         app = AsyncApp(client=self.web_client)
         assistant = AsyncAssistant()
-        called = {"value": False}
+        listener_called = asyncio.Event()
 
         @assistant.thread_started
         async def start_thread(
@@ -72,39 +63,39 @@ class TestAsyncEventsAssistant:
                 prompts=[{"title": "What does SLACK stand for?", "message": "What does SLACK stand for?"}],
                 title="foo",
             )
-            called["value"] = True
+            listener_called.set()
 
         app.assistant(assistant)
 
         request = AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
-        await assert_target_called(called)
+        assert (await asyncio.wait_for(listener_called.wait(), timeout=0.1)) is True
 
     @pytest.mark.asyncio
     async def test_thread_context_changed(self):
         app = AsyncApp(client=self.web_client)
         assistant = AsyncAssistant()
-        called = {"value": False}
+        listener_called = asyncio.Event()
 
         @assistant.thread_context_changed
         async def handle_thread_context_changed(context: AsyncBoltContext):
             assert context.channel_id == "D111"
             assert context.thread_ts == "1726133698.626339"
-            called["value"] = True
+            listener_called.set()
 
         app.assistant(assistant)
 
         request = AsyncBoltRequest(body=thread_context_changed_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
-        await assert_target_called(called)
+        assert (await asyncio.wait_for(listener_called.wait(), timeout=0.1)) is True
 
     @pytest.mark.asyncio
     async def test_user_message(self):
         app = AsyncApp(client=self.web_client)
         assistant = AsyncAssistant()
-        called = {"value": False}
+        listener_called = asyncio.Event()
 
         @assistant.user_message
         async def handle_user_message(say: AsyncSay, set_status: AsyncSetStatus, context: AsyncBoltContext):
@@ -114,7 +105,7 @@ class TestAsyncEventsAssistant:
             try:
                 await set_status("is typing...")
                 await say("Here you are!")
-                called["value"] = True
+                listener_called.set()
             except Exception as e:
                 await say(f"Oops, something went wrong (error: {e})")
 
@@ -123,13 +114,13 @@ class TestAsyncEventsAssistant:
         request = AsyncBoltRequest(body=user_message_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
-        await assert_target_called(called)
+        assert (await asyncio.wait_for(listener_called.wait(), timeout=0.1)) is True
 
     @pytest.mark.asyncio
     async def test_user_message_with_assistant_thread(self):
         app = AsyncApp(client=self.web_client)
         assistant = AsyncAssistant()
-        called = {"value": False}
+        listener_called = asyncio.Event()
 
         @assistant.user_message
         async def handle_user_message(say: AsyncSay, set_status: AsyncSetStatus, context: AsyncBoltContext):
@@ -139,7 +130,7 @@ class TestAsyncEventsAssistant:
             try:
                 await set_status("is typing...")
                 await say("Here you are!")
-                called["value"] = True
+                listener_called.set()
             except Exception as e:
                 await say(f"Oops, something went wrong (error: {e})")
 
@@ -148,84 +139,78 @@ class TestAsyncEventsAssistant:
         request = AsyncBoltRequest(body=user_message_event_body_with_assistant_thread, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
-        await assert_target_called(called)
+        assert (await asyncio.wait_for(listener_called.wait(), timeout=0.1)) is True
 
     @pytest.mark.asyncio
     async def test_message_changed(self):
         app = AsyncApp(client=self.web_client)
         assistant = AsyncAssistant()
-        called = {"value": False}
+        listener_called = asyncio.Event()
 
         @assistant.user_message
         async def handle_user_message():
-            called["value"] = True
+            listener_called.set()
 
         @assistant.bot_message
         async def handle_bot_message():
-            called["value"] = True
+            listener_called.set()
 
         app.assistant(assistant)
 
         request = AsyncBoltRequest(body=message_changed_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert called["value"] is False
+        await asyncio.sleep(0.1)
+        assert not listener_called.is_set()
 
     @pytest.mark.asyncio
     async def test_channel_user_message_ignored(self):
         app = AsyncApp(client=self.web_client)
         assistant = AsyncAssistant()
-        called = {"value": False}
+        listener_called = asyncio.Event()
 
         @assistant.user_message
         async def handle_user_message():
-            called["value"] = True
+            listener_called.set()
 
         @assistant.bot_message
         async def handle_bot_message():
-            called["value"] = True
+            listener_called.set()
 
         app.assistant(assistant)
 
         request = AsyncBoltRequest(body=channel_user_message_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert called["value"] is False
+        await asyncio.sleep(0.1)
+        assert not listener_called.is_set()
 
     @pytest.mark.asyncio
     async def test_channel_message_changed_ignored(self):
         app = AsyncApp(client=self.web_client)
         assistant = AsyncAssistant()
-        called = {"value": False}
+        listener_called = asyncio.Event()
 
         @assistant.user_message
         async def handle_user_message():
-            called["value"] = True
+            listener_called.set()
 
         @assistant.bot_message
         async def handle_bot_message():
-            called["value"] = True
+            listener_called.set()
 
         app.assistant(assistant)
 
         request = AsyncBoltRequest(body=channel_message_changed_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 404
-        assert called["value"] is False
+        await asyncio.sleep(0.1)
+        assert not listener_called.is_set()
 
     @pytest.mark.asyncio
     async def test_assistant_events_kwargs_disabled(self):
         app = AsyncApp(client=self.web_client, attaching_agent_kwargs_enabled=False)
-
-        state = {"called": False}
-
-        async def assert_target_called():
-            count = 0
-            while state["called"] is False and count < 20:
-                await asyncio.sleep(0.1)
-                count += 1
-            assert state["called"] is True
-            state["called"] = False
+        listener_called = asyncio.Event()
 
         @app.event("assistant_thread_started")
         async def start_thread(context: AsyncBoltContext):
@@ -234,27 +219,19 @@ class TestAsyncEventsAssistant:
             assert context.get("set_suggested_prompts") is None
             assert context.get("get_thread_context") is None
             assert context.get("save_thread_context") is None
-            state["called"] = True
+            listener_called.set()
 
         request = AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
-        await assert_target_called()
+        assert (await asyncio.wait_for(listener_called.wait(), timeout=0.1)) is True
 
     @pytest.mark.asyncio
     async def test_assistant_with_custom_listener_middleware(self):
         app = AsyncApp(client=self.web_client)
         assistant = AsyncAssistant()
-
-        state = {"called": False, "middleware_called": False}
-
-        async def assert_target_called():
-            count = 0
-            while state["called"] is False and count < 20:
-                await asyncio.sleep(0.1)
-                count += 1
-            assert state["called"] is True
-            state["called"] = False
+        listener_called = asyncio.Event()
+        middleware_called = asyncio.Event()
 
         class TestAsyncMiddleware(AsyncMiddleware):
             async def async_process(
@@ -264,7 +241,7 @@ class TestAsyncEventsAssistant:
                 resp: BoltResponse,
                 next: Callable[[], Awaitable[BoltResponse]],
             ) -> Optional[BoltResponse]:
-                state["middleware_called"] = True
+                middleware_called.set()
                 # Verify assistant utilities are available (set by _AsyncAssistantMiddleware before this)
                 assert req.context.get("set_status") is not None
                 assert req.context.get("set_title") is not None
@@ -282,7 +259,7 @@ class TestAsyncEventsAssistant:
             await set_suggested_prompts(
                 prompts=[{"title": "What does SLACK stand for?", "message": "What does SLACK stand for?"}]
             )
-            state["called"] = True
+            listener_called.set()
 
         @assistant.user_message(middleware=[TestAsyncMiddleware()])
         async def handle_user_message(say: AsyncSay, set_status: AsyncSetStatus, context: AsyncBoltContext):
@@ -291,29 +268,30 @@ class TestAsyncEventsAssistant:
             assert say.thread_ts == context.thread_ts
             await set_status("is typing...")
             await say("Here you are!")
-            state["called"] = True
+            listener_called.set()
 
         app.assistant(assistant)
 
         request = AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
-        await assert_target_called()
-        assert state["middleware_called"] is True
-        state["middleware_called"] = False
+        assert (await asyncio.wait_for(listener_called.wait(), timeout=0.1)) is True
+        assert (await asyncio.wait_for(middleware_called.wait(), timeout=0.1)) is True
+
+        listener_called.clear()
+        middleware_called.clear()
 
         request = AsyncBoltRequest(body=user_message_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
-        await assert_target_called()
-        assert state["middleware_called"] is True
+        assert (await asyncio.wait_for(listener_called.wait(), timeout=0.1)) is True
+        assert (await asyncio.wait_for(middleware_called.wait(), timeout=0.1)) is True
 
     @pytest.mark.asyncio
     async def test_assistant_custom_middleware_can_short_circuit(self):
         app = AsyncApp(client=self.web_client)
         assistant = AsyncAssistant()
-
-        state = {"handler_called": False}
+        listener_called = asyncio.Event()
 
         class BlockingAsyncMiddleware(AsyncMiddleware):
             async def async_process(
@@ -328,14 +306,15 @@ class TestAsyncEventsAssistant:
 
         @assistant.thread_started(middleware=[BlockingAsyncMiddleware()])
         async def start_thread(say: AsyncSay, context: AsyncBoltContext):
-            state["handler_called"] = True
+            listener_called.set()
 
         app.assistant(assistant)
 
         request = AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 200
-        assert state["handler_called"] is False
+        await asyncio.sleep(0.1)
+        assert not listener_called.is_set()
 
 
 def build_payload(event: dict) -> dict:
