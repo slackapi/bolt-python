@@ -133,6 +133,12 @@ class TestEventsAssistant:
 
         app.assistant(assistant)
 
+        request = BoltRequest(body=user_message_event_body_with_action_token, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert listener_called.wait(timeout=0.1) is True
+        listener_called.clear()
+
         request = BoltRequest(body=message_changed_event_body, mode="socket_mode")
         response = app.dispatch(request)
         assert response.status == 200
@@ -329,6 +335,25 @@ user_message_event_body_with_assistant_thread = build_payload(
         "event_ts": "1726133700.887259",
         "channel_type": "im",
         "assistant_thread": {"XXX": "YYY"},
+    }
+)
+
+user_message_event_body_with_action_token = build_payload(
+    {
+        "user": "W222",
+        "type": "message",
+        "ts": "1726133700.887259",
+        "text": "When Slack was released?",
+        "team": "T111",
+        "user_team": "T111",
+        "source_team": "T222",
+        "user_profile": {},
+        "thread_ts": "1726133698.626339",
+        "parent_user_id": "W222",
+        "channel": "D111",
+        "event_ts": "1726133700.887259",
+        "channel_type": "im",
+        "assistant_thread": {"action_token": "10647138185092.960436384805.afce3599"},
     }
 )
 
