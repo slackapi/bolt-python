@@ -59,6 +59,7 @@ from .context.set_title.async_set_title import AsyncSetTitle
 from .context.set_suggested_prompts.async_set_suggested_prompts import AsyncSetSuggestedPrompts
 from .context.get_thread_context.async_get_thread_context import AsyncGetThreadContext
 from .context.save_thread_context.async_save_thread_context import AsyncSaveThreadContext
+from .context.say_stream.async_say_stream import AsyncSayStream
 
 __all__ = [
     "AsyncApp",
@@ -66,6 +67,7 @@ __all__ = [
     "AsyncBoltContext",
     "AsyncRespond",
     "AsyncSay",
+    "AsyncSayStream",
     "AsyncListener",
     "AsyncCustomListenerMatcher",
     "AsyncBoltRequest",

@@ -8,6 +8,7 @@ from slack_bolt.context.assistant.thread_context_store.async_store import AsyncA
 
 from slack_bolt.listener.asyncio_runner import AsyncioListenerRunner
 from slack_bolt.listener_matcher.builtins import build_listener_matcher
+from slack_bolt.middleware.attaching_agent_kwargs.async_attaching_agent_kwargs import AsyncAttachingAgentKwargs
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from slack_bolt.error import BoltError
@@ -265,6 +266,15 @@ class AsyncAssistant(AsyncMiddleware):
             if listeners is not None:
                 for listener in listeners:
                     if listener is not None and await listener.async_matches(req=req, resp=resp):
+                        middleware_resp, next_was_not_called = await listener.run_async_middleware(req=req, resp=resp)
+                        if next_was_not_called:
+                            if middleware_resp is not None:
+                                return middleware_resp
+                            # The listener middleware didn't call next().
+                            # Skip this listener and try the next one.
+                            continue
+                        if middleware_resp is not None:
+                            resp = middleware_resp
                         return await listener_runner.run(
                             request=req,
                             response=resp,
@@ -291,6 +301,7 @@ class AsyncAssistant(AsyncMiddleware):
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
             middleware = middleware if middleware else []
+            middleware.insert(0, AsyncAttachingAgentKwargs(self.thread_context_store))
             functions = listener_or_functions
             ack_function = functions.pop(0)
 

@@ -152,7 +152,7 @@ For FaaS environments (`process_before_response=True`), long-running handlers ex
 
 ### Kwargs Injection
 
-Listeners receive arguments by parameter name. The framework inspects function signatures and injects matching args: `body`, `event`, `action`, `command`, `payload`, `context`, `client`, `ack`, `say`, `respond`, `logger`, `complete`, `fail`, `agent`, etc. Defined in `slack_bolt/kwargs_injection/args.py`.
+Listeners receive arguments by parameter name. The framework inspects function signatures and injects matching args: `body`, `event`, `action`, `command`, `payload`, `context`, `client`, `ack`, `say`, `respond`, `logger`, `complete`, `fail`, etc. Defined in `slack_bolt/kwargs_injection/args.py`.
 
 ### Adapter System
 
@@ -160,7 +160,7 @@ Each adapter in `slack_bolt/adapter/` converts between a web framework's request
 
 ### AI Agents & Assistants
 
-`BoltAgent` (`slack_bolt/agent/`) provides `chat_stream()`, `set_status()`, and `set_suggested_prompts()` for AI-powered agents. `Assistant` middleware (`slack_bolt/middleware/assistant/`) handles assistant thread events.
+`Assistant` middleware (`slack_bolt/middleware/assistant/`) handles assistant thread events.
 
 ## Key Development Patterns
 

@@ -156,11 +156,11 @@ class TestErrorHandler:
 
         @app.middleware
         def set_ssl_context(context, next_):
-            from ssl import SSLContext
+            import ssl
 
             context["foo"] = "FOO"
             # This causes an error when starting lazy listener executions
-            context["ssl_context"] = SSLContext()
+            context["ssl_context"] = ssl.create_default_context()
             next_()
 
         # 2021-12-13 11:14:29 ERROR Failed to run a middleware middleware (error: cannot pickle 'SSLContext' object)

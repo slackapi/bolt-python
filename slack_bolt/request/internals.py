@@ -3,7 +3,6 @@ from typing import Optional, Dict, Union, Any, Sequence
 from urllib.parse import parse_qsl, parse_qs
 
 from slack_bolt.context import BoltContext
-from slack_bolt.request.payload_utils import is_assistant_event
 
 
 def parse_query(query: Optional[Union[str, Dict[str, str], Dict[str, Sequence[str]]]]) -> Dict[str, Sequence[str]]:
@@ -66,10 +65,10 @@ def extract_enterprise_id(payload: Dict[str, Any]) -> Optional[str]:
         return extract_enterprise_id(payload["authorizations"][0])
     if "enterprise_id" in payload:
         return payload.get("enterprise_id")
-    if payload.get("team") is not None and "enterprise_id" in payload["team"]:
+    if isinstance(payload.get("team"), dict) and "enterprise_id" in payload["team"]:
         # In the case where the type is view_submission
         return payload["team"].get("enterprise_id")
-    if payload.get("event") is not None:
+    if isinstance(payload.get("event"), dict):
         return extract_enterprise_id(payload["event"])
     return None
 
@@ -89,13 +88,13 @@ def extract_actor_enterprise_id(payload: Dict[str, Any]) -> Optional[str]:
 
 
 def extract_team_id(payload: Dict[str, Any]) -> Optional[str]:
-    app_installed_team_id = payload.get("view", {}).get("app_installed_team_id")
-    if app_installed_team_id is not None:
+    view = payload.get("view")
+    if isinstance(view, dict) and view.get("app_installed_team_id") is not None:
         # view_submission payloads can have `view.app_installed_team_id` when a modal view that was opened
         # in a different workspace via some operations inside a Slack Connect channel.
         # Note that the same for enterprise_id does not exist. When you need to know the enterprise_id as well,
         # you have to run some query toward your InstallationStore to know the org where the team_id belongs to.
-        return app_installed_team_id
+        return view["app_installed_team_id"]
     if payload.get("team") is not None:
         # With org-wide installations, payload.team in interactivity payloads can be None
         # You need to extract either payload.user.team_id or payload.view.team_id as below
@@ -110,12 +109,12 @@ def extract_team_id(payload: Dict[str, Any]) -> Optional[str]:
         return extract_team_id(payload["authorizations"][0])
     if "team_id" in payload:
         return payload.get("team_id")
-    if payload.get("event") is not None:
+    if isinstance(payload.get("event"), dict):
         return extract_team_id(payload["event"])
-    if payload.get("user") is not None:
+    if isinstance(payload.get("user"), dict):
         return payload["user"]["team_id"]
-    if payload.get("view") is not None:
-        return payload.get("view", {})["team_id"]
+    if isinstance(payload.get("view"), dict):
+        return payload["view"]["team_id"]
     return None
 
 
@@ -170,12 +169,12 @@ def extract_user_id(payload: Dict[str, Any]) -> Optional[str]:
             return user.get("id")
     if "user_id" in payload:
         return payload.get("user_id")
-    if payload.get("event") is not None:
+    if isinstance(payload.get("event"), dict):
         return extract_user_id(payload["event"])
-    if payload.get("message") is not None:
+    if isinstance(payload.get("message"), dict):
         # message_changed: body["event"]["message"]
         return extract_user_id(payload["message"])
-    if payload.get("previous_message") is not None:
+    if isinstance(payload.get("previous_message"), dict):
         # message_deleted: body["event"]["previous_message"]
         return extract_user_id(payload["previous_message"])
     return None
@@ -203,54 +202,38 @@ def extract_channel_id(payload: Dict[str, Any]) -> Optional[str]:
             return channel.get("id")
     if "channel_id" in payload:
         return payload.get("channel_id")
-    if payload.get("event") is not None:
+    if isinstance(payload.get("event"), dict):
         return extract_channel_id(payload["event"])
-    if payload.get("item") is not None:
+    if isinstance(payload.get("item"), dict):
         # reaction_added: body["event"]["item"]
         return extract_channel_id(payload["item"])
-    if payload.get("assistant_thread") is not None:
+    if isinstance(payload.get("assistant_thread"), dict):
         # assistant_thread_started
         return extract_channel_id(payload["assistant_thread"])
     return None
 
 
 def extract_thread_ts(payload: Dict[str, Any]) -> Optional[str]:
-    # This utility initially supports only the use cases for AI assistants, but it may be fine to add more patterns.
-    # That said, note that thread_ts is always required for assistant threads, but it's not for channels.
-    # Thus, blindly setting this thread_ts to say utility can break existing apps' behaviors.
-    #
-    # The BoltAgent class handles non-assistant thread_ts separately by reading from the event directly,
-    # allowing it to work correctly without affecting say() behavior.
-    if is_assistant_event(payload):
-        event = payload["event"]
-        if (
-            event.get("assistant_thread") is not None
-            and event["assistant_thread"].get("channel_id") is not None
-            and event["assistant_thread"].get("thread_ts") is not None
-        ):
-            # assistant_thread_started, assistant_thread_context_changed
-            # "assistant_thread" property can exist for message event without channel_id and thread_ts
-            # Thus, the above if check verifies these properties exist
-            return event["assistant_thread"]["thread_ts"]
-        elif event.get("channel") is not None:
-            if event.get("thread_ts") is not None:
-                # message in an assistant thread
-                return event["thread_ts"]
-            elif event.get("message", {}).get("thread_ts") is not None:
-                # message_changed
-                return event["message"]["thread_ts"]
-            elif event.get("previous_message", {}).get("thread_ts") is not None:
-                # message_deleted
-                return event["previous_message"]["thread_ts"]
+    thread_ts = payload.get("thread_ts")
+    if thread_ts is not None:
+        return thread_ts
+    if isinstance(payload.get("event"), dict):
+        return extract_thread_ts(payload["event"])
+    if isinstance(payload.get("assistant_thread"), dict):
+        return extract_thread_ts(payload["assistant_thread"])
+    if isinstance(payload.get("message"), dict):
+        return extract_thread_ts(payload["message"])
+    if isinstance(payload.get("previous_message"), dict):
+        return extract_thread_ts(payload["previous_message"])
     return None
 
 
 def extract_function_execution_id(payload: Dict[str, Any]) -> Optional[str]:
     if payload.get("function_execution_id") is not None:
         return payload.get("function_execution_id")
-    if payload.get("event") is not None:
+    if isinstance(payload.get("event"), dict):
         return extract_function_execution_id(payload["event"])
-    if payload.get("function_data") is not None:
+    if isinstance(payload.get("function_data"), dict):
         return payload["function_data"].get("execution_id")
     return None
 
@@ -258,15 +241,15 @@ def extract_function_execution_id(payload: Dict[str, Any]) -> Optional[str]:
 def extract_function_bot_access_token(payload: Dict[str, Any]) -> Optional[str]:
     if payload.get("bot_access_token") is not None:
         return payload.get("bot_access_token")
-    if payload.get("event") is not None:
+    if isinstance(payload.get("event"), dict):
         return payload["event"].get("bot_access_token")
     return None
 
 
 def extract_function_inputs(payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    if payload.get("event") is not None:
+    if isinstance(payload.get("event"), dict):
         return payload["event"].get("inputs")
-    if payload.get("function_data") is not None:
+    if isinstance(payload.get("function_data"), dict):
         return payload["function_data"].get("inputs")
     return None
 

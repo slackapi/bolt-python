@@ -13,6 +13,7 @@ from slack_bolt.request.internals import (
     extract_actor_team_id,
     extract_actor_user_id,
     extract_function_execution_id,
+    extract_thread_ts,
 )
 
 
@@ -109,6 +110,196 @@ class TestRequestInternals:
             "function_data": {"execution_id": "Fx111", "inputs": {"customer_id": "Ux111"}},
             "interactivity": {"interactivity_pointer": "111.222.xxx"},
         },
+    ]
+
+    thread_ts_event_requests = [
+        {
+            "event": {
+                "type": "app_mention",
+                "channel": "C111",
+                "user": "U111",
+                "ts": "123.420",
+                "thread_ts": "123.456",
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "channel": "C111",
+                "user": "U111",
+                "ts": "123.420",
+                "thread_ts": "123.456",
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "subtype": "bot_message",
+                "channel": "C111",
+                "bot_id": "B111",
+                "ts": "123.420",
+                "thread_ts": "123.456",
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "subtype": "file_share",
+                "channel": "C111",
+                "user": "U111",
+                "ts": "123.420",
+                "thread_ts": "123.456",
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "subtype": "thread_broadcast",
+                "channel": "C111",
+                "user": "U111",
+                "ts": "123.420",
+                "thread_ts": "123.456",
+                "root": {"thread_ts": "123.420"},
+            },
+        },
+        {
+            "event": {
+                "type": "link_shared",
+                "channel": "C111",
+                "user": "U111",
+                "thread_ts": "123.456",
+                "links": [{"url": "https://example.com"}],
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "subtype": "message_changed",
+                "channel": "C111",
+                "message": {
+                    "type": "message",
+                    "user": "U111",
+                    "text": "edited",
+                    "ts": "123.420",
+                    "thread_ts": "123.456",
+                },
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "subtype": "message_changed",
+                "channel": "C111",
+                "message": {
+                    "type": "message",
+                    "user": "U111",
+                    "text": "edited",
+                    "ts": "123.420",
+                    "thread_ts": "123.456",
+                },
+                "previous_message": {
+                    "type": "message",
+                    "user": "U111",
+                    "text": "deleted",
+                    "ts": "123.420",
+                    "thread_ts": "123.420",
+                },
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "subtype": "message_deleted",
+                "channel": "C111",
+                "previous_message": {
+                    "type": "message",
+                    "user": "U111",
+                    "text": "deleted",
+                    "ts": "123.420",
+                    "thread_ts": "123.456",
+                },
+            },
+        },
+        {
+            "event": {
+                "type": "assistant_thread_started",
+                "assistant_thread": {
+                    "user_id": "U123ABC456",
+                    "context": {
+                        "channel_id": "C123ABC456",
+                        "team_id": "T123ABC456",
+                        "enterprise_id": "E123ABC456",
+                    },
+                    "channel_id": "D123ABC456",
+                    "thread_ts": "123.456",
+                },
+                "event_ts": "1715873754.429808",
+            },
+        },
+        {
+            "event": {
+                "type": "assistant_thread_context_changed",
+                "assistant_thread": {
+                    "user_id": "U123ABC456",
+                    "context": {
+                        "channel_id": "C123ABC456",
+                        "team_id": "T123ABC456",
+                        "enterprise_id": "E123ABC456",
+                    },
+                    "channel_id": "D123ABC456",
+                    "thread_ts": "123.456",
+                },
+                "event_ts": "17298244.022142",
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "subtype": "message_changed",
+                "message": {
+                    "text": "Chats from 2024-09-28",
+                    "subtype": "assistant_app_thread",
+                    "user": "U123456ABCD",
+                    "type": "message",
+                    "team": "T123456ABCD",
+                    "thread_ts": "123.456",
+                    "reply_count": 1,
+                    "ts": "123.420",
+                },
+                "channel": "D987654ABCD",
+                "hidden": True,
+                "ts": "123.420",
+                "event_ts": "123.420",
+                "channel_type": "im",
+            },
+        },
+    ]
+
+    no_thread_ts_requests = [
+        {
+            "event": {
+                "type": "reaction_added",
+                "user": "U111",
+                "reaction": "thumbsup",
+                "item": {"type": "message", "channel": "C111", "ts": "123.420"},
+            },
+        },
+        {
+            "event": {
+                "type": "channel_created",
+                "channel": {"id": "C222", "name": "test", "created": 1678455198},
+            },
+        },
+        {
+            "event": {
+                "type": "message",
+                "channel": "C111",
+                "user": "U111",
+                "text": "hello",
+                "ts": "123.420",
+            },
+        },
+        {},
     ]
 
     slack_connect_authorizations = [
@@ -336,6 +527,16 @@ class TestRequestInternals:
         for req in self.function_event_requests:
             inputs = extract_function_inputs(req)
             assert inputs == {"customer_id": "Ux111"}
+
+    def test_extract_thread_ts(self):
+        for req in self.thread_ts_event_requests:
+            thread_ts = extract_thread_ts(req)
+            assert thread_ts == "123.456", f"Expected thread_ts for {req}"
+
+    def test_extract_thread_ts_fail(self):
+        for req in self.no_thread_ts_requests:
+            thread_ts = extract_thread_ts(req)
+            assert thread_ts is None, f"Expected None for {req}"
 
     def test_is_enterprise_install_extraction(self):
         for req in self.requests:
@@ -1047,3 +1248,28 @@ class TestRequestInternals:
             assert extract_actor_enterprise_id(request) == actor_enterprise_id
             assert extract_actor_team_id(request) == actor_team_id
             assert extract_actor_user_id(request) == actor_user_id
+
+    def test_extraction_functions_invalid_dict_keys(self):
+        invalid_payloads = {
+            "event": {"event": "some_event_type"},
+            "user": {"user": "U12345"},
+            "team": {"team": "T12345"},
+            "view": {"view": "V12345"},
+            "message": {"message": "some text"},
+            "item": {"item": "item_id"},
+            "function_data": {"function_data": "fd_123"},
+            "assistant_thread": {"assistant_thread": "at_123"},
+            "previous_message": {"previous_message": "old_msg"},
+        }
+
+        for _, payload in invalid_payloads.items():
+            # We only verify no TypeError/AttributeError is raised and that functions which
+            # would try to subscript the string value return None instead of crashing.
+            extract_enterprise_id(payload)
+            extract_team_id(payload)
+            extract_user_id(payload)
+            extract_channel_id(payload)
+            extract_thread_ts(payload)
+            extract_function_execution_id(payload)
+            extract_function_bot_access_token(payload)
+            extract_function_inputs(payload)
