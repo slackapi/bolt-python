@@ -32,7 +32,7 @@ class AsyncGetThreadContext:
             return self._thread_context
 
         thread = self.payload.get("assistant_thread")
-        if thread is not None and thread.get("context", {}).get("channel_id") is not None:
+        if isinstance(thread, dict) and thread.get("context", {}).get("channel_id") is not None:
             # assistant_thread_started
             self._thread_context = AssistantThreadContext(thread["context"])
             # for this event, the context will never be changed
