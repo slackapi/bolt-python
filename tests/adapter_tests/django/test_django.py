@@ -1,5 +1,4 @@
 import json
-import os
 from time import time
 from urllib.parse import quote
 
@@ -29,7 +28,6 @@ class TestDjango(TestCase):
         base_url=mock_api_server_base_url,
     )
 
-    os.environ["DJANGO_SETTINGS_MODULE"] = "tests.adapter_tests.django.test_django_settings"
     rf = RequestFactory()
 
     def setUp(self):
