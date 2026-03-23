@@ -1,7 +1,7 @@
 import logging
 import time
 from concurrent.futures import Executor
-from ssl import SSLContext
+import ssl
 
 import pytest
 from slack_sdk import WebClient
@@ -236,12 +236,12 @@ class TestApp:
         assert response.body == '{"error": "unhandled request"}'
 
     def test_proxy_ssl_for_respond(self):
-        ssl = SSLContext()
+        ssl_context = ssl.create_default_context()
         web_client = WebClient(
             token=self.valid_token,
             base_url=self.mock_api_server_base_url,
             proxy="http://proxy-host:9000/",
-            ssl=ssl,
+            ssl=ssl_context,
         )
         app = App(
             signing_secret="valid",
@@ -257,9 +257,9 @@ class TestApp:
         @app.event("app_mention")
         def handle(context: BoltContext, respond):
             assert context.respond.proxy == "http://proxy-host:9000/"
-            assert context.respond.ssl == ssl
+            assert context.respond.ssl == ssl_context
             assert respond.proxy == "http://proxy-host:9000/"
-            assert respond.ssl == ssl
+            assert respond.ssl == ssl_context
             result["called"] = True
 
         req = BoltRequest(body=app_mention_event_body, headers={}, mode="socket_mode")
