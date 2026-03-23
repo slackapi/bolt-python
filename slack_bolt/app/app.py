@@ -813,6 +813,7 @@ class App:
         ],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new event listener. This method can be used as either a decorator or a method.
 
@@ -855,6 +856,7 @@ class App:
         keyword: Union[str, Pattern] = "",
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new message event listener. This method can be used as either a decorator or a method.
         Check the `App#event` method's docstring for details.
@@ -917,6 +919,7 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
         auto_acknowledge: bool = True,
         ack_timeout: int = 3,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new Function listener.
         This method can be used as either a decorator or a method.
@@ -967,6 +970,7 @@ class App:
         command: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new slash command listener.
         This method can be used as either a decorator or a method.
@@ -1008,6 +1012,7 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new shortcut listener.
         This method can be used as either a decorator or a method.
@@ -1052,6 +1057,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new global shortcut listener."""
 
@@ -1067,6 +1073,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new message shortcut listener."""
 
@@ -1085,6 +1092,7 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new action listener. This method can be used as either a decorator or a method.
 
@@ -1122,6 +1130,7 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `block_actions` action listener.
         Refer to https://docs.slack.dev/reference/interaction-payloads/block_actions-payload/ for details.
@@ -1139,6 +1148,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `interactive_message` action listener.
         Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons/ for details."""
@@ -1155,6 +1165,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `dialog_submission` listener.
         Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details."""
@@ -1171,6 +1182,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `dialog_cancellation` listener.
         Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details."""
@@ -1190,6 +1202,7 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `view_submission`/`view_closed` event listener.
         This method can be used as either a decorator or a method.
@@ -1238,6 +1251,7 @@ class App:
         constraints: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `view_submission` listener.
         Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for
@@ -1256,6 +1270,7 @@ class App:
         constraints: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `view_closed` listener.
         Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_closed for details."""
@@ -1275,6 +1290,7 @@ class App:
         constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new options listener.
         This method can be used as either a decorator or a method.
@@ -1323,6 +1339,7 @@ class App:
         action_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `block_suggestion` listener."""
 
@@ -1338,6 +1355,7 @@ class App:
         callback_id: Union[str, Pattern],
         matchers: Optional[Sequence[Callable[..., bool]]] = None,
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
+        lazy: Optional[Sequence[Callable[..., Optional[BoltResponse]]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `dialog_suggestion` listener.
         Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details."""
