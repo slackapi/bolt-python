@@ -85,11 +85,7 @@
 			"tools/bolt-python/concepts/token-rotation"
 		]
 	},
-	{
-		"type": "category",
-		"label": "Experiments",
-		"items": ["tools/bolt-python/experiments"]
-	},
+	"tools/bolt-python/experiments",
 	{
 		"type": "category",
 		"label": "Legacy",
