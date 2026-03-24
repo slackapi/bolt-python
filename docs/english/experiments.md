@@ -8,7 +8,6 @@ We love feedback from our community, so we encourage you to explore and interact
 
 ## Available experiments
 * [Agent listener argument](#agent)
-* [`say_stream` utility](#say-stream)
 
 ## Agent listener argument {#agent}
 
