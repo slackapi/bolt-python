@@ -1,6 +1,6 @@
 import logging
 from logging import Logger
-from typing import Optional, Callable
+from typing import Optional, Callable, TYPE_CHECKING
 
 from slack_sdk.oauth import RedirectUriPageRenderer, OAuthStateUtils
 from slack_sdk.oauth.installation_store import Installation
@@ -9,6 +9,9 @@ from slack_bolt.oauth.internals import CallbackResponseBuilder
 from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
+if TYPE_CHECKING:
+    from slack_bolt.oauth.oauth_settings import OAuthSettings
+
 
 class SuccessArgs:
     def __init__(
@@ -16,7 +19,7 @@ class SuccessArgs:
         *,
         request: BoltRequest,
         installation: Installation,
-        settings: "OAuthSettings",  # type: ignore[name-defined]
+        settings: "OAuthSettings",
         default: "CallbackOptions",
     ):
         """The arguments for a success function.
@@ -41,7 +44,7 @@ class FailureArgs:
         reason: str,
         error: Optional[Exception] = None,
         suggested_status_code: int,
-        settings: "OAuthSettings",  # type: ignore[name-defined]
+        settings: "OAuthSettings",
         default: "CallbackOptions",
     ):
         """The arguments for a failure function.
