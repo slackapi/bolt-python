@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from slack_sdk import WebClient
 
@@ -15,6 +15,9 @@ from slack_bolt.context.set_status import SetStatus
 from slack_bolt.context.set_suggested_prompts import SetSuggestedPrompts
 from slack_bolt.context.set_title import SetTitle
 from slack_bolt.util.utils import create_copy
+
+if TYPE_CHECKING:
+    from slack_bolt.listener.thread_runner import ThreadListenerRunner
 
 
 class BoltContext(BaseContext):
@@ -43,7 +46,7 @@ class BoltContext(BaseContext):
 
     # The return type is intentionally string to avoid circular imports
     @property
-    def listener_runner(self) -> "ThreadListenerRunner":  # type: ignore[name-defined]
+    def listener_runner(self) -> "ThreadListenerRunner":
         """The properly configured listener_runner that is available for middleware/listeners."""
         return self["listener_runner"]
 

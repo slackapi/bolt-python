@@ -48,9 +48,10 @@ class AsyncCustomMiddlewareErrorHandler(AsyncMiddlewareErrorHandler):
         )
         returned_response = await self.func(**kwargs)
         if returned_response is not None and isinstance(returned_response, BoltResponse):
-            response.status = returned_response.status  # type: ignore[union-attr]
-            response.headers = returned_response.headers  # type: ignore[union-attr]
-            response.body = returned_response.body  # type: ignore[union-attr]
+            assert response is not None, "response must be provided when returning a BoltResponse from an error handler"
+            response.status = returned_response.status
+            response.headers = returned_response.headers
+            response.body = returned_response.body
 
 
 class AsyncDefaultMiddlewareErrorHandler(AsyncMiddlewareErrorHandler):
