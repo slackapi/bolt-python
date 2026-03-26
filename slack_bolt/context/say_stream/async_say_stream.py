@@ -1,10 +1,7 @@
-import warnings
 from typing import Optional
 
 from slack_sdk.web.async_client import AsyncWebClient
 from slack_sdk.web.async_chat_stream import AsyncChatStream
-
-from slack_bolt.warning import ExperimentalWarning
 
 
 class AsyncSayStream:
@@ -39,16 +36,7 @@ class AsyncSayStream:
         thread_ts: Optional[str] = None,
         **kwargs,
     ) -> AsyncChatStream:
-        """Starts a new chat stream with context.
-
-        Warning: This is an experimental feature and may change in future versions.
-        """
-        warnings.warn(
-            "say_stream is experimental and may change in future versions.",
-            category=ExperimentalWarning,
-            stacklevel=2,
-        )
-
+        """Starts a new chat stream with context."""
         channel = channel or self.channel
         thread_ts = thread_ts or self.thread_ts
         if channel is None:
