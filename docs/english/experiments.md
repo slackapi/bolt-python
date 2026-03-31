@@ -28,7 +28,3 @@ def handle_mention(agent: BoltAgent):
     stream.append(markdown_text="Hello!")
     stream.stop()
 ```
-
-### Limitations
-
-The `chat_stream()` method currently only works when the `thread_ts` field is available in the event context (DMs and threaded replies). Top-level channel messages do not have a `thread_ts` field, and the `ts` field is not yet provided to `BoltAgent`.
