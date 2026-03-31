@@ -43,13 +43,7 @@ def show_datepicker(event, say):
 
 ## Streaming messages {#streaming-messages}
 
-You can have your app's messages stream in to replicate conventional agent behavior. This is done through three Web API methods:
-
-* [`chat_startStream`](/reference/methods/chat.startStream)
-* [`chat_appendStream`](/reference/methods/chat.appendStream)
-* [`chat_stopStream`](/reference/methods/chat.stopStream)
-
-Bolt for Python provides a `say_stream` listener argument available on `app.event` and `app.message` listeners. 
+You can have your app's messages stream in to replicate conventional agent behavior. Bolt for Python provides a `say_stream` utility as a listener argument available for `app.event` and `app.message` listeners. 
 
 The `say_stream` utility streamlines calling the Python Slack SDK's [`WebClient.chat_stream`](https://docs.slack.dev/tools/python-slack-sdk/reference/web/client.html#slack_sdk.web.client.WebClient.chat_stream) helper utility by sourcing parameter values from the relevant event payload.
 
