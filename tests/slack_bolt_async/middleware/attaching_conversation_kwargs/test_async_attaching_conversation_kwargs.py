@@ -1,7 +1,9 @@
 import pytest
 from slack_sdk.web.async_client import AsyncWebClient
 
-from slack_bolt.middleware.attaching_agent_kwargs.async_attaching_agent_kwargs import AsyncAttachingAgentKwargs
+from slack_bolt.middleware.attaching_conversation_kwargs.async_attaching_conversation_kwargs import (
+    AsyncAttachingConversationKwargs,
+)
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from tests.scenario_tests_async.test_events_assistant import (
@@ -18,10 +20,10 @@ async def next():
 ASSISTANT_KWARGS = ("say", "set_title", "set_suggested_prompts", "get_thread_context", "save_thread_context")
 
 
-class TestAsyncAttachingAgentKwargs:
+class TestAsyncAttachingConversationKwargs:
     @pytest.mark.asyncio
     async def test_assistant_event_attaches_kwargs(self):
-        middleware = AsyncAttachingAgentKwargs()
+        middleware = AsyncAttachingConversationKwargs()
         req = AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode")
         req.context["client"] = AsyncWebClient(token="xoxb-test")
 
@@ -36,7 +38,7 @@ class TestAsyncAttachingAgentKwargs:
 
     @pytest.mark.asyncio
     async def test_user_message_event_attaches_kwargs(self):
-        middleware = AsyncAttachingAgentKwargs()
+        middleware = AsyncAttachingConversationKwargs()
         req = AsyncBoltRequest(body=user_message_event_body, mode="socket_mode")
         req.context["client"] = AsyncWebClient(token="xoxb-test")
 
@@ -51,7 +53,7 @@ class TestAsyncAttachingAgentKwargs:
 
     @pytest.mark.asyncio
     async def test_non_assistant_event_does_not_attach_kwargs(self):
-        middleware = AsyncAttachingAgentKwargs()
+        middleware = AsyncAttachingConversationKwargs()
         req = AsyncBoltRequest(body=channel_user_message_event_body, mode="socket_mode")
         req.context["client"] = AsyncWebClient(token="xoxb-test")
 
@@ -65,7 +67,7 @@ class TestAsyncAttachingAgentKwargs:
 
     @pytest.mark.asyncio
     async def test_non_event_does_not_attach_kwargs(self):
-        middleware = AsyncAttachingAgentKwargs()
+        middleware = AsyncAttachingConversationKwargs()
         req = AsyncBoltRequest(body="payload={}", headers={})
 
         resp = await middleware.async_process(req=req, resp=BoltResponse(status=404), next=next)
