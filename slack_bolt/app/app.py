@@ -69,7 +69,7 @@ from slack_bolt.middleware import (
     IgnoringSelfEvents,
     CustomMiddleware,
     AttachingFunctionToken,
-    AttachingAgentKwargs,
+    AttachingConversationKwargs,
 )
 from slack_bolt.middleware.assistant import Assistant
 from slack_bolt.middleware.message_listener_matches import MessageListenerMatches
@@ -133,7 +133,7 @@ class App:
         listener_executor: Optional[Executor] = None,
         # for AI Agents & Assistants
         assistant_thread_context_store: Optional[AssistantThreadContextStore] = None,
-        attaching_agent_kwargs_enabled: bool = True,
+        attaching_conversation_kwargs_enabled: bool = True,
     ):
         """Bolt App that provides functionalities to register middleware/listeners.
 
@@ -354,7 +354,7 @@ class App:
             listener_executor = ThreadPoolExecutor(max_workers=5)
 
         self._assistant_thread_context_store = assistant_thread_context_store
-        self._attaching_agent_kwargs_enabled = attaching_agent_kwargs_enabled
+        self._attaching_conversation_kwargs_enabled = attaching_conversation_kwargs_enabled
 
         self._process_before_response = process_before_response
         self._listener_runner = ThreadListenerRunner(
@@ -844,8 +844,8 @@ class App:
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.event(event, base_logger=self._base_logger)
-            if self._attaching_agent_kwargs_enabled:
-                middleware.insert(0, AttachingAgentKwargs(self._assistant_thread_context_store))
+            if self._attaching_conversation_kwargs_enabled:
+                middleware.insert(0, AttachingConversationKwargs(self._assistant_thread_context_store))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
         return __call__
@@ -903,8 +903,8 @@ class App:
             primary_matcher = builtin_matchers.message_event(
                 keyword=keyword, constraints=constraints, base_logger=self._base_logger
             )
-            if self._attaching_agent_kwargs_enabled:
-                middleware.insert(0, AttachingAgentKwargs(self._assistant_thread_context_store))
+            if self._attaching_conversation_kwargs_enabled:
+                middleware.insert(0, AttachingConversationKwargs(self._assistant_thread_context_store))
             middleware.insert(0, MessageListenerMatches(keyword))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 

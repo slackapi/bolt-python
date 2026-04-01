@@ -10,7 +10,7 @@ from .message_listener_matches.async_message_listener_matches import (
     AsyncMessageListenerMatches,
 )
 from .attaching_function_token.async_attaching_function_token import AsyncAttachingFunctionToken
-from .attaching_agent_kwargs.async_attaching_agent_kwargs import AsyncAttachingAgentKwargs
+from .attaching_conversation_kwargs.async_attaching_conversation_kwargs import AsyncAttachingConversationKwargs
 
 __all__ = [
     "AsyncIgnoringSelfEvents",
@@ -19,5 +19,5 @@ __all__ = [
     "AsyncUrlVerification",
     "AsyncMessageListenerMatches",
     "AsyncAttachingFunctionToken",
-    "AsyncAttachingAgentKwargs",
+    "AsyncAttachingConversationKwargs",
 ]

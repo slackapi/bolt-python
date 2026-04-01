@@ -216,7 +216,7 @@ class TestAsyncEventsAssistant:
 
     @pytest.mark.asyncio
     async def test_assistant_events_kwargs_disabled(self):
-        app = AsyncApp(client=self.web_client, attaching_agent_kwargs_enabled=False)
+        app = AsyncApp(client=self.web_client, attaching_conversation_kwargs_enabled=False)
         listener_called = asyncio.Event()
 
         @app.event("assistant_thread_started")

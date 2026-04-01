@@ -268,8 +268,8 @@ class TestAsyncEventsAssistantWithoutMiddleware:
         assert (await asyncio.wait_for(listener_called.wait(), timeout=0.1)) is True
 
     @pytest.mark.asyncio
-    async def test_assistant_events_agent_kwargs_disabled(self):
-        app = AsyncApp(client=self.web_client, attaching_agent_kwargs_enabled=False)
+    async def test_assistant_events_conversation_kwargs_disabled(self):
+        app = AsyncApp(client=self.web_client, attaching_conversation_kwargs_enabled=False)
 
         listener_called = asyncio.Event()
 
