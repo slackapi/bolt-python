@@ -65,6 +65,10 @@ It's also possible to run a middleware only for a particular listener.</p>
 <dd>
 <div class="desc"></div>
 </dd>
+<dt><code class="name"><a title="slack_bolt.middleware.attaching_conversation_kwargs" href="attaching_conversation_kwargs/index.html">slack_bolt.middleware.attaching_conversation_kwargs</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt><code class="name"><a title="slack_bolt.middleware.attaching_function_token" href="attaching_function_token/index.html">slack_bolt.middleware.attaching_function_token</a></code></dt>
 <dd>
 <div class="desc"></div>
@@ -114,6 +118,76 @@ It's also possible to run a middleware only for a particular listener.</p>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="slack_bolt.middleware.AttachingConversationKwargs"><code class="flex name class">
+<span>class <span class="ident">AttachingConversationKwargs</span></span>
+<span>(</span><span>thread_context_store: <a title="slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore" href="../context/assistant/thread_context_store/store.html#slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore">AssistantThreadContextStore</a> | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AttachingConversationKwargs(Middleware):
+
+    thread_context_store: Optional[AssistantThreadContextStore]
+
+    def __init__(self, thread_context_store: Optional[AssistantThreadContextStore] = None):
+        self.thread_context_store = thread_context_store
+
+    def process(self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse]) -&gt; Optional[BoltResponse]:
+        event = to_event(req.body)
+        if event is not None:
+            if is_assistant_event(req.body):
+                assistant = AssistantUtilities(
+                    payload=event,
+                    context=req.context,
+                    thread_context_store=self.thread_context_store,
+                )
+                req.context[&#34;say&#34;] = assistant.say
+                req.context[&#34;set_title&#34;] = assistant.set_title
+                req.context[&#34;set_suggested_prompts&#34;] = assistant.set_suggested_prompts
+                req.context[&#34;get_thread_context&#34;] = assistant.get_thread_context
+                req.context[&#34;save_thread_context&#34;] = assistant.save_thread_context
+
+            # TODO: in the future we might want to introduce a &#34;proper&#34; extract_ts utility
+            thread_ts = req.context.thread_ts or event.get(&#34;ts&#34;)
+            if req.context.channel_id and thread_ts:
+                req.context[&#34;set_status&#34;] = SetStatus(
+                    client=req.context.client,
+                    channel_id=req.context.channel_id,
+                    thread_ts=thread_ts,
+                )
+                req.context[&#34;say_stream&#34;] = SayStream(
+                    client=req.context.client,
+                    channel=req.context.channel_id,
+                    recipient_team_id=req.context.team_id or req.context.enterprise_id,
+                    recipient_user_id=req.context.user_id,
+                    thread_ts=thread_ts,
+                )
+        return next()</code></pre>
+</details>
+<div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="slack_bolt.middleware.middleware.Middleware" href="middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.middleware.AttachingConversationKwargs.thread_context_store"><code class="name">var <span class="ident">thread_context_store</span> : <a title="slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore" href="../context/assistant/thread_context_store/store.html#slack_bolt.context.assistant.thread_context_store.store.AssistantThreadContextStore">AssistantThreadContextStore</a> | None</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="slack_bolt.middleware.middleware.Middleware" href="middleware.html#slack_bolt.middleware.middleware.Middleware">Middleware</a></b></code>:
+<ul class="hlist">
+<li><code><a title="slack_bolt.middleware.middleware.Middleware.name" href="middleware.html#slack_bolt.middleware.middleware.Middleware.name">name</a></code></li>
+<li><code><a title="slack_bolt.middleware.middleware.Middleware.process" href="middleware.html#slack_bolt.middleware.middleware.Middleware.process">process</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
 <dt id="slack_bolt.middleware.AttachingFunctionToken"><code class="flex name class">
 <span>class <span class="ident">AttachingFunctionToken</span></span>
 </code></dt>
@@ -385,6 +459,7 @@ It's also possible to run a middleware only for a particular listener.</p>
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li><a title="slack_bolt.middleware.assistant.assistant.Assistant" href="assistant/assistant.html#slack_bolt.middleware.assistant.assistant.Assistant">Assistant</a></li>
+<li><a title="slack_bolt.middleware.attaching_conversation_kwargs.attaching_conversation_kwargs.AttachingConversationKwargs" href="attaching_conversation_kwargs/attaching_conversation_kwargs.html#slack_bolt.middleware.attaching_conversation_kwargs.attaching_conversation_kwargs.AttachingConversationKwargs">AttachingConversationKwargs</a></li>
 <li><a title="slack_bolt.middleware.attaching_function_token.attaching_function_token.AttachingFunctionToken" href="attaching_function_token/attaching_function_token.html#slack_bolt.middleware.attaching_function_token.attaching_function_token.AttachingFunctionToken">AttachingFunctionToken</a></li>
 <li><a title="slack_bolt.middleware.authorization.authorization.Authorization" href="authorization/authorization.html#slack_bolt.middleware.authorization.authorization.Authorization">Authorization</a></li>
 <li><a title="slack_bolt.middleware.custom_middleware.CustomMiddleware" href="custom_middleware.html#slack_bolt.middleware.custom_middleware.CustomMiddleware">CustomMiddleware</a></li>
@@ -1009,6 +1084,7 @@ Refer to <a href="https://docs.slack.dev/interactivity/implementing-slash-comman
 <li><code><a title="slack_bolt.middleware.async_custom_middleware" href="async_custom_middleware.html">slack_bolt.middleware.async_custom_middleware</a></code></li>
 <li><code><a title="slack_bolt.middleware.async_middleware" href="async_middleware.html">slack_bolt.middleware.async_middleware</a></code></li>
 <li><code><a title="slack_bolt.middleware.async_middleware_error_handler" href="async_middleware_error_handler.html">slack_bolt.middleware.async_middleware_error_handler</a></code></li>
+<li><code><a title="slack_bolt.middleware.attaching_conversation_kwargs" href="attaching_conversation_kwargs/index.html">slack_bolt.middleware.attaching_conversation_kwargs</a></code></li>
 <li><code><a title="slack_bolt.middleware.attaching_function_token" href="attaching_function_token/index.html">slack_bolt.middleware.attaching_function_token</a></code></li>
 <li><code><a title="slack_bolt.middleware.authorization" href="authorization/index.html">slack_bolt.middleware.authorization</a></code></li>
 <li><code><a title="slack_bolt.middleware.custom_middleware" href="custom_middleware.html">slack_bolt.middleware.custom_middleware</a></code></li>
@@ -1023,6 +1099,12 @@ Refer to <a href="https://docs.slack.dev/interactivity/implementing-slash-comman
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="slack_bolt.middleware.AttachingConversationKwargs" href="#slack_bolt.middleware.AttachingConversationKwargs">AttachingConversationKwargs</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.middleware.AttachingConversationKwargs.thread_context_store" href="#slack_bolt.middleware.AttachingConversationKwargs.thread_context_store">thread_context_store</a></code></li>
+</ul>
+</li>
 <li>
 <h4><code><a title="slack_bolt.middleware.AttachingFunctionToken" href="#slack_bolt.middleware.AttachingFunctionToken">AttachingFunctionToken</a></code></h4>
 </li>

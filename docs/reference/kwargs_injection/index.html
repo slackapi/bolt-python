@@ -85,7 +85,7 @@ For steps from apps, checking <code><a title="slack_bolt.workflows.step.utilitie
     error: Optional[Exception] = None,  # for error handlers
     next_keys_required: bool = True,  # False for listeners / middleware / error handlers
 ) -&gt; Dict[str, Any]:
-    all_available_args = {
+    all_available_args: Dict[str, Any] = {
         &#34;logger&#34;: logger,
         &#34;client&#34;: request.context.client,
         &#34;req&#34;: request,
@@ -113,6 +113,7 @@ For steps from apps, checking <code><a title="slack_bolt.workflows.step.utilitie
         &#34;set_title&#34;: request.context.set_title,
         &#34;set_suggested_prompts&#34;: request.context.set_suggested_prompts,
         &#34;save_thread_context&#34;: request.context.save_thread_context,
+        &#34;say_stream&#34;: request.context.say_stream,
         # middleware
         &#34;next&#34;: next_func,
         &#34;next_&#34;: next_func,  # for the middleware using Python&#39;s built-in `next()` function
@@ -157,7 +158,7 @@ For steps from apps, checking <code><a title="slack_bolt.workflows.step.utilitie
     for name in required_arg_names:
         if name == &#34;args&#34;:
             if isinstance(request, BoltRequest):
-                kwargs[name] = Args(**all_available_args)  # type: ignore[arg-type]
+                kwargs[name] = Args(**all_available_args)
             else:
                 logger.warning(f&#34;Unknown Request object type detected ({type(request)})&#34;)
 
@@ -175,7 +176,7 @@ For steps from apps, checking <code><a title="slack_bolt.workflows.step.utilitie
 <dl>
 <dt id="slack_bolt.kwargs_injection.Args"><code class="flex name class">
 <span>class <span class="ident">Args</span></span>
-<span>(</span><span>*,<br>logger: logging.Logger,<br>client: slack_sdk.web.client.WebClient,<br>req: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>,<br>resp: <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>,<br>context: <a title="slack_bolt.context.context.BoltContext" href="../context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a>,<br>body: Dict[str, Any],<br>payload: Dict[str, Any],<br>options: Dict[str, Any] | None = None,<br>shortcut: Dict[str, Any] | None = None,<br>action: Dict[str, Any] | None = None,<br>view: Dict[str, Any] | None = None,<br>command: Dict[str, Any] | None = None,<br>event: Dict[str, Any] | None = None,<br>message: Dict[str, Any] | None = None,<br>ack: <a title="slack_bolt.context.ack.ack.Ack" href="../context/ack/ack.html#slack_bolt.context.ack.ack.Ack">Ack</a>,<br>say: <a title="slack_bolt.context.say.say.Say" href="../context/say/say.html#slack_bolt.context.say.say.Say">Say</a>,<br>respond: <a title="slack_bolt.context.respond.respond.Respond" href="../context/respond/respond.html#slack_bolt.context.respond.respond.Respond">Respond</a>,<br>complete: <a title="slack_bolt.context.complete.complete.Complete" href="../context/complete/complete.html#slack_bolt.context.complete.complete.Complete">Complete</a>,<br>fail: <a title="slack_bolt.context.fail.fail.Fail" href="../context/fail/fail.html#slack_bolt.context.fail.fail.Fail">Fail</a>,<br>set_status: <a title="slack_bolt.context.set_status.set_status.SetStatus" href="../context/set_status/set_status.html#slack_bolt.context.set_status.set_status.SetStatus">SetStatus</a> | None = None,<br>set_title: <a title="slack_bolt.context.set_title.set_title.SetTitle" href="../context/set_title/set_title.html#slack_bolt.context.set_title.set_title.SetTitle">SetTitle</a> | None = None,<br>set_suggested_prompts: <a title="slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts" href="../context/set_suggested_prompts/set_suggested_prompts.html#slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts">SetSuggestedPrompts</a> | None = None,<br>get_thread_context: <a title="slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext" href="../context/get_thread_context/get_thread_context.html#slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext">GetThreadContext</a> | None = None,<br>save_thread_context: <a title="slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext" href="../context/save_thread_context/save_thread_context.html#slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext">SaveThreadContext</a> | None = None,<br>next: Callable[[], None],<br>**kwargs)</span>
+<span>(</span><span>*,<br>logger: logging.Logger,<br>client: slack_sdk.web.client.WebClient,<br>req: <a title="slack_bolt.request.request.BoltRequest" href="../request/request.html#slack_bolt.request.request.BoltRequest">BoltRequest</a>,<br>resp: <a title="slack_bolt.response.response.BoltResponse" href="../response/response.html#slack_bolt.response.response.BoltResponse">BoltResponse</a>,<br>context: <a title="slack_bolt.context.context.BoltContext" href="../context/context.html#slack_bolt.context.context.BoltContext">BoltContext</a>,<br>body: Dict[str, Any],<br>payload: Dict[str, Any],<br>options: Dict[str, Any] | None = None,<br>shortcut: Dict[str, Any] | None = None,<br>action: Dict[str, Any] | None = None,<br>view: Dict[str, Any] | None = None,<br>command: Dict[str, Any] | None = None,<br>event: Dict[str, Any] | None = None,<br>message: Dict[str, Any] | None = None,<br>ack: <a title="slack_bolt.context.ack.ack.Ack" href="../context/ack/ack.html#slack_bolt.context.ack.ack.Ack">Ack</a>,<br>say: <a title="slack_bolt.context.say.say.Say" href="../context/say/say.html#slack_bolt.context.say.say.Say">Say</a>,<br>respond: <a title="slack_bolt.context.respond.respond.Respond" href="../context/respond/respond.html#slack_bolt.context.respond.respond.Respond">Respond</a>,<br>complete: <a title="slack_bolt.context.complete.complete.Complete" href="../context/complete/complete.html#slack_bolt.context.complete.complete.Complete">Complete</a>,<br>fail: <a title="slack_bolt.context.fail.fail.Fail" href="../context/fail/fail.html#slack_bolt.context.fail.fail.Fail">Fail</a>,<br>set_status: <a title="slack_bolt.context.set_status.set_status.SetStatus" href="../context/set_status/set_status.html#slack_bolt.context.set_status.set_status.SetStatus">SetStatus</a> | None = None,<br>set_title: <a title="slack_bolt.context.set_title.set_title.SetTitle" href="../context/set_title/set_title.html#slack_bolt.context.set_title.set_title.SetTitle">SetTitle</a> | None = None,<br>set_suggested_prompts: <a title="slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts" href="../context/set_suggested_prompts/set_suggested_prompts.html#slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts">SetSuggestedPrompts</a> | None = None,<br>get_thread_context: <a title="slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext" href="../context/get_thread_context/get_thread_context.html#slack_bolt.context.get_thread_context.get_thread_context.GetThreadContext">GetThreadContext</a> | None = None,<br>save_thread_context: <a title="slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext" href="../context/save_thread_context/save_thread_context.html#slack_bolt.context.save_thread_context.save_thread_context.SaveThreadContext">SaveThreadContext</a> | None = None,<br>say_stream: <a title="slack_bolt.context.say_stream.say_stream.SayStream" href="../context/say_stream/say_stream.html#slack_bolt.context.say_stream.say_stream.SayStream">SayStream</a> | None = None,<br>next: Callable[[], None],<br>**kwargs)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -266,6 +267,8 @@ For steps from apps, checking <code><a title="slack_bolt.workflows.step.utilitie
     &#34;&#34;&#34;`get_thread_context()` utility function for AI Agents &amp; Assistants&#34;&#34;&#34;
     save_thread_context: Optional[SaveThreadContext]
     &#34;&#34;&#34;`save_thread_context()` utility function for AI Agents &amp; Assistants&#34;&#34;&#34;
+    say_stream: Optional[SayStream]
+    &#34;&#34;&#34;`say_stream()` utility function for conversations, AI Agents &amp; Assistants&#34;&#34;&#34;
     # middleware
     next: Callable[[], None]
     &#34;&#34;&#34;`next()` utility function, which tells the middleware chain that it can continue with the next one&#34;&#34;&#34;
@@ -299,6 +302,7 @@ For steps from apps, checking <code><a title="slack_bolt.workflows.step.utilitie
         set_suggested_prompts: Optional[SetSuggestedPrompts] = None,
         get_thread_context: Optional[GetThreadContext] = None,
         save_thread_context: Optional[SaveThreadContext] = None,
+        say_stream: Optional[SayStream] = None,
         # As this method is not supposed to be invoked by bolt-python users,
         # the naming conflict with the built-in one affects
         # only the internals of this method
@@ -332,6 +336,7 @@ For steps from apps, checking <code><a title="slack_bolt.workflows.step.utilitie
         self.set_suggested_prompts = set_suggested_prompts
         self.get_thread_context = get_thread_context
         self.save_thread_context = save_thread_context
+        self.say_stream = say_stream
 
         self.next: Callable[[], None] = next
         self.next_: Callable[[], None] = next</code></pre>
@@ -455,6 +460,10 @@ def handle_buttons(args):
 <dd>
 <div class="desc"><p><code>say()</code> utility function, which calls <code>chat.postMessage</code> API with the associated channel ID</p></div>
 </dd>
+<dt id="slack_bolt.kwargs_injection.Args.say_stream"><code class="name">var <span class="ident">say_stream</span> : <a title="slack_bolt.context.say_stream.say_stream.SayStream" href="../context/say_stream/say_stream.html#slack_bolt.context.say_stream.say_stream.SayStream">SayStream</a> | None</code></dt>
+<dd>
+<div class="desc"><p><code>say_stream()</code> utility function for conversations, AI Agents &amp; Assistants</p></div>
+</dd>
 <dt id="slack_bolt.kwargs_injection.Args.set_status"><code class="name">var <span class="ident">set_status</span> : <a title="slack_bolt.context.set_status.set_status.SetStatus" href="../context/set_status/set_status.html#slack_bolt.context.set_status.set_status.SetStatus">SetStatus</a> | None</code></dt>
 <dd>
 <div class="desc"><p><code>set_status()</code> utility function for AI Agents &amp; Assistants</p></div>
@@ -531,6 +540,7 @@ def handle_buttons(args):
 <li><code><a title="slack_bolt.kwargs_injection.Args.response" href="#slack_bolt.kwargs_injection.Args.response">response</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.Args.save_thread_context" href="#slack_bolt.kwargs_injection.Args.save_thread_context">save_thread_context</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.Args.say" href="#slack_bolt.kwargs_injection.Args.say">say</a></code></li>
+<li><code><a title="slack_bolt.kwargs_injection.Args.say_stream" href="#slack_bolt.kwargs_injection.Args.say_stream">say_stream</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.Args.set_status" href="#slack_bolt.kwargs_injection.Args.set_status">set_status</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.Args.set_suggested_prompts" href="#slack_bolt.kwargs_injection.Args.set_suggested_prompts">set_suggested_prompts</a></code></li>
 <li><code><a title="slack_bolt.kwargs_injection.Args.set_title" href="#slack_bolt.kwargs_injection.Args.set_title">set_title</a></code></li>

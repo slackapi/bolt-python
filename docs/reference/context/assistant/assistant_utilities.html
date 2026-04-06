@@ -91,6 +91,13 @@ el.replaceWith(d);
 
     @property
     def set_status(self) -&gt; SetStatus:
+        warnings.warn(
+            &#34;AssistantUtilities.set_status is deprecated. &#34;
+            &#34;Use the set_status argument directly in your listener function &#34;
+            &#34;or access it via context.set_status instead.&#34;,
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return SetStatus(self.client, self.channel_id, self.thread_ts)
 
     @property
@@ -205,6 +212,13 @@ def say(self) -&gt; Say:
 </summary>
 <pre><code class="python">@property
 def set_status(self) -&gt; SetStatus:
+    warnings.warn(
+        &#34;AssistantUtilities.set_status is deprecated. &#34;
+        &#34;Use the set_status argument directly in your listener function &#34;
+        &#34;or access it via context.set_status instead.&#34;,
+        DeprecationWarning,
+        stacklevel=2,
+    )
     return SetStatus(self.client, self.channel_id, self.thread_ts)</code></pre>
 </details>
 <div class="desc"></div>

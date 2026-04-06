@@ -77,9 +77,10 @@ el.replaceWith(d);
         )
         returned_response = await self.func(**kwargs)
         if returned_response is not None and isinstance(returned_response, BoltResponse):
-            response.status = returned_response.status  # type: ignore[union-attr]
-            response.headers = returned_response.headers  # type: ignore[union-attr]
-            response.body = returned_response.body  # type: ignore[union-attr]</code></pre>
+            assert response is not None, &#34;response must be provided when returning a BoltResponse from an error handler&#34;
+            response.status = returned_response.status
+            response.headers = returned_response.headers
+            response.body = returned_response.body</code></pre>
 </details>
 <div class="desc"></div>
 <h3>Ancestors</h3>
