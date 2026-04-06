@@ -104,7 +104,7 @@ class Args:
     save_thread_context: Optional[SaveThreadContext]
     """`save_thread_context()` utility function for AI Agents & Assistants"""
     say_stream: Optional[SayStream]
-    """`say_stream()` utility function for AI Agents & Assistants"""
+    """`say_stream()` utility function for conversations, AI Agents & Assistants"""
     # middleware
     next: Callable[[], None]
     """`next()` utility function, which tells the middleware chain that it can continue with the next one"""

@@ -245,8 +245,8 @@ class TestEventsAssistantWithoutMiddleware:
         assert response.status == 200
         assert listener_called.wait(timeout=0.1) is True
 
-    def test_assistant_events_agent_kwargs_disabled(self):
-        app = App(client=self.web_client, attaching_agent_kwargs_enabled=False)
+    def test_assistant_events_conversation_kwargs_disabled(self):
+        app = App(client=self.web_client, attaching_conversation_kwargs_enabled=False)
 
         listener_called = Event()
 
