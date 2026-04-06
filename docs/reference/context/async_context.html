@@ -80,7 +80,7 @@ el.replaceWith(d);
 
     # The return type is intentionally string to avoid circular imports
     @property
-    def listener_runner(self) -&gt; &#34;AsyncioListenerRunner&#34;:  # type: ignore[name-defined]
+    def listener_runner(self) -&gt; &#34;AsyncioListenerRunner&#34;:
         &#34;&#34;&#34;The properly configured listener_runner that is available for middleware/listeners.&#34;&#34;&#34;
         return self[&#34;listener_runner&#34;]
 
@@ -149,7 +149,7 @@ el.replaceWith(d);
             Callable `say()` function
         &#34;&#34;&#34;
         if &#34;say&#34; not in self:
-            self[&#34;say&#34;] = AsyncSay(client=self.client, channel=self.channel_id, thread_ts=self.thread_ts)
+            self[&#34;say&#34;] = AsyncSay(client=self.client, channel=self.channel_id)
         return self[&#34;say&#34;]
 
     @property
@@ -241,6 +241,10 @@ el.replaceWith(d);
     @property
     def get_thread_context(self) -&gt; Optional[AsyncGetThreadContext]:
         return self.get(&#34;get_thread_context&#34;)
+
+    @property
+    def say_stream(self) -&gt; Optional[AsyncSayStream]:
+        return self.get(&#34;say_stream&#34;)
 
     @property
     def save_thread_context(self) -&gt; Optional[AsyncSaveThreadContext]:
@@ -457,7 +461,7 @@ def get_thread_context(self) -&gt; Optional[AsyncGetThreadContext]:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
-def listener_runner(self) -&gt; &#34;AsyncioListenerRunner&#34;:  # type: ignore[name-defined]
+def listener_runner(self) -&gt; &#34;AsyncioListenerRunner&#34;:
     &#34;&#34;&#34;The properly configured listener_runner that is available for middleware/listeners.&#34;&#34;&#34;
     return self[&#34;listener_runner&#34;]</code></pre>
 </details>
@@ -547,7 +551,7 @@ def say(self) -&gt; AsyncSay:
         Callable `say()` function
     &#34;&#34;&#34;
     if &#34;say&#34; not in self:
-        self[&#34;say&#34;] = AsyncSay(client=self.client, channel=self.channel_id, thread_ts=self.thread_ts)
+        self[&#34;say&#34;] = AsyncSay(client=self.client, channel=self.channel_id)
     return self[&#34;say&#34;]</code></pre>
 </details>
 <div class="desc"><p><code>say()</code> function for this request.</p>
@@ -564,6 +568,18 @@ async def handle_button_clicks(ack, say):
 </code></pre>
 <h2 id="returns">Returns</h2>
 <p>Callable <code>say()</code> function</p></div>
+</dd>
+<dt id="slack_bolt.context.async_context.AsyncBoltContext.say_stream"><code class="name">prop <span class="ident">say_stream</span> : <a title="slack_bolt.context.say_stream.async_say_stream.AsyncSayStream" href="say_stream/async_say_stream.html#slack_bolt.context.say_stream.async_say_stream.AsyncSayStream">AsyncSayStream</a> | None</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def say_stream(self) -&gt; Optional[AsyncSayStream]:
+    return self.get(&#34;say_stream&#34;)</code></pre>
+</details>
+<div class="desc"></div>
 </dd>
 <dt id="slack_bolt.context.async_context.AsyncBoltContext.set_status"><code class="name">prop <span class="ident">set_status</span> : <a title="slack_bolt.context.set_status.async_set_status.AsyncSetStatus" href="set_status/async_set_status.html#slack_bolt.context.set_status.async_set_status.AsyncSetStatus">AsyncSetStatus</a> | None</code></dt>
 <dd>
@@ -694,6 +710,7 @@ def set_title(self) -&gt; Optional[AsyncSetTitle]:
 <li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.respond" href="#slack_bolt.context.async_context.AsyncBoltContext.respond">respond</a></code></li>
 <li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.save_thread_context" href="#slack_bolt.context.async_context.AsyncBoltContext.save_thread_context">save_thread_context</a></code></li>
 <li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.say" href="#slack_bolt.context.async_context.AsyncBoltContext.say">say</a></code></li>
+<li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.say_stream" href="#slack_bolt.context.async_context.AsyncBoltContext.say_stream">say_stream</a></code></li>
 <li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.set_status" href="#slack_bolt.context.async_context.AsyncBoltContext.set_status">set_status</a></code></li>
 <li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.set_suggested_prompts" href="#slack_bolt.context.async_context.AsyncBoltContext.set_suggested_prompts">set_suggested_prompts</a></code></li>
 <li><code><a title="slack_bolt.context.async_context.AsyncBoltContext.set_title" href="#slack_bolt.context.async_context.AsyncBoltContext.set_title">set_title</a></code></li>

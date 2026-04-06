@@ -139,7 +139,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
 </dd>
 <dt id="slack_bolt.async_app.AsyncApp"><code class="flex name class">
 <span>class <span class="ident">AsyncApp</span></span>
-<span>(</span><span>*,<br>logger: logging.Logger | None = None,<br>name: str | None = None,<br>process_before_response: bool = False,<br>raise_error_for_unhandled_request: bool = False,<br>signing_secret: str | None = None,<br>token: str | None = None,<br>client: slack_sdk.web.async_client.AsyncWebClient | None = None,<br>before_authorize: <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a> | Callable[..., Awaitable[Any]] | None = None,<br>authorize: Callable[..., Awaitable[<a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]] | None = None,<br>user_facing_authorize_error_message: str | None = None,<br>installation_store: slack_sdk.oauth.installation_store.async_installation_store.AsyncInstallationStore | None = None,<br>installation_store_bot_only: bool | None = None,<br>request_verification_enabled: bool = True,<br>ignoring_self_events_enabled: bool = True,<br>ignoring_self_assistant_message_events_enabled: bool = True,<br>ssl_check_enabled: bool = True,<br>url_verification_enabled: bool = True,<br>attaching_function_token_enabled: bool = True,<br>oauth_settings: <a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings" href="oauth/async_oauth_settings.html#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings">AsyncOAuthSettings</a> | None = None,<br>oauth_flow: <a title="slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow" href="oauth/async_oauth_flow.html#slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow">AsyncOAuthFlow</a> | None = None,<br>verification_token: str | None = None,<br>assistant_thread_context_store: <a title="slack_bolt.context.assistant.thread_context_store.async_store.AsyncAssistantThreadContextStore" href="context/assistant/thread_context_store/async_store.html#slack_bolt.context.assistant.thread_context_store.async_store.AsyncAssistantThreadContextStore">AsyncAssistantThreadContextStore</a> | None = None)</span>
+<span>(</span><span>*,<br>logger: logging.Logger | None = None,<br>name: str | None = None,<br>process_before_response: bool = False,<br>raise_error_for_unhandled_request: bool = False,<br>signing_secret: str | None = None,<br>token: str | None = None,<br>client: slack_sdk.web.async_client.AsyncWebClient | None = None,<br>before_authorize: <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a> | Callable[..., Awaitable[Any]] | None = None,<br>authorize: Callable[..., Awaitable[<a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]] | None = None,<br>user_facing_authorize_error_message: str | None = None,<br>installation_store: slack_sdk.oauth.installation_store.async_installation_store.AsyncInstallationStore | None = None,<br>installation_store_bot_only: bool | None = None,<br>request_verification_enabled: bool = True,<br>ignoring_self_events_enabled: bool = True,<br>ignoring_self_assistant_message_events_enabled: bool = True,<br>ssl_check_enabled: bool = True,<br>url_verification_enabled: bool = True,<br>attaching_function_token_enabled: bool = True,<br>oauth_settings: <a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings" href="oauth/async_oauth_settings.html#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings">AsyncOAuthSettings</a> | None = None,<br>oauth_flow: <a title="slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow" href="oauth/async_oauth_flow.html#slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow">AsyncOAuthFlow</a> | None = None,<br>verification_token: str | None = None,<br>assistant_thread_context_store: <a title="slack_bolt.context.assistant.thread_context_store.async_store.AsyncAssistantThreadContextStore" href="context/assistant/thread_context_store/async_store.html#slack_bolt.context.assistant.thread_context_store.async_store.AsyncAssistantThreadContextStore">AsyncAssistantThreadContextStore</a> | None = None,<br>attaching_conversation_kwargs_enabled: bool = True)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -183,6 +183,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
         verification_token: Optional[str] = None,
         # for AI Agents &amp; Assistants
         assistant_thread_context_store: Optional[AsyncAssistantThreadContextStore] = None,
+        attaching_conversation_kwargs_enabled: bool = True,
     ):
         &#34;&#34;&#34;Bolt App that provides functionalities to register middleware/listeners.
 
@@ -403,6 +404,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
         self._async_listeners: List[AsyncListener] = []
 
         self._assistant_thread_context_store = assistant_thread_context_store
+        self._attaching_conversation_kwargs_enabled = attaching_conversation_kwargs_enabled
 
         self._process_before_response = process_before_response
         self._async_listener_runner = AsyncioListenerRunner(
@@ -656,7 +658,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
                 self._framework_logger.debug(debug_checking_listener(listener_name))
                 if await listener.async_matches(req=req, resp=resp):  # type: ignore[arg-type]
                     # run all the middleware attached to this listener first
-                    (middleware_resp, next_was_not_called) = await listener.run_async_middleware(
+                    middleware_resp, next_was_not_called = await listener.run_async_middleware(
                         req=req, resp=resp  # type: ignore[arg-type]
                     )
                     if next_was_not_called:
@@ -906,10 +908,13 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
             middleware: A list of lister middleware functions.
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         &#34;&#34;&#34;
+        middleware = list(middleware) if middleware else []
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.event(event, True, base_logger=self._base_logger)
+            if self._attaching_conversation_kwargs_enabled:
+                middleware.insert(0, AsyncAttachingConversationKwargs(self._assistant_thread_context_store))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
         return __call__
@@ -970,6 +975,8 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
                 asyncio=True,
                 base_logger=self._base_logger,
             )
+            if self._attaching_conversation_kwargs_enabled:
+                middleware.insert(0, AsyncAttachingConversationKwargs(self._assistant_thread_context_store))
             middleware.insert(0, AsyncMessageListenerMatches(keyword))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
@@ -1471,20 +1478,6 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
         # It is intended for apps that start lazy listeners from their custom global middleware.
         req.context[&#34;listener_runner&#34;] = self.listener_runner
 
-        # For AI Agents &amp; Assistants
-        if is_assistant_event(req.body):
-            assistant = AsyncAssistantUtilities(
-                payload=to_event(req.body),  # type:ignore[arg-type]
-                context=req.context,
-                thread_context_store=self._assistant_thread_context_store,
-            )
-            req.context[&#34;say&#34;] = assistant.say
-            req.context[&#34;set_status&#34;] = assistant.set_status
-            req.context[&#34;set_title&#34;] = assistant.set_title
-            req.context[&#34;set_suggested_prompts&#34;] = assistant.set_suggested_prompts
-            req.context[&#34;get_thread_context&#34;] = assistant.get_thread_context
-            req.context[&#34;save_thread_context&#34;] = assistant.save_thread_context
-
     @staticmethod
     def _to_listener_functions(
         kwargs: dict,
@@ -1535,7 +1528,7 @@ Apps can be run the same way as the synchronous example above. If you'd prefer a
             AsyncCustomListener(
                 app_name=self.name,
                 ack_function=functions.pop(0),
-                lazy_functions=functions,  # type:ignore[arg-type]
+                lazy_functions=functions,  # type: ignore[arg-type]
                 matchers=listener_matchers,
                 middleware=listener_middleware,
                 auto_acknowledgement=auto_acknowledgement,
@@ -1885,7 +1878,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
             self._framework_logger.debug(debug_checking_listener(listener_name))
             if await listener.async_matches(req=req, resp=resp):  # type: ignore[arg-type]
                 # run all the middleware attached to this listener first
-                (middleware_resp, next_was_not_called) = await listener.run_async_middleware(
+                middleware_resp, next_was_not_called = await listener.run_async_middleware(
                     req=req, resp=resp  # type: ignore[arg-type]
                 )
                 if next_was_not_called:
@@ -2334,10 +2327,13 @@ when getting an unhandled error in Bolt app.</dd>
         middleware: A list of lister middleware functions.
             Only when all the middleware call `next()` method, the listener function can be invoked.
     &#34;&#34;&#34;
+    middleware = list(middleware) if middleware else []
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.event(event, True, base_logger=self._base_logger)
+        if self._attaching_conversation_kwargs_enabled:
+            middleware.insert(0, AsyncAttachingConversationKwargs(self._assistant_thread_context_store))
         return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
     return __call__</code></pre>
@@ -2545,6 +2541,8 @@ Only when all the middleware call <code>next()</code> method, the listener funct
             asyncio=True,
             base_logger=self._base_logger,
         )
+        if self._attaching_conversation_kwargs_enabled:
+            middleware.insert(0, AsyncAttachingConversationKwargs(self._assistant_thread_context_store))
         middleware.insert(0, AsyncMessageListenerMatches(keyword))
         return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
@@ -3285,7 +3283,7 @@ def app_factory():
                 func=is_assistant_thread_started_event,
                 asyncio=True,
                 base_logger=self.base_logger,
-            ),  # type:ignore[arg-type]
+            ),  # type: ignore[arg-type]
             matchers,
         )
         if is_used_without_argument(args):
@@ -3294,7 +3292,7 @@ def app_factory():
                 self.build_listener(
                     listener_or_functions=func,
                     matchers=all_matchers,
-                    middleware=middleware,  # type:ignore[arg-type]
+                    middleware=middleware,  # type: ignore[arg-type]
                 )
             )
             return func
@@ -3331,7 +3329,7 @@ def app_factory():
                 func=is_user_message_event_in_assistant_thread,
                 asyncio=True,
                 base_logger=self.base_logger,
-            ),  # type:ignore[arg-type]
+            ),  # type: ignore[arg-type]
             matchers,
         )
         if is_used_without_argument(args):
@@ -3340,7 +3338,7 @@ def app_factory():
                 self.build_listener(
                     listener_or_functions=func,
                     matchers=all_matchers,
-                    middleware=middleware,  # type:ignore[arg-type]
+                    middleware=middleware,  # type: ignore[arg-type]
                 )
             )
             return func
@@ -3377,7 +3375,7 @@ def app_factory():
                 func=is_bot_message_event_in_assistant_thread,
                 asyncio=True,
                 base_logger=self.base_logger,
-            ),  # type:ignore[arg-type]
+            ),  # type: ignore[arg-type]
             matchers,
         )
         if is_used_without_argument(args):
@@ -3386,7 +3384,7 @@ def app_factory():
                 self.build_listener(
                     listener_or_functions=func,
                     matchers=all_matchers,
-                    middleware=middleware,  # type:ignore[arg-type]
+                    middleware=middleware,  # type: ignore[arg-type]
                 )
             )
             return func
@@ -3423,7 +3421,7 @@ def app_factory():
                 func=is_assistant_thread_context_changed_event,
                 asyncio=True,
                 base_logger=self.base_logger,
-            ),  # type:ignore[arg-type]
+            ),  # type: ignore[arg-type]
             matchers,
         )
         if is_used_without_argument(args):
@@ -3432,7 +3430,7 @@ def app_factory():
                 self.build_listener(
                     listener_or_functions=func,
                     matchers=all_matchers,
-                    middleware=middleware,  # type:ignore[arg-type]
+                    middleware=middleware,  # type: ignore[arg-type]
                 )
             )
             return func
@@ -3460,14 +3458,14 @@ def app_factory():
         primary_matcher: Union[Callable[..., bool], AsyncListenerMatcher],
         custom_matchers: Optional[Union[Callable[..., bool], AsyncListenerMatcher]],
     ):
-        return [primary_matcher] + (custom_matchers or [])  # type:ignore[operator]
+        return [primary_matcher] + (custom_matchers or [])  # type: ignore[operator]
 
     @staticmethod
     async def default_thread_context_changed(save_thread_context: AsyncSaveThreadContext, payload: dict):
         new_context: dict = payload[&#34;assistant_thread&#34;][&#34;context&#34;]
         await save_thread_context(new_context)
 
-    async def async_process(  # type:ignore[return]
+    async def async_process(  # type: ignore[return]
         self,
         *,
         req: AsyncBoltRequest,
@@ -3487,6 +3485,15 @@ def app_factory():
             if listeners is not None:
                 for listener in listeners:
                     if listener is not None and await listener.async_matches(req=req, resp=resp):
+                        middleware_resp, next_was_not_called = await listener.run_async_middleware(req=req, resp=resp)
+                        if next_was_not_called:
+                            if middleware_resp is not None:
+                                return middleware_resp
+                            # The listener middleware didn&#39;t call next().
+                            # Skip this listener and try the next one.
+                            continue
+                        if middleware_resp is not None:
+                            resp = middleware_resp
                         return await listener_runner.run(
                             request=req,
                             response=resp,
@@ -3506,13 +3513,14 @@ def app_factory():
         middleware: Optional[List[AsyncMiddleware]] = None,
         base_logger: Optional[Logger] = None,
     ) -&gt; AsyncListener:
-        if isinstance(listener_or_functions, Callable):  # type:ignore[arg-type]
-            listener_or_functions = [listener_or_functions]  # type:ignore[list-item]
+        if isinstance(listener_or_functions, Callable):  # type: ignore[arg-type]
+            listener_or_functions = [listener_or_functions]  # type: ignore[list-item]
 
         if isinstance(listener_or_functions, AsyncListener):
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
             middleware = middleware if middleware else []
+            middleware.insert(0, AsyncAttachingConversationKwargs(self.thread_context_store))
             functions = listener_or_functions
             ack_function = functions.pop(0)
 
@@ -3524,7 +3532,7 @@ def app_factory():
                 else:
                     listener_matchers.append(
                         build_listener_matcher(
-                            func=matcher,  # type:ignore[arg-type]
+                            func=matcher,  # type: ignore[arg-type]
                             asyncio=True,
                             base_logger=base_logger,
                         )
@@ -3599,7 +3607,7 @@ async def default_thread_context_changed(save_thread_context: AsyncSaveThreadCon
             func=is_bot_message_event_in_assistant_thread,
             asyncio=True,
             base_logger=self.base_logger,
-        ),  # type:ignore[arg-type]
+        ),  # type: ignore[arg-type]
         matchers,
     )
     if is_used_without_argument(args):
@@ -3608,7 +3616,7 @@ async def default_thread_context_changed(save_thread_context: AsyncSaveThreadCon
             self.build_listener(
                 listener_or_functions=func,
                 matchers=all_matchers,
-                middleware=middleware,  # type:ignore[arg-type]
+                middleware=middleware,  # type: ignore[arg-type]
             )
         )
         return func
@@ -3648,13 +3656,14 @@ async def default_thread_context_changed(save_thread_context: AsyncSaveThreadCon
     middleware: Optional[List[AsyncMiddleware]] = None,
     base_logger: Optional[Logger] = None,
 ) -&gt; AsyncListener:
-    if isinstance(listener_or_functions, Callable):  # type:ignore[arg-type]
-        listener_or_functions = [listener_or_functions]  # type:ignore[list-item]
+    if isinstance(listener_or_functions, Callable):  # type: ignore[arg-type]
+        listener_or_functions = [listener_or_functions]  # type: ignore[list-item]
 
     if isinstance(listener_or_functions, AsyncListener):
         return listener_or_functions
     elif isinstance(listener_or_functions, list):
         middleware = middleware if middleware else []
+        middleware.insert(0, AsyncAttachingConversationKwargs(self.thread_context_store))
         functions = listener_or_functions
         ack_function = functions.pop(0)
 
@@ -3666,7 +3675,7 @@ async def default_thread_context_changed(save_thread_context: AsyncSaveThreadCon
             else:
                 listener_matchers.append(
                     build_listener_matcher(
-                        func=matcher,  # type:ignore[arg-type]
+                        func=matcher,  # type: ignore[arg-type]
                         asyncio=True,
                         base_logger=base_logger,
                     )
@@ -3707,7 +3716,7 @@ async def default_thread_context_changed(save_thread_context: AsyncSaveThreadCon
             func=is_assistant_thread_context_changed_event,
             asyncio=True,
             base_logger=self.base_logger,
-        ),  # type:ignore[arg-type]
+        ),  # type: ignore[arg-type]
         matchers,
     )
     if is_used_without_argument(args):
@@ -3716,7 +3725,7 @@ async def default_thread_context_changed(save_thread_context: AsyncSaveThreadCon
             self.build_listener(
                 listener_or_functions=func,
                 matchers=all_matchers,
-                middleware=middleware,  # type:ignore[arg-type]
+                middleware=middleware,  # type: ignore[arg-type]
             )
         )
         return func
@@ -3763,7 +3772,7 @@ async def default_thread_context_changed(save_thread_context: AsyncSaveThreadCon
             func=is_assistant_thread_started_event,
             asyncio=True,
             base_logger=self.base_logger,
-        ),  # type:ignore[arg-type]
+        ),  # type: ignore[arg-type]
         matchers,
     )
     if is_used_without_argument(args):
@@ -3772,7 +3781,7 @@ async def default_thread_context_changed(save_thread_context: AsyncSaveThreadCon
             self.build_listener(
                 listener_or_functions=func,
                 matchers=all_matchers,
-                middleware=middleware,  # type:ignore[arg-type]
+                middleware=middleware,  # type: ignore[arg-type]
             )
         )
         return func
@@ -3819,7 +3828,7 @@ async def default_thread_context_changed(save_thread_context: AsyncSaveThreadCon
             func=is_user_message_event_in_assistant_thread,
             asyncio=True,
             base_logger=self.base_logger,
-        ),  # type:ignore[arg-type]
+        ),  # type: ignore[arg-type]
         matchers,
     )
     if is_used_without_argument(args):
@@ -3828,7 +3837,7 @@ async def default_thread_context_changed(save_thread_context: AsyncSaveThreadCon
             self.build_listener(
                 listener_or_functions=func,
                 matchers=all_matchers,
-                middleware=middleware,  # type:ignore[arg-type]
+                middleware=middleware,  # type: ignore[arg-type]
             )
         )
         return func
@@ -3898,7 +3907,7 @@ async def default_thread_context_changed(save_thread_context: AsyncSaveThreadCon
 
     # The return type is intentionally string to avoid circular imports
     @property
-    def listener_runner(self) -&gt; &#34;AsyncioListenerRunner&#34;:  # type: ignore[name-defined]
+    def listener_runner(self) -&gt; &#34;AsyncioListenerRunner&#34;:
         &#34;&#34;&#34;The properly configured listener_runner that is available for middleware/listeners.&#34;&#34;&#34;
         return self[&#34;listener_runner&#34;]
 
@@ -3967,7 +3976,7 @@ async def default_thread_context_changed(save_thread_context: AsyncSaveThreadCon
             Callable `say()` function
         &#34;&#34;&#34;
         if &#34;say&#34; not in self:
-            self[&#34;say&#34;] = AsyncSay(client=self.client, channel=self.channel_id, thread_ts=self.thread_ts)
+            self[&#34;say&#34;] = AsyncSay(client=self.client, channel=self.channel_id)
         return self[&#34;say&#34;]
 
     @property
@@ -4059,6 +4068,10 @@ async def default_thread_context_changed(save_thread_context: AsyncSaveThreadCon
     @property
     def get_thread_context(self) -&gt; Optional[AsyncGetThreadContext]:
         return self.get(&#34;get_thread_context&#34;)
+
+    @property
+    def say_stream(self) -&gt; Optional[AsyncSayStream]:
+        return self.get(&#34;say_stream&#34;)
 
     @property
     def save_thread_context(self) -&gt; Optional[AsyncSaveThreadContext]:
@@ -4275,7 +4288,7 @@ def get_thread_context(self) -&gt; Optional[AsyncGetThreadContext]:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
-def listener_runner(self) -&gt; &#34;AsyncioListenerRunner&#34;:  # type: ignore[name-defined]
+def listener_runner(self) -&gt; &#34;AsyncioListenerRunner&#34;:
     &#34;&#34;&#34;The properly configured listener_runner that is available for middleware/listeners.&#34;&#34;&#34;
     return self[&#34;listener_runner&#34;]</code></pre>
 </details>
@@ -4365,7 +4378,7 @@ def say(self) -&gt; AsyncSay:
         Callable `say()` function
     &#34;&#34;&#34;
     if &#34;say&#34; not in self:
-        self[&#34;say&#34;] = AsyncSay(client=self.client, channel=self.channel_id, thread_ts=self.thread_ts)
+        self[&#34;say&#34;] = AsyncSay(client=self.client, channel=self.channel_id)
     return self[&#34;say&#34;]</code></pre>
 </details>
 <div class="desc"><p><code>say()</code> function for this request.</p>
@@ -4382,6 +4395,18 @@ async def handle_button_clicks(ack, say):
 </code></pre>
 <h2 id="returns">Returns</h2>
 <p>Callable <code>say()</code> function</p></div>
+</dd>
+<dt id="slack_bolt.async_app.AsyncBoltContext.say_stream"><code class="name">prop <span class="ident">say_stream</span> : <a title="slack_bolt.context.say_stream.async_say_stream.AsyncSayStream" href="context/say_stream/async_say_stream.html#slack_bolt.context.say_stream.async_say_stream.AsyncSayStream">AsyncSayStream</a> | None</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def say_stream(self) -&gt; Optional[AsyncSayStream]:
+    return self.get(&#34;say_stream&#34;)</code></pre>
+</details>
+<div class="desc"></div>
 </dd>
 <dt id="slack_bolt.async_app.AsyncBoltContext.set_status"><code class="name">prop <span class="ident">set_status</span> : <a title="slack_bolt.context.set_status.async_set_status.AsyncSetStatus" href="context/set_status/async_set_status.html#slack_bolt.context.set_status.async_set_status.AsyncSetStatus">AsyncSetStatus</a> | None</code></dt>
 <dd>
@@ -4742,14 +4767,10 @@ def set_title(self) -&gt; Optional[AsyncSetTitle]:
         if self.thread_context_loaded is True:
             return self._thread_context
 
-        if self.payload.get(&#34;assistant_thread&#34;) is not None:
+        thread = self.payload.get(&#34;assistant_thread&#34;)
+        if isinstance(thread, dict) and thread.get(&#34;context&#34;, {}).get(&#34;channel_id&#34;) is not None:
             # assistant_thread_started
-            thread = self.payload[&#34;assistant_thread&#34;]
-            self._thread_context = (
-                AssistantThreadContext(thread[&#34;context&#34;])
-                if thread.get(&#34;context&#34;, {}).get(&#34;channel_id&#34;) is not None
-                else None
-            )
+            self._thread_context = AssistantThreadContext(thread[&#34;context&#34;])
             # for this event, the context will never be changed
             self.thread_context_loaded = True
         elif self.payload.get(&#34;channel&#34;) is not None and self.payload.get(&#34;thread_ts&#34;) is not None:
@@ -5231,6 +5252,97 @@ async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltRes
 </dd>
 </dl>
 </dd>
+<dt id="slack_bolt.async_app.AsyncSayStream"><code class="flex name class">
+<span>class <span class="ident">AsyncSayStream</span></span>
+<span>(</span><span>*,<br>client: slack_sdk.web.async_client.AsyncWebClient,<br>channel: str | None = None,<br>recipient_team_id: str | None = None,<br>recipient_user_id: str | None = None,<br>thread_ts: str | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AsyncSayStream:
+    client: AsyncWebClient
+    channel: Optional[str]
+    recipient_team_id: Optional[str]
+    recipient_user_id: Optional[str]
+    thread_ts: Optional[str]
+
+    def __init__(
+        self,
+        *,
+        client: AsyncWebClient,
+        channel: Optional[str] = None,
+        recipient_team_id: Optional[str] = None,
+        recipient_user_id: Optional[str] = None,
+        thread_ts: Optional[str] = None,
+    ):
+        self.client = client
+        self.channel = channel
+        self.recipient_team_id = recipient_team_id
+        self.recipient_user_id = recipient_user_id
+        self.thread_ts = thread_ts
+
+    async def __call__(
+        self,
+        *,
+        buffer_size: Optional[int] = None,
+        channel: Optional[str] = None,
+        recipient_team_id: Optional[str] = None,
+        recipient_user_id: Optional[str] = None,
+        thread_ts: Optional[str] = None,
+        **kwargs,
+    ) -&gt; AsyncChatStream:
+        &#34;&#34;&#34;Starts a new chat stream with context.&#34;&#34;&#34;
+        channel = channel or self.channel
+        thread_ts = thread_ts or self.thread_ts
+        if channel is None:
+            raise ValueError(&#34;say_stream without channel here is unsupported&#34;)
+        if thread_ts is None:
+            raise ValueError(&#34;say_stream without thread_ts here is unsupported&#34;)
+
+        if buffer_size is not None:
+            return await self.client.chat_stream(
+                buffer_size=buffer_size,
+                channel=channel,
+                recipient_team_id=recipient_team_id or self.recipient_team_id,
+                recipient_user_id=recipient_user_id or self.recipient_user_id,
+                thread_ts=thread_ts,
+                **kwargs,
+            )
+        return await self.client.chat_stream(
+            channel=channel,
+            recipient_team_id=recipient_team_id or self.recipient_team_id,
+            recipient_user_id=recipient_user_id or self.recipient_user_id,
+            thread_ts=thread_ts,
+            **kwargs,
+        )</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="slack_bolt.async_app.AsyncSayStream.channel"><code class="name">var <span class="ident">channel</span> : str | None</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="slack_bolt.async_app.AsyncSayStream.client"><code class="name">var <span class="ident">client</span> : slack_sdk.web.async_client.AsyncWebClient</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="slack_bolt.async_app.AsyncSayStream.recipient_team_id"><code class="name">var <span class="ident">recipient_team_id</span> : str | None</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="slack_bolt.async_app.AsyncSayStream.recipient_user_id"><code class="name">var <span class="ident">recipient_user_id</span> : str | None</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="slack_bolt.async_app.AsyncSayStream.thread_ts"><code class="name">var <span class="ident">thread_ts</span> : str | None</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+</dd>
 <dt id="slack_bolt.async_app.AsyncSetStatus"><code class="flex name class">
 <span>class <span class="ident">AsyncSetStatus</span></span>
 <span>(</span><span>client: slack_sdk.web.async_client.AsyncWebClient,<br>channel_id: str,<br>thread_ts: str)</span>
@@ -5485,6 +5597,7 @@ async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltRes
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.respond" href="#slack_bolt.async_app.AsyncBoltContext.respond">respond</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.save_thread_context" href="#slack_bolt.async_app.AsyncBoltContext.save_thread_context">save_thread_context</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.say" href="#slack_bolt.async_app.AsyncBoltContext.say">say</a></code></li>
+<li><code><a title="slack_bolt.async_app.AsyncBoltContext.say_stream" href="#slack_bolt.async_app.AsyncBoltContext.say_stream">say_stream</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.set_status" href="#slack_bolt.async_app.AsyncBoltContext.set_status">set_status</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.set_suggested_prompts" href="#slack_bolt.async_app.AsyncBoltContext.set_suggested_prompts">set_suggested_prompts</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncBoltContext.set_title" href="#slack_bolt.async_app.AsyncBoltContext.set_title">set_title</a></code></li>
@@ -5562,6 +5675,16 @@ async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltRes
 <li><code><a title="slack_bolt.async_app.AsyncSay.channel" href="#slack_bolt.async_app.AsyncSay.channel">channel</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncSay.client" href="#slack_bolt.async_app.AsyncSay.client">client</a></code></li>
 <li><code><a title="slack_bolt.async_app.AsyncSay.thread_ts" href="#slack_bolt.async_app.AsyncSay.thread_ts">thread_ts</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="slack_bolt.async_app.AsyncSayStream" href="#slack_bolt.async_app.AsyncSayStream">AsyncSayStream</a></code></h4>
+<ul class="">
+<li><code><a title="slack_bolt.async_app.AsyncSayStream.channel" href="#slack_bolt.async_app.AsyncSayStream.channel">channel</a></code></li>
+<li><code><a title="slack_bolt.async_app.AsyncSayStream.client" href="#slack_bolt.async_app.AsyncSayStream.client">client</a></code></li>
+<li><code><a title="slack_bolt.async_app.AsyncSayStream.recipient_team_id" href="#slack_bolt.async_app.AsyncSayStream.recipient_team_id">recipient_team_id</a></code></li>
+<li><code><a title="slack_bolt.async_app.AsyncSayStream.recipient_user_id" href="#slack_bolt.async_app.AsyncSayStream.recipient_user_id">recipient_user_id</a></code></li>
+<li><code><a title="slack_bolt.async_app.AsyncSayStream.thread_ts" href="#slack_bolt.async_app.AsyncSayStream.thread_ts">thread_ts</a></code></li>
 </ul>
 </li>
 <li>

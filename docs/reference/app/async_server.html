@@ -59,14 +59,14 @@ el.replaceWith(d);
     port: int
     path: str
     host: str
-    bolt_app: &#34;AsyncApp&#34;  # type: ignore[name-defined]
+    bolt_app: &#34;AsyncApp&#34;
     web_app: web.Application
 
     def __init__(
         self,
         port: int,
         path: str,
-        app: &#34;AsyncApp&#34;,  # type: ignore[name-defined]
+        app: &#34;AsyncApp&#34;,
         host: Optional[str] = None,
     ):
         &#34;&#34;&#34;Standalone AIOHTTP Web Server.
@@ -81,7 +81,7 @@ el.replaceWith(d);
         self.port = port
         self.path = path
         self.host = host if host is not None else &#34;0.0.0.0&#34;
-        self.bolt_app: &#34;AsyncApp&#34; = app  # type: ignore[name-defined]
+        self.bolt_app: &#34;AsyncApp&#34; = app
         self.web_app = web.Application()
         self._bolt_oauth_flow = self.bolt_app.oauth_flow
         if self._bolt_oauth_flow:

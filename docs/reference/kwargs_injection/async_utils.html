@@ -63,7 +63,7 @@ el.replaceWith(d);
     error: Optional[Exception] = None,  # for error handlers
     next_keys_required: bool = True,  # False for listeners / middleware / error handlers
 ) -&gt; Dict[str, Any]:
-    all_available_args = {
+    all_available_args: Dict[str, Any] = {
         &#34;logger&#34;: logger,
         &#34;client&#34;: request.context.client,
         &#34;req&#34;: request,
@@ -92,6 +92,7 @@ el.replaceWith(d);
         &#34;set_suggested_prompts&#34;: request.context.set_suggested_prompts,
         &#34;get_thread_context&#34;: request.context.get_thread_context,
         &#34;save_thread_context&#34;: request.context.save_thread_context,
+        &#34;say_stream&#34;: request.context.say_stream,
         # middleware
         &#34;next&#34;: next_func,
         &#34;next_&#34;: next_func,  # for the middleware using Python&#39;s built-in `next()` function
@@ -136,7 +137,7 @@ el.replaceWith(d);
     for name in required_arg_names:
         if name == &#34;args&#34;:
             if isinstance(request, AsyncBoltRequest):
-                kwargs[name] = AsyncArgs(**all_available_args)  # type: ignore[arg-type]
+                kwargs[name] = AsyncArgs(**all_available_args)
             else:
                 logger.warning(f&#34;Unknown Request object type detected ({type(request)})&#34;)
 
