@@ -51,7 +51,6 @@
 			"tools/bolt-python/concepts/app-home"
 		]
 	},
-	"tools/bolt-python/concepts/ai-apps",
 	{
 		"type": "category",
 		"label": "Custom Steps",
