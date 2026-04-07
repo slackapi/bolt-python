@@ -1,18 +1,21 @@
+---
+sidebar_label: Overview
+---
 
-# Using AI in Apps {#using-ai-in-apps}
+# Creating agents with Bolt
 
-The Slack platform offers features tailored for AI agents and assistants. Your apps can [utilize the `Assistant` class](#assistant) for a side-panel view designed with AI in mind, and they can utilize features applicable to messages throughout Slack, like [chat streaming](#text-streaming) and [feedback buttons](#adding-and-handling-feedback).
+The Slack platform offers features tailored for AI agents. Your agent can utilize features applicable to messages throughout Slack, like [chat streaming](#text-streaming) and [feedback buttons](#adding-and-handling-feedback). They can also [utilize the `Assistant` class](/bolt-python/concepts/assistant-class) for a side-panel view designed with AI in mind,
 
 If you're unfamiliar with using these feature within Slack, you may want to read the [API docs on the subject](/ai/). Then come back here to implement them with Bolt!
 
-## Listening for events
+---
 
-Agents can be invoked throughout Slack, such as @mentions in channels. 
+## Listening for user invocation 
 
-:::tip[Using the Assistant side panel]
+Agents can be invoked throughout Slack, such as @mentions in channels, messages to the app, and using the assistant side panel. 
 
-The Assistant side panel requires additional setup. See the [Assistant class guide](/concepts/assistant-class).
-:::
+<Tabs>
+<TabItem value="appmention" label = "app_mention">
 
 ```python
 import re
@@ -63,9 +66,172 @@ def handle_app_mentioned(
         ...
 ```
 
-## Setting assistant status {#setting-assistant-status}
+<TabItem>
+<TabItem value="message" label = "Message">
 
-Your app can show users action is happening behind the scenes by setting the thread status. 
+```python
+from logging import Logger
+
+from slack_bolt.context.async_context import AsyncBoltContext
+from slack_bolt.context.say.async_say import AsyncSay
+from slack_bolt.context.say_stream.async_say_stream import AsyncSayStream
+from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
+from slack_sdk.web.async_client import AsyncWebClient
+
+from agent import CaseyDeps, run_casey_agent
+from thread_context import session_store
+from listeners.views.feedback_builder import build_feedback_blocks
+
+
+async def handle_message(
+    client: AsyncWebClient,
+    context: AsyncBoltContext,
+    event: dict,
+    logger: Logger,
+    say: AsyncSay,
+    say_stream: AsyncSayStream,
+    set_status: AsyncSetStatus,
+):
+    """Handle messages sent to Casey via DM or in threads the bot is part of."""
+    # Issue submissions are posted by the bot with metadata so the message
+    # handler can run the agent on behalf of the original user.
+    is_issue_submission = (
+        event.get("metadata", {}).get("event_type") == "issue_submission"
+    )
+
+    # Skip message subtypes (edits, deletes, etc.) and bot messages that
+    # are not issue submissions.
+    if event.get("subtype"):
+        return
+    if event.get("bot_id") and not is_issue_submission:
+        return
+
+    is_dm = event.get("channel_type") == "im"
+    is_thread_reply = event.get("thread_ts") is not None
+
+    if is_dm:
+        pass
+    elif is_thread_reply:
+        # Channel thread replies are handled only if the bot is already engaged
+        session = session_store.get_session(context.channel_id, event["thread_ts"])
+        if session is None:
+            return
+    else:
+        # Top-level channel messages are handled by app_mentioned
+        return
+
+    try:
+        channel_id = context.channel_id
+        text = event.get("text", "")
+        thread_ts = event.get("thread_ts") or event["ts"]
+
+        # Get session ID for conversation context
+        existing_session_id = session_store.get_session(channel_id, thread_ts)
+
+        # Add eyes reaction only to the first message (DMs only — channel
+        # threads already have the reaction from the initial app_mention)
+        if is_dm and not existing_session_id:
+            await client.reactions_add(
+                channel=channel_id,
+                timestamp=event["ts"],
+                name="eyes",
+            )
+
+        # Set assistant thread status with loading messages
+        await set_status(
+            status="Thinking...",
+            loading_messages=[
+                "Teaching the hamsters to type faster…",
+                "Untangling the internet cables…",
+                "Consulting the office goldfish…",
+                "Polishing up the response just for you…",
+                "Convincing the AI to stop overthinking…",
+            ],
+        )
+
+        # For issue submissions the bot posted the message, so the real
+        # user_id comes from the metadata rather than the event context.
+        if is_issue_submission:
+            user_id = event["metadata"]["event_payload"]["user_id"]
+        else:
+            user_id = context.user_id
+
+        # Run the agent with deps for tool access
+        deps = CaseyDeps(
+            client=client,
+            user_id=user_id,
+            channel_id=channel_id,
+            thread_ts=thread_ts,
+            message_ts=event["ts"],
+        )
+        response_text, new_session_id = await run_casey_agent(
+            text, session_id=existing_session_id, deps=deps
+        )
+
+        # Stream response in thread with feedback buttons
+        streamer = await say_stream()
+        await streamer.append(markdown_text=response_text)
+        feedback_blocks = build_feedback_blocks()
+        await streamer.stop(blocks=feedback_blocks)
+
+        # Store session ID for future context
+        if new_session_id:
+            session_store.set_session(channel_id, thread_ts, new_session_id)
+
+    except Exception as e:
+        logger.exception(f"Failed to handle message: {e}")
+        await say(
+            text=f":warning: Something went wrong! ({e})",
+            thread_ts=event.get("thread_ts") or event.get("ts"),
+        )
+```
+
+</TabItem>
+
+<TabItem value="assistant" label = "Assistant thread">
+
+
+:::tip[Using the Assistant side panel]
+
+The Assistant side panel requires additional setup. See the [Assistant class guide](/bolt-python/concepts/assistant-class).
+:::
+
+
+```py
+from logging import Logger
+
+from slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts import (
+    AsyncSetSuggestedPrompts,
+)
+
+SUGGESTED_PROMPTS = [
+    {"title": "Reset Password", "message": "I need to reset my password"},
+    {"title": "Request Access", "message": "I need access to a system or tool"},
+    {"title": "Network Issues", "message": "I'm having network connectivity issues"},
+]
+
+
+async def handle_assistant_thread_started(
+    set_suggested_prompts: AsyncSetSuggestedPrompts, logger: Logger
+):
+    """Handle assistant thread started events by setting suggested prompts."""
+    try:
+        await set_suggested_prompts(
+            prompts=SUGGESTED_PROMPTS,
+            title="How can I help you today?",
+        )
+    except Exception as e:
+        logger.exception(f"Failed to handle assistant thread started: {e}")
+```
+
+</TabItem>
+</Tabs>
+
+---
+
+## Setting status {#setting-assistant-status}
+
+Your app can show its users action is happening behind the scenes by setting its thread status. 
 
 ```python
 def handle_app_mentioned(
@@ -83,6 +249,8 @@ def handle_app_mentioned(
         ],
     )
 ```
+
+---
 
 ## Streaming messages {#text-streaming}
 
@@ -111,6 +279,8 @@ def handle_message(say_stream: SayStream):
     streamer.append(markdown_text="And here's more...")
     streamer.stop()
 ```
+
+---
 
 ## Adding and handling feedback {#adding-and-handling-feedback}
 
@@ -203,6 +373,7 @@ def handle_feedback_button(
         logger.exception(f"Failed to handle feedback: {e}")
 ```
 
+---
 
 ## Full example
 
