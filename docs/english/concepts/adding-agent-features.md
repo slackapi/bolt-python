@@ -1,11 +1,13 @@
 ---
-sidebar_label: Creating an agent
+sidebar_label: Adding agent features
 ---
 
-# Creating an agent with Bolt for Python
+# Adding agent features with Bolt for Python
 
 :::tip[Check out the Support Agent sample app]
-The code snippets throughout this guide are from our [Support Agent sample app](https://github.com/slack-samples/bolt-python-support-agent), Casey, which supports integration with Pydantic, Anthropic, and OpenAI. View our [agent quickstart](/ai/agent-quickstart) to get up and running with Casey.  Otherwise, read on for exploration and explanation of agent-focused Bolt features found within Casey.
+The code snippets throughout this guide are from our [Support Agent sample app](https://github.com/slack-samples/bolt-python-support-agent), Casey, which supports integration with Pydantic, Anthropic, and OpenAI. 
+
+View our [agent quickstart](/ai/agent-quickstart) to get up and running with Casey.  Otherwise, read on for exploration and explanation of agent-focused Bolt features found within Casey.
 :::
 
 Your agent can utilize features applicable to messages throughout Slack, like [chat streaming](#text-streaming) and [feedback buttons](#adding-and-handling-feedback). They can also [utilize the `Assistant` class](/tools/bolt-python/concepts/assistant-class) for a side-panel view designed with AI in mind.
@@ -14,7 +16,7 @@ If you're unfamiliar with using these feature within Slack, you may want to read
 
 ## Prerequisites
 
-You'll need a Slack app to mold into an agent via in this guide. Follow the [quickstart](/tools/bolt-python/getting-started), and then come back here! 
+You'll need a Slack app to mold into an agent. Follow the [quickstart](/tools/bolt-python/getting-started), and then come back here! 
 
 ---
 
@@ -379,9 +381,71 @@ def handle_feedback_button(
 
 ---
 
+## Defining agent tools
+
+Your agent can perform actions by defining tools. A _tool_ in an agent context is a function that calls an external system.
+
+The following example uses the Claude Agent SDK.
+
+```python title="agent/tools/create_support_ticket.py"
+from claude_agent_sdk import tool
+
+
+@tool(
+    name="create_support_ticket",
+    description="Create a new IT support ticket for issues that require human follow-up.",
+    input_schema={
+        "type": "object",
+        "properties": {
+            "title": {
+                "type": "string",
+                "description": "A concise title describing the issue.",
+            },
+            "priority": {
+                "type": "string",
+                "description": "The ticket priority level.",
+                "enum": ["low", "medium", "high", "critical"],
+            },
+        },
+        "required": ["title", "priority"],
+    },
+)
+async def create_support_ticket_tool(args):
+    """Create a new IT support ticket."""
+    title = args["title"]
+    priority = args["priority"]
+    
+    ticket_id = f"INC-{random.randint(100000, 999999)}"
+    
+    text = (
+        f"Support ticket created successfully.\n"
+        f"**Ticket ID:** {ticket_id}\n"
+        f"**Priority:** {priority}"
+    )
+    
+    return {"content": [{"type": "text", "text": text}]}
+```
+
+Then import and register the tool:
+
+```python title="agent/casey.py"
+from claude_agent_sdk import create_sdk_mcp_server
+from agent.tools.create_support_ticket import create_support_ticket_tool
+
+casey_tools_server = create_sdk_mcp_server(
+    name="casey-tools",
+    version="1.0.0",
+    tools=[create_support_ticket_tool],
+)
+```
+
+Your agent can then call those tools as needed.
+
+---
+
 ## Full example
 
-Putting all those concepts together result in a dynamic agent ready to helpfully respond.
+Putting all those concepts together results in a dynamic agent ready to helpfully respond.
 
 <Tabs>
 <TabItem value="pydantic" label = "Pydantic">

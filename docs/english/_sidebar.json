@@ -13,11 +13,11 @@
 		"label": "AI & Agents",
 		"link": {
 			"type": "doc",
-			"id": "tools/bolt-python/concepts/creating-an-agent"
+			"id": "tools/bolt-python/concepts/adding-agent-features"
 		  },
 		"items": [
-			"tools/bolt-python/concepts/creating-an-agent",
-			"tools/bolt-python/concepts/assistant-class"
+			"tools/bolt-python/concepts/adding-agent-features",
+			"tools/bolt-python/concepts/using-the-assistant-class"
 		]
 	},
 	{
