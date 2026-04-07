@@ -66,7 +66,7 @@ def handle_app_mentioned(
         ...
 ```
 
-<TabItem>
+</TabItem>
 <TabItem value="message" label = "Message">
 
 ```python
@@ -190,9 +190,7 @@ async def handle_message(
 
 <TabItem value="assistant" label = "Assistant thread">
 
-
 :::tip[Using the Assistant side panel]
-
 The Assistant side panel requires additional setup. See the [Assistant class guide](/bolt-python/concepts/assistant-class).
 :::
 
