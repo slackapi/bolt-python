@@ -7,16 +7,16 @@
 	},
 	"tools/bolt-python/getting-started",
 	{ "type": "html", "value": "<hr>" },
-	"tools/bolt-python/building-an-app",
+	"tools/bolt-python/developing-an-app",
 	{
 		"type": "category",
-		"label": "Creating agents",
+		"label": "Developing agents",
 		"link": {
 			"type": "doc",
-			"id": "tools/bolt-python/concepts/ai-apps"
+			"id": "tools/bolt-python/concepts/developing-an-agent"
 		  },
 		"items": [
-			"tools/bolt-python/concepts/ai-apps",
+			"tools/bolt-python/concepts/developing-an-agent",
 			"tools/bolt-python/concepts/assistant-class"
 		]
 	},

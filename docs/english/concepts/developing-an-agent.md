@@ -2,10 +2,9 @@
 sidebar_label: Overview
 ---
 
-# Creating agents with Bolt
+# Developing an agent with Bolt
 
 ::tip[Check out the Support Agent sample app]
-
 The code snippets throughout this guide are from our [Support Agent sample app](https://github.com/slack-samples/bolt-python-support-agent), Casey, which supports integration with Pydantic, Anthropic, and OpenAI. View our [agent quickstart](/ai/agent-quickstart) to get up and running with Casey.  Otherwise, read on for exploration and explanation of agent-focused Bolt features found within Casey.
 :::
 
@@ -671,8 +670,3 @@ def handle_app_mentioned(
 
 </TabItem>
 </Tabs>
-
----
-
-For a dedicated AI assistant experience with a side panel, see the [Assistant class guide](./assistant-class.md).
-
