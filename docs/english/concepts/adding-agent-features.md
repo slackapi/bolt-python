@@ -12,17 +12,13 @@ View our [agent quickstart](/ai/agent-quickstart) to get up and running with Cas
 
 Your agent can utilize features applicable to messages throughout Slack, like [chat streaming](#text-streaming) and [feedback buttons](#adding-and-handling-feedback). They can also [utilize the `Assistant` class](/tools/bolt-python/concepts/assistant-class) for a side-panel view designed with AI in mind.
 
-If you're unfamiliar with using these feature within Slack, you may want to read the [API docs on the subject](/ai/).
-
-## Prerequisites
-
-You'll need a Slack app to mold into an agent. Follow the [quickstart](/tools/bolt-python/getting-started), and then come back here! 
+If you're unfamiliar with using these feature within Slack, you may want to read the [API docs on the subject](/ai/). Then come back here to implement them with Bolt!
 
 ---
 
 ## Listening for user invocation 
 
-Agents can be invoked throughout Slack, such as @mentions in channels, messages to the app, and using the assistant side panel. 
+Agents can be invoked throughout Slack, such as via @mentions in channels, messaging the agent, and using the assistant side panel. 
 
 <Tabs>
 <TabItem value="appmention" label = "App mention">
@@ -378,68 +374,6 @@ def handle_feedback_button(
     except Exception as e:
         logger.exception(f"Failed to handle feedback: {e}")
 ```
-
----
-
-## Defining agent tools
-
-Your agent can perform actions by defining tools. A _tool_ in an agent context is a function that calls an external system.
-
-The following example uses the Claude Agent SDK.
-
-```python title="agent/tools/create_support_ticket.py"
-from claude_agent_sdk import tool
-
-
-@tool(
-    name="create_support_ticket",
-    description="Create a new IT support ticket for issues that require human follow-up.",
-    input_schema={
-        "type": "object",
-        "properties": {
-            "title": {
-                "type": "string",
-                "description": "A concise title describing the issue.",
-            },
-            "priority": {
-                "type": "string",
-                "description": "The ticket priority level.",
-                "enum": ["low", "medium", "high", "critical"],
-            },
-        },
-        "required": ["title", "priority"],
-    },
-)
-async def create_support_ticket_tool(args):
-    """Create a new IT support ticket."""
-    title = args["title"]
-    priority = args["priority"]
-    
-    ticket_id = f"INC-{random.randint(100000, 999999)}"
-    
-    text = (
-        f"Support ticket created successfully.\n"
-        f"**Ticket ID:** {ticket_id}\n"
-        f"**Priority:** {priority}"
-    )
-    
-    return {"content": [{"type": "text", "text": text}]}
-```
-
-Then import and register the tool:
-
-```python title="agent/casey.py"
-from claude_agent_sdk import create_sdk_mcp_server
-from agent.tools.create_support_ticket import create_support_ticket_tool
-
-casey_tools_server = create_sdk_mcp_server(
-    name="casey-tools",
-    version="1.0.0",
-    tools=[create_support_ticket_tool],
-)
-```
-
-Your agent can then call those tools as needed.
 
 ---
 
