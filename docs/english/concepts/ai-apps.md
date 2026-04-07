@@ -84,27 +84,6 @@ def handle_app_mentioned(
     )
 ```
 
-</TabItem>
-<TabItem value="assistant" label="Assistant class">
-
-```python
-@assistant.user_message
-def respond_in_assistant_thread(
-    set_status: SetStatus,
-    ...
-):
-    set_status(
-        status="thinking...",
-        loading_messages=[
-            "Teaching the hamsters to type faster…",
-            "Untangling the internet cables…",
-            "Consulting the office goldfish…",
-            "Polishing up the response just for you…",
-            "Convincing the AI to stop overthinking…",
-        ],
-    )
-```
-
 ## Streaming messages {#text-streaming}
 
 You can have your app's messages stream in to replicate conventional agent behavior. Bolt for Python provides a `say_stream` utility as a listener argument available for `app.event` and `app.message` listeners. 
