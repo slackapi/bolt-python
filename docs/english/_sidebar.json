@@ -10,6 +10,18 @@
 	"tools/bolt-python/building-an-app",
 	{
 		"type": "category",
+		"label": "Creating agents",
+		"link": {
+			"type": "doc",
+			"id": "tools/bolt-python/concepts/ai-apps"
+		  },
+		"items": [
+			"tools/bolt-python/concepts/ai-apps",
+			"tools/bolt-python/concepts/assistant-class"
+		]
+	},
+	{
+		"type": "category",
 		"label": "Slack API calls",
 		"items": [
 			"tools/bolt-python/concepts/message-sending",
@@ -37,18 +49,6 @@
 			"tools/bolt-python/concepts/view-submissions",
 			"tools/bolt-python/concepts/select-menu-options",
 			"tools/bolt-python/concepts/app-home"
-		]
-	},
-	{
-		"type": "category",
-		"label": "Creating agents",
-		"link": {
-			"type": "doc",
-			"id": "tools/bolt-python/concepts/ai-apps"
-		  },
-		"items": [
-			"tools/bolt-python/concepts/ai-apps",
-			"tools/bolt-python/concepts/assistant-class"
 		]
 	},
 	"tools/bolt-python/concepts/ai-apps",

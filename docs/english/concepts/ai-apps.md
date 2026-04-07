@@ -4,7 +4,12 @@ sidebar_label: Overview
 
 # Creating agents with Bolt
 
-The Slack platform offers features tailored for AI agents. Your agent can utilize features applicable to messages throughout Slack, like [chat streaming](#text-streaming) and [feedback buttons](#adding-and-handling-feedback). They can also [utilize the `Assistant` class](/bolt-python/concepts/assistant-class) for a side-panel view designed with AI in mind,
+::tip[Check out the Support Agent sample app]
+
+The code snippets throughout this guide are from our [Support Agent sample app](https://github.com/slack-samples/bolt-python-support-agent), Casey, which supports integration with Pydantic, Anthropic, and OpenAI. View our [agent quickstart](/ai/agent-quickstart) to get up and running with Casey.  Otherwise, read on for exploration and explanation of agent-focused Bolt features found within Casey.
+:::
+
+The Slack platform offers features tailored for AI agents. Your agent can utilize features applicable to messages throughout Slack, like [chat streaming](#text-streaming) and [feedback buttons](#adding-and-handling-feedback). They can also [utilize the `Assistant` class](/tools/bolt-python/concepts/assistant-class) for a side-panel view designed with AI in mind.
 
 If you're unfamiliar with using these feature within Slack, you may want to read the [API docs on the subject](/ai/). Then come back here to implement them with Bolt!
 
@@ -15,7 +20,7 @@ If you're unfamiliar with using these feature within Slack, you may want to read
 Agents can be invoked throughout Slack, such as @mentions in channels, messages to the app, and using the assistant side panel. 
 
 <Tabs>
-<TabItem value="appmention" label = "app_mention">
+<TabItem value="appmention" label = "App mention">
 
 ```python
 import re
@@ -191,7 +196,7 @@ async def handle_message(
 <TabItem value="assistant" label = "Assistant thread">
 
 :::tip[Using the Assistant side panel]
-The Assistant side panel requires additional setup. See the [Assistant class guide](/bolt-python/concepts/assistant-class).
+The Assistant side panel requires additional setup. See the [Assistant class guide](/tools/bolt-python/concepts/assistant-class).
 :::
 
 
@@ -264,8 +269,6 @@ The `say_stream` utility streamlines calling the Python Slack SDK's [`WebClient.
 | `recipient_user_id` | Sourced from the `user_id` of the event.
 
 If neither a `channel_id` or `thread_ts` can be sourced, then the utility will be `None`.
-
-You can see how our [Support Agent](https://github.com/slack-samples/bolt-python-support-agent) sample app uses `say_stream` when responding to DMs below.
 
 ```python
 from slack_bolt import SayStream
