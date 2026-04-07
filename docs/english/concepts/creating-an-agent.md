@@ -1,16 +1,20 @@
 ---
-sidebar_label: Overview
+sidebar_label: Creating an agent
 ---
 
-# Developing an agent with Bolt
+# Creating an agent with Bolt for Python
 
-::tip[Check out the Support Agent sample app]
+:::tip[Check out the Support Agent sample app]
 The code snippets throughout this guide are from our [Support Agent sample app](https://github.com/slack-samples/bolt-python-support-agent), Casey, which supports integration with Pydantic, Anthropic, and OpenAI. View our [agent quickstart](/ai/agent-quickstart) to get up and running with Casey.  Otherwise, read on for exploration and explanation of agent-focused Bolt features found within Casey.
 :::
 
-The Slack platform offers features tailored for AI agents. Your agent can utilize features applicable to messages throughout Slack, like [chat streaming](#text-streaming) and [feedback buttons](#adding-and-handling-feedback). They can also [utilize the `Assistant` class](/tools/bolt-python/concepts/assistant-class) for a side-panel view designed with AI in mind.
+Your agent can utilize features applicable to messages throughout Slack, like [chat streaming](#text-streaming) and [feedback buttons](#adding-and-handling-feedback). They can also [utilize the `Assistant` class](/tools/bolt-python/concepts/assistant-class) for a side-panel view designed with AI in mind.
 
-If you're unfamiliar with using these feature within Slack, you may want to read the [API docs on the subject](/ai/). Then come back here to implement them with Bolt!
+If you're unfamiliar with using these feature within Slack, you may want to read the [API docs on the subject](/ai/).
+
+## Prerequisites
+
+You'll need a Slack app to mold into an agent via in this guide. Follow the [quickstart](/tools/bolt-python/getting-started), and then come back here! 
 
 ---
 
