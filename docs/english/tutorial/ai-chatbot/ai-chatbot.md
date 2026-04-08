@@ -1,14 +1,16 @@
 # AI Chatbot
 
-In this tutorial, you'll learn how to bring the power of AI into your Slack workspace using a chatbot called Bolty that uses Anthropic or OpenAI. Here's what we'll do with this sample app:
+In this tutorial, you'll learn how to bring the power of AI into your Slack workspace using a chatbot called Bolty that uses Anthropic or OpenAI.
 
-1. Create your app using the Slack CLI
-2. Set up and run your local project
-3. Create a workflow using Workflow Builder to summarize messages in conversations
-4. Select your preferred API and model to customize Bolty's responses
-5. Interact with Bolty via direct message, the `/ask-bolty` slash command, or by mentioning the app in conversations
+With Bolty, users can:
+
+- send direct messages to Bolty and get AI-powered responses in response,
+- use the `/ask-bolty` slash command to ask Bolty questions, and
+- receive channel summaries when joining new channels.
 
 Intrigued? First, grab your tools by following the three steps below.
+
+import QuickstartGuide from '@site/src/components/QuickstartGuide';
 
 <QuickstartGuide 
   steps={[
@@ -128,7 +130,7 @@ Install the required dependencies:
 pip install -r requirements.txt
 ```
 
-RUn your app locally:
+Run your app locally:
 
 ```bash
 slack run
