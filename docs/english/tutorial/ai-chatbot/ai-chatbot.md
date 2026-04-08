@@ -39,7 +39,6 @@ Intrigued? First, grab your tools by following the three steps below.
         windows: 'slack create ai-chatbot --template slack-samples/bolt-python-ai-chatbot'
       }
     }
-    }
   ]}
 buttonText="View sample app"
   buttonLink="https://github.com/slack-samples/bolt-python-ai-chatbot"
