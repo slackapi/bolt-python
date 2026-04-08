@@ -96,7 +96,7 @@ export OPENAI_API_KEY=<your-api-key>
 ```
 
 </TabItem>
-</tabs>
+</Tabs>
 
 ## Setting up and running your local project {#configure-project}
 
