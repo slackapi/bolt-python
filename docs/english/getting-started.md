@@ -283,6 +283,6 @@ On these pages you're free to make changes such as updating your app icon, confi
 
 You can now continue customizing your app with various features to make it right for whatever job's at hand. Here are some ideas about what to explore next:
 
-- Follow along with the steps that went into making this app on the [building an app](/tools/bolt-python/building-an-app) guide for an educational overview.
+- Follow along with the steps that went into making this app on the [creating an app](/tools/bolt-python/creating-an-app) guide for an educational overview.
 - Check out the [Agent quickstart](/ai/agent-quickstart) to get up and running with an agent.
 - Browse our [curated catalog of samples](/samples) for more apps to use as a starting point for development.

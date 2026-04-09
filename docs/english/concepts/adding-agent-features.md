@@ -196,53 +196,7 @@ async def handle_message(
                 name="eyes",
             )
 
-        # Set assistant thread status with loading messages
-        await set_status(
-            status="Thinking...",
-            loading_messages=[
-                "Teaching the hamsters to type faster…",
-                "Untangling the internet cables…",
-                "Consulting the office goldfish…",
-                "Polishing up the response just for you…",
-                "Convincing the AI to stop overthinking…",
-            ],
-        )
-
-        # For issue submissions the bot posted the message, so the real
-        # user_id comes from the metadata rather than the event context.
-        if is_issue_submission:
-            user_id = event["metadata"]["event_payload"]["user_id"]
-        else:
-            user_id = context.user_id
-
-        # Run the agent with deps for tool access
-        deps = CaseyDeps(
-            client=client,
-            user_id=user_id,
-            channel_id=channel_id,
-            thread_ts=thread_ts,
-            message_ts=event["ts"],
-        )
-        response_text, new_session_id = await run_casey_agent(
-            text, session_id=existing_session_id, deps=deps
-        )
-
-        # Stream response in thread with feedback buttons
-        streamer = await say_stream()
-        await streamer.append(markdown_text=response_text)
-        feedback_blocks = build_feedback_blocks()
-        await streamer.stop(blocks=feedback_blocks)
-
-        # Store session ID for future context
-        if new_session_id:
-            session_store.set_session(channel_id, thread_ts, new_session_id)
-
-    except Exception as e:
-        logger.exception(f"Failed to handle message: {e}")
-        await say(
-            text=f":warning: Something went wrong! ({e})",
-            thread_ts=event.get("thread_ts") or event.get("ts"),
-        )
+        ...
 ```
 
 </TabItem>
