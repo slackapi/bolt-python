@@ -7,7 +7,7 @@ sidebar_label: Adding agent features
 :::tip[Check out the Support Agent sample app]
 The code snippets throughout this guide are from our [Support Agent sample app](https://github.com/slack-samples/bolt-python-support-agent), Casey, which supports integration with Pydantic, Anthropic, and OpenAI. 
 
-View our [agent quickstart](/ai/agent-quickstart) to get up and running with Casey.  Otherwise, read on for exploration and explanation of agent-focused Bolt features found within Casey.
+View our [agent quickstart](/ai/agent-quickstart) to get up and running with Casey. Otherwise, read on for exploration and explanation of agent-focused Bolt features found within Casey.
 :::
 
 Your agent can utilize features applicable to messages throughout Slack, like [chat streaming](#text-streaming) and [feedback buttons](#adding-and-handling-feedback). They can also [utilize the `Assistant` class](/tools/bolt-python/concepts/assistant-class) for a side-panel view designed with AI in mind.
@@ -272,14 +272,12 @@ The `say_stream` utility streamlines calling the Python Slack SDK's [`WebClient.
 If neither a `channel_id` or `thread_ts` can be sourced, then the utility will be `None`.
 
 ```python
-from slack_bolt import SayStream
-
-def handle_message(say_stream: SayStream):
-    """Stream a response to a message."""
-    streamer = say_stream()
-    streamer.append(markdown_text="Here's my response...")
-    streamer.append(markdown_text="And here's more...")
-    streamer.stop()
+app.message('*', async ({ sayStream }) => {
+  const stream = sayStream();
+  await stream.append({ markdown_text: "Here's my response..." });
+  await stream.append({ markdown_text: "And here's more..." });
+  await stream.stop();
+});
 ```
 
 ---
