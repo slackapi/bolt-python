@@ -285,4 +285,4 @@ You can now continue customizing your app with various features to make it right
 
 - Follow along with the steps that went into making this app on the [building an app](/tools/bolt-python/building-an-app) guide for an educational overview.
 - Check out the [Agent quickstart](/ai/agent-quickstart) to get up and running with an agent.
-- Browse our [curated catalog of samples](/samples) for more apps to develop off of.
+- Browse our [curated catalog of samples](/samples) for more apps to use as a starting point for development.

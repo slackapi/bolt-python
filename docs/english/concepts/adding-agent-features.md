@@ -337,7 +337,7 @@ app.message('*', async ({ sayStream }) => {
 
 ## Adding and handling feedback {#adding-and-handling-feedback}
 
-You can use [feedback buttons block element](/reference/block-kit/block-elements/feedback-buttons-element/) to allow users to immediately provide feedback regarding the app's responses. Here's what the feedback buttons look like from the Support Agent sample app:
+You can use the [feedback buttons block element](/reference/block-kit/block-elements/feedback-buttons-element/) to allow users to immediately provide feedback regarding the app's responses. Here's what the feedback buttons look like from the Support Agent sample app:
 
 ```py title=".../listeners/views/feedback_builder.py"
 from slack_sdk.models.blocks import (

@@ -326,4 +326,4 @@ def respond_to_bot_messages(logger: logging.Logger, set_status: SetStatus, say: 
 
 See the [_Creating agents: adding and handling feedback_](/tools/bolt-python/concepts/ai-apps#adding-and-handling-feedback) section for adding feedback buttons with Block Kit. 
 
-Want to see the functionality described throughout this guide in action? We've created a [App Agent Template](https://github.com/slack-samples/bolt-python-assistant-template) repo for you to build off of.
+Want to see the functionality described throughout this guide in action? We've created a [App Agent Template](https://github.com/slack-samples/bolt-python-assistant-template) repo for you to build from.
