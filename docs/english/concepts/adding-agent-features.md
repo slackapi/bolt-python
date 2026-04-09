@@ -16,6 +16,59 @@ If you're unfamiliar with using these feature within Slack, you may want to read
 
 ---
 
+## Slack MCP Server {#slack-mcp-server}
+
+Casey can harness the [Slack MCP Server](https://docs.slack.dev/ai/slack-mcp-server/developing) when deployed via an HTTP Server with OAuth. 
+
+To enable the Slack MCP Server:
+
+1. Install [ngrok](https://ngrok.com/download) and start a tunnel:
+
+```sh
+ngrok http 3000
+```
+
+2. Copy the `https://*.ngrok-free.app` URL from the ngrok output.
+
+3. Update `manifest.json` for HTTP mode:
+   - Set `socket_mode_enabled` to `false`
+   - Replace `ngrok-free.app` with your ngrok domain (e.g. `YOUR_NGROK_SUBDOMAIN.ngrok-free.app`)
+
+4. Create a new local dev app:
+
+```sh
+slack install -E local
+```
+
+5. Enable MCP for your app:
+   - Run `slack app settings` to open your app's settings
+   - Navigate to **Agents & AI Apps** in the left-side navigation
+   - Toggle **Model Context Protocol** on
+
+6. Update your `.env` OAuth environment variables:
+   - Run `slack app settings` to open App Settings
+   - Copy **Client ID**, **Client Secret**, and **Signing Secret**
+   - Update `SLACK_REDIRECT_URI` in `.env` with your ngrok domain
+
+```sh
+SLACK_CLIENT_ID=YOUR_CLIENT_ID
+SLACK_CLIENT_SECRET=YOUR_CLIENT_SECRET
+SLACK_REDIRECT_URI=https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app/slack/oauth_redirect
+SLACK_SIGNING_SECRET=YOUR_SIGNING_SECRET
+```
+
+7. Start the app:
+
+```sh
+slack run app_oauth.py
+```
+
+8. Click the install URL printed in the terminal to install the app to your workspace via OAuth.
+
+Your agent can now access the Slack MCP server!
+
+---
+
 ## Listening for user invocation 
 
 Agents can be invoked throughout Slack, such as via @mentions in channels, messaging the agent, and using the assistant side panel. 
