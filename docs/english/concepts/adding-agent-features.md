@@ -379,6 +379,9 @@ def handle_feedback_button(
 
 Putting all those concepts together results in a dynamic agent ready to helpfully respond.
 
+
+<details>
+<summary Full example></summary>
 <Tabs>
 <TabItem value="pydantic" label = "Pydantic">
 
@@ -670,3 +673,71 @@ def handle_app_mentioned(
 
 </TabItem>
 </Tabs>
+</details>
+
+---
+
+## Onward: adding custom tools
+
+Casey comes with test tools and simulated systems. You can extend it with custom tools to make it a fully functioning Slack agent.
+
+In this example, we'll add a tool that makes live calls to check the GitHub status.
+
+1. Create `agent/tools/{tool-name}.py` and define the tool with the `@tool` decorator:
+
+```python title="agent/tools/check_github_status.py"
+from claude_agent_sdk import tool
+import httpx
+
+@tool(
+    name="check_github_status",
+    description="Check GitHub's current operational status",
+    input_schema={},
+)
+async def check_github_status_tool(args):
+    """Check if GitHub is operational."""
+    async with httpx.AsyncClient() as client:
+        response = await client.get("https://www.githubstatus.com/api/v2/status.json")
+        data = response.json()
+        status = data["status"]["indicator"]
+        description = data["status"]["description"]
+    
+    return {
+        "content": [
+            {
+                "type": "text",
+                "text": f"**GitHub Status** — {status}\n{description}",
+            }
+        ]
+    }
+```
+
+2. Import the tool in `agent/casey.py`:
+
+```python title="agent/casey.py"
+from agent.tools import check_github_status_tool
+```
+
+3. Register in `casey_tools_server`:
+
+```python title="agent/casey.py"
+casey_tools_server = create_sdk_mcp_server(
+    name="casey-tools",
+    version="1.0.0",
+    tools=[
+        check_github_status_tool,  # Add here
+        # ... other tools
+    ],
+)
+```
+
+4. Add to `CASEY_TOOLS`:
+
+```python title="agent/casey.py"
+CASEY_TOOLS = [
+    "check_github_status",  # Add here
+    # ... other tools
+]
+```
+
+Use this example as a jumping off point for building out an agent with the capabilities you need!
