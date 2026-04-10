@@ -388,7 +388,7 @@ Putting all those concepts together results in a dynamic agent ready to helpfull
 
 
 <details>
-<summary Full example></summary>
+<summary>Full example</summary>
 <Tabs>
 <TabItem value="pydantic" label = "Pydantic">
 
