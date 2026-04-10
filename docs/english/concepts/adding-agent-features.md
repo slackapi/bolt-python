@@ -131,25 +131,25 @@ def handle_app_mentioned(
 ```python
 from logging import Logger
 
-from slack_bolt.context.async_context import AsyncBoltContext
-from slack_bolt.context.say.async_say import AsyncSay
-from slack_bolt.context.say_stream.async_say_stream import AsyncSayStream
-from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
-from slack_sdk.web.async_client import AsyncWebClient
+from slack_bolt.context import BoltContext
+from slack_bolt.context.say import Say
+from slack_bolt.context.say_stream import SayStream
+from slack_bolt.context.set_status import SetStatus
+from slack_sdk import WebClient
 
 from agent import CaseyDeps, run_casey_agent
 from thread_context import session_store
 from listeners.views.feedback_builder import build_feedback_blocks
 
 
-async def handle_message(
-    client: AsyncWebClient,
-    context: AsyncBoltContext,
+def handle_message(
+    client: WebClient,
+    context: BoltContext,
     event: dict,
     logger: Logger,
-    say: AsyncSay,
-    say_stream: AsyncSayStream,
-    set_status: AsyncSetStatus,
+    say: Say,
+    say_stream: SayStream,
+    set_status: SetStatus,
 ):
     """Handle messages sent to Casey via DM or in threads the bot is part of."""
     # Issue submissions are posted by the bot with metadata so the message
@@ -211,9 +211,7 @@ The Assistant side panel requires additional setup. See the [Assistant class gui
 ```py
 from logging import Logger
 
-from slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts import (
-    AsyncSetSuggestedPrompts,
-)
+from slack_bolt.context.set_suggested_prompts import SetSuggestedPrompts
 
 SUGGESTED_PROMPTS = [
     {"title": "Reset Password", "message": "I need to reset my password"},
@@ -222,12 +220,12 @@ SUGGESTED_PROMPTS = [
 ]
 
 
-async def handle_assistant_thread_started(
-    set_suggested_prompts: AsyncSetSuggestedPrompts, logger: Logger
+def handle_assistant_thread_started(
+    set_suggested_prompts: SetSuggestedPrompts, logger: Logger
 ):
     """Handle assistant thread started events by setting suggested prompts."""
     try:
-        await set_suggested_prompts(
+        set_suggested_prompts(
             prompts=SUGGESTED_PROMPTS,
             title="How can I help you today?",
         )
@@ -279,12 +277,10 @@ The `say_stream` utility streamlines calling the Python Slack SDK's [`WebClient.
 If neither a `channel_id` or `thread_ts` can be sourced, then the utility will be `None`.
 
 ```python
-app.message('*', async ({ sayStream }) => {
-  const stream = sayStream();
-  await stream.append({ markdown_text: "Here's my response..." });
-  await stream.append({ markdown_text: "And here's more..." });
-  await stream.stop();
-});
+streamer = say_stream()
+streamer.append(markdown_text="Here's my response...")
+streamer.append(markdown_text="And here's more...")
+streamer.stop()
 ```
 
 ---
@@ -492,25 +488,25 @@ def handle_app_mentioned(
 import re
 from logging import Logger
 
-from slack_bolt.context.async_context import AsyncBoltContext
-from slack_bolt.context.say.async_say import AsyncSay
-from slack_bolt.context.say_stream.async_say_stream import AsyncSayStream
-from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
-from slack_sdk.web.async_client import AsyncWebClient
+from slack_bolt.context import BoltContext
+from slack_bolt.context.say import Say
+from slack_bolt.context.say_stream import SayStream
+from slack_bolt.context.set_status import SetStatus
+from slack_sdk import WebClient
 
 from agent import CaseyDeps, run_casey_agent
 from thread_context import session_store
 from listeners.views.feedback_builder import build_feedback_blocks
 
 
-async def handle_app_mentioned(
-    client: AsyncWebClient,
-    context: AsyncBoltContext,
+def handle_app_mentioned(
+    client: WebClient,
+    context: BoltContext,
     event: dict,
     logger: Logger,
-    say: AsyncSay,
-    say_stream: AsyncSayStream,
-    set_status: AsyncSetStatus,
+    say: Say,
+    say_stream: SayStream,
+    set_status: SetStatus,
 ):
     """Handle @Casey mentions in channels."""
     try:
@@ -522,7 +518,7 @@ async def handle_app_mentioned(
         cleaned_text = re.sub(r"<@[A-Z0-9]+>", "", text).strip()
 
         if not cleaned_text:
-            await say(
+            say(
                 text="Hey there! How can I help you? Describe your IT issue and I'll do my best to assist.",
                 thread_ts=thread_ts,
             )
@@ -530,14 +526,14 @@ async def handle_app_mentioned(
 
         # Add eyes reaction only to the first message (not threaded replies)
         if not event.get("thread_ts"):
-            await client.reactions_add(
+            client.reactions_add(
                 channel=channel_id,
                 timestamp=event["ts"],
                 name="eyes",
             )
 
         # Set assistant thread status with loading messages
-        await set_status(
+        set_status(
             status="Thinking...",
             loading_messages=[
                 "Teaching the hamsters to type faster…",
@@ -559,15 +555,15 @@ async def handle_app_mentioned(
             thread_ts=thread_ts,
             message_ts=event["ts"],
         )
-        response_text, new_session_id = await run_casey_agent(
+        response_text, new_session_id = run_casey_agent(
             cleaned_text, session_id=existing_session_id, deps=deps
         )
 
         # Stream response in thread with feedback buttons
-        streamer = await say_stream()
-        await streamer.append(markdown_text=response_text)
+        streamer = say_stream()
+        streamer.append(markdown_text=response_text)
         feedback_blocks = build_feedback_blocks()
-        await streamer.stop(blocks=feedback_blocks)
+        streamer.stop(blocks=feedback_blocks)
 
         # Store session ID for future context
         if new_session_id:
