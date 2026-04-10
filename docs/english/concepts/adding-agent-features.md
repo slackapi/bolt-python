@@ -240,7 +240,7 @@ def handle_assistant_thread_started(
 
 ## Setting status {#setting-assistant-status}
 
-Your app can show its users action is happening behind the scenes by setting its thread status. 
+Your app can show actions are happening behind the scenes by setting its thread status. 
 
 ```python
 def handle_app_mentioned(
