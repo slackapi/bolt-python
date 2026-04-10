@@ -1,64 +1,72 @@
 # AI Chatbot
 
-In this tutorial, you'll learn how to bring the power of AI into your Slack workspace using a chatbot called Bolty that uses Anthropic or OpenAI. Here's what we'll do with this sample app:
+In this tutorial, you'll learn how to bring the power of AI into your Slack workspace using a chatbot called Bolty that uses Anthropic or OpenAI.
 
-1. Create your app from an app manifest and clone a starter template
-2. Set up and run your local project
-3. Create a workflow using Workflow Builder to summarize messages in conversations
-4. Select your preferred API and model to customize Bolty's responses
-5. Interact with Bolty via direct message, the `/ask-bolty` slash command, or by mentioning the app in conversations
+With Bolty, users can:
+
+- send direct messages to Bolty and get AI-powered responses in response,
+- use the `/ask-bolty` slash command to ask Bolty questions, and
+- receive channel summaries when joining new channels.
+
+Intrigued? First, grab your tools by following the three steps below.
+
+import QuickstartGuide from '@site/src/components/QuickstartGuide';
+
+<QuickstartGuide 
+  steps={[
+    {
+      number: 1,
+      title: 'Install the Slack CLI',
+      description: 'Download the command-line tool for developing Slack apps.',
+      commands: {
+        macos: 'curl -fsSL https://downloads.slack-edge.com/slack-cli/install.sh | bash',
+        windows: 'irm https://downloads.slack-edge.com/slack-cli/install-windows.ps1 | iex'
+      }
+    },
+    {
+      number: 2,
+      title: 'Connect to your workspace',
+      description: 'Log in and authenticate with your Slack workspace.',
+      commands: {
+        macos: 'slack login',
+        windows: 'slack login'
+      }
+    },
+    {
+      number: 3,
+      title: 'Create a project',
+      description: 'Set up a new Bolt project from a starter template.',
+      commands: {
+        macos: 'slack create ai-chatbot --template slack-samples/bolt-python-ai-chatbot',
+        windows: 'slack create ai-chatbot --template slack-samples/bolt-python-ai-chatbot'
+      }
+    }
+  ]}
+buttonText="View sample app"
+  buttonLink="https://github.com/slack-samples/bolt-python-ai-chatbot"
+  buttonIcon={true}
+/>
+
+<br/>
 
 ## Prerequisites {#prereqs}
 
-Before getting started, you will need the following:
+You will also need the following:
 
-- a development workspace where you have permissions to install apps. If you don’t have a workspace, go ahead and set that up now — you can [go here](https://slack.com/get-started#create) to create one, or you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
+- a development workspace where you have permissions to install apps. If you don’t have a workspace you can join the [Developer Program](https://api.slack.com/developer-program) and provision a sandbox with access to all Slack features for free.
 - a development environment with [Python 3.7](https://www.python.org/downloads/) or later.
 - an Anthropic or OpenAI account with sufficient credits, and in which you have generated a secret key.
-
-**Skip to the code**
-If you'd rather skip the tutorial and just head straight to the code, you can use our [Bolt for Python AI Chatbot sample](https://github.com/slack-samples/bolt-python-ai-chatbot) as a template.
-
-## Creating your app {#create-app}
-
-1. Navigate to the [app creation page](https://api.slack.com/apps/new) and select **From a manifest**.
-2. Select the workspace you want to install the application in.
-3. Copy the contents of the [`manifest.json`](https://github.com/slack-samples/bolt-python-ai-chatbot/blob/main/manifest.json) file into the text box that says **Paste your manifest code here** (within the **JSON** tab) and click **Next**.
-4. Review the configuration and click **Create**.
-5. You're now in your app configuration's **Basic Information** page. Navigate to the **Install App** link in the left nav and click **Install to Workspace**, then **Allow** on the screen that follows.
 
 ### Obtaining and storing your environment variables {#environment-variables}
 
 Before you'll be able to successfully run the app, you'll need to first obtain and set some environment variables.
 
-#### Slack tokens {#slack-tokens}
-
-From your app's page on [app settings](https://api.slack.com/apps) collect an app and bot token:
-
-1. On the **Install App** page, copy your **Bot User OAuth Token**. You will store this in your environment as `SLACK_BOT_TOKEN` (we'll get to that next).
-2. Navigate to **Basic Information** and in the **App-Level Tokens** section , click **Generate Token and Scopes**. Add the [`connections:write`](/reference/scopes/connections.write) scope, name the token, and click **Generate**. (For more details, refer to [understanding OAuth scopes for bots](/authentication/tokens#bot)). Copy this token. You will store this in your environment as `SLACK_APP_TOKEN`.
-
-To store your tokens and environment variables, run the following commands in the terminal. Replace the placeholder values with your bot and app tokens collected above:
-
-**For macOS**
-
-```bash
-export SLACK_BOT_TOKEN=<your-bot-token>
-export SLACK_APP_TOKEN=<your-app-token>
-```
-
-**For Windows**
-
-```pwsh
-set SLACK_BOT_TOKEN=<your-bot-token>
-set SLACK_APP_TOKEN=<your-app-token>
-```
-
 #### Provider tokens {#provider-tokens}
 
 Models from different AI providers are available if the corresponding environment variable is added as shown in the sections below.
 
-##### Anthropic {#anthropic}
+<Tabs groupId="ai-providers">
+<TabItem value="anthropic" label="Anthropic">
 
 To interact with Anthropic models, navigate to your Anthropic account dashboard to [create an API key](https://console.anthropic.com/settings/keys), then export the key as follows:
 
@@ -66,7 +74,8 @@ To interact with Anthropic models, navigate to your Anthropic account dashboard 
 export ANTHROPIC_API_KEY=<your-api-key>
 ```
 
-##### Google Cloud Vertex AI {#google-cloud-vertex-ai}
+</TabItem>
+<TabItem value="Google Cloud Vertex AI" label="Google Cloud Vertex AI">
 
 To use Google Cloud Vertex AI, [follow this quick start](https://cloud.google.com/vertex-ai/generative-ai/docs/start/quickstarts/quickstart-multimodal#expandable-1) to create a project for sending requests to the Gemini API, then gather [Application Default Credentials](https://cloud.google.com/docs/authentication/provide-credentials-adc) with the strategy to match your development environment.
 
@@ -79,7 +88,8 @@ export VERTEX_AI_LOCATION=<location-to-deploy-model>
 
 The project location can be located under the **Region** on the [Vertex AI](https://console.cloud.google.com/vertex-ai) dashboard, as well as more details about available Gemini models.
 
-##### OpenAI {#openai}
+</TabItem>
+<TabItem value="OpenAI" label="OpenAI">
 
 Unlock the OpenAI models from your OpenAI account dashboard by clicking [create a new secret key](https://platform.openai.com/api-keys), then export the key like so:
 
@@ -87,35 +97,32 @@ Unlock the OpenAI models from your OpenAI account dashboard by clicking [create 
 export OPENAI_API_KEY=<your-api-key>
 ```
 
+</TabItem>
+</Tabs>
+
 ## Setting up and running your local project {#configure-project}
 
-Clone the starter template onto your machine by running the following command:
-
-```bash
-git clone https://github.com/slack-samples/bolt-python-ai-chatbot.git
-```
-
-Change into the new project directory:
-
-```bash
-cd bolt-python-ai-chatbot
-```
 
 Start your Python virtual environment:
 
-**For macOS**
+<Tabs groupId="os">
+<TabItem value="macos" label="macOS">
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-**For Windows**
+</TabItem>
+<TabItem value="windows" label="Windows">
 
 ```bash
 py -m venv .venv
 .venv\Scripts\activate
 ```
+
+</TabItem>
+</Tabs>
 
 Install the required dependencies:
 
@@ -123,13 +130,13 @@ Install the required dependencies:
 pip install -r requirements.txt
 ```
 
-Start your local server:
+Run your app locally:
 
 ```bash
-python app.py
+slack run
 ```
 
-If your app is up and running, you'll see a message that says "⚡️ Bolt app is running!"
+If your app is indeed up and running, you'll see a message that says "⚡️ Bolt app is running!"
 
 ## Choosing your provider {#provider}
 
@@ -236,4 +243,3 @@ Congratulations! You've successfully integrated the power of AI into your worksp
 
 - To learn more about Bolt for Python, refer to the [Getting started](/tools/bolt-python/getting-started) documentation.
 - For more details about creating workflow steps using the Bolt SDK, refer to the [workflow steps for Bolt](/workflows/workflow-steps) guide.
-- To use the Bolt for Python SDK to develop on the automations platform, refer to the [Create a workflow step for Workflow Builder: Bolt for Python](/tools/bolt-python/tutorial/custom-steps-workflow-builder-new) tutorial.

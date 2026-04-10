@@ -7,7 +7,19 @@
 	},
 	"tools/bolt-python/getting-started",
 	{ "type": "html", "value": "<hr>" },
-	"tools/bolt-python/building-an-app",
+	"tools/bolt-python/creating-an-app",
+	{
+		"type": "category",
+		"label": "AI & Agents",
+		"link": {
+			"type": "doc",
+			"id": "tools/bolt-python/concepts/adding-agent-features"
+		  },
+		"items": [
+			"tools/bolt-python/concepts/adding-agent-features",
+			"tools/bolt-python/concepts/using-the-assistant-class"
+		]
+	},
 	{
 		"type": "category",
 		"label": "Slack API calls",
@@ -39,7 +51,6 @@
 			"tools/bolt-python/concepts/app-home"
 		]
 	},
-	"tools/bolt-python/concepts/ai-apps",
 	{
 		"type": "category",
 		"label": "Custom Steps",
@@ -85,11 +96,7 @@
 			"tools/bolt-python/concepts/token-rotation"
 		]
 	},
-	{
-		"type": "category",
-		"label": "Experiments",
-		"items": ["tools/bolt-python/experiments"]
-	},
+	"tools/bolt-python/experiments",
 	{
 		"type": "category",
 		"label": "Legacy",

@@ -43,37 +43,58 @@ def show_datepicker(event, say):
 
 ## Streaming messages {#streaming-messages}
 
-You can have your app's messages stream in to replicate conventional AI chatbot behavior. This is done through three Web API methods:
+You can have your app's messages stream in to replicate conventional agent behavior. Bolt for Python provides a `say_stream` utility as a listener argument available for `app.event` and `app.message` listeners. 
 
-* [`chat_startStream`](/reference/methods/chat.startStream)
-* [`chat_appendStream`](/reference/methods/chat.appendStream)
-* [`chat_stopStream`](/reference/methods/chat.stopStream)
+The `say_stream` utility streamlines calling the Python Slack SDK's [`WebClient.chat_stream`](https://docs.slack.dev/tools/python-slack-sdk/reference/web/client.html#slack_sdk.web.client.WebClient.chat_stream) helper utility by sourcing parameter values from the relevant event payload.
 
-The Python Slack SDK provides a [`chat_stream()`](https://docs.slack.dev/tools/python-slack-sdk/reference/web/client.html#slack_sdk.web.client.WebClient.chat_stream) helper utility to streamline calling these methods. Here's an excerpt from our [Assistant template app](https://github.com/slack-samples/bolt-python-assistant-template):
+| Parameter | Value |
+|---|---| 
+| `channel_id` | Sourced from the event payload.
+| `thread_ts` | Sourced from the event payload. Falls back to the `ts` value if available.
+| `recipient_team_id` | Sourced from the event `team_id` (`enterprise_id` if the app is installed on an org).
+| `recipient_user_id` | Sourced from the `user_id` of the event.
 
-```python
-streamer = client.chat_stream(
-    channel=channel_id,
-    recipient_team_id=team_id,
-    recipient_user_id=user_id,
-    thread_ts=thread_ts,
-)
+If neither a `channel_id` or `thread_ts` can be sourced, then the utility will be `None`.
 
-# Loop over OpenAI response stream
-# https://platform.openai.com/docs/api-reference/responses/create
-for event in returned_message:
-    if event.type == "response.output_text.delta":
-        streamer.append(markdown_text=f"{event.delta}")
-    else:
-        continue
+For information on calling the `chat_*Stream` API methods directly, see the [_Sending streaming messages_](/tools/python-slack-sdk/web#sending-streaming-messages) section of the Python Slack SDK docs.
 
-feedback_block = create_feedback_block()
-streamer.stop(blocks=feedback_block)
+### Example {#example}
+
+```py
+import os
+
+from slack_bolt import App, SayStream
+from slack_bolt.adapter.socket_mode import SocketModeHandler
+from slack_sdk import WebClient
+
+app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
+
+@app.event("app_mention")
+def handle_app_mention(client: WebClient, say_stream: SayStream):
+  stream = say_stream()
+  stream.append(markdown_text="Someone rang the bat signal!")
+  stream.stop()
+
+@app.message("")
+def handle_message(client: WebClient, say_stream: SayStream):
+  stream = say_stream()
+
+  stream.append(markdown_text="Let me consult my *vast knowledge database*...)
+  stream.stop()
+
+if __name__ == "__main__":
+  SocketModeHandler(app, os.environ.get("SLACK_APP_TOKEN")).start()
 ```
 
-In that example, a [feedback buttons](/reference/block-kit/block-elements/feedback-buttons-element) block element is passed to `streamer.stop` to provide feedback buttons to the user at the bottom of the message. Interaction with these buttons will send a block action event to your app to receive the feedback.
+#### Adding feedback buttons after a stream
 
-```python
+You can pass a [feedback buttons](/reference/block-kit/block-elements/feedback-buttons-element) block element to `stream.stop` to provide feedback buttons to the user at the bottom of the message. Interaction with these buttons will send a block action event to your app to receive the feedback.
+
+```py
+stream.stop(blocks=feedback_block)
+```
+
+```py
 def create_feedback_block() -> List[Block]:
     blocks: List[Block] = [
         ContextActionsBlock(
@@ -96,5 +117,3 @@ def create_feedback_block() -> List[Block]:
     ]
     return blocks
 ```
-
-For information on calling the `chat_*Stream` API methods without the helper utility, see the [_Sending streaming messages_](/tools/python-slack-sdk/web#sending-streaming-messages) section of the Python Slack SDK docs.
