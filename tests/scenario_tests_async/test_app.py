@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from ssl import SSLContext
+import ssl
 
 import pytest
 from slack_sdk import WebClient
@@ -185,14 +185,14 @@ class TestAsyncApp:
 
     @pytest.mark.asyncio
     async def test_proxy_ssl_for_respond(self):
-        ssl = SSLContext()
+        ssl_ctx = ssl.create_default_context()
         app = AsyncApp(
             signing_secret="valid",
             client=AsyncWebClient(
                 token=self.valid_token,
                 base_url=self.mock_api_server_base_url,
                 proxy="http://proxy-host:9000/",
-                ssl=ssl,
+                ssl=ssl_ctx,
             ),
             authorize=my_authorize,
         )
@@ -202,9 +202,9 @@ class TestAsyncApp:
         @app.event("app_mention")
         async def handle(context: AsyncBoltContext, respond):
             assert context.respond.proxy == "http://proxy-host:9000/"
-            assert context.respond.ssl == ssl
+            assert context.respond.ssl == ssl_ctx
             assert respond.proxy == "http://proxy-host:9000/"
-            assert respond.ssl == ssl
+            assert respond.ssl == ssl_ctx
             result["called"] = True
 
         req = AsyncBoltRequest(body=app_mention_event_body, headers={}, mode="socket_mode")

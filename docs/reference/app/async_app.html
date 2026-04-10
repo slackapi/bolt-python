@@ -48,7 +48,7 @@ el.replaceWith(d);
 <dl>
 <dt id="slack_bolt.app.async_app.AsyncApp"><code class="flex name class">
 <span>class <span class="ident">AsyncApp</span></span>
-<span>(</span><span>*,<br>logger: logging.Logger | None = None,<br>name: str | None = None,<br>process_before_response: bool = False,<br>raise_error_for_unhandled_request: bool = False,<br>signing_secret: str | None = None,<br>token: str | None = None,<br>client: slack_sdk.web.async_client.AsyncWebClient | None = None,<br>before_authorize: <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="../middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a> | Callable[..., Awaitable[Any]] | None = None,<br>authorize: Callable[..., Awaitable[<a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="../authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]] | None = None,<br>user_facing_authorize_error_message: str | None = None,<br>installation_store: slack_sdk.oauth.installation_store.async_installation_store.AsyncInstallationStore | None = None,<br>installation_store_bot_only: bool | None = None,<br>request_verification_enabled: bool = True,<br>ignoring_self_events_enabled: bool = True,<br>ignoring_self_assistant_message_events_enabled: bool = True,<br>ssl_check_enabled: bool = True,<br>url_verification_enabled: bool = True,<br>attaching_function_token_enabled: bool = True,<br>oauth_settings: <a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings" href="../oauth/async_oauth_settings.html#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings">AsyncOAuthSettings</a> | None = None,<br>oauth_flow: <a title="slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow" href="../oauth/async_oauth_flow.html#slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow">AsyncOAuthFlow</a> | None = None,<br>verification_token: str | None = None,<br>assistant_thread_context_store: <a title="slack_bolt.context.assistant.thread_context_store.async_store.AsyncAssistantThreadContextStore" href="../context/assistant/thread_context_store/async_store.html#slack_bolt.context.assistant.thread_context_store.async_store.AsyncAssistantThreadContextStore">AsyncAssistantThreadContextStore</a> | None = None)</span>
+<span>(</span><span>*,<br>logger: logging.Logger | None = None,<br>name: str | None = None,<br>process_before_response: bool = False,<br>raise_error_for_unhandled_request: bool = False,<br>signing_secret: str | None = None,<br>token: str | None = None,<br>client: slack_sdk.web.async_client.AsyncWebClient | None = None,<br>before_authorize: <a title="slack_bolt.middleware.async_middleware.AsyncMiddleware" href="../middleware/async_middleware.html#slack_bolt.middleware.async_middleware.AsyncMiddleware">AsyncMiddleware</a> | Callable[..., Awaitable[Any]] | None = None,<br>authorize: Callable[..., Awaitable[<a title="slack_bolt.authorization.authorize_result.AuthorizeResult" href="../authorization/authorize_result.html#slack_bolt.authorization.authorize_result.AuthorizeResult">AuthorizeResult</a>]] | None = None,<br>user_facing_authorize_error_message: str | None = None,<br>installation_store: slack_sdk.oauth.installation_store.async_installation_store.AsyncInstallationStore | None = None,<br>installation_store_bot_only: bool | None = None,<br>request_verification_enabled: bool = True,<br>ignoring_self_events_enabled: bool = True,<br>ignoring_self_assistant_message_events_enabled: bool = True,<br>ssl_check_enabled: bool = True,<br>url_verification_enabled: bool = True,<br>attaching_function_token_enabled: bool = True,<br>oauth_settings: <a title="slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings" href="../oauth/async_oauth_settings.html#slack_bolt.oauth.async_oauth_settings.AsyncOAuthSettings">AsyncOAuthSettings</a> | None = None,<br>oauth_flow: <a title="slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow" href="../oauth/async_oauth_flow.html#slack_bolt.oauth.async_oauth_flow.AsyncOAuthFlow">AsyncOAuthFlow</a> | None = None,<br>verification_token: str | None = None,<br>assistant_thread_context_store: <a title="slack_bolt.context.assistant.thread_context_store.async_store.AsyncAssistantThreadContextStore" href="../context/assistant/thread_context_store/async_store.html#slack_bolt.context.assistant.thread_context_store.async_store.AsyncAssistantThreadContextStore">AsyncAssistantThreadContextStore</a> | None = None,<br>attaching_conversation_kwargs_enabled: bool = True)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -92,6 +92,7 @@ el.replaceWith(d);
         verification_token: Optional[str] = None,
         # for AI Agents &amp; Assistants
         assistant_thread_context_store: Optional[AsyncAssistantThreadContextStore] = None,
+        attaching_conversation_kwargs_enabled: bool = True,
     ):
         &#34;&#34;&#34;Bolt App that provides functionalities to register middleware/listeners.
 
@@ -312,6 +313,7 @@ el.replaceWith(d);
         self._async_listeners: List[AsyncListener] = []
 
         self._assistant_thread_context_store = assistant_thread_context_store
+        self._attaching_conversation_kwargs_enabled = attaching_conversation_kwargs_enabled
 
         self._process_before_response = process_before_response
         self._async_listener_runner = AsyncioListenerRunner(
@@ -565,7 +567,7 @@ el.replaceWith(d);
                 self._framework_logger.debug(debug_checking_listener(listener_name))
                 if await listener.async_matches(req=req, resp=resp):  # type: ignore[arg-type]
                     # run all the middleware attached to this listener first
-                    (middleware_resp, next_was_not_called) = await listener.run_async_middleware(
+                    middleware_resp, next_was_not_called = await listener.run_async_middleware(
                         req=req, resp=resp  # type: ignore[arg-type]
                     )
                     if next_was_not_called:
@@ -815,10 +817,13 @@ el.replaceWith(d);
             middleware: A list of lister middleware functions.
                 Only when all the middleware call `next()` method, the listener function can be invoked.
         &#34;&#34;&#34;
+        middleware = list(middleware) if middleware else []
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
             primary_matcher = builtin_matchers.event(event, True, base_logger=self._base_logger)
+            if self._attaching_conversation_kwargs_enabled:
+                middleware.insert(0, AsyncAttachingConversationKwargs(self._assistant_thread_context_store))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
         return __call__
@@ -879,6 +884,8 @@ el.replaceWith(d);
                 asyncio=True,
                 base_logger=self._base_logger,
             )
+            if self._attaching_conversation_kwargs_enabled:
+                middleware.insert(0, AsyncAttachingConversationKwargs(self._assistant_thread_context_store))
             middleware.insert(0, AsyncMessageListenerMatches(keyword))
             return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
@@ -1380,20 +1387,6 @@ el.replaceWith(d);
         # It is intended for apps that start lazy listeners from their custom global middleware.
         req.context[&#34;listener_runner&#34;] = self.listener_runner
 
-        # For AI Agents &amp; Assistants
-        if is_assistant_event(req.body):
-            assistant = AsyncAssistantUtilities(
-                payload=to_event(req.body),  # type:ignore[arg-type]
-                context=req.context,
-                thread_context_store=self._assistant_thread_context_store,
-            )
-            req.context[&#34;say&#34;] = assistant.say
-            req.context[&#34;set_status&#34;] = assistant.set_status
-            req.context[&#34;set_title&#34;] = assistant.set_title
-            req.context[&#34;set_suggested_prompts&#34;] = assistant.set_suggested_prompts
-            req.context[&#34;get_thread_context&#34;] = assistant.get_thread_context
-            req.context[&#34;save_thread_context&#34;] = assistant.save_thread_context
-
     @staticmethod
     def _to_listener_functions(
         kwargs: dict,
@@ -1444,7 +1437,7 @@ el.replaceWith(d);
             AsyncCustomListener(
                 app_name=self.name,
                 ack_function=functions.pop(0),
-                lazy_functions=functions,  # type:ignore[arg-type]
+                lazy_functions=functions,  # type: ignore[arg-type]
                 matchers=listener_matchers,
                 middleware=listener_middleware,
                 auto_acknowledgement=auto_acknowledgement,
@@ -1794,7 +1787,7 @@ Only when all the middleware call <code>next()</code> method, the listener funct
             self._framework_logger.debug(debug_checking_listener(listener_name))
             if await listener.async_matches(req=req, resp=resp):  # type: ignore[arg-type]
                 # run all the middleware attached to this listener first
-                (middleware_resp, next_was_not_called) = await listener.run_async_middleware(
+                middleware_resp, next_was_not_called = await listener.run_async_middleware(
                     req=req, resp=resp  # type: ignore[arg-type]
                 )
                 if next_was_not_called:
@@ -2243,10 +2236,13 @@ when getting an unhandled error in Bolt app.</dd>
         middleware: A list of lister middleware functions.
             Only when all the middleware call `next()` method, the listener function can be invoked.
     &#34;&#34;&#34;
+    middleware = list(middleware) if middleware else []
 
     def __call__(*args, **kwargs):
         functions = self._to_listener_functions(kwargs) if kwargs else list(args)
         primary_matcher = builtin_matchers.event(event, True, base_logger=self._base_logger)
+        if self._attaching_conversation_kwargs_enabled:
+            middleware.insert(0, AsyncAttachingConversationKwargs(self._assistant_thread_context_store))
         return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 
     return __call__</code></pre>
@@ -2454,6 +2450,8 @@ Only when all the middleware call <code>next()</code> method, the listener funct
             asyncio=True,
             base_logger=self._base_logger,
         )
+        if self._attaching_conversation_kwargs_enabled:
+            middleware.insert(0, AsyncAttachingConversationKwargs(self._assistant_thread_context_store))
         middleware.insert(0, AsyncMessageListenerMatches(keyword))
         return self._register_listener(list(functions), primary_matcher, matchers, middleware, True)
 

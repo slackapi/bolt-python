@@ -2,7 +2,6 @@ import pytest
 from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.context.say_stream.async_say_stream import AsyncSayStream
-from slack_bolt.warning import ExperimentalWarning
 from tests.mock_web_api_server import (
     cleanup_mock_web_api_server,
     setup_mock_web_api_server,
@@ -29,16 +28,14 @@ class TestAsyncSayStream:
     @pytest.mark.asyncio
     async def test_missing_channel_raises(self):
         say_stream = AsyncSayStream(client=self.web_client, channel=None, thread_ts="111.222")
-        with pytest.warns(ExperimentalWarning):
-            with pytest.raises(ValueError, match="channel"):
-                await say_stream()
+        with pytest.raises(ValueError, match="channel"):
+            await say_stream()
 
     @pytest.mark.asyncio
     async def test_missing_thread_ts_raises(self):
         say_stream = AsyncSayStream(client=self.web_client, channel="C111", thread_ts=None)
-        with pytest.warns(ExperimentalWarning):
-            with pytest.raises(ValueError, match="thread_ts"):
-                await say_stream()
+        with pytest.raises(ValueError, match="thread_ts"):
+            await say_stream()
 
     @pytest.mark.asyncio
     async def test_default_params(self):
@@ -105,13 +102,3 @@ class TestAsyncSayStream:
             "recipient_user_id": "U222",
             "task_display_mode": None,
         }
-
-    @pytest.mark.asyncio
-    async def test_experimental_warning(self):
-        say_stream = AsyncSayStream(
-            client=self.web_client,
-            channel="C111",
-            thread_ts="111.222",
-        )
-        with pytest.warns(ExperimentalWarning, match="say_stream is experimental"):
-            await say_stream()

@@ -82,14 +82,10 @@ el.replaceWith(d);
         if self.thread_context_loaded is True:
             return self._thread_context
 
-        if self.payload.get(&#34;assistant_thread&#34;) is not None:
+        thread = self.payload.get(&#34;assistant_thread&#34;)
+        if isinstance(thread, dict) and thread.get(&#34;context&#34;, {}).get(&#34;channel_id&#34;) is not None:
             # assistant_thread_started
-            thread = self.payload[&#34;assistant_thread&#34;]
-            self._thread_context = (
-                AssistantThreadContext(thread[&#34;context&#34;])
-                if thread.get(&#34;context&#34;, {}).get(&#34;channel_id&#34;) is not None
-                else None
-            )
+            self._thread_context = AssistantThreadContext(thread[&#34;context&#34;])
             # for this event, the context will never be changed
             self.thread_context_loaded = True
         elif self.payload.get(&#34;channel&#34;) is not None and self.payload.get(&#34;thread_ts&#34;) is not None:

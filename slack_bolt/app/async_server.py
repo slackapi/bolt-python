@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from aiohttp import web
 
@@ -7,19 +7,22 @@ from slack_bolt.adapter.aiohttp import to_bolt_request, to_aiohttp_response
 from slack_bolt.response import BoltResponse
 from slack_bolt.util.utils import get_boot_message
 
+if TYPE_CHECKING:
+    from slack_bolt.app.async_app import AsyncApp
+
 
 class AsyncSlackAppServer:
     port: int
     path: str
     host: str
-    bolt_app: "AsyncApp"  # type: ignore[name-defined]
+    bolt_app: "AsyncApp"
     web_app: web.Application
 
     def __init__(
         self,
         port: int,
         path: str,
-        app: "AsyncApp",  # type: ignore[name-defined]
+        app: "AsyncApp",
         host: Optional[str] = None,
     ):
         """Standalone AIOHTTP Web Server.
@@ -34,7 +37,7 @@ class AsyncSlackAppServer:
         self.port = port
         self.path = path
         self.host = host if host is not None else "0.0.0.0"
-        self.bolt_app: "AsyncApp" = app  # type: ignore[name-defined]
+        self.bolt_app: "AsyncApp" = app
         self.web_app = web.Application()
         self._bolt_oauth_flow = self.bolt_app.oauth_flow
         if self._bolt_oauth_flow:
