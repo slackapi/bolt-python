@@ -112,9 +112,9 @@ def extract_team_id(payload: Dict[str, Any]) -> Optional[str]:
     if isinstance(payload.get("event"), dict):
         return extract_team_id(payload["event"])
     if isinstance(payload.get("user"), dict):
-        return payload["user"]["team_id"]
+        return payload["user"].get("team_id")
     if isinstance(payload.get("view"), dict):
-        return payload["view"]["team_id"]
+        return payload["view"].get("team_id")
     return None
 
 

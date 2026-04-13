@@ -1253,8 +1253,10 @@ class TestRequestInternals:
         invalid_payloads = {
             "event": {"event": "some_event_type"},
             "user": {"user": "U12345"},
+            "user_missing_team_id": {"user": {"id": "U12345"}},
             "team": {"team": "T12345"},
             "view": {"view": "V12345"},
+            "view_missing_team_id": {"view": {"id": "V12345"}},
             "message": {"message": "some text"},
             "item": {"item": "item_id"},
             "function_data": {"function_data": "fd_123"},
