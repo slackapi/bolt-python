@@ -3,7 +3,8 @@
 # used only under slack_bolt/adapter
 boto3<=2
 bottle>=0.12,<1
-chalice>=1.32.0,<2;
+chalice>=1.28,<1.31; python_version<"3.9"
+chalice>=1.32.0,<2; python_version>="3.9"
 cheroot<12
 CherryPy>=18,<19
 Django>=3,<6
