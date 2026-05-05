@@ -23,7 +23,7 @@ tracerite<1.1.2; python_version<="3.8"  # older versions of python are not compa
 sanic>=21,<24; python_version<="3.8"
 sanic>=21,<26; python_version>"3.8"
 
-starlette>=0.19.1,<1
+starlette>=0.49.3,<1
 tornado>=6,<7
 uvicorn<1                                # The oldest version can vary among Python runtime versions
 gunicorn>=20,<24
