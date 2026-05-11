@@ -176,6 +176,7 @@ jobs:
       - lint
       - typecheck
       - unittest
+      - codecov
     if: ${{ !success() && github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch' }}
     steps:
       - name: Send notifications of failing tests
