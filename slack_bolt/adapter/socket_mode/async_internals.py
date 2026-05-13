@@ -8,14 +8,14 @@ from slack_sdk.socket_mode.async_client import AsyncBaseSocketModeClient
 from slack_sdk.socket_mode.request import SocketModeRequest
 from slack_sdk.socket_mode.response import SocketModeResponse
 
-from slack_bolt.adapter.socket_mode.internals import build_retry_headers
+from slack_bolt.adapter.socket_mode.internals import build_headers
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 
 
 async def run_async_bolt_app(app: AsyncApp, req: SocketModeRequest):
-    bolt_req: AsyncBoltRequest = AsyncBoltRequest(mode="socket_mode", body=req.payload, headers=build_retry_headers(req))
+    bolt_req: AsyncBoltRequest = AsyncBoltRequest(mode="socket_mode", body=req.payload, headers=build_headers(req))
     bolt_resp: BoltResponse = await app.async_dispatch(bolt_req)
     return bolt_resp
 

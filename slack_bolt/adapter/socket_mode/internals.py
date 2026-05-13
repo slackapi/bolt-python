@@ -14,7 +14,7 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
-def build_retry_headers(req: SocketModeRequest) -> Optional[Dict[str, Union[str, Sequence[str]]]]:
+def build_headers(req: SocketModeRequest) -> Optional[Dict[str, Union[str, Sequence[str]]]]:
     # Mirror the HTTP mode retry headers so middleware/listeners can detect Events API retries
     headers: Dict[str, Union[str, Sequence[str]]] = {}
     if req.retry_attempt is not None:
@@ -25,7 +25,7 @@ def build_retry_headers(req: SocketModeRequest) -> Optional[Dict[str, Union[str,
 
 
 def run_bolt_app(app: App, req: SocketModeRequest):
-    bolt_req: BoltRequest = BoltRequest(mode="socket_mode", body=req.payload, headers=build_retry_headers(req))
+    bolt_req: BoltRequest = BoltRequest(mode="socket_mode", body=req.payload, headers=build_headers(req))
     bolt_resp: BoltResponse = app.dispatch(bolt_req)
     return bolt_resp
 
