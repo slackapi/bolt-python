@@ -40,7 +40,7 @@ class TestSocketModeWebsockets:
 
         app = AsyncApp(client=self.web_client)
 
-        result = {"shortcut": False, "command": False}
+        result = {"shortcut": False, "command": False, "message": False}
 
         @app.shortcut("do-something")
         async def shortcut_handler(ack):
@@ -50,6 +50,13 @@ class TestSocketModeWebsockets:
         @app.command("/hello-socket-mode")
         async def command_handler(ack):
             result["command"] = True
+            await ack()
+
+        @app.message("<@W111>")
+        async def message_handler(ack, req):
+            result["message"] = req.headers.get("x-slack-retry-num") == ["1"] and req.headers.get(
+                "x-slack-retry-reason"
+            ) == ["timeout"]
             await ack()
 
         handler = AsyncSocketModeHandler(
@@ -67,6 +74,7 @@ class TestSocketModeWebsockets:
             await asyncio.sleep(2)
             assert result["shortcut"] is True
             assert result["command"] is True
+            assert result["message"] is True
         finally:
             await handler.client.close()
             stop_socket_mode_server(self)

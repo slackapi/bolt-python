@@ -3,6 +3,7 @@
 import json
 import logging
 from time import time
+from typing import Dict, Optional, Sequence, Union
 
 from slack_sdk.socket_mode.client import BaseSocketModeClient
 from slack_sdk.socket_mode.request import SocketModeRequest
@@ -13,8 +14,18 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
+def build_headers(req: SocketModeRequest) -> Optional[Dict[str, Union[str, Sequence[str]]]]:
+    # Mirror the HTTP mode retry headers so middleware/listeners can detect Events API retries
+    headers: Dict[str, Union[str, Sequence[str]]] = {}
+    if req.retry_attempt is not None:
+        headers["x-slack-retry-num"] = str(req.retry_attempt)
+    if req.retry_reason is not None:
+        headers["x-slack-retry-reason"] = req.retry_reason
+    return headers or None
+
+
 def run_bolt_app(app: App, req: SocketModeRequest):
-    bolt_req: BoltRequest = BoltRequest(mode="socket_mode", body=req.payload)
+    bolt_req: BoltRequest = BoltRequest(mode="socket_mode", body=req.payload, headers=build_headers(req))
     bolt_resp: BoltResponse = app.dispatch(bolt_req)
     return bolt_resp
 

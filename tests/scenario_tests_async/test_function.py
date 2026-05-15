@@ -8,6 +8,7 @@ from unittest.mock import Mock, MagicMock
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 
+import slack_bolt.listener.asyncio_runner as async_runner_module
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.request.async_request import AsyncBoltRequest
 from tests.mock_web_api_server import (
@@ -17,10 +18,6 @@ from tests.mock_web_api_server import (
     assert_auth_test_count_async,
 )
 from tests.utils import remove_os_env_temporarily, restore_os_env
-
-
-async def fake_sleep(seconds):
-    pass
 
 
 class TestAsyncFunction:
@@ -60,9 +57,9 @@ class TestAsyncFunction:
         timestamp, body = str(int(time.time())), json.dumps(message_body)
         return AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
-    def setup_time_mocks(self, *, monkeypatch: pytest.MonkeyPatch, time_mock: Mock, sleep_mock: MagicMock):
-        monkeypatch.setattr(time, "time", time_mock)
-        monkeypatch.setattr(asyncio, "sleep", sleep_mock)
+    def setup_time_mocks(self, *, monkeypatch: pytest.MonkeyPatch, time_mock, sleep_mock):
+        monkeypatch.setattr(async_runner_module.time, "time", time_mock)
+        monkeypatch.setattr(async_runner_module.asyncio, "sleep", sleep_mock)
 
     @pytest.mark.asyncio
     async def test_mock_server_is_running(self):
@@ -146,9 +143,18 @@ class TestAsyncFunction:
         app.function("reverse", auto_acknowledge=False)(just_no_ack)
         request = self.build_request_from_body(function_body)
 
+        elapsed_seconds = 0
+
+        def fake_time():
+            return float(elapsed_seconds)
+
+        async def fake_sleep(duration):
+            nonlocal elapsed_seconds
+            elapsed_seconds += 1
+
         self.setup_time_mocks(
             monkeypatch=monkeypatch,
-            time_mock=Mock(side_effect=[current_time for current_time in range(100)]),
+            time_mock=fake_time,
             sleep_mock=MagicMock(side_effect=fake_sleep),
         )
 
@@ -167,20 +173,28 @@ class TestAsyncFunction:
         app.function("reverse", auto_acknowledge=False, ack_timeout=timeout)(just_no_ack)
         request = self.build_request_from_body(function_body)
 
-        sleep_mock = MagicMock(side_effect=fake_sleep)
+        elapsed_seconds = 0
+
+        def fake_time():
+            return float(elapsed_seconds)
+
+        async def fake_sleep(duration):
+            nonlocal elapsed_seconds
+            elapsed_seconds += 1
+
         self.setup_time_mocks(
             monkeypatch=monkeypatch,
-            time_mock=Mock(side_effect=[current_time for current_time in range(100)]),
-            sleep_mock=sleep_mock,
+            time_mock=fake_time,
+            sleep_mock=MagicMock(side_effect=fake_sleep),
         )
 
         response = await app.async_dispatch(request)
 
         assert response.status == 404
         await assert_auth_test_count_async(self, 1)
-        assert (
-            sleep_mock.call_count == timeout
-        ), f"Expected handler to time out after calling time.sleep 5 times, but it was called {sleep_mock.call_count} times"
+        assert elapsed_seconds == timeout + 1, (
+            f"Expected handler to time out after {timeout + 1} sleep calls, " f"but it was called {elapsed_seconds} times"
+        )
 
     @pytest.mark.asyncio
     async def test_warning_when_timeout_improperly_set(self, caplog):
