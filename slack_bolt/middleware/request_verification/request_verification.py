@@ -49,7 +49,7 @@ class RequestVerification(Middleware):
 
     @staticmethod
     def _can_skip(mode: str, body: Dict[str, Any]) -> bool:
-        return mode == "socket_mode" or (body is not None and body.get("ssl_check") == "1")
+        return mode == "socket_mode"
 
     @staticmethod
     def _build_error_response() -> BoltResponse:
