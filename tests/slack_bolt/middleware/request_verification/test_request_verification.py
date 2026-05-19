@@ -45,3 +45,18 @@ class TestRequestVerification:
         resp = middleware.process(req=req, resp=resp, next=next)
         assert resp.status == 401
         assert resp.body == """{"error": "invalid request"}"""
+
+    def test_ssl_check_param_requires_valid_signature(self):
+        middleware = RequestVerification(signing_secret=self.signing_secret)
+        req = BoltRequest(
+            body="token=random&ssl_check=1",
+            headers={
+                "content-type": ["application/x-www-form-urlencoded"],
+                "x-slack-signature": ["v0=invalid"],
+                "x-slack-request-timestamp": ["0"],
+            },
+        )
+        resp = BoltResponse(status=404)
+        resp = middleware.process(req=req, resp=resp, next=next)
+        assert resp.status == 401
+        assert resp.body == """{"error": "invalid request"}"""
