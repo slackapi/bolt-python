@@ -98,3 +98,24 @@ class TestSayStream:
             "icon_url": None,
             "username": None,
         }
+
+    def test_authorship_overrides(self):
+        say_stream = SayStream(
+            client=self.web_client,
+            channel="C111",
+            recipient_team_id="T111",
+            recipient_user_id="U111",
+            thread_ts="111.222",
+        )
+        stream = say_stream(icon_emoji=":maple_leaf:", username="Charlie Brown")
+
+        assert stream._stream_args == {
+            "channel": "C111",
+            "thread_ts": "111.222",
+            "recipient_team_id": "T111",
+            "recipient_user_id": "U111",
+            "task_display_mode": None,
+            "icon_emoji": ":maple_leaf:",
+            "icon_url": None,
+            "username": "Charlie Brown",
+        }
