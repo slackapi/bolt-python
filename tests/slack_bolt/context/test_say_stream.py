@@ -44,6 +44,9 @@ class TestSayStream:
             "recipient_team_id": "T111",
             "recipient_user_id": "U111",
             "task_display_mode": None,
+            "icon_emoji": None,
+            "icon_url": None,
+            "username": None,
         }
 
     def test_parameter_overrides(self):
@@ -63,6 +66,9 @@ class TestSayStream:
             "recipient_team_id": "T222",
             "recipient_user_id": "U222",
             "task_display_mode": None,
+            "icon_emoji": None,
+            "icon_url": None,
+            "username": None,
         }
 
     def test_buffer_size_overrides(self):
@@ -88,4 +94,7 @@ class TestSayStream:
             "recipient_team_id": "T222",
             "recipient_user_id": "U222",
             "task_display_mode": None,
+            "icon_emoji": None,
+            "icon_url": None,
+            "username": None,
         }

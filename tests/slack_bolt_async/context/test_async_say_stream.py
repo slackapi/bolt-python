@@ -55,6 +55,9 @@ class TestAsyncSayStream:
             "recipient_team_id": "T111",
             "recipient_user_id": "U111",
             "task_display_mode": None,
+            "icon_emoji": None,
+            "icon_url": None,
+            "username": None,
         }
 
     @pytest.mark.asyncio
@@ -75,6 +78,9 @@ class TestAsyncSayStream:
             "recipient_team_id": "T222",
             "recipient_user_id": "U222",
             "task_display_mode": None,
+            "icon_emoji": None,
+            "icon_url": None,
+            "username": None,
         }
 
     @pytest.mark.asyncio
@@ -101,4 +107,7 @@ class TestAsyncSayStream:
             "recipient_team_id": "T222",
             "recipient_user_id": "U222",
             "task_display_mode": None,
+            "icon_emoji": None,
+            "icon_url": None,
+            "username": None,
         }
