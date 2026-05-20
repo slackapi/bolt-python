@@ -34,6 +34,9 @@ class SayStream:
         recipient_team_id: Optional[str] = None,
         recipient_user_id: Optional[str] = None,
         thread_ts: Optional[str] = None,
+        icon_emoji: Optional[str] = None,
+        icon_url: Optional[str] = None,
+        username: Optional[str] = None,
         **kwargs,
     ) -> ChatStream:
         """Starts a new chat stream with context."""
@@ -51,6 +54,9 @@ class SayStream:
                 recipient_team_id=recipient_team_id or self.recipient_team_id,
                 recipient_user_id=recipient_user_id or self.recipient_user_id,
                 thread_ts=thread_ts,
+                icon_emoji=icon_emoji,
+                icon_url=icon_url,
+                username=username,
                 **kwargs,
             )
         return self.client.chat_stream(
@@ -58,5 +64,8 @@ class SayStream:
             recipient_team_id=recipient_team_id or self.recipient_team_id,
             recipient_user_id=recipient_user_id or self.recipient_user_id,
             thread_ts=thread_ts,
+            icon_emoji=icon_emoji,
+            icon_url=icon_url,
+            username=username,
             **kwargs,
         )

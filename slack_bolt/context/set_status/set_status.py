@@ -23,6 +23,9 @@ class SetStatus:
         self,
         status: str,
         loading_messages: Optional[List[str]] = None,
+        icon_emoji: Optional[str] = None,
+        icon_url: Optional[str] = None,
+        username: Optional[str] = None,
         **kwargs,
     ) -> SlackResponse:
         return self.client.assistant_threads_setStatus(
@@ -30,5 +33,8 @@ class SetStatus:
             thread_ts=self.thread_ts,
             status=status,
             loading_messages=loading_messages,
+            icon_emoji=icon_emoji,
+            icon_url=icon_url,
+            username=username,
             **kwargs,
         )
