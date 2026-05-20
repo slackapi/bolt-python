@@ -1,28 +1,20 @@
 import pytest
+from unittest.mock import patch, MagicMock
+
 from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt.context.say_stream.async_say_stream import AsyncSayStream
-from tests.mock_web_api_server import (
-    cleanup_mock_web_api_server,
-    setup_mock_web_api_server,
-)
 from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
 class TestAsyncSayStream:
-    default_chat_stream_buffer_size = AsyncWebClient.chat_stream.__kwdefaults__["buffer_size"]
-
     @pytest.fixture(scope="function", autouse=True)
     def setup_teardown(self):
         old_os_env = remove_os_env_temporarily()
-        setup_mock_web_api_server(self)
-        valid_token = "xoxb-valid"
-        mock_api_server_base_url = "http://localhost:8888"
         try:
-            self.web_client = AsyncWebClient(token=valid_token, base_url=mock_api_server_base_url)
-            yield  # run the test here
+            self.web_client = AsyncWebClient(token="xoxb-valid")
+            yield
         finally:
-            cleanup_mock_web_api_server(self)
             restore_os_env(old_os_env)
 
     @pytest.mark.asyncio
@@ -46,19 +38,22 @@ class TestAsyncSayStream:
             recipient_user_id="U111",
             thread_ts="111.222",
         )
-        stream = await say_stream()
+        mock_chat_stream = MagicMock()
 
-        assert stream._buffer_size == self.default_chat_stream_buffer_size
-        assert stream._stream_args == {
-            "channel": "C111",
-            "thread_ts": "111.222",
-            "recipient_team_id": "T111",
-            "recipient_user_id": "U111",
-            "task_display_mode": None,
-            "icon_emoji": None,
-            "icon_url": None,
-            "username": None,
-        }
+        async def fake_chat_stream(**kwargs):
+            return mock_chat_stream(**kwargs)
+
+        with patch.object(self.web_client, "chat_stream", side_effect=fake_chat_stream):
+            await say_stream()
+            mock_chat_stream.assert_called_once_with(
+                channel="C111",
+                recipient_team_id="T111",
+                recipient_user_id="U111",
+                thread_ts="111.222",
+                icon_emoji=None,
+                icon_url=None,
+                username=None,
+            )
 
     @pytest.mark.asyncio
     async def test_parameter_overrides(self):
@@ -69,19 +64,22 @@ class TestAsyncSayStream:
             recipient_user_id="U111",
             thread_ts="111.222",
         )
-        stream = await say_stream(channel="C222", thread_ts="333.444", recipient_team_id="T222", recipient_user_id="U222")
+        mock_chat_stream = MagicMock()
 
-        assert stream._buffer_size == self.default_chat_stream_buffer_size
-        assert stream._stream_args == {
-            "channel": "C222",
-            "thread_ts": "333.444",
-            "recipient_team_id": "T222",
-            "recipient_user_id": "U222",
-            "task_display_mode": None,
-            "icon_emoji": None,
-            "icon_url": None,
-            "username": None,
-        }
+        async def fake_chat_stream(**kwargs):
+            return mock_chat_stream(**kwargs)
+
+        with patch.object(self.web_client, "chat_stream", side_effect=fake_chat_stream):
+            await say_stream(channel="C222", thread_ts="333.444", recipient_team_id="T222", recipient_user_id="U222")
+            mock_chat_stream.assert_called_once_with(
+                channel="C222",
+                recipient_team_id="T222",
+                recipient_user_id="U222",
+                thread_ts="333.444",
+                icon_emoji=None,
+                icon_url=None,
+                username=None,
+            )
 
     @pytest.mark.asyncio
     async def test_buffer_size_overrides(self):
@@ -92,25 +90,29 @@ class TestAsyncSayStream:
             recipient_user_id="U111",
             thread_ts="111.222",
         )
-        stream = await say_stream(
-            buffer_size=100,
-            channel="C222",
-            thread_ts="333.444",
-            recipient_team_id="T222",
-            recipient_user_id="U222",
-        )
+        mock_chat_stream = MagicMock()
 
-        assert stream._buffer_size == 100
-        assert stream._stream_args == {
-            "channel": "C222",
-            "thread_ts": "333.444",
-            "recipient_team_id": "T222",
-            "recipient_user_id": "U222",
-            "task_display_mode": None,
-            "icon_emoji": None,
-            "icon_url": None,
-            "username": None,
-        }
+        async def fake_chat_stream(**kwargs):
+            return mock_chat_stream(**kwargs)
+
+        with patch.object(self.web_client, "chat_stream", side_effect=fake_chat_stream):
+            await say_stream(
+                buffer_size=100,
+                channel="C222",
+                thread_ts="333.444",
+                recipient_team_id="T222",
+                recipient_user_id="U222",
+            )
+            mock_chat_stream.assert_called_once_with(
+                buffer_size=100,
+                channel="C222",
+                recipient_team_id="T222",
+                recipient_user_id="U222",
+                thread_ts="333.444",
+                icon_emoji=None,
+                icon_url=None,
+                username=None,
+            )
 
     @pytest.mark.asyncio
     async def test_authorship_overrides(self):
@@ -121,15 +123,19 @@ class TestAsyncSayStream:
             recipient_user_id="U111",
             thread_ts="111.222",
         )
-        stream = await say_stream(icon_emoji=":maple_leaf:", username="Charlie Brown")
+        mock_chat_stream = MagicMock()
 
-        assert stream._stream_args == {
-            "channel": "C111",
-            "thread_ts": "111.222",
-            "recipient_team_id": "T111",
-            "recipient_user_id": "U111",
-            "task_display_mode": None,
-            "icon_emoji": ":maple_leaf:",
-            "icon_url": None,
-            "username": "Charlie Brown",
-        }
+        async def fake_chat_stream(**kwargs):
+            return mock_chat_stream(**kwargs)
+
+        with patch.object(self.web_client, "chat_stream", side_effect=fake_chat_stream):
+            await say_stream(icon_emoji=":maple_leaf:", username="Charlie Brown")
+            mock_chat_stream.assert_called_once_with(
+                channel="C111",
+                recipient_team_id="T111",
+                recipient_user_id="U111",
+                thread_ts="111.222",
+                icon_emoji=":maple_leaf:",
+                icon_url=None,
+                username="Charlie Brown",
+            )

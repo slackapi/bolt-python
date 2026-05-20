@@ -1,21 +1,14 @@
 import pytest
+from unittest.mock import patch, MagicMock
+
 from slack_sdk import WebClient
 
 from slack_bolt.context.say_stream.say_stream import SayStream
-from tests.mock_web_api_server import cleanup_mock_web_api_server, setup_mock_web_api_server
 
 
 class TestSayStream:
-    default_chat_stream_buffer_size = WebClient.chat_stream.__kwdefaults__["buffer_size"]
-
     def setup_method(self):
-        setup_mock_web_api_server(self)
-        valid_token = "xoxb-valid"
-        mock_api_server_base_url = "http://localhost:8888"
-        self.web_client = WebClient(token=valid_token, base_url=mock_api_server_base_url)
-
-    def teardown_method(self):
-        cleanup_mock_web_api_server(self)
+        self.web_client = WebClient(token="xoxb-valid")
 
     def test_missing_channel_raises(self):
         say_stream = SayStream(client=self.web_client, channel=None, thread_ts="111.222")
@@ -35,19 +28,17 @@ class TestSayStream:
             recipient_user_id="U111",
             thread_ts="111.222",
         )
-        stream = say_stream()
-
-        assert stream._buffer_size == self.default_chat_stream_buffer_size
-        assert stream._stream_args == {
-            "channel": "C111",
-            "thread_ts": "111.222",
-            "recipient_team_id": "T111",
-            "recipient_user_id": "U111",
-            "task_display_mode": None,
-            "icon_emoji": None,
-            "icon_url": None,
-            "username": None,
-        }
+        with patch.object(self.web_client, "chat_stream", return_value=MagicMock()) as mock_chat_stream:
+            say_stream()
+            mock_chat_stream.assert_called_once_with(
+                channel="C111",
+                recipient_team_id="T111",
+                recipient_user_id="U111",
+                thread_ts="111.222",
+                icon_emoji=None,
+                icon_url=None,
+                username=None,
+            )
 
     def test_parameter_overrides(self):
         say_stream = SayStream(
@@ -57,19 +48,17 @@ class TestSayStream:
             recipient_user_id="U111",
             thread_ts="111.222",
         )
-        stream = say_stream(channel="C222", thread_ts="333.444", recipient_team_id="T222", recipient_user_id="U222")
-
-        assert stream._buffer_size == self.default_chat_stream_buffer_size
-        assert stream._stream_args == {
-            "channel": "C222",
-            "thread_ts": "333.444",
-            "recipient_team_id": "T222",
-            "recipient_user_id": "U222",
-            "task_display_mode": None,
-            "icon_emoji": None,
-            "icon_url": None,
-            "username": None,
-        }
+        with patch.object(self.web_client, "chat_stream", return_value=MagicMock()) as mock_chat_stream:
+            say_stream(channel="C222", thread_ts="333.444", recipient_team_id="T222", recipient_user_id="U222")
+            mock_chat_stream.assert_called_once_with(
+                channel="C222",
+                recipient_team_id="T222",
+                recipient_user_id="U222",
+                thread_ts="333.444",
+                icon_emoji=None,
+                icon_url=None,
+                username=None,
+            )
 
     def test_buffer_size_overrides(self):
         say_stream = SayStream(
@@ -79,25 +68,24 @@ class TestSayStream:
             recipient_user_id="U111",
             thread_ts="111.222",
         )
-        stream = say_stream(
-            buffer_size=100,
-            channel="C222",
-            thread_ts="333.444",
-            recipient_team_id="T222",
-            recipient_user_id="U222",
-        )
-
-        assert stream._buffer_size == 100
-        assert stream._stream_args == {
-            "channel": "C222",
-            "thread_ts": "333.444",
-            "recipient_team_id": "T222",
-            "recipient_user_id": "U222",
-            "task_display_mode": None,
-            "icon_emoji": None,
-            "icon_url": None,
-            "username": None,
-        }
+        with patch.object(self.web_client, "chat_stream", return_value=MagicMock()) as mock_chat_stream:
+            say_stream(
+                buffer_size=100,
+                channel="C222",
+                thread_ts="333.444",
+                recipient_team_id="T222",
+                recipient_user_id="U222",
+            )
+            mock_chat_stream.assert_called_once_with(
+                buffer_size=100,
+                channel="C222",
+                recipient_team_id="T222",
+                recipient_user_id="U222",
+                thread_ts="333.444",
+                icon_emoji=None,
+                icon_url=None,
+                username=None,
+            )
 
     def test_authorship_overrides(self):
         say_stream = SayStream(
@@ -107,15 +95,14 @@ class TestSayStream:
             recipient_user_id="U111",
             thread_ts="111.222",
         )
-        stream = say_stream(icon_emoji=":maple_leaf:", username="Charlie Brown")
-
-        assert stream._stream_args == {
-            "channel": "C111",
-            "thread_ts": "111.222",
-            "recipient_team_id": "T111",
-            "recipient_user_id": "U111",
-            "task_display_mode": None,
-            "icon_emoji": ":maple_leaf:",
-            "icon_url": None,
-            "username": "Charlie Brown",
-        }
+        with patch.object(self.web_client, "chat_stream", return_value=MagicMock()) as mock_chat_stream:
+            say_stream(icon_emoji=":maple_leaf:", username="Charlie Brown")
+            mock_chat_stream.assert_called_once_with(
+                channel="C111",
+                recipient_team_id="T111",
+                recipient_user_id="U111",
+                thread_ts="111.222",
+                icon_emoji=":maple_leaf:",
+                icon_url=None,
+                username="Charlie Brown",
+            )
