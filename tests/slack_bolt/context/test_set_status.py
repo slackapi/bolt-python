@@ -32,6 +32,15 @@ class TestSetStatus:
         )
         assert response.status_code == 200
 
+    def test_set_status_authorship(self):
+        set_status = SetStatus(client=self.web_client, channel_id="C111", thread_ts="123.123")
+        response: SlackResponse = set_status(
+            status="Thinking...",
+            icon_emoji=":maple_leaf:",
+            username="Charlie Brown",
+        )
+        assert response.status_code == 200
+
     def test_set_status_invalid(self):
         set_status = SetStatus(client=self.web_client, channel_id="C111", thread_ts="123.123")
         with pytest.raises(TypeError):
