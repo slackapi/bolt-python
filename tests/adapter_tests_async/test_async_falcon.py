@@ -2,8 +2,9 @@ import json
 from time import time
 from urllib.parse import quote
 
+import pytest
 import falcon
-from falcon import testing
+from falcon.testing import ASGIConductor
 
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
@@ -55,7 +56,8 @@ class TestAsyncFalcon:
             "x-slack-request-timestamp": timestamp,
         }
 
-    def test_events(self):
+    @pytest.mark.asyncio
+    async def test_events(self):
         app = AsyncApp(
             client=self.web_client,
             signing_secret=self.signing_secret,
@@ -92,16 +94,17 @@ class TestAsyncFalcon:
         resource = AsyncSlackAppResource(app)
         api.add_route("/slack/events", resource)
 
-        client = testing.TestClient(api)
-        response = client.simulate_post(
-            "/slack/events",
-            body=body,
-            headers=self.build_headers(timestamp, body),
-        )
+        async with ASGIConductor(api) as conductor:
+            response = await conductor.simulate_post(
+                "/slack/events",
+                body=body,
+                headers=self.build_headers(timestamp, body),
+            )
         assert response.status_code == 200
         assert_auth_test_count(self, 1)
 
-    def test_shortcuts(self):
+    @pytest.mark.asyncio
+    async def test_shortcuts(self):
         app = AsyncApp(
             client=self.web_client,
             signing_secret=self.signing_secret,
@@ -133,16 +136,17 @@ class TestAsyncFalcon:
         resource = AsyncSlackAppResource(app)
         api.add_route("/slack/events", resource)
 
-        client = testing.TestClient(api)
-        response = client.simulate_post(
-            "/slack/events",
-            body=body,
-            headers=self.build_headers(timestamp, body),
-        )
+        async with ASGIConductor(api) as conductor:
+            response = await conductor.simulate_post(
+                "/slack/events",
+                body=body,
+                headers=self.build_headers(timestamp, body),
+            )
         assert response.status_code == 200
         assert_auth_test_count(self, 1)
 
-    def test_commands(self):
+    @pytest.mark.asyncio
+    async def test_commands(self):
         app = AsyncApp(
             client=self.web_client,
             signing_secret=self.signing_secret,
@@ -174,16 +178,17 @@ class TestAsyncFalcon:
         resource = AsyncSlackAppResource(app)
         api.add_route("/slack/events", resource)
 
-        client = testing.TestClient(api)
-        response = client.simulate_post(
-            "/slack/events",
-            body=body,
-            headers=self.build_headers(timestamp, body),
-        )
+        async with ASGIConductor(api) as conductor:
+            response = await conductor.simulate_post(
+                "/slack/events",
+                body=body,
+                headers=self.build_headers(timestamp, body),
+            )
         assert response.status_code == 200
         assert_auth_test_count(self, 1)
 
-    def test_oauth(self):
+    @pytest.mark.asyncio
+    async def test_oauth(self):
         app = AsyncApp(
             client=self.web_client,
             signing_secret=self.signing_secret,
@@ -197,8 +202,8 @@ class TestAsyncFalcon:
         resource = AsyncSlackAppResource(app)
         api.add_route("/slack/install", resource)
 
-        client = testing.TestClient(api)
-        response = client.simulate_get("/slack/install")
+        async with ASGIConductor(api) as conductor:
+            response = await conductor.simulate_get("/slack/install")
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
         assert response.headers.get("content-length") == "607"
