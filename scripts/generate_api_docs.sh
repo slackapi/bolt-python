@@ -6,8 +6,8 @@ script_dir=$(dirname "$0")
 cd "${script_dir}/.."
 
 pip install -U pip
-pip install -U -r requirements/adapter.txt
-pip install -U -r requirements/async.txt
+pip install -U -r requirements/adapter_dev.txt
+pip install -U -r requirements/async_dev.txt
 pip install -U pdoc3
 pip install .
 rm -rf docs/reference

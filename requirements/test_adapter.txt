@@ -1,4 +1,4 @@
-# pip install -r requirements/adapter_testing.txt
+# pip install -r requirements/test_adapter.txt
 moto>=3,<6                               # For AWS tests
 docker>=5,<8                             # Used by moto
 boddle>=0.2.9,<0.3                         # For Bottle app tests

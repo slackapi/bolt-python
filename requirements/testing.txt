@@ -1,4 +1,0 @@
-# pip install -r requirements/testing.txt
--r testing_without_asyncio.txt
--r async.txt
-pytest-asyncio<2;

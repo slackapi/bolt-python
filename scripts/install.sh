@@ -13,10 +13,10 @@ pip install -U pip
 pip uninstall python-lambda
 
 pip install -U -e .
-pip install -U -r requirements/testing.txt
-pip install -U -r requirements/adapter.txt
-pip install -U -r requirements/adapter_testing.txt
-pip install -U -r requirements/tools.txt
+pip install -U -r requirements/test_async.txt
+pip install -U -r requirements/adapter_dev.txt
+pip install -U -r requirements/test_adapter.txt
+pip install -U -r requirements/dev_tools.txt
 
 # To avoid errors due to the old versions of click forced by Chalice
 pip install -U pip click

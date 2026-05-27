@@ -183,7 +183,7 @@ Then wire it into `BoltContext` (`slack_bolt/context/context.py`) and `AsyncBolt
 1. Create `slack_bolt/adapter/<framework>/`
 2. Add `__init__.py` and `handler.py` (or `async_handler.py` for async frameworks)
 3. The handler converts the framework's request to `BoltRequest`, calls `app.dispatch()`, and converts `BoltResponse` back
-4. Add the framework to `requirements/adapter.txt` with version constraints
+4. Add the framework to `requirements/adapter_dev.txt` with version constraints
 5. Add adapter tests in `tests/adapter_tests/` (sync) or `tests/adapter_tests_async/` (async)
 
 ### Adding a Kwargs-Injectable Argument
@@ -205,12 +205,12 @@ The core package has a **single required runtime dependency**: `slack_sdk` (defi
 
 **`requirements/` directory structure:**
 
-- `async.txt` -- async runtime deps (`aiohttp`, `websockets`)
-- `adapter.txt` -- all framework adapter deps (Flask, Django, FastAPI, etc.)
-- `testing.txt` -- test runner deps (`pytest`, `pytest-asyncio`, includes `async.txt`)
-- `testing_without_asyncio.txt` -- test deps without async (`pytest`, `pytest-cov`)
-- `adapter_testing.txt` -- adapter-specific test deps (`moto`, `boddle`, `sanic-testing`)
-- `tools.txt` -- dev tools (`mypy`, `flake8`, `black`)
+- `async_dev.txt` -- async runtime deps (`aiohttp`, `websockets`)
+- `adapter_dev.txt` -- all framework adapter deps (Flask, Django, FastAPI, etc.)
+- `test_async.txt` -- test runner deps (`pytest`, `pytest-asyncio`, includes `async_dev.txt`)
+- `test.txt` -- test deps without async (`pytest`, `pytest-cov`)
+- `test_adapter.txt` -- adapter-specific test deps (`moto`, `boddle`, `sanic-testing`)
+- `dev_tools.txt` -- dev tools (`mypy`, `flake8`, `black`)
 
 When adding a new dependency: add it to the appropriate `requirements/*.txt` file with version constraints, never to `pyproject.toml` `dependencies` (unless it's a core runtime dep, which is very rare).
 

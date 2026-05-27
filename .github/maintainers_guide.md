@@ -71,8 +71,8 @@ If you make changes to `slack_bolt/adapter/*`, please verify if it surely works 
 
 ```sh
 # Install all optional dependencies
-$ pip install -r requirements/adapter.txt
-$ pip install -r requirements/adapter_testing.txt
+$ pip install -r requirements/adapter_dev.txt
+$ pip install -r requirements/test_adapter.txt
 
 # Set required env variables
 $ export SLACK_SIGNING_SECRET=***
