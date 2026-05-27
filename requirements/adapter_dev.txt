@@ -1,5 +1,5 @@
-# pip install -r requirements/adapter.txt
-# NOTE: any of async ones requires pip install -r requirements/async.txt too
+# pip install -r requirements/adapter_dev.txt
+# NOTE: any of async ones requires pip install -r requirements/async_dev.txt too
 # used only under slack_bolt/adapter
 boto3<=2
 bottle>=0.12,<1
