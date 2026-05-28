@@ -8,4 +8,4 @@ We love feedback from our community, so we encourage you to explore and interact
 
 ## Available experiments
 
-There are currently no active experiments. Previous experiments like `say_stream` have graduated to stable features.
+There are currently no active experiments. We're steadily staying stable.
