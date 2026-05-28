@@ -47,7 +47,9 @@ You can also open a terminal window from inside VSCode like this: `Ctrl` + `~`
 Once in VSCode, open the terminal. Let's install our package dependencies: run the following command(s) in the terminal inside VSCode:
 
 ```sh
-npm install
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
 We now have a Bolt app ready for development! Open the `manifest.json` file and copy its contents; you'll need this in the next step.
@@ -99,7 +101,7 @@ You will then have a bot token. Again, copy that value and save it somewhere acc
 
 ## Starting your local development server {#local}
 
-While building your app, you can see your changes appear in your workspace in real-time with `npm start`. Soon we'll start our local development server and see what our sample code is all about! But first, we need to store those tokens we gathered as environment variables. 
+While building your app, you can see your changes appear in your workspace in real-time with `python app.py`. Soon we'll start our local development server and see what our sample code is all about! But first, we need to store those tokens we gathered as environment variables. 
 
 Navigate back to VSCode. Rename the `.env.sample` file to `.env`. Open this file and update `SLACK_APP_TOKEN` and `SLACK_BOT_TOKEN` with the values you previously saved. It will look like this, with your actual token values where you see `<your_app_token>` and `<your_bot_token>`:
 
@@ -111,7 +113,7 @@ SLACK_BOT_TOKEN=<your_bot_token>
 Now save the file and try starting your app:
 
 ```sh
-npm start
+python app.py
 ```
 
 You'll know the local development server is up and running successfully when it emits a bunch of `[DEBUG]` statements to your terminal, the last one containing `connected:ready`.

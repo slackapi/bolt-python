@@ -90,6 +90,6 @@ def handle_submission(ack, body, client, view, logger):
     # Message the user
     try:
         client.chat_postMessage(channel=user, text=msg)
-    except e:
+    except Exception as e:
         logger.exception(f"Failed to post a message {e}")
 ```

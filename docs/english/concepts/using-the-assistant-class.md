@@ -51,7 +51,7 @@ You _could_ go it alone and [listen](/tools/bolt-python/concepts/event-listening
 
 While the `assistant_thread_started` and `assistant_thread_context_changed` events do provide Slack-client thread context information, the `message.im` event does not. Any subsequent user message events won't contain thread context data. For that reason, Bolt not only provides a way to store thread context — the `threadContextStore` property — but it also provides a `DefaultThreadContextStore` instance that is utilized by default. This implementation relies on storing and retrieving [message metadata](/messaging/message-metadata/) as the user interacts with the app. 
 
-If you do provide your own `threadContextStore` property, it must feature `get` and `save` methods.
+If you do provide your own `threadContextStore` property, it must feature `find` and `save` methods.
 
 :::tip[Refer to the [reference docs](https://docs.slack.dev/tools/bolt-python/reference/kwargs_injection/args.html) to learn the available listener arguments.]
 :::
@@ -138,10 +138,10 @@ Messages sent to the app do not contain a [subtype](/reference/events/message#su
 
 There are three utilities that are particularly useful in curating the user experience:
 * [`say`](https://docs.slack.dev/tools/bolt-python/reference/#slack_bolt.Say)
-* [`setTitle`](https://docs.slack.dev/tools/bolt-python/reference/#slack_bolt.SetTitle)
-* [`setStatus`](https://docs.slack.dev/tools/bolt-python/reference/#slack_bolt.SetStatus)
+* [`set_title`](https://docs.slack.dev/tools/bolt-python/reference/#slack_bolt.SetTitle)
+* [`set_status`](https://docs.slack.dev/tools/bolt-python/reference/#slack_bolt.SetStatus)
 
-Within the `setStatus` utility, you can cycle through strings passed into a `loading_messages` array.
+Within the `set_status` utility, you can cycle through strings passed into a `loading_messages` list.
 
 ```python
 # This listener is invoked when the human user sends a reply in the assistant thread

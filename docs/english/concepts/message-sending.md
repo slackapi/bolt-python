@@ -54,7 +54,7 @@ The `say_stream` utility streamlines calling the Python Slack SDK's [`WebClient.
 | `recipient_team_id` | Sourced from the event `team_id` (`enterprise_id` if the app is installed on an org).
 | `recipient_user_id` | Sourced from the `user_id` of the event.
 
-If neither a `channel_id` or `thread_ts` can be sourced, then the utility will be `None`.
+If either `channel_id` or `thread_ts` cannot be sourced, the utility will be `None`.
 
 For information on calling the `chat_*Stream` API methods directly, see the [_Sending streaming messages_](/tools/python-slack-sdk/web#sending-streaming-messages) section of the Python Slack SDK docs.
 
@@ -79,7 +79,7 @@ def handle_app_mention(client: WebClient, say_stream: SayStream):
 def handle_message(client: WebClient, say_stream: SayStream):
   stream = say_stream()
 
-  stream.append(markdown_text="Let me consult my *vast knowledge database*...)
+  stream.append(markdown_text="Let me consult my *vast knowledge database*...")
   stream.stop()
 
 if __name__ == "__main__":
