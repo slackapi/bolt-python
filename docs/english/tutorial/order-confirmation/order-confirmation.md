@@ -91,12 +91,17 @@ Still in the app settings, navigate to the **Install App** page in the left side
 
 Within a terminal of your choice, set the two tokens from the previous step as environment variables using the commands below. Make sure not to mix these two up, `SLACK_APP_TOKEN` will start with “xapp-“ and `SLACK_BOT_TOKEN` will start with “xoxb-“.
 
-For macOS:
+
+<Tabs groupId="os">
+<TabItem value="macos" label="macOS & Linux">
 
 ```bash
 export SLACK_APP_TOKEN=<YOUR-APP-TOKEN-HERE>
 export SLACK_BOT_TOKEN=<YOUR-BOT-TOKEN-HERE>
 ```
+
+</TabItem>
+<TabItem value="windows" label="Windows">
 
 For Windows Command Prompt:
 
@@ -112,9 +117,18 @@ $env:SLACK_APP_TOKEN="YOUR-APP-TOKEN-HERE"
 $env:SLACK_BOT_TOKEN="YOUR-BOT-TOKEN-HERE"
 ```
 
+</TabItem>
+</Tabs>
+
 ## Starting your app {#starting-your-app}
 
-Run the following commands to activate a virtual environment for your Python packages to be installed, install the dependencies, and start your app.
+If you're using the Slack CLI, you can start your local server with the following command:
+
+```bash
+slack run
+```
+
+If you're not using the Slack CLI, you'll need to run the following commands to activate a virtual environment for your Python packages to be installed, install the dependencies, and then start your app.
 
 ```bash
 # Setup your python virtual environment
@@ -125,12 +139,6 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 # Start your local server
-slack run
-```
-
-If you're not using the Slack CLI, a different `python` command can be used to start your app instead:
-	
-```sh
 python app.py
 ```
 

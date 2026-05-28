@@ -3,9 +3,8 @@ sidebar_label: Quickstart
 title: Quickstart guide with Bolt for Python
 ---
 
-This quickstart guide aims to help you get a Slack app using Bolt for Python up and running as soon as possible! 
+This quickstart guide will get you a running Slack app using Bolt for Python. When complete, you'll have a local environment configured with a customized [app](https://github.com/slack-samples/bolt-python-getting-started-app) that responds to "hello" messages. You'll then be able to modify it and make it your own.
 
-When complete, you'll have a local environment configured with a customized [app](https://github.com/slack-samples/bolt-python-getting-started-app) that responds to "hello" messages. You'll then be able to modify it and make it your own.
 
 ## Setting up the app
 
@@ -40,19 +39,10 @@ import QuickstartGuide from '@site/src/components/QuickstartGuide';
     {
       number: 3,
       title: 'Use the starter app as a template',
-      description: 'Select "Starter app" after running the command',
+      description: 'Select "Starter app" after running the command, then select your language.',
       commands: {
         macos: 'slack create',
         windows: 'slack create'
-      }
-    },
-    {
-      number: 4,
-      title: 'Run your app',
-      description: 'See your app working in Slack.',
-      commands: {
-        macos: 'slack run',
-        windows: 'slack run'
       }
     }
   ]}
@@ -61,21 +51,35 @@ import QuickstartGuide from '@site/src/components/QuickstartGuide';
   buttonIcon={true}
 />
 
-## Testing the app {#testing-the-app}
+---
 
-With the app running, you can test it out with the following steps in Slack:
+## Running the app {#running-the-app}
+
+Now that you're inside the directory, let's get the app running:
+
+```zsh
+$ slack run
+...
+⚡️ Bolt app is running!
+```
+
+You can test it out with the following steps in Slack:
 
 1. Invite the bot `@first-bolt-app (local)` to a public channel. You can do this a few ways:
-    Option A: @-mention them in a message in a channel. You will be prompted to add them
-    Option B: Click the channel name, go to the "Integrations" tab, and click the "Add apps" button 
+
+    Option A: @-mention them in a message in a channel. You will be prompted to add them.
+
+    Option B: Click the channel name, go to the "Integrations" tab, and click the "Add apps" button.
     
 2. Send "hello" to the current conversation and wait for a response.
 
 After confirming the app responds, celebrate, then interrupt the process by pressing `CTRL+C` in the terminal to stop your app from running.
 
-## Updating the app
+---
 
-At this point, you've successfully run the getting started Bolt for Python [app](https://github.com/slack-samples/bolt-python-getting-started-app)!
+## Extra credit: updating the app
+
+At this point, you've successfully run the Bolt for Python [getting started app](https://github.com/slack-samples/bolt-python-getting-started-app)!
 
 The defaults included leave opportunities abound, so to personalize this app let's now edit the code to respond with a kind farewell.
 
@@ -95,39 +99,13 @@ def message_goodbye(say):
     say(f"{parting}!")
 ```
 
-Once the file is updated, save the changes and then we'll make sure those changes are being used.
-
-Run the following command and select the app created earlier to start, or restart, your app with the latest changes:
-
-```sh
-$ slack run
-...
-⚡️ Bolt app is running!
-```
-
-After finding the above output appears, open Slack to perform these steps:
+Once the file is updated, save the changes. The Slack CLI will restart the app for you. Then open Slack to perform these steps:
 
 1. Return to the direct message or public channel with your bot.
 2. Send "goodbye" to the conversation.
 3. Receive a parting response from before and repeat "goodbye" to find another one.
 
 Your app can be stopped again by pressing `CTRL+C` in the terminal to end these chats.
-
-### Customizing app settings
-
-The created app will have some placeholder values and a small set of [scopes](/reference/scopes) to start, but we recommend exploring the customizations possible on app settings.
-
-Open app settings for your app with the following command:
-
-```sh
-$ slack app settings
-```
-
-This will open the following page in a web browser:
-
-![Basic Information page](/img/bolt-python/basic-information-page.png "Basic Information page")
-
-On these pages you're free to make changes such as updating your app icon, configuring app features, and perhaps even distributing your app!
 
 ## Next steps {#next-steps}
 

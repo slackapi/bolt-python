@@ -76,7 +76,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 <Tabs groupId="os">
-<TabItem value="macos" label="For macOS">
+<TabItem value="macos" label="macOS & Windows">
 
 ```bash
 python3 -m venv .venv

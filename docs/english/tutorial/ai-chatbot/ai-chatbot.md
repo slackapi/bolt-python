@@ -68,10 +68,10 @@ Models from different AI providers are available if the corresponding environmen
 <Tabs groupId="ai-providers">
 <TabItem value="anthropic" label="Anthropic">
 
-To interact with Anthropic models, navigate to your Anthropic account dashboard to [create an API key](https://console.anthropic.com/settings/keys), then export the key as follows:
+To interact with Anthropic models, navigate to your Anthropic account dashboard to [create an API key](https://console.anthropic.com/settings/keys), then set it using the Slack CLI:
 
 ```bash
-export ANTHROPIC_API_KEY=<your-api-key>
+slack env set ANTHROPIC_API_KEY <your-api-key>
 ```
 
 </TabItem>
@@ -79,11 +79,11 @@ export ANTHROPIC_API_KEY=<your-api-key>
 
 To use Google Cloud Vertex AI, [follow this quick start](https://cloud.google.com/vertex-ai/generative-ai/docs/start/quickstarts/quickstart-multimodal#expandable-1) to create a project for sending requests to the Gemini API, then gather [Application Default Credentials](https://cloud.google.com/docs/authentication/provide-credentials-adc) with the strategy to match your development environment.
 
-Once your project and credentials are configured, export environment variables to select from Gemini models:
+Once your project and credentials are configured, set environment variables using the Slack CLI to select from Gemini models:
 
 ```bash
-export VERTEX_AI_PROJECT_ID=<your-project-id>
-export VERTEX_AI_LOCATION=<location-to-deploy-model>
+slack env set VERTEX_AI_PROJECT_ID <your-project-id>
+slack env set VERTEX_AI_LOCATION <location-to-deploy-model>
 ```
 
 The project location can be located under the **Region** on the [Vertex AI](https://console.cloud.google.com/vertex-ai) dashboard, as well as more details about available Gemini models.
@@ -91,44 +91,16 @@ The project location can be located under the **Region** on the [Vertex AI](http
 </TabItem>
 <TabItem value="OpenAI" label="OpenAI">
 
-Unlock the OpenAI models from your OpenAI account dashboard by clicking [create a new secret key](https://platform.openai.com/api-keys), then export the key like so:
+Unlock the OpenAI models from your OpenAI account dashboard by clicking [create a new secret key](https://platform.openai.com/api-keys), then set the key like so using the Slack CLI:
 
 ```bash
-export OPENAI_API_KEY=<your-api-key>
+slack env set OPENAI_API_KEY <your-api-key>
 ```
 
 </TabItem>
 </Tabs>
 
-## Setting up and running your local project {#configure-project}
-
-
-Start your Python virtual environment:
-
-<Tabs groupId="os">
-<TabItem value="macos" label="macOS">
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-</TabItem>
-<TabItem value="windows" label="Windows">
-
-```bash
-py -m venv .venv
-.venv\Scripts\activate
-```
-
-</TabItem>
-</Tabs>
-
-Install the required dependencies:
-
-```bash
-pip install -r requirements.txt
-```
+## Running your local project {#running-project}
 
 Run your app locally:
 
