@@ -9,12 +9,12 @@ class AsgiHttpResponse:
     def __init__(self, status: int, headers: Dict[str, Sequence[str]] = {}, body: str = ""):
         self.status: int = status
         self.body: bytes = bytes(body, ENCODING)
-        self.raw_headers: List[Tuple[bytes, bytes]] = [
-            (bytes(key, ENCODING), bytes(v, ENCODING))
-            for key, values in headers.items()
-            if key.lower() != "content-length"
-            for v in values
-        ]
+        self.raw_headers: List[Tuple[bytes, bytes]] = []
+        for key, values in headers.items():
+            if key.lower() == "content-length":
+                continue
+            for v in values:
+                self.raw_headers.append((bytes(key, ENCODING), bytes(v, ENCODING)))
         self.raw_headers.append((b"content-length", bytes(str(len(self.body)), ENCODING)))
 
     def get_response_start(self) -> Dict[str, Union[str, int, Iterable[Tuple[bytes, bytes]]]]:
