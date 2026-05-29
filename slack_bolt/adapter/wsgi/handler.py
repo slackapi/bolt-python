@@ -70,7 +70,7 @@ class SlackRequestHandler:
     def __call__(
         self,
         environ: Dict[str, Any],
-        start_response: Callable[[str, List[Tuple[str, str]]], None],
+        start_response: Callable[..., Any],
     ) -> Iterable[bytes]:
         request = WsgiHttpRequest(environ)
         if "HTTP" in request.protocol:

@@ -1,4 +1,7 @@
-from typing import Dict, Iterable, Optional, Tuple
+import io
+from typing import Any, Callable, Dict, List, Optional, Tuple
+from wsgiref.util import setup_testing_defaults
+from wsgiref.validate import validator
 
 from slack_bolt.adapter.wsgi import SlackRequestHandler
 
@@ -6,37 +9,49 @@ ENCODING = "utf-8"
 
 
 class WsgiTestServerResponse:
-    def __init__(self):
+    def __init__(self) -> None:
         self.status: Optional[str] = None
-        self._headers: Iterable[Tuple[str, str]] = []
-        self._body: Iterable[bytes] = []
+        self._headers: List[Tuple[str, str]] = []
+        self._body: List[bytes] = []
 
     @property
     def headers(self) -> Dict[str, str]:
         return {header[0]: header[1] for header in self._headers}
 
     @property
-    def body(self, length: int = 0) -> str:
-        return "".join([chunk.decode(ENCODING) for chunk in self._body[length:]])
+    def body(self) -> str:
+        return "".join([chunk.decode(ENCODING) for chunk in self._body])
 
 
 class MockReadable:
+    """PEP 3333 compliant input stream.
+
+    Implements read, readline, readlines, and __iter__ as required
+    by the WSGI specification for wsgi.input.
+    """
+
     def __init__(self, body: str):
         self.body = body
-        self._body = bytes(body, ENCODING)
+        self._stream = io.BytesIO(bytes(body, ENCODING))
 
     def get_content_length(self) -> int:
-        return len(self._body)
+        return len(self.body.encode(ENCODING))
 
-    def read(self, size: int) -> bytes:
-        if size < 0:
-            raise ValueError("Size must be positive.")
-        if size == 0:
-            return b""
-        # The body can only be read once
-        _body = self._body[:size]
-        self._body = b""
-        return _body
+    def read(self, size: int = -1) -> bytes:
+        if size == -1:
+            return self._stream.read()
+        return self._stream.read(size)
+
+    def readline(self, size: int = -1) -> bytes:
+        if size == -1:
+            return self._stream.readline()
+        return self._stream.readline(size)
+
+    def readlines(self, hint: int = -1) -> List[bytes]:
+        return self._stream.readlines(hint)
+
+    def __iter__(self):
+        return iter(self._stream)
 
 
 class WsgiTestServer:
@@ -44,29 +59,26 @@ class WsgiTestServer:
         self,
         wsgi_app: SlackRequestHandler,
         root_path: str = "",
-        version: Tuple[int, int] = (1, 0),
-        multithread: bool = False,
-        multiprocess: bool = False,
-        run_once: bool = False,
         input_terminated: bool = True,
-        server_software: bool = "mock/0.0.0",
+        server_software: str = "mock/0.0.0",
         url_scheme: str = "https",
         remote_addr: str = "127.0.0.1",
         remote_port: str = "63263",
     ):
         self.root_path = root_path
-        self.wsgi_app = wsgi_app
-        self.environ = {
-            "wsgi.version": version,
-            "wsgi.multithread": multithread,
-            "wsgi.multiprocess": multiprocess,
-            "wsgi.run_once": run_once,
-            "wsgi.input_terminated": input_terminated,
-            "SERVER_SOFTWARE": server_software,
-            "wsgi.url_scheme": url_scheme,
-            "REMOTE_ADDR": remote_addr,
-            "REMOTE_PORT": remote_port,
-        }
+        self.wsgi_app = validator(wsgi_app)
+        self.environ: Dict[str, Any] = {}
+        setup_testing_defaults(self.environ)
+        self.environ.update(
+            {
+                "wsgi.input_terminated": input_terminated,
+                "wsgi.errors": io.StringIO(),
+                "SERVER_SOFTWARE": server_software,
+                "wsgi.url_scheme": url_scheme,
+                "REMOTE_ADDR": remote_addr,
+                "REMOTE_PORT": remote_port,
+            }
+        )
 
     def http(
         self,
@@ -101,16 +113,29 @@ class WsgiTestServer:
                 environ[f"HTTP_{header_key}"] = value
 
         if body is not None:
-            environ["wsgi.input"] = MockReadable(body)
+            readable = MockReadable(body)
+            environ["wsgi.input"] = readable
             if "CONTENT_LENGTH" not in environ:
-                environ["CONTENT_LENGTH"] = str(environ["wsgi.input"].get_content_length())
+                environ["CONTENT_LENGTH"] = str(readable.get_content_length())
+        else:
+            environ["wsgi.input"] = MockReadable("")
 
         response = WsgiTestServerResponse()
 
-        def start_response(status, headers):
+        def start_response(
+            status: str,
+            headers: List[Tuple[str, str]],
+            exc_info: Optional[Any] = None,
+        ) -> Callable[[bytes], object]:
             response.status = status
             response._headers = headers
+            return lambda s: None
 
-        response._body = self.wsgi_app(environ=environ, start_response=start_response)
+        iterator = self.wsgi_app(environ, start_response)
+        try:
+            response._body = list(iterator)
+        finally:
+            if hasattr(iterator, "close"):
+                iterator.close()
 
         return response
