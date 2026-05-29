@@ -190,7 +190,7 @@ def handle_message(
         # Add eyes reaction only to the first message (DMs only — channel
         # threads already have the reaction from the initial app_mention)
         if is_dm and not existing_session_id:
-            await client.reactions_add(
+            client.reactions_add(
                 channel=channel_id,
                 timestamp=event["ts"],
                 name="eyes",
@@ -274,7 +274,7 @@ The `say_stream` utility streamlines calling the Python Slack SDK's [`WebClient.
 | `recipient_team_id` | Sourced from the event `team_id` (`enterprise_id` if the app is installed on an org).
 | `recipient_user_id` | Sourced from the `user_id` of the event.
 
-If neither a `channel_id` or `thread_ts` can be sourced, then the utility will be `None`.
+If either `channel_id` or `thread_ts` cannot be sourced, the utility will be `None`.
 
 ```python
 streamer = say_stream()
@@ -571,7 +571,7 @@ def handle_app_mentioned(
 
     except Exception as e:
         logger.exception(f"Failed to handle app mention: {e}")
-        await say(
+        say(
             text=f":warning: Something went wrong! ({e})",
             thread_ts=event.get("thread_ts") or event["ts"],
         )
