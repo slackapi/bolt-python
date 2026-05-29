@@ -26,6 +26,7 @@ dependencies = ["slack_sdk>=3.38.0,<4"]
 
 [project.urls]
 Documentation = "https://docs.slack.dev/tools/bolt-python/"
+Source = "https://github.com/slackapi/bolt-python"
 
 [tool.setuptools.packages.find]
 include = ["slack_bolt*"]
