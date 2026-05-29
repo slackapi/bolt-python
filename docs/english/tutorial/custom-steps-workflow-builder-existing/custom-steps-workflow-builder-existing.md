@@ -14,7 +14,7 @@ In this tutorial we will:
 
 ## Prerequisites {#prereqs}
 
-The custom steps feature is compatible with Bolt version 1.20.0 and above. First, update your `package.json` file to reflect version 1.20.0 of Bolt, then run the following command in your terminal:
+The custom steps feature is compatible with Bolt version 1.20.0 and above. First, update your `requirements.txt` file to reflect version 1.20.0 of Bolt (e.g., `slack-bolt>=1.20.0`), then run the following commands in your terminal:
 
 ```sh
 python3 -m venv .venv 
@@ -215,9 +215,8 @@ def manager_resp_handler(ack: Ack, action, body: dict, client: WebClient, comple
 
         client.chat_update(
             channel=body['channel']['id'],
-            message=body['message'],
             ts=body["message"]["ts"],
-            text=f'Request {"approved" if request_decision == 'approve' else "denied"}!'
+            text=f"Request {'approved' if request_decision == 'approve' else 'denied'}!"
         )
 
         complete({
