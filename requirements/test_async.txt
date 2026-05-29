@@ -1,4 +1,6 @@
 # pip install -r requirements/test_async.txt
 -r test.txt
 -r async_dev.txt
+asgiref>=3.7.2,<3.8; python_version<"3.9"
+asgiref>=3.8,<4; python_version>="3.9"
 pytest-asyncio<2;
