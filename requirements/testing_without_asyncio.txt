@@ -1,3 +1,0 @@
-# pip install -r requirements/testing_without_asyncio.txt
-pytest<8.5
-pytest-cov>=3,<8

@@ -1,0 +1,3 @@
+# pip install -r requirements/async_dev.txt
+aiohttp>=3,<4
+websockets<16

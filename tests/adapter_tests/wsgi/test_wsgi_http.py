@@ -89,6 +89,47 @@ class TestWsgiHttp:
         assert response.headers.get("content-type") == "text/plain;charset=utf-8"
         assert_auth_test_count(self, 1)
 
+    def test_ssl_check_param_does_not_bypass_request_verification(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            ssl_check_enabled=False,
+        )
+        command_called = False
+
+        def command_handler(ack):
+            nonlocal command_called
+            command_called = True
+            ack()
+
+        app.command("/hello-world")(command_handler)
+
+        body = (
+            "token=verification_token"
+            "&team_id=T111"
+            "&team_domain=test-domain"
+            "&channel_id=C111"
+            "&channel_name=random"
+            "&user_id=W111"
+            "&user_name=primary-owner"
+            "&command=%2Fhello-world"
+            "&text=Hi"
+            "&enterprise_id=E111"
+            "&enterprise_name=Org+Name"
+            "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
+            "&trigger_id=111.111.xxx"
+            "&ssl_check=1"
+        )
+        headers = self.build_raw_headers("0", body)
+        headers["x-slack-signature"] = "v0=invalid"
+
+        wsgi_server = WsgiTestServer(SlackRequestHandler(app))
+        response = wsgi_server.http(method="POST", headers=headers, body=body)
+
+        assert response.status == "401 Unauthorized"
+        assert response.body == """{"error": "invalid request"}"""
+        assert command_called is False
+
     def test_events(self):
         app = App(
             client=self.web_client,

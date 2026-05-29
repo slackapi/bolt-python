@@ -100,6 +100,35 @@ class TestAsyncSlashCommand:
         assert response.status == 404
         await assert_auth_test_count_async(self, 1)
 
+    @pytest.mark.asyncio
+    async def test_ssl_check_param_does_not_bypass_request_verification(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+            ssl_check_enabled=False,
+        )
+        command_called = False
+
+        async def command_handler(ack):
+            nonlocal command_called
+            command_called = True
+            await ack()
+
+        app.command("/hello-world")(command_handler)
+
+        request = AsyncBoltRequest(
+            body=f"{slash_command_body}&ssl_check=1",
+            headers={
+                "content-type": ["application/x-www-form-urlencoded"],
+                "x-slack-signature": ["v0=invalid"],
+                "x-slack-request-timestamp": ["0"],
+            },
+        )
+        response = await app.async_dispatch(request)
+        assert response.status == 401
+        assert response.body == """{"error": "invalid request"}"""
+        assert command_called is False
+
 
 slash_command_body = (
     "token=verification_token"

@@ -48,13 +48,13 @@ jobs:
         run: |
           pip install -U pip
           pip install -U .
-          pip install -r requirements/tools.txt
+          pip install -r requirements/dev_tools.txt
       - name: Type check synchronous modules
         run: mypy --config-file pyproject.toml --exclude "async_|/adapter/"
       - name: Install async and adapter dependencies
         run: |
-          pip install -r requirements/async.txt
-          pip install -r requirements/adapter.txt
+          pip install -r requirements/async_dev.txt
+          pip install -r requirements/adapter_dev.txt
       - name: Type check all modules
         run: mypy --config-file pyproject.toml
 
@@ -88,15 +88,15 @@ jobs:
         run: |
           pip install -U pip
           pip install .
-          pip install -r requirements/testing_without_asyncio.txt
+          pip install -r requirements/test.txt
       - name: Run tests without aiohttp
         run: |
           pytest tests/slack_bolt/ --junitxml=reports/test_slack_bolt.xml
           pytest tests/scenario_tests/ --junitxml=reports/test_scenario.xml
       - name: Install adapter dependencies
         run: |
-          pip install -r requirements/adapter.txt
-          pip install -r requirements/adapter_testing.txt
+          pip install -r requirements/adapter_dev.txt
+          pip install -r requirements/test_adapter.txt
       - name: Run tests for HTTP Mode adapters
         run: |
           pytest tests/adapter_tests/ \
@@ -105,14 +105,14 @@ jobs:
           --junitxml=reports/test_adapter.xml
       - name: Install async dependencies
         run: |
-          pip install -r requirements/async.txt
+          pip install -r requirements/async_dev.txt
       - name: Run tests for Socket Mode adapters
         run: |
           # Requires async test dependencies
           pytest tests/adapter_tests/socket_mode/ --junitxml=reports/test_adapter_socket_mode.xml
       - name: Install all dependencies
         run: |
-          pip install -r requirements/testing.txt
+          pip install -r requirements/test_async.txt
       - name: Run tests for HTTP Mode adapters (ASGI)
         run: |
           # Requires async test dependencies
@@ -155,9 +155,9 @@ jobs:
         run: |
           pip install -U pip
           pip install .
-          pip install -r requirements/adapter.txt
-          pip install -r requirements/testing.txt
-          pip install -r requirements/adapter_testing.txt
+          pip install -r requirements/adapter_dev.txt
+          pip install -r requirements/test_async.txt
+          pip install -r requirements/test_adapter.txt
       - name: Run all tests for codecov
         run: |
           pytest --cov=./slack_bolt/ --cov-report=xml
@@ -179,7 +179,7 @@ jobs:
     if: ${{ !success() && github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch' }}
     steps:
       - name: Send notifications of failing tests
-        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
+        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
         with:
           errors: true
           webhook: ${{ secrets.SLACK_REGRESSION_FAILURES_WEBHOOK_URL }}

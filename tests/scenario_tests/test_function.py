@@ -7,6 +7,7 @@ from unittest.mock import Mock
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 
+import slack_bolt.listener.thread_runner as runner_module
 from slack_bolt.app import App
 from slack_bolt.request import BoltRequest
 from tests.mock_web_api_server import (
@@ -53,9 +54,9 @@ class TestFunction:
         timestamp, body = str(int(time.time())), json.dumps(message_body)
         return BoltRequest(body=body, headers=self.build_headers(timestamp, body))
 
-    def setup_time_mocks(self, *, monkeypatch: pytest.MonkeyPatch, time_mock: Mock, sleep_mock: Mock):
-        monkeypatch.setattr(time, "time", time_mock)
-        monkeypatch.setattr(time, "sleep", sleep_mock)
+    def setup_time_mocks(self, *, monkeypatch: pytest.MonkeyPatch, time_mock, sleep_mock):
+        monkeypatch.setattr(runner_module.time, "time", time_mock)
+        monkeypatch.setattr(runner_module.time, "sleep", sleep_mock)
 
     def test_valid_callback_id_success(self):
         app = App(
@@ -138,10 +139,20 @@ class TestFunction:
         app.function("reverse", auto_acknowledge=False)(just_no_ack)
 
         request = self.build_request_from_body(function_body)
+
+        elapsed_seconds = 0
+
+        def fake_time():
+            return float(elapsed_seconds)
+
+        def fake_sleep(duration):
+            nonlocal elapsed_seconds
+            elapsed_seconds += 1
+
         self.setup_time_mocks(
             monkeypatch=monkeypatch,
-            time_mock=Mock(side_effect=[current_time for current_time in range(100)]),
-            sleep_mock=Mock(),
+            time_mock=fake_time,
+            sleep_mock=Mock(side_effect=fake_sleep),
         )
         response = app.dispatch(request)
 
@@ -158,20 +169,29 @@ class TestFunction:
         app.function("reverse", auto_acknowledge=False, ack_timeout=timeout)(just_no_ack)
         request = self.build_request_from_body(function_body)
 
-        sleep_mock = Mock()
+        elapsed_seconds = 0
+
+        def fake_time():
+            return float(elapsed_seconds)
+
+        def fake_sleep(duration):
+            nonlocal elapsed_seconds
+            elapsed_seconds += 1
+
         self.setup_time_mocks(
             monkeypatch=monkeypatch,
-            time_mock=Mock(side_effect=[current_time for current_time in range(100)]),
-            sleep_mock=sleep_mock,
+            time_mock=fake_time,
+            sleep_mock=Mock(side_effect=fake_sleep),
         )
 
         response = app.dispatch(request)
 
         assert response.status == 404
         assert_auth_test_count(self, 1)
-        assert (
-            sleep_mock.call_count == timeout
-        ), f"Expected handler to time out after calling time.sleep 5 times, but it was called {sleep_mock.call_count} times"
+        assert elapsed_seconds == timeout + 1, (
+            f"Expected handler to time out after {timeout + 1} time.sleep calls, "
+            f"but it was called {elapsed_seconds} times"
+        )
 
     def test_warning_when_timeout_improperly_set(self, caplog):
         app = App(
