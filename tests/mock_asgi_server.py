@@ -24,7 +24,15 @@ class AsgiTestServerResponse:
 
     @property
     def headers(self) -> dict:
-        return {header[0].decode(ENCODING): header[1].decode(ENCODING) for header in self._headers}
+        result = {}
+        for header in self._headers:
+            key = header[0].decode(ENCODING)
+            if key not in result:
+                result[key] = header[1].decode(ENCODING)
+        return result
+
+    def get_headers_list(self, name: str) -> list:
+        return [header[1].decode(ENCODING) for header in self._headers if header[0].decode(ENCODING) == name]
 
 
 class AsgiTestServerLifespanResponse:
@@ -99,6 +107,12 @@ class AsgiTestServer:
         await communicator.send_input({"type": f"lifespan.{event}"})
 
         result = await communicator.receive_output(timeout=1)
+
+        # Send shutdown so the handler exits cleanly
+        if event == "startup":
+            await communicator.send_input({"type": "lifespan.shutdown"})
+            await communicator.receive_output(timeout=1)
+
         return AsgiTestServerLifespanResponse(
             type=result["type"],
             message=result.get("message", ""),
