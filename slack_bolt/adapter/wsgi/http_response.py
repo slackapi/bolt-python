@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Dict, Iterable, List, Sequence, Tuple
+from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 from .internals import ENCODING
 
@@ -13,18 +13,19 @@ class WsgiHttpResponse:
 
     __slots__ = ("status", "_headers", "_body")
 
-    def __init__(self, status: int, headers: Dict[str, Sequence[str]] = {}, body: str = ""):
+    def __init__(self, status: int, headers: Optional[Dict[str, Sequence[str]]] = None, body: str = ""):
         _status = HTTPStatus(status)
         self.status = f"{_status.value} {_status.phrase}"
-        self._headers = headers
+        self._headers = headers or {}
         self._body = bytes(body, ENCODING)
 
     def get_headers(self) -> List[Tuple[str, str]]:
         headers: List[Tuple[str, str]] = []
-        for key, value in self._headers.items():
+        for key, values in self._headers.items():
             if key.lower() == "content-length":
                 continue
-            headers.append((key, value[0]))
+            for v in values:
+                headers.append((key, v))
 
         headers.append(("content-length", str(len(self._body))))
         return headers

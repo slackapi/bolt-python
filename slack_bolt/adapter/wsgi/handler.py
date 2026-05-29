@@ -1,6 +1,10 @@
-from typing import Any, Callable, Dict, Iterable, List, Tuple
+from typing import TYPE_CHECKING, Iterable
 
 from slack_bolt import App
+
+if TYPE_CHECKING:
+    from wsgiref.types import StartResponse, WSGIEnvironment
+
 from slack_bolt.adapter.wsgi.http_request import WsgiHttpRequest
 from slack_bolt.adapter.wsgi.http_response import WsgiHttpResponse
 from slack_bolt.request import BoltRequest
@@ -69,14 +73,17 @@ class SlackRequestHandler:
 
     def __call__(
         self,
-        environ: Dict[str, Any],
-        start_response: Callable[..., Any],
+        environ: "WSGIEnvironment",
+        start_response: "StartResponse",
     ) -> Iterable[bytes]:
         request = WsgiHttpRequest(environ)
-        if "HTTP" in request.protocol:
+        if request.protocol.startswith("HTTP"):
             response: WsgiHttpResponse = self._get_http_response(
                 request=request,
             )
-            start_response(response.status, response.get_headers())
-            return response.get_body()
-        raise TypeError(f"Unsupported SERVER_PROTOCOL: {request.protocol}")
+        else:
+            response = WsgiHttpResponse(
+                status=400, headers={"content-type": ["text/plain;charset=utf-8"]}, body="Bad Request"
+            )
+        start_response(response.status, response.get_headers())
+        return response.get_body()

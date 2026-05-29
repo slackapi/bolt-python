@@ -1,4 +1,7 @@
-from typing import Any, Dict, Sequence, Union
+from typing import TYPE_CHECKING, Dict, Sequence, Union
+
+if TYPE_CHECKING:
+    from wsgiref.types import WSGIEnvironment
 
 from .internals import ENCODING
 
@@ -12,7 +15,7 @@ class WsgiHttpRequest:
 
     __slots__ = ("method", "path", "query_string", "protocol", "environ")
 
-    def __init__(self, environ: Dict[str, Any]):
+    def __init__(self, environ: "WSGIEnvironment"):
         self.method: str = environ.get("REQUEST_METHOD", "GET")
         self.path: str = environ.get("PATH_INFO", "")
         self.query_string: str = environ.get("QUERY_STRING", "")
@@ -33,5 +36,5 @@ class WsgiHttpRequest:
     def get_body(self) -> str:
         if "wsgi.input" not in self.environ:
             return ""
-        content_length = int(self.environ.get("CONTENT_LENGTH", 0))
+        content_length = int(self.environ.get("CONTENT_LENGTH") or 0)
         return self.environ["wsgi.input"].read(content_length).decode(ENCODING)
