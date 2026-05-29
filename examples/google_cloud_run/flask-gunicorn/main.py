@@ -3,8 +3,10 @@ import os
 
 from slack_bolt import App
 
+# Initialize the Slack app with the bot token from an environment variable
+app = App(token=os.environ.get('SLACK_BOT_TOKEN'))
+
 logging.basicConfig(level=logging.DEBUG)
-app = App()
 
 
 @app.command("/hey-google")
