@@ -361,6 +361,7 @@ class AsyncApp:
 
         self._async_middleware_list: List[AsyncMiddleware] = []
         self._async_listeners: List[AsyncListener] = []
+        self._assistant_listener_insertion_index = 0
 
         self._assistant_thread_context_store = assistant_thread_context_store
         self._attaching_conversation_kwargs_enabled = attaching_conversation_kwargs_enabled
@@ -707,11 +708,12 @@ class AsyncApp:
             middleware_or_callable = args[0]
             if isinstance(middleware_or_callable, AsyncMiddleware):
                 middleware: AsyncMiddleware = middleware_or_callable
+                if isinstance(middleware, AsyncAssistant) and middleware.auto_inherit_app_middleware is True:
+                    self._register_assistant_listeners(middleware)
+                    return None
                 self._async_middleware_list.append(middleware)
                 if isinstance(middleware, AsyncAssistant) and middleware.thread_context_store is not None:
                     self._assistant_thread_context_store = middleware.thread_context_store
-                elif not isinstance(middleware, AsyncAssistant):
-                    self._inherit_app_middleware_for_assistants(middleware)
             elif callable(middleware_or_callable):
                 middleware = AsyncCustomMiddleware(
                     app_name=self.name,
@@ -719,16 +721,20 @@ class AsyncApp:
                     base_logger=self._base_logger,
                 )
                 self._async_middleware_list.append(middleware)
-                self._inherit_app_middleware_for_assistants(middleware)
                 return middleware_or_callable
             else:
                 raise BoltError(f"Unexpected type for a middleware ({type(middleware_or_callable)})")
         return None
 
-    def _inherit_app_middleware_for_assistants(self, middleware: AsyncMiddleware) -> None:
-        for registered_middleware in self._async_middleware_list[:-1]:
-            if isinstance(registered_middleware, AsyncAssistant):
-                registered_middleware.inherit_app_middleware(middleware)
+    def _register_assistant_listeners(self, assistant: AsyncAssistant) -> None:
+        if assistant.thread_context_store is not None:
+            self._assistant_thread_context_store = assistant.thread_context_store
+
+        def register_listener(listener: AsyncListener) -> None:
+            self._async_listeners.insert(self._assistant_listener_insertion_index, listener)
+            self._assistant_listener_insertion_index += 1
+
+        assistant._register_app_listeners(register_listener)
 
     def assistant(self, assistant: AsyncAssistant) -> Optional[Callable]:
         return self.middleware(assistant)

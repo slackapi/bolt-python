@@ -1,7 +1,7 @@
 import logging
 from functools import wraps
 from logging import Logger
-from typing import List, Optional, Union, Callable, Awaitable, Tuple
+from typing import List, Optional, Union, Callable, Awaitable, cast
 
 from slack_bolt.context.save_thread_context.async_save_thread_context import AsyncSaveThreadContext
 from slack_bolt.context.assistant.thread_context_store.async_store import AsyncAssistantThreadContextStore
@@ -32,6 +32,8 @@ class AsyncAssistant(AsyncMiddleware):
     _user_message_listeners: Optional[List[AsyncListener]]
     _bot_message_listeners: Optional[List[AsyncListener]]
     _thread_context_changed_listeners: Optional[List[AsyncListener]]
+    _other_message_sub_event_listeners: Optional[List[AsyncListener]]
+    _app_listener_registrars: List[Callable[[AsyncListener], None]]
 
     thread_context_store: Optional[AsyncAssistantThreadContextStore]
     base_logger: Optional[logging.Logger]
@@ -48,18 +50,13 @@ class AsyncAssistant(AsyncMiddleware):
         self.thread_context_store = thread_context_store
         self.base_logger = logger
         self.auto_inherit_app_middleware = auto_inherit_app_middleware
-        self._inherited_app_middleware: List[AsyncMiddleware] = []
 
         self._thread_started_listeners = None
         self._thread_context_changed_listeners = None
         self._user_message_listeners = None
         self._bot_message_listeners = None
-
-    def inherit_app_middleware(self, middleware: AsyncMiddleware) -> None:
-        if self.auto_inherit_app_middleware is False:
-            return
-
-        self._inherited_app_middleware.append(middleware)
+        self._other_message_sub_event_listeners = None
+        self._app_listener_registrars = []
 
     def thread_started(
         self,
@@ -80,23 +77,25 @@ class AsyncAssistant(AsyncMiddleware):
         )
         if is_used_without_argument(args):
             func = args[0]
-            self._thread_started_listeners.append(
+            self._append_listener(
+                self._thread_started_listeners,
                 self.build_listener(
                     listener_or_functions=func,
                     matchers=all_matchers,
                     middleware=middleware,  # type: ignore[arg-type]
-                )
+                ),
             )
             return func
 
         def _inner(func):
             functions = [func] + (lazy if lazy is not None else [])
-            self._thread_started_listeners.append(
+            self._append_listener(
+                self._thread_started_listeners,
                 self.build_listener(
                     listener_or_functions=functions,
                     matchers=all_matchers,
                     middleware=middleware,
-                )
+                ),
             )
 
             @wraps(func)
@@ -126,23 +125,25 @@ class AsyncAssistant(AsyncMiddleware):
         )
         if is_used_without_argument(args):
             func = args[0]
-            self._user_message_listeners.append(
+            self._append_listener(
+                self._user_message_listeners,
                 self.build_listener(
                     listener_or_functions=func,
                     matchers=all_matchers,
                     middleware=middleware,  # type: ignore[arg-type]
-                )
+                ),
             )
             return func
 
         def _inner(func):
             functions = [func] + (lazy if lazy is not None else [])
-            self._user_message_listeners.append(
+            self._append_listener(
+                self._user_message_listeners,
                 self.build_listener(
                     listener_or_functions=functions,
                     matchers=all_matchers,
                     middleware=middleware,
-                )
+                ),
             )
 
             @wraps(func)
@@ -172,23 +173,25 @@ class AsyncAssistant(AsyncMiddleware):
         )
         if is_used_without_argument(args):
             func = args[0]
-            self._bot_message_listeners.append(
+            self._append_listener(
+                self._bot_message_listeners,
                 self.build_listener(
                     listener_or_functions=func,
                     matchers=all_matchers,
                     middleware=middleware,  # type: ignore[arg-type]
-                )
+                ),
             )
             return func
 
         def _inner(func):
             functions = [func] + (lazy if lazy is not None else [])
-            self._bot_message_listeners.append(
+            self._append_listener(
+                self._bot_message_listeners,
                 self.build_listener(
                     listener_or_functions=functions,
                     matchers=all_matchers,
                     middleware=middleware,
-                )
+                ),
             )
 
             @wraps(func)
@@ -218,23 +221,25 @@ class AsyncAssistant(AsyncMiddleware):
         )
         if is_used_without_argument(args):
             func = args[0]
-            self._thread_context_changed_listeners.append(
+            self._append_listener(
+                self._thread_context_changed_listeners,
                 self.build_listener(
                     listener_or_functions=func,
                     matchers=all_matchers,
                     middleware=middleware,  # type: ignore[arg-type]
-                )
+                ),
             )
             return func
 
         def _inner(func):
             functions = [func] + (lazy if lazy is not None else [])
-            self._thread_context_changed_listeners.append(
+            self._append_listener(
+                self._thread_context_changed_listeners,
                 self.build_listener(
                     listener_or_functions=functions,
                     matchers=all_matchers,
                     middleware=middleware,
-                )
+                ),
             )
 
             @wraps(func)
@@ -257,15 +262,68 @@ class AsyncAssistant(AsyncMiddleware):
         new_context: dict = payload["assistant_thread"]["context"]
         await save_thread_context(new_context)
 
-    async def async_process(  # type: ignore[return]
+    @staticmethod
+    async def default_other_message_sub_event(ack):
+        await ack()
+
+    def _register_app_listeners(self, listener_registrar: Callable[[AsyncListener], None]) -> None:
+        self._ensure_default_thread_context_changed_listener()
+        self._ensure_other_message_sub_event_listener()
+        for listener in self._app_listeners:
+            listener_registrar(listener)
+        self._app_listener_registrars.append(listener_registrar)
+
+    @property
+    def _app_listeners(self) -> List[AsyncListener]:
+        listeners: List[AsyncListener] = []
+        for listener_list in [
+            self._thread_started_listeners,
+            self._thread_context_changed_listeners,
+            self._user_message_listeners,
+            self._bot_message_listeners,
+            self._other_message_sub_event_listeners,
+        ]:
+            if listener_list is not None:
+                listeners.extend(listener_list)
+        return listeners
+
+    def _append_listener(self, listeners: List[AsyncListener], listener: AsyncListener) -> None:
+        listeners.append(listener)
+        for registrar in self._app_listener_registrars:
+            registrar(listener)
+
+    def _ensure_default_thread_context_changed_listener(self) -> None:
+        if self._thread_context_changed_listeners is None:
+            self.thread_context_changed(self.default_thread_context_changed)
+
+    def _ensure_other_message_sub_event_listener(self) -> None:
+        if self._other_message_sub_event_listeners is None:
+            self._other_message_sub_event_listeners = []
+            self._append_listener(
+                self._other_message_sub_event_listeners,
+                self.build_listener(
+                    listener_or_functions=self.default_other_message_sub_event,
+                    matchers=[
+                        cast(
+                            AsyncListenerMatcher,
+                            build_listener_matcher(
+                                func=is_other_message_sub_event_in_assistant_thread,
+                                asyncio=True,
+                                base_logger=self.base_logger,
+                            ),
+                        )
+                    ],
+                ),
+            )
+
+    async def async_process(
         self,
         *,
         req: AsyncBoltRequest,
         resp: BoltResponse,
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> Optional[BoltResponse]:
-        if self._thread_context_changed_listeners is None:
-            self.thread_context_changed(self.default_thread_context_changed)
+        self._ensure_default_thread_context_changed_listener()
 
         listener_runner: AsyncioListenerRunner = req.context.listener_runner
         for listeners in [
@@ -277,11 +335,7 @@ class AsyncAssistant(AsyncMiddleware):
             if listeners is not None:
                 for listener in listeners:
                     if listener is not None and await listener.async_matches(req=req, resp=resp):
-                        middleware_resp, next_was_not_called = await self._run_middleware(
-                            listener=listener,
-                            req=req,
-                            resp=resp,
-                        )
+                        middleware_resp, next_was_not_called = await listener.run_async_middleware(req=req, resp=resp)
                         if next_was_not_called:
                             if middleware_resp is not None:
                                 return middleware_resp
@@ -301,33 +355,7 @@ class AsyncAssistant(AsyncMiddleware):
             return await req.context.ack()
 
         await next()
-
-    async def _run_middleware(
-        self,
-        *,
-        listener: AsyncListener,
-        req: AsyncBoltRequest,
-        resp: BoltResponse,
-    ) -> Tuple[Optional[BoltResponse], bool]:
-        middleware = list(listener.middleware)
-        if len(self._inherited_app_middleware) > 0:
-            insertion_index = 1 if len(middleware) > 0 and isinstance(middleware[0], AsyncAttachingConversationKwargs) else 0
-            middleware = [
-                *middleware[:insertion_index],
-                *self._inherited_app_middleware,
-                *middleware[insertion_index:],
-            ]
-
-        for m in middleware:
-            middleware_state = {"next_called": False}
-
-            async def next_():
-                middleware_state["next_called"] = True
-
-            resp = await m.async_process(req=req, resp=resp, next=next_)  # type: ignore[assignment]
-            if not middleware_state["next_called"]:
-                return resp, True
-        return resp, False
+        return None
 
     def build_listener(
         self,

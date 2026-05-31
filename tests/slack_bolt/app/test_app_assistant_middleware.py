@@ -30,6 +30,35 @@ async def async_authorize_test_app(context, enterprise_id, team_id, user_id):
 
 
 class TestAppAssistantMiddleware:
+    def test_auto_inherit_assistant_registers_handlers_as_app_listeners(self):
+        app = App(client=WebClient(token=None), authorize=authorize_test_app, process_before_response=True)
+        assistant = Assistant(auto_inherit_app_middleware=True)
+
+        @app.message("")
+        def catch_all():
+            pass
+
+        @assistant.user_message
+        def handle_user_message():
+            pass
+
+        app.assistant(assistant)
+
+        second_assistant = Assistant(auto_inherit_app_middleware=True)
+
+        @second_assistant.user_message
+        def handle_second_user_message():
+            pass
+
+        app.assistant(second_assistant)
+
+        assert assistant not in app._middleware_list
+        listener_functions = [listener.ack_function for listener in app._listeners]
+        assert handle_user_message in listener_functions
+        assert listener_functions.index(handle_user_message) < listener_functions.index(catch_all)
+        assert listener_functions.index(handle_user_message) < listener_functions.index(handle_second_user_message)
+        assert listener_functions.index(handle_second_user_message) < listener_functions.index(catch_all)
+
     def test_assistant_inherits_app_middleware_registered_after_assistant(self):
         app = App(client=WebClient(token=None), authorize=authorize_test_app, process_before_response=True)
         assistant = Assistant(auto_inherit_app_middleware=True)
@@ -38,6 +67,8 @@ class TestAppAssistantMiddleware:
         class ListenerMiddleware(Middleware):
             def process(self, *, req: BoltRequestType, resp: BoltResponse, next: Callable[[], BoltResponse]):
                 calls.append("listener")
+                assert req.context.get("set_status") is not None
+                assert req.context.get("set_title") is not None
                 return next()
 
         @assistant.user_message(middleware=[ListenerMiddleware()])
@@ -49,8 +80,6 @@ class TestAppAssistantMiddleware:
         @app.middleware
         def app_middleware(req, next):
             calls.append("app")
-            assert req.context.get("set_status") is not None
-            assert req.context.get("set_title") is not None
             return next()
 
         request = BoltRequest(body=user_message_event_body, mode="socket_mode")
@@ -126,6 +155,35 @@ class TestAppAssistantMiddleware:
 
 
 class TestAsyncAppAssistantMiddleware:
+    def test_auto_inherit_assistant_registers_handlers_as_app_listeners(self):
+        app = AsyncApp(client=AsyncWebClient(token=None), authorize=async_authorize_test_app, process_before_response=True)
+        assistant = AsyncAssistant(auto_inherit_app_middleware=True)
+
+        @app.message("")
+        async def catch_all():
+            pass
+
+        @assistant.user_message
+        async def handle_user_message():
+            pass
+
+        app.assistant(assistant)
+
+        second_assistant = AsyncAssistant(auto_inherit_app_middleware=True)
+
+        @second_assistant.user_message
+        async def handle_second_user_message():
+            pass
+
+        app.assistant(second_assistant)
+
+        assert assistant not in app._async_middleware_list
+        listener_functions = [listener.ack_function for listener in app._async_listeners]
+        assert handle_user_message in listener_functions
+        assert listener_functions.index(handle_user_message) < listener_functions.index(catch_all)
+        assert listener_functions.index(handle_user_message) < listener_functions.index(handle_second_user_message)
+        assert listener_functions.index(handle_second_user_message) < listener_functions.index(catch_all)
+
     @pytest.mark.asyncio
     async def test_assistant_inherits_app_middleware_registered_after_assistant(self):
         app = AsyncApp(client=AsyncWebClient(token=None), authorize=async_authorize_test_app, process_before_response=True)
@@ -141,6 +199,8 @@ class TestAsyncAppAssistantMiddleware:
                 next: Callable[[], Awaitable[BoltResponse]],
             ) -> Optional[BoltResponse]:
                 calls.append("listener")
+                assert req.context.get("set_status") is not None
+                assert req.context.get("set_title") is not None
                 return await next()
 
         @assistant.user_message(middleware=[ListenerMiddleware()])
@@ -152,8 +212,6 @@ class TestAsyncAppAssistantMiddleware:
         @app.middleware
         async def app_middleware(req, next):
             calls.append("app")
-            assert req.context.get("set_status") is not None
-            assert req.context.get("set_title") is not None
             return await next()
 
         request = AsyncBoltRequest(body=user_message_event_body, mode="socket_mode")
