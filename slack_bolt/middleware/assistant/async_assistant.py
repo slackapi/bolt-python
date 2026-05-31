@@ -1,7 +1,7 @@
 import logging
 from functools import wraps
 from logging import Logger
-from typing import List, Optional, Union, Callable, Awaitable
+from typing import List, Optional, Union, Callable, Awaitable, Tuple
 
 from slack_bolt.context.save_thread_context.async_save_thread_context import AsyncSaveThreadContext
 from slack_bolt.context.assistant.thread_context_store.async_store import AsyncAssistantThreadContextStore
@@ -42,15 +42,24 @@ class AsyncAssistant(AsyncMiddleware):
         app_name: str = "assistant",
         thread_context_store: Optional[AsyncAssistantThreadContextStore] = None,
         logger: Optional[logging.Logger] = None,
+        auto_inherit_app_middleware: bool = False,
     ):
         self.app_name = app_name
         self.thread_context_store = thread_context_store
         self.base_logger = logger
+        self.auto_inherit_app_middleware = auto_inherit_app_middleware
+        self._inherited_app_middleware: List[AsyncMiddleware] = []
 
         self._thread_started_listeners = None
         self._thread_context_changed_listeners = None
         self._user_message_listeners = None
         self._bot_message_listeners = None
+
+    def inherit_app_middleware(self, middleware: AsyncMiddleware) -> None:
+        if self.auto_inherit_app_middleware is False:
+            return
+
+        self._inherited_app_middleware.append(middleware)
 
     def thread_started(
         self,
@@ -268,7 +277,11 @@ class AsyncAssistant(AsyncMiddleware):
             if listeners is not None:
                 for listener in listeners:
                     if listener is not None and await listener.async_matches(req=req, resp=resp):
-                        middleware_resp, next_was_not_called = await listener.run_async_middleware(req=req, resp=resp)
+                        middleware_resp, next_was_not_called = await self._run_middleware(
+                            listener=listener,
+                            req=req,
+                            resp=resp,
+                        )
                         if next_was_not_called:
                             if middleware_resp is not None:
                                 return middleware_resp
@@ -289,6 +302,33 @@ class AsyncAssistant(AsyncMiddleware):
 
         await next()
 
+    async def _run_middleware(
+        self,
+        *,
+        listener: AsyncListener,
+        req: AsyncBoltRequest,
+        resp: BoltResponse,
+    ) -> Tuple[Optional[BoltResponse], bool]:
+        middleware = list(listener.middleware)
+        if len(self._inherited_app_middleware) > 0:
+            insertion_index = 1 if len(middleware) > 0 and isinstance(middleware[0], AsyncAttachingConversationKwargs) else 0
+            middleware = [
+                *middleware[:insertion_index],
+                *self._inherited_app_middleware,
+                *middleware[insertion_index:],
+            ]
+
+        for m in middleware:
+            middleware_state = {"next_called": False}
+
+            async def next_():
+                middleware_state["next_called"] = True
+
+            resp = await m.async_process(req=req, resp=resp, next=next_)  # type: ignore[assignment]
+            if not middleware_state["next_called"]:
+                return resp, True
+        return resp, False
+
     def build_listener(
         self,
         listener_or_functions: Union[AsyncListener, Callable, List[Callable]],
@@ -302,8 +342,10 @@ class AsyncAssistant(AsyncMiddleware):
         if isinstance(listener_or_functions, AsyncListener):
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
-            middleware = middleware if middleware else []
-            middleware.insert(0, AsyncAttachingConversationKwargs(self.thread_context_store))
+            middleware = [
+                AsyncAttachingConversationKwargs(self.thread_context_store),
+                *(middleware if middleware else []),
+            ]
             functions = listener_or_functions
             ack_function = functions.pop(0)
 

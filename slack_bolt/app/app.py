@@ -683,18 +683,25 @@ class App:
                 self._middleware_list.append(middleware)
                 if isinstance(middleware, Assistant) and middleware.thread_context_store is not None:
                     self._assistant_thread_context_store = middleware.thread_context_store
+                elif not isinstance(middleware, Assistant):
+                    self._inherit_app_middleware_for_assistants(middleware)
             elif callable(middleware_or_callable):
-                self._middleware_list.append(
-                    CustomMiddleware(
-                        app_name=self.name,
-                        func=middleware_or_callable,
-                        base_logger=self._base_logger,
-                    )
+                middleware = CustomMiddleware(
+                    app_name=self.name,
+                    func=middleware_or_callable,
+                    base_logger=self._base_logger,
                 )
+                self._middleware_list.append(middleware)
+                self._inherit_app_middleware_for_assistants(middleware)
                 return middleware_or_callable
             else:
                 raise BoltError(f"Unexpected type for a middleware ({type(middleware_or_callable)})")
         return None
+
+    def _inherit_app_middleware_for_assistants(self, middleware: Middleware) -> None:
+        for registered_middleware in self._middleware_list[:-1]:
+            if isinstance(registered_middleware, Assistant):
+                registered_middleware.inherit_app_middleware(middleware)
 
     # -------------------------
     # AI Agents & Assistants

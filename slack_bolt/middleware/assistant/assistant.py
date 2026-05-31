@@ -1,7 +1,7 @@
 import logging
 from functools import wraps
 from logging import Logger
-from typing import List, Optional, Union, Callable
+from typing import List, Optional, Union, Callable, Tuple
 
 from slack_bolt.context.save_thread_context import SaveThreadContext
 from slack_bolt.context.assistant.thread_context_store.store import AssistantThreadContextStore
@@ -42,15 +42,24 @@ class Assistant(Middleware):
         app_name: str = "assistant",
         thread_context_store: Optional[AssistantThreadContextStore] = None,
         logger: Optional[logging.Logger] = None,
+        auto_inherit_app_middleware: bool = False,
     ):
         self.app_name = app_name
         self.thread_context_store = thread_context_store
         self.base_logger = logger
+        self.auto_inherit_app_middleware = auto_inherit_app_middleware
+        self._inherited_app_middleware: List[Middleware] = []
 
         self._thread_started_listeners = None
         self._thread_context_changed_listeners = None
         self._user_message_listeners = None
         self._bot_message_listeners = None
+
+    def inherit_app_middleware(self, middleware: Middleware) -> None:
+        if self.auto_inherit_app_middleware is False:
+            return
+
+        self._inherited_app_middleware.append(middleware)
 
     def thread_started(
         self,
@@ -237,7 +246,11 @@ class Assistant(Middleware):
             if listeners is not None:
                 for listener in listeners:
                     if listener.matches(req=req, resp=resp):
-                        middleware_resp, next_was_not_called = listener.run_middleware(req=req, resp=resp)
+                        middleware_resp, next_was_not_called = self._run_middleware(
+                            listener=listener,
+                            req=req,
+                            resp=resp,
+                        )
                         if next_was_not_called:
                             if middleware_resp is not None:
                                 return middleware_resp
@@ -258,6 +271,33 @@ class Assistant(Middleware):
 
         next()
 
+    def _run_middleware(
+        self,
+        *,
+        listener: Listener,
+        req: BoltRequest,
+        resp: BoltResponse,
+    ) -> Tuple[Optional[BoltResponse], bool]:
+        middleware = list(listener.middleware)
+        if len(self._inherited_app_middleware) > 0:
+            insertion_index = 1 if len(middleware) > 0 and isinstance(middleware[0], AttachingConversationKwargs) else 0
+            middleware = [
+                *middleware[:insertion_index],
+                *self._inherited_app_middleware,
+                *middleware[insertion_index:],
+            ]
+
+        for m in middleware:
+            middleware_state = {"next_called": False}
+
+            def next_():
+                middleware_state["next_called"] = True
+
+            resp = m.process(req=req, resp=resp, next=next_)  # type: ignore[assignment]
+            if not middleware_state["next_called"]:
+                return resp, True
+        return resp, False
+
     def build_listener(
         self,
         listener_or_functions: Union[Listener, Callable, List[Callable]],
@@ -271,8 +311,10 @@ class Assistant(Middleware):
         if isinstance(listener_or_functions, Listener):
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
-            middleware = middleware if middleware else []
-            middleware.insert(0, AttachingConversationKwargs(self.thread_context_store))
+            middleware = [
+                AttachingConversationKwargs(self.thread_context_store),
+                *(middleware if middleware else []),
+            ]
             functions = listener_or_functions
             ack_function = functions.pop(0)
 

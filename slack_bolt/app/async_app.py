@@ -710,18 +710,25 @@ class AsyncApp:
                 self._async_middleware_list.append(middleware)
                 if isinstance(middleware, AsyncAssistant) and middleware.thread_context_store is not None:
                     self._assistant_thread_context_store = middleware.thread_context_store
+                elif not isinstance(middleware, AsyncAssistant):
+                    self._inherit_app_middleware_for_assistants(middleware)
             elif callable(middleware_or_callable):
-                self._async_middleware_list.append(
-                    AsyncCustomMiddleware(
-                        app_name=self.name,
-                        func=middleware_or_callable,
-                        base_logger=self._base_logger,
-                    )
+                middleware = AsyncCustomMiddleware(
+                    app_name=self.name,
+                    func=middleware_or_callable,
+                    base_logger=self._base_logger,
                 )
+                self._async_middleware_list.append(middleware)
+                self._inherit_app_middleware_for_assistants(middleware)
                 return middleware_or_callable
             else:
                 raise BoltError(f"Unexpected type for a middleware ({type(middleware_or_callable)})")
         return None
+
+    def _inherit_app_middleware_for_assistants(self, middleware: AsyncMiddleware) -> None:
+        for registered_middleware in self._async_middleware_list[:-1]:
+            if isinstance(registered_middleware, AsyncAssistant):
+                registered_middleware.inherit_app_middleware(middleware)
 
     def assistant(self, assistant: AsyncAssistant) -> Optional[Callable]:
         return self.middleware(assistant)
