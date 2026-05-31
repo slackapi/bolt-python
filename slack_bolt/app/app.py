@@ -682,6 +682,7 @@ class App:
             if isinstance(middleware_or_callable, Middleware):
                 middleware: Middleware = middleware_or_callable
                 if isinstance(middleware, Assistant) and middleware.auto_inherit_app_middleware is True:
+                    # In this opt-in mode, Assistant handlers should run through the app listener pipeline.
                     self._register_assistant_listeners(middleware)
                     return None
                 self._middleware_list.append(middleware)
@@ -705,6 +706,7 @@ class App:
             self._assistant_thread_context_store = assistant.thread_context_store
 
         def register_listener(listener: Listener) -> None:
+            # Keep Assistant listeners before catch-all listeners while preserving Assistant registration order.
             self._listeners.insert(self._assistant_listener_insertion_index, listener)
             self._assistant_listener_insertion_index += 1
 

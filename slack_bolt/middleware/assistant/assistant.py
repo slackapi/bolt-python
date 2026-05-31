@@ -70,7 +70,7 @@ class Assistant(Middleware):
         all_matchers = self._merge_matchers(is_assistant_thread_started_event, matchers)
         if is_used_without_argument(args):
             func = args[0]
-            self._append_listener(
+            self._append_and_register_listener(
                 self._thread_started_listeners,
                 self.build_listener(
                     listener_or_functions=func,
@@ -82,7 +82,7 @@ class Assistant(Middleware):
 
         def _inner(func):
             functions = [func] + (lazy if lazy is not None else [])
-            self._append_listener(
+            self._append_and_register_listener(
                 self._thread_started_listeners,
                 self.build_listener(
                     listener_or_functions=functions,
@@ -111,7 +111,7 @@ class Assistant(Middleware):
         all_matchers = self._merge_matchers(is_user_message_event_in_assistant_thread, matchers)
         if is_used_without_argument(args):
             func = args[0]
-            self._append_listener(
+            self._append_and_register_listener(
                 self._user_message_listeners,
                 self.build_listener(
                     listener_or_functions=func,
@@ -123,7 +123,7 @@ class Assistant(Middleware):
 
         def _inner(func):
             functions = [func] + (lazy if lazy is not None else [])
-            self._append_listener(
+            self._append_and_register_listener(
                 self._user_message_listeners,
                 self.build_listener(
                     listener_or_functions=functions,
@@ -152,7 +152,7 @@ class Assistant(Middleware):
         all_matchers = self._merge_matchers(is_bot_message_event_in_assistant_thread, matchers)
         if is_used_without_argument(args):
             func = args[0]
-            self._append_listener(
+            self._append_and_register_listener(
                 self._bot_message_listeners,
                 self.build_listener(
                     listener_or_functions=func,
@@ -164,7 +164,7 @@ class Assistant(Middleware):
 
         def _inner(func):
             functions = [func] + (lazy if lazy is not None else [])
-            self._append_listener(
+            self._append_and_register_listener(
                 self._bot_message_listeners,
                 self.build_listener(
                     listener_or_functions=functions,
@@ -193,7 +193,7 @@ class Assistant(Middleware):
         all_matchers = self._merge_matchers(is_assistant_thread_context_changed_event, matchers)
         if is_used_without_argument(args):
             func = args[0]
-            self._append_listener(
+            self._append_and_register_listener(
                 self._thread_context_changed_listeners,
                 self.build_listener(
                     listener_or_functions=func,
@@ -205,7 +205,7 @@ class Assistant(Middleware):
 
         def _inner(func):
             functions = [func] + (lazy if lazy is not None else [])
-            self._append_listener(
+            self._append_and_register_listener(
                 self._thread_context_changed_listeners,
                 self.build_listener(
                     listener_or_functions=functions,
@@ -244,7 +244,8 @@ class Assistant(Middleware):
             self.thread_context_changed(self.default_thread_context_changed)
         if self._other_message_sub_event_listeners is None:
             self._other_message_sub_event_listeners = []
-            self._append_listener(
+            # Preserve the middleware path's ack behavior for message_changed, message_deleted, and similar subevents.
+            self._append_and_register_listener(
                 self._other_message_sub_event_listeners,
                 self.build_listener(
                     listener_or_functions=self.default_other_message_sub_event,
@@ -263,7 +264,7 @@ class Assistant(Middleware):
                     listener_registrar(listener)
         self._app_listener_registrars.append(listener_registrar)
 
-    def _append_listener(self, listeners: List[Listener], listener: Listener) -> None:
+    def _append_and_register_listener(self, listeners: List[Listener], listener: Listener) -> None:
         listeners.append(listener)
         for registrar in self._app_listener_registrars:
             registrar(listener)

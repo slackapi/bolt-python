@@ -709,6 +709,7 @@ class AsyncApp:
             if isinstance(middleware_or_callable, AsyncMiddleware):
                 middleware: AsyncMiddleware = middleware_or_callable
                 if isinstance(middleware, AsyncAssistant) and middleware.auto_inherit_app_middleware is True:
+                    # In this opt-in mode, Assistant handlers should run through the app listener pipeline.
                     self._register_assistant_listeners(middleware)
                     return None
                 self._async_middleware_list.append(middleware)
@@ -732,6 +733,7 @@ class AsyncApp:
             self._assistant_thread_context_store = assistant.thread_context_store
 
         def register_listener(listener: AsyncListener) -> None:
+            # Keep Assistant listeners before catch-all listeners while preserving Assistant registration order.
             self._async_listeners.insert(self._assistant_listener_insertion_index, listener)
             self._assistant_listener_insertion_index += 1
 
