@@ -55,22 +55,18 @@ class AsyncSlackRequestHandler:
         self.app = app
 
     async def handle(self, req: Request, addition_context_properties: Optional[Dict[str, Any]] = None) -> Response:
-        if req.method == "GET":
-            if self.app.oauth_flow is not None:
-                oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
-                if req.path == oauth_flow.install_path:
-                    bolt_resp = await oauth_flow.handle_installation(
-                        await to_async_bolt_request(req, addition_context_properties)
-                    )
-                    return await to_quart_response(bolt_resp)
-                elif req.path == oauth_flow.redirect_uri_path:
-                    bolt_resp = await oauth_flow.handle_callback(
-                        await to_async_bolt_request(req, addition_context_properties)
-                    )
-                    return await to_quart_response(bolt_resp)
-
-        elif req.method == "POST":
+        if req.method == "POST":
             bolt_resp = await self.app.async_dispatch(await to_async_bolt_request(req, addition_context_properties))
             return await to_quart_response(bolt_resp)
+
+        if req.method == "GET" and self.app.oauth_flow is not None:
+            oauth_flow: AsyncOAuthFlow = self.app.oauth_flow
+            bolt_req = await to_async_bolt_request(req, addition_context_properties)
+            if req.path == oauth_flow.install_path:
+                bolt_resp = await oauth_flow.handle_installation(bolt_req)
+                return await to_quart_response(bolt_resp)
+            if req.path == oauth_flow.redirect_uri_path:
+                bolt_resp = await oauth_flow.handle_callback(bolt_req)
+                return await to_quart_response(bolt_resp)
 
         return cast(Response, await make_response("Not Found", 404))

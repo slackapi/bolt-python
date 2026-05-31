@@ -64,48 +64,58 @@ class TestAsyncQuart:
             "x-slack-request-timestamp": timestamp,
         }
 
-    @pytest.mark.asyncio
-    async def test_events(self):
-        app = AsyncApp(
+    def build_app(self, oauth_settings=None):
+        return AsyncApp(
             client=self.web_client,
             signing_secret=self.signing_secret,
+            oauth_settings=oauth_settings,
         )
+
+    def build_client(self, app, path: str = "/slack/events", method: str = "POST", addition_context_properties=None):
+        api = Quart(__name__)
+        app_handler = AsyncSlackRequestHandler(app)
+
+        async def endpoint():
+            return await app_handler.handle(request, addition_context_properties)
+
+        api.add_url_rule(path, "endpoint", endpoint, methods=[method])
+        return api.test_client()
+
+    def build_event_body(self) -> str:
+        return json.dumps(
+            {
+                "token": "verification_token",
+                "team_id": "T111",
+                "enterprise_id": "E111",
+                "api_app_id": "A111",
+                "event": {
+                    "client_msg_id": "9cbd4c5b-7ddf-4ede-b479-ad21fca66d63",
+                    "type": "app_mention",
+                    "text": "<@W111> Hi there!",
+                    "user": "W222",
+                    "ts": "1595926230.009600",
+                    "team": "T111",
+                    "channel": "C111",
+                    "event_ts": "1595926230.009600",
+                },
+                "type": "event_callback",
+                "event_id": "Ev111",
+                "event_time": 1595926230,
+                "authed_users": ["W111"],
+            }
+        )
+
+    @pytest.mark.asyncio
+    async def test_events(self):
+        app = self.build_app()
 
         async def event_handler():
             pass
 
         app.event("app_mention")(event_handler)
 
-        input = {
-            "token": "verification_token",
-            "team_id": "T111",
-            "enterprise_id": "E111",
-            "api_app_id": "A111",
-            "event": {
-                "client_msg_id": "9cbd4c5b-7ddf-4ede-b479-ad21fca66d63",
-                "type": "app_mention",
-                "text": "<@W111> Hi there!",
-                "user": "W222",
-                "ts": "1595926230.009600",
-                "team": "T111",
-                "channel": "C111",
-                "event_ts": "1595926230.009600",
-            },
-            "type": "event_callback",
-            "event_id": "Ev111",
-            "event_time": 1595926230,
-            "authed_users": ["W111"],
-        }
-        timestamp, body = str(int(time())), json.dumps(input)
-
-        api = Quart(__name__)
-        app_handler = AsyncSlackRequestHandler(app)
-
-        @api.post("/slack/events")
-        async def endpoint():
-            return await app_handler.handle(request)
-
-        client = api.test_client()
+        timestamp, body = str(int(time())), self.build_event_body()
+        client = self.build_client(app)
         response = await client.post(
             "/slack/events",
             data=body,
@@ -116,10 +126,7 @@ class TestAsyncQuart:
 
     @pytest.mark.asyncio
     async def test_events_with_additional_context_properties(self):
-        app = AsyncApp(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
-        )
+        app = self.build_app()
         observed_context = {}
 
         async def event_handler(context):
@@ -127,36 +134,8 @@ class TestAsyncQuart:
 
         app.event("app_mention")(event_handler)
 
-        input = {
-            "token": "verification_token",
-            "team_id": "T111",
-            "enterprise_id": "E111",
-            "api_app_id": "A111",
-            "event": {
-                "client_msg_id": "9cbd4c5b-7ddf-4ede-b479-ad21fca66d63",
-                "type": "app_mention",
-                "text": "<@W111> Hi there!",
-                "user": "W222",
-                "ts": "1595926230.009600",
-                "team": "T111",
-                "channel": "C111",
-                "event_ts": "1595926230.009600",
-            },
-            "type": "event_callback",
-            "event_id": "Ev111",
-            "event_time": 1595926230,
-            "authed_users": ["W111"],
-        }
-        timestamp, body = str(int(time())), json.dumps(input)
-
-        api = Quart(__name__)
-        app_handler = AsyncSlackRequestHandler(app)
-
-        @api.post("/slack/events")
-        async def endpoint():
-            return await app_handler.handle(request, {"custom_value": "quart"})
-
-        client = api.test_client()
+        timestamp, body = str(int(time())), self.build_event_body()
+        client = self.build_client(app, addition_context_properties={"custom_value": "quart"})
         response = await client.post(
             "/slack/events",
             data=body,
@@ -168,10 +147,7 @@ class TestAsyncQuart:
 
     @pytest.mark.asyncio
     async def test_shortcuts(self):
-        app = AsyncApp(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
-        )
+        app = self.build_app()
 
         async def shortcut_handler(ack):
             await ack()
@@ -195,14 +171,7 @@ class TestAsyncQuart:
 
         timestamp, body = str(int(time())), f"payload={quote(json.dumps(input))}"
 
-        api = Quart(__name__)
-        app_handler = AsyncSlackRequestHandler(app)
-
-        @api.post("/slack/events")
-        async def endpoint():
-            return await app_handler.handle(request)
-
-        client = api.test_client()
+        client = self.build_client(app)
         response = await client.post(
             "/slack/events",
             data=body,
@@ -213,10 +182,7 @@ class TestAsyncQuart:
 
     @pytest.mark.asyncio
     async def test_commands(self):
-        app = AsyncApp(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
-        )
+        app = self.build_app()
 
         async def command_handler(ack):
             await ack()
@@ -240,14 +206,7 @@ class TestAsyncQuart:
         )
         timestamp, body = str(int(time())), input
 
-        api = Quart(__name__)
-        app_handler = AsyncSlackRequestHandler(app)
-
-        @api.post("/slack/events")
-        async def endpoint():
-            return await app_handler.handle(request)
-
-        client = api.test_client()
+        client = self.build_client(app)
         response = await client.post(
             "/slack/events",
             data=body,
@@ -258,23 +217,15 @@ class TestAsyncQuart:
 
     @pytest.mark.asyncio
     async def test_oauth(self):
-        app = AsyncApp(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
+        app = self.build_app(
             oauth_settings=AsyncOAuthSettings(
                 client_id="111.111",
                 client_secret="xxx",
                 scopes=["chat:write", "commands"],
             ),
         )
-        api = Quart(__name__)
-        app_handler = AsyncSlackRequestHandler(app)
 
-        @api.get("/slack/install")
-        async def install():
-            return await app_handler.handle(request)
-
-        client = api.test_client()
+        client = self.build_client(app, path="/slack/install", method="GET")
         response = await client.get("/slack/install")
         assert response.status_code == 200
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
@@ -283,9 +234,7 @@ class TestAsyncQuart:
 
     @pytest.mark.asyncio
     async def test_oauth_callback(self):
-        app = AsyncApp(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
+        app = self.build_app(
             oauth_settings=AsyncOAuthSettings(
                 client_id="111.111",
                 client_secret="xxx",
@@ -293,14 +242,8 @@ class TestAsyncQuart:
                 state_store=TestAsyncStateStore(),
             ),
         )
-        api = Quart(__name__)
-        app_handler = AsyncSlackRequestHandler(app)
 
-        @api.get("/slack/oauth_redirect")
-        async def oauth_redirect():
-            return await app_handler.handle(request)
-
-        client = api.test_client()
+        client = self.build_client(app, path="/slack/oauth_redirect", method="GET")
         response = await client.get(
             "/slack/oauth_redirect?code=1234567890&state=uuid4-value",
             headers={"Cookie": "slack-app-oauth-state=uuid4-value"},
@@ -311,10 +254,7 @@ class TestAsyncQuart:
 
     @pytest.mark.asyncio
     async def test_url_verification(self):
-        app = AsyncApp(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
-        )
+        app = self.build_app()
 
         input = {
             "token": "Jhj5dZrVaK7ZwHHjRyZWjbDl",
@@ -324,14 +264,7 @@ class TestAsyncQuart:
 
         timestamp, body = str(int(time())), json.dumps(input)
 
-        api = Quart(__name__)
-        app_handler = AsyncSlackRequestHandler(app)
-
-        @api.post("/slack/events")
-        async def endpoint():
-            return await app_handler.handle(request)
-
-        client = api.test_client()
+        client = self.build_client(app)
         response = await client.post(
             "/slack/events",
             data=body,
@@ -344,18 +277,8 @@ class TestAsyncQuart:
 
     @pytest.mark.asyncio
     async def test_not_found(self):
-        app = AsyncApp(
-            client=self.web_client,
-            signing_secret=self.signing_secret,
-        )
-        api = Quart(__name__)
-        app_handler = AsyncSlackRequestHandler(app)
-
-        @api.get("/slack/unknown")
-        async def unknown():
-            return await app_handler.handle(request)
-
-        client = api.test_client()
+        app = self.build_app()
+        client = self.build_client(app, path="/slack/unknown", method="GET")
         response = await client.get("/slack/unknown")
         assert response.status_code == 404
         assert "Not Found" == await response.get_data(as_text=True)
