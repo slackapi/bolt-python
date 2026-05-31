@@ -681,10 +681,6 @@ class App:
             middleware_or_callable = args[0]
             if isinstance(middleware_or_callable, Middleware):
                 middleware: Middleware = middleware_or_callable
-                if isinstance(middleware, Assistant) and middleware.auto_inherit_app_middleware is True:
-                    # In this opt-in mode, Assistant handlers should run through the app listener pipeline.
-                    self._register_assistant_listeners(middleware)
-                    return None
                 self._middleware_list.append(middleware)
                 if isinstance(middleware, Assistant) and middleware.thread_context_store is not None:
                     self._assistant_thread_context_store = middleware.thread_context_store
@@ -713,8 +709,13 @@ class App:
     # -------------------------
     # AI Agents & Assistants
 
-    def assistant(self, assistant: Assistant) -> Optional[Callable]:
-        return self.middleware(assistant)
+    def assistant(self, assistant: Assistant, mode: str = "middleware") -> Optional[Callable]:
+        if mode == "middleware":
+            return self.middleware(assistant)
+        if mode == "listeners":
+            self._register_assistant_listeners(assistant)
+            return None
+        raise BoltError(f"Unsupported Assistant registration mode ({mode})")
 
     # -------------------------
     # Workflows: Steps from apps

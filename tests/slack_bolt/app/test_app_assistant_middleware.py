@@ -7,6 +7,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 from slack_bolt import App, Assistant, BoltRequest
 from slack_bolt.async_app import AsyncApp, AsyncAssistant, AsyncBoltRequest
 from slack_bolt.authorization import AuthorizeResult
+from slack_bolt.error import BoltError
 from slack_bolt.middleware import Middleware
 from slack_bolt.middleware.async_middleware import AsyncMiddleware
 from slack_bolt.request import BoltRequest as BoltRequestType
@@ -30,9 +31,9 @@ async def async_authorize_test_app(context, enterprise_id, team_id, user_id):
 
 
 class TestAppAssistantMiddleware:
-    def test_auto_inherit_assistant_registers_handlers_as_app_listeners(self):
+    def test_assistant_listener_mode_registers_handlers_as_app_listeners(self):
         app = App(client=WebClient(token=None), authorize=authorize_test_app, process_before_response=True)
-        assistant = Assistant(auto_inherit_app_middleware=True)
+        assistant = Assistant()
 
         @app.message("")
         def catch_all():
@@ -42,15 +43,15 @@ class TestAppAssistantMiddleware:
         def handle_user_message():
             pass
 
-        app.assistant(assistant)
+        app.assistant(assistant, mode="listeners")
 
-        second_assistant = Assistant(auto_inherit_app_middleware=True)
+        second_assistant = Assistant()
 
         @second_assistant.user_message
         def handle_second_user_message():
             pass
 
-        app.assistant(second_assistant)
+        app.assistant(second_assistant, mode="listeners")
 
         assert assistant not in app._middleware_list
         listener_functions = [listener.ack_function for listener in app._listeners]
@@ -59,9 +60,9 @@ class TestAppAssistantMiddleware:
         assert listener_functions.index(handle_user_message) < listener_functions.index(handle_second_user_message)
         assert listener_functions.index(handle_second_user_message) < listener_functions.index(catch_all)
 
-    def test_assistant_inherits_app_middleware_registered_after_assistant(self):
+    def test_assistant_listener_mode_inherits_app_middleware_registered_after_assistant(self):
         app = App(client=WebClient(token=None), authorize=authorize_test_app, process_before_response=True)
-        assistant = Assistant(auto_inherit_app_middleware=True)
+        assistant = Assistant()
         calls = []
 
         class ListenerMiddleware(Middleware):
@@ -75,7 +76,7 @@ class TestAppAssistantMiddleware:
         def handle_user_message():
             calls.append("handler")
 
-        app.assistant(assistant)
+        app.assistant(assistant, mode="listeners")
 
         @app.middleware
         def app_middleware(req, next):
@@ -109,9 +110,9 @@ class TestAppAssistantMiddleware:
         assert response.status == 200
         assert calls == ["handler"]
 
-    def test_assistant_inherits_app_middleware_for_listeners_registered_later(self):
+    def test_assistant_middleware_mode_does_not_inherit_app_middleware(self):
         app = App(client=WebClient(token=None), authorize=authorize_test_app, process_before_response=True)
-        assistant = Assistant(auto_inherit_app_middleware=True)
+        assistant = Assistant()
         calls = []
 
         class AppMiddleware(Middleware):
@@ -119,7 +120,29 @@ class TestAppAssistantMiddleware:
                 calls.append("app")
                 return next()
 
-        app.assistant(assistant)
+        @assistant.user_message
+        def handle_user_message():
+            calls.append("handler")
+
+        app.assistant(assistant, mode="middleware")
+        app.middleware(AppMiddleware())
+
+        request = BoltRequest(body=user_message_event_body, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert calls == ["handler"]
+
+    def test_assistant_listener_mode_inherits_app_middleware_for_listeners_registered_later(self):
+        app = App(client=WebClient(token=None), authorize=authorize_test_app, process_before_response=True)
+        assistant = Assistant()
+        calls = []
+
+        class AppMiddleware(Middleware):
+            def process(self, *, req: BoltRequestType, resp: BoltResponse, next: Callable[[], BoltResponse]):
+                calls.append("app")
+                return next()
+
+        app.assistant(assistant, mode="listeners")
         app.middleware(AppMiddleware())
 
         @assistant.user_message
@@ -131,9 +154,9 @@ class TestAppAssistantMiddleware:
         assert response.status == 200
         assert calls == ["app", "handler"]
 
-    def test_assistant_inherited_app_middleware_can_short_circuit(self):
+    def test_assistant_listener_mode_inherited_app_middleware_can_short_circuit(self):
         app = App(client=WebClient(token=None), authorize=authorize_test_app, process_before_response=True)
-        assistant = Assistant(auto_inherit_app_middleware=True)
+        assistant = Assistant()
         calls = []
 
         class BlockingMiddleware(Middleware):
@@ -145,7 +168,7 @@ class TestAppAssistantMiddleware:
         def start_thread():
             calls.append("handler")
 
-        app.assistant(assistant)
+        app.assistant(assistant, mode="listeners")
         app.middleware(BlockingMiddleware())
 
         request = BoltRequest(body=thread_started_event_body, mode="socket_mode")
@@ -153,11 +176,17 @@ class TestAppAssistantMiddleware:
         assert response.status == 201
         assert calls == ["app"]
 
+    def test_assistant_rejects_unknown_mode(self):
+        app = App(client=WebClient(token=None), authorize=authorize_test_app, process_before_response=True)
+
+        with pytest.raises(BoltError, match="Unsupported Assistant registration mode"):
+            app.assistant(Assistant(), mode="something")
+
 
 class TestAsyncAppAssistantMiddleware:
-    def test_auto_inherit_assistant_registers_handlers_as_app_listeners(self):
+    def test_assistant_listener_mode_registers_handlers_as_app_listeners(self):
         app = AsyncApp(client=AsyncWebClient(token=None), authorize=async_authorize_test_app, process_before_response=True)
-        assistant = AsyncAssistant(auto_inherit_app_middleware=True)
+        assistant = AsyncAssistant()
 
         @app.message("")
         async def catch_all():
@@ -167,15 +196,15 @@ class TestAsyncAppAssistantMiddleware:
         async def handle_user_message():
             pass
 
-        app.assistant(assistant)
+        app.assistant(assistant, mode="listeners")
 
-        second_assistant = AsyncAssistant(auto_inherit_app_middleware=True)
+        second_assistant = AsyncAssistant()
 
         @second_assistant.user_message
         async def handle_second_user_message():
             pass
 
-        app.assistant(second_assistant)
+        app.assistant(second_assistant, mode="listeners")
 
         assert assistant not in app._async_middleware_list
         listener_functions = [listener.ack_function for listener in app._async_listeners]
@@ -185,9 +214,9 @@ class TestAsyncAppAssistantMiddleware:
         assert listener_functions.index(handle_second_user_message) < listener_functions.index(catch_all)
 
     @pytest.mark.asyncio
-    async def test_assistant_inherits_app_middleware_registered_after_assistant(self):
+    async def test_assistant_listener_mode_inherits_app_middleware_registered_after_assistant(self):
         app = AsyncApp(client=AsyncWebClient(token=None), authorize=async_authorize_test_app, process_before_response=True)
-        assistant = AsyncAssistant(auto_inherit_app_middleware=True)
+        assistant = AsyncAssistant()
         calls = []
 
         class ListenerMiddleware(AsyncMiddleware):
@@ -207,7 +236,7 @@ class TestAsyncAppAssistantMiddleware:
         async def handle_user_message():
             calls.append("handler")
 
-        app.assistant(assistant)
+        app.assistant(assistant, mode="listeners")
 
         @app.middleware
         async def app_middleware(req, next):
@@ -249,9 +278,9 @@ class TestAsyncAppAssistantMiddleware:
         assert calls == ["handler"]
 
     @pytest.mark.asyncio
-    async def test_assistant_inherits_app_middleware_for_listeners_registered_later(self):
+    async def test_assistant_middleware_mode_does_not_inherit_app_middleware(self):
         app = AsyncApp(client=AsyncWebClient(token=None), authorize=async_authorize_test_app, process_before_response=True)
-        assistant = AsyncAssistant(auto_inherit_app_middleware=True)
+        assistant = AsyncAssistant()
         calls = []
 
         class AppMiddleware(AsyncMiddleware):
@@ -265,7 +294,36 @@ class TestAsyncAppAssistantMiddleware:
                 calls.append("app")
                 return await next()
 
-        app.assistant(assistant)
+        @assistant.user_message
+        async def handle_user_message():
+            calls.append("handler")
+
+        app.assistant(assistant, mode="middleware")
+        app.middleware(AppMiddleware())
+
+        request = AsyncBoltRequest(body=user_message_event_body, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert calls == ["handler"]
+
+    @pytest.mark.asyncio
+    async def test_assistant_listener_mode_inherits_app_middleware_for_listeners_registered_later(self):
+        app = AsyncApp(client=AsyncWebClient(token=None), authorize=async_authorize_test_app, process_before_response=True)
+        assistant = AsyncAssistant()
+        calls = []
+
+        class AppMiddleware(AsyncMiddleware):
+            async def async_process(
+                self,
+                *,
+                req: AsyncBoltRequest,
+                resp: BoltResponse,
+                next: Callable[[], Awaitable[BoltResponse]],
+            ) -> Optional[BoltResponse]:
+                calls.append("app")
+                return await next()
+
+        app.assistant(assistant, mode="listeners")
         app.middleware(AppMiddleware())
 
         @assistant.user_message
@@ -278,9 +336,9 @@ class TestAsyncAppAssistantMiddleware:
         assert calls == ["app", "handler"]
 
     @pytest.mark.asyncio
-    async def test_assistant_inherited_app_middleware_can_short_circuit(self):
+    async def test_assistant_listener_mode_inherited_app_middleware_can_short_circuit(self):
         app = AsyncApp(client=AsyncWebClient(token=None), authorize=async_authorize_test_app, process_before_response=True)
-        assistant = AsyncAssistant(auto_inherit_app_middleware=True)
+        assistant = AsyncAssistant()
         calls = []
 
         class BlockingMiddleware(AsyncMiddleware):
@@ -298,10 +356,16 @@ class TestAsyncAppAssistantMiddleware:
         async def start_thread():
             calls.append("handler")
 
-        app.assistant(assistant)
+        app.assistant(assistant, mode="listeners")
         app.middleware(BlockingMiddleware())
 
         request = AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode")
         response = await app.async_dispatch(request)
         assert response.status == 201
         assert calls == ["app"]
+
+    def test_assistant_rejects_unknown_mode(self):
+        app = AsyncApp(client=AsyncWebClient(token=None), authorize=async_authorize_test_app, process_before_response=True)
+
+        with pytest.raises(BoltError, match="Unsupported Assistant registration mode"):
+            app.assistant(AsyncAssistant(), mode="something")

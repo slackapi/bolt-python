@@ -44,12 +44,10 @@ class AsyncAssistant(AsyncMiddleware):
         app_name: str = "assistant",
         thread_context_store: Optional[AsyncAssistantThreadContextStore] = None,
         logger: Optional[logging.Logger] = None,
-        auto_inherit_app_middleware: bool = False,
     ):
         self.app_name = app_name
         self.thread_context_store = thread_context_store
         self.base_logger = logger
-        self.auto_inherit_app_middleware = auto_inherit_app_middleware
 
         self._thread_started_listeners = None
         self._thread_context_changed_listeners = None

@@ -708,10 +708,6 @@ class AsyncApp:
             middleware_or_callable = args[0]
             if isinstance(middleware_or_callable, AsyncMiddleware):
                 middleware: AsyncMiddleware = middleware_or_callable
-                if isinstance(middleware, AsyncAssistant) and middleware.auto_inherit_app_middleware is True:
-                    # In this opt-in mode, Assistant handlers should run through the app listener pipeline.
-                    self._register_assistant_listeners(middleware)
-                    return None
                 self._async_middleware_list.append(middleware)
                 if isinstance(middleware, AsyncAssistant) and middleware.thread_context_store is not None:
                     self._assistant_thread_context_store = middleware.thread_context_store
@@ -737,8 +733,13 @@ class AsyncApp:
 
         assistant._register_app_listeners(register_listener)
 
-    def assistant(self, assistant: AsyncAssistant) -> Optional[Callable]:
-        return self.middleware(assistant)
+    def assistant(self, assistant: AsyncAssistant, mode: str = "middleware") -> Optional[Callable]:
+        if mode == "middleware":
+            return self.middleware(assistant)
+        if mode == "listeners":
+            self._register_assistant_listeners(assistant)
+            return None
+        raise BoltError(f"Unsupported Assistant registration mode ({mode})")
 
     # -------------------------
     # Workflows: Steps from apps
