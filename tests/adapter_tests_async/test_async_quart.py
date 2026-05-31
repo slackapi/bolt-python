@@ -8,6 +8,7 @@ from slack_sdk.oauth.state_store.async_state_store import AsyncOAuthStateStore
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 
+from slack_bolt import BoltResponse
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.oauth.async_oauth_settings import AsyncOAuthSettings
 from tests.mock_web_api_server import (
@@ -20,7 +21,7 @@ from tests.utils import remove_os_env_temporarily, restore_os_env
 pytestmark = pytest.mark.skipif(sys.version_info < (3, 9), reason="Quart requires Python 3.9+")
 
 if sys.version_info >= (3, 9):
-    from slack_bolt.adapter.quart.async_handler import AsyncSlackRequestHandler
+    from slack_bolt.adapter.quart.async_handler import AsyncSlackRequestHandler, to_quart_response
     from quart import Quart, request
 
 
@@ -274,6 +275,64 @@ class TestAsyncQuart:
         assert response.headers.get("content-type") == "application/json;charset=utf-8"
         assert json.loads(await response.get_data(as_text=True)) == {"challenge": input["challenge"]}
         assert_auth_test_count(self, 0)
+
+    @pytest.mark.asyncio
+    async def test_to_quart_response_preserves_multi_value_headers_and_content_type(self):
+        api = Quart(__name__)
+        async with api.app_context():
+            response = await to_quart_response(
+                BoltResponse(
+                    status=201,
+                    body="created",
+                    headers={
+                        "content-type": "application/custom",
+                        "x-bolt-test": ["one", "two"],
+                    },
+                )
+            )
+
+        assert response.status_code == 201
+        assert await response.get_data(as_text=True) == "created"
+        assert response.headers.get("content-type") == "application/custom"
+        assert response.headers.getlist("x-bolt-test") == ["one", "two"]
+
+    @pytest.mark.asyncio
+    async def test_to_quart_response_preserves_cookie_attributes(self):
+        api = Quart(__name__)
+        async with api.app_context():
+            response = await to_quart_response(
+                BoltResponse(
+                    status=200,
+                    body="",
+                    headers={
+                        "set-cookie": [
+                            "session=abc; Max-Age=60; Path=/install; Domain=example.com",
+                            "bare=xyz",
+                        ],
+                    },
+                )
+            )
+
+        set_cookie_headers = response.headers.getlist("set-cookie")
+        assert len(set_cookie_headers) == 2
+
+        session_cookie = set_cookie_headers[0]
+        assert "session=abc" in session_cookie
+        assert "Domain=example.com" in session_cookie
+        assert "Max-Age=60" in session_cookie
+        assert "Path=/install" in session_cookie
+        assert "Secure" in session_cookie
+        assert "HttpOnly" in session_cookie
+        assert "Expires=;" not in session_cookie
+
+        bare_cookie = set_cookie_headers[1]
+        assert "bare=xyz" in bare_cookie
+        assert "Secure" in bare_cookie
+        assert "HttpOnly" in bare_cookie
+        assert "Domain=" not in bare_cookie
+        assert "Expires=" not in bare_cookie
+        assert "Max-Age=" not in bare_cookie
+        assert "Path=" not in bare_cookie
 
     @pytest.mark.asyncio
     async def test_not_found(self):

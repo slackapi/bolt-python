@@ -26,6 +26,7 @@ if __name__ == "__main__":
     api.run(host="0.0.0.0", port=int(os.environ.get("PORT", 3000)))
 
 
+# Requires Python 3.9+
 # pip install -r requirements.txt
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***

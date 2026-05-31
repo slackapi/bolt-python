@@ -36,13 +36,14 @@ async def to_quart_response(bolt_resp: BoltResponse) -> Response:
 
     for cookie in bolt_resp.cookies():
         for name, c in cookie.items():
+            max_age = int(c["max-age"]) if c.get("max-age") else None
             resp.set_cookie(
                 key=name,
                 value=c.value,
-                max_age=c.get("max-age"),
-                expires=c.get("expires"),
-                path=c.get("path"),
-                domain=c.get("domain"),
+                max_age=max_age,
+                expires=c.get("expires") or None,
+                path=c.get("path") or None,
+                domain=c.get("domain") or None,
                 secure=True,
                 httponly=True,
             )
