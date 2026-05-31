@@ -20,6 +20,7 @@ from slack_bolt.authorization.authorize import (
     CallableAuthorize,
 )
 
+from slack_bolt.app.listener_registry import ListenerRegistry
 from slack_bolt.context.assistant.thread_context_store.store import AssistantThreadContextStore
 
 from slack_bolt.error import BoltError, BoltUnhandledRequestError
@@ -348,8 +349,7 @@ class App:
         # --------------------------------------
 
         self._middleware_list: List[Middleware] = []
-        self._listeners: List[Listener] = []
-        self._assistant_listener_insertion_index = 0
+        self._listeners: ListenerRegistry[Listener] = ListenerRegistry()
 
         if listener_executor is None:
             listener_executor = ThreadPoolExecutor(max_workers=5)
@@ -706,9 +706,7 @@ class App:
             self._assistant_thread_context_store = assistant.thread_context_store
 
         def register_listener(listener: Listener) -> None:
-            # Keep Assistant listeners before catch-all listeners while preserving Assistant registration order.
-            self._listeners.insert(self._assistant_listener_insertion_index, listener)
-            self._assistant_listener_insertion_index += 1
+            self._listeners.append_assistant(listener)
 
         assistant._register_app_listeners(register_listener)
 

@@ -8,6 +8,7 @@ import warnings
 from aiohttp import web
 
 from slack_bolt.app.async_server import AsyncSlackAppServer
+from slack_bolt.app.listener_registry import ListenerRegistry
 from slack_bolt.context.assistant.thread_context_store.async_store import (
     AsyncAssistantThreadContextStore,
 )
@@ -360,8 +361,7 @@ class AsyncApp:
         # --------------------------------------
 
         self._async_middleware_list: List[AsyncMiddleware] = []
-        self._async_listeners: List[AsyncListener] = []
-        self._assistant_listener_insertion_index = 0
+        self._async_listeners: ListenerRegistry[AsyncListener] = ListenerRegistry()
 
         self._assistant_thread_context_store = assistant_thread_context_store
         self._attaching_conversation_kwargs_enabled = attaching_conversation_kwargs_enabled
@@ -733,9 +733,7 @@ class AsyncApp:
             self._assistant_thread_context_store = assistant.thread_context_store
 
         def register_listener(listener: AsyncListener) -> None:
-            # Keep Assistant listeners before catch-all listeners while preserving Assistant registration order.
-            self._async_listeners.insert(self._assistant_listener_insertion_index, listener)
-            self._assistant_listener_insertion_index += 1
+            self._async_listeners.append_assistant(listener)
 
         assistant._register_app_listeners(register_listener)
 
