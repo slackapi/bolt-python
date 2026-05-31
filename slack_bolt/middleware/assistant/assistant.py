@@ -240,36 +240,8 @@ class Assistant(Middleware):
         ack()
 
     def _register_app_listeners(self, listener_registrar: Callable[[Listener], None]) -> None:
-        self._ensure_default_thread_context_changed_listener()
-        self._ensure_other_message_sub_event_listener()
-        for listener in self._app_listeners:
-            listener_registrar(listener)
-        self._app_listener_registrars.append(listener_registrar)
-
-    @property
-    def _app_listeners(self) -> List[Listener]:
-        listeners: List[Listener] = []
-        for listener_list in [
-            self._thread_started_listeners,
-            self._thread_context_changed_listeners,
-            self._user_message_listeners,
-            self._bot_message_listeners,
-            self._other_message_sub_event_listeners,
-        ]:
-            if listener_list is not None:
-                listeners.extend(listener_list)
-        return listeners
-
-    def _append_listener(self, listeners: List[Listener], listener: Listener) -> None:
-        listeners.append(listener)
-        for registrar in self._app_listener_registrars:
-            registrar(listener)
-
-    def _ensure_default_thread_context_changed_listener(self) -> None:
         if self._thread_context_changed_listeners is None:
             self.thread_context_changed(self.default_thread_context_changed)
-
-    def _ensure_other_message_sub_event_listener(self) -> None:
         if self._other_message_sub_event_listeners is None:
             self._other_message_sub_event_listeners = []
             self._append_listener(
@@ -279,9 +251,28 @@ class Assistant(Middleware):
                     matchers=[is_other_message_sub_event_in_assistant_thread],
                 ),
             )
+        for listener_list in [
+            self._thread_started_listeners,
+            self._thread_context_changed_listeners,
+            self._user_message_listeners,
+            self._bot_message_listeners,
+            self._other_message_sub_event_listeners,
+        ]:
+            if listener_list is not None:
+                for listener in listener_list:
+                    listener_registrar(listener)
+        self._app_listener_registrars.append(listener_registrar)
 
-    def process(self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse]) -> Optional[BoltResponse]:
-        self._ensure_default_thread_context_changed_listener()
+    def _append_listener(self, listeners: List[Listener], listener: Listener) -> None:
+        listeners.append(listener)
+        for registrar in self._app_listener_registrars:
+            registrar(listener)
+
+    def process(  # type: ignore[return]
+        self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse]
+    ) -> Optional[BoltResponse]:
+        if self._thread_context_changed_listeners is None:
+            self.thread_context_changed(self.default_thread_context_changed)
 
         listener_runner: ThreadListenerRunner = req.context.listener_runner
         for listeners in [
@@ -313,7 +304,6 @@ class Assistant(Middleware):
             return req.context.ack()
 
         next()
-        return None
 
     def build_listener(
         self,
@@ -328,10 +318,8 @@ class Assistant(Middleware):
         if isinstance(listener_or_functions, Listener):
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
-            middleware = [
-                AttachingConversationKwargs(self.thread_context_store),
-                *(middleware if middleware else []),
-            ]
+            middleware = middleware if middleware else []
+            middleware.insert(0, AttachingConversationKwargs(self.thread_context_store))
             functions = listener_or_functions
             ack_function = functions.pop(0)
 

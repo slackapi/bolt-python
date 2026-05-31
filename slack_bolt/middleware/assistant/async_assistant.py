@@ -1,7 +1,7 @@
 import logging
 from functools import wraps
 from logging import Logger
-from typing import List, Optional, Union, Callable, Awaitable, cast
+from typing import List, Optional, Union, Callable, Awaitable
 
 from slack_bolt.context.save_thread_context.async_save_thread_context import AsyncSaveThreadContext
 from slack_bolt.context.assistant.thread_context_store.async_store import AsyncAssistantThreadContextStore
@@ -267,15 +267,25 @@ class AsyncAssistant(AsyncMiddleware):
         await ack()
 
     def _register_app_listeners(self, listener_registrar: Callable[[AsyncListener], None]) -> None:
-        self._ensure_default_thread_context_changed_listener()
-        self._ensure_other_message_sub_event_listener()
-        for listener in self._app_listeners:
-            listener_registrar(listener)
-        self._app_listener_registrars.append(listener_registrar)
-
-    @property
-    def _app_listeners(self) -> List[AsyncListener]:
-        listeners: List[AsyncListener] = []
+        if self._thread_context_changed_listeners is None:
+            self.thread_context_changed(self.default_thread_context_changed)
+        if self._other_message_sub_event_listeners is None:
+            self._other_message_sub_event_listeners = []
+            all_matchers = self._merge_matchers(
+                build_listener_matcher(
+                    func=is_other_message_sub_event_in_assistant_thread,
+                    asyncio=True,
+                    base_logger=self.base_logger,
+                ),  # type: ignore[arg-type]
+                None,
+            )
+            self._append_listener(
+                self._other_message_sub_event_listeners,
+                self.build_listener(
+                    listener_or_functions=self.default_other_message_sub_event,
+                    matchers=all_matchers,
+                ),
+            )
         for listener_list in [
             self._thread_started_listeners,
             self._thread_context_changed_listeners,
@@ -284,46 +294,24 @@ class AsyncAssistant(AsyncMiddleware):
             self._other_message_sub_event_listeners,
         ]:
             if listener_list is not None:
-                listeners.extend(listener_list)
-        return listeners
+                for listener in listener_list:
+                    listener_registrar(listener)
+        self._app_listener_registrars.append(listener_registrar)
 
     def _append_listener(self, listeners: List[AsyncListener], listener: AsyncListener) -> None:
         listeners.append(listener)
         for registrar in self._app_listener_registrars:
             registrar(listener)
 
-    def _ensure_default_thread_context_changed_listener(self) -> None:
-        if self._thread_context_changed_listeners is None:
-            self.thread_context_changed(self.default_thread_context_changed)
-
-    def _ensure_other_message_sub_event_listener(self) -> None:
-        if self._other_message_sub_event_listeners is None:
-            self._other_message_sub_event_listeners = []
-            self._append_listener(
-                self._other_message_sub_event_listeners,
-                self.build_listener(
-                    listener_or_functions=self.default_other_message_sub_event,
-                    matchers=[
-                        cast(
-                            AsyncListenerMatcher,
-                            build_listener_matcher(
-                                func=is_other_message_sub_event_in_assistant_thread,
-                                asyncio=True,
-                                base_logger=self.base_logger,
-                            ),
-                        )
-                    ],
-                ),
-            )
-
-    async def async_process(
+    async def async_process(  # type: ignore[return]
         self,
         *,
         req: AsyncBoltRequest,
         resp: BoltResponse,
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> Optional[BoltResponse]:
-        self._ensure_default_thread_context_changed_listener()
+        if self._thread_context_changed_listeners is None:
+            self.thread_context_changed(self.default_thread_context_changed)
 
         listener_runner: AsyncioListenerRunner = req.context.listener_runner
         for listeners in [
@@ -355,7 +343,6 @@ class AsyncAssistant(AsyncMiddleware):
             return await req.context.ack()
 
         await next()
-        return None
 
     def build_listener(
         self,
@@ -370,10 +357,8 @@ class AsyncAssistant(AsyncMiddleware):
         if isinstance(listener_or_functions, AsyncListener):
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
-            middleware = [
-                AsyncAttachingConversationKwargs(self.thread_context_store),
-                *(middleware if middleware else []),
-            ]
+            middleware = middleware if middleware else []
+            middleware.insert(0, AsyncAttachingConversationKwargs(self.thread_context_store))
             functions = listener_or_functions
             ack_function = functions.pop(0)
 

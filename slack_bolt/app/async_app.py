@@ -715,12 +715,13 @@ class AsyncApp:
                 if isinstance(middleware, AsyncAssistant) and middleware.thread_context_store is not None:
                     self._assistant_thread_context_store = middleware.thread_context_store
             elif callable(middleware_or_callable):
-                middleware = AsyncCustomMiddleware(
-                    app_name=self.name,
-                    func=middleware_or_callable,
-                    base_logger=self._base_logger,
+                self._async_middleware_list.append(
+                    AsyncCustomMiddleware(
+                        app_name=self.name,
+                        func=middleware_or_callable,
+                        base_logger=self._base_logger,
+                    )
                 )
-                self._async_middleware_list.append(middleware)
                 return middleware_or_callable
             else:
                 raise BoltError(f"Unexpected type for a middleware ({type(middleware_or_callable)})")
