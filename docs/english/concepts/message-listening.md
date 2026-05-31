@@ -28,3 +28,20 @@ def say_hello_regex(say, context):
     greeting = context['matches'][0]
     say(f"{greeting}, how are you?")
 ```
+
+## Parsing references in message text
+
+Retrieved Slack messages can contain mrkdwn references such as user mentions, channel links, user group mentions, dates, and URLs. To parse these references from a message's `text` value, use `parse_slack_references()`:
+
+```python
+from slack_bolt.message_references import parse_slack_references
+
+
+@app.message("hello")
+def handle_message(message, say):
+    references = parse_slack_references(message["text"])
+    user_ids = [ref.id for ref in references if ref.type == "user"]
+    say(f"Found {len(user_ids)} user mention(s)")
+```
+
+The parser only extracts the IDs and labels present in the text. To retrieve the latest names or other entity details, use the Web API methods such as `users.info`, `conversations.info`, or `usergroups.list`.
