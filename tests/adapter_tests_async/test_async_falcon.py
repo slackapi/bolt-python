@@ -208,3 +208,18 @@ class TestAsyncFalcon:
         assert response.headers.get("content-type") == "text/html; charset=utf-8"
         assert response.headers.get("content-length") == "607"
         assert "https://slack.com/oauth/v2/authorize?state=" in response.text
+
+    @pytest.mark.asyncio
+    async def test_get_no_oauth(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        api = new_falcon_app()
+        resource = AsyncSlackAppResource(app)
+        api.add_route("/slack/events", resource)
+
+        async with ASGIConductor(api) as conductor:
+            response = await conductor.simulate_get("/slack/events")
+        assert response.status_code == 404
+        assert "The page is not found" in response.text

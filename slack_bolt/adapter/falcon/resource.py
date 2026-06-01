@@ -1,6 +1,7 @@
 from datetime import datetime
 from http import HTTPStatus
 
+from falcon import MEDIA_TEXT
 from falcon import Request, Response, version as falcon_version
 
 from slack_bolt import BoltResponse
@@ -34,9 +35,9 @@ class SlackAppResource:
                 self._write_response(bolt_resp, resp)
                 return
 
-        resp.status = "404"
-        # Falcon 4.x w/ mypy fails to correctly infer the str type here
-        resp.body = "The page is not found..."
+        resp.status = HTTPStatus.NOT_FOUND
+        resp.content_type = MEDIA_TEXT
+        resp.text = "The page is not found..."
 
     def on_post(self, req: Request, resp: Response):
         bolt_req = self._to_bolt_request(req)
