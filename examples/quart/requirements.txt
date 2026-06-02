@@ -1,0 +1,2 @@
+# Requires Python 3.9+
+quart>=0.20,<1
