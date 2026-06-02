@@ -224,6 +224,59 @@ class TestAsgiHttp:
         assert_auth_test_count(self, 1)
 
     @pytest.mark.asyncio
+    async def test_content_length_multibyte_body(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        def command_handler(ack):
+            ack(text="Hello ☃")  # snowman is 3 bytes in UTF-8
+
+        app.command("/hello-world")(command_handler)
+
+        body = (
+            "token=verification_token"
+            "&team_id=T111"
+            "&team_domain=test-domain"
+            "&channel_id=C111"
+            "&channel_name=random"
+            "&user_id=W111"
+            "&user_name=primary-owner"
+            "&command=%2Fhello-world"
+            "&text=Hi"
+            "&enterprise_id=E111"
+            "&enterprise_name=Org+Name"
+            "&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT111%2F111%2Fxxxxx"
+            "&trigger_id=111.111.xxx"
+        )
+
+        headers = self.build_raw_headers(str(int(time())), body)
+
+        asgi_server = AsgiTestServer(SlackRequestHandler(app))
+        response = await asgi_server.http("POST", headers, body)
+
+        assert response.status_code == 200
+        content_length = int(response.headers.get("content-length"))
+        actual_bytes = len(response.body.encode("utf-8"))
+        assert content_length == actual_bytes
+
+    @pytest.mark.asyncio
+    async def test_multi_value_headers(self):
+        from slack_bolt.adapter.asgi.http_response import AsgiHttpResponse
+
+        headers = {
+            "set-cookie": ["cookie1=value1; Path=/", "cookie2=value2; Path=/"],
+            "content-type": ["text/html; charset=utf-8"],
+        }
+        response = AsgiHttpResponse(status=200, headers=headers, body="OK")
+
+        set_cookie_headers = [(name, value) for name, value in response.raw_headers if name == b"set-cookie"]
+        assert len(set_cookie_headers) == 2
+        assert set_cookie_headers[0] == (b"set-cookie", b"cookie1=value1; Path=/")
+        assert set_cookie_headers[1] == (b"set-cookie", b"cookie2=value2; Path=/")
+
+    @pytest.mark.asyncio
     async def test_unsupported_method(self):
         app = App(
             client=self.web_client,

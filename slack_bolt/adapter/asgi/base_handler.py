@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Union
+from typing import Callable, Union
 
 from .http_request import AsgiHttpRequest
 from .http_response import AsgiHttpResponse
@@ -47,15 +47,13 @@ class BaseSlackRequestHandler:
             return AsgiHttpResponse(status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body)
         return AsgiHttpResponse(status=404, headers={"content-type": ["text/plain;charset=utf-8"]}, body="Not Found")
 
-    async def _handle_lifespan(self, receive: Callable) -> Dict[str, str]:
-        while True:
-            lifespan = await receive()
-            if lifespan["type"] == "lifespan.startup":
-                """Do something before startup"""
-                return {"type": "lifespan.startup.complete"}
-            if lifespan["type"] == "lifespan.shutdown":
-                """Do something before shutdown"""
-                return {"type": "lifespan.shutdown.complete"}
+    async def _handle_lifespan(self, receive: Callable, send: Callable) -> None:
+        message = await receive()
+        if message["type"] == "lifespan.startup":
+            await send({"type": "lifespan.startup.complete"})
+            message = await receive()
+        if message["type"] == "lifespan.shutdown":
+            await send({"type": "lifespan.shutdown.complete"})
 
     async def __call__(self, scope: scope_type, receive: Callable, send: Callable) -> None:
         if scope["type"] == "http":
@@ -66,6 +64,6 @@ class BaseSlackRequestHandler:
             await send(response.get_response_body())
             return
         if scope["type"] == "lifespan":
-            await send(await self._handle_lifespan(receive))
+            await self._handle_lifespan(receive, send)
             return
         raise TypeError(f"Unsupported scope type: {scope['type']!r}")

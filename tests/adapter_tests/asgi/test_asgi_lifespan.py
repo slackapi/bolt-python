@@ -1,5 +1,6 @@
 import pytest
 
+from asgiref.testing import ApplicationCommunicator
 from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web import WebClient
 
@@ -58,6 +59,24 @@ class TestAsgiLifespan:
 
         assert response.type == "lifespan.shutdown.complete"
         assert response.message == ""
+
+    @pytest.mark.asyncio
+    async def test_full_lifespan_cycle(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+
+        scope = {"type": "lifespan", "asgi": {"version": "3.0", "spec_version": "2.3"}}
+        communicator = ApplicationCommunicator(SlackRequestHandler(app), scope)
+
+        await communicator.send_input({"type": "lifespan.startup"})
+        startup_response = await communicator.receive_output(timeout=1)
+        assert startup_response["type"] == "lifespan.startup.complete"
+
+        await communicator.send_input({"type": "lifespan.shutdown"})
+        shutdown_response = await communicator.receive_output(timeout=1)
+        assert shutdown_response["type"] == "lifespan.shutdown.complete"
 
     @pytest.mark.asyncio
     async def test_failed_event(self):
