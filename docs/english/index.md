@@ -19,3 +19,7 @@ These docs live within the [Bolt-Python](https://github.com/slackapi/bolt-python
 
 We welcome contributions from everyone! Please check out our
 [Contributor's Guide](https://github.com/slackapi/bolt-python/blob/main/.github/contributing.md) for how to contribute in a helpful and collaborative way.
+
+## Release notes
+
+Check out the [Bolt for Python release notes](https://github.com/slackapi/bolt-python/releases) for all the latest happenings.
