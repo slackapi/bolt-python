@@ -13,6 +13,10 @@ If you otherwise get stuck, we're here to help. The following are the best ways 
 * [Issue Tracker](http://github.com/slackapi/bolt-python/issues) for questions, bug reports, feature requests, and general discussion related to Bolt for Python. Try searching for an existing issue before creating a new one.
 * [Email](mailto:support@slack.com) our developer support team: `support@slack.com`.
 
+## Release notes
+
+Check out the [Bolt for Python release notes](https://github.com/slackapi/bolt-python/releases) for all the latest happenings.
+
 ## Contributing
 
 These docs live within the [Bolt-Python](https://github.com/slackapi/bolt-python/) repository and are open source.
