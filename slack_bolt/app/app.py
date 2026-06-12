@@ -156,7 +156,7 @@ class App:
             if __name__ == "__main__":
                 app.start(port=int(os.environ.get("PORT", 3000)))
 
-        Refer to https://docs.slack.dev/tools/bolt-python/building-an-app for details.
+        Refer to https://docs.slack.dev/tools/bolt-python/creating-an-app for details.
 
         If you would like to build an OAuth app for enabling the app to run with multiple workspaces,
         refer to https://docs.slack.dev/tools/bolt-python/concepts/authenticating-oauth to learn how to configure the app.
