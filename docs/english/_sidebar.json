@@ -202,21 +202,5 @@
 				"items": ["tools/bolt-python/ja-jp/legacy/steps-from-apps"]
 			}
 		]
-	},
-	{ "type": "html", "value": "<hr>" },
-	{
-		"type": "link",
-		"label": "Release notes",
-		"href": "https://github.com/slackapi/bolt-python/releases"
-	},
-	{
-		"type": "link",
-		"label": "Code on GitHub",
-		"href": "https://github.com/SlackAPI/bolt-python"
-	},
-	{
-		"type": "link",
-		"label": "Contributors Guide",
-		"href": "https://github.com/SlackAPI/bolt-python/blob/main/.github/contributing.md"
 	}
 ]
