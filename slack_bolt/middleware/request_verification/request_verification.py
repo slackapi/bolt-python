@@ -26,6 +26,8 @@ class RequestVerification(Middleware):
 
     @property
     def verifier(self) -> SignatureVerifier:
+        # Defer initialization to avoid errors of a missing signing secret for
+        # apps using Socket Mode connections
         if self._verifier is None:
             self._verifier = SignatureVerifier(signing_secret=self._signing_secret)
         return self._verifier
