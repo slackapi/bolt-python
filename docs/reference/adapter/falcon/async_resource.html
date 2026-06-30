@@ -85,9 +85,9 @@ el.replaceWith(d);
                 await self._write_response(bolt_resp, resp)
                 return
 
-        resp.status = &#34;404&#34;
-        # Falcon 4.x w/ mypy fails to correctly infer the str type here
-        resp.body = &#34;The page is not found...&#34;
+        resp.status = HTTPStatus.NOT_FOUND
+        resp.content_type = MEDIA_TEXT
+        resp.text = &#34;The page is not found...&#34;
 
     async def on_post(self, req: Request, resp: Response):
         bolt_req = await self._to_bolt_request(req)
@@ -149,9 +149,9 @@ app.add_route("/slack/events", AsyncSlackAppResource(app))</p></div>
             await self._write_response(bolt_resp, resp)
             return
 
-    resp.status = &#34;404&#34;
-    # Falcon 4.x w/ mypy fails to correctly infer the str type here
-    resp.body = &#34;The page is not found...&#34;</code></pre>
+    resp.status = HTTPStatus.NOT_FOUND
+    resp.content_type = MEDIA_TEXT
+    resp.text = &#34;The page is not found...&#34;</code></pre>
 </details>
 <div class="desc"></div>
 </dd>

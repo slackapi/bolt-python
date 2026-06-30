@@ -45,6 +45,25 @@ el.replaceWith(d);
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="slack_bolt.adapter.socket_mode.internals.build_headers"><code class="name flex">
+<span>def <span class="ident">build_headers</span></span>(<span>req: slack_sdk.socket_mode.request.SocketModeRequest) ‑> Dict[str, str | Sequence[str]] | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_headers(req: SocketModeRequest) -&gt; Optional[Dict[str, Union[str, Sequence[str]]]]:
+    # Mirror the HTTP mode retry headers so middleware/listeners can detect Events API retries
+    headers: Dict[str, Union[str, Sequence[str]]] = {}
+    if req.retry_attempt is not None:
+        headers[&#34;x-slack-retry-num&#34;] = str(req.retry_attempt)
+    if req.retry_reason is not None:
+        headers[&#34;x-slack-retry-reason&#34;] = req.retry_reason
+    return headers or None</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
 <dt id="slack_bolt.adapter.socket_mode.internals.run_bolt_app"><code class="name flex">
 <span>def <span class="ident">run_bolt_app</span></span>(<span>app: <a title="slack_bolt.app.app.App" href="../../app/app.html#slack_bolt.app.app.App">App</a>,<br>req: slack_sdk.socket_mode.request.SocketModeRequest)</span>
 </code></dt>
@@ -54,7 +73,7 @@ el.replaceWith(d);
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def run_bolt_app(app: App, req: SocketModeRequest):
-    bolt_req: BoltRequest = BoltRequest(mode=&#34;socket_mode&#34;, body=req.payload)
+    bolt_req: BoltRequest = BoltRequest(mode=&#34;socket_mode&#34;, body=req.payload, headers=build_headers(req))
     bolt_resp: BoltResponse = app.dispatch(bolt_req)
     return bolt_resp</code></pre>
 </details>
@@ -111,6 +130,7 @@ el.replaceWith(d);
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="slack_bolt.adapter.socket_mode.internals.build_headers" href="#slack_bolt.adapter.socket_mode.internals.build_headers">build_headers</a></code></li>
 <li><code><a title="slack_bolt.adapter.socket_mode.internals.run_bolt_app" href="#slack_bolt.adapter.socket_mode.internals.run_bolt_app">run_bolt_app</a></code></li>
 <li><code><a title="slack_bolt.adapter.socket_mode.internals.send_response" href="#slack_bolt.adapter.socket_mode.internals.send_response">send_response</a></code></li>
 </ul>

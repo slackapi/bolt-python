@@ -88,15 +88,13 @@ el.replaceWith(d);
             return AsgiHttpResponse(status=bolt_response.status, headers=bolt_response.headers, body=bolt_response.body)
         return AsgiHttpResponse(status=404, headers={&#34;content-type&#34;: [&#34;text/plain;charset=utf-8&#34;]}, body=&#34;Not Found&#34;)
 
-    async def _handle_lifespan(self, receive: Callable) -&gt; Dict[str, str]:
-        while True:
-            lifespan = await receive()
-            if lifespan[&#34;type&#34;] == &#34;lifespan.startup&#34;:
-                &#34;&#34;&#34;Do something before startup&#34;&#34;&#34;
-                return {&#34;type&#34;: &#34;lifespan.startup.complete&#34;}
-            if lifespan[&#34;type&#34;] == &#34;lifespan.shutdown&#34;:
-                &#34;&#34;&#34;Do something before shutdown&#34;&#34;&#34;
-                return {&#34;type&#34;: &#34;lifespan.shutdown.complete&#34;}
+    async def _handle_lifespan(self, receive: Callable, send: Callable) -&gt; None:
+        message = await receive()
+        if message[&#34;type&#34;] == &#34;lifespan.startup&#34;:
+            await send({&#34;type&#34;: &#34;lifespan.startup.complete&#34;})
+            message = await receive()
+        if message[&#34;type&#34;] == &#34;lifespan.shutdown&#34;:
+            await send({&#34;type&#34;: &#34;lifespan.shutdown.complete&#34;})
 
     async def __call__(self, scope: scope_type, receive: Callable, send: Callable) -&gt; None:
         if scope[&#34;type&#34;] == &#34;http&#34;:
@@ -107,7 +105,7 @@ el.replaceWith(d);
             await send(response.get_response_body())
             return
         if scope[&#34;type&#34;] == &#34;lifespan&#34;:
-            await send(await self._handle_lifespan(receive))
+            await self._handle_lifespan(receive, send)
             return
         raise TypeError(f&#34;Unsupported scope type: {scope[&#39;type&#39;]!r}&#34;)</code></pre>
 </details>
