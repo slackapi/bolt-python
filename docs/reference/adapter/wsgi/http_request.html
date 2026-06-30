@@ -48,7 +48,7 @@ el.replaceWith(d);
 <dl>
 <dt id="slack_bolt.adapter.wsgi.http_request.WsgiHttpRequest"><code class="flex name class">
 <span>class <span class="ident">WsgiHttpRequest</span></span>
-<span>(</span><span>environ: Dict[str, Any])</span>
+<span>(</span><span>environ: WSGIEnvironment)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -64,7 +64,7 @@ el.replaceWith(d);
 
     __slots__ = (&#34;method&#34;, &#34;path&#34;, &#34;query_string&#34;, &#34;protocol&#34;, &#34;environ&#34;)
 
-    def __init__(self, environ: Dict[str, Any]):
+    def __init__(self, environ: &#34;WSGIEnvironment&#34;):
         self.method: str = environ.get(&#34;REQUEST_METHOD&#34;, &#34;GET&#34;)
         self.path: str = environ.get(&#34;PATH_INFO&#34;, &#34;&#34;)
         self.query_string: str = environ.get(&#34;QUERY_STRING&#34;, &#34;&#34;)
@@ -85,7 +85,7 @@ el.replaceWith(d);
     def get_body(self) -&gt; str:
         if &#34;wsgi.input&#34; not in self.environ:
             return &#34;&#34;
-        content_length = int(self.environ.get(&#34;CONTENT_LENGTH&#34;, 0))
+        content_length = int(self.environ.get(&#34;CONTENT_LENGTH&#34;) or 0)
         return self.environ[&#34;wsgi.input&#34;].read(content_length).decode(ENCODING)</code></pre>
 </details>
 <div class="desc"><p>This Class uses the PEP 3333 standard to extract request information
@@ -108,7 +108,7 @@ from the WSGI web server running the application</p>
 
     __slots__ = (&#34;method&#34;, &#34;path&#34;, &#34;query_string&#34;, &#34;protocol&#34;, &#34;environ&#34;)
 
-    def __init__(self, environ: Dict[str, Any]):
+    def __init__(self, environ: &#34;WSGIEnvironment&#34;):
         self.method: str = environ.get(&#34;REQUEST_METHOD&#34;, &#34;GET&#34;)
         self.path: str = environ.get(&#34;PATH_INFO&#34;, &#34;&#34;)
         self.query_string: str = environ.get(&#34;QUERY_STRING&#34;, &#34;&#34;)
@@ -129,7 +129,7 @@ from the WSGI web server running the application</p>
     def get_body(self) -&gt; str:
         if &#34;wsgi.input&#34; not in self.environ:
             return &#34;&#34;
-        content_length = int(self.environ.get(&#34;CONTENT_LENGTH&#34;, 0))
+        content_length = int(self.environ.get(&#34;CONTENT_LENGTH&#34;) or 0)
         return self.environ[&#34;wsgi.input&#34;].read(content_length).decode(ENCODING)</code></pre>
 </details>
 <div class="desc"></div>
@@ -149,7 +149,7 @@ from the WSGI web server running the application</p>
 
     __slots__ = (&#34;method&#34;, &#34;path&#34;, &#34;query_string&#34;, &#34;protocol&#34;, &#34;environ&#34;)
 
-    def __init__(self, environ: Dict[str, Any]):
+    def __init__(self, environ: &#34;WSGIEnvironment&#34;):
         self.method: str = environ.get(&#34;REQUEST_METHOD&#34;, &#34;GET&#34;)
         self.path: str = environ.get(&#34;PATH_INFO&#34;, &#34;&#34;)
         self.query_string: str = environ.get(&#34;QUERY_STRING&#34;, &#34;&#34;)
@@ -170,7 +170,7 @@ from the WSGI web server running the application</p>
     def get_body(self) -&gt; str:
         if &#34;wsgi.input&#34; not in self.environ:
             return &#34;&#34;
-        content_length = int(self.environ.get(&#34;CONTENT_LENGTH&#34;, 0))
+        content_length = int(self.environ.get(&#34;CONTENT_LENGTH&#34;) or 0)
         return self.environ[&#34;wsgi.input&#34;].read(content_length).decode(ENCODING)</code></pre>
 </details>
 <div class="desc"></div>
@@ -190,7 +190,7 @@ from the WSGI web server running the application</p>
 
     __slots__ = (&#34;method&#34;, &#34;path&#34;, &#34;query_string&#34;, &#34;protocol&#34;, &#34;environ&#34;)
 
-    def __init__(self, environ: Dict[str, Any]):
+    def __init__(self, environ: &#34;WSGIEnvironment&#34;):
         self.method: str = environ.get(&#34;REQUEST_METHOD&#34;, &#34;GET&#34;)
         self.path: str = environ.get(&#34;PATH_INFO&#34;, &#34;&#34;)
         self.query_string: str = environ.get(&#34;QUERY_STRING&#34;, &#34;&#34;)
@@ -211,7 +211,7 @@ from the WSGI web server running the application</p>
     def get_body(self) -&gt; str:
         if &#34;wsgi.input&#34; not in self.environ:
             return &#34;&#34;
-        content_length = int(self.environ.get(&#34;CONTENT_LENGTH&#34;, 0))
+        content_length = int(self.environ.get(&#34;CONTENT_LENGTH&#34;) or 0)
         return self.environ[&#34;wsgi.input&#34;].read(content_length).decode(ENCODING)</code></pre>
 </details>
 <div class="desc"></div>
@@ -231,7 +231,7 @@ from the WSGI web server running the application</p>
 
     __slots__ = (&#34;method&#34;, &#34;path&#34;, &#34;query_string&#34;, &#34;protocol&#34;, &#34;environ&#34;)
 
-    def __init__(self, environ: Dict[str, Any]):
+    def __init__(self, environ: &#34;WSGIEnvironment&#34;):
         self.method: str = environ.get(&#34;REQUEST_METHOD&#34;, &#34;GET&#34;)
         self.path: str = environ.get(&#34;PATH_INFO&#34;, &#34;&#34;)
         self.query_string: str = environ.get(&#34;QUERY_STRING&#34;, &#34;&#34;)
@@ -252,7 +252,7 @@ from the WSGI web server running the application</p>
     def get_body(self) -&gt; str:
         if &#34;wsgi.input&#34; not in self.environ:
             return &#34;&#34;
-        content_length = int(self.environ.get(&#34;CONTENT_LENGTH&#34;, 0))
+        content_length = int(self.environ.get(&#34;CONTENT_LENGTH&#34;) or 0)
         return self.environ[&#34;wsgi.input&#34;].read(content_length).decode(ENCODING)</code></pre>
 </details>
 <div class="desc"></div>
@@ -272,7 +272,7 @@ from the WSGI web server running the application</p>
 
     __slots__ = (&#34;method&#34;, &#34;path&#34;, &#34;query_string&#34;, &#34;protocol&#34;, &#34;environ&#34;)
 
-    def __init__(self, environ: Dict[str, Any]):
+    def __init__(self, environ: &#34;WSGIEnvironment&#34;):
         self.method: str = environ.get(&#34;REQUEST_METHOD&#34;, &#34;GET&#34;)
         self.path: str = environ.get(&#34;PATH_INFO&#34;, &#34;&#34;)
         self.query_string: str = environ.get(&#34;QUERY_STRING&#34;, &#34;&#34;)
@@ -293,7 +293,7 @@ from the WSGI web server running the application</p>
     def get_body(self) -&gt; str:
         if &#34;wsgi.input&#34; not in self.environ:
             return &#34;&#34;
-        content_length = int(self.environ.get(&#34;CONTENT_LENGTH&#34;, 0))
+        content_length = int(self.environ.get(&#34;CONTENT_LENGTH&#34;) or 0)
         return self.environ[&#34;wsgi.input&#34;].read(content_length).decode(ENCODING)</code></pre>
 </details>
 <div class="desc"></div>
@@ -312,7 +312,7 @@ from the WSGI web server running the application</p>
 <pre><code class="python">def get_body(self) -&gt; str:
     if &#34;wsgi.input&#34; not in self.environ:
         return &#34;&#34;
-    content_length = int(self.environ.get(&#34;CONTENT_LENGTH&#34;, 0))
+    content_length = int(self.environ.get(&#34;CONTENT_LENGTH&#34;) or 0)
     return self.environ[&#34;wsgi.input&#34;].read(content_length).decode(ENCODING)</code></pre>
 </details>
 <div class="desc"></div>

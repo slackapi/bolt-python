@@ -1,5 +1,6 @@
 from time import time
 
+import pytest
 from slack_sdk.signature import SignatureVerifier
 
 from slack_bolt.middleware import RequestVerification
@@ -60,3 +61,21 @@ class TestRequestVerification:
         resp = middleware.process(req=req, resp=resp, next=next)
         assert resp.status == 401
         assert resp.body == """{"error": "invalid request"}"""
+
+    def test_empty_signing_secret_does_not_raise_on_init(self):
+        RequestVerification(signing_secret="")
+
+    def test_socket_mode_request_skips_verification_without_signing_secret(self):
+        middleware = RequestVerification(signing_secret="")
+        req = BoltRequest(mode="socket_mode", body="payload={}", headers={})
+        resp = BoltResponse(status=404, body="default")
+        resp = middleware.process(req=req, resp=resp, next=next)
+        assert resp.status == 200
+        assert resp.body == "next"
+
+    def test_http_request_with_empty_signing_secret_raises(self):
+        middleware = RequestVerification(signing_secret="")
+        req = BoltRequest(body="payload={}", headers={})
+        resp = BoltResponse(status=404)
+        with pytest.raises(ValueError):
+            middleware.process(req=req, resp=resp, next=next)

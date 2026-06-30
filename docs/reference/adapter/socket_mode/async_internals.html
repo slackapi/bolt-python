@@ -54,7 +54,7 @@ el.replaceWith(d);
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">async def run_async_bolt_app(app: AsyncApp, req: SocketModeRequest):
-    bolt_req: AsyncBoltRequest = AsyncBoltRequest(mode=&#34;socket_mode&#34;, body=req.payload)
+    bolt_req: AsyncBoltRequest = AsyncBoltRequest(mode=&#34;socket_mode&#34;, body=req.payload, headers=build_headers(req))
     bolt_resp: BoltResponse = await app.async_dispatch(bolt_req)
     return bolt_resp</code></pre>
 </details>
