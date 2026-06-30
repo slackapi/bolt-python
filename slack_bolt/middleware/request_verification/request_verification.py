@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Callable, Dict, Any, Optional
+from typing import Any, Callable, Dict, Optional
 
 from slack_sdk.signature import SignatureVerifier
 
