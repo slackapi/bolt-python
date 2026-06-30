@@ -6,7 +6,7 @@ bottle>=0.12,<1
 chalice>=1.28,<1.31; python_version<"3.9"
 chalice>=1.32.0,<2; python_version>="3.9"
 cheroot<12
-CherryPy>=18,<19
+CherryPy>=18.10.0,<19
 Django>=3.2,<4; python_version<"3.8"
 Django>=5.2.15,<6; python_version>="3.8"
 falcon>=2,<4; python_version<"3.9"
