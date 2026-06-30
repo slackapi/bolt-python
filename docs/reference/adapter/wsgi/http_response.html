@@ -48,7 +48,7 @@ el.replaceWith(d);
 <dl>
 <dt id="slack_bolt.adapter.wsgi.http_response.WsgiHttpResponse"><code class="flex name class">
 <span>class <span class="ident">WsgiHttpResponse</span></span>
-<span>(</span><span>status: int, headers: Dict[str, Sequence[str]] = {}, body: str = '')</span>
+<span>(</span><span>status: int, headers: Dict[str, Sequence[str]] | None = None, body: str = '')</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -64,18 +64,19 @@ el.replaceWith(d);
 
     __slots__ = (&#34;status&#34;, &#34;_headers&#34;, &#34;_body&#34;)
 
-    def __init__(self, status: int, headers: Dict[str, Sequence[str]] = {}, body: str = &#34;&#34;):
+    def __init__(self, status: int, headers: Optional[Dict[str, Sequence[str]]] = None, body: str = &#34;&#34;):
         _status = HTTPStatus(status)
         self.status = f&#34;{_status.value} {_status.phrase}&#34;
-        self._headers = headers
+        self._headers = headers or {}
         self._body = bytes(body, ENCODING)
 
     def get_headers(self) -&gt; List[Tuple[str, str]]:
         headers: List[Tuple[str, str]] = []
-        for key, value in self._headers.items():
+        for key, values in self._headers.items():
             if key.lower() == &#34;content-length&#34;:
                 continue
-            headers.append((key, value[0]))
+            for v in values:
+                headers.append((key, v))
 
         headers.append((&#34;content-length&#34;, str(len(self._body))))
         return headers
@@ -103,18 +104,19 @@ for the WSGI web server running the application</p>
 
     __slots__ = (&#34;status&#34;, &#34;_headers&#34;, &#34;_body&#34;)
 
-    def __init__(self, status: int, headers: Dict[str, Sequence[str]] = {}, body: str = &#34;&#34;):
+    def __init__(self, status: int, headers: Optional[Dict[str, Sequence[str]]] = None, body: str = &#34;&#34;):
         _status = HTTPStatus(status)
         self.status = f&#34;{_status.value} {_status.phrase}&#34;
-        self._headers = headers
+        self._headers = headers or {}
         self._body = bytes(body, ENCODING)
 
     def get_headers(self) -&gt; List[Tuple[str, str]]:
         headers: List[Tuple[str, str]] = []
-        for key, value in self._headers.items():
+        for key, values in self._headers.items():
             if key.lower() == &#34;content-length&#34;:
                 continue
-            headers.append((key, value[0]))
+            for v in values:
+                headers.append((key, v))
 
         headers.append((&#34;content-length&#34;, str(len(self._body))))
         return headers
@@ -150,10 +152,11 @@ for the WSGI web server running the application</p>
 </summary>
 <pre><code class="python">def get_headers(self) -&gt; List[Tuple[str, str]]:
     headers: List[Tuple[str, str]] = []
-    for key, value in self._headers.items():
+    for key, values in self._headers.items():
         if key.lower() == &#34;content-length&#34;:
             continue
-        headers.append((key, value[0]))
+        for v in values:
+            headers.append((key, v))
 
     headers.append((&#34;content-length&#34;, str(len(self._body))))
     return headers</code></pre>

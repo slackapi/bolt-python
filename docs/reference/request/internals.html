@@ -432,9 +432,9 @@ el.replaceWith(d);
     if isinstance(payload.get(&#34;event&#34;), dict):
         return extract_team_id(payload[&#34;event&#34;])
     if isinstance(payload.get(&#34;user&#34;), dict):
-        return payload[&#34;user&#34;][&#34;team_id&#34;]
+        return payload[&#34;user&#34;].get(&#34;team_id&#34;)
     if isinstance(payload.get(&#34;view&#34;), dict):
-        return payload[&#34;view&#34;][&#34;team_id&#34;]
+        return payload[&#34;view&#34;].get(&#34;team_id&#34;)
     return None</code></pre>
 </details>
 <div class="desc"></div>

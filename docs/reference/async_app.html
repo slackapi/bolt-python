@@ -5291,6 +5291,9 @@ async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltRes
         recipient_team_id: Optional[str] = None,
         recipient_user_id: Optional[str] = None,
         thread_ts: Optional[str] = None,
+        icon_emoji: Optional[str] = None,
+        icon_url: Optional[str] = None,
+        username: Optional[str] = None,
         **kwargs,
     ) -&gt; AsyncChatStream:
         &#34;&#34;&#34;Starts a new chat stream with context.&#34;&#34;&#34;
@@ -5308,6 +5311,9 @@ async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltRes
                 recipient_team_id=recipient_team_id or self.recipient_team_id,
                 recipient_user_id=recipient_user_id or self.recipient_user_id,
                 thread_ts=thread_ts,
+                icon_emoji=icon_emoji,
+                icon_url=icon_url,
+                username=username,
                 **kwargs,
             )
         return await self.client.chat_stream(
@@ -5315,6 +5321,9 @@ async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltRes
             recipient_team_id=recipient_team_id or self.recipient_team_id,
             recipient_user_id=recipient_user_id or self.recipient_user_id,
             thread_ts=thread_ts,
+            icon_emoji=icon_emoji,
+            icon_url=icon_url,
+            username=username,
             **kwargs,
         )</code></pre>
 </details>
@@ -5371,6 +5380,9 @@ async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltRes
         self,
         status: str,
         loading_messages: Optional[List[str]] = None,
+        icon_emoji: Optional[str] = None,
+        icon_url: Optional[str] = None,
+        username: Optional[str] = None,
         **kwargs,
     ) -&gt; AsyncSlackResponse:
         return await self.client.assistant_threads_setStatus(
@@ -5378,6 +5390,9 @@ async def run_ack_function(self, *, request: AsyncBoltRequest, response: BoltRes
             thread_ts=self.thread_ts,
             status=status,
             loading_messages=loading_messages,
+            icon_emoji=icon_emoji,
+            icon_url=icon_url,
+            username=username,
             **kwargs,
         )</code></pre>
 </details>

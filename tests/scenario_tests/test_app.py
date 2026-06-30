@@ -96,6 +96,13 @@ class TestApp:
 
         assert self.received_requests.get("/auth.test") is None
 
+    def test_socket_mode_app_without_signing_secret(self):
+        app = App(
+            client=self.web_client,
+            token_verification_enabled=False,
+        )
+        assert app is not None
+
     # --------------------------
     # multi teams auth
     # --------------------------
