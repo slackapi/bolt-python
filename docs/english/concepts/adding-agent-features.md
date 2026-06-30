@@ -202,12 +202,16 @@ def handle_message(
 
 <TabItem value="dm" label = "Agent DM">
 
+:::tip[Using the Assistant side panel]
+The assistant messaging experience requires additional setup. See the [Assistant class guide](/tools/bolt-python/concepts/using-the-assistant-class).
+:::
+
 How you greet a user and set suggested prompts when they open the agent's DM depends on which [messaging experience](/ai/developing-agents) your app uses:
 
 * The **agent messaging experience** (`agent_view`) is the default and the only experience available to apps going forward. Conversations happen in the app's **Messages** tab, so you listen for the [`app_home_opened`](/reference/events/app_home_opened) event and check for the `messages` tab to detect when a user opens the DM, then set suggested prompts at the top of the tab (no `thread_ts` required). Casey uses this approach.
 * The **assistant messaging experience** (`assistant_view`) is the legacy experience, with separate **Chat** and **History** tabs. You listen for the [`assistant_thread_started`](/reference/events/assistant_thread_started) event to detect a thread, then set suggested prompts on it. Existing apps can continue to use this but should migrate to the agent messaging experience.
 
-Refer to the [agent messaging experience changelog entry](https://docs.slack.dev/changelog/2026/06/30/agent-messages-tab) for the full list of changes and a migration checklist.
+Refer to the [agent messaging experience changelog entry](/changelog/2026/06/30/agent-messages-tab) for the full list of changes and a migration checklist.
 
 <Tabs groupId="messaging-experience">
 <TabItem value="agent_view" label = "agent_view (default)">
@@ -250,10 +254,6 @@ def handle_app_home_opened(
 
 </TabItem>
 <TabItem value="assistant_view" label = "assistant_view (legacy)">
-
-:::tip[Using the Assistant side panel]
-The assistant messaging experience requires additional setup. See the [Assistant class guide](/tools/bolt-python/concepts/using-the-assistant-class).
-:::
 
 ```python
 from logging import Logger
