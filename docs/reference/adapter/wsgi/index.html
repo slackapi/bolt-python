@@ -136,17 +136,20 @@ el.replaceWith(d);
 
     def __call__(
         self,
-        environ: Dict[str, Any],
-        start_response: Callable[[str, List[Tuple[str, str]]], None],
+        environ: &#34;WSGIEnvironment&#34;,
+        start_response: &#34;StartResponse&#34;,
     ) -&gt; Iterable[bytes]:
         request = WsgiHttpRequest(environ)
-        if &#34;HTTP&#34; in request.protocol:
+        if request.protocol.startswith(&#34;HTTP&#34;):
             response: WsgiHttpResponse = self._get_http_response(
                 request=request,
             )
-            start_response(response.status, response.get_headers())
-            return response.get_body()
-        raise TypeError(f&#34;Unsupported SERVER_PROTOCOL: {request.protocol}&#34;)</code></pre>
+        else:
+            response = WsgiHttpResponse(
+                status=400, headers={&#34;content-type&#34;: [&#34;text/plain;charset=utf-8&#34;]}, body=&#34;Bad Request&#34;
+            )
+        start_response(response.status, response.get_headers())
+        return response.get_body()</code></pre>
 </details>
 <div class="desc"><p>Setup Bolt as a WSGI web framework, this will make your application compatible with WSGI web servers.
 This can be used for production deployments.</p>
