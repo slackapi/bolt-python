@@ -66,3 +66,23 @@ class TestAsyncRequestVerification:
         resp = await middleware.async_process(req=req, resp=resp, next=next)
         assert resp.status == 401
         assert resp.body == """{"error": "invalid request"}"""
+
+    def test_empty_signing_secret_does_not_raise_on_init(self):
+        AsyncRequestVerification(signing_secret="")
+
+    @pytest.mark.asyncio
+    async def test_socket_mode_request_skips_verification_without_signing_secret(self):
+        middleware = AsyncRequestVerification(signing_secret="")
+        req = AsyncBoltRequest(mode="socket_mode", body="payload={}", headers={})
+        resp = BoltResponse(status=404, body="default")
+        resp = await middleware.async_process(req=req, resp=resp, next=next)
+        assert resp.status == 200
+        assert resp.body == "next"
+
+    @pytest.mark.asyncio
+    async def test_http_request_with_empty_signing_secret_raises(self):
+        middleware = AsyncRequestVerification(signing_secret="")
+        req = AsyncBoltRequest(body="payload={}", headers={})
+        resp = BoltResponse(status=404)
+        with pytest.raises(ValueError):
+            await middleware.async_process(req=req, resp=resp, next=next)
