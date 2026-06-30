@@ -66,3 +66,18 @@ class TestAsyncRequestVerification:
         resp = await middleware.async_process(req=req, resp=resp, next=next)
         assert resp.status == 401
         assert resp.body == """{"error": "invalid request"}"""
+
+    def test_empty_signing_secret_does_not_raise_on_init(self):
+        # A Socket Mode app has no signing secret. Constructing the middleware
+        # must not raise, even though slack_sdk>=3.43.0 rejects an empty
+        # signing secret when the SignatureVerifier is created.
+        AsyncRequestVerification(signing_secret="")
+
+    @pytest.mark.asyncio
+    async def test_socket_mode_request_skips_verification_without_signing_secret(self):
+        middleware = AsyncRequestVerification(signing_secret="")
+        req = AsyncBoltRequest(mode="socket_mode", body="payload={}", headers={})
+        resp = BoltResponse(status=404, body="default")
+        resp = await middleware.async_process(req=req, resp=resp, next=next)
+        assert resp.status == 200
+        assert resp.body == "next"
