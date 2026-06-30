@@ -20,10 +20,6 @@ class RequestVerification(Middleware):
             signing_secret: The signing secret
             base_logger: The base logger
         """
-        # The verifier is created lazily so that apps without a signing secret
-        # (e.g. Socket Mode) can be initialized. slack_sdk>=3.43.0 rejects an
-        # empty signing secret on construction, but request verification is
-        # skipped for those requests anyway (see `_can_skip`).
         self._signing_secret = signing_secret
         self._verifier: Optional[SignatureVerifier] = None
         self.logger = get_bolt_logger(RequestVerification, base_logger=base_logger)

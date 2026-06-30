@@ -97,9 +97,6 @@ class TestApp:
         assert self.received_requests.get("/auth.test") is None
 
     def test_socket_mode_app_without_signing_secret(self):
-        # A Socket Mode app has no signing secret. Initializing the app must not
-        # raise, even though slack_sdk>=3.43.0 rejects an empty signing secret
-        # when the request verification middleware builds its SignatureVerifier.
         app = App(
             client=self.web_client,
             token_verification_enabled=False,
