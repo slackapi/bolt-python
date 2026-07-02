@@ -31,6 +31,16 @@ class TestSetSuggestedPrompts:
         )
         assert response.status_code == 200
 
+    def test_set_suggested_prompts_without_thread_ts(self):
+        set_suggested_prompts = SetSuggestedPrompts(client=self.web_client, channel_id="C111")
+        response: SlackResponse = set_suggested_prompts(prompts=["One", "Two"])
+        assert response.status_code == 200
+
+    def test_set_suggested_prompts_thread_ts_override(self):
+        set_suggested_prompts = SetSuggestedPrompts(client=self.web_client, channel_id="C111")
+        response: SlackResponse = set_suggested_prompts(prompts=["One", "Two"], thread_ts="123.123")
+        assert response.status_code == 200
+
     def test_set_suggested_prompts_invalid(self):
         set_suggested_prompts = SetSuggestedPrompts(client=self.web_client, channel_id="C111", thread_ts="123.123")
         with pytest.raises(TypeError):
