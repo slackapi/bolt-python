@@ -67,6 +67,13 @@ class AssistantUtilities:
 
     @property
     def set_suggested_prompts(self) -> SetSuggestedPrompts:
+        warnings.warn(
+            "AssistantUtilities.set_suggested_prompts is deprecated. "
+            "Use the set_suggested_prompts argument directly in your listener function "
+            "or access it via context.set_suggested_prompts instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return SetSuggestedPrompts(self.client, self.channel_id, self.thread_ts)
 
     @property
