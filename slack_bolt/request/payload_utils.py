@@ -37,6 +37,19 @@ def is_message_event(body: Dict[str, Any]) -> bool:
     return False
 
 
+def is_any_im_message_event(body: Dict[str, Any]) -> bool:
+    if is_message_event(body):
+        # Any message event with no subtype or any subtype (message_changed, message_deleted, etc.)
+        return body["event"].get("channel_type") == "im"
+    return False
+
+
+def is_im_message_event(body: Dict[str, Any]) -> bool:
+    if is_any_im_message_event(body):
+        return body["event"].get("subtype") in (None, "file_share")
+    return False
+
+
 def is_assistant_event(body: Dict[str, Any]) -> bool:
     return is_event(body) and (
         is_assistant_thread_started_event(body)
@@ -55,19 +68,6 @@ def is_assistant_thread_started_event(body: Dict[str, Any]) -> bool:
 def is_assistant_thread_context_changed_event(body: Dict[str, Any]) -> bool:
     if is_event(body):
         return body["event"]["type"] == "assistant_thread_context_changed"
-    return False
-
-
-def is_any_im_message_event(body: Dict[str, Any]) -> bool:
-    if is_message_event(body):
-        # no subtype or message_changed, message_deleted etc.
-        return body["event"].get("channel_type") == "im"
-    return False
-
-
-def is_im_message_event(body: Dict[str, Any]) -> bool:
-    if is_any_im_message_event(body):
-        return body["event"].get("subtype") in (None, "file_share")
     return False
 
 

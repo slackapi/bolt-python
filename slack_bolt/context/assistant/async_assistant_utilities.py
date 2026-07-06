@@ -1,4 +1,3 @@
-import warnings
 from typing import Optional
 
 from slack_sdk.web.async_client import AsyncWebClient
@@ -11,12 +10,8 @@ from slack_bolt.context.assistant.thread_context_store.default_async_store impor
 
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.context.say.async_say import AsyncSay
-from .internals import has_channel_id_and_thread_ts
 from ..get_thread_context.async_get_thread_context import AsyncGetThreadContext
 from ..save_thread_context.async_save_thread_context import AsyncSaveThreadContext
-from ..set_status.async_set_status import AsyncSetStatus
-from ..set_suggested_prompts.async_set_suggested_prompts import AsyncSetSuggestedPrompts
-from ..set_title.async_set_title import AsyncSetTitle
 
 
 class AsyncAssistantUtilities:
@@ -37,47 +32,12 @@ class AsyncAssistantUtilities:
         self.client = context.client
         self.thread_context_store = thread_context_store or DefaultAsyncAssistantThreadContextStore(context)
 
-        if has_channel_id_and_thread_ts(self.payload):
-            # assistant_thread_started
-            thread = self.payload["assistant_thread"]
-            self.channel_id = thread["channel_id"]
-            self.thread_ts = thread["thread_ts"]
-        elif self.payload.get("channel") is not None and self.payload.get("thread_ts") is not None:
-            # message event
-            self.channel_id = self.payload["channel"]
-            self.thread_ts = self.payload["thread_ts"]
+        if context.channel_id is not None and context.thread_ts is not None:
+            self.channel_id = context.channel_id
+            self.thread_ts = context.thread_ts
         else:
             # When moving this code to Bolt internals, no need to raise an exception for this pattern
             raise ValueError(f"Cannot instantiate Assistant for this event pattern ({self.payload})")
-
-    def is_valid(self) -> bool:
-        return self.channel_id is not None and self.thread_ts is not None
-
-    @property
-    def set_status(self) -> AsyncSetStatus:
-        warnings.warn(
-            "AsyncAssistantUtilities.set_status is deprecated. "
-            "Use the set_status argument directly in your listener function "
-            "or access it via context.set_status instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return AsyncSetStatus(self.client, self.channel_id, self.thread_ts)
-
-    @property
-    def set_title(self) -> AsyncSetTitle:
-        return AsyncSetTitle(self.client, self.channel_id, self.thread_ts)
-
-    @property
-    def set_suggested_prompts(self) -> AsyncSetSuggestedPrompts:
-        warnings.warn(
-            "AsyncAssistantUtilities.set_suggested_prompts is deprecated. "
-            "Use the set_suggested_prompts argument directly in your listener function "
-            "or access it via context.set_suggested_prompts instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return AsyncSetSuggestedPrompts(self.client, self.channel_id, self.thread_ts)
 
     @property
     def say(self) -> AsyncSay:
