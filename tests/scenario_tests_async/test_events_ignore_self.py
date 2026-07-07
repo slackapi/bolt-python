@@ -89,6 +89,7 @@ self_event = {
             "type": "message",
             "channel": "C111",
             "ts": "1599529504.000400",
+            "channel_type": "channel",
         },
         "reaction": "heart_eyes",
         "item_user": "W111",
