@@ -167,13 +167,11 @@ class TestPayloadUtils:
             ), f"{key} should NOT pass {is_user_message_event_in_assistant_thread.__name__}"
 
     def test_is_bot_message_event_in_assistant_thread(self):
-        # Requires: is_any_im_message_event + subtype is None + thread_ts present + bot_id present
         positives = {
             "bot_im_thread": bot_im_thread_message_body,
         }
         negatives = {
             "user_message_im": user_message_event_body,
-            # file_share_im has subtype="file_share" -- the key user/bot asymmetry
             "file_share_im": file_share_im_message_body,
             "im_no_thread_ts": im_message_no_thread_ts_body,
             "message_changed_im": message_changed_event_body,
@@ -195,11 +193,9 @@ class TestPayloadUtils:
             ), f"{key} should NOT pass {is_bot_message_event_in_assistant_thread.__name__}"
 
     def test_is_bot_message_user_message_asymmetry(self):
-        # file_share in IM thread: user predicate accepts it, bot predicate rejects it
         assert is_user_message_event_in_assistant_thread(file_share_im_message_body)
         assert not is_bot_message_event_in_assistant_thread(file_share_im_message_body)
 
-        # bot message in IM thread: bot predicate accepts it, user predicate rejects it
         assert is_bot_message_event_in_assistant_thread(bot_im_thread_message_body)
         assert not is_user_message_event_in_assistant_thread(bot_im_thread_message_body)
 
