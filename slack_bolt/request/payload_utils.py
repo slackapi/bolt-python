@@ -82,7 +82,8 @@ def is_user_message_event_in_assistant_thread(body: Dict[str, Any]) -> bool:
 def is_bot_message_event_in_assistant_thread(body: Dict[str, Any]) -> bool:
     if is_event(body):
         return (
-            is_im_message_event(body)
+            is_any_im_message_event(body)
+            and body["event"].get("subtype") is None
             and body["event"].get("thread_ts") is not None
             and body["event"].get("bot_id") is not None
         )
