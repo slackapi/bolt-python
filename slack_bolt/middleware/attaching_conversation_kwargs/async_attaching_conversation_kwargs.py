@@ -5,15 +5,14 @@ from slack_bolt.context.assistant.thread_context_store.async_store import AsyncA
 from slack_bolt.context.say_stream.async_say_stream import AsyncSayStream
 from slack_bolt.context.set_status.async_set_status import AsyncSetStatus
 from slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts import AsyncSetSuggestedPrompts
-from slack_bolt.context.set_title.async_set_title import AsyncSetTitle
 from slack_bolt.middleware.async_middleware import AsyncMiddleware
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.request.payload_utils import (
     is_assistant_event,
     is_assistant_thread_context_changed_event,
     is_assistant_thread_started_event,
-    to_event,
     is_im_message_event,
+    to_event,
 )
 from slack_bolt.response import BoltResponse
 
@@ -46,6 +45,7 @@ class AsyncAttachingConversationKwargs(AsyncMiddleware):
                 thread_context_store=self.thread_context_store,
             )
             req.context["say"] = assistant.say
+            req.context["set_title"] = assistant.set_title
             req.context["get_thread_context"] = assistant.get_thread_context
             req.context["save_thread_context"] = assistant.save_thread_context
 
@@ -59,8 +59,6 @@ class AsyncAttachingConversationKwargs(AsyncMiddleware):
                 channel_id=req.context.channel_id,
                 thread_ts=req.context.thread_ts,
             )
-            if req.context.thread_ts:
-                req.context["set_title"] = AsyncSetTitle(req.context.client, req.context.channel_id, req.context.thread_ts)
 
         # TODO: in the future we might want to introduce a "proper" extract_ts utility
         thread_ts_or_ts = req.context.thread_ts or event.get("ts")

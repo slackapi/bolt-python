@@ -7,8 +7,10 @@ from slack_bolt.context.assistant.thread_context_store.default_store import Defa
 
 from slack_bolt.context.context import BoltContext
 from slack_bolt.context.say import Say
+from .internals import has_channel_id_and_thread_ts
 from ..get_thread_context.get_thread_context import GetThreadContext
 from ..save_thread_context import SaveThreadContext
+from ..set_title import SetTitle
 
 
 class AssistantUtilities:
@@ -29,9 +31,15 @@ class AssistantUtilities:
         self.client = context.client
         self.thread_context_store = thread_context_store or DefaultAssistantThreadContextStore(context)
 
-        if context.channel_id is not None and context.thread_ts is not None:
-            self.channel_id = context.channel_id
-            self.thread_ts = context.thread_ts
+        if has_channel_id_and_thread_ts(self.payload):
+            # assistant_thread_started
+            thread = self.payload["assistant_thread"]
+            self.channel_id = thread["channel_id"]
+            self.thread_ts = thread["thread_ts"]
+        elif self.payload.get("channel") is not None and self.payload.get("thread_ts") is not None:
+            # message event
+            self.channel_id = self.payload["channel"]
+            self.thread_ts = self.payload["thread_ts"]
         else:
             # When moving this code to Bolt internals, no need to raise an exception for this pattern
             raise ValueError(f"Cannot instantiate Assistant for this event pattern ({self.payload})")
@@ -50,6 +58,10 @@ class AssistantUtilities:
             thread_ts=self.thread_ts,
             build_metadata=build_metadata,
         )
+
+    @property
+    def set_title(self) -> SetTitle:
+        return SetTitle(self.client, self.channel_id, self.thread_ts)
 
     @property
     def get_thread_context(self) -> GetThreadContext:

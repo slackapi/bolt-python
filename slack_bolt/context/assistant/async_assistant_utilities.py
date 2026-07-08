@@ -10,8 +10,10 @@ from slack_bolt.context.assistant.thread_context_store.default_async_store impor
 
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.context.say.async_say import AsyncSay
+from .internals import has_channel_id_and_thread_ts
 from ..get_thread_context.async_get_thread_context import AsyncGetThreadContext
 from ..save_thread_context.async_save_thread_context import AsyncSaveThreadContext
+from ..set_title.async_set_title import AsyncSetTitle
 
 
 class AsyncAssistantUtilities:
@@ -32,9 +34,15 @@ class AsyncAssistantUtilities:
         self.client = context.client
         self.thread_context_store = thread_context_store or DefaultAsyncAssistantThreadContextStore(context)
 
-        if context.channel_id is not None and context.thread_ts is not None:
-            self.channel_id = context.channel_id
-            self.thread_ts = context.thread_ts
+        if has_channel_id_and_thread_ts(self.payload):
+            # assistant_thread_started
+            thread = self.payload["assistant_thread"]
+            self.channel_id = thread["channel_id"]
+            self.thread_ts = thread["thread_ts"]
+        elif self.payload.get("channel") is not None and self.payload.get("thread_ts") is not None:
+            # message event
+            self.channel_id = self.payload["channel"]
+            self.thread_ts = self.payload["thread_ts"]
         else:
             # When moving this code to Bolt internals, no need to raise an exception for this pattern
             raise ValueError(f"Cannot instantiate Assistant for this event pattern ({self.payload})")
@@ -47,6 +55,10 @@ class AsyncAssistantUtilities:
             thread_ts=self.thread_ts,
             build_metadata=self._build_message_metadata,
         )
+
+    @property
+    def set_title(self) -> AsyncSetTitle:
+        return AsyncSetTitle(self.client, self.channel_id, self.thread_ts)
 
     async def _build_message_metadata(self) -> dict:
         return {

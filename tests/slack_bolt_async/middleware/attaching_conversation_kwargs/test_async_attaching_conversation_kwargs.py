@@ -7,6 +7,7 @@ from slack_bolt.middleware.attaching_conversation_kwargs.async_attaching_convers
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 from tests.scenario_tests_async.test_events_assistant import (
+    build_payload,
     thread_started_event_body,
     user_message_event_body,
     channel_user_message_event_body,
@@ -18,6 +19,19 @@ async def next():
 
 
 ASSISTANT_KWARGS = ("say", "set_title", "set_suggested_prompts", "get_thread_context", "save_thread_context")
+
+# A top-level DM (not in a thread) is not an assistant thread, but set_suggested_prompts is still attached.
+top_level_im_message_event_body = build_payload(
+    {
+        "user": "W222",
+        "type": "message",
+        "ts": "1726133700.887259",
+        "text": "A top-level DM, not in a thread",
+        "channel": "D111",
+        "event_ts": "1726133700.887259",
+        "channel_type": "im",
+    }
+)
 
 
 class TestAsyncAttachingConversationKwargs:
@@ -48,6 +62,27 @@ class TestAsyncAttachingConversationKwargs:
         for key in ASSISTANT_KWARGS:
             assert key in req.context, f"{key} should be set on context"
         assert req.context["say"].thread_ts == "1726133698.626339"
+        assert "say_stream" in req.context
+        assert "set_status" in req.context
+
+    @pytest.mark.asyncio
+    async def test_top_level_dm_attaches_suggested_prompts_but_not_set_title(self):
+        middleware = AsyncAttachingConversationKwargs()
+        req = AsyncBoltRequest(body=top_level_im_message_event_body, mode="socket_mode")
+        req.context["client"] = AsyncWebClient(token="xoxb-test")
+
+        resp = await middleware.async_process(req=req, resp=BoltResponse(status=404), next=next)
+
+        assert resp.status == 200
+        # set_suggested_prompts is available for any DM to the app
+        assert "set_suggested_prompts" in req.context
+        # set_title is assistant-thread-only; a top-level DM is not an assistant thread
+        assert "set_title" not in req.context
+        # say/get_thread_context/save_thread_context remain assistant-only
+        assert "say" not in req.context
+        assert "get_thread_context" not in req.context
+        assert "save_thread_context" not in req.context
+        # set_status / say_stream are attached whenever a ts is resolvable
         assert "say_stream" in req.context
         assert "set_status" in req.context
 
