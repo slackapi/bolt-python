@@ -48,6 +48,10 @@ class AsyncAssistantUtilities:
             raise ValueError(f"Cannot instantiate Assistant for this event pattern ({self.payload})")
 
     @property
+    def set_title(self) -> AsyncSetTitle:
+        return AsyncSetTitle(self.client, self.channel_id, self.thread_ts)
+
+    @property
     def say(self) -> AsyncSay:
         return AsyncSay(
             self.client,
@@ -55,10 +59,6 @@ class AsyncAssistantUtilities:
             thread_ts=self.thread_ts,
             build_metadata=self._build_message_metadata,
         )
-
-    @property
-    def set_title(self) -> AsyncSetTitle:
-        return AsyncSetTitle(self.client, self.channel_id, self.thread_ts)
 
     async def _build_message_metadata(self) -> dict:
         return {

@@ -45,6 +45,10 @@ class AssistantUtilities:
             raise ValueError(f"Cannot instantiate Assistant for this event pattern ({self.payload})")
 
     @property
+    def set_title(self) -> SetTitle:
+        return SetTitle(self.client, self.channel_id, self.thread_ts)
+
+    @property
     def say(self) -> Say:
         def build_metadata() -> Optional[dict]:
             thread_context = self.get_thread_context()
@@ -58,10 +62,6 @@ class AssistantUtilities:
             thread_ts=self.thread_ts,
             build_metadata=build_metadata,
         )
-
-    @property
-    def set_title(self) -> SetTitle:
-        return SetTitle(self.client, self.channel_id, self.thread_ts)
 
     @property
     def get_thread_context(self) -> GetThreadContext:
