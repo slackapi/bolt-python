@@ -42,7 +42,7 @@ slack install -E local
 
 5. Enable MCP for your app:
    - Run `slack app settings` to open your app's settings
-   - Navigate to **Agents & AI Apps** in the left-side navigation
+   - Navigate to **Agents** in the left-side navigation
    - Toggle **Model Context Protocol** on
 
 6. Update your `.env` OAuth environment variables:
@@ -80,11 +80,10 @@ Agents can be invoked throughout Slack, such as via @mentions in channels, messa
 import re
 from logging import Logger
 
-from agents import Runner
 from slack_bolt import BoltContext, Say, SayStream, SetStatus
 from slack_sdk import WebClient
 
-from agent import CaseyDeps, casey_agent
+from agent import CaseyDeps, run_casey
 from thread_context import conversation_store
 from listeners.views.feedback_builder import build_feedback_blocks
 
@@ -201,14 +200,62 @@ def handle_message(
 
 </TabItem>
 
-<TabItem value="assistant" label = "Assistant thread">
+<TabItem value="dm" label = "Agent DM">
 
 :::tip[Using the Assistant side panel]
-The Assistant side panel requires additional setup. See the [Assistant class guide](/tools/bolt-python/concepts/using-the-assistant-class).
+The assistant messaging experience requires additional setup. See the [Assistant class guide](/tools/bolt-python/concepts/using-the-assistant-class).
 :::
 
+How you greet a user and set suggested prompts when they open the agent's DM depends on which [messaging experience](/ai/developing-agents) your app uses:
 
-```py
+* The **agent messaging experience** (`agent_view`) is the default and the only experience available to apps going forward. Conversations happen in the app's **Messages** tab, so you listen for the [`app_home_opened`](/reference/events/app_home_opened) event and check for the `messages` tab to detect when a user opens the DM, then set suggested prompts at the top of the tab (no `thread_ts` required). Casey uses this approach.
+* The **assistant messaging experience** (`assistant_view`) is the legacy experience, with separate **Chat** and **History** tabs. You listen for the [`assistant_thread_started`](/reference/events/assistant_thread_started) event to detect a thread, then set suggested prompts on it. Existing apps can continue to use this but should migrate to the agent messaging experience.
+
+Refer to the [agent messaging experience changelog entry](/changelog/2026/06/30/agent-messages-tab) for the full list of changes and a migration checklist.
+
+<Tabs groupId="messaging-experience">
+<TabItem value="agent_view" label = "agent_view (default)">
+
+```python
+from logging import Logger
+
+from slack_bolt import BoltContext
+from slack_sdk import WebClient
+
+SUGGESTED_PROMPTS = [
+    {"title": "Reset Password", "message": "I need to reset my password"},
+    {"title": "Request Access", "message": "I need access to a system or tool"},
+    {"title": "Network Issues", "message": "I'm having network connectivity issues"},
+]
+
+
+def handle_app_home_opened(
+    client: WebClient, event: dict, context: BoltContext, logger: Logger
+):
+    """Handle app_home_opened events.
+
+    Under agent_view, this event fires for both the Home tab and the Messages
+    tab (the agent DM). Branch on ``event["tab"]``.
+    """
+    try:
+        if event.get("tab") == "messages":
+            # Suggested prompts pin to the top of the Messages tab; no thread_ts required.
+            client.assistant_threads_setSuggestedPrompts(
+                channel_id=event["channel"],
+                title="How can I help you today?",
+                prompts=SUGGESTED_PROMPTS,
+            )
+            return
+
+        # event["tab"] == "home": publish your App Home Block Kit view here
+    except Exception as e:
+        logger.exception(f"Failed to handle app_home_opened: {e}")
+```
+
+</TabItem>
+<TabItem value="assistant_view" label = "assistant_view (legacy)">
+
+```python
 from logging import Logger
 
 from slack_bolt.context.set_suggested_prompts import SetSuggestedPrompts
@@ -232,6 +279,9 @@ def handle_assistant_thread_started(
     except Exception as e:
         logger.exception(f"Failed to handle assistant thread started: {e}")
 ```
+
+</TabItem>
+</Tabs>
 
 </TabItem>
 </Tabs>
@@ -395,7 +445,7 @@ from logging import Logger
 from slack_bolt import BoltContext, Say, SayStream, SetStatus
 from slack_sdk import WebClient
 
-from agent import CaseyDeps, casey_agent, get_model
+from agent import CaseyDeps, run_casey
 from thread_context import conversation_store
 from listeners.views.feedback_builder import build_feedback_blocks
 
@@ -456,13 +506,9 @@ def handle_app_mentioned(
             channel_id=channel_id,
             thread_ts=thread_ts,
             message_ts=event["ts"],
+            user_token=context.user_token,
         )
-        result = casey_agent.run_sync(
-            cleaned_text,
-            model=get_model(),
-            deps=deps,
-            message_history=history,
-        )
+        result = run_casey(cleaned_text, deps, message_history=history)
 
         # Stream response in thread with feedback buttons
         streamer = say_stream()
@@ -554,6 +600,7 @@ def handle_app_mentioned(
             channel_id=channel_id,
             thread_ts=thread_ts,
             message_ts=event["ts"],
+            user_token=context.user_token,
         )
         response_text, new_session_id = run_casey_agent(
             cleaned_text, session_id=existing_session_id, deps=deps
@@ -583,11 +630,10 @@ def handle_app_mentioned(
 import re
 from logging import Logger
 
-from agents import Runner
 from slack_bolt import BoltContext, Say, SayStream, SetStatus
 from slack_sdk import WebClient
 
-from agent import CaseyDeps, casey_agent
+from agent import CaseyDeps, run_casey
 from thread_context import conversation_store
 from listeners.views.feedback_builder import build_feedback_blocks
 
@@ -654,8 +700,9 @@ def handle_app_mentioned(
             channel_id=channel_id,
             thread_ts=thread_ts,
             message_ts=event["ts"],
+            user_token=context.user_token,
         )
-        result = Runner.run_sync(casey_agent, input=input_items, context=deps)
+        result = run_casey(input_items, deps)
 
         # Stream response in thread with feedback buttons
         streamer = say_stream()
