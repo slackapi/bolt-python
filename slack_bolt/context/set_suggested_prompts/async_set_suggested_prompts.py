@@ -34,7 +34,7 @@ class AsyncSetSuggestedPrompts:
 
         return await self.client.assistant_threads_setSuggestedPrompts(
             channel_id=self.channel_id,
-            thread_ts=thread_ts or self.thread_ts,
+            thread_ts=thread_ts if thread_ts is not None else self.thread_ts,
             prompts=prompts_arg,
             title=title,
         )

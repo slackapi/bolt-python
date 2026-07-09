@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
 from slack_sdk import WebClient
 from slack_sdk.web import SlackResponse
@@ -33,13 +35,44 @@ class TestSetSuggestedPrompts:
 
     def test_set_suggested_prompts_without_thread_ts(self):
         set_suggested_prompts = SetSuggestedPrompts(client=self.web_client, channel_id="C111")
-        response: SlackResponse = set_suggested_prompts(prompts=["One", "Two"])
-        assert response.status_code == 200
+        with patch.object(
+            self.web_client, self.web_client.assistant_threads_setSuggestedPrompts.__name__, return_value=MagicMock()
+        ) as mock_api:
+            set_suggested_prompts(prompts=["One", "Two"])
+            mock_api.assert_called_once_with(
+                channel_id="C111",
+                thread_ts=None,
+                prompts=[{"title": "One", "message": "One"}, {"title": "Two", "message": "Two"}],
+                title=None,
+            )
 
     def test_set_suggested_prompts_thread_ts_override(self):
-        set_suggested_prompts = SetSuggestedPrompts(client=self.web_client, channel_id="C111")
-        response: SlackResponse = set_suggested_prompts(prompts=["One", "Two"], thread_ts="123.123")
-        assert response.status_code == 200
+        # The call-time thread_ts must win over the stored one
+        set_suggested_prompts = SetSuggestedPrompts(client=self.web_client, channel_id="C111", thread_ts="999.999")
+        with patch.object(
+            self.web_client, self.web_client.assistant_threads_setSuggestedPrompts.__name__, return_value=MagicMock()
+        ) as mock_api:
+            set_suggested_prompts(prompts=["One", "Two"], thread_ts="123.123")
+            mock_api.assert_called_once_with(
+                channel_id="C111",
+                thread_ts="123.123",
+                prompts=[{"title": "One", "message": "One"}, {"title": "Two", "message": "Two"}],
+                title=None,
+            )
+
+    def test_set_suggested_prompts_thread_ts_override_falsy(self):
+        # An explicitly passed falsy thread_ts must be forwarded, not swallowed by the stored value
+        set_suggested_prompts = SetSuggestedPrompts(client=self.web_client, channel_id="C111", thread_ts="123.123")
+        with patch.object(
+            self.web_client, self.web_client.assistant_threads_setSuggestedPrompts.__name__, return_value=MagicMock()
+        ) as mock_api:
+            set_suggested_prompts(prompts=["One", "Two"], thread_ts="")
+            mock_api.assert_called_once_with(
+                channel_id="C111",
+                thread_ts="",
+                prompts=[{"title": "One", "message": "One"}, {"title": "Two", "message": "Two"}],
+                title=None,
+            )
 
     def test_set_suggested_prompts_invalid(self):
         set_suggested_prompts = SetSuggestedPrompts(client=self.web_client, channel_id="C111", thread_ts="123.123")
