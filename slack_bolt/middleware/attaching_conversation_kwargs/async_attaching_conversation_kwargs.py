@@ -8,6 +8,7 @@ from slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts import
 from slack_bolt.middleware.async_middleware import AsyncMiddleware
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.request.payload_utils import (
+    is_app_home_opened_event,
     is_assistant_event,
     is_assistant_thread_context_changed_event,
     is_assistant_thread_started_event,
@@ -53,6 +54,7 @@ class AsyncAttachingConversationKwargs(AsyncMiddleware):
             is_im_message_event(req.body)
             or is_assistant_thread_started_event(req.body)
             or is_assistant_thread_context_changed_event(req.body)
+            or is_app_home_opened_event(req.body, tab="messages")
         ):
             req.context["set_suggested_prompts"] = AsyncSetSuggestedPrompts(
                 client=req.context.client,

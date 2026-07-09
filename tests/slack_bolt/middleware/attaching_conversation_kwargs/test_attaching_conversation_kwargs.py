@@ -59,6 +59,28 @@ file_share_im_message_event_body = build_payload(
     }
 )
 
+# Opening the Messages tab of App Home is in scope for set_suggested_prompts.
+app_home_opened_messages_event_body = build_payload(
+    {
+        "type": "app_home_opened",
+        "user": "W222",
+        "channel": "D111",
+        "tab": "messages",
+        "event_ts": "1726133700.887259",
+    }
+)
+
+# Opening the Home tab is NOT in scope: set_suggested_prompts should not be attached.
+app_home_opened_home_event_body = build_payload(
+    {
+        "type": "app_home_opened",
+        "user": "W222",
+        "channel": "D111",
+        "tab": "home",
+        "event_ts": "1726133700.887259",
+    }
+)
+
 
 class TestAttachingConversationKwargs:
     def test_assistant_event_attaches_kwargs(self):
@@ -98,18 +120,14 @@ class TestAttachingConversationKwargs:
 
         assert resp.status == 200
         assert "set_suggested_prompts" in req.context
-        # set_title is assistant-thread-only; a top-level DM is not an assistant thread
         assert "set_title" not in req.context
-        # say/get_thread_context/save_thread_context remain assistant-only
         assert "say" not in req.context
         assert "get_thread_context" not in req.context
         assert "save_thread_context" not in req.context
-        # set_status / say_stream are attached whenever a ts is resolvable
         assert "say_stream" in req.context
         assert "set_status" in req.context
 
     def test_bot_dm_attaches_suggested_prompts(self):
-        # set_suggested_prompts is intentionally attached for any IM message, including bot-authored DMs.
         middleware = AttachingConversationKwargs()
         req = BoltRequest(body=bot_im_message_event_body, mode="socket_mode")
         req.context["client"] = WebClient(token="xoxb-test")
@@ -120,7 +138,6 @@ class TestAttachingConversationKwargs:
         assert "set_suggested_prompts" in req.context
 
     def test_file_share_dm_attaches_suggested_prompts(self):
-        # A file_share DM is in scope for set_suggested_prompts.
         middleware = AttachingConversationKwargs()
         req = BoltRequest(body=file_share_im_message_event_body, mode="socket_mode")
         req.context["client"] = WebClient(token="xoxb-test")
@@ -129,6 +146,30 @@ class TestAttachingConversationKwargs:
 
         assert resp.status == 200
         assert "set_suggested_prompts" in req.context
+
+    def test_app_home_opened_messages_tab_attaches_suggested_prompts(self):
+        middleware = AttachingConversationKwargs()
+        req = BoltRequest(body=app_home_opened_messages_event_body, mode="socket_mode")
+        req.context["client"] = WebClient(token="xoxb-test")
+
+        resp = middleware.process(req=req, resp=BoltResponse(status=404), next=next)
+
+        assert resp.status == 200
+        assert "set_suggested_prompts" in req.context
+        assert "say" not in req.context
+        assert "set_title" not in req.context
+        assert "get_thread_context" not in req.context
+        assert "save_thread_context" not in req.context
+
+    def test_app_home_opened_home_tab_does_not_attach_suggested_prompts(self):
+        middleware = AttachingConversationKwargs()
+        req = BoltRequest(body=app_home_opened_home_event_body, mode="socket_mode")
+        req.context["client"] = WebClient(token="xoxb-test")
+
+        resp = middleware.process(req=req, resp=BoltResponse(status=404), next=next)
+
+        assert resp.status == 200
+        assert "set_suggested_prompts" not in req.context
 
     def test_non_assistant_event_does_not_attach_kwargs(self):
         middleware = AttachingConversationKwargs()

@@ -7,6 +7,7 @@ from slack_bolt.context.set_suggested_prompts.set_suggested_prompts import SetSu
 from slack_bolt.middleware import Middleware
 from slack_bolt.context.assistant.assistant_utilities import AssistantUtilities
 from slack_bolt.request.payload_utils import (
+    is_app_home_opened_event,
     is_assistant_event,
     is_assistant_thread_context_changed_event,
     is_assistant_thread_started_event,
@@ -47,6 +48,7 @@ class AttachingConversationKwargs(Middleware):
             is_im_message_event(req.body)
             or is_assistant_thread_started_event(req.body)
             or is_assistant_thread_context_changed_event(req.body)
+            or is_app_home_opened_event(req.body, tab="messages")
         ):
             req.context["set_suggested_prompts"] = SetSuggestedPrompts(
                 client=req.context.client,

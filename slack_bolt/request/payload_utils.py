@@ -71,6 +71,14 @@ def is_assistant_thread_context_changed_event(body: Dict[str, Any]) -> bool:
     return False
 
 
+def is_app_home_opened_event(body: Dict[str, Any], tab: Optional[str] = None) -> bool:
+    if is_event(body) and body["event"]["type"] == "app_home_opened":
+        if tab is not None:
+            return body["event"].get("tab") == tab
+        return True
+    return False
+
+
 def is_user_message_event_in_assistant_thread(body: Dict[str, Any]) -> bool:
     if is_im_message_event(body):
         return body["event"].get("thread_ts") is not None and body["event"].get("bot_id") is None

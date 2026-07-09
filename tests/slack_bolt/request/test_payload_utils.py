@@ -6,6 +6,7 @@ from slack_bolt.request.payload_utils import (
     is_assistant_event,
     is_assistant_thread_started_event,
     is_assistant_thread_context_changed_event,
+    is_app_home_opened_event,
     is_user_message_event_in_assistant_thread,
     is_bot_message_event_in_assistant_thread,
     is_other_message_sub_event_in_assistant_thread,
@@ -93,6 +94,26 @@ im_message_no_thread_ts_body = build_payload(
         "channel": "D111",
         "event_ts": "1726133700.887259",
         "channel_type": "im",
+    }
+)
+
+app_home_opened_messages_body = build_payload(
+    {
+        "type": "app_home_opened",
+        "user": "W222",
+        "channel": "D111",
+        "tab": "messages",
+        "event_ts": "1726133700.887259",
+    }
+)
+
+app_home_opened_home_body = build_payload(
+    {
+        "type": "app_home_opened",
+        "user": "W222",
+        "channel": "D111",
+        "tab": "home",
+        "event_ts": "1726133700.887259",
     }
 )
 
@@ -363,3 +384,25 @@ class TestPayloadUtils:
             assert not is_assistant_thread_context_changed_event(
                 body
             ), f"{key} should NOT pass {is_assistant_thread_context_changed_event.__name__}"
+
+    def test_is_app_home_opened_event(self):
+        assert is_app_home_opened_event(app_home_opened_messages_body)
+        assert is_app_home_opened_event(app_home_opened_home_body)
+
+        assert is_app_home_opened_event(app_home_opened_messages_body, tab="messages")
+        assert not is_app_home_opened_event(app_home_opened_home_body, tab="messages")
+
+        negatives = {
+            "thread_started": thread_started_event_body,
+            "thread_context_changed": thread_context_changed_event_body,
+            "user_message_im": user_message_event_body,
+            "channel_user_message": channel_user_message_event_body,
+            "reaction_added": reaction_added_event_body,
+            "block_actions": block_actions_body,
+            "empty_dict": {},
+        }
+        for key, body in negatives.items():
+            assert not is_app_home_opened_event(body), f"{key} should NOT pass {is_app_home_opened_event.__name__}"
+            assert not is_app_home_opened_event(
+                body, tab="messages"
+            ), f"{key} should NOT pass {is_app_home_opened_event.__name__} with tab='messages'"
