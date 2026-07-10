@@ -8,6 +8,7 @@ import warnings
 from aiohttp import web
 
 from slack_bolt.app.async_server import AsyncSlackAppServer
+from slack_bolt.app.listener_registry import ListenerRegistry
 from slack_bolt.context.assistant.thread_context_store.async_store import (
     AsyncAssistantThreadContextStore,
 )
@@ -360,7 +361,7 @@ class AsyncApp:
         # --------------------------------------
 
         self._async_middleware_list: List[AsyncMiddleware] = []
-        self._async_listeners: List[AsyncListener] = []
+        self._async_listeners: ListenerRegistry[AsyncListener] = ListenerRegistry()
 
         self._assistant_thread_context_store = assistant_thread_context_store
         self._attaching_conversation_kwargs_enabled = attaching_conversation_kwargs_enabled
@@ -723,8 +724,22 @@ class AsyncApp:
                 raise BoltError(f"Unexpected type for a middleware ({type(middleware_or_callable)})")
         return None
 
-    def assistant(self, assistant: AsyncAssistant) -> Optional[Callable]:
-        return self.middleware(assistant)
+    def _register_assistant_listeners(self, assistant: AsyncAssistant) -> None:
+        if assistant.thread_context_store is not None:
+            self._assistant_thread_context_store = assistant.thread_context_store
+
+        def register_listener(listener: AsyncListener) -> None:
+            self._async_listeners.append_assistant(listener)
+
+        assistant._register_app_listeners(register_listener)
+
+    def assistant(self, assistant: AsyncAssistant, mode: str = "middleware") -> Optional[Callable]:
+        if mode == "middleware":
+            return self.middleware(assistant)
+        if mode == "listeners":
+            self._register_assistant_listeners(assistant)
+            return None
+        raise BoltError(f"Unsupported Assistant registration mode ({mode})")
 
     # -------------------------
     # Workflows: Steps from apps

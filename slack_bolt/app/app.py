@@ -20,6 +20,7 @@ from slack_bolt.authorization.authorize import (
     CallableAuthorize,
 )
 
+from slack_bolt.app.listener_registry import ListenerRegistry
 from slack_bolt.context.assistant.thread_context_store.store import AssistantThreadContextStore
 
 from slack_bolt.error import BoltError, BoltUnhandledRequestError
@@ -348,7 +349,7 @@ class App:
         # --------------------------------------
 
         self._middleware_list: List[Middleware] = []
-        self._listeners: List[Listener] = []
+        self._listeners: ListenerRegistry[Listener] = ListenerRegistry()
 
         if listener_executor is None:
             listener_executor = ThreadPoolExecutor(max_workers=5)
@@ -696,11 +697,25 @@ class App:
                 raise BoltError(f"Unexpected type for a middleware ({type(middleware_or_callable)})")
         return None
 
+    def _register_assistant_listeners(self, assistant: Assistant) -> None:
+        if assistant.thread_context_store is not None:
+            self._assistant_thread_context_store = assistant.thread_context_store
+
+        def register_listener(listener: Listener) -> None:
+            self._listeners.append_assistant(listener)
+
+        assistant._register_app_listeners(register_listener)
+
     # -------------------------
     # AI Agents & Assistants
 
-    def assistant(self, assistant: Assistant) -> Optional[Callable]:
-        return self.middleware(assistant)
+    def assistant(self, assistant: Assistant, mode: str = "middleware") -> Optional[Callable]:
+        if mode == "middleware":
+            return self.middleware(assistant)
+        if mode == "listeners":
+            self._register_assistant_listeners(assistant)
+            return None
+        raise BoltError(f"Unsupported Assistant registration mode ({mode})")
 
     # -------------------------
     # Workflows: Steps from apps
