@@ -1,11 +1,15 @@
 from slack_bolt.request.payload_utils import (
     is_event,
-    is_user_message_event_in_assistant_thread,
-    is_bot_message_event_in_assistant_thread,
-    is_other_message_sub_event_in_assistant_thread,
+    is_message_event,
+    is_any_im_message_event,
+    is_im_message_event,
     is_assistant_event,
     is_assistant_thread_started_event,
     is_assistant_thread_context_changed_event,
+    is_app_home_opened_event,
+    is_user_message_event_in_assistant_thread,
+    is_bot_message_event_in_assistant_thread,
+    is_other_message_sub_event_in_assistant_thread,
 )
 from tests.scenario_tests.test_events_assistant import (
     build_payload,
@@ -93,6 +97,26 @@ im_message_no_thread_ts_body = build_payload(
     }
 )
 
+app_home_opened_messages_body = build_payload(
+    {
+        "type": "app_home_opened",
+        "user": "W222",
+        "channel": "D111",
+        "tab": "messages",
+        "event_ts": "1726133700.887259",
+    }
+)
+
+app_home_opened_home_body = build_payload(
+    {
+        "type": "app_home_opened",
+        "user": "W222",
+        "channel": "D111",
+        "tab": "home",
+        "event_ts": "1726133700.887259",
+    }
+)
+
 slash_command_body = {
     "token": "verification_token",
     "command": "/test",
@@ -111,6 +135,85 @@ slash_command_body = {
 
 
 class TestPayloadUtils:
+    def test_is_message_event(self):
+        positives = {
+            "user_message_im": user_message_event_body,
+            "user_message_im_with_assistant_thread": user_message_event_body_with_assistant_thread,
+            "message_changed_im": message_changed_event_body,
+            "channel_user_message": channel_user_message_event_body,
+            "channel_message_changed": channel_message_changed_event_body,
+            "bot_message_channel": bot_message_event_payload,
+            "classic_bot_message_channel": classic_bot_message_event_payload,
+            "message_deleted_channel": message_deleted_channel_body,
+            "file_share_im": file_share_im_message_body,
+            "bot_im_thread": bot_im_thread_message_body,
+            "im_no_thread_ts": im_message_no_thread_ts_body,
+        }
+        negatives = {
+            "thread_started": thread_started_event_body,
+            "thread_context_changed": thread_context_changed_event_body,
+            "reaction_added": reaction_added_event_body,
+            "block_actions": block_actions_body,
+            "slash_command": slash_command_body,
+            "empty_dict": {},
+        }
+        for key, body in positives.items():
+            assert is_message_event(body), f"{key} should be recognized as a message event"
+        for key, body in negatives.items():
+            assert not is_message_event(body), f"{key} should NOT be recognized as a message event"
+
+    def test_is_any_im_message_event(self):
+        positives = {
+            "user_message_im": user_message_event_body,
+            "user_message_im_with_assistant_thread": user_message_event_body_with_assistant_thread,
+            "message_changed_im": message_changed_event_body,
+            "file_share_im": file_share_im_message_body,
+            "bot_im_thread": bot_im_thread_message_body,
+            "im_no_thread_ts": im_message_no_thread_ts_body,
+        }
+        negatives = {
+            "channel_user_message": channel_user_message_event_body,
+            "channel_message_changed": channel_message_changed_event_body,
+            "bot_message_channel": bot_message_event_payload,
+            "classic_bot_message_channel": classic_bot_message_event_payload,
+            "message_deleted_channel": message_deleted_channel_body,
+            "thread_started": thread_started_event_body,
+            "thread_context_changed": thread_context_changed_event_body,
+            "reaction_added": reaction_added_event_body,
+            "block_actions": block_actions_body,
+            "slash_command": slash_command_body,
+        }
+        for key, body in positives.items():
+            assert is_any_im_message_event(body), f"{key} should pass {is_any_im_message_event.__name__}"
+        for key, body in negatives.items():
+            assert not is_any_im_message_event(body), f"{key} should NOT pass {is_any_im_message_event.__name__}"
+
+    def test_is_im_message_event(self):
+        # subtype must be None or "file_share" to pass
+        positives = {
+            "user_message_im": user_message_event_body,
+            "user_message_im_with_assistant_thread": user_message_event_body_with_assistant_thread,
+            "file_share_im": file_share_im_message_body,
+            "bot_im_thread": bot_im_thread_message_body,
+            "im_no_thread_ts": im_message_no_thread_ts_body,
+        }
+        negatives = {
+            "message_changed_im": message_changed_event_body,
+            "channel_user_message": channel_user_message_event_body,
+            "channel_message_changed": channel_message_changed_event_body,
+            "classic_bot_message_channel": classic_bot_message_event_payload,
+            "bot_message_channel": bot_message_event_payload,
+            "message_deleted_channel": message_deleted_channel_body,
+            "thread_started": thread_started_event_body,
+            "thread_context_changed": thread_context_changed_event_body,
+            "reaction_added": reaction_added_event_body,
+            "block_actions": block_actions_body,
+        }
+        for key, body in positives.items():
+            assert is_im_message_event(body), f"{key} should pass {is_im_message_event.__name__}"
+        for key, body in negatives.items():
+            assert not is_im_message_event(body), f"{key} should NOT pass {is_im_message_event.__name__}"
+
     def test_is_event(self):
         positives = {
             "thread_started": thread_started_event_body,
@@ -281,3 +384,25 @@ class TestPayloadUtils:
             assert not is_assistant_thread_context_changed_event(
                 body
             ), f"{key} should NOT pass {is_assistant_thread_context_changed_event.__name__}"
+
+    def test_is_app_home_opened_event(self):
+        assert is_app_home_opened_event(app_home_opened_messages_body)
+        assert is_app_home_opened_event(app_home_opened_home_body)
+
+        assert is_app_home_opened_event(app_home_opened_messages_body, tab="messages")
+        assert not is_app_home_opened_event(app_home_opened_home_body, tab="messages")
+
+        negatives = {
+            "thread_started": thread_started_event_body,
+            "thread_context_changed": thread_context_changed_event_body,
+            "user_message_im": user_message_event_body,
+            "channel_user_message": channel_user_message_event_body,
+            "reaction_added": reaction_added_event_body,
+            "block_actions": block_actions_body,
+            "empty_dict": {},
+        }
+        for key, body in negatives.items():
+            assert not is_app_home_opened_event(body), f"{key} should NOT pass {is_app_home_opened_event.__name__}"
+            assert not is_app_home_opened_event(
+                body, tab="messages"
+            ), f"{key} should NOT pass {is_app_home_opened_event.__name__} with tab='messages'"
