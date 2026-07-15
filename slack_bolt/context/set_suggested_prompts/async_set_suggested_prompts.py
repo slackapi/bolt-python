@@ -7,13 +7,13 @@ from slack_sdk.web.async_slack_response import AsyncSlackResponse
 class AsyncSetSuggestedPrompts:
     client: AsyncWebClient
     channel_id: str
-    thread_ts: str
+    thread_ts: Optional[str]
 
     def __init__(
         self,
         client: AsyncWebClient,
         channel_id: str,
-        thread_ts: str,
+        thread_ts: Optional[str] = None,
     ):
         self.client = client
         self.channel_id = channel_id
@@ -23,6 +23,7 @@ class AsyncSetSuggestedPrompts:
         self,
         prompts: Sequence[Union[str, Dict[str, str]]],
         title: Optional[str] = None,
+        thread_ts: Optional[str] = None,
     ) -> AsyncSlackResponse:
         prompts_arg: List[Dict[str, str]] = []
         for prompt in prompts:
@@ -33,7 +34,7 @@ class AsyncSetSuggestedPrompts:
 
         return await self.client.assistant_threads_setSuggestedPrompts(
             channel_id=self.channel_id,
-            thread_ts=self.thread_ts,
+            thread_ts=thread_ts if thread_ts is not None else self.thread_ts,
             prompts=prompts_arg,
             title=title,
         )
