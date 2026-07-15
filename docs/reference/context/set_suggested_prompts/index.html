@@ -59,7 +59,7 @@ el.replaceWith(d);
 <dl>
 <dt id="slack_bolt.context.set_suggested_prompts.SetSuggestedPrompts"><code class="flex name class">
 <span>class <span class="ident">SetSuggestedPrompts</span></span>
-<span>(</span><span>client: slack_sdk.web.client.WebClient, channel_id: str, thread_ts: str)</span>
+<span>(</span><span>client: slack_sdk.web.client.WebClient,<br>channel_id: str,<br>thread_ts: str | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -69,13 +69,13 @@ el.replaceWith(d);
 <pre><code class="python">class SetSuggestedPrompts:
     client: WebClient
     channel_id: str
-    thread_ts: str
+    thread_ts: Optional[str]
 
     def __init__(
         self,
         client: WebClient,
         channel_id: str,
-        thread_ts: str,
+        thread_ts: Optional[str] = None,
     ):
         self.client = client
         self.channel_id = channel_id
@@ -85,6 +85,7 @@ el.replaceWith(d);
         self,
         prompts: Sequence[Union[str, Dict[str, str]]],
         title: Optional[str] = None,
+        thread_ts: Optional[str] = None,
     ) -&gt; SlackResponse:
         prompts_arg: List[Dict[str, str]] = []
         for prompt in prompts:
@@ -95,7 +96,7 @@ el.replaceWith(d);
 
         return self.client.assistant_threads_setSuggestedPrompts(
             channel_id=self.channel_id,
-            thread_ts=self.thread_ts,
+            thread_ts=thread_ts if thread_ts is not None else self.thread_ts,
             prompts=prompts_arg,
             title=title,
         )</code></pre>
@@ -111,7 +112,7 @@ el.replaceWith(d);
 <dd>
 <div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
-<dt id="slack_bolt.context.set_suggested_prompts.SetSuggestedPrompts.thread_ts"><code class="name">var <span class="ident">thread_ts</span> : str</code></dt>
+<dt id="slack_bolt.context.set_suggested_prompts.SetSuggestedPrompts.thread_ts"><code class="name">var <span class="ident">thread_ts</span> : str | None</code></dt>
 <dd>
 <div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
