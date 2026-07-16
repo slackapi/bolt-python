@@ -1,3 +1,8 @@
 # pip install -r requirements/test.txt
+
+# pytest
 pytest<9.2
-pytest-cov>=7.1.0,<8; python_version>="3.14"  # only needed to evaluate coverage on the latest supported python version
+
+# pytest-cov
+# Note: only needed to evaluate coverage on the latest supported python version
+pytest-cov>=7.1.0,<8; python_version >= "3.14"
