@@ -1,6 +1,11 @@
 # pip install -r requirements/test_async.txt
 -r test.txt
 -r async_dev.txt
-asgiref>=3.7.2,<3.8; python_version<"3.9"
-asgiref>=3.11.1,<4; python_version>="3.9"
-pytest-asyncio<2;
+
+# asgiref
+# Note: asgiref 3.11.1 requires Python >=3.9; 3.7/3.8 stay on the older pinned release.
+asgiref>=3.7.2,<3.8; python_version < "3.9"
+asgiref>=3.11.1,<4; python_version >= "3.9"
+
+# pytest-asyncio
+pytest-asyncio<2

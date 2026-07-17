@@ -1,4 +1,12 @@
 # pip install -r requirements/test_adapter.txt
-moto>=3,<6                               # For AWS tests
-boddle>=0.2.9,<0.3                         # For Bottle app tests
+
+# moto
+# Note: for AWS tests
+moto>=3,<6
+
+# boddle
+# Note: for Bottle app tests
+boddle>=0.2.9,<0.3
+
+# sanic-testing
 sanic-testing>=0.7
