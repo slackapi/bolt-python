@@ -86,27 +86,9 @@ el.replaceWith(d);
             # When moving this code to Bolt internals, no need to raise an exception for this pattern
             raise ValueError(f&#34;Cannot instantiate Assistant for this event pattern ({self.payload})&#34;)
 
-    def is_valid(self) -&gt; bool:
-        return self.channel_id is not None and self.thread_ts is not None
-
-    @property
-    def set_status(self) -&gt; AsyncSetStatus:
-        warnings.warn(
-            &#34;AsyncAssistantUtilities.set_status is deprecated. &#34;
-            &#34;Use the set_status argument directly in your listener function &#34;
-            &#34;or access it via context.set_status instead.&#34;,
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return AsyncSetStatus(self.client, self.channel_id, self.thread_ts)
-
     @property
     def set_title(self) -&gt; AsyncSetTitle:
         return AsyncSetTitle(self.client, self.channel_id, self.thread_ts)
-
-    @property
-    def set_suggested_prompts(self) -&gt; AsyncSetSuggestedPrompts:
-        return AsyncSetSuggestedPrompts(self.client, self.channel_id, self.thread_ts)
 
     @property
     def say(self) -&gt; AsyncSay:
@@ -198,37 +180,6 @@ def say(self) -&gt; AsyncSay:
 </details>
 <div class="desc"></div>
 </dd>
-<dt id="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.set_status"><code class="name">prop <span class="ident">set_status</span> : <a title="slack_bolt.context.set_status.async_set_status.AsyncSetStatus" href="../set_status/async_set_status.html#slack_bolt.context.set_status.async_set_status.AsyncSetStatus">AsyncSetStatus</a></code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@property
-def set_status(self) -&gt; AsyncSetStatus:
-    warnings.warn(
-        &#34;AsyncAssistantUtilities.set_status is deprecated. &#34;
-        &#34;Use the set_status argument directly in your listener function &#34;
-        &#34;or access it via context.set_status instead.&#34;,
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    return AsyncSetStatus(self.client, self.channel_id, self.thread_ts)</code></pre>
-</details>
-<div class="desc"></div>
-</dd>
-<dt id="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.set_suggested_prompts"><code class="name">prop <span class="ident">set_suggested_prompts</span> : <a title="slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts.AsyncSetSuggestedPrompts" href="../set_suggested_prompts/async_set_suggested_prompts.html#slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts.AsyncSetSuggestedPrompts">AsyncSetSuggestedPrompts</a></code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@property
-def set_suggested_prompts(self) -&gt; AsyncSetSuggestedPrompts:
-    return AsyncSetSuggestedPrompts(self.client, self.channel_id, self.thread_ts)</code></pre>
-</details>
-<div class="desc"></div>
-</dd>
 <dt id="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.set_title"><code class="name">prop <span class="ident">set_title</span> : <a title="slack_bolt.context.set_title.async_set_title.AsyncSetTitle" href="../set_title/async_set_title.html#slack_bolt.context.set_title.async_set_title.AsyncSetTitle">AsyncSetTitle</a></code></dt>
 <dd>
 <details class="source">
@@ -238,22 +189,6 @@ def set_suggested_prompts(self) -&gt; AsyncSetSuggestedPrompts:
 <pre><code class="python">@property
 def set_title(self) -&gt; AsyncSetTitle:
     return AsyncSetTitle(self.client, self.channel_id, self.thread_ts)</code></pre>
-</details>
-<div class="desc"></div>
-</dd>
-</dl>
-<h3>Methods</h3>
-<dl>
-<dt id="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.is_valid"><code class="name flex">
-<span>def <span class="ident">is_valid</span></span>(<span>self) ‑> bool</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_valid(self) -&gt; bool:
-    return self.channel_id is not None and self.thread_ts is not None</code></pre>
 </details>
 <div class="desc"></div>
 </dd>
@@ -280,12 +215,9 @@ def set_title(self) -&gt; AsyncSetTitle:
 <li><code><a title="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.channel_id" href="#slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.channel_id">channel_id</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.client" href="#slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.client">client</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.get_thread_context" href="#slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.get_thread_context">get_thread_context</a></code></li>
-<li><code><a title="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.is_valid" href="#slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.is_valid">is_valid</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.payload" href="#slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.payload">payload</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.save_thread_context" href="#slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.save_thread_context">save_thread_context</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.say" href="#slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.say">say</a></code></li>
-<li><code><a title="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.set_status" href="#slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.set_status">set_status</a></code></li>
-<li><code><a title="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.set_suggested_prompts" href="#slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.set_suggested_prompts">set_suggested_prompts</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.set_title" href="#slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.set_title">set_title</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.thread_context_store" href="#slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.thread_context_store">thread_context_store</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.thread_ts" href="#slack_bolt.context.assistant.async_assistant_utilities.AsyncAssistantUtilities.thread_ts">thread_ts</a></code></li>

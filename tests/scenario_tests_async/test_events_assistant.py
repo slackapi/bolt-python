@@ -483,7 +483,7 @@ channel_user_message_event_body = build_payload(
         "user_profile": {},
         "thread_ts": "1726133698.626339",
         "parent_user_id": "W222",
-        "channel": "D111",
+        "channel": "C111",
         "event_ts": "1726133700.887259",
         "channel_type": "channel",
     }
@@ -518,7 +518,7 @@ channel_message_changed_event_body = build_payload(
             "reply_users": ["U222", "W111"],
             "is_locked": False,
         },
-        "channel": "D111",
+        "channel": "C111",
         "hidden": True,
         "ts": "1726133701.028300",
         "event_ts": "1726133701.028300",

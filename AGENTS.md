@@ -214,6 +214,8 @@ The core package has a **single required runtime dependency**: `slack_sdk` (defi
 
 When adding a new dependency: add it to the appropriate `requirements/*.txt` file with version constraints, never to `pyproject.toml` `dependencies` (unless it's a core runtime dep, which is very rare).
 
+Before adding, bumping, pinning, or reviewing any dependency in `requirements/*.txt` -- whether a Dependabot PR or a manual edit -- follow the `managing-dependencies` skill in `.claude/skills/`. It defines the layout and `python_version` marker conventions that keep one set of pins working across the full CPython 3.7--3.14 matrix.
+
 ## Test Organization and CI
 
 ### Directory Structure

@@ -1,4 +1,16 @@
 # pip install -r requirements/test_adapter.txt
-moto>=3,<6                               # For AWS tests
-boddle>=0.2.9,<0.3                         # For Bottle app tests
+
+# moto
+# Note: for AWS tests
+# Note: moto drops old Pythons across the 5.x line — 5.0.0 requires >=3.8, 5.1.0 >=3.9, 5.2.0 >=3.10; older interpreters stay on the last compatible release.
+moto>=3,<5; python_version < "3.8"
+moto>=3,<5.1; python_version >= "3.8" and python_version < "3.9"
+moto>=3,<5.2; python_version >= "3.9" and python_version < "3.10"
+moto>=5.2.2,<6; python_version >= "3.10"
+
+# boddle
+# Note: for Bottle app tests
+boddle>=0.2.9,<0.3
+
+# sanic-testing
 sanic-testing>=0.7
