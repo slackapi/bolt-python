@@ -63,6 +63,39 @@ el.replaceWith(d);
 </details>
 <div class="desc"></div>
 </dd>
+<dt id="slack_bolt.request.payload_utils.is_any_im_message_event"><code class="name flex">
+<span>def <span class="ident">is_any_im_message_event</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_any_im_message_event(body: Dict[str, Any]) -&gt; bool:
+    if is_message_event(body):
+        # Any message event with no subtype or any subtype (message_changed, message_deleted, etc.)
+        return body[&#34;event&#34;].get(&#34;channel_type&#34;) == &#34;im&#34;
+    return False</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.request.payload_utils.is_app_home_opened_event"><code class="name flex">
+<span>def <span class="ident">is_app_home_opened_event</span></span>(<span>body: Dict[str, Any], tab: str | None = None) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_app_home_opened_event(body: Dict[str, Any], tab: Optional[str] = None) -&gt; bool:
+    if is_event(body) and body[&#34;event&#34;][&#34;type&#34;] == &#34;app_home_opened&#34;:
+        if tab is not None:
+            return body[&#34;event&#34;].get(&#34;tab&#34;) == tab
+        return True
+    return False</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
 <dt id="slack_bolt.request.payload_utils.is_assistant_event"><code class="name flex">
 <span>def <span class="ident">is_assistant_event</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
 </code></dt>
@@ -159,10 +192,9 @@ el.replaceWith(d);
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_bot_message_event_in_assistant_thread(body: Dict[str, Any]) -&gt; bool:
-    if is_event(body):
+    if is_any_im_message_event(body):
         return (
-            is_message_event_in_assistant_thread(body)
-            and body[&#34;event&#34;].get(&#34;subtype&#34;) is None
+            body[&#34;event&#34;].get(&#34;subtype&#34;) is None
             and body[&#34;event&#34;].get(&#34;thread_ts&#34;) is not None
             and body[&#34;event&#34;].get(&#34;bot_id&#34;) is not None
         )
@@ -248,17 +280,32 @@ el.replaceWith(d);
 </details>
 <div class="desc"></div>
 </dd>
-<dt id="slack_bolt.request.payload_utils.is_message_event_in_assistant_thread"><code class="name flex">
-<span>def <span class="ident">is_message_event_in_assistant_thread</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
+<dt id="slack_bolt.request.payload_utils.is_im_message_event"><code class="name flex">
+<span>def <span class="ident">is_im_message_event</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def is_message_event_in_assistant_thread(body: Dict[str, Any]) -&gt; bool:
+<pre><code class="python">def is_im_message_event(body: Dict[str, Any]) -&gt; bool:
+    if is_any_im_message_event(body):
+        return body[&#34;event&#34;].get(&#34;subtype&#34;) in (None, &#34;file_share&#34;)
+    return False</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="slack_bolt.request.payload_utils.is_message_event"><code class="name flex">
+<span>def <span class="ident">is_message_event</span></span>(<span>body: Dict[str, Any]) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_message_event(body: Dict[str, Any]) -&gt; bool:
     if is_event(body):
-        return body[&#34;event&#34;][&#34;type&#34;] == &#34;message&#34; and body[&#34;event&#34;].get(&#34;channel_type&#34;) == &#34;im&#34;
+        return body[&#34;event&#34;][&#34;type&#34;] == &#34;message&#34;
     return False</code></pre>
 </details>
 <div class="desc"></div>
@@ -299,14 +346,10 @@ el.replaceWith(d);
 </summary>
 <pre><code class="python">def is_other_message_sub_event_in_assistant_thread(body: Dict[str, Any]) -&gt; bool:
     # message_changed, message_deleted etc.
-    if is_event(body):
-        return (
-            is_message_event_in_assistant_thread(body)
-            and not is_user_message_event_in_assistant_thread(body)
-            and (
-                _is_other_message_sub_event(body[&#34;event&#34;].get(&#34;message&#34;))
-                or _is_other_message_sub_event(body[&#34;event&#34;].get(&#34;previous_message&#34;))
-            )
+    if is_any_im_message_event(body):
+        return not is_user_message_event_in_assistant_thread(body) and (
+            _is_other_message_sub_event(body[&#34;event&#34;].get(&#34;message&#34;))
+            or _is_other_message_sub_event(body[&#34;event&#34;].get(&#34;previous_message&#34;))
         )
     return False</code></pre>
 </details>
@@ -347,13 +390,8 @@ el.replaceWith(d);
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_user_message_event_in_assistant_thread(body: Dict[str, Any]) -&gt; bool:
-    if is_event(body):
-        return (
-            is_message_event_in_assistant_thread(body)
-            and body[&#34;event&#34;].get(&#34;subtype&#34;) in (None, &#34;file_share&#34;)
-            and body[&#34;event&#34;].get(&#34;thread_ts&#34;) is not None
-            and body[&#34;event&#34;].get(&#34;bot_id&#34;) is None
-        )
+    if is_im_message_event(body):
+        return body[&#34;event&#34;].get(&#34;thread_ts&#34;) is not None and body[&#34;event&#34;].get(&#34;bot_id&#34;) is None
     return False</code></pre>
 </details>
 <div class="desc"></div>
@@ -491,7 +529,7 @@ el.replaceWith(d);
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def to_message(body: Dict[str, Any]) -&gt; Optional[Dict[str, Any]]:
-    if is_event(body) and body[&#34;event&#34;][&#34;type&#34;] == &#34;message&#34;:
+    if is_message_event(body):
         return to_event(body)
     return None</code></pre>
 </details>
@@ -582,6 +620,8 @@ el.replaceWith(d);
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="slack_bolt.request.payload_utils.is_action" href="#slack_bolt.request.payload_utils.is_action">is_action</a></code></li>
+<li><code><a title="slack_bolt.request.payload_utils.is_any_im_message_event" href="#slack_bolt.request.payload_utils.is_any_im_message_event">is_any_im_message_event</a></code></li>
+<li><code><a title="slack_bolt.request.payload_utils.is_app_home_opened_event" href="#slack_bolt.request.payload_utils.is_app_home_opened_event">is_app_home_opened_event</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_assistant_event" href="#slack_bolt.request.payload_utils.is_assistant_event">is_assistant_event</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_assistant_thread_context_changed_event" href="#slack_bolt.request.payload_utils.is_assistant_thread_context_changed_event">is_assistant_thread_context_changed_event</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_assistant_thread_started_event" href="#slack_bolt.request.payload_utils.is_assistant_thread_started_event">is_assistant_thread_started_event</a></code></li>
@@ -595,7 +635,8 @@ el.replaceWith(d);
 <li><code><a title="slack_bolt.request.payload_utils.is_event" href="#slack_bolt.request.payload_utils.is_event">is_event</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_function" href="#slack_bolt.request.payload_utils.is_function">is_function</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_global_shortcut" href="#slack_bolt.request.payload_utils.is_global_shortcut">is_global_shortcut</a></code></li>
-<li><code><a title="slack_bolt.request.payload_utils.is_message_event_in_assistant_thread" href="#slack_bolt.request.payload_utils.is_message_event_in_assistant_thread">is_message_event_in_assistant_thread</a></code></li>
+<li><code><a title="slack_bolt.request.payload_utils.is_im_message_event" href="#slack_bolt.request.payload_utils.is_im_message_event">is_im_message_event</a></code></li>
+<li><code><a title="slack_bolt.request.payload_utils.is_message_event" href="#slack_bolt.request.payload_utils.is_message_event">is_message_event</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_message_shortcut" href="#slack_bolt.request.payload_utils.is_message_shortcut">is_message_shortcut</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_options" href="#slack_bolt.request.payload_utils.is_options">is_options</a></code></li>
 <li><code><a title="slack_bolt.request.payload_utils.is_other_message_sub_event_in_assistant_thread" href="#slack_bolt.request.payload_utils.is_other_message_sub_event_in_assistant_thread">is_other_message_sub_event_in_assistant_thread</a></code></li>

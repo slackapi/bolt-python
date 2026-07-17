@@ -1,34 +1,76 @@
 # pip install -r requirements/adapter_dev.txt
-# NOTE: any of async ones requires pip install -r requirements/async_dev.txt too
-# used only under slack_bolt/adapter
+# Note: any of the async ones requires pip install -r requirements/async_dev.txt too
+# Note: used only under slack_bolt/adapter
+
+# boto3
 boto3<=2
+
+# bottle
 bottle>=0.12,<1
-chalice>=1.28,<1.31; python_version<"3.9"
-chalice>=1.32.0,<2; python_version>="3.9"
+
+# chalice
+chalice>=1.28,<1.31; python_version < "3.9"
+chalice>=1.32.0,<2; python_version >= "3.9"
+
+# cheroot
 cheroot<12
+
+# CherryPy
 CherryPy>=18.10.0,<19
-Django>=3.2,<4; python_version<"3.8"
-Django>=4.2.30,<6; python_version>="3.8"
-falcon>=2,<4; python_version<"3.9"
-falcon>=4.2.0,<5; python_version>="3.9"
-fastapi>=0.70.0,<1; python_version<"3.9"
-fastapi>=0.128.8,<1; python_version>="3.9"
-Flask>=1,<4; python_version<"3.9"
-Flask>=3.1.3,<4; python_version>="3.9"
-Werkzeug>=2,<3; python_version<"3.9"
-Werkzeug>=3.1.8,<4; python_version>="3.9"
-pyramid>=1,<3
-setuptools<82  # Pinned: Pyramid depends on pkg_resources (deprecated in setuptools 67.5.0, removed in 82+). See: https://github.com/Pylons/pyramid/issues/3731
 
-# Sanic and its dependencies
-# Note: Sanic imports tracerite with wild card versions
-tracerite<1.1.2; python_version<="3.8"  # older versions of python are not compatible with tracerite>1.1.2
-sanic>=21,<24; python_version<="3.8"
-sanic>=25.3.0,<26; python_version>"3.8"
+# Django
+# Note: Django 5.x requires Python >=3.10 and 4.x requires >=3.8, so 3.8/3.9 stay on the 4.2 LTS line and 3.7 stays on the 3.2 line.
+Django>=3.2,<4; python_version < "3.8"
+Django>=4.2.30,<5; python_version >= "3.8" and python_version < "3.10"
+Django>=5.2.15,<6; python_version >= "3.10"
 
-starlette>=0.19.1,<0.45; python_version<"3.9"
-starlette>=0.49.3,<1; python_version>="3.9"
-tornado>=6.2,<7; python_version<"3.9"
-tornado>=6.5.6,<7; python_version>="3.9"
-websocket_client>=1.2.3,<1.9; python_version<"3.9"  # Socket Mode 3rd party implementation
-websocket_client>=1.9.0,<2; python_version>="3.9"   # Socket Mode 3rd party implementation
+# falcon
+# Note: falcon 4.2.0 requires Python >=3.9; 3.7/3.8 stay on the older pinned release.
+falcon>=2,<4; python_version < "3.9"
+falcon>=4.2.0,<5; python_version >= "3.9"
+
+# fastapi
+# Note: fastapi 0.128.8 requires Python >=3.9; 3.7/3.8 stay on the older pinned release.
+fastapi>=0.70.0,<1; python_version < "3.9"
+fastapi>=0.128.8,<1; python_version >= "3.9"
+
+# Flask
+# Note: Flask 3.1.3 requires Python >=3.9; 3.7/3.8 stay on the older pinned release.
+Flask>=1,<4; python_version < "3.9"
+Flask>=3.1.3,<4; python_version >= "3.9"
+
+# Werkzeug
+# Note: Werkzeug 3.1.8 requires Python >=3.9; 3.7/3.8 stay on the older pinned release.
+Werkzeug>=2,<3; python_version < "3.9"
+Werkzeug>=3.1.8,<4; python_version >= "3.9"
+
+# pyramid
+# Note: pyramid 2.1 requires Python >=3.10; 3.7/3.8/3.9 stay on the last 2.0.x release.
+pyramid>=1,<2.1; python_version < "3.10"
+pyramid>=2.1,<3; python_version >= "3.10"
+
+# setuptools
+# Note: Pyramid depends on pkg_resources (deprecated in setuptools 67.5.0, removed in 82+). See: https://github.com/Pylons/pyramid/issues/3731
+setuptools<82
+
+# sanic
+# Note: Sanic pulls in tracerite via a wildcard version, so tracerite is co-pinned here.
+# Note: tracerite > 1.1.2 is incompatible with Python <= 3.8 and ships no requires_python, so an explicit ceiling is required.
+tracerite<1.1.2; python_version < "3.9"
+sanic>=21,<24; python_version < "3.9"
+sanic>=25.3.0,<26; python_version >= "3.9"
+
+# starlette
+# Note: starlette 0.49.3 requires Python >=3.9; 3.7/3.8 stay on the older pinned release.
+starlette>=0.19.1,<0.45; python_version < "3.9"
+starlette>=0.49.3,<1; python_version >= "3.9"
+
+# tornado
+# Note: tornado 6.5.6 requires Python >=3.9; 3.7/3.8 stay on the older pinned release.
+tornado>=6.2,<7; python_version < "3.9"
+tornado>=6.5.6,<7; python_version >= "3.9"
+
+# websocket_client
+# Note: Socket Mode 3rd party implementation
+websocket_client>=1.2.3,<1.9; python_version < "3.9"
+websocket_client>=1.9.0,<2; python_version >= "3.9"

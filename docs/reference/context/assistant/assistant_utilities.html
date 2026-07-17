@@ -86,27 +86,9 @@ el.replaceWith(d);
             # When moving this code to Bolt internals, no need to raise an exception for this pattern
             raise ValueError(f&#34;Cannot instantiate Assistant for this event pattern ({self.payload})&#34;)
 
-    def is_valid(self) -&gt; bool:
-        return self.channel_id is not None and self.thread_ts is not None
-
-    @property
-    def set_status(self) -&gt; SetStatus:
-        warnings.warn(
-            &#34;AssistantUtilities.set_status is deprecated. &#34;
-            &#34;Use the set_status argument directly in your listener function &#34;
-            &#34;or access it via context.set_status instead.&#34;,
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return SetStatus(self.client, self.channel_id, self.thread_ts)
-
     @property
     def set_title(self) -&gt; SetTitle:
         return SetTitle(self.client, self.channel_id, self.thread_ts)
-
-    @property
-    def set_suggested_prompts(self) -&gt; SetSuggestedPrompts:
-        return SetSuggestedPrompts(self.client, self.channel_id, self.thread_ts)
 
     @property
     def say(self) -&gt; Say:
@@ -204,37 +186,6 @@ def say(self) -&gt; Say:
 </details>
 <div class="desc"></div>
 </dd>
-<dt id="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.set_status"><code class="name">prop <span class="ident">set_status</span> : <a title="slack_bolt.context.set_status.set_status.SetStatus" href="../set_status/set_status.html#slack_bolt.context.set_status.set_status.SetStatus">SetStatus</a></code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@property
-def set_status(self) -&gt; SetStatus:
-    warnings.warn(
-        &#34;AssistantUtilities.set_status is deprecated. &#34;
-        &#34;Use the set_status argument directly in your listener function &#34;
-        &#34;or access it via context.set_status instead.&#34;,
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    return SetStatus(self.client, self.channel_id, self.thread_ts)</code></pre>
-</details>
-<div class="desc"></div>
-</dd>
-<dt id="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.set_suggested_prompts"><code class="name">prop <span class="ident">set_suggested_prompts</span> : <a title="slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts" href="../set_suggested_prompts/set_suggested_prompts.html#slack_bolt.context.set_suggested_prompts.set_suggested_prompts.SetSuggestedPrompts">SetSuggestedPrompts</a></code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@property
-def set_suggested_prompts(self) -&gt; SetSuggestedPrompts:
-    return SetSuggestedPrompts(self.client, self.channel_id, self.thread_ts)</code></pre>
-</details>
-<div class="desc"></div>
-</dd>
 <dt id="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.set_title"><code class="name">prop <span class="ident">set_title</span> : <a title="slack_bolt.context.set_title.set_title.SetTitle" href="../set_title/set_title.html#slack_bolt.context.set_title.set_title.SetTitle">SetTitle</a></code></dt>
 <dd>
 <details class="source">
@@ -244,22 +195,6 @@ def set_suggested_prompts(self) -&gt; SetSuggestedPrompts:
 <pre><code class="python">@property
 def set_title(self) -&gt; SetTitle:
     return SetTitle(self.client, self.channel_id, self.thread_ts)</code></pre>
-</details>
-<div class="desc"></div>
-</dd>
-</dl>
-<h3>Methods</h3>
-<dl>
-<dt id="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.is_valid"><code class="name flex">
-<span>def <span class="ident">is_valid</span></span>(<span>self) ‑> bool</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_valid(self) -&gt; bool:
-    return self.channel_id is not None and self.thread_ts is not None</code></pre>
 </details>
 <div class="desc"></div>
 </dd>
@@ -286,12 +221,9 @@ def set_title(self) -&gt; SetTitle:
 <li><code><a title="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.channel_id" href="#slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.channel_id">channel_id</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.client" href="#slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.client">client</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.get_thread_context" href="#slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.get_thread_context">get_thread_context</a></code></li>
-<li><code><a title="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.is_valid" href="#slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.is_valid">is_valid</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.payload" href="#slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.payload">payload</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.save_thread_context" href="#slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.save_thread_context">save_thread_context</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.say" href="#slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.say">say</a></code></li>
-<li><code><a title="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.set_status" href="#slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.set_status">set_status</a></code></li>
-<li><code><a title="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.set_suggested_prompts" href="#slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.set_suggested_prompts">set_suggested_prompts</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.set_title" href="#slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.set_title">set_title</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.thread_context_store" href="#slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.thread_context_store">thread_context_store</a></code></li>
 <li><code><a title="slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.thread_ts" href="#slack_bolt.context.assistant.assistant_utilities.AssistantUtilities.thread_ts">thread_ts</a></code></li>
