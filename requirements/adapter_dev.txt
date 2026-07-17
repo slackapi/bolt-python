@@ -45,7 +45,9 @@ Werkzeug>=2,<3; python_version < "3.9"
 Werkzeug>=3.1.8,<4; python_version >= "3.9"
 
 # pyramid
-pyramid>=1,<3
+# Note: pyramid 2.1 requires Python >=3.10; 3.7/3.8/3.9 stay on the last 2.0.x release.
+pyramid>=1,<2.1; python_version < "3.10"
+pyramid>=2.1,<3; python_version >= "3.10"
 
 # setuptools
 # Note: Pyramid depends on pkg_resources (deprecated in setuptools 67.5.0, removed in 82+). See: https://github.com/Pylons/pyramid/issues/3731
