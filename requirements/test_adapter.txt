@@ -2,7 +2,7 @@
 
 # moto
 # Note: for AWS tests
-moto>=3,<6
+moto>=5.2.2,<6
 
 # boddle
 # Note: for Bottle app tests
