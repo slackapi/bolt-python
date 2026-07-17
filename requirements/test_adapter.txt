@@ -13,4 +13,4 @@ moto>=5.2.2,<6; python_version >= "3.10"
 boddle>=0.2.9,<0.3
 
 # sanic-testing
-sanic-testing>=0.7
+sanic-testing>=24.6.0
