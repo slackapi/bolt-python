@@ -1,4 +1,3 @@
-import warnings
 from typing import Optional
 
 from slack_sdk.web.async_client import AsyncWebClient
@@ -14,8 +13,6 @@ from slack_bolt.context.say.async_say import AsyncSay
 from .internals import has_channel_id_and_thread_ts
 from ..get_thread_context.async_get_thread_context import AsyncGetThreadContext
 from ..save_thread_context.async_save_thread_context import AsyncSaveThreadContext
-from ..set_status.async_set_status import AsyncSetStatus
-from ..set_suggested_prompts.async_set_suggested_prompts import AsyncSetSuggestedPrompts
 from ..set_title.async_set_title import AsyncSetTitle
 
 
@@ -50,27 +47,9 @@ class AsyncAssistantUtilities:
             # When moving this code to Bolt internals, no need to raise an exception for this pattern
             raise ValueError(f"Cannot instantiate Assistant for this event pattern ({self.payload})")
 
-    def is_valid(self) -> bool:
-        return self.channel_id is not None and self.thread_ts is not None
-
-    @property
-    def set_status(self) -> AsyncSetStatus:
-        warnings.warn(
-            "AsyncAssistantUtilities.set_status is deprecated. "
-            "Use the set_status argument directly in your listener function "
-            "or access it via context.set_status instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return AsyncSetStatus(self.client, self.channel_id, self.thread_ts)
-
     @property
     def set_title(self) -> AsyncSetTitle:
         return AsyncSetTitle(self.client, self.channel_id, self.thread_ts)
-
-    @property
-    def set_suggested_prompts(self) -> AsyncSetSuggestedPrompts:
-        return AsyncSetSuggestedPrompts(self.client, self.channel_id, self.thread_ts)
 
     @property
     def say(self) -> AsyncSay:

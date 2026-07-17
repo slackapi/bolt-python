@@ -48,7 +48,7 @@ el.replaceWith(d);
 <dl>
 <dt id="slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts.AsyncSetSuggestedPrompts"><code class="flex name class">
 <span>class <span class="ident">AsyncSetSuggestedPrompts</span></span>
-<span>(</span><span>client: slack_sdk.web.async_client.AsyncWebClient,<br>channel_id: str,<br>thread_ts: str)</span>
+<span>(</span><span>client: slack_sdk.web.async_client.AsyncWebClient,<br>channel_id: str,<br>thread_ts: str | None = None)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -58,13 +58,13 @@ el.replaceWith(d);
 <pre><code class="python">class AsyncSetSuggestedPrompts:
     client: AsyncWebClient
     channel_id: str
-    thread_ts: str
+    thread_ts: Optional[str]
 
     def __init__(
         self,
         client: AsyncWebClient,
         channel_id: str,
-        thread_ts: str,
+        thread_ts: Optional[str] = None,
     ):
         self.client = client
         self.channel_id = channel_id
@@ -74,6 +74,7 @@ el.replaceWith(d);
         self,
         prompts: Sequence[Union[str, Dict[str, str]]],
         title: Optional[str] = None,
+        thread_ts: Optional[str] = None,
     ) -&gt; AsyncSlackResponse:
         prompts_arg: List[Dict[str, str]] = []
         for prompt in prompts:
@@ -84,7 +85,7 @@ el.replaceWith(d);
 
         return await self.client.assistant_threads_setSuggestedPrompts(
             channel_id=self.channel_id,
-            thread_ts=self.thread_ts,
+            thread_ts=thread_ts if thread_ts is not None else self.thread_ts,
             prompts=prompts_arg,
             title=title,
         )</code></pre>
@@ -100,7 +101,7 @@ el.replaceWith(d);
 <dd>
 <div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
-<dt id="slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts.AsyncSetSuggestedPrompts.thread_ts"><code class="name">var <span class="ident">thread_ts</span> : str</code></dt>
+<dt id="slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts.AsyncSetSuggestedPrompts.thread_ts"><code class="name">var <span class="ident">thread_ts</span> : str | None</code></dt>
 <dd>
 <div class="desc"><p>The type of the None singleton.</p></div>
 </dd>

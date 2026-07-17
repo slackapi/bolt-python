@@ -64,34 +64,50 @@ el.replaceWith(d);
 
     def process(self, *, req: BoltRequest, resp: BoltResponse, next: Callable[[], BoltResponse]) -&gt; Optional[BoltResponse]:
         event = to_event(req.body)
-        if event is not None:
-            if is_assistant_event(req.body):
-                assistant = AssistantUtilities(
-                    payload=event,
-                    context=req.context,
-                    thread_context_store=self.thread_context_store,
-                )
-                req.context[&#34;say&#34;] = assistant.say
-                req.context[&#34;set_title&#34;] = assistant.set_title
-                req.context[&#34;set_suggested_prompts&#34;] = assistant.set_suggested_prompts
-                req.context[&#34;get_thread_context&#34;] = assistant.get_thread_context
-                req.context[&#34;save_thread_context&#34;] = assistant.save_thread_context
+        if event is None:
+            return next()
+        if req.context.channel_id is None:
+            return next()
 
-            # TODO: in the future we might want to introduce a &#34;proper&#34; extract_ts utility
-            thread_ts = req.context.thread_ts or event.get(&#34;ts&#34;)
-            if req.context.channel_id and thread_ts:
-                req.context[&#34;set_status&#34;] = SetStatus(
-                    client=req.context.client,
-                    channel_id=req.context.channel_id,
-                    thread_ts=thread_ts,
-                )
-                req.context[&#34;say_stream&#34;] = SayStream(
-                    client=req.context.client,
-                    channel=req.context.channel_id,
-                    recipient_team_id=req.context.team_id or req.context.enterprise_id,
-                    recipient_user_id=req.context.user_id,
-                    thread_ts=thread_ts,
-                )
+        if is_assistant_event(req.body):
+            # TODO: eventually we might remove this assistant specific logic
+            assistant = AssistantUtilities(
+                payload=event,
+                context=req.context,
+                thread_context_store=self.thread_context_store,
+            )
+            req.context[&#34;say&#34;] = assistant.say
+            req.context[&#34;set_title&#34;] = assistant.set_title
+            req.context[&#34;get_thread_context&#34;] = assistant.get_thread_context
+            req.context[&#34;save_thread_context&#34;] = assistant.save_thread_context
+
+        if (
+            is_im_message_event(req.body)
+            or is_assistant_thread_started_event(req.body)
+            or is_assistant_thread_context_changed_event(req.body)
+            or is_app_home_opened_event(req.body, tab=&#34;messages&#34;)
+        ):
+            req.context[&#34;set_suggested_prompts&#34;] = SetSuggestedPrompts(
+                client=req.context.client,
+                channel_id=req.context.channel_id,
+                thread_ts=req.context.thread_ts,
+            )
+
+        # TODO: in the future we might want to introduce a &#34;proper&#34; extract_ts utility
+        thread_ts_or_ts = req.context.thread_ts or event.get(&#34;ts&#34;)
+        if thread_ts_or_ts:
+            req.context[&#34;set_status&#34;] = SetStatus(
+                client=req.context.client,
+                channel_id=req.context.channel_id,
+                thread_ts=thread_ts_or_ts,
+            )
+            req.context[&#34;say_stream&#34;] = SayStream(
+                client=req.context.client,
+                channel=req.context.channel_id,
+                recipient_team_id=req.context.team_id or req.context.enterprise_id,
+                recipient_user_id=req.context.user_id,
+                thread_ts=thread_ts_or_ts,
+            )
         return next()</code></pre>
 </details>
 <div class="desc"><p>A middleware can process request data before other middleware and listener functions.</p></div>
