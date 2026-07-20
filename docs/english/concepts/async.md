@@ -1,11 +1,11 @@
 # Using async (asyncio)
 
-To use the async version of Bolt, you can import and initialize an `AsyncApp` instance (rather than `App`). `AsyncApp` relies on [AIOHTTP](https://docs.aiohttp.org) to make API requests, which means you'll need to install `aiohttp` (by adding to `requirements.txt` or running `pip install aiohttp`).
+To use the async version of Bolt, you can import and initialize an `AsyncApp` instance (rather than `App`). `AsyncApp` relies on [AIOHTTP](https://docs.aiohttp.org) to make API requests. On Python 3.9 and newer, install the async extra by running `pip install "slack_bolt[async]"`. If you're using Python 3.7 or 3.8, install an `aiohttp` version compatible with your Python runtime separately.
 
 Sample async projects can be found within the repository's [examples](https://github.com/slackapi/bolt-python/tree/main/examples) folder.
 
 ```python
-# Requirement: install aiohttp
+# Requirement: pip install "slack_bolt[async]"
 from slack_bolt.async_app import AsyncApp
 app = AsyncApp()
 

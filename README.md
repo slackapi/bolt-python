@@ -150,17 +150,18 @@ Most of the app's functionality will be inside listener functions (the `fn` para
 
 ## Creating an async app
 
-If you'd prefer to build your app with [asyncio](https://docs.python.org/3/library/asyncio.html), you can import the [AIOHTTP](https://docs.aiohttp.org/en/stable/) library and call the `AsyncApp` constructor. Within async apps, you can use the async/await pattern.
+If you'd prefer to build your app with [asyncio](https://docs.python.org/3/library/asyncio.html), you can install the async extra to include [AIOHTTP](https://docs.aiohttp.org/en/stable/) and call the `AsyncApp` constructor. Within async apps, you can use the async/await pattern.
 
 ```bash
-# Python 3.7+ required
+# Python 3.9+ required for the async extra
 python -m venv .venv
 source .venv/bin/activate
 
 pip install -U pip
-# aiohttp is required
-pip install slack_bolt aiohttp
+pip install "slack_bolt[async]"
 ```
+
+If you're using Python 3.7 or 3.8, install an `aiohttp` version compatible with your Python runtime separately.
 
 In async apps, all middleware/listeners must be async functions. When calling utility methods (like `ack` and `say`) within these functions, it's required to use the `await` keyword.
 
