@@ -58,7 +58,7 @@ setuptools<82
 # Note: tracerite > 1.1.2 is incompatible with Python <= 3.8 and ships no requires_python, so an explicit ceiling is required.
 tracerite<1.1.2; python_version < "3.9"
 sanic>=21,<24; python_version < "3.9"
-sanic>=25.3.0,<26; python_version >= "3.9"
+sanic>=25.12.1,<26; python_version >= "3.9"
 
 # starlette
 # Note: starlette 0.49.3 requires Python >=3.9; 3.7/3.8 stay on the older pinned release.
