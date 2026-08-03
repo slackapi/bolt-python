@@ -6,7 +6,7 @@
 boto3<=2
 
 # bottle
-bottle>=0.12,<1
+bottle>=0.13.4,<1
 
 # chalice
 chalice>=1.28,<1.31; python_version < "3.9"
@@ -57,9 +57,11 @@ setuptools<82
 # sanic
 # Note: Sanic pulls in tracerite via a wildcard version, so tracerite is co-pinned here.
 # Note: tracerite > 1.1.2 is incompatible with Python <= 3.8 and ships no requires_python, so an explicit ceiling is required.
+# Note: sanic 25.12 requires Python >=3.10; 3.9 stays on the older 25.x line.
 tracerite<1.1.2; python_version < "3.9"
 sanic>=21,<24; python_version < "3.9"
-sanic>=25.3.0,<26; python_version >= "3.9"
+sanic>=25.3.0,<25.12.0; python_version >= "3.9" and python_version < "3.10"
+sanic>=25.12.1,<26; python_version >= "3.10"
 
 # starlette
 # Note: starlette 0.49.3 requires Python >=3.9; 3.7/3.8 stay on the older pinned release.
