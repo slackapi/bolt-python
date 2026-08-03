@@ -6,7 +6,7 @@
 boto3<=2
 
 # bottle
-bottle>=0.12,<1
+bottle>=0.13.4,<1
 
 # chalice
 chalice>=1.28,<1.31; python_version < "3.9"
