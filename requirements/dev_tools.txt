@@ -1,7 +1,7 @@
 # pip install -r requirements/dev_tools.txt
 
 # mypy
-mypy==1.19.1
+mypy==2.3.0
 
 # flake8
 flake8==7.3.0
