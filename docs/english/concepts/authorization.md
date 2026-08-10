@@ -2,10 +2,9 @@
 
 Authorization is the process of determining which Slack credentials should be available while processing an incoming Slack request.
 
-Apps installed on a single workspace can pass their bot token into the `App` constructor using the `token` parameter. However, if your app will be installed on multiple workspaces, you have two options:
+Apps installed on a single workspace can simply pass their bot token into the `App` constructor using the `token` parameter. However, if your app will be installed on multiple workspaces, you have two options. The easier option is to use the built-in OAuth support. This will handle setting up OAuth routes and verifying state. Read the section on [authenticating with OAuth](/tools/bolt-python/concepts/authenticating-oauth) for details.
 
-* Use the built-in OAuth support. This will handle setting up OAuth routes and verifying state. See [authenticating with OAuth](/tools/bolt-python/concepts/authenticating-oauth) for more details.
-* Set the `authorize` parameter to a function upon `App` instantiation. The `authorize` function should return [an instance of `AuthorizeResult`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/authorization/authorize_result.py), which contains information about who and where the request is coming from.
+For a more custom solution, you can set the `authorize` parameter to a function upon `App` instantiation. The `authorize` function should return [an instance of `AuthorizeResult`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/authorization/authorize_result.py), which contains information about who and where the request is coming from.
 
 `AuthorizeResult` should have a few specific properties, all of type `str`:
 - Either **`bot_token`** (xoxb) *or* **`user_token`** (xoxp) are **required**. Most apps will use `bot_token` by default. Passing a token allows built-in functions (like `say()`) to work.
@@ -63,11 +62,3 @@ app = App(
     authorize=authorize
 )
 ```
-
-## Handling failed token lookups {#handling-failed-token-lookups}
-
-In the event that you receive events from disconnected teams, make sure to gracefully drop these unauthorized payloads by returning `None` to silently drop the payload as follows.
-
-In the custom `authorize` callback, if a token lookup fails due to an `unknown team_id`, you should return `None` rather than raising an exception (such as `BoltUnauthorizedError`). Bolt's authorization middleware will recognize the `None` response as an authorization failure and immediately halt execution, silently dropping the payload without generating server error logs.
-
-Additionally, the `user_facing_authorize_error_message` parameter strictly controls the ephemeral message sent back to the end user via the Slack UI. It does not suppress internal server logs or exceptions. To achieve both the desired UI behavior and clean server logs, pair this parameter with returning `None` in your authorize function.
