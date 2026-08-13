@@ -255,6 +255,7 @@ def main():
     session.process(modules)
     session.render(modules)
     _rename_package_indexes()
+    _sync_reference_sidebar()
 
 
 def _rename_package_indexes():
@@ -295,6 +296,64 @@ def _rename_package_indexes():
         handle.write("\n")
 
     print("Renamed {} package __init__.md files to index.md".format(renamed))
+
+
+# The docs site (docs.slack.dev) imports docs/english/_sidebar.json as an array
+# and filters it; it does not read the generated reference/sidebar.json. So the
+# reference tree is embedded directly into _sidebar.json under a "Reference"
+# category. Doc IDs are relative to the docs root there, hence the prefix.
+SIDEBAR_DOC_ID_PREFIX = "tools/bolt-python/"
+
+
+def _prefix_doc_ids(node):
+    """Return a copy of the generated sidebar with the docs-root prefix added to
+    every doc-ID string. Doc IDs only appear as string elements of ``items``
+    lists; ``label``/``type``/``link`` values are left untouched."""
+    if isinstance(node, dict):
+        return {
+            key: [_prefix_doc_ids(item) for item in value] if key == "items" and isinstance(value, list) else value
+            for key, value in node.items()
+        }
+    if isinstance(node, list):
+        return [_prefix_doc_ids(item) for item in node]
+    if isinstance(node, str):
+        return SIDEBAR_DOC_ID_PREFIX + node
+    return node
+
+
+def _sync_reference_sidebar():
+    """Embed the generated reference category into docs/english/_sidebar.json,
+    replacing the existing "Reference" entry so the sidebar stays in sync with
+    the regenerated docs."""
+    reference_sidebar = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR, "sidebar.json")
+    with open(reference_sidebar, encoding="utf-8") as handle:
+        category = _prefix_doc_ids(json.load(handle))
+    category["label"] = "Reference"
+
+    site_sidebar = os.path.join(DOCS_BASE_PATH, "_sidebar.json")
+    with open(site_sidebar, encoding="utf-8") as handle:
+        entries = json.load(handle)
+
+    def is_reference_entry(entry):
+        return isinstance(entry, dict) and entry.get("label") == "Reference"
+
+    replaced = False
+    new_entries = []
+    for entry in entries:
+        if is_reference_entry(entry):
+            new_entries.append(category)
+            replaced = True
+        else:
+            new_entries.append(entry)
+    if not replaced:
+        raise SystemExit('No "Reference" entry found in _sidebar.json to replace')
+
+    # _sidebar.json is tab-indented; match it so the diff stays minimal.
+    with open(site_sidebar, "w", encoding="utf-8") as handle:
+        json.dump(new_entries, handle, indent="\t", ensure_ascii=False)
+        handle.write("\n")
+
+    print("Embedded Reference category into _sidebar.json")
 
 
 if __name__ == "__main__":
