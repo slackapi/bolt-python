@@ -120,7 +120,7 @@
 	{
 		"type": "link",
 		"label": "Reference",
-		"href": "https://docs.slack.dev/tools/bolt-python/reference/index.html"
+		"href": "https://docs.slack.dev/tools/bolt-python/reference/slack_bolt/"
 	},
 	{ "type": "html", "value": "<hr>" },
 	{

@@ -1,0 +1,630 @@
+{
+  "items": [
+    {
+      "items": [
+        {
+          "items": [
+            {
+              "items": [
+                "reference/slack_bolt/adapter/aiohttp/__init__"
+              ],
+              "label": "slack_bolt.adapter.aiohttp",
+              "type": "category"
+            },
+            {
+              "items": [
+                {
+                  "items": [
+                    "reference/slack_bolt/adapter/asgi/aiohttp/__init__"
+                  ],
+                  "label": "slack_bolt.adapter.asgi.aiohttp",
+                  "type": "category"
+                },
+                {
+                  "items": [
+                    "reference/slack_bolt/adapter/asgi/builtin/__init__"
+                  ],
+                  "label": "slack_bolt.adapter.asgi.builtin",
+                  "type": "category"
+                },
+                "reference/slack_bolt/adapter/asgi/__init__",
+                "reference/slack_bolt/adapter/asgi/async_handler",
+                "reference/slack_bolt/adapter/asgi/base_handler",
+                "reference/slack_bolt/adapter/asgi/http_request",
+                "reference/slack_bolt/adapter/asgi/http_response",
+                "reference/slack_bolt/adapter/asgi/utils"
+              ],
+              "label": "slack_bolt.adapter.asgi",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/adapter/aws_lambda/__init__",
+                "reference/slack_bolt/adapter/aws_lambda/chalice_handler",
+                "reference/slack_bolt/adapter/aws_lambda/chalice_lazy_listener_runner",
+                "reference/slack_bolt/adapter/aws_lambda/handler",
+                "reference/slack_bolt/adapter/aws_lambda/internals",
+                "reference/slack_bolt/adapter/aws_lambda/lambda_s3_oauth_flow",
+                "reference/slack_bolt/adapter/aws_lambda/lazy_listener_runner",
+                "reference/slack_bolt/adapter/aws_lambda/local_lambda_client"
+              ],
+              "label": "slack_bolt.adapter.aws_lambda",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/adapter/bottle/__init__",
+                "reference/slack_bolt/adapter/bottle/handler"
+              ],
+              "label": "slack_bolt.adapter.bottle",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/adapter/cherrypy/__init__",
+                "reference/slack_bolt/adapter/cherrypy/handler"
+              ],
+              "label": "slack_bolt.adapter.cherrypy",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/adapter/django/__init__",
+                "reference/slack_bolt/adapter/django/handler"
+              ],
+              "label": "slack_bolt.adapter.django",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/adapter/falcon/__init__",
+                "reference/slack_bolt/adapter/falcon/async_resource",
+                "reference/slack_bolt/adapter/falcon/resource"
+              ],
+              "label": "slack_bolt.adapter.falcon",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/adapter/fastapi/__init__",
+                "reference/slack_bolt/adapter/fastapi/async_handler"
+              ],
+              "label": "slack_bolt.adapter.fastapi",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/adapter/flask/__init__",
+                "reference/slack_bolt/adapter/flask/handler"
+              ],
+              "label": "slack_bolt.adapter.flask",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/adapter/google_cloud_functions/__init__",
+                "reference/slack_bolt/adapter/google_cloud_functions/handler"
+              ],
+              "label": "slack_bolt.adapter.google_cloud_functions",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/adapter/pyramid/__init__",
+                "reference/slack_bolt/adapter/pyramid/handler"
+              ],
+              "label": "slack_bolt.adapter.pyramid",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/adapter/sanic/__init__",
+                "reference/slack_bolt/adapter/sanic/async_handler"
+              ],
+              "label": "slack_bolt.adapter.sanic",
+              "type": "category"
+            },
+            {
+              "items": [
+                {
+                  "items": [
+                    "reference/slack_bolt/adapter/socket_mode/aiohttp/__init__"
+                  ],
+                  "label": "slack_bolt.adapter.socket_mode.aiohttp",
+                  "type": "category"
+                },
+                {
+                  "items": [
+                    "reference/slack_bolt/adapter/socket_mode/builtin/__init__"
+                  ],
+                  "label": "slack_bolt.adapter.socket_mode.builtin",
+                  "type": "category"
+                },
+                {
+                  "items": [
+                    "reference/slack_bolt/adapter/socket_mode/websocket_client/__init__"
+                  ],
+                  "label": "slack_bolt.adapter.socket_mode.websocket_client",
+                  "type": "category"
+                },
+                {
+                  "items": [
+                    "reference/slack_bolt/adapter/socket_mode/websockets/__init__"
+                  ],
+                  "label": "slack_bolt.adapter.socket_mode.websockets",
+                  "type": "category"
+                },
+                "reference/slack_bolt/adapter/socket_mode/__init__",
+                "reference/slack_bolt/adapter/socket_mode/async_base_handler",
+                "reference/slack_bolt/adapter/socket_mode/async_handler",
+                "reference/slack_bolt/adapter/socket_mode/async_internals",
+                "reference/slack_bolt/adapter/socket_mode/base_handler",
+                "reference/slack_bolt/adapter/socket_mode/internals"
+              ],
+              "label": "slack_bolt.adapter.socket_mode",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/adapter/starlette/__init__",
+                "reference/slack_bolt/adapter/starlette/async_handler",
+                "reference/slack_bolt/adapter/starlette/handler"
+              ],
+              "label": "slack_bolt.adapter.starlette",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/adapter/tornado/__init__",
+                "reference/slack_bolt/adapter/tornado/async_handler",
+                "reference/slack_bolt/adapter/tornado/handler"
+              ],
+              "label": "slack_bolt.adapter.tornado",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/adapter/wsgi/__init__",
+                "reference/slack_bolt/adapter/wsgi/handler",
+                "reference/slack_bolt/adapter/wsgi/http_request",
+                "reference/slack_bolt/adapter/wsgi/http_response",
+                "reference/slack_bolt/adapter/wsgi/internals"
+              ],
+              "label": "slack_bolt.adapter.wsgi",
+              "type": "category"
+            },
+            "reference/slack_bolt/adapter/__init__"
+          ],
+          "label": "slack_bolt.adapter",
+          "type": "category"
+        },
+        {
+          "items": [
+            "reference/slack_bolt/app/__init__",
+            "reference/slack_bolt/app/app",
+            "reference/slack_bolt/app/async_app",
+            "reference/slack_bolt/app/async_server"
+          ],
+          "label": "slack_bolt.app",
+          "type": "category"
+        },
+        {
+          "items": [
+            "reference/slack_bolt/authorization/__init__",
+            "reference/slack_bolt/authorization/async_authorize",
+            "reference/slack_bolt/authorization/async_authorize_args",
+            "reference/slack_bolt/authorization/authorize",
+            "reference/slack_bolt/authorization/authorize_args",
+            "reference/slack_bolt/authorization/authorize_result"
+          ],
+          "label": "slack_bolt.authorization",
+          "type": "category"
+        },
+        {
+          "items": [
+            {
+              "items": [
+                "reference/slack_bolt/context/ack/__init__",
+                "reference/slack_bolt/context/ack/ack",
+                "reference/slack_bolt/context/ack/async_ack",
+                "reference/slack_bolt/context/ack/internals"
+              ],
+              "label": "slack_bolt.context.ack",
+              "type": "category"
+            },
+            {
+              "items": [
+                {
+                  "items": [
+                    "reference/slack_bolt/context/assistant/thread_context/__init__"
+                  ],
+                  "label": "slack_bolt.context.assistant.thread_context",
+                  "type": "category"
+                },
+                {
+                  "items": [
+                    {
+                      "items": [
+                        "reference/slack_bolt/context/assistant/thread_context_store/file/__init__"
+                      ],
+                      "label": "slack_bolt.context.assistant.thread_context_store.file",
+                      "type": "category"
+                    },
+                    "reference/slack_bolt/context/assistant/thread_context_store/__init__",
+                    "reference/slack_bolt/context/assistant/thread_context_store/async_store",
+                    "reference/slack_bolt/context/assistant/thread_context_store/default_async_store",
+                    "reference/slack_bolt/context/assistant/thread_context_store/default_store",
+                    "reference/slack_bolt/context/assistant/thread_context_store/store"
+                  ],
+                  "label": "slack_bolt.context.assistant.thread_context_store",
+                  "type": "category"
+                },
+                "reference/slack_bolt/context/assistant/__init__",
+                "reference/slack_bolt/context/assistant/assistant_utilities",
+                "reference/slack_bolt/context/assistant/async_assistant_utilities",
+                "reference/slack_bolt/context/assistant/internals"
+              ],
+              "label": "slack_bolt.context.assistant",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/context/complete/__init__",
+                "reference/slack_bolt/context/complete/async_complete",
+                "reference/slack_bolt/context/complete/complete"
+              ],
+              "label": "slack_bolt.context.complete",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/context/fail/__init__",
+                "reference/slack_bolt/context/fail/async_fail",
+                "reference/slack_bolt/context/fail/fail"
+              ],
+              "label": "slack_bolt.context.fail",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/context/get_thread_context/__init__",
+                "reference/slack_bolt/context/get_thread_context/async_get_thread_context",
+                "reference/slack_bolt/context/get_thread_context/get_thread_context"
+              ],
+              "label": "slack_bolt.context.get_thread_context",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/context/respond/__init__",
+                "reference/slack_bolt/context/respond/async_respond",
+                "reference/slack_bolt/context/respond/internals",
+                "reference/slack_bolt/context/respond/respond"
+              ],
+              "label": "slack_bolt.context.respond",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/context/save_thread_context/__init__",
+                "reference/slack_bolt/context/save_thread_context/async_save_thread_context",
+                "reference/slack_bolt/context/save_thread_context/save_thread_context"
+              ],
+              "label": "slack_bolt.context.save_thread_context",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/context/say/__init__",
+                "reference/slack_bolt/context/say/async_say",
+                "reference/slack_bolt/context/say/internals",
+                "reference/slack_bolt/context/say/say"
+              ],
+              "label": "slack_bolt.context.say",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/context/say_stream/__init__",
+                "reference/slack_bolt/context/say_stream/async_say_stream",
+                "reference/slack_bolt/context/say_stream/say_stream"
+              ],
+              "label": "slack_bolt.context.say_stream",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/context/set_status/__init__",
+                "reference/slack_bolt/context/set_status/async_set_status",
+                "reference/slack_bolt/context/set_status/set_status"
+              ],
+              "label": "slack_bolt.context.set_status",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/context/set_suggested_prompts/__init__",
+                "reference/slack_bolt/context/set_suggested_prompts/async_set_suggested_prompts",
+                "reference/slack_bolt/context/set_suggested_prompts/set_suggested_prompts"
+              ],
+              "label": "slack_bolt.context.set_suggested_prompts",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/context/set_title/__init__",
+                "reference/slack_bolt/context/set_title/async_set_title",
+                "reference/slack_bolt/context/set_title/set_title"
+              ],
+              "label": "slack_bolt.context.set_title",
+              "type": "category"
+            },
+            "reference/slack_bolt/context/__init__",
+            "reference/slack_bolt/context/async_context",
+            "reference/slack_bolt/context/base_context",
+            "reference/slack_bolt/context/context"
+          ],
+          "label": "slack_bolt.context",
+          "type": "category"
+        },
+        {
+          "items": [
+            "reference/slack_bolt/error/__init__"
+          ],
+          "label": "slack_bolt.error",
+          "type": "category"
+        },
+        {
+          "items": [
+            "reference/slack_bolt/kwargs_injection/__init__",
+            "reference/slack_bolt/kwargs_injection/args",
+            "reference/slack_bolt/kwargs_injection/async_args",
+            "reference/slack_bolt/kwargs_injection/async_utils",
+            "reference/slack_bolt/kwargs_injection/utils"
+          ],
+          "label": "slack_bolt.kwargs_injection",
+          "type": "category"
+        },
+        {
+          "items": [
+            "reference/slack_bolt/lazy_listener/__init__",
+            "reference/slack_bolt/lazy_listener/async_internals",
+            "reference/slack_bolt/lazy_listener/async_runner",
+            "reference/slack_bolt/lazy_listener/asyncio_runner",
+            "reference/slack_bolt/lazy_listener/internals",
+            "reference/slack_bolt/lazy_listener/runner",
+            "reference/slack_bolt/lazy_listener/thread_runner"
+          ],
+          "label": "slack_bolt.lazy_listener",
+          "type": "category"
+        },
+        {
+          "items": [
+            "reference/slack_bolt/listener/__init__",
+            "reference/slack_bolt/listener/async_builtins",
+            "reference/slack_bolt/listener/async_listener",
+            "reference/slack_bolt/listener/async_listener_completion_handler",
+            "reference/slack_bolt/listener/async_listener_error_handler",
+            "reference/slack_bolt/listener/async_listener_start_handler",
+            "reference/slack_bolt/listener/asyncio_runner",
+            "reference/slack_bolt/listener/builtins",
+            "reference/slack_bolt/listener/custom_listener",
+            "reference/slack_bolt/listener/listener",
+            "reference/slack_bolt/listener/listener_completion_handler",
+            "reference/slack_bolt/listener/listener_error_handler",
+            "reference/slack_bolt/listener/listener_start_handler",
+            "reference/slack_bolt/listener/thread_runner"
+          ],
+          "label": "slack_bolt.listener",
+          "type": "category"
+        },
+        {
+          "items": [
+            "reference/slack_bolt/listener_matcher/__init__",
+            "reference/slack_bolt/listener_matcher/async_builtins",
+            "reference/slack_bolt/listener_matcher/async_listener_matcher",
+            "reference/slack_bolt/listener_matcher/builtins",
+            "reference/slack_bolt/listener_matcher/custom_listener_matcher",
+            "reference/slack_bolt/listener_matcher/listener_matcher"
+          ],
+          "label": "slack_bolt.listener_matcher",
+          "type": "category"
+        },
+        {
+          "items": [
+            "reference/slack_bolt/logger/__init__",
+            "reference/slack_bolt/logger/messages"
+          ],
+          "label": "slack_bolt.logger",
+          "type": "category"
+        },
+        {
+          "items": [
+            {
+              "items": [
+                "reference/slack_bolt/middleware/assistant/__init__",
+                "reference/slack_bolt/middleware/assistant/assistant",
+                "reference/slack_bolt/middleware/assistant/async_assistant"
+              ],
+              "label": "slack_bolt.middleware.assistant",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/middleware/attaching_conversation_kwargs/__init__",
+                "reference/slack_bolt/middleware/attaching_conversation_kwargs/async_attaching_conversation_kwargs",
+                "reference/slack_bolt/middleware/attaching_conversation_kwargs/attaching_conversation_kwargs"
+              ],
+              "label": "slack_bolt.middleware.attaching_conversation_kwargs",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/middleware/attaching_function_token/__init__",
+                "reference/slack_bolt/middleware/attaching_function_token/async_attaching_function_token",
+                "reference/slack_bolt/middleware/attaching_function_token/attaching_function_token"
+              ],
+              "label": "slack_bolt.middleware.attaching_function_token",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/middleware/authorization/__init__",
+                "reference/slack_bolt/middleware/authorization/async_authorization",
+                "reference/slack_bolt/middleware/authorization/async_internals",
+                "reference/slack_bolt/middleware/authorization/async_multi_teams_authorization",
+                "reference/slack_bolt/middleware/authorization/async_single_team_authorization",
+                "reference/slack_bolt/middleware/authorization/authorization",
+                "reference/slack_bolt/middleware/authorization/internals",
+                "reference/slack_bolt/middleware/authorization/multi_teams_authorization",
+                "reference/slack_bolt/middleware/authorization/single_team_authorization"
+              ],
+              "label": "slack_bolt.middleware.authorization",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/middleware/ignoring_self_events/__init__",
+                "reference/slack_bolt/middleware/ignoring_self_events/async_ignoring_self_events",
+                "reference/slack_bolt/middleware/ignoring_self_events/ignoring_self_events"
+              ],
+              "label": "slack_bolt.middleware.ignoring_self_events",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/middleware/message_listener_matches/__init__",
+                "reference/slack_bolt/middleware/message_listener_matches/async_message_listener_matches",
+                "reference/slack_bolt/middleware/message_listener_matches/message_listener_matches"
+              ],
+              "label": "slack_bolt.middleware.message_listener_matches",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/middleware/request_verification/__init__",
+                "reference/slack_bolt/middleware/request_verification/async_request_verification",
+                "reference/slack_bolt/middleware/request_verification/request_verification"
+              ],
+              "label": "slack_bolt.middleware.request_verification",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/middleware/ssl_check/__init__",
+                "reference/slack_bolt/middleware/ssl_check/async_ssl_check",
+                "reference/slack_bolt/middleware/ssl_check/ssl_check"
+              ],
+              "label": "slack_bolt.middleware.ssl_check",
+              "type": "category"
+            },
+            {
+              "items": [
+                "reference/slack_bolt/middleware/url_verification/__init__",
+                "reference/slack_bolt/middleware/url_verification/async_url_verification",
+                "reference/slack_bolt/middleware/url_verification/url_verification"
+              ],
+              "label": "slack_bolt.middleware.url_verification",
+              "type": "category"
+            },
+            "reference/slack_bolt/middleware/__init__",
+            "reference/slack_bolt/middleware/async_builtins",
+            "reference/slack_bolt/middleware/async_custom_middleware",
+            "reference/slack_bolt/middleware/async_middleware",
+            "reference/slack_bolt/middleware/async_middleware_error_handler",
+            "reference/slack_bolt/middleware/custom_middleware",
+            "reference/slack_bolt/middleware/middleware",
+            "reference/slack_bolt/middleware/middleware_error_handler"
+          ],
+          "label": "slack_bolt.middleware",
+          "type": "category"
+        },
+        {
+          "items": [
+            "reference/slack_bolt/oauth/__init__",
+            "reference/slack_bolt/oauth/async_callback_options",
+            "reference/slack_bolt/oauth/async_internals",
+            "reference/slack_bolt/oauth/async_oauth_flow",
+            "reference/slack_bolt/oauth/async_oauth_settings",
+            "reference/slack_bolt/oauth/callback_options",
+            "reference/slack_bolt/oauth/internals",
+            "reference/slack_bolt/oauth/oauth_flow",
+            "reference/slack_bolt/oauth/oauth_settings"
+          ],
+          "label": "slack_bolt.oauth",
+          "type": "category"
+        },
+        {
+          "items": [
+            "reference/slack_bolt/request/__init__",
+            "reference/slack_bolt/request/async_internals",
+            "reference/slack_bolt/request/async_request",
+            "reference/slack_bolt/request/internals",
+            "reference/slack_bolt/request/payload_utils",
+            "reference/slack_bolt/request/request"
+          ],
+          "label": "slack_bolt.request",
+          "type": "category"
+        },
+        {
+          "items": [
+            "reference/slack_bolt/response/__init__",
+            "reference/slack_bolt/response/response"
+          ],
+          "label": "slack_bolt.response",
+          "type": "category"
+        },
+        {
+          "items": [
+            "reference/slack_bolt/util/__init__",
+            "reference/slack_bolt/util/async_utils",
+            "reference/slack_bolt/util/utils"
+          ],
+          "label": "slack_bolt.util",
+          "type": "category"
+        },
+        {
+          "items": [
+            {
+              "items": [
+                {
+                  "items": [
+                    "reference/slack_bolt/workflows/step/utilities/__init__",
+                    "reference/slack_bolt/workflows/step/utilities/async_complete",
+                    "reference/slack_bolt/workflows/step/utilities/async_configure",
+                    "reference/slack_bolt/workflows/step/utilities/async_fail",
+                    "reference/slack_bolt/workflows/step/utilities/async_update",
+                    "reference/slack_bolt/workflows/step/utilities/complete",
+                    "reference/slack_bolt/workflows/step/utilities/configure",
+                    "reference/slack_bolt/workflows/step/utilities/fail",
+                    "reference/slack_bolt/workflows/step/utilities/update"
+                  ],
+                  "label": "slack_bolt.workflows.step.utilities",
+                  "type": "category"
+                },
+                "reference/slack_bolt/workflows/step/__init__",
+                "reference/slack_bolt/workflows/step/async_step",
+                "reference/slack_bolt/workflows/step/async_step_middleware",
+                "reference/slack_bolt/workflows/step/internals",
+                "reference/slack_bolt/workflows/step/step",
+                "reference/slack_bolt/workflows/step/step_middleware"
+              ],
+              "label": "slack_bolt.workflows.step",
+              "type": "category"
+            },
+            "reference/slack_bolt/workflows/__init__"
+          ],
+          "label": "slack_bolt.workflows",
+          "type": "category"
+        },
+        "reference/slack_bolt/__init__",
+        "reference/slack_bolt/async_app",
+        "reference/slack_bolt/version"
+      ],
+      "label": "slack_bolt",
+      "type": "category"
+    }
+  ],
+  "label": "Reference",
+  "type": "category"
+}
