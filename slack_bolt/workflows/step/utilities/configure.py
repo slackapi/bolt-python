@@ -7,6 +7,7 @@ from slack_sdk.models.blocks import Block
 class Configure:
     """`configure()` utility to send the modal view in Workflow Builder.
 
+    ```python
         def edit(ack, step, configure):
             ack()
 
@@ -31,6 +32,7 @@ class Configure:
             execute=execute,
         )
         app.step(ws)
+    ```
 
     Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
     """

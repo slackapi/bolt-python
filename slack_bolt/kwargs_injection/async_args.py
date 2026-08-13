@@ -22,6 +22,7 @@ class AsyncArgs:
     """All the arguments in this class are available in any middleware / listeners.
     You can inject the named variables in the argument list in arbitrary order.
 
+    ```python
         @app.action("link_button")
         async def handle_buttons(ack, respond, logger, context, body, client):
             logger.info(f"request body: {body}")
@@ -32,9 +33,11 @@ class AsyncArgs:
                 trigger_id=body["trigger_id"],
                 view={ ... }
             )
+    ```
 
     Alternatively, you can include a parameter named `args` and it will be injected with an instance of this class.
 
+    ```python
         @app.action("link_button")
         async def handle_buttons(args):
             args.logger.info(f"request body: {args.body}")
@@ -45,6 +48,7 @@ class AsyncArgs:
                 trigger_id=args.body["trigger_id"],
                 view={ ... }
             )
+    ```
 
     """
 

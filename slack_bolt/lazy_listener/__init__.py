@@ -1,5 +1,6 @@
 """Lazy listener runner is a beta feature for the apps running on Function-as-a-Service platforms.
 
+```python
     def respond_to_slack_within_3_seconds(body, ack):
         text = body.get("text")
         if text is None or len(text) == 0:
@@ -18,6 +19,7 @@
         # Lazy function is responsible for processing the event
         lazy=[run_long_process]
     )
+```
 
 Refer to https://docs.slack.dev/tools/bolt-python/concepts/lazy-listeners for more details.
 """

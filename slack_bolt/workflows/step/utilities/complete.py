@@ -4,6 +4,7 @@ from slack_sdk.web import WebClient
 class Complete:
     """`complete()` utility to tell Slack the completion of a step from app execution.
 
+    ```python
         def execute(step, complete, fail):
             inputs = step["inputs"]
             # if everything was successful
@@ -20,6 +21,7 @@ class Complete:
             execute=execute,
         )
         app.step(ws)
+    ```
 
     This utility is a thin wrapper of workflows.stepCompleted API method.
     Refer to https://api.slack.com/methods/workflows.stepCompleted for details.

@@ -4,6 +4,7 @@ from slack_sdk.web import WebClient
 class Update:
     """`update()` utility to tell Slack the processing results of a `save` listener.
 
+    ```python
         def save(ack, view, update):
             ack()
 
@@ -36,6 +37,7 @@ class Update:
             execute=execute,
         )
         app.step(ws)
+    ```
 
     This utility is a thin wrapper of workflows.stepFailed API method.
     Refer to https://api.slack.com/methods/workflows.updateStep for details.

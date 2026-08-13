@@ -19,6 +19,7 @@ class SlackRequestHandler:
         With the default settings, `http://localhost:3000/slack/events`
         Run Bolt with [gunicorn](https://gunicorn.org/)
 
+        ```python
         # Python
             app = App()
 
@@ -30,6 +31,7 @@ class SlackRequestHandler:
             export SLACK_BOT_TOKEN=xoxb-***
 
             gunicorn app:api -b 0.0.0.0:3000 --log-level debug
+        ```
 
         Args:
             app: Your bolt application
