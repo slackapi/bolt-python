@@ -12,6 +12,6 @@ pip install -U -r requirements/adapter_dev.txt
 pip install -U -r requirements/async_dev.txt
 pip install -U pydoc-markdown
 pip install .
-rm -rf docs/reference
+rm -rf docs/english/reference
 
 python scripts/generate_api_docs.py

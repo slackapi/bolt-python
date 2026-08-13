@@ -110,9 +110,11 @@ def start(port: int = 3000,
 
 Starts a web server for local development.
 
-# With the default settings, `http://localhost:3000/slack/events`
-# is available for handling incoming requests from Slack
-app.start()
+```python
+    # With the default settings, `http://localhost:3000/slack/events`
+    # is available for handling incoming requests from Slack
+    app.start()
+```
 
 This method internally starts a Web server process built with the `http.server` module.
 For production, consider using a production-ready WSGI server such as Gunicorn.

@@ -28,6 +28,12 @@ from pydoc_markdown.contrib.renderers import markdown as _markdown_renderer
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# The API reference lives under the English docs tree. docs_base_path is the
+# directory Docusaurus doc IDs are relative to; the reference is written to
+# DOCS_BASE_PATH/REFERENCE_SUBDIR.
+DOCS_BASE_PATH = os.path.join(REPO_ROOT, "docs", "english")
+REFERENCE_SUBDIR = "reference"
+
 
 def _escape_except_code(string):
     """HTML-escape a docstring while leaving fenced blocks and inline code spans
@@ -76,8 +82,8 @@ CONFIG = {
     ],
     "renderer": {
         "type": "docusaurus",
-        "docs_base_path": os.path.join(REPO_ROOT, "docs"),
-        "relative_output_path": "reference",
+        "docs_base_path": DOCS_BASE_PATH,
+        "relative_output_path": REFERENCE_SUBDIR,
     },
 }
 
@@ -234,7 +240,7 @@ def inline_reexports(modules):
 def main():
     # The docusaurus renderer writes sidebar.json into the output directory and
     # expects it to already exist.
-    os.makedirs(os.path.join(REPO_ROOT, "docs", "reference"), exist_ok=True)
+    os.makedirs(os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR), exist_ok=True)
 
     # Replace pydoc-markdown's buggy code-span-preserving HTML escaper (see
     # _escape_except_code for the bug it fixes). The MarkdownRenderer looks the
@@ -261,7 +267,7 @@ def _rename_package_indexes():
     URL, so renaming makes ``.../reference/slack_bolt/`` resolve (the path the
     sidebar's Reference link points at) instead of 404ing.
     """
-    reference_dir = os.path.join(REPO_ROOT, "docs", "reference")
+    reference_dir = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR)
     renamed = 0
     for dirpath, _dirnames, filenames in os.walk(reference_dir):
         if "__init__.md" in filenames:
