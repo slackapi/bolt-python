@@ -6,7 +6,7 @@
           "items": [
             {
               "items": [
-                "reference/slack_bolt/adapter/aiohttp/__init__"
+                "reference/slack_bolt/adapter/aiohttp/index"
               ],
               "label": "slack_bolt.adapter.aiohttp",
               "type": "category"
@@ -15,19 +15,19 @@
               "items": [
                 {
                   "items": [
-                    "reference/slack_bolt/adapter/asgi/aiohttp/__init__"
+                    "reference/slack_bolt/adapter/asgi/aiohttp/index"
                   ],
                   "label": "slack_bolt.adapter.asgi.aiohttp",
                   "type": "category"
                 },
                 {
                   "items": [
-                    "reference/slack_bolt/adapter/asgi/builtin/__init__"
+                    "reference/slack_bolt/adapter/asgi/builtin/index"
                   ],
                   "label": "slack_bolt.adapter.asgi.builtin",
                   "type": "category"
                 },
-                "reference/slack_bolt/adapter/asgi/__init__",
+                "reference/slack_bolt/adapter/asgi/index",
                 "reference/slack_bolt/adapter/asgi/async_handler",
                 "reference/slack_bolt/adapter/asgi/base_handler",
                 "reference/slack_bolt/adapter/asgi/http_request",
@@ -39,7 +39,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/adapter/aws_lambda/__init__",
+                "reference/slack_bolt/adapter/aws_lambda/index",
                 "reference/slack_bolt/adapter/aws_lambda/chalice_handler",
                 "reference/slack_bolt/adapter/aws_lambda/chalice_lazy_listener_runner",
                 "reference/slack_bolt/adapter/aws_lambda/handler",
@@ -53,7 +53,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/adapter/bottle/__init__",
+                "reference/slack_bolt/adapter/bottle/index",
                 "reference/slack_bolt/adapter/bottle/handler"
               ],
               "label": "slack_bolt.adapter.bottle",
@@ -61,7 +61,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/adapter/cherrypy/__init__",
+                "reference/slack_bolt/adapter/cherrypy/index",
                 "reference/slack_bolt/adapter/cherrypy/handler"
               ],
               "label": "slack_bolt.adapter.cherrypy",
@@ -69,7 +69,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/adapter/django/__init__",
+                "reference/slack_bolt/adapter/django/index",
                 "reference/slack_bolt/adapter/django/handler"
               ],
               "label": "slack_bolt.adapter.django",
@@ -77,7 +77,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/adapter/falcon/__init__",
+                "reference/slack_bolt/adapter/falcon/index",
                 "reference/slack_bolt/adapter/falcon/async_resource",
                 "reference/slack_bolt/adapter/falcon/resource"
               ],
@@ -86,7 +86,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/adapter/fastapi/__init__",
+                "reference/slack_bolt/adapter/fastapi/index",
                 "reference/slack_bolt/adapter/fastapi/async_handler"
               ],
               "label": "slack_bolt.adapter.fastapi",
@@ -94,7 +94,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/adapter/flask/__init__",
+                "reference/slack_bolt/adapter/flask/index",
                 "reference/slack_bolt/adapter/flask/handler"
               ],
               "label": "slack_bolt.adapter.flask",
@@ -102,7 +102,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/adapter/google_cloud_functions/__init__",
+                "reference/slack_bolt/adapter/google_cloud_functions/index",
                 "reference/slack_bolt/adapter/google_cloud_functions/handler"
               ],
               "label": "slack_bolt.adapter.google_cloud_functions",
@@ -110,7 +110,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/adapter/pyramid/__init__",
+                "reference/slack_bolt/adapter/pyramid/index",
                 "reference/slack_bolt/adapter/pyramid/handler"
               ],
               "label": "slack_bolt.adapter.pyramid",
@@ -118,7 +118,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/adapter/sanic/__init__",
+                "reference/slack_bolt/adapter/sanic/index",
                 "reference/slack_bolt/adapter/sanic/async_handler"
               ],
               "label": "slack_bolt.adapter.sanic",
@@ -128,33 +128,33 @@
               "items": [
                 {
                   "items": [
-                    "reference/slack_bolt/adapter/socket_mode/aiohttp/__init__"
+                    "reference/slack_bolt/adapter/socket_mode/aiohttp/index"
                   ],
                   "label": "slack_bolt.adapter.socket_mode.aiohttp",
                   "type": "category"
                 },
                 {
                   "items": [
-                    "reference/slack_bolt/adapter/socket_mode/builtin/__init__"
+                    "reference/slack_bolt/adapter/socket_mode/builtin/index"
                   ],
                   "label": "slack_bolt.adapter.socket_mode.builtin",
                   "type": "category"
                 },
                 {
                   "items": [
-                    "reference/slack_bolt/adapter/socket_mode/websocket_client/__init__"
+                    "reference/slack_bolt/adapter/socket_mode/websocket_client/index"
                   ],
                   "label": "slack_bolt.adapter.socket_mode.websocket_client",
                   "type": "category"
                 },
                 {
                   "items": [
-                    "reference/slack_bolt/adapter/socket_mode/websockets/__init__"
+                    "reference/slack_bolt/adapter/socket_mode/websockets/index"
                   ],
                   "label": "slack_bolt.adapter.socket_mode.websockets",
                   "type": "category"
                 },
-                "reference/slack_bolt/adapter/socket_mode/__init__",
+                "reference/slack_bolt/adapter/socket_mode/index",
                 "reference/slack_bolt/adapter/socket_mode/async_base_handler",
                 "reference/slack_bolt/adapter/socket_mode/async_handler",
                 "reference/slack_bolt/adapter/socket_mode/async_internals",
@@ -166,7 +166,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/adapter/starlette/__init__",
+                "reference/slack_bolt/adapter/starlette/index",
                 "reference/slack_bolt/adapter/starlette/async_handler",
                 "reference/slack_bolt/adapter/starlette/handler"
               ],
@@ -175,7 +175,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/adapter/tornado/__init__",
+                "reference/slack_bolt/adapter/tornado/index",
                 "reference/slack_bolt/adapter/tornado/async_handler",
                 "reference/slack_bolt/adapter/tornado/handler"
               ],
@@ -184,7 +184,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/adapter/wsgi/__init__",
+                "reference/slack_bolt/adapter/wsgi/index",
                 "reference/slack_bolt/adapter/wsgi/handler",
                 "reference/slack_bolt/adapter/wsgi/http_request",
                 "reference/slack_bolt/adapter/wsgi/http_response",
@@ -193,14 +193,14 @@
               "label": "slack_bolt.adapter.wsgi",
               "type": "category"
             },
-            "reference/slack_bolt/adapter/__init__"
+            "reference/slack_bolt/adapter/index"
           ],
           "label": "slack_bolt.adapter",
           "type": "category"
         },
         {
           "items": [
-            "reference/slack_bolt/app/__init__",
+            "reference/slack_bolt/app/index",
             "reference/slack_bolt/app/app",
             "reference/slack_bolt/app/async_app",
             "reference/slack_bolt/app/async_server"
@@ -210,7 +210,7 @@
         },
         {
           "items": [
-            "reference/slack_bolt/authorization/__init__",
+            "reference/slack_bolt/authorization/index",
             "reference/slack_bolt/authorization/async_authorize",
             "reference/slack_bolt/authorization/async_authorize_args",
             "reference/slack_bolt/authorization/authorize",
@@ -224,7 +224,7 @@
           "items": [
             {
               "items": [
-                "reference/slack_bolt/context/ack/__init__",
+                "reference/slack_bolt/context/ack/index",
                 "reference/slack_bolt/context/ack/ack",
                 "reference/slack_bolt/context/ack/async_ack",
                 "reference/slack_bolt/context/ack/internals"
@@ -236,7 +236,7 @@
               "items": [
                 {
                   "items": [
-                    "reference/slack_bolt/context/assistant/thread_context/__init__"
+                    "reference/slack_bolt/context/assistant/thread_context/index"
                   ],
                   "label": "slack_bolt.context.assistant.thread_context",
                   "type": "category"
@@ -245,12 +245,12 @@
                   "items": [
                     {
                       "items": [
-                        "reference/slack_bolt/context/assistant/thread_context_store/file/__init__"
+                        "reference/slack_bolt/context/assistant/thread_context_store/file/index"
                       ],
                       "label": "slack_bolt.context.assistant.thread_context_store.file",
                       "type": "category"
                     },
-                    "reference/slack_bolt/context/assistant/thread_context_store/__init__",
+                    "reference/slack_bolt/context/assistant/thread_context_store/index",
                     "reference/slack_bolt/context/assistant/thread_context_store/async_store",
                     "reference/slack_bolt/context/assistant/thread_context_store/default_async_store",
                     "reference/slack_bolt/context/assistant/thread_context_store/default_store",
@@ -259,7 +259,7 @@
                   "label": "slack_bolt.context.assistant.thread_context_store",
                   "type": "category"
                 },
-                "reference/slack_bolt/context/assistant/__init__",
+                "reference/slack_bolt/context/assistant/index",
                 "reference/slack_bolt/context/assistant/assistant_utilities",
                 "reference/slack_bolt/context/assistant/async_assistant_utilities",
                 "reference/slack_bolt/context/assistant/internals"
@@ -269,7 +269,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/context/complete/__init__",
+                "reference/slack_bolt/context/complete/index",
                 "reference/slack_bolt/context/complete/async_complete",
                 "reference/slack_bolt/context/complete/complete"
               ],
@@ -278,7 +278,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/context/fail/__init__",
+                "reference/slack_bolt/context/fail/index",
                 "reference/slack_bolt/context/fail/async_fail",
                 "reference/slack_bolt/context/fail/fail"
               ],
@@ -287,7 +287,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/context/get_thread_context/__init__",
+                "reference/slack_bolt/context/get_thread_context/index",
                 "reference/slack_bolt/context/get_thread_context/async_get_thread_context",
                 "reference/slack_bolt/context/get_thread_context/get_thread_context"
               ],
@@ -296,7 +296,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/context/respond/__init__",
+                "reference/slack_bolt/context/respond/index",
                 "reference/slack_bolt/context/respond/async_respond",
                 "reference/slack_bolt/context/respond/internals",
                 "reference/slack_bolt/context/respond/respond"
@@ -306,7 +306,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/context/save_thread_context/__init__",
+                "reference/slack_bolt/context/save_thread_context/index",
                 "reference/slack_bolt/context/save_thread_context/async_save_thread_context",
                 "reference/slack_bolt/context/save_thread_context/save_thread_context"
               ],
@@ -315,7 +315,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/context/say/__init__",
+                "reference/slack_bolt/context/say/index",
                 "reference/slack_bolt/context/say/async_say",
                 "reference/slack_bolt/context/say/internals",
                 "reference/slack_bolt/context/say/say"
@@ -325,7 +325,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/context/say_stream/__init__",
+                "reference/slack_bolt/context/say_stream/index",
                 "reference/slack_bolt/context/say_stream/async_say_stream",
                 "reference/slack_bolt/context/say_stream/say_stream"
               ],
@@ -334,7 +334,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/context/set_status/__init__",
+                "reference/slack_bolt/context/set_status/index",
                 "reference/slack_bolt/context/set_status/async_set_status",
                 "reference/slack_bolt/context/set_status/set_status"
               ],
@@ -343,7 +343,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/context/set_suggested_prompts/__init__",
+                "reference/slack_bolt/context/set_suggested_prompts/index",
                 "reference/slack_bolt/context/set_suggested_prompts/async_set_suggested_prompts",
                 "reference/slack_bolt/context/set_suggested_prompts/set_suggested_prompts"
               ],
@@ -352,14 +352,14 @@
             },
             {
               "items": [
-                "reference/slack_bolt/context/set_title/__init__",
+                "reference/slack_bolt/context/set_title/index",
                 "reference/slack_bolt/context/set_title/async_set_title",
                 "reference/slack_bolt/context/set_title/set_title"
               ],
               "label": "slack_bolt.context.set_title",
               "type": "category"
             },
-            "reference/slack_bolt/context/__init__",
+            "reference/slack_bolt/context/index",
             "reference/slack_bolt/context/async_context",
             "reference/slack_bolt/context/base_context",
             "reference/slack_bolt/context/context"
@@ -369,14 +369,14 @@
         },
         {
           "items": [
-            "reference/slack_bolt/error/__init__"
+            "reference/slack_bolt/error/index"
           ],
           "label": "slack_bolt.error",
           "type": "category"
         },
         {
           "items": [
-            "reference/slack_bolt/kwargs_injection/__init__",
+            "reference/slack_bolt/kwargs_injection/index",
             "reference/slack_bolt/kwargs_injection/args",
             "reference/slack_bolt/kwargs_injection/async_args",
             "reference/slack_bolt/kwargs_injection/async_utils",
@@ -387,7 +387,7 @@
         },
         {
           "items": [
-            "reference/slack_bolt/lazy_listener/__init__",
+            "reference/slack_bolt/lazy_listener/index",
             "reference/slack_bolt/lazy_listener/async_internals",
             "reference/slack_bolt/lazy_listener/async_runner",
             "reference/slack_bolt/lazy_listener/asyncio_runner",
@@ -400,7 +400,7 @@
         },
         {
           "items": [
-            "reference/slack_bolt/listener/__init__",
+            "reference/slack_bolt/listener/index",
             "reference/slack_bolt/listener/async_builtins",
             "reference/slack_bolt/listener/async_listener",
             "reference/slack_bolt/listener/async_listener_completion_handler",
@@ -420,7 +420,7 @@
         },
         {
           "items": [
-            "reference/slack_bolt/listener_matcher/__init__",
+            "reference/slack_bolt/listener_matcher/index",
             "reference/slack_bolt/listener_matcher/async_builtins",
             "reference/slack_bolt/listener_matcher/async_listener_matcher",
             "reference/slack_bolt/listener_matcher/builtins",
@@ -432,7 +432,7 @@
         },
         {
           "items": [
-            "reference/slack_bolt/logger/__init__",
+            "reference/slack_bolt/logger/index",
             "reference/slack_bolt/logger/messages"
           ],
           "label": "slack_bolt.logger",
@@ -442,7 +442,7 @@
           "items": [
             {
               "items": [
-                "reference/slack_bolt/middleware/assistant/__init__",
+                "reference/slack_bolt/middleware/assistant/index",
                 "reference/slack_bolt/middleware/assistant/assistant",
                 "reference/slack_bolt/middleware/assistant/async_assistant"
               ],
@@ -451,7 +451,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/middleware/attaching_conversation_kwargs/__init__",
+                "reference/slack_bolt/middleware/attaching_conversation_kwargs/index",
                 "reference/slack_bolt/middleware/attaching_conversation_kwargs/async_attaching_conversation_kwargs",
                 "reference/slack_bolt/middleware/attaching_conversation_kwargs/attaching_conversation_kwargs"
               ],
@@ -460,7 +460,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/middleware/attaching_function_token/__init__",
+                "reference/slack_bolt/middleware/attaching_function_token/index",
                 "reference/slack_bolt/middleware/attaching_function_token/async_attaching_function_token",
                 "reference/slack_bolt/middleware/attaching_function_token/attaching_function_token"
               ],
@@ -469,7 +469,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/middleware/authorization/__init__",
+                "reference/slack_bolt/middleware/authorization/index",
                 "reference/slack_bolt/middleware/authorization/async_authorization",
                 "reference/slack_bolt/middleware/authorization/async_internals",
                 "reference/slack_bolt/middleware/authorization/async_multi_teams_authorization",
@@ -484,7 +484,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/middleware/ignoring_self_events/__init__",
+                "reference/slack_bolt/middleware/ignoring_self_events/index",
                 "reference/slack_bolt/middleware/ignoring_self_events/async_ignoring_self_events",
                 "reference/slack_bolt/middleware/ignoring_self_events/ignoring_self_events"
               ],
@@ -493,7 +493,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/middleware/message_listener_matches/__init__",
+                "reference/slack_bolt/middleware/message_listener_matches/index",
                 "reference/slack_bolt/middleware/message_listener_matches/async_message_listener_matches",
                 "reference/slack_bolt/middleware/message_listener_matches/message_listener_matches"
               ],
@@ -502,7 +502,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/middleware/request_verification/__init__",
+                "reference/slack_bolt/middleware/request_verification/index",
                 "reference/slack_bolt/middleware/request_verification/async_request_verification",
                 "reference/slack_bolt/middleware/request_verification/request_verification"
               ],
@@ -511,7 +511,7 @@
             },
             {
               "items": [
-                "reference/slack_bolt/middleware/ssl_check/__init__",
+                "reference/slack_bolt/middleware/ssl_check/index",
                 "reference/slack_bolt/middleware/ssl_check/async_ssl_check",
                 "reference/slack_bolt/middleware/ssl_check/ssl_check"
               ],
@@ -520,14 +520,14 @@
             },
             {
               "items": [
-                "reference/slack_bolt/middleware/url_verification/__init__",
+                "reference/slack_bolt/middleware/url_verification/index",
                 "reference/slack_bolt/middleware/url_verification/async_url_verification",
                 "reference/slack_bolt/middleware/url_verification/url_verification"
               ],
               "label": "slack_bolt.middleware.url_verification",
               "type": "category"
             },
-            "reference/slack_bolt/middleware/__init__",
+            "reference/slack_bolt/middleware/index",
             "reference/slack_bolt/middleware/async_builtins",
             "reference/slack_bolt/middleware/async_custom_middleware",
             "reference/slack_bolt/middleware/async_middleware",
@@ -541,7 +541,7 @@
         },
         {
           "items": [
-            "reference/slack_bolt/oauth/__init__",
+            "reference/slack_bolt/oauth/index",
             "reference/slack_bolt/oauth/async_callback_options",
             "reference/slack_bolt/oauth/async_internals",
             "reference/slack_bolt/oauth/async_oauth_flow",
@@ -556,7 +556,7 @@
         },
         {
           "items": [
-            "reference/slack_bolt/request/__init__",
+            "reference/slack_bolt/request/index",
             "reference/slack_bolt/request/async_internals",
             "reference/slack_bolt/request/async_request",
             "reference/slack_bolt/request/internals",
@@ -568,7 +568,7 @@
         },
         {
           "items": [
-            "reference/slack_bolt/response/__init__",
+            "reference/slack_bolt/response/index",
             "reference/slack_bolt/response/response"
           ],
           "label": "slack_bolt.response",
@@ -576,7 +576,7 @@
         },
         {
           "items": [
-            "reference/slack_bolt/util/__init__",
+            "reference/slack_bolt/util/index",
             "reference/slack_bolt/util/async_utils",
             "reference/slack_bolt/util/utils"
           ],
@@ -589,7 +589,7 @@
               "items": [
                 {
                   "items": [
-                    "reference/slack_bolt/workflows/step/utilities/__init__",
+                    "reference/slack_bolt/workflows/step/utilities/index",
                     "reference/slack_bolt/workflows/step/utilities/async_complete",
                     "reference/slack_bolt/workflows/step/utilities/async_configure",
                     "reference/slack_bolt/workflows/step/utilities/async_fail",
@@ -602,7 +602,7 @@
                   "label": "slack_bolt.workflows.step.utilities",
                   "type": "category"
                 },
-                "reference/slack_bolt/workflows/step/__init__",
+                "reference/slack_bolt/workflows/step/index",
                 "reference/slack_bolt/workflows/step/async_step",
                 "reference/slack_bolt/workflows/step/async_step_middleware",
                 "reference/slack_bolt/workflows/step/internals",
@@ -612,12 +612,12 @@
               "label": "slack_bolt.workflows.step",
               "type": "category"
             },
-            "reference/slack_bolt/workflows/__init__"
+            "reference/slack_bolt/workflows/index"
           ],
           "label": "slack_bolt.workflows",
           "type": "category"
         },
-        "reference/slack_bolt/__init__",
+        "reference/slack_bolt/index",
         "reference/slack_bolt/async_app",
         "reference/slack_bolt/version"
       ],

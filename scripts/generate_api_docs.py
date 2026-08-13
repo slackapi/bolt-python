@@ -16,6 +16,7 @@ concrete Class/Function and splices a copy in under the exported name.
 
 import copy
 import html
+import json
 import os
 import re
 
@@ -247,6 +248,47 @@ def main():
     inline_reexports(modules)
     session.process(modules)
     session.render(modules)
+    _rename_package_indexes()
+
+
+def _rename_package_indexes():
+    """Rename each package's ``__init__.md`` to ``index.md`` and rewrite the
+    generated ``sidebar.json`` to match.
+
+    The docusaurus renderer writes a package's docs to ``<pkg>/__init__.md``,
+    whose Docusaurus route is ``.../<pkg>/__init__`` -- there is no document at
+    the bare ``.../<pkg>/`` URL. Docusaurus serves ``index.md`` at the folder
+    URL, so renaming makes ``.../reference/slack_bolt/`` resolve (the path the
+    sidebar's Reference link points at) instead of 404ing.
+    """
+    reference_dir = os.path.join(REPO_ROOT, "docs", "reference")
+    renamed = 0
+    for dirpath, _dirnames, filenames in os.walk(reference_dir):
+        if "__init__.md" in filenames:
+            os.replace(
+                os.path.join(dirpath, "__init__.md"),
+                os.path.join(dirpath, "index.md"),
+            )
+            renamed += 1
+
+    sidebar_path = os.path.join(reference_dir, "sidebar.json")
+    with open(sidebar_path, encoding="utf-8") as handle:
+        sidebar = json.load(handle)
+
+    def rewrite(node):
+        if isinstance(node, str):
+            return node[: -len("__init__")] + "index" if node.endswith("/__init__") else node
+        if isinstance(node, list):
+            return [rewrite(item) for item in node]
+        if isinstance(node, dict):
+            return {key: rewrite(value) for key, value in node.items()}
+        return node
+
+    with open(sidebar_path, "w", encoding="utf-8") as handle:
+        json.dump(rewrite(sidebar), handle, indent=2)
+        handle.write("\n")
+
+    print("Renamed {} package __init__.md files to index.md".format(renamed))
 
 
 if __name__ == "__main__":
