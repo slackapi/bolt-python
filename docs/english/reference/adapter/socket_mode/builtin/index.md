@@ -1,5 +1,5 @@
 ---
-sidebar_label: slack_bolt.adapter.socket_mode.builtin
+sidebar_label: builtin
 title: slack_bolt.adapter.socket_mode.builtin
 ---
 

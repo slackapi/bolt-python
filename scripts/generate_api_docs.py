@@ -510,7 +510,7 @@ def _prefix_doc_ids(node):
     return node
 
 
-def _link_categories_to_overview(node):
+def _link_categories_to_overview(node, depth=0):
     """Turn each package category's ``index`` overview doc into the category's
     ``link`` and drop it from ``items``, returning the (possibly replaced) node.
 
@@ -525,12 +525,25 @@ def _link_categories_to_overview(node):
     A package with *no* submodules (only an ``index``, e.g. slack_bolt.error)
     would become an empty category -- a dead expandable node. In that case the
     category is replaced outright by a plain doc leaf pointing at the index, so
-    it renders as an ordinary link with no empty twisty."""
+    it renders as an ordinary link with no empty twisty.
+
+    ``depth`` is the node's depth below the Reference root (which is depth 0, its
+    top-level package categories depth 1). Top-level categories keep the full
+    dotted label (``slack_bolt.adapter``); *nested* categories (depth >= 2) are
+    relabeled to just their last dotted segment (``aiohttp`` instead of
+    ``slack_bolt.adapter.aiohttp``) since the ancestor path is already visible in
+    the tree. The page ``title`` frontmatter keeps the full dotted name."""
     if not isinstance(node, dict):
         return node
     items = node.get("items")
     if not isinstance(items, list):
         return node
+
+    # Shorten nested category labels to their leaf segment (depth 1 kept full).
+    short_label = node.get("label", "")
+    if depth >= 2 and "." in short_label:
+        short_label = short_label.rsplit(".", 1)[-1]
+        node["label"] = short_label
 
     # Find this node's own overview *before* recursing: at this point child
     # categories are still dicts, so the only ``.../index`` string is genuinely
@@ -542,7 +555,7 @@ def _link_categories_to_overview(node):
         None,
     )
 
-    node["items"] = [_link_categories_to_overview(child) for child in items]
+    node["items"] = [_link_categories_to_overview(child, depth + 1) for child in items]
 
     if overview is None or "link" in node:
         return node
@@ -550,10 +563,10 @@ def _link_categories_to_overview(node):
     remaining = [item for item in node["items"] if item is not overview]
     if not remaining:
         # Index-only package (e.g. slack_bolt.error): collapse the category to a
-        # plain doc leaf. Its label now comes from the index doc's own
-        # sidebar_label, which is the bare package name ("error"); rewrite it to
-        # the category's dotted label so it matches the sibling categories.
-        _set_sidebar_label(overview, node["label"])
+        # plain doc leaf. Its label comes from the index doc's own sidebar_label
+        # (the bare package name); rewrite it to match how the category would have
+        # read -- full dotted at depth 1, leaf segment when nested.
+        _set_sidebar_label(overview, short_label)
         return overview
     node["link"] = {"type": "doc", "id": overview}
     node["items"] = remaining

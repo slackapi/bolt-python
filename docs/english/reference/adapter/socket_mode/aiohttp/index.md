@@ -1,5 +1,5 @@
 ---
-sidebar_label: slack_bolt.adapter.socket_mode.aiohttp
+sidebar_label: aiohttp
 title: slack_bolt.adapter.socket_mode.aiohttp
 ---
 

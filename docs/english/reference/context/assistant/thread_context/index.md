@@ -1,5 +1,5 @@
 ---
-sidebar_label: slack_bolt.context.assistant.thread_context
+sidebar_label: thread_context
 title: slack_bolt.context.assistant.thread_context
 ---
 

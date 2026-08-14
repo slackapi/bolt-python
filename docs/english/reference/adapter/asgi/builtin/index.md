@@ -1,5 +1,5 @@
 ---
-sidebar_label: slack_bolt.adapter.asgi.builtin
+sidebar_label: builtin
 title: slack_bolt.adapter.asgi.builtin
 ---
 
