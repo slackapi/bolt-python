@@ -496,6 +496,48 @@ def _link_categories_to_overview(node):
             _link_categories_to_overview(child)
 
 
+def _read_doc_title(doc_id):
+    """Return the ``title`` frontmatter of a generated doc (its fully-qualified
+    module name, e.g. ``slack_bolt.async_app``), or None."""
+    rel = doc_id[len(SIDEBAR_DOC_ID_PREFIX) :] if doc_id.startswith(SIDEBAR_DOC_ID_PREFIX) else doc_id
+    path = os.path.join(DOCS_BASE_PATH, rel + ".md")
+    if not os.path.isfile(path):
+        return None
+    with open(path, encoding="utf-8") as handle:
+        text = handle.read()
+    if not text.startswith("---\n"):
+        return None
+    frontmatter = text[4 : text.index("\n---\n", 4)]
+    match = re.search(r"^title:\s*(.+)$", frontmatter, re.M)
+    return match.group(1).strip() if match else None
+
+
+def _label_top_level_module_leaves(category):
+    """Relabel the Reference category's direct leaf docs with their full dotted
+    module name.
+
+    Subpackages render as categories the renderer labels ``slack_bolt.<name>``,
+    but a top-level *module* (slack_bolt/async_app.py, slack_bolt/version.py)
+    renders as a bare-string leaf whose label is just ``async_app``/``version``.
+    Those sit beside the ``slack_bolt.*`` categories and read inconsistently.
+    Converting each such leaf to ``{type: doc, id, label: <title>}`` gives it the
+    same ``slack_bolt.<name>`` label; nested module leaves (correctly short, e.g.
+    ``app`` under ``slack_bolt.app``) are untouched because only the Reference
+    category's own items are scanned."""
+    relabeled = 0
+    new_items = []
+    for item in category.get("items", []):
+        if isinstance(item, str):
+            title = _read_doc_title(item)
+            if title:
+                new_items.append({"type": "doc", "id": item, "label": title})
+                relabeled += 1
+                continue
+        new_items.append(item)
+    category["items"] = new_items
+    print("Relabeled {} top-level module leaves with dotted names".format(relabeled))
+
+
 def _finalize_reference_sidebar():
     """Rewrite the generated reference/sidebar.json in place into the shape the
     docs repo imports: a self-contained "Reference" category with docs-root
@@ -517,6 +559,7 @@ def _finalize_reference_sidebar():
         category["items"] = items[0]["items"]
 
     _link_categories_to_overview(category)
+    _label_top_level_module_leaves(category)
 
     with open(reference_sidebar, "w", encoding="utf-8") as handle:
         json.dump(category, handle, indent=2, ensure_ascii=False)

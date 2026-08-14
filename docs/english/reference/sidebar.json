@@ -797,8 +797,16 @@
         "id": "tools/bolt-python/reference/workflows/index"
       }
     },
-    "tools/bolt-python/reference/async_app",
-    "tools/bolt-python/reference/version"
+    {
+      "type": "doc",
+      "id": "tools/bolt-python/reference/async_app",
+      "label": "slack_bolt.async_app"
+    },
+    {
+      "type": "doc",
+      "id": "tools/bolt-python/reference/version",
+      "label": "slack_bolt.version"
+    }
   ],
   "label": "Reference",
   "type": "category",
