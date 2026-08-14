@@ -3,583 +3,756 @@
     {
       "items": [
         {
-          "items": [
-            "tools/bolt-python/reference/slack_bolt/adapter/aiohttp/index"
-          ],
+          "items": [],
           "label": "slack_bolt.adapter.aiohttp",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/aiohttp/index"
+          }
         },
         {
           "items": [
             {
-              "items": [
-                "tools/bolt-python/reference/slack_bolt/adapter/asgi/aiohttp/index"
-              ],
+              "items": [],
               "label": "slack_bolt.adapter.asgi.aiohttp",
-              "type": "category"
+              "type": "category",
+              "link": {
+                "type": "doc",
+                "id": "tools/bolt-python/reference/adapter/asgi/aiohttp/index"
+              }
             },
             {
-              "items": [
-                "tools/bolt-python/reference/slack_bolt/adapter/asgi/builtin/index"
-              ],
+              "items": [],
               "label": "slack_bolt.adapter.asgi.builtin",
-              "type": "category"
+              "type": "category",
+              "link": {
+                "type": "doc",
+                "id": "tools/bolt-python/reference/adapter/asgi/builtin/index"
+              }
             },
-            "tools/bolt-python/reference/slack_bolt/adapter/asgi/index",
-            "tools/bolt-python/reference/slack_bolt/adapter/asgi/async_handler",
-            "tools/bolt-python/reference/slack_bolt/adapter/asgi/base_handler",
-            "tools/bolt-python/reference/slack_bolt/adapter/asgi/http_request",
-            "tools/bolt-python/reference/slack_bolt/adapter/asgi/http_response",
-            "tools/bolt-python/reference/slack_bolt/adapter/asgi/utils"
+            "tools/bolt-python/reference/adapter/asgi/async_handler",
+            "tools/bolt-python/reference/adapter/asgi/base_handler",
+            "tools/bolt-python/reference/adapter/asgi/http_request",
+            "tools/bolt-python/reference/adapter/asgi/http_response",
+            "tools/bolt-python/reference/adapter/asgi/utils"
           ],
           "label": "slack_bolt.adapter.asgi",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/asgi/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/adapter/aws_lambda/index",
-            "tools/bolt-python/reference/slack_bolt/adapter/aws_lambda/chalice_handler",
-            "tools/bolt-python/reference/slack_bolt/adapter/aws_lambda/chalice_lazy_listener_runner",
-            "tools/bolt-python/reference/slack_bolt/adapter/aws_lambda/handler",
-            "tools/bolt-python/reference/slack_bolt/adapter/aws_lambda/internals",
-            "tools/bolt-python/reference/slack_bolt/adapter/aws_lambda/lambda_s3_oauth_flow",
-            "tools/bolt-python/reference/slack_bolt/adapter/aws_lambda/lazy_listener_runner",
-            "tools/bolt-python/reference/slack_bolt/adapter/aws_lambda/local_lambda_client"
+            "tools/bolt-python/reference/adapter/aws_lambda/chalice_handler",
+            "tools/bolt-python/reference/adapter/aws_lambda/chalice_lazy_listener_runner",
+            "tools/bolt-python/reference/adapter/aws_lambda/handler",
+            "tools/bolt-python/reference/adapter/aws_lambda/internals",
+            "tools/bolt-python/reference/adapter/aws_lambda/lambda_s3_oauth_flow",
+            "tools/bolt-python/reference/adapter/aws_lambda/lazy_listener_runner",
+            "tools/bolt-python/reference/adapter/aws_lambda/local_lambda_client"
           ],
           "label": "slack_bolt.adapter.aws_lambda",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/aws_lambda/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/adapter/bottle/index",
-            "tools/bolt-python/reference/slack_bolt/adapter/bottle/handler"
+            "tools/bolt-python/reference/adapter/bottle/handler"
           ],
           "label": "slack_bolt.adapter.bottle",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/bottle/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/adapter/cherrypy/index",
-            "tools/bolt-python/reference/slack_bolt/adapter/cherrypy/handler"
+            "tools/bolt-python/reference/adapter/cherrypy/handler"
           ],
           "label": "slack_bolt.adapter.cherrypy",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/cherrypy/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/adapter/django/index",
-            "tools/bolt-python/reference/slack_bolt/adapter/django/handler"
+            "tools/bolt-python/reference/adapter/django/handler"
           ],
           "label": "slack_bolt.adapter.django",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/django/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/adapter/falcon/index",
-            "tools/bolt-python/reference/slack_bolt/adapter/falcon/async_resource",
-            "tools/bolt-python/reference/slack_bolt/adapter/falcon/resource"
+            "tools/bolt-python/reference/adapter/falcon/async_resource",
+            "tools/bolt-python/reference/adapter/falcon/resource"
           ],
           "label": "slack_bolt.adapter.falcon",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/falcon/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/adapter/fastapi/index",
-            "tools/bolt-python/reference/slack_bolt/adapter/fastapi/async_handler"
+            "tools/bolt-python/reference/adapter/fastapi/async_handler"
           ],
           "label": "slack_bolt.adapter.fastapi",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/fastapi/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/adapter/flask/index",
-            "tools/bolt-python/reference/slack_bolt/adapter/flask/handler"
+            "tools/bolt-python/reference/adapter/flask/handler"
           ],
           "label": "slack_bolt.adapter.flask",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/flask/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/adapter/google_cloud_functions/index",
-            "tools/bolt-python/reference/slack_bolt/adapter/google_cloud_functions/handler"
+            "tools/bolt-python/reference/adapter/google_cloud_functions/handler"
           ],
           "label": "slack_bolt.adapter.google_cloud_functions",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/google_cloud_functions/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/adapter/pyramid/index",
-            "tools/bolt-python/reference/slack_bolt/adapter/pyramid/handler"
+            "tools/bolt-python/reference/adapter/pyramid/handler"
           ],
           "label": "slack_bolt.adapter.pyramid",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/pyramid/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/adapter/sanic/index",
-            "tools/bolt-python/reference/slack_bolt/adapter/sanic/async_handler"
+            "tools/bolt-python/reference/adapter/sanic/async_handler"
           ],
           "label": "slack_bolt.adapter.sanic",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/sanic/index"
+          }
         },
         {
           "items": [
             {
-              "items": [
-                "tools/bolt-python/reference/slack_bolt/adapter/socket_mode/aiohttp/index"
-              ],
+              "items": [],
               "label": "slack_bolt.adapter.socket_mode.aiohttp",
-              "type": "category"
+              "type": "category",
+              "link": {
+                "type": "doc",
+                "id": "tools/bolt-python/reference/adapter/socket_mode/aiohttp/index"
+              }
             },
             {
-              "items": [
-                "tools/bolt-python/reference/slack_bolt/adapter/socket_mode/builtin/index"
-              ],
+              "items": [],
               "label": "slack_bolt.adapter.socket_mode.builtin",
-              "type": "category"
+              "type": "category",
+              "link": {
+                "type": "doc",
+                "id": "tools/bolt-python/reference/adapter/socket_mode/builtin/index"
+              }
             },
             {
-              "items": [
-                "tools/bolt-python/reference/slack_bolt/adapter/socket_mode/websocket_client/index"
-              ],
+              "items": [],
               "label": "slack_bolt.adapter.socket_mode.websocket_client",
-              "type": "category"
+              "type": "category",
+              "link": {
+                "type": "doc",
+                "id": "tools/bolt-python/reference/adapter/socket_mode/websocket_client/index"
+              }
             },
             {
-              "items": [
-                "tools/bolt-python/reference/slack_bolt/adapter/socket_mode/websockets/index"
-              ],
+              "items": [],
               "label": "slack_bolt.adapter.socket_mode.websockets",
-              "type": "category"
+              "type": "category",
+              "link": {
+                "type": "doc",
+                "id": "tools/bolt-python/reference/adapter/socket_mode/websockets/index"
+              }
             },
-            "tools/bolt-python/reference/slack_bolt/adapter/socket_mode/index",
-            "tools/bolt-python/reference/slack_bolt/adapter/socket_mode/async_base_handler",
-            "tools/bolt-python/reference/slack_bolt/adapter/socket_mode/async_handler",
-            "tools/bolt-python/reference/slack_bolt/adapter/socket_mode/async_internals",
-            "tools/bolt-python/reference/slack_bolt/adapter/socket_mode/base_handler",
-            "tools/bolt-python/reference/slack_bolt/adapter/socket_mode/internals"
+            "tools/bolt-python/reference/adapter/socket_mode/async_base_handler",
+            "tools/bolt-python/reference/adapter/socket_mode/async_handler",
+            "tools/bolt-python/reference/adapter/socket_mode/async_internals",
+            "tools/bolt-python/reference/adapter/socket_mode/base_handler",
+            "tools/bolt-python/reference/adapter/socket_mode/internals"
           ],
           "label": "slack_bolt.adapter.socket_mode",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/socket_mode/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/adapter/starlette/index",
-            "tools/bolt-python/reference/slack_bolt/adapter/starlette/async_handler",
-            "tools/bolt-python/reference/slack_bolt/adapter/starlette/handler"
+            "tools/bolt-python/reference/adapter/starlette/async_handler",
+            "tools/bolt-python/reference/adapter/starlette/handler"
           ],
           "label": "slack_bolt.adapter.starlette",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/starlette/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/adapter/tornado/index",
-            "tools/bolt-python/reference/slack_bolt/adapter/tornado/async_handler",
-            "tools/bolt-python/reference/slack_bolt/adapter/tornado/handler"
+            "tools/bolt-python/reference/adapter/tornado/async_handler",
+            "tools/bolt-python/reference/adapter/tornado/handler"
           ],
           "label": "slack_bolt.adapter.tornado",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/tornado/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/adapter/wsgi/index",
-            "tools/bolt-python/reference/slack_bolt/adapter/wsgi/handler",
-            "tools/bolt-python/reference/slack_bolt/adapter/wsgi/http_request",
-            "tools/bolt-python/reference/slack_bolt/adapter/wsgi/http_response",
-            "tools/bolt-python/reference/slack_bolt/adapter/wsgi/internals"
+            "tools/bolt-python/reference/adapter/wsgi/handler",
+            "tools/bolt-python/reference/adapter/wsgi/http_request",
+            "tools/bolt-python/reference/adapter/wsgi/http_response",
+            "tools/bolt-python/reference/adapter/wsgi/internals"
           ],
           "label": "slack_bolt.adapter.wsgi",
-          "type": "category"
-        },
-        "tools/bolt-python/reference/slack_bolt/adapter/index"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/adapter/wsgi/index"
+          }
+        }
       ],
       "label": "slack_bolt.adapter",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/adapter/index"
+      }
     },
     {
       "items": [
-        "tools/bolt-python/reference/slack_bolt/app/index",
-        "tools/bolt-python/reference/slack_bolt/app/app",
-        "tools/bolt-python/reference/slack_bolt/app/async_app",
-        "tools/bolt-python/reference/slack_bolt/app/async_server"
+        "tools/bolt-python/reference/app/app",
+        "tools/bolt-python/reference/app/async_app",
+        "tools/bolt-python/reference/app/async_server"
       ],
       "label": "slack_bolt.app",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/app/index"
+      }
     },
     {
       "items": [
-        "tools/bolt-python/reference/slack_bolt/authorization/index",
-        "tools/bolt-python/reference/slack_bolt/authorization/async_authorize",
-        "tools/bolt-python/reference/slack_bolt/authorization/async_authorize_args",
-        "tools/bolt-python/reference/slack_bolt/authorization/authorize",
-        "tools/bolt-python/reference/slack_bolt/authorization/authorize_args",
-        "tools/bolt-python/reference/slack_bolt/authorization/authorize_result"
+        "tools/bolt-python/reference/authorization/async_authorize",
+        "tools/bolt-python/reference/authorization/async_authorize_args",
+        "tools/bolt-python/reference/authorization/authorize",
+        "tools/bolt-python/reference/authorization/authorize_args",
+        "tools/bolt-python/reference/authorization/authorize_result"
       ],
       "label": "slack_bolt.authorization",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/authorization/index"
+      }
     },
     {
       "items": [
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/context/ack/index",
-            "tools/bolt-python/reference/slack_bolt/context/ack/ack",
-            "tools/bolt-python/reference/slack_bolt/context/ack/async_ack",
-            "tools/bolt-python/reference/slack_bolt/context/ack/internals"
+            "tools/bolt-python/reference/context/ack/ack",
+            "tools/bolt-python/reference/context/ack/async_ack",
+            "tools/bolt-python/reference/context/ack/internals"
           ],
           "label": "slack_bolt.context.ack",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/context/ack/index"
+          }
         },
         {
           "items": [
             {
-              "items": [
-                "tools/bolt-python/reference/slack_bolt/context/assistant/thread_context/index"
-              ],
+              "items": [],
               "label": "slack_bolt.context.assistant.thread_context",
-              "type": "category"
+              "type": "category",
+              "link": {
+                "type": "doc",
+                "id": "tools/bolt-python/reference/context/assistant/thread_context/index"
+              }
             },
             {
               "items": [
                 {
-                  "items": [
-                    "tools/bolt-python/reference/slack_bolt/context/assistant/thread_context_store/file/index"
-                  ],
+                  "items": [],
                   "label": "slack_bolt.context.assistant.thread_context_store.file",
-                  "type": "category"
+                  "type": "category",
+                  "link": {
+                    "type": "doc",
+                    "id": "tools/bolt-python/reference/context/assistant/thread_context_store/file/index"
+                  }
                 },
-                "tools/bolt-python/reference/slack_bolt/context/assistant/thread_context_store/index",
-                "tools/bolt-python/reference/slack_bolt/context/assistant/thread_context_store/async_store",
-                "tools/bolt-python/reference/slack_bolt/context/assistant/thread_context_store/default_async_store",
-                "tools/bolt-python/reference/slack_bolt/context/assistant/thread_context_store/default_store",
-                "tools/bolt-python/reference/slack_bolt/context/assistant/thread_context_store/store"
+                "tools/bolt-python/reference/context/assistant/thread_context_store/async_store",
+                "tools/bolt-python/reference/context/assistant/thread_context_store/default_async_store",
+                "tools/bolt-python/reference/context/assistant/thread_context_store/default_store",
+                "tools/bolt-python/reference/context/assistant/thread_context_store/store"
               ],
               "label": "slack_bolt.context.assistant.thread_context_store",
-              "type": "category"
+              "type": "category",
+              "link": {
+                "type": "doc",
+                "id": "tools/bolt-python/reference/context/assistant/thread_context_store/index"
+              }
             },
-            "tools/bolt-python/reference/slack_bolt/context/assistant/index",
-            "tools/bolt-python/reference/slack_bolt/context/assistant/assistant_utilities",
-            "tools/bolt-python/reference/slack_bolt/context/assistant/async_assistant_utilities",
-            "tools/bolt-python/reference/slack_bolt/context/assistant/internals"
+            "tools/bolt-python/reference/context/assistant/assistant_utilities",
+            "tools/bolt-python/reference/context/assistant/async_assistant_utilities",
+            "tools/bolt-python/reference/context/assistant/internals"
           ],
           "label": "slack_bolt.context.assistant",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/context/assistant/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/context/complete/index",
-            "tools/bolt-python/reference/slack_bolt/context/complete/async_complete",
-            "tools/bolt-python/reference/slack_bolt/context/complete/complete"
+            "tools/bolt-python/reference/context/complete/async_complete",
+            "tools/bolt-python/reference/context/complete/complete"
           ],
           "label": "slack_bolt.context.complete",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/context/complete/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/context/fail/index",
-            "tools/bolt-python/reference/slack_bolt/context/fail/async_fail",
-            "tools/bolt-python/reference/slack_bolt/context/fail/fail"
+            "tools/bolt-python/reference/context/fail/async_fail",
+            "tools/bolt-python/reference/context/fail/fail"
           ],
           "label": "slack_bolt.context.fail",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/context/fail/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/context/get_thread_context/index",
-            "tools/bolt-python/reference/slack_bolt/context/get_thread_context/async_get_thread_context",
-            "tools/bolt-python/reference/slack_bolt/context/get_thread_context/get_thread_context"
+            "tools/bolt-python/reference/context/get_thread_context/async_get_thread_context",
+            "tools/bolt-python/reference/context/get_thread_context/get_thread_context"
           ],
           "label": "slack_bolt.context.get_thread_context",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/context/get_thread_context/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/context/respond/index",
-            "tools/bolt-python/reference/slack_bolt/context/respond/async_respond",
-            "tools/bolt-python/reference/slack_bolt/context/respond/internals",
-            "tools/bolt-python/reference/slack_bolt/context/respond/respond"
+            "tools/bolt-python/reference/context/respond/async_respond",
+            "tools/bolt-python/reference/context/respond/internals",
+            "tools/bolt-python/reference/context/respond/respond"
           ],
           "label": "slack_bolt.context.respond",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/context/respond/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/context/save_thread_context/index",
-            "tools/bolt-python/reference/slack_bolt/context/save_thread_context/async_save_thread_context",
-            "tools/bolt-python/reference/slack_bolt/context/save_thread_context/save_thread_context"
+            "tools/bolt-python/reference/context/save_thread_context/async_save_thread_context",
+            "tools/bolt-python/reference/context/save_thread_context/save_thread_context"
           ],
           "label": "slack_bolt.context.save_thread_context",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/context/save_thread_context/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/context/say/index",
-            "tools/bolt-python/reference/slack_bolt/context/say/async_say",
-            "tools/bolt-python/reference/slack_bolt/context/say/internals",
-            "tools/bolt-python/reference/slack_bolt/context/say/say"
+            "tools/bolt-python/reference/context/say/async_say",
+            "tools/bolt-python/reference/context/say/internals",
+            "tools/bolt-python/reference/context/say/say"
           ],
           "label": "slack_bolt.context.say",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/context/say/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/context/say_stream/index",
-            "tools/bolt-python/reference/slack_bolt/context/say_stream/async_say_stream",
-            "tools/bolt-python/reference/slack_bolt/context/say_stream/say_stream"
+            "tools/bolt-python/reference/context/say_stream/async_say_stream",
+            "tools/bolt-python/reference/context/say_stream/say_stream"
           ],
           "label": "slack_bolt.context.say_stream",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/context/say_stream/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/context/set_status/index",
-            "tools/bolt-python/reference/slack_bolt/context/set_status/async_set_status",
-            "tools/bolt-python/reference/slack_bolt/context/set_status/set_status"
+            "tools/bolt-python/reference/context/set_status/async_set_status",
+            "tools/bolt-python/reference/context/set_status/set_status"
           ],
           "label": "slack_bolt.context.set_status",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/context/set_status/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/context/set_suggested_prompts/index",
-            "tools/bolt-python/reference/slack_bolt/context/set_suggested_prompts/async_set_suggested_prompts",
-            "tools/bolt-python/reference/slack_bolt/context/set_suggested_prompts/set_suggested_prompts"
+            "tools/bolt-python/reference/context/set_suggested_prompts/async_set_suggested_prompts",
+            "tools/bolt-python/reference/context/set_suggested_prompts/set_suggested_prompts"
           ],
           "label": "slack_bolt.context.set_suggested_prompts",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/context/set_suggested_prompts/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/context/set_title/index",
-            "tools/bolt-python/reference/slack_bolt/context/set_title/async_set_title",
-            "tools/bolt-python/reference/slack_bolt/context/set_title/set_title"
+            "tools/bolt-python/reference/context/set_title/async_set_title",
+            "tools/bolt-python/reference/context/set_title/set_title"
           ],
           "label": "slack_bolt.context.set_title",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/context/set_title/index"
+          }
         },
-        "tools/bolt-python/reference/slack_bolt/context/index",
-        "tools/bolt-python/reference/slack_bolt/context/async_context",
-        "tools/bolt-python/reference/slack_bolt/context/base_context",
-        "tools/bolt-python/reference/slack_bolt/context/context"
+        "tools/bolt-python/reference/context/async_context",
+        "tools/bolt-python/reference/context/base_context",
+        "tools/bolt-python/reference/context/context"
       ],
       "label": "slack_bolt.context",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/context/index"
+      }
     },
     {
-      "items": [
-        "tools/bolt-python/reference/slack_bolt/error/index"
-      ],
+      "items": [],
       "label": "slack_bolt.error",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/error/index"
+      }
     },
     {
       "items": [
-        "tools/bolt-python/reference/slack_bolt/kwargs_injection/index",
-        "tools/bolt-python/reference/slack_bolt/kwargs_injection/args",
-        "tools/bolt-python/reference/slack_bolt/kwargs_injection/async_args",
-        "tools/bolt-python/reference/slack_bolt/kwargs_injection/async_utils",
-        "tools/bolt-python/reference/slack_bolt/kwargs_injection/utils"
+        "tools/bolt-python/reference/kwargs_injection/args",
+        "tools/bolt-python/reference/kwargs_injection/async_args",
+        "tools/bolt-python/reference/kwargs_injection/async_utils",
+        "tools/bolt-python/reference/kwargs_injection/utils"
       ],
       "label": "slack_bolt.kwargs_injection",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/kwargs_injection/index"
+      }
     },
     {
       "items": [
-        "tools/bolt-python/reference/slack_bolt/lazy_listener/index",
-        "tools/bolt-python/reference/slack_bolt/lazy_listener/async_internals",
-        "tools/bolt-python/reference/slack_bolt/lazy_listener/async_runner",
-        "tools/bolt-python/reference/slack_bolt/lazy_listener/asyncio_runner",
-        "tools/bolt-python/reference/slack_bolt/lazy_listener/internals",
-        "tools/bolt-python/reference/slack_bolt/lazy_listener/runner",
-        "tools/bolt-python/reference/slack_bolt/lazy_listener/thread_runner"
+        "tools/bolt-python/reference/lazy_listener/async_internals",
+        "tools/bolt-python/reference/lazy_listener/async_runner",
+        "tools/bolt-python/reference/lazy_listener/asyncio_runner",
+        "tools/bolt-python/reference/lazy_listener/internals",
+        "tools/bolt-python/reference/lazy_listener/runner",
+        "tools/bolt-python/reference/lazy_listener/thread_runner"
       ],
       "label": "slack_bolt.lazy_listener",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/lazy_listener/index"
+      }
     },
     {
       "items": [
-        "tools/bolt-python/reference/slack_bolt/listener/index",
-        "tools/bolt-python/reference/slack_bolt/listener/async_builtins",
-        "tools/bolt-python/reference/slack_bolt/listener/async_listener",
-        "tools/bolt-python/reference/slack_bolt/listener/async_listener_completion_handler",
-        "tools/bolt-python/reference/slack_bolt/listener/async_listener_error_handler",
-        "tools/bolt-python/reference/slack_bolt/listener/async_listener_start_handler",
-        "tools/bolt-python/reference/slack_bolt/listener/asyncio_runner",
-        "tools/bolt-python/reference/slack_bolt/listener/builtins",
-        "tools/bolt-python/reference/slack_bolt/listener/custom_listener",
-        "tools/bolt-python/reference/slack_bolt/listener/listener",
-        "tools/bolt-python/reference/slack_bolt/listener/listener_completion_handler",
-        "tools/bolt-python/reference/slack_bolt/listener/listener_error_handler",
-        "tools/bolt-python/reference/slack_bolt/listener/listener_start_handler",
-        "tools/bolt-python/reference/slack_bolt/listener/thread_runner"
+        "tools/bolt-python/reference/listener/async_builtins",
+        "tools/bolt-python/reference/listener/async_listener",
+        "tools/bolt-python/reference/listener/async_listener_completion_handler",
+        "tools/bolt-python/reference/listener/async_listener_error_handler",
+        "tools/bolt-python/reference/listener/async_listener_start_handler",
+        "tools/bolt-python/reference/listener/asyncio_runner",
+        "tools/bolt-python/reference/listener/builtins",
+        "tools/bolt-python/reference/listener/custom_listener",
+        "tools/bolt-python/reference/listener/listener",
+        "tools/bolt-python/reference/listener/listener_completion_handler",
+        "tools/bolt-python/reference/listener/listener_error_handler",
+        "tools/bolt-python/reference/listener/listener_start_handler",
+        "tools/bolt-python/reference/listener/thread_runner"
       ],
       "label": "slack_bolt.listener",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/listener/index"
+      }
     },
     {
       "items": [
-        "tools/bolt-python/reference/slack_bolt/listener_matcher/index",
-        "tools/bolt-python/reference/slack_bolt/listener_matcher/async_builtins",
-        "tools/bolt-python/reference/slack_bolt/listener_matcher/async_listener_matcher",
-        "tools/bolt-python/reference/slack_bolt/listener_matcher/builtins",
-        "tools/bolt-python/reference/slack_bolt/listener_matcher/custom_listener_matcher",
-        "tools/bolt-python/reference/slack_bolt/listener_matcher/listener_matcher"
+        "tools/bolt-python/reference/listener_matcher/async_builtins",
+        "tools/bolt-python/reference/listener_matcher/async_listener_matcher",
+        "tools/bolt-python/reference/listener_matcher/builtins",
+        "tools/bolt-python/reference/listener_matcher/custom_listener_matcher",
+        "tools/bolt-python/reference/listener_matcher/listener_matcher"
       ],
       "label": "slack_bolt.listener_matcher",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/listener_matcher/index"
+      }
     },
     {
       "items": [
-        "tools/bolt-python/reference/slack_bolt/logger/index",
-        "tools/bolt-python/reference/slack_bolt/logger/messages"
+        "tools/bolt-python/reference/logger/messages"
       ],
       "label": "slack_bolt.logger",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/logger/index"
+      }
     },
     {
       "items": [
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/middleware/assistant/index",
-            "tools/bolt-python/reference/slack_bolt/middleware/assistant/assistant",
-            "tools/bolt-python/reference/slack_bolt/middleware/assistant/async_assistant"
+            "tools/bolt-python/reference/middleware/assistant/assistant",
+            "tools/bolt-python/reference/middleware/assistant/async_assistant"
           ],
           "label": "slack_bolt.middleware.assistant",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/middleware/assistant/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/middleware/attaching_conversation_kwargs/index",
-            "tools/bolt-python/reference/slack_bolt/middleware/attaching_conversation_kwargs/async_attaching_conversation_kwargs",
-            "tools/bolt-python/reference/slack_bolt/middleware/attaching_conversation_kwargs/attaching_conversation_kwargs"
+            "tools/bolt-python/reference/middleware/attaching_conversation_kwargs/async_attaching_conversation_kwargs",
+            "tools/bolt-python/reference/middleware/attaching_conversation_kwargs/attaching_conversation_kwargs"
           ],
           "label": "slack_bolt.middleware.attaching_conversation_kwargs",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/middleware/attaching_conversation_kwargs/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/middleware/attaching_function_token/index",
-            "tools/bolt-python/reference/slack_bolt/middleware/attaching_function_token/async_attaching_function_token",
-            "tools/bolt-python/reference/slack_bolt/middleware/attaching_function_token/attaching_function_token"
+            "tools/bolt-python/reference/middleware/attaching_function_token/async_attaching_function_token",
+            "tools/bolt-python/reference/middleware/attaching_function_token/attaching_function_token"
           ],
           "label": "slack_bolt.middleware.attaching_function_token",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/middleware/attaching_function_token/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/middleware/authorization/index",
-            "tools/bolt-python/reference/slack_bolt/middleware/authorization/async_authorization",
-            "tools/bolt-python/reference/slack_bolt/middleware/authorization/async_internals",
-            "tools/bolt-python/reference/slack_bolt/middleware/authorization/async_multi_teams_authorization",
-            "tools/bolt-python/reference/slack_bolt/middleware/authorization/async_single_team_authorization",
-            "tools/bolt-python/reference/slack_bolt/middleware/authorization/authorization",
-            "tools/bolt-python/reference/slack_bolt/middleware/authorization/internals",
-            "tools/bolt-python/reference/slack_bolt/middleware/authorization/multi_teams_authorization",
-            "tools/bolt-python/reference/slack_bolt/middleware/authorization/single_team_authorization"
+            "tools/bolt-python/reference/middleware/authorization/async_authorization",
+            "tools/bolt-python/reference/middleware/authorization/async_internals",
+            "tools/bolt-python/reference/middleware/authorization/async_multi_teams_authorization",
+            "tools/bolt-python/reference/middleware/authorization/async_single_team_authorization",
+            "tools/bolt-python/reference/middleware/authorization/authorization",
+            "tools/bolt-python/reference/middleware/authorization/internals",
+            "tools/bolt-python/reference/middleware/authorization/multi_teams_authorization",
+            "tools/bolt-python/reference/middleware/authorization/single_team_authorization"
           ],
           "label": "slack_bolt.middleware.authorization",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/middleware/authorization/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/middleware/ignoring_self_events/index",
-            "tools/bolt-python/reference/slack_bolt/middleware/ignoring_self_events/async_ignoring_self_events",
-            "tools/bolt-python/reference/slack_bolt/middleware/ignoring_self_events/ignoring_self_events"
+            "tools/bolt-python/reference/middleware/ignoring_self_events/async_ignoring_self_events",
+            "tools/bolt-python/reference/middleware/ignoring_self_events/ignoring_self_events"
           ],
           "label": "slack_bolt.middleware.ignoring_self_events",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/middleware/ignoring_self_events/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/middleware/message_listener_matches/index",
-            "tools/bolt-python/reference/slack_bolt/middleware/message_listener_matches/async_message_listener_matches",
-            "tools/bolt-python/reference/slack_bolt/middleware/message_listener_matches/message_listener_matches"
+            "tools/bolt-python/reference/middleware/message_listener_matches/async_message_listener_matches",
+            "tools/bolt-python/reference/middleware/message_listener_matches/message_listener_matches"
           ],
           "label": "slack_bolt.middleware.message_listener_matches",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/middleware/message_listener_matches/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/middleware/request_verification/index",
-            "tools/bolt-python/reference/slack_bolt/middleware/request_verification/async_request_verification",
-            "tools/bolt-python/reference/slack_bolt/middleware/request_verification/request_verification"
+            "tools/bolt-python/reference/middleware/request_verification/async_request_verification",
+            "tools/bolt-python/reference/middleware/request_verification/request_verification"
           ],
           "label": "slack_bolt.middleware.request_verification",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/middleware/request_verification/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/middleware/ssl_check/index",
-            "tools/bolt-python/reference/slack_bolt/middleware/ssl_check/async_ssl_check",
-            "tools/bolt-python/reference/slack_bolt/middleware/ssl_check/ssl_check"
+            "tools/bolt-python/reference/middleware/ssl_check/async_ssl_check",
+            "tools/bolt-python/reference/middleware/ssl_check/ssl_check"
           ],
           "label": "slack_bolt.middleware.ssl_check",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/middleware/ssl_check/index"
+          }
         },
         {
           "items": [
-            "tools/bolt-python/reference/slack_bolt/middleware/url_verification/index",
-            "tools/bolt-python/reference/slack_bolt/middleware/url_verification/async_url_verification",
-            "tools/bolt-python/reference/slack_bolt/middleware/url_verification/url_verification"
+            "tools/bolt-python/reference/middleware/url_verification/async_url_verification",
+            "tools/bolt-python/reference/middleware/url_verification/url_verification"
           ],
           "label": "slack_bolt.middleware.url_verification",
-          "type": "category"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/middleware/url_verification/index"
+          }
         },
-        "tools/bolt-python/reference/slack_bolt/middleware/index",
-        "tools/bolt-python/reference/slack_bolt/middleware/async_builtins",
-        "tools/bolt-python/reference/slack_bolt/middleware/async_custom_middleware",
-        "tools/bolt-python/reference/slack_bolt/middleware/async_middleware",
-        "tools/bolt-python/reference/slack_bolt/middleware/async_middleware_error_handler",
-        "tools/bolt-python/reference/slack_bolt/middleware/custom_middleware",
-        "tools/bolt-python/reference/slack_bolt/middleware/middleware",
-        "tools/bolt-python/reference/slack_bolt/middleware/middleware_error_handler"
+        "tools/bolt-python/reference/middleware/async_builtins",
+        "tools/bolt-python/reference/middleware/async_custom_middleware",
+        "tools/bolt-python/reference/middleware/async_middleware",
+        "tools/bolt-python/reference/middleware/async_middleware_error_handler",
+        "tools/bolt-python/reference/middleware/custom_middleware",
+        "tools/bolt-python/reference/middleware/middleware",
+        "tools/bolt-python/reference/middleware/middleware_error_handler"
       ],
       "label": "slack_bolt.middleware",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/middleware/index"
+      }
     },
     {
       "items": [
-        "tools/bolt-python/reference/slack_bolt/oauth/index",
-        "tools/bolt-python/reference/slack_bolt/oauth/async_callback_options",
-        "tools/bolt-python/reference/slack_bolt/oauth/async_internals",
-        "tools/bolt-python/reference/slack_bolt/oauth/async_oauth_flow",
-        "tools/bolt-python/reference/slack_bolt/oauth/async_oauth_settings",
-        "tools/bolt-python/reference/slack_bolt/oauth/callback_options",
-        "tools/bolt-python/reference/slack_bolt/oauth/internals",
-        "tools/bolt-python/reference/slack_bolt/oauth/oauth_flow",
-        "tools/bolt-python/reference/slack_bolt/oauth/oauth_settings"
+        "tools/bolt-python/reference/oauth/async_callback_options",
+        "tools/bolt-python/reference/oauth/async_internals",
+        "tools/bolt-python/reference/oauth/async_oauth_flow",
+        "tools/bolt-python/reference/oauth/async_oauth_settings",
+        "tools/bolt-python/reference/oauth/callback_options",
+        "tools/bolt-python/reference/oauth/internals",
+        "tools/bolt-python/reference/oauth/oauth_flow",
+        "tools/bolt-python/reference/oauth/oauth_settings"
       ],
       "label": "slack_bolt.oauth",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/oauth/index"
+      }
     },
     {
       "items": [
-        "tools/bolt-python/reference/slack_bolt/request/index",
-        "tools/bolt-python/reference/slack_bolt/request/async_internals",
-        "tools/bolt-python/reference/slack_bolt/request/async_request",
-        "tools/bolt-python/reference/slack_bolt/request/internals",
-        "tools/bolt-python/reference/slack_bolt/request/payload_utils",
-        "tools/bolt-python/reference/slack_bolt/request/request"
+        "tools/bolt-python/reference/request/async_internals",
+        "tools/bolt-python/reference/request/async_request",
+        "tools/bolt-python/reference/request/internals",
+        "tools/bolt-python/reference/request/payload_utils",
+        "tools/bolt-python/reference/request/request"
       ],
       "label": "slack_bolt.request",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/request/index"
+      }
     },
     {
       "items": [
-        "tools/bolt-python/reference/slack_bolt/response/index",
-        "tools/bolt-python/reference/slack_bolt/response/response"
+        "tools/bolt-python/reference/response/response"
       ],
       "label": "slack_bolt.response",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/response/index"
+      }
     },
     {
       "items": [
-        "tools/bolt-python/reference/slack_bolt/util/index",
-        "tools/bolt-python/reference/slack_bolt/util/async_utils",
-        "tools/bolt-python/reference/slack_bolt/util/utils"
+        "tools/bolt-python/reference/util/async_utils",
+        "tools/bolt-python/reference/util/utils"
       ],
       "label": "slack_bolt.util",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/util/index"
+      }
     },
     {
       "items": [
@@ -587,38 +760,50 @@
           "items": [
             {
               "items": [
-                "tools/bolt-python/reference/slack_bolt/workflows/step/utilities/index",
-                "tools/bolt-python/reference/slack_bolt/workflows/step/utilities/async_complete",
-                "tools/bolt-python/reference/slack_bolt/workflows/step/utilities/async_configure",
-                "tools/bolt-python/reference/slack_bolt/workflows/step/utilities/async_fail",
-                "tools/bolt-python/reference/slack_bolt/workflows/step/utilities/async_update",
-                "tools/bolt-python/reference/slack_bolt/workflows/step/utilities/complete",
-                "tools/bolt-python/reference/slack_bolt/workflows/step/utilities/configure",
-                "tools/bolt-python/reference/slack_bolt/workflows/step/utilities/fail",
-                "tools/bolt-python/reference/slack_bolt/workflows/step/utilities/update"
+                "tools/bolt-python/reference/workflows/step/utilities/async_complete",
+                "tools/bolt-python/reference/workflows/step/utilities/async_configure",
+                "tools/bolt-python/reference/workflows/step/utilities/async_fail",
+                "tools/bolt-python/reference/workflows/step/utilities/async_update",
+                "tools/bolt-python/reference/workflows/step/utilities/complete",
+                "tools/bolt-python/reference/workflows/step/utilities/configure",
+                "tools/bolt-python/reference/workflows/step/utilities/fail",
+                "tools/bolt-python/reference/workflows/step/utilities/update"
               ],
               "label": "slack_bolt.workflows.step.utilities",
-              "type": "category"
+              "type": "category",
+              "link": {
+                "type": "doc",
+                "id": "tools/bolt-python/reference/workflows/step/utilities/index"
+              }
             },
-            "tools/bolt-python/reference/slack_bolt/workflows/step/index",
-            "tools/bolt-python/reference/slack_bolt/workflows/step/async_step",
-            "tools/bolt-python/reference/slack_bolt/workflows/step/async_step_middleware",
-            "tools/bolt-python/reference/slack_bolt/workflows/step/internals",
-            "tools/bolt-python/reference/slack_bolt/workflows/step/step",
-            "tools/bolt-python/reference/slack_bolt/workflows/step/step_middleware"
+            "tools/bolt-python/reference/workflows/step/async_step",
+            "tools/bolt-python/reference/workflows/step/async_step_middleware",
+            "tools/bolt-python/reference/workflows/step/internals",
+            "tools/bolt-python/reference/workflows/step/step",
+            "tools/bolt-python/reference/workflows/step/step_middleware"
           ],
           "label": "slack_bolt.workflows.step",
-          "type": "category"
-        },
-        "tools/bolt-python/reference/slack_bolt/workflows/index"
+          "type": "category",
+          "link": {
+            "type": "doc",
+            "id": "tools/bolt-python/reference/workflows/step/index"
+          }
+        }
       ],
       "label": "slack_bolt.workflows",
-      "type": "category"
+      "type": "category",
+      "link": {
+        "type": "doc",
+        "id": "tools/bolt-python/reference/workflows/index"
+      }
     },
-    "tools/bolt-python/reference/slack_bolt/index",
-    "tools/bolt-python/reference/slack_bolt/async_app",
-    "tools/bolt-python/reference/slack_bolt/version"
+    "tools/bolt-python/reference/async_app",
+    "tools/bolt-python/reference/version"
   ],
   "label": "Reference",
-  "type": "category"
+  "type": "category",
+  "link": {
+    "type": "doc",
+    "id": "tools/bolt-python/reference/index"
+  }
 }

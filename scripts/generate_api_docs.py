@@ -261,6 +261,7 @@ def main():
     session.process(modules)
     session.render(modules)
     _rename_package_indexes()
+    _flatten_top_package()
     _disambiguate_folder_named_docs()
     _check_mdx_hazards()
     _finalize_reference_sidebar()
@@ -305,6 +306,57 @@ def _rename_package_indexes():
         handle.write("\n")
 
     print("Renamed {} package __init__.md files to index.md".format(renamed))
+
+
+def _flatten_top_package():
+    """Hoist ``reference/slack_bolt/*`` up to ``reference/*`` so the reference
+    root URL is ``/reference`` instead of ``/reference/slack_bolt``.
+
+    The renderer mirrors the Python package layout, nesting everything under a
+    ``slack_bolt/`` directory. Since the entire reference *is* slack_bolt, that
+    segment is redundant in every URL. Moving the package contents up one level
+    turns ``.../reference/slack_bolt/`` into ``.../reference/`` (the package
+    overview becomes the reference landing page) and ``.../reference/slack_bolt/
+    app/app`` into ``.../reference/app/app``. Sidebar labels (``slack_bolt.app``)
+    are unaffected; only the doc-ID paths in sidebar.json are rewritten to match."""
+    reference_dir = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR)
+    package_dir = os.path.join(reference_dir, "slack_bolt")
+    if not os.path.isdir(package_dir):
+        raise SystemExit("Expected {} to exist before flattening".format(package_dir))
+
+    for entry in os.listdir(package_dir):
+        source = os.path.join(package_dir, entry)
+        target = os.path.join(reference_dir, entry)
+        if os.path.exists(target):
+            raise SystemExit("Flatten would clobber existing {}".format(target))
+        os.replace(source, target)
+    os.rmdir(package_dir)
+
+    sidebar_path = os.path.join(reference_dir, "sidebar.json")
+    with open(sidebar_path, encoding="utf-8") as handle:
+        sidebar = json.load(handle)
+
+    old_prefix = "{}/slack_bolt".format(REFERENCE_SUBDIR)
+    new_prefix = REFERENCE_SUBDIR
+
+    def rewrite(node):
+        if isinstance(node, str):
+            if node == old_prefix:
+                return new_prefix
+            if node.startswith(old_prefix + "/"):
+                return new_prefix + node[len(old_prefix) :]
+            return node
+        if isinstance(node, list):
+            return [rewrite(item) for item in node]
+        if isinstance(node, dict):
+            return {key: rewrite(value) for key, value in node.items()}
+        return node
+
+    with open(sidebar_path, "w", encoding="utf-8") as handle:
+        json.dump(rewrite(sidebar), handle, indent=2)
+        handle.write("\n")
+
+    print("Flattened reference/slack_bolt/* to reference/*")
 
 
 def _disambiguate_folder_named_docs():
@@ -418,6 +470,32 @@ def _prefix_doc_ids(node):
     return node
 
 
+def _link_categories_to_overview(node):
+    """Turn each package category's ``index`` overview doc into the category's
+    ``link`` and drop it from ``items``.
+
+    A package renders as ``{type: category, label: slack_bolt.app, items: [
+    ".../app/index", ".../app/app", ...]}``. Both the ``index`` doc (the package
+    overview, sidebar_label "app") and the ``app`` module doc (also "app") show
+    up as sibling leaves labeled identically, which is confusing. Promoting the
+    overview to a ``link: {type: doc, id: .../index}`` on the category header --
+    the standard Docusaurus idiom -- makes clicking the category name open the
+    overview and removes the duplicate leaf, leaving only the true module docs."""
+    if not isinstance(node, dict):
+        return
+    items = node.get("items")
+    if isinstance(items, list):
+        overview = next(
+            (item for item in items if isinstance(item, str) and item.rsplit("/", 1)[-1] == "index"),
+            None,
+        )
+        if overview is not None and "link" not in node:
+            node["link"] = {"type": "doc", "id": overview}
+            node["items"] = [item for item in items if item is not overview]
+        for child in node["items"]:
+            _link_categories_to_overview(child)
+
+
 def _finalize_reference_sidebar():
     """Rewrite the generated reference/sidebar.json in place into the shape the
     docs repo imports: a self-contained "Reference" category with docs-root
@@ -437,6 +515,8 @@ def _finalize_reference_sidebar():
     items = category.get("items")
     if isinstance(items, list) and len(items) == 1 and isinstance(items[0], dict) and items[0].get("label") == "slack_bolt":
         category["items"] = items[0]["items"]
+
+    _link_categories_to_overview(category)
 
     with open(reference_sidebar, "w", encoding="utf-8") as handle:
         json.dump(category, handle, indent=2, ensure_ascii=False)
