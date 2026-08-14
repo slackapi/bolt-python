@@ -1,5 +1,5 @@
 ---
-sidebar_label: websockets
+sidebar_label: slack_bolt.adapter.socket_mode.websockets
 title: slack_bolt.adapter.socket_mode.websockets
 ---
 

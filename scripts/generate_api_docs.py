@@ -262,6 +262,7 @@ def main():
     session.render(modules)
     _rename_package_indexes()
     _flatten_top_package()
+    _label_top_level_module_docs()
     _disambiguate_folder_named_docs()
     _check_mdx_hazards()
     _finalize_reference_sidebar()
@@ -357,6 +358,45 @@ def _flatten_top_package():
         handle.write("\n")
 
     print("Flattened reference/slack_bolt/* to reference/*")
+
+
+def _label_top_level_module_docs():
+    """Rewrite each top-level module doc's ``sidebar_label`` frontmatter to its
+    fully-qualified dotted name.
+
+    Subpackages render as sidebar categories the renderer labels ``slack_bolt.<name>``,
+    but a top-level *module* (slack_bolt/async_app.py, slack_bolt/version.py, after
+    flattening) becomes a leaf doc whose ``sidebar_label`` is the bare name
+    (``async_app``/``version``). Sitting beside the ``slack_bolt.*`` categories,
+    those read inconsistently. The reliable fix is to set the doc's own
+    ``sidebar_label`` -- Docusaurus always honors it, regardless of whether the
+    sidebar item is a bare string or an object -- so the leaf's ``title``
+    (``slack_bolt.async_app``) is copied over ``sidebar_label``. Only the direct
+    ``.md`` children of reference/ are top-level modules; ``index.md`` (the package
+    overview) and nested module docs are left alone."""
+    reference_dir = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR)
+    relabeled = 0
+    for filename in os.listdir(reference_dir):
+        if not filename.endswith(".md") or filename == "index.md":
+            continue
+        path = os.path.join(reference_dir, filename)
+        if not os.path.isfile(path):
+            continue
+        with open(path, encoding="utf-8") as handle:
+            text = handle.read()
+        if not text.startswith("---\n"):
+            raise SystemExit("Expected frontmatter in {}".format(path))
+        end = text.index("\n---\n", 4)
+        frontmatter = text[4:end]
+        body = text[end + len("\n---\n") :]
+        title = re.search(r"^title:\s*(.+)$", frontmatter, re.M)
+        if not title:
+            continue
+        frontmatter = re.sub(r"^sidebar_label:\s*.+$", "sidebar_label: " + title.group(1).strip(), frontmatter, count=1, flags=re.M)
+        with open(path, "w", encoding="utf-8") as handle:
+            handle.write("---\n" + frontmatter + "\n---\n" + body)
+        relabeled += 1
+    print("Relabeled {} top-level module docs' sidebar_label with dotted names".format(relabeled))
 
 
 def _disambiguate_folder_named_docs():
@@ -472,7 +512,7 @@ def _prefix_doc_ids(node):
 
 def _link_categories_to_overview(node):
     """Turn each package category's ``index`` overview doc into the category's
-    ``link`` and drop it from ``items``.
+    ``link`` and drop it from ``items``, returning the (possibly replaced) node.
 
     A package renders as ``{type: category, label: slack_bolt.app, items: [
     ".../app/index", ".../app/app", ...]}``. Both the ``index`` doc (the package
@@ -480,62 +520,60 @@ def _link_categories_to_overview(node):
     up as sibling leaves labeled identically, which is confusing. Promoting the
     overview to a ``link: {type: doc, id: .../index}`` on the category header --
     the standard Docusaurus idiom -- makes clicking the category name open the
-    overview and removes the duplicate leaf, leaving only the true module docs."""
+    overview and removes the duplicate leaf, leaving only the true module docs.
+
+    A package with *no* submodules (only an ``index``, e.g. slack_bolt.error)
+    would become an empty category -- a dead expandable node. In that case the
+    category is replaced outright by a plain doc leaf pointing at the index, so
+    it renders as an ordinary link with no empty twisty."""
     if not isinstance(node, dict):
-        return
+        return node
     items = node.get("items")
-    if isinstance(items, list):
-        overview = next(
-            (item for item in items if isinstance(item, str) and item.rsplit("/", 1)[-1] == "index"),
-            None,
-        )
-        if overview is not None and "link" not in node:
-            node["link"] = {"type": "doc", "id": overview}
-            node["items"] = [item for item in items if item is not overview]
-        for child in node["items"]:
-            _link_categories_to_overview(child)
+    if not isinstance(items, list):
+        return node
+
+    # Find this node's own overview *before* recursing: at this point child
+    # categories are still dicts, so the only ``.../index`` string is genuinely
+    # this node's overview. (Recursing first can collapse an index-only child to
+    # a bare ``.../index`` string, which would then be mistaken for this node's
+    # overview.)
+    overview = next(
+        (item for item in items if isinstance(item, str) and item.rsplit("/", 1)[-1] == "index"),
+        None,
+    )
+
+    node["items"] = [_link_categories_to_overview(child) for child in items]
+
+    if overview is None or "link" in node:
+        return node
+
+    remaining = [item for item in node["items"] if item is not overview]
+    if not remaining:
+        # Index-only package (e.g. slack_bolt.error): collapse the category to a
+        # plain doc leaf. Its label now comes from the index doc's own
+        # sidebar_label, which is the bare package name ("error"); rewrite it to
+        # the category's dotted label so it matches the sibling categories.
+        _set_sidebar_label(overview, node["label"])
+        return overview
+    node["link"] = {"type": "doc", "id": overview}
+    node["items"] = remaining
+    return node
 
 
-def _read_doc_title(doc_id):
-    """Return the ``title`` frontmatter of a generated doc (its fully-qualified
-    module name, e.g. ``slack_bolt.async_app``), or None."""
+def _set_sidebar_label(doc_id, label):
+    """Overwrite the ``sidebar_label`` frontmatter of a generated doc."""
     rel = doc_id[len(SIDEBAR_DOC_ID_PREFIX) :] if doc_id.startswith(SIDEBAR_DOC_ID_PREFIX) else doc_id
     path = os.path.join(DOCS_BASE_PATH, rel + ".md")
-    if not os.path.isfile(path):
-        return None
     with open(path, encoding="utf-8") as handle:
         text = handle.read()
     if not text.startswith("---\n"):
-        return None
-    frontmatter = text[4 : text.index("\n---\n", 4)]
-    match = re.search(r"^title:\s*(.+)$", frontmatter, re.M)
-    return match.group(1).strip() if match else None
-
-
-def _label_top_level_module_leaves(category):
-    """Relabel the Reference category's direct leaf docs with their full dotted
-    module name.
-
-    Subpackages render as categories the renderer labels ``slack_bolt.<name>``,
-    but a top-level *module* (slack_bolt/async_app.py, slack_bolt/version.py)
-    renders as a bare-string leaf whose label is just ``async_app``/``version``.
-    Those sit beside the ``slack_bolt.*`` categories and read inconsistently.
-    Converting each such leaf to ``{type: doc, id, label: <title>}`` gives it the
-    same ``slack_bolt.<name>`` label; nested module leaves (correctly short, e.g.
-    ``app`` under ``slack_bolt.app``) are untouched because only the Reference
-    category's own items are scanned."""
-    relabeled = 0
-    new_items = []
-    for item in category.get("items", []):
-        if isinstance(item, str):
-            title = _read_doc_title(item)
-            if title:
-                new_items.append({"type": "doc", "id": item, "label": title})
-                relabeled += 1
-                continue
-        new_items.append(item)
-    category["items"] = new_items
-    print("Relabeled {} top-level module leaves with dotted names".format(relabeled))
+        raise SystemExit("Expected frontmatter in {}".format(path))
+    end = text.index("\n---\n", 4)
+    frontmatter = text[4:end]
+    body = text[end + len("\n---\n") :]
+    frontmatter = re.sub(r"^sidebar_label:\s*.+$", "sidebar_label: " + label, frontmatter, count=1, flags=re.M)
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write("---\n" + frontmatter + "\n---\n" + body)
 
 
 def _finalize_reference_sidebar():
@@ -559,7 +597,6 @@ def _finalize_reference_sidebar():
         category["items"] = items[0]["items"]
 
     _link_categories_to_overview(category)
-    _label_top_level_module_leaves(category)
 
     with open(reference_sidebar, "w", encoding="utf-8") as handle:
         json.dump(category, handle, indent=2, ensure_ascii=False)

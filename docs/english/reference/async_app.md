@@ -1,5 +1,5 @@
 ---
-sidebar_label: async_app
+sidebar_label: slack_bolt.async_app
 title: slack_bolt.async_app
 ---
 

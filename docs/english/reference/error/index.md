@@ -1,5 +1,5 @@
 ---
-sidebar_label: error
+sidebar_label: slack_bolt.error
 title: slack_bolt.error
 ---
 

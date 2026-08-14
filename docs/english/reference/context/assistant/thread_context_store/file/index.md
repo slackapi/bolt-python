@@ -1,5 +1,5 @@
 ---
-sidebar_label: file
+sidebar_label: slack_bolt.context.assistant.thread_context_store.file
 title: slack_bolt.context.assistant.thread_context_store.file
 ---
 

@@ -1,5 +1,5 @@
 ---
-sidebar_label: aiohttp
+sidebar_label: slack_bolt.adapter.asgi.aiohttp
 title: slack_bolt.adapter.asgi.aiohttp
 ---
 
