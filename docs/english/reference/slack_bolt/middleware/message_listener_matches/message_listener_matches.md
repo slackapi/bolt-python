@@ -1,6 +1,7 @@
 ---
 sidebar_label: message_listener_matches
 title: slack_bolt.middleware.message_listener_matches.message_listener_matches
+slug: message_listener_matches
 ---
 
 ## BoltRequest Objects

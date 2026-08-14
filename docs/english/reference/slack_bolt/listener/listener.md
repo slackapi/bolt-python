@@ -1,6 +1,7 @@
 ---
 sidebar_label: listener
 title: slack_bolt.listener.listener
+slug: listener
 ---
 
 ## ListenerMatcher Objects

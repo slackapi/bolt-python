@@ -1,6 +1,7 @@
 ---
 sidebar_label: app
 title: slack_bolt.app.app
+slug: app
 ---
 
 ## AuthorizeResult Objects

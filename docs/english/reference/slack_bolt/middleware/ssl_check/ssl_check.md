@@ -1,6 +1,7 @@
 ---
 sidebar_label: ssl_check
 title: slack_bolt.middleware.ssl_check.ssl_check
+slug: ssl_check
 ---
 
 #### get\_bolt\_logger

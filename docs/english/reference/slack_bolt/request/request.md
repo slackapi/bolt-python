@@ -1,6 +1,7 @@
 ---
 sidebar_label: request
 title: slack_bolt.request.request
+slug: request
 ---
 
 ## BoltContext Objects

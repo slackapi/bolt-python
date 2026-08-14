@@ -1,6 +1,7 @@
 ---
 sidebar_label: middleware
 title: slack_bolt.middleware.middleware
+slug: middleware
 ---
 
 ## BoltRequest Objects

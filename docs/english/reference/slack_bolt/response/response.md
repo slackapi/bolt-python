@@ -1,6 +1,7 @@
 ---
 sidebar_label: response
 title: slack_bolt.response.response
+slug: response
 ---
 
 ## BoltResponse Objects

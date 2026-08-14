@@ -1,6 +1,7 @@
 ---
 sidebar_label: request_verification
 title: slack_bolt.middleware.request_verification.request_verification
+slug: request_verification
 ---
 
 #### get\_bolt\_logger

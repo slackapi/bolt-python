@@ -1,6 +1,7 @@
 ---
 sidebar_label: step
 title: slack_bolt.workflows.step.step
+slug: step
 ---
 
 ## BoltContext Objects

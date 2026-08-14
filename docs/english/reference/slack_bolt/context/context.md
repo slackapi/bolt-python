@@ -1,6 +1,7 @@
 ---
 sidebar_label: context
 title: slack_bolt.context.context
+slug: context
 ---
 
 ## Ack Objects

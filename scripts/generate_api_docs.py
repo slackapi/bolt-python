@@ -261,6 +261,7 @@ def main():
     session.process(modules)
     session.render(modules)
     _rename_package_indexes()
+    _disambiguate_folder_named_docs()
     _check_mdx_hazards()
     _finalize_reference_sidebar()
     _strip_reference_from_site_sidebar()
@@ -304,6 +305,48 @@ def _rename_package_indexes():
         handle.write("\n")
 
     print("Renamed {} package __init__.md files to index.md".format(renamed))
+
+
+def _disambiguate_folder_named_docs():
+    """Give each ``<folder>/<folder>.md`` module doc an explicit relative slug so
+    it stops colliding with the package's ``index.md``.
+
+    Docusaurus routes three filenames to a folder's own URL: ``index.md``,
+    ``README.md``, and ``<foldername>.md``. A subpackage that also contains a
+    same-named module -- e.g. ``slack_bolt/app`` with the module ``app.py`` --
+    therefore renders both ``app/index.md`` (the package, from _rename_package_indexes)
+    and ``app/app.md`` (the module) at the same route ``.../app/``, which trips
+    Docusaurus's "Duplicate routes" warning and is non-deterministic. Setting a
+    relative ``slug: <foldername>`` on the module doc pins it to ``.../app/app``
+    while the package keeps ``.../app/``. The slug is relative (no leading "/") so
+    it stays correct under whatever base path the docs site mounts the tree at;
+    doc IDs are unchanged, so sidebar entries still resolve."""
+    reference_dir = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR)
+    fixed = 0
+    for dirpath, _dirnames, filenames in os.walk(reference_dir):
+        name = os.path.basename(dirpath)
+        module_doc = name + ".md"
+        if "index.md" in filenames and module_doc in filenames:
+            path = os.path.join(dirpath, module_doc)
+            with open(path, encoding="utf-8") as handle:
+                text = handle.read()
+            # The renderer always emits YAML frontmatter as the first block:
+            # "---\n<frontmatter>\n---\n<body>".
+            opening = "---\n"
+            closing = "\n---\n"
+            if not text.startswith(opening):
+                raise SystemExit("Expected frontmatter in {}".format(path))
+            end = text.index(closing, len(opening))
+            frontmatter = text[len(opening) : end]
+            body = text[end + len(closing) :]
+            if "\nslug:" not in ("\n" + frontmatter):
+                frontmatter = frontmatter.rstrip("\n") + "\nslug: {}".format(name)
+            text = opening + frontmatter + closing + body
+            with open(path, "w", encoding="utf-8") as handle:
+                handle.write(text)
+            fixed += 1
+
+    print("Disambiguated {} folder-named module docs with an explicit slug".format(fixed))
 
 
 # Docusaurus v3 parses every .md file as MDX, so a line that begins (at column

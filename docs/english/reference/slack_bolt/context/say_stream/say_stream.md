@@ -1,6 +1,7 @@
 ---
 sidebar_label: say_stream
 title: slack_bolt.context.say_stream.say_stream
+slug: say_stream
 ---
 
 ## SayStream Objects

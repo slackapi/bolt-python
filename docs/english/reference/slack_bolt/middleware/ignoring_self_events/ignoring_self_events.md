@@ -1,6 +1,7 @@
 ---
 sidebar_label: ignoring_self_events
 title: slack_bolt.middleware.ignoring_self_events.ignoring_self_events
+slug: ignoring_self_events
 ---
 
 ## AuthorizeResult Objects

@@ -1,6 +1,7 @@
 ---
 sidebar_label: complete
 title: slack_bolt.context.complete.complete
+slug: complete
 ---
 
 ## Complete Objects

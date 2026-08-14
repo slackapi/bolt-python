@@ -1,6 +1,7 @@
 ---
 sidebar_label: url_verification
 title: slack_bolt.middleware.url_verification.url_verification
+slug: url_verification
 ---
 
 #### get\_bolt\_logger

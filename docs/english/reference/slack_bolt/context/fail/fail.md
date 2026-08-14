@@ -1,6 +1,7 @@
 ---
 sidebar_label: fail
 title: slack_bolt.context.fail.fail
+slug: fail
 ---
 
 ## Fail Objects
