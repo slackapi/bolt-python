@@ -248,3 +248,19 @@ class AsyncAuthorizeArgs()
 
 #### user\_id
 
+#### \_\_init\_\_
+
+```python
+def __init__(*, context: AsyncBoltContext, enterprise_id: Optional[str],
+             team_id: Optional[str], user_id: Optional[str])
+```
+
+The full list of the arguments passed to `authorize` function.
+
+**Arguments**:
+
+- `context` - The request context
+- `enterprise_id` - The Organization ID (Enterprise Grid)
+- `team_id` - The workspace ID
+- `user_id` - The request user ID
+

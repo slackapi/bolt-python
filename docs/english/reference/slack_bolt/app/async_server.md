@@ -27,6 +27,23 @@ class BoltResponse()
 
 #### headers
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             status: int,
+             body: Union[str, dict] = "",
+             headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None)
+```
+
+The response from a Bolt app.
+
+**Arguments**:
+
+- `status` - HTTP status code
+- `body` - The response body (dict and str are supported)
+- `headers` - The response headers.
+
 #### first\_headers
 
 ```python
@@ -66,6 +83,25 @@ class AsyncSlackAppServer()
 #### bolt\_app
 
 #### web\_app
+
+#### \_\_init\_\_
+
+```python
+def __init__(port: int,
+             path: str,
+             app: "AsyncApp",
+             host: Optional[str] = None)
+```
+
+Standalone AIOHTTP Web Server.
+Refer to https://docs.aiohttp.org/en/stable/web.html for details of AIOHTTP.
+
+**Arguments**:
+
+- `port` - The port to listen on
+- `path` - The path to receive incoming requests from Slack
+- `app` - The `AsyncApp` instance that is used for processing requests
+- `host` - The hostname to serve the web endpoints. (Default: 0.0.0.0)
 
 #### handle\_get\_requests
 

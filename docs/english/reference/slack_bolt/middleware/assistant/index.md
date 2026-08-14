@@ -13,6 +13,16 @@ class Assistant(Middleware)
 
 #### base\_logger
 
+#### \_\_init\_\_
+
+```python
+def __init__(
+        *,
+        app_name: str = "assistant",
+        thread_context_store: Optional[AssistantThreadContextStore] = None,
+        logger: Optional[logging.Logger] = None)
+```
+
 #### thread\_started
 
 ```python

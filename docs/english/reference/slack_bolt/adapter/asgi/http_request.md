@@ -9,6 +9,12 @@ title: slack_bolt.adapter.asgi.http_request
 class AsgiHttpRequest()
 ```
 
+#### \_\_init\_\_
+
+```python
+def __init__(scope: scope_type, receive: Callable)
+```
+
 #### get\_headers
 
 ```python

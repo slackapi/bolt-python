@@ -15,3 +15,9 @@ class SetTitle()
 
 #### thread\_ts
 
+#### \_\_init\_\_
+
+```python
+def __init__(client: WebClient, channel_id: str, thread_ts: str)
+```
+

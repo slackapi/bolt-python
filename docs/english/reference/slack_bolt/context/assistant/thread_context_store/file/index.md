@@ -9,6 +9,13 @@ title: slack_bolt.context.assistant.thread_context_store.file
 class FileAssistantThreadContextStore(AssistantThreadContextStore)
 ```
 
+#### \_\_init\_\_
+
+```python
+def __init__(base_dir: str = str(Path.home()) +
+             "/.bolt-app-assistant-thread-contexts")
+```
+
 #### save
 
 ```python

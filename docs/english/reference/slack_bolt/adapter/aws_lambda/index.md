@@ -9,6 +9,12 @@ title: slack_bolt.adapter.aws_lambda
 class SlackRequestHandler()
 ```
 
+#### \_\_init\_\_
+
+```python
+def __init__(app: App)
+```
+
 #### clear\_all\_log\_handlers
 
 ```python

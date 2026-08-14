@@ -148,6 +148,28 @@ class BoltRequest()
 
 either &quot;http&quot; or &quot;socket_mode&quot;
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             body: Union[str, dict],
+             query: Optional[Union[str, Dict[str, str],
+                                   Dict[str, Sequence[str]]]] = None,
+             headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None,
+             context: Optional[Dict[str, Any]] = None,
+             mode: str = "http")
+```
+
+Request to a Bolt app.
+
+**Arguments**:
+
+- `body` - The raw request body (only plain text is supported for &quot;http&quot; mode)
+- `query` - The query string data in any data format.
+- `headers` - The request headers.
+- `context` - The context in this request.
+- `mode` - The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
+
 #### to\_copyable
 
 ```python
@@ -165,6 +187,23 @@ class BoltResponse()
 #### body
 
 #### headers
+
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             status: int,
+             body: Union[str, dict] = "",
+             headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None)
+```
+
+The response from a Bolt app.
+
+**Arguments**:
+
+- `status` - HTTP status code
+- `body` - The response body (dict and str are supported)
+- `headers` - The response headers.
 
 #### first\_headers
 
@@ -223,6 +262,37 @@ The Callback ID of the step from app
 
 `execute` listener, which processes step from app execution
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             callback_id: Union[str, Pattern],
+             edit: Union[Callable[..., Optional[BoltResponse]], Listener,
+                         Sequence[Callable]],
+             save: Union[Callable[..., Optional[BoltResponse]], Listener,
+                         Sequence[Callable]],
+             execute: Union[Callable[..., Optional[BoltResponse]], Listener,
+                            Sequence[Callable]],
+             app_name: Optional[str] = None,
+             base_logger: Optional[Logger] = None)
+```
+
+Deprecated:
+Steps from apps for legacy workflows are now deprecated.
+Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+
+**Arguments**:
+
+- `callback_id` - The callback_id for this step from app
+- `edit` - Either a single function or a list of functions for opening a modal in the builder UI
+  When it&#x27;s a list, the first one is responsible for ack() while the rest are lazy listeners.
+- `save` - Either a single function or a list of functions for handling modal interactions in the builder UI
+  When it&#x27;s a list, the first one is responsible for ack() while the rest are lazy listeners.
+- `execute` - Either a single function or a list of functions for handling step from app executions
+  When it&#x27;s a list, the first one is responsible for ack() while the rest are lazy listeners.
+- `app_name` - The app name that can be mainly used for logging
+- `base_logger` - The logger instance that can be used as a template when creating this step&#x27;s logger
+
 #### builder
 
 ```python
@@ -258,6 +328,12 @@ class WorkflowStepMiddleware(Middleware)
 ```
 
 Base middleware for step from app specific ones
+
+#### \_\_init\_\_
+
+```python
+def __init__(step: WorkflowStep)
+```
 
 #### process
 

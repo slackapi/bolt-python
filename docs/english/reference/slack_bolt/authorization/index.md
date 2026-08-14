@@ -50,6 +50,39 @@ since v1.18
 
 since v1.17
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             enterprise_id: Optional[str],
+             team_id: Optional[str],
+             team: Optional[str] = None,
+             url: Optional[str] = None,
+             bot_user_id: Optional[str] = None,
+             bot_id: Optional[str] = None,
+             bot_token: Optional[str] = None,
+             bot_scopes: Optional[Union[Sequence[str], str]] = None,
+             user_id: Optional[str] = None,
+             user: Optional[str] = None,
+             user_token: Optional[str] = None,
+             user_scopes: Optional[Union[Sequence[str], str]] = None)
+```
+
+**Arguments**:
+
+- `enterprise_id` - Organization ID (Enterprise Grid) starting with `E`
+- `team_id` - Workspace ID starting with `T`
+- `team` - Workspace name
+- `url` - Workspace slack.com URL
+- `bot_user_id` - Bot user&#x27;s User ID starting with either `U` or `W`
+- `bot_id` - Bot ID starting with `B`
+- `bot_token` - Bot user access token starting with `xoxb-`
+- `bot_scopes` - The scopes associated with the bot token
+- `user_id` - The request user ID
+- `user` - The request user&#x27;s name
+- `user_token` - User access token starting with `xoxp-`
+- `user_scopes` - The scopes associated wth the user token
+
 #### from\_auth\_test\_response
 
 ```python

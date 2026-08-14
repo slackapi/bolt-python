@@ -17,6 +17,18 @@ class AsyncSocketModeHandler(AsyncBaseSocketModeHandler)
 
 #### client
 
+#### \_\_init\_\_
+
+```python
+def __init__(app: AsyncApp,
+             app_token: Optional[str] = None,
+             logger: Optional[Logger] = None,
+             web_client: Optional[AsyncWebClient] = None,
+             proxy: Optional[str] = None,
+             ping_interval: float = 10,
+             loop: Optional[AbstractEventLoop] = None)
+```
+
 #### handle
 
 ```python

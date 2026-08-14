@@ -31,3 +31,12 @@ type: ignore[name-defined]
 
 #### last\_global\_middleware\_name
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             request: Union["BoltRequest", "AsyncBoltRequest"],
+             current_response: Optional["BoltResponse"],
+             last_global_middleware_name: Optional[str] = None)
+```
+

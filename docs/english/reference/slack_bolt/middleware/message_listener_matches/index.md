@@ -9,6 +9,14 @@ title: slack_bolt.middleware.message_listener_matches
 class MessageListenerMatches(Middleware)
 ```
 
+#### \_\_init\_\_
+
+```python
+def __init__(keyword: Union[str, Pattern])
+```
+
+Captures matched keywords and saves the values in context.
+
 #### process
 
 ```python

@@ -19,3 +19,10 @@ class GetThreadContext()
 
 #### thread\_context\_loaded
 
+#### \_\_init\_\_
+
+```python
+def __init__(thread_context_store: AssistantThreadContextStore,
+             channel_id: str, thread_ts: str, payload: dict)
+```
+

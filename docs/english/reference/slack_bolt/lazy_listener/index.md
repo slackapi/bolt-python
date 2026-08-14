@@ -71,6 +71,12 @@ class ThreadLazyListenerRunner(LazyListenerRunner)
 
 #### logger
 
+#### \_\_init\_\_
+
+```python
+def __init__(logger: Logger, executor: Executor)
+```
+
 #### start
 
 ```python

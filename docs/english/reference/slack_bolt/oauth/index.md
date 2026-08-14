@@ -27,6 +27,23 @@ class OAuthFlow()
 
 #### failure\_handler
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             client: Optional[WebClient] = None,
+             logger: Optional[Logger] = None,
+             settings: OAuthSettings)
+```
+
+The module to run the Slack app installation flow (OAuth flow).
+
+**Arguments**:
+
+- `client` - The `slack_sdk.web.WebClient` instance.
+- `logger` - The logger.
+- `settings` - OAuth settings to configure this module.
+
 #### client
 
 ```python

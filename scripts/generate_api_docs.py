@@ -70,12 +70,18 @@ CONFIG = {
         # documented_only=False keeps signatures for members that lack a
         # docstring (matching pdoc3). The expression drops private names and
         # Indirection members (bare imports/re-exports) so imported symbols
-        # like Optional/WebClient do not leak in as empty headings.
+        # like Optional/WebClient do not leak in as empty headings. __init__ is
+        # explicitly kept: constructors carry the class's `Args:` docstring
+        # (e.g. BoltRequest), which pdoc3 folded onto the class page -- without
+        # this exception every per-argument description would be dropped.
         {
             "type": "filter",
             "documented_only": False,
             "exclude_private": True,
-            "expression": ('not name.startswith("_") and default() ' 'and obj.__class__.__name__ != "Indirection"'),
+            "expression": (
+                '(name == "__init__" or not name.startswith("_")) and default() '
+                'and obj.__class__.__name__ != "Indirection"'
+            ),
         },
         {"type": "smart"},
         {"type": "crossref"},
@@ -255,7 +261,8 @@ def main():
     session.process(modules)
     session.render(modules)
     _rename_package_indexes()
-    _sync_reference_sidebar()
+    _finalize_reference_sidebar()
+    _strip_reference_from_site_sidebar()
 
 
 def _rename_package_indexes():
@@ -298,10 +305,10 @@ def _rename_package_indexes():
     print("Renamed {} package __init__.md files to index.md".format(renamed))
 
 
-# The docs site (docs.slack.dev) imports docs/english/_sidebar.json as an array
-# and filters it; it does not read the generated reference/sidebar.json. So the
-# reference tree is embedded directly into _sidebar.json under a "Reference"
-# category. Doc IDs are relative to the docs root there, hence the prefix.
+# The docs site (docs.slack.dev) build imports this generated sidebar.json in
+# its sidebars.js and appends it under the "Bolt for Python" nav, so the file
+# ships as an import-ready, self-contained "Reference" category. Its doc IDs are
+# resolved relative to the docs root there, hence the prefix.
 SIDEBAR_DOC_ID_PREFIX = "tools/bolt-python/"
 
 
@@ -321,15 +328,40 @@ def _prefix_doc_ids(node):
     return node
 
 
-def _sync_reference_sidebar():
-    """Embed the generated reference category into docs/english/_sidebar.json,
-    replacing the existing "Reference" entry so the sidebar stays in sync with
-    the regenerated docs."""
+def _finalize_reference_sidebar():
+    """Rewrite the generated reference/sidebar.json in place into the shape the
+    docs repo imports: a self-contained "Reference" category with docs-root
+    doc IDs and the redundant top-level "slack_bolt" wrapper collapsed away.
+
+    The docs-site sidebars.js does ``import ref from '.../reference/sidebar.json'``
+    and appends ``ref`` directly, so this file is the single source of truth for
+    the reference nav -- no copy lives in _sidebar.json."""
     reference_sidebar = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR, "sidebar.json")
     with open(reference_sidebar, encoding="utf-8") as handle:
         category = _prefix_doc_ids(json.load(handle))
     category["label"] = "Reference"
 
+    # The generated tree nests everything under a single "slack_bolt" category
+    # (Reference -> slack_bolt -> ...). Collapse that redundant level so the
+    # sidebar goes straight from Reference to the top-level modules.
+    items = category.get("items")
+    if isinstance(items, list) and len(items) == 1 and isinstance(items[0], dict) and items[0].get("label") == "slack_bolt":
+        category["items"] = items[0]["items"]
+
+    with open(reference_sidebar, "w", encoding="utf-8") as handle:
+        json.dump(category, handle, indent=2, ensure_ascii=False)
+        handle.write("\n")
+
+    print("Finalized reference/sidebar.json as an import-ready Reference category")
+
+
+def _strip_reference_from_site_sidebar():
+    """Remove the "Reference" entry from docs/english/_sidebar.json.
+
+    Under the docs-repo import model (_finalize_reference_sidebar), the reference
+    nav is contributed by the docs-site build from reference/sidebar.json. Leaving
+    a Reference entry here too would render it twice, so drop it. A missing entry
+    is fine (idempotent) -- only warn."""
     site_sidebar = os.path.join(DOCS_BASE_PATH, "_sidebar.json")
     with open(site_sidebar, encoding="utf-8") as handle:
         entries = json.load(handle)
@@ -337,23 +369,17 @@ def _sync_reference_sidebar():
     def is_reference_entry(entry):
         return isinstance(entry, dict) and entry.get("label") == "Reference"
 
-    replaced = False
-    new_entries = []
-    for entry in entries:
-        if is_reference_entry(entry):
-            new_entries.append(category)
-            replaced = True
-        else:
-            new_entries.append(entry)
-    if not replaced:
-        raise SystemExit('No "Reference" entry found in _sidebar.json to replace')
+    new_entries = [entry for entry in entries if not is_reference_entry(entry)]
+    if len(new_entries) == len(entries):
+        print('No "Reference" entry in _sidebar.json to strip (already absent)')
+        return
 
     # _sidebar.json is tab-indented; match it so the diff stays minimal.
     with open(site_sidebar, "w", encoding="utf-8") as handle:
         json.dump(new_entries, handle, indent="\t", ensure_ascii=False)
         handle.write("\n")
 
-    print("Embedded Reference category into _sidebar.json")
+    print("Stripped Reference entry from _sidebar.json")
 
 
 if __name__ == "__main__":

@@ -21,6 +21,15 @@ class CustomListenerMatcher(ListenerMatcher)
 
 #### logger
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             app_name: str,
+             func: Callable[..., bool],
+             base_logger: Optional[Logger] = None)
+```
+
 #### matches
 
 ```python

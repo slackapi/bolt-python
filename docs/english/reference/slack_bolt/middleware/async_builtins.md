@@ -56,6 +56,12 @@ async def async_process(
 class AsyncUrlVerification(UrlVerification, AsyncMiddleware)
 ```
 
+#### \_\_init\_\_
+
+```python
+def __init__(base_logger: Optional[Logger] = None)
+```
+
 #### async\_process
 
 ```python
@@ -69,6 +75,14 @@ async def async_process(
 ```python
 class AsyncMessageListenerMatches(AsyncMiddleware)
 ```
+
+#### \_\_init\_\_
+
+```python
+def __init__(keyword: Union[str, Pattern])
+```
+
+Captures matched keywords and saves the values in context.
 
 #### async\_process
 
@@ -99,6 +113,14 @@ class AsyncAttachingConversationKwargs(AsyncMiddleware)
 ```
 
 #### thread\_context\_store
+
+#### \_\_init\_\_
+
+```python
+def __init__(
+        thread_context_store: Optional[AsyncAssistantThreadContextStore] = None
+)
+```
 
 #### async\_process
 

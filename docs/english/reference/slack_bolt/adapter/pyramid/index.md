@@ -9,6 +9,12 @@ title: slack_bolt.adapter.pyramid
 class SlackRequestHandler()
 ```
 
+#### \_\_init\_\_
+
+```python
+def __init__(app: App)
+```
+
 #### handle
 
 ```python

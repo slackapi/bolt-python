@@ -15,6 +15,23 @@ class BoltResponse()
 
 #### headers
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             status: int,
+             body: Union[str, dict] = "",
+             headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None)
+```
+
+The response from a Bolt app.
+
+**Arguments**:
+
+- `status` - HTTP status code
+- `body` - The response body (dict and str are supported)
+- `headers` - The response headers.
+
 #### first\_headers
 
 ```python
@@ -40,4 +57,10 @@ class AsyncAck()
 ```
 
 #### response
+
+#### \_\_init\_\_
+
+```python
+def __init__()
+```
 

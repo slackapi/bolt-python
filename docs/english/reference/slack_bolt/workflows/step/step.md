@@ -327,6 +327,20 @@ type: ignore[assignment]
 
 #### logger
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             app_name: str,
+             ack_function: Callable[..., Optional[BoltResponse]],
+             lazy_functions: Sequence[Callable[..., None]],
+             matchers: Sequence[ListenerMatcher],
+             middleware: Sequence[Middleware],
+             auto_acknowledgement: bool = False,
+             ack_timeout: int = 3,
+             base_logger: Optional[Logger] = None)
+```
+
 #### run\_ack\_function
 
 ```python
@@ -372,6 +386,15 @@ class CustomListenerMatcher(ListenerMatcher)
 #### arg\_names
 
 #### logger
+
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             app_name: str,
+             func: Callable[..., bool],
+             base_logger: Optional[Logger] = None)
+```
 
 #### matches
 
@@ -422,6 +445,15 @@ class CustomMiddleware(Middleware)
 #### arg\_names
 
 #### logger
+
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             app_name: str,
+             func: Callable,
+             base_logger: Optional[Logger] = None)
+```
 
 #### process
 
@@ -505,6 +537,23 @@ class BoltResponse()
 
 #### headers
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             status: int,
+             body: Union[str, dict] = "",
+             headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None)
+```
+
+The response from a Bolt app.
+
+**Arguments**:
+
+- `status` - HTTP status code
+- `body` - The response body (dict and str are supported)
+- `headers` - The response headers.
+
 #### first\_headers
 
 ```python
@@ -553,6 +602,12 @@ class Complete()
 This utility is a thin wrapper of workflows.stepCompleted API method.
 Refer to https://api.slack.com/methods/workflows.stepCompleted for details.
 
+#### \_\_init\_\_
+
+```python
+def __init__(*, client: WebClient, body: dict)
+```
+
 ## Configure Objects
 
 ```python
@@ -590,6 +645,12 @@ class Configure()
 
 Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
 
+#### \_\_init\_\_
+
+```python
+def __init__(*, callback_id: str, client: WebClient, body: dict)
+```
+
 ## Fail Objects
 
 ```python
@@ -616,6 +677,12 @@ class Fail()
 
 This utility is a thin wrapper of workflows.stepFailed API method.
 Refer to https://api.slack.com/methods/workflows.stepFailed for details.
+
+#### \_\_init\_\_
+
+```python
+def __init__(*, client: WebClient, body: dict)
+```
 
 ## Update Objects
 
@@ -663,6 +730,12 @@ class Update()
 This utility is a thin wrapper of workflows.stepFailed API method.
 Refer to https://api.slack.com/methods/workflows.updateStep for details.
 
+#### \_\_init\_\_
+
+```python
+def __init__(*, client: WebClient, body: dict)
+```
+
 ## WorkflowStepBuilder Objects
 
 ```python
@@ -673,6 +746,44 @@ Steps from apps
 Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
 
 #### callback\_id
+
+#### \_\_init\_\_
+
+```python
+def __init__(callback_id: Union[str, Pattern],
+             app_name: Optional[str] = None,
+             base_logger: Optional[Logger] = None)
+```
+
+Deprecated:
+Steps from apps for legacy workflows are now deprecated.
+Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+
+This builder is supposed to be used as decorator.
+
+```python
+    my_step = WorkflowStep.builder("my_step")
+    @my_step.edit
+    def edit_my_step(ack, configure):
+        pass
+    @my_step.save
+    def save_my_step(ack, step, update):
+        pass
+    @my_step.execute
+    def execute_my_step(step, complete, fail):
+        pass
+    app.step(my_step)
+```
+
+For further information about WorkflowStep specific function arguments
+such as `configure`, `update`, `complete`, and `fail`,
+refer to `slack_bolt.workflows.step.utilities` API documents.
+
+**Arguments**:
+
+- `callback_id` - The callback_id for the workflow
+- `app_name` - The application name mainly for logging
+- `base_logger` - The base logger
 
 #### edit
 
@@ -861,6 +972,37 @@ The Callback ID of the step from app
 #### execute
 
 `execute` listener, which processes step from app execution
+
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             callback_id: Union[str, Pattern],
+             edit: Union[Callable[..., Optional[BoltResponse]], Listener,
+                         Sequence[Callable]],
+             save: Union[Callable[..., Optional[BoltResponse]], Listener,
+                         Sequence[Callable]],
+             execute: Union[Callable[..., Optional[BoltResponse]], Listener,
+                            Sequence[Callable]],
+             app_name: Optional[str] = None,
+             base_logger: Optional[Logger] = None)
+```
+
+Deprecated:
+Steps from apps for legacy workflows are now deprecated.
+Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+
+**Arguments**:
+
+- `callback_id` - The callback_id for this step from app
+- `edit` - Either a single function or a list of functions for opening a modal in the builder UI
+  When it&#x27;s a list, the first one is responsible for ack() while the rest are lazy listeners.
+- `save` - Either a single function or a list of functions for handling modal interactions in the builder UI
+  When it&#x27;s a list, the first one is responsible for ack() while the rest are lazy listeners.
+- `execute` - Either a single function or a list of functions for handling step from app executions
+  When it&#x27;s a list, the first one is responsible for ack() while the rest are lazy listeners.
+- `app_name` - The app name that can be mainly used for logging
+- `base_logger` - The logger instance that can be used as a template when creating this step&#x27;s logger
 
 #### builder
 

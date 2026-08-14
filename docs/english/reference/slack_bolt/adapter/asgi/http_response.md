@@ -9,6 +9,14 @@ title: slack_bolt.adapter.asgi.http_response
 class AsgiHttpResponse()
 ```
 
+#### \_\_init\_\_
+
+```python
+def __init__(status: int,
+             headers: Dict[str, Sequence[str]] = {},
+             body: str = "")
+```
+
 #### get\_response\_start
 
 ```python

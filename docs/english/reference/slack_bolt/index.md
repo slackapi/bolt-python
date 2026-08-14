@@ -15,6 +15,115 @@ A Python framework to build Slack apps in a flash with the latest platform featu
 class App()
 ```
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             logger: Optional[logging.Logger] = None,
+             name: Optional[str] = None,
+             process_before_response: bool = False,
+             raise_error_for_unhandled_request: bool = False,
+             signing_secret: Optional[str] = None,
+             token: Optional[str] = None,
+             token_verification_enabled: bool = True,
+             client: Optional[WebClient] = None,
+             before_authorize: Optional[Union[Middleware,
+                                              Callable[..., Any]]] = None,
+             authorize: Optional[Callable[..., AuthorizeResult]] = None,
+             user_facing_authorize_error_message: Optional[str] = None,
+             installation_store: Optional[InstallationStore] = None,
+             installation_store_bot_only: Optional[bool] = None,
+             request_verification_enabled: bool = True,
+             ignoring_self_events_enabled: bool = True,
+             ignoring_self_assistant_message_events_enabled: bool = True,
+             ssl_check_enabled: bool = True,
+             url_verification_enabled: bool = True,
+             attaching_function_token_enabled: bool = True,
+             oauth_settings: Optional[OAuthSettings] = None,
+             oauth_flow: Optional[OAuthFlow] = None,
+             verification_token: Optional[str] = None,
+             listener_executor: Optional[Executor] = None,
+             assistant_thread_context_store: Optional[
+                 AssistantThreadContextStore] = None,
+             attaching_conversation_kwargs_enabled: bool = True)
+```
+
+Bolt App that provides functionalities to register middleware/listeners.
+
+```python
+    import os
+    from slack_bolt import App
+
+    # Initializes your app with your bot token and signing secret
+    app = App(
+        token=os.environ.get("SLACK_BOT_TOKEN"),
+        signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+    )
+
+    # Listens to incoming messages that contain "hello"
+    @app.message("hello")
+    def message_hello(message, say):
+        # say() sends a message to the channel where the event was triggered
+        say(f"Hey there <@{message['user']}>!")
+
+    # Start your app
+    if __name__ == "__main__":
+        app.start(port=int(os.environ.get("PORT", 3000)))
+```
+
+Refer to https://docs.slack.dev/tools/bolt-python/creating-an-app for details.
+
+If you would like to build an OAuth app for enabling the app to run with multiple workspaces,
+refer to https://docs.slack.dev/tools/bolt-python/concepts/authenticating-oauth to learn how to configure the app.
+
+**Arguments**:
+
+- `logger` - The custom logger that can be used in this app.
+- `name` - The application name that will be used in logging. If absent, the source file name will be used.
+- `process_before_response` - True if this app runs on Function as a Service. (Default: False)
+- `raise_error_for_unhandled_request` - True if you want to raise exceptions for unhandled requests
+  and use @app.error listeners instead of
+  the built-in handler, which pints warning logs and returns 404 to Slack (Default: False)
+- `signing_secret` - The Signing Secret value used for verifying requests from Slack.
+- `token` - The bot/user access token required only for single-workspace app.
+- `token_verification_enabled` - Verifies the validity of the given token if True.
+- `client` - The singleton `slack_sdk.WebClient` instance for this app.
+- `before_authorize` - A global middleware that can be executed right before authorize function
+- `authorize` - The function to authorize an incoming request from Slack
+  by checking if there is a team/user in the installation data.
+- `user_facing_authorize_error_message` - The user-facing error message to display
+  when the app is installed but the installation is not managed by this app&#x27;s installation store
+- `installation_store` - The module offering save/find operations of installation data
+- `installation_store_bot_only` - Use `InstallationStore#find_bot()` if True (Default: False)
+- `request_verification_enabled` - False if you would like to disable the built-in middleware (Default: True).
+  `RequestVerification` is a built-in middleware that verifies the signature in HTTP Mode requests.
+  Make sure if it&#x27;s safe enough when you turn a built-in middleware off.
+  We strongly recommend using RequestVerification for better security.
+  If you have a proxy that verifies request signature in front of the Bolt app,
+  it&#x27;s totally fine to disable RequestVerification to avoid duplication of work.
+  Don&#x27;t turn it off just for easiness of development.
+- `ignoring_self_events_enabled` - False if you would like to disable the built-in middleware (Default: True).
+  `IgnoringSelfEvents` is a built-in middleware that enables Bolt apps to easily skip the events
+  generated by this app&#x27;s bot user (this is useful for avoiding code error causing an infinite loop).
+- `ignoring_self_assistant_message_events_enabled` - False if you would like to disable the built-in middleware.
+  `IgnoringSelfEvents` for this app&#x27;s bot user message events within an assistant thread
+  This is useful for avoiding code error causing an infinite loop; Default: True
+- `url_verification_enabled` - False if you would like to disable the built-in middleware (Default: True).
+  `UrlVerification` is a built-in middleware that handles url_verification requests
+  that verify the endpoint for Events API in HTTP Mode requests.
+- `attaching_function_token_enabled` - False if you would like to disable the built-in middleware (Default: True).
+  `AttachingFunctionToken` is a built-in middleware that injects the just-in-time workflow-execution tokens
+  when your app receives `function_executed` or interactivity events scoped to a custom step.
+- `ssl_check_enabled` - bool = False if you would like to disable the built-in middleware (Default: True).
+  `SslCheck` is a built-in middleware that handles ssl_check requests from Slack.
+- `oauth_settings` - The settings related to Slack app installation flow (OAuth flow)
+- `oauth_flow` - Instantiated `slack_bolt.oauth.OAuthFlow`. This is always prioritized over oauth_settings.
+- `verification_token` - Deprecated verification mechanism. This can be used only for ssl_check requests.
+- `listener_executor` - Custom executor to run background tasks. If absent, the default `ThreadPoolExecutor` will
+  be used.
+- `assistant_thread_context_store` - Custom AssistantThreadContext store (Default: the built-in implementation,
+  which uses a parent message&#x27;s metadata to store the latest context)
+
 #### name
 
 ```python
@@ -972,6 +1081,12 @@ class Ack()
 
 #### response
 
+#### \_\_init\_\_
+
+```python
+def __init__()
+```
+
 ## Complete Objects
 
 ```python
@@ -981,6 +1096,12 @@ class Complete()
 #### client
 
 #### function\_execution\_id
+
+#### \_\_init\_\_
+
+```python
+def __init__(client: WebClient, function_execution_id: Optional[str])
+```
 
 #### has\_been\_called
 
@@ -1003,6 +1124,12 @@ class Fail()
 #### client
 
 #### function\_execution\_id
+
+#### \_\_init\_\_
+
+```python
+def __init__(client: WebClient, function_execution_id: Optional[str])
+```
 
 #### has\_been\_called
 
@@ -1028,6 +1155,15 @@ class Respond()
 
 #### ssl
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             response_url: Optional[str],
+             proxy: Optional[str] = None,
+             ssl: Optional[SSLContext] = None)
+```
+
 ## Say Objects
 
 ```python
@@ -1044,6 +1180,18 @@ class Say()
 
 #### build\_metadata
 
+#### \_\_init\_\_
+
+```python
+def __init__(
+    client: Optional[WebClient],
+    channel: Optional[str],
+    thread_ts: Optional[str] = None,
+    metadata: Optional[Union[Dict, Metadata]] = None,
+    build_metadata: Optional[Callable[[], Optional[Union[Dict,
+                                                         Metadata]]]] = None)
+```
+
 ## SayStream Objects
 
 ```python
@@ -1059,6 +1207,17 @@ class SayStream()
 #### recipient\_user\_id
 
 #### thread\_ts
+
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             client: WebClient,
+             channel: Optional[str] = None,
+             recipient_team_id: Optional[str] = None,
+             recipient_user_id: Optional[str] = None,
+             thread_ts: Optional[str] = None)
+```
 
 ## Args Objects
 
@@ -1213,6 +1372,39 @@ An alias for payload in an `@app.message` listener
 
 An alias of `next()` for avoiding the Python built-in method overrides in middleware functions
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             logger: logging.Logger,
+             client: WebClient,
+             req: BoltRequest,
+             resp: BoltResponse,
+             context: BoltContext,
+             body: Dict[str, Any],
+             payload: Dict[str, Any],
+             options: Optional[Dict[str, Any]] = None,
+             shortcut: Optional[Dict[str, Any]] = None,
+             action: Optional[Dict[str, Any]] = None,
+             view: Optional[Dict[str, Any]] = None,
+             command: Optional[Dict[str, Any]] = None,
+             event: Optional[Dict[str, Any]] = None,
+             message: Optional[Dict[str, Any]] = None,
+             ack: Ack,
+             say: Say,
+             respond: Respond,
+             complete: Complete,
+             fail: Fail,
+             set_status: Optional[SetStatus] = None,
+             set_title: Optional[SetTitle] = None,
+             set_suggested_prompts: Optional[SetSuggestedPrompts] = None,
+             get_thread_context: Optional[GetThreadContext] = None,
+             save_thread_context: Optional[SaveThreadContext] = None,
+             say_stream: Optional[SayStream] = None,
+             next: Callable[[], None],
+             **kwargs)
+```
+
 ## Listener Objects
 
 ```python
@@ -1290,6 +1482,15 @@ class CustomListenerMatcher(ListenerMatcher)
 
 #### logger
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             app_name: str,
+             func: Callable[..., bool],
+             base_logger: Optional[Logger] = None)
+```
+
 #### matches
 
 ```python
@@ -1322,6 +1523,28 @@ class BoltRequest()
 
 either &quot;http&quot; or &quot;socket_mode&quot;
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             body: Union[str, dict],
+             query: Optional[Union[str, Dict[str, str],
+                                   Dict[str, Sequence[str]]]] = None,
+             headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None,
+             context: Optional[Dict[str, Any]] = None,
+             mode: str = "http")
+```
+
+Request to a Bolt app.
+
+**Arguments**:
+
+- `body` - The raw request body (only plain text is supported for &quot;http&quot; mode)
+- `query` - The query string data in any data format.
+- `headers` - The request headers.
+- `context` - The context in this request.
+- `mode` - The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
+
 #### to\_copyable
 
 ```python
@@ -1339,6 +1562,23 @@ class BoltResponse()
 #### body
 
 #### headers
+
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             status: int,
+             body: Union[str, dict] = "",
+             headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None)
+```
+
+The response from a Bolt app.
+
+**Arguments**:
+
+- `status` - HTTP status code
+- `body` - The response body (dict and str are supported)
+- `headers` - The response headers.
 
 #### first\_headers
 
@@ -1367,6 +1607,16 @@ class Assistant(Middleware)
 #### thread\_context\_store
 
 #### base\_logger
+
+#### \_\_init\_\_
+
+```python
+def __init__(
+        *,
+        app_name: str = "assistant",
+        thread_context_store: Optional[AssistantThreadContextStore] = None,
+        logger: Optional[logging.Logger] = None)
+```
 
 #### thread\_started
 
@@ -1447,6 +1697,12 @@ class AssistantThreadContext(dict)
 
 #### channel\_id
 
+#### \_\_init\_\_
+
+```python
+def __init__(payload: dict)
+```
+
 ## AssistantThreadContextStore Objects
 
 ```python
@@ -1470,6 +1726,13 @@ def find(*, channel_id: str,
 
 ```python
 class FileAssistantThreadContextStore(AssistantThreadContextStore)
+```
+
+#### \_\_init\_\_
+
+```python
+def __init__(base_dir: str = str(Path.home()) +
+             "/.bolt-app-assistant-thread-contexts")
 ```
 
 #### save
@@ -1497,6 +1760,12 @@ class SetStatus()
 
 #### thread\_ts
 
+#### \_\_init\_\_
+
+```python
+def __init__(client: WebClient, channel_id: str, thread_ts: str)
+```
+
 ## SetTitle Objects
 
 ```python
@@ -1508,6 +1777,12 @@ class SetTitle()
 #### channel\_id
 
 #### thread\_ts
+
+#### \_\_init\_\_
+
+```python
+def __init__(client: WebClient, channel_id: str, thread_ts: str)
+```
 
 ## SetSuggestedPrompts Objects
 
@@ -1521,6 +1796,14 @@ class SetSuggestedPrompts()
 
 #### thread\_ts
 
+#### \_\_init\_\_
+
+```python
+def __init__(client: WebClient,
+             channel_id: str,
+             thread_ts: Optional[str] = None)
+```
+
 ## SaveThreadContext Objects
 
 ```python
@@ -1532,4 +1815,11 @@ class SaveThreadContext()
 #### channel\_id
 
 #### thread\_ts
+
+#### \_\_init\_\_
+
+```python
+def __init__(thread_context_store: AssistantThreadContextStore,
+             channel_id: str, thread_ts: str)
+```
 

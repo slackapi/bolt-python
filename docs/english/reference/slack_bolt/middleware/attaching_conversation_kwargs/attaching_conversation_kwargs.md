@@ -38,6 +38,17 @@ class SayStream()
 
 #### thread\_ts
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             client: WebClient,
+             channel: Optional[str] = None,
+             recipient_team_id: Optional[str] = None,
+             recipient_user_id: Optional[str] = None,
+             thread_ts: Optional[str] = None)
+```
+
 ## SetStatus Objects
 
 ```python
@@ -50,6 +61,12 @@ class SetStatus()
 
 #### thread\_ts
 
+#### \_\_init\_\_
+
+```python
+def __init__(client: WebClient, channel_id: str, thread_ts: str)
+```
+
 ## SetSuggestedPrompts Objects
 
 ```python
@@ -61,6 +78,14 @@ class SetSuggestedPrompts()
 #### channel\_id
 
 #### thread\_ts
+
+#### \_\_init\_\_
+
+```python
+def __init__(client: WebClient,
+             channel_id: str,
+             thread_ts: Optional[str] = None)
+```
 
 ## Middleware Objects
 
@@ -133,6 +158,16 @@ class AssistantUtilities()
 #### thread\_ts
 
 #### thread\_context\_store
+
+#### \_\_init\_\_
+
+```python
+def __init__(
+        *,
+        payload: dict,
+        context: BoltContext,
+        thread_context_store: Optional[AssistantThreadContextStore] = None)
+```
 
 #### set\_title
 
@@ -225,6 +260,28 @@ class BoltRequest()
 
 either &quot;http&quot; or &quot;socket_mode&quot;
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             body: Union[str, dict],
+             query: Optional[Union[str, Dict[str, str],
+                                   Dict[str, Sequence[str]]]] = None,
+             headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None,
+             context: Optional[Dict[str, Any]] = None,
+             mode: str = "http")
+```
+
+Request to a Bolt app.
+
+**Arguments**:
+
+- `body` - The raw request body (only plain text is supported for &quot;http&quot; mode)
+- `query` - The query string data in any data format.
+- `headers` - The request headers.
+- `context` - The context in this request.
+- `mode` - The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
+
 #### to\_copyable
 
 ```python
@@ -242,6 +299,23 @@ class BoltResponse()
 #### body
 
 #### headers
+
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             status: int,
+             body: Union[str, dict] = "",
+             headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None)
+```
+
+The response from a Bolt app.
+
+**Arguments**:
+
+- `status` - HTTP status code
+- `body` - The response body (dict and str are supported)
+- `headers` - The response headers.
 
 #### first\_headers
 
@@ -268,6 +342,13 @@ class AttachingConversationKwargs(Middleware)
 ```
 
 #### thread\_context\_store
+
+#### \_\_init\_\_
+
+```python
+def __init__(
+        thread_context_store: Optional[AssistantThreadContextStore] = None)
+```
 
 #### process
 

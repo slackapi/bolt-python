@@ -23,3 +23,14 @@ class AsyncSay()
 
 #### build\_metadata
 
+#### \_\_init\_\_
+
+```python
+def __init__(
+    client: Optional[AsyncWebClient],
+    channel: Optional[str],
+    thread_ts: Optional[str] = None,
+    build_metadata: Optional[Callable[[], Awaitable[Union[Dict,
+                                                          Metadata]]]] = None)
+```
+

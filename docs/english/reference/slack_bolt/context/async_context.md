@@ -11,6 +11,12 @@ class AsyncAck()
 
 #### response
 
+#### \_\_init\_\_
+
+```python
+def __init__()
+```
+
 ## BaseContext Objects
 
 ```python
@@ -239,6 +245,12 @@ class AsyncComplete()
 
 #### function\_execution\_id
 
+#### \_\_init\_\_
+
+```python
+def __init__(client: AsyncWebClient, function_execution_id: Optional[str])
+```
+
 #### has\_been\_called
 
 ```python
@@ -260,6 +272,12 @@ class AsyncFail()
 #### client
 
 #### function\_execution\_id
+
+#### \_\_init\_\_
+
+```python
+def __init__(client: AsyncWebClient, function_execution_id: Optional[str])
+```
 
 #### has\_been\_called
 
@@ -285,6 +303,15 @@ class AsyncRespond()
 
 #### ssl
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             response_url: Optional[str],
+             proxy: Optional[str] = None,
+             ssl: Optional[SSLContext] = None)
+```
+
 ## AsyncGetThreadContext Objects
 
 ```python
@@ -301,6 +328,13 @@ class AsyncGetThreadContext()
 
 #### thread\_context\_loaded
 
+#### \_\_init\_\_
+
+```python
+def __init__(thread_context_store: AsyncAssistantThreadContextStore,
+             channel_id: str, thread_ts: str, payload: dict)
+```
+
 ## AsyncSaveThreadContext Objects
 
 ```python
@@ -312,6 +346,13 @@ class AsyncSaveThreadContext()
 #### channel\_id
 
 #### thread\_ts
+
+#### \_\_init\_\_
+
+```python
+def __init__(thread_context_store: AsyncAssistantThreadContextStore,
+             channel_id: str, thread_ts: str)
+```
 
 ## AsyncSay Objects
 
@@ -326,6 +367,17 @@ class AsyncSay()
 #### thread\_ts
 
 #### build\_metadata
+
+#### \_\_init\_\_
+
+```python
+def __init__(
+    client: Optional[AsyncWebClient],
+    channel: Optional[str],
+    thread_ts: Optional[str] = None,
+    build_metadata: Optional[Callable[[], Awaitable[Union[Dict,
+                                                          Metadata]]]] = None)
+```
 
 ## AsyncSayStream Objects
 
@@ -343,6 +395,17 @@ class AsyncSayStream()
 
 #### thread\_ts
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             client: AsyncWebClient,
+             channel: Optional[str] = None,
+             recipient_team_id: Optional[str] = None,
+             recipient_user_id: Optional[str] = None,
+             thread_ts: Optional[str] = None)
+```
+
 ## AsyncSetStatus Objects
 
 ```python
@@ -354,6 +417,12 @@ class AsyncSetStatus()
 #### channel\_id
 
 #### thread\_ts
+
+#### \_\_init\_\_
+
+```python
+def __init__(client: AsyncWebClient, channel_id: str, thread_ts: str)
+```
 
 ## AsyncSetSuggestedPrompts Objects
 
@@ -367,6 +436,14 @@ class AsyncSetSuggestedPrompts()
 
 #### thread\_ts
 
+#### \_\_init\_\_
+
+```python
+def __init__(client: AsyncWebClient,
+             channel_id: str,
+             thread_ts: Optional[str] = None)
+```
+
 ## AsyncSetTitle Objects
 
 ```python
@@ -378,6 +455,12 @@ class AsyncSetTitle()
 #### channel\_id
 
 #### thread\_ts
+
+#### \_\_init\_\_
+
+```python
+def __init__(client: AsyncWebClient, channel_id: str, thread_ts: str)
+```
 
 #### create\_copy
 

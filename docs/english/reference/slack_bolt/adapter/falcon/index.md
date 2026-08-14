@@ -18,6 +18,12 @@ api = application = falcon.API()
 api.add_route("/slack/events", SlackAppResource(app))
 ```
 
+#### \_\_init\_\_
+
+```python
+def __init__(app: App)
+```
+
 #### on\_get
 
 ```python

@@ -11,6 +11,13 @@ class AttachingConversationKwargs(Middleware)
 
 #### thread\_context\_store
 
+#### \_\_init\_\_
+
+```python
+def __init__(
+        thread_context_store: Optional[AssistantThreadContextStore] = None)
+```
+
 #### process
 
 ```python

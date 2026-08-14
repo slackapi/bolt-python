@@ -9,6 +9,12 @@ title: slack_bolt.adapter.fastapi.async_handler
 class AsyncSlackRequestHandler()
 ```
 
+#### \_\_init\_\_
+
+```python
+def __init__(app: AsyncApp)
+```
+
 #### handle
 
 ```python

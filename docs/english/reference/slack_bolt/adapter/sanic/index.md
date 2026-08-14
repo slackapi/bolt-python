@@ -9,6 +9,12 @@ title: slack_bolt.adapter.sanic
 class AsyncSlackRequestHandler()
 ```
 
+#### \_\_init\_\_
+
+```python
+def __init__(app: AsyncApp)
+```
+
 #### handle
 
 ```python

@@ -9,6 +9,12 @@ title: slack_bolt.adapter.asgi.aiohttp
 class AsgiHttpRequest()
 ```
 
+#### \_\_init\_\_
+
+```python
+def __init__(scope: scope_type, receive: Callable)
+```
+
 #### get\_headers
 
 ```python
@@ -26,6 +32,34 @@ async def get_raw_body() -> str
 ```python
 class SlackRequestHandler(BaseSlackRequestHandler)
 ```
+
+#### \_\_init\_\_
+
+```python
+def __init__(app: App, path: str = "/slack/events")
+```
+
+Setup Bolt as an ASGI web framework, this will make your application compatible with ASGI web servers.
+This can be used for production deployment.
+
+With the default settings, `http://localhost:3000/slack/events`
+Run Bolt with [uvicron](https://www.uvicorn.org/)
+
+```python
+    # Python
+    app = App()
+    api = SlackRequestHandler(app)
+
+    # bash
+    export SLACK_SIGNING_SECRET=***
+    export SLACK_BOT_TOKEN=xoxb-***
+    uvicorn app:api --port 3000 --log-level debug
+```
+
+**Arguments**:
+
+- `app` - Your bolt application
+- `path` - The path to handle request from Slack (Default: `/slack/events`)
 
 #### dispatch
 
@@ -50,6 +84,112 @@ async def handle_callback(request: AsgiHttpRequest) -> BoltResponse
 ```python
 class AsyncApp()
 ```
+
+#### \_\_init\_\_
+
+```python
+def __init__(
+        *,
+        logger: Optional[logging.Logger] = None,
+        name: Optional[str] = None,
+        process_before_response: bool = False,
+        raise_error_for_unhandled_request: bool = False,
+        signing_secret: Optional[str] = None,
+        token: Optional[str] = None,
+        client: Optional[AsyncWebClient] = None,
+        before_authorize: Optional[Union[AsyncMiddleware,
+                                         Callable[...,
+                                                  Awaitable[Any]]]] = None,
+        authorize: Optional[Callable[..., Awaitable[AuthorizeResult]]] = None,
+        user_facing_authorize_error_message: Optional[str] = None,
+        installation_store: Optional[AsyncInstallationStore] = None,
+        installation_store_bot_only: Optional[bool] = None,
+        request_verification_enabled: bool = True,
+        ignoring_self_events_enabled: bool = True,
+        ignoring_self_assistant_message_events_enabled: bool = True,
+        ssl_check_enabled: bool = True,
+        url_verification_enabled: bool = True,
+        attaching_function_token_enabled: bool = True,
+        oauth_settings: Optional[AsyncOAuthSettings] = None,
+        oauth_flow: Optional[AsyncOAuthFlow] = None,
+        verification_token: Optional[str] = None,
+        assistant_thread_context_store: Optional[
+            AsyncAssistantThreadContextStore] = None,
+        attaching_conversation_kwargs_enabled: bool = True)
+```
+
+Bolt App that provides functionalities to register middleware/listeners.
+
+```python
+    import os
+    from slack_bolt.async_app import AsyncApp
+
+    # Initializes your app with your bot token and signing secret
+    app = AsyncApp(
+        token=os.environ.get("SLACK_BOT_TOKEN"),
+        signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+    )
+
+    # Listens to incoming messages that contain "hello"
+    @app.message("hello")
+    async def message_hello(message, say):  # async function
+        # say() sends a message to the channel where the event was triggered
+        await say(f"Hey there <@{message['user']}>!")
+
+    # Start your app
+    if __name__ == "__main__":
+        app.start(port=int(os.environ.get("PORT", 3000)))
+```
+
+Refer to https://docs.slack.dev/tools/bolt-python/concepts/async for details.
+
+If you would like to build an OAuth app for enabling the app to run with multiple workspaces,
+refer to https://docs.slack.dev/tools/bolt-python/concepts/authenticating-oauth to learn how to configure the app.
+
+**Arguments**:
+
+- `logger` - The custom logger that can be used in this app.
+- `name` - The application name that will be used in logging. If absent, the source file name will be used.
+- `process_before_response` - True if this app runs on Function as a Service. (Default: False)
+- `raise_error_for_unhandled_request` - True if you want to raise exceptions for unhandled requests
+  and use @app.error listeners instead of
+  the built-in handler, which pints warning logs and returns 404 to Slack (Default: False)
+- `signing_secret` - The Signing Secret value used for verifying requests from Slack.
+- `token` - The bot/user access token required only for single-workspace app.
+- `client` - The singleton `slack_sdk.web.async_client.AsyncWebClient` instance for this app.
+- `before_authorize` - A global middleware that can be executed right before authorize function
+- `authorize` - The function to authorize an incoming request from Slack
+  by checking if there is a team/user in the installation data.
+- `user_facing_authorize_error_message` - The user-facing error message to display
+  when the app is installed but the installation is not managed by this app&#x27;s installation store
+- `installation_store` - The module offering save/find operations of installation data
+- `installation_store_bot_only` - Use `AsyncInstallationStore#async_find_bot()` if True (Default: False)
+- `request_verification_enabled` - False if you would like to disable the built-in middleware (Default: True).
+  `AsyncRequestVerification` is a built-in middleware that verifies the signature in HTTP Mode requests.
+  Make sure if it&#x27;s safe enough when you turn a built-in middleware off.
+  We strongly recommend using RequestVerification for better security.
+  If you have a proxy that verifies request signature in front of the Bolt app,
+  it&#x27;s totally fine to disable RequestVerification to avoid duplication of work.
+  Don&#x27;t turn it off just for easiness of development.
+- `ignoring_self_events_enabled` - False if you would like to disable the built-in middleware (Default: True).
+  `AsyncIgnoringSelfEvents` is a built-in middleware that enables Bolt apps to easily skip the events
+  generated by this app&#x27;s bot user (this is useful for avoiding code error causing an infinite loop).
+- `ignoring_self_assistant_message_events_enabled` - False if you would like to disable the built-in middleware.
+  `IgnoringSelfEvents` for this app&#x27;s bot user message events within an assistant thread
+  This is useful for avoiding code error causing an infinite loop; Default: True
+- `url_verification_enabled` - False if you would like to disable the built-in middleware (Default: True).
+  `AsyncUrlVerification` is a built-in middleware that handles url_verification requests
+  that verify the endpoint for Events API in HTTP Mode requests.
+- `ssl_check_enabled` - bool = False if you would like to disable the built-in middleware (Default: True).
+  `AsyncSslCheck` is a built-in middleware that handles ssl_check requests from Slack.
+- `attaching_function_token_enabled` - False if you would like to disable the built-in middleware (Default: True).
+  `AsyncAttachingFunctionToken` is a built-in middleware that injects the just-in-time workflow-execution token
+  when your app receives `function_executed` or interactivity events scoped to a custom step.
+- `oauth_settings` - The settings related to Slack app installation flow (OAuth flow)
+- `oauth_flow` - Instantiated `slack_bolt.oauth.AsyncOAuthFlow`. This is always prioritized over oauth_settings.
+- `verification_token` - Deprecated verification mechanism. This can be used only for ssl_check requests.
+- `assistant_thread_context_store` - Custom AssistantThreadContext store (Default: the built-in implementation,
+  which uses a parent message&#x27;s metadata to store the latest context)
 
 #### name
 
@@ -832,6 +972,28 @@ class AsyncBoltRequest()
 
 either &quot;http&quot; or &quot;socket_mode&quot;
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             body: Union[str, dict],
+             query: Optional[Union[str, Dict[str, str],
+                                   Dict[str, Sequence[str]]]] = None,
+             headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None,
+             context: Optional[Dict[str, Any]] = None,
+             mode: str = "http")
+```
+
+Request to a Bolt app.
+
+**Arguments**:
+
+- `body` - The raw request body (only plain text is supported for &quot;http&quot; mode)
+- `query` - The query string data in any data format.
+- `headers` - The request headers.
+- `context` - The context in this request.
+- `mode` - The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
+
 #### to\_copyable
 
 ```python
@@ -849,6 +1011,23 @@ class BoltResponse()
 #### body
 
 #### headers
+
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             status: int,
+             body: Union[str, dict] = "",
+             headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None)
+```
+
+The response from a Bolt app.
+
+**Arguments**:
+
+- `status` - HTTP status code
+- `body` - The response body (dict and str are supported)
+- `headers` - The response headers.
 
 #### first\_headers
 
@@ -875,6 +1054,32 @@ class AsyncSlackRequestHandler(SlackRequestHandler)
 ```
 
 #### app
+
+#### \_\_init\_\_
+
+```python
+def __init__(app: AsyncApp, path: str = "/slack/events")
+```
+
+Setup Bolt as an ASGI web framework, this will make your application compatible with ASGI web servers.
+This can be used for production deployment.
+
+With the default settings, `http://localhost:3000/slack/events`
+Run Bolt with [uvicron](https://www.uvicorn.org/)
+
+# Python
+app = AsyncApp()
+api = SlackRequestHandler(app)
+
+# bash
+export SLACK_SIGNING_SECRET=***
+export SLACK_BOT_TOKEN=xoxb-***
+uvicorn app:api --port 3000 --log-level debug
+
+**Arguments**:
+
+- `app` - Your bolt application
+- `path` - The path to handle request from Slack (Default: `/slack/events`)
 
 #### dispatch
 

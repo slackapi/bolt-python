@@ -33,3 +33,9 @@ class Complete()
 This utility is a thin wrapper of workflows.stepCompleted API method.
 Refer to https://api.slack.com/methods/workflows.stepCompleted for details.
 
+#### \_\_init\_\_
+
+```python
+def __init__(*, client: WebClient, body: dict)
+```
+

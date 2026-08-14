@@ -242,6 +242,12 @@ class AssistantThreadContext(dict)
 
 #### channel\_id
 
+#### \_\_init\_\_
+
+```python
+def __init__(payload: dict)
+```
+
 ## AssistantThreadContextStore Objects
 
 ```python
@@ -270,6 +276,12 @@ class DefaultAssistantThreadContextStore(AssistantThreadContextStore)
 #### client
 
 #### context
+
+#### \_\_init\_\_
+
+```python
+def __init__(context: BoltContext)
+```
 
 #### save
 

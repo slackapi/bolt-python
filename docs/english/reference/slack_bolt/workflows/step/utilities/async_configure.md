@@ -40,3 +40,9 @@ class AsyncConfigure()
 
 Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
 
+#### \_\_init\_\_
+
+```python
+def __init__(*, callback_id: str, client: AsyncWebClient, body: dict)
+```
+

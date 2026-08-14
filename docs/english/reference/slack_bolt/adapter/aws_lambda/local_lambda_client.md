@@ -11,6 +11,12 @@ class LocalLambdaClient(BaseClient)
 
 Lambda client implementing `invoke` for use when running with Chalice CLI.
 
+#### \_\_init\_\_
+
+```python
+def __init__(app: Chalice, config: Config) -> None
+```
+
 #### invoke
 
 ```python

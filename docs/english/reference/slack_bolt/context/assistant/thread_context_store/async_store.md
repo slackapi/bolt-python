@@ -15,6 +15,12 @@ class AssistantThreadContext(dict)
 
 #### channel\_id
 
+#### \_\_init\_\_
+
+```python
+def __init__(payload: dict)
+```
+
 ## AsyncAssistantThreadContextStore Objects
 
 ```python

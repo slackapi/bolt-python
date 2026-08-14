@@ -13,6 +13,12 @@ class Complete()
 
 #### function\_execution\_id
 
+#### \_\_init\_\_
+
+```python
+def __init__(client: WebClient, function_execution_id: Optional[str])
+```
+
 #### has\_been\_called
 
 ```python

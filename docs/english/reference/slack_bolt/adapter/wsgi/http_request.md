@@ -14,6 +14,12 @@ from the WSGI web server running the application
 
 PEP 3333: https://peps.python.org/pep-3333/
 
+#### \_\_init\_\_
+
+```python
+def __init__(environ: "WSGIEnvironment")
+```
+
 #### get\_headers
 
 ```python

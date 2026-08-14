@@ -33,6 +33,20 @@ type: ignore[assignment]
 
 #### logger
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             app_name: str,
+             ack_function: Callable[..., Optional[BoltResponse]],
+             lazy_functions: Sequence[Callable[..., None]],
+             matchers: Sequence[ListenerMatcher],
+             middleware: Sequence[Middleware],
+             auto_acknowledgement: bool = False,
+             ack_timeout: int = 3,
+             base_logger: Optional[Logger] = None)
+```
+
 #### run\_ack\_function
 
 ```python

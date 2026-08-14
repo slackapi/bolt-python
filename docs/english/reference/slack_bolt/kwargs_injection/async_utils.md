@@ -29,6 +29,28 @@ class AsyncBoltRequest()
 
 either &quot;http&quot; or &quot;socket_mode&quot;
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             body: Union[str, dict],
+             query: Optional[Union[str, Dict[str, str],
+                                   Dict[str, Sequence[str]]]] = None,
+             headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None,
+             context: Optional[Dict[str, Any]] = None,
+             mode: str = "http")
+```
+
+Request to a Bolt app.
+
+**Arguments**:
+
+- `body` - The raw request body (only plain text is supported for &quot;http&quot; mode)
+- `query` - The query string data in any data format.
+- `headers` - The request headers.
+- `context` - The context in this request.
+- `mode` - The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
+
 #### to\_copyable
 
 ```python
@@ -46,6 +68,23 @@ class BoltResponse()
 #### body
 
 #### headers
+
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             status: int,
+             body: Union[str, dict] = "",
+             headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None)
+```
+
+The response from a Bolt app.
+
+**Arguments**:
+
+- `status` - HTTP status code
+- `body` - The response body (dict and str are supported)
+- `headers` - The response headers.
 
 #### first\_headers
 
@@ -217,6 +256,39 @@ An alias for payload in an `@app.message` listener
 #### next\_
 
 An alias of `next()` for avoiding the Python built-in method overrides in middleware functions
+
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             logger: Logger,
+             client: AsyncWebClient,
+             req: AsyncBoltRequest,
+             resp: BoltResponse,
+             context: AsyncBoltContext,
+             body: Dict[str, Any],
+             payload: Dict[str, Any],
+             options: Optional[Dict[str, Any]] = None,
+             shortcut: Optional[Dict[str, Any]] = None,
+             action: Optional[Dict[str, Any]] = None,
+             view: Optional[Dict[str, Any]] = None,
+             command: Optional[Dict[str, Any]] = None,
+             event: Optional[Dict[str, Any]] = None,
+             message: Optional[Dict[str, Any]] = None,
+             ack: AsyncAck,
+             say: AsyncSay,
+             respond: AsyncRespond,
+             complete: AsyncComplete,
+             fail: AsyncFail,
+             set_status: Optional[AsyncSetStatus] = None,
+             set_title: Optional[AsyncSetTitle] = None,
+             set_suggested_prompts: Optional[AsyncSetSuggestedPrompts] = None,
+             get_thread_context: Optional[AsyncGetThreadContext] = None,
+             save_thread_context: Optional[AsyncSaveThreadContext] = None,
+             say_stream: Optional[AsyncSayStream] = None,
+             next: Callable[[], Awaitable[None]],
+             **kwargs)
+```
 
 #### to\_options
 

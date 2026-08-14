@@ -49,3 +49,9 @@ class AsyncUpdate()
 This utility is a thin wrapper of workflows.stepFailed API method.
 Refer to https://api.slack.com/methods/workflows.updateStep for details.
 
+#### \_\_init\_\_
+
+```python
+def __init__(*, client: AsyncWebClient, body: dict)
+```
+

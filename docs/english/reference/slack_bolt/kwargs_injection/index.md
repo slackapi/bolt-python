@@ -161,6 +161,39 @@ An alias for payload in an `@app.message` listener
 
 An alias of `next()` for avoiding the Python built-in method overrides in middleware functions
 
+#### \_\_init\_\_
+
+```python
+def __init__(*,
+             logger: logging.Logger,
+             client: WebClient,
+             req: BoltRequest,
+             resp: BoltResponse,
+             context: BoltContext,
+             body: Dict[str, Any],
+             payload: Dict[str, Any],
+             options: Optional[Dict[str, Any]] = None,
+             shortcut: Optional[Dict[str, Any]] = None,
+             action: Optional[Dict[str, Any]] = None,
+             view: Optional[Dict[str, Any]] = None,
+             command: Optional[Dict[str, Any]] = None,
+             event: Optional[Dict[str, Any]] = None,
+             message: Optional[Dict[str, Any]] = None,
+             ack: Ack,
+             say: Say,
+             respond: Respond,
+             complete: Complete,
+             fail: Fail,
+             set_status: Optional[SetStatus] = None,
+             set_title: Optional[SetTitle] = None,
+             set_suggested_prompts: Optional[SetSuggestedPrompts] = None,
+             get_thread_context: Optional[GetThreadContext] = None,
+             save_thread_context: Optional[SaveThreadContext] = None,
+             say_stream: Optional[SayStream] = None,
+             next: Callable[[], None],
+             **kwargs)
+```
+
 #### build\_required\_kwargs
 
 ```python
