@@ -261,6 +261,7 @@ def main():
     session.process(modules)
     session.render(modules)
     _rename_package_indexes()
+    _check_mdx_hazards()
     _finalize_reference_sidebar()
     _strip_reference_from_site_sidebar()
 
@@ -303,6 +304,52 @@ def _rename_package_indexes():
         handle.write("\n")
 
     print("Renamed {} package __init__.md files to index.md".format(renamed))
+
+
+# Docusaurus v3 parses every .md file as MDX, so a line that begins (at column
+# zero, outside a code fence) with `export`/`import` is read as an ESM statement
+# and a bare `<` as JSX -- either aborts the docs-site build with an opaque acorn
+# error. pydoc-markdown strips docstring indentation, so an *unfenced* shell/py
+# example (e.g. `export SLACK_BOT_TOKEN=...`) lands at column zero and trips this.
+# The guard below turns that into a loud failure here, pointing at the generated
+# file, instead of a cryptic failure later in the docs repo.
+_MDX_ESM_RE = re.compile(r"^(export|import)\s")
+
+
+def _check_mdx_hazards():
+    """Fail generation if any rendered Markdown has an MDX/acorn hazard.
+
+    Scans every generated .md for lines outside code fences that MDX would try to
+    parse as JavaScript: leading ``export``/``import`` (ESM) or a leading ``<``
+    (JSX). These come from unfenced code examples in docstrings; the fix is to
+    fence the example at its source (see slack_bolt/adapter/asgi/aiohttp for the
+    canonical pattern)."""
+    reference_dir = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR)
+    hazards = []
+    for dirpath, _dirnames, filenames in os.walk(reference_dir):
+        for filename in filenames:
+            if not filename.endswith(".md"):
+                continue
+            path = os.path.join(dirpath, filename)
+            in_codeblock = False
+            with open(path, encoding="utf-8") as handle:
+                for lineno, raw in enumerate(handle, 1):
+                    line = raw.rstrip("\n")
+                    if line.lstrip().startswith("```"):
+                        in_codeblock = not in_codeblock
+                        continue
+                    if in_codeblock:
+                        continue
+                    if _MDX_ESM_RE.match(line) or line.startswith("<"):
+                        rel = os.path.relpath(path, DOCS_BASE_PATH)
+                        hazards.append("{}:{}: {}".format(rel, lineno, line))
+
+    if hazards:
+        raise SystemExit(
+            "MDX/acorn hazards found in generated Markdown (unfenced code at column "
+            "zero). Fence the offending example in its source docstring:\n  " + "\n  ".join(hazards)
+        )
+    print("No MDX/acorn hazards in generated Markdown")
 
 
 # The docs site (docs.slack.dev) build imports this generated sidebar.json in
