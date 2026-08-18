@@ -21,15 +21,15 @@ async def to_aiohttp_response(bolt_resp: BoltResponse) -> web.Response
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -80,21 +80,21 @@ def get_boot_message(development_server: bool = False) -> str
 class AsyncSlackAppServer()
 ```
 
-#### port
+#### port: `int`
 
 The port to listen on
 
-#### path
+#### path: `str`
 
 The path to receive incoming requests from Slack
 
-#### host
+#### host: `str`
 
 The hostname to serve the web endpoints. (Default: 0.0.0.0)
 
-#### bolt\_app
+#### bolt\_app: `"AsyncApp"`
 
-#### web\_app
+#### web\_app: `web.Application`
 
 #### \_\_init\_\_
 

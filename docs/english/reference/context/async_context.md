@@ -9,7 +9,7 @@ title: slack_bolt.context.async_context
 class AsyncAck()
 ```
 
-#### response
+#### response: `Optional[BoltResponse]`
 
 #### \_\_init\_\_
 
@@ -241,9 +241,9 @@ def set_authorize_result(authorize_result: AuthorizeResult)
 class AsyncComplete()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### function\_execution\_id
+#### function\_execution\_id: `Optional[str]`
 
 #### \_\_init\_\_
 
@@ -269,9 +269,9 @@ Check if this complete function has been called.
 class AsyncFail()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### function\_execution\_id
+#### function\_execution\_id: `Optional[str]`
 
 #### \_\_init\_\_
 
@@ -297,11 +297,11 @@ Check if this fail function has been called.
 class AsyncRespond()
 ```
 
-#### response\_url
+#### response\_url: `Optional[str]`
 
-#### proxy
+#### proxy: `Optional[str]`
 
-#### ssl
+#### ssl: `Optional[SSLContext]`
 
 #### \_\_init\_\_
 
@@ -318,15 +318,15 @@ def __init__(*,
 class AsyncGetThreadContext()
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `AsyncAssistantThreadContextStore`
 
-#### payload
+#### payload: `dict`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
-#### thread\_context\_loaded
+#### thread\_context\_loaded: `bool`
 
 #### \_\_init\_\_
 
@@ -341,11 +341,11 @@ def __init__(thread_context_store: AsyncAssistantThreadContextStore,
 class AsyncSaveThreadContext()
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `AsyncAssistantThreadContextStore`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 
@@ -360,13 +360,13 @@ def __init__(thread_context_store: AsyncAssistantThreadContextStore,
 class AsyncSay()
 ```
 
-#### client
+#### client: `Optional[AsyncWebClient]`
 
-#### channel
+#### channel: `Optional[str]`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
-#### build\_metadata
+#### build\_metadata: `Optional[Callable[[], Awaitable[Union[Dict, Metadata]]]]`
 
 #### \_\_init\_\_
 
@@ -385,15 +385,15 @@ def __init__(
 class AsyncSayStream()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel
+#### channel: `Optional[str]`
 
-#### recipient\_team\_id
+#### recipient\_team\_id: `Optional[str]`
 
-#### recipient\_user\_id
+#### recipient\_user\_id: `Optional[str]`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
 #### \_\_init\_\_
 
@@ -412,11 +412,11 @@ def __init__(*,
 class AsyncSetStatus()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 
@@ -430,11 +430,11 @@ def __init__(client: AsyncWebClient, channel_id: str, thread_ts: str)
 class AsyncSetSuggestedPrompts()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
 #### \_\_init\_\_
 
@@ -450,11 +450,11 @@ def __init__(client: AsyncWebClient,
 class AsyncSetTitle()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 

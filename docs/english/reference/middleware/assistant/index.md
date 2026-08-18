@@ -14,9 +14,9 @@ title: slack_bolt.middleware.assistant
 class Assistant(Middleware)
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `Optional[AssistantThreadContextStore]`
 
-#### base\_logger
+#### base\_logger: `Optional[logging.Logger]`
 
 #### \_\_init\_\_
 

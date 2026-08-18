@@ -14,7 +14,7 @@ title: slack_bolt.middleware.attaching_conversation_kwargs
 class AttachingConversationKwargs(Middleware)
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `Optional[AssistantThreadContextStore]`
 
 #### \_\_init\_\_
 

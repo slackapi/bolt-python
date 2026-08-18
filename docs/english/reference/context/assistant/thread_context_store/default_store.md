@@ -236,11 +236,11 @@ def save_thread_context() -> Optional[SaveThreadContext]
 class AssistantThreadContext(dict)
 ```
 
-#### enterprise\_id
+#### enterprise\_id: `Optional[str]`
 
-#### team\_id
+#### team\_id: `Optional[str]`
 
-#### channel\_id
+#### channel\_id: `str`
 
 #### \_\_init\_\_
 
@@ -273,9 +273,9 @@ def find(*, channel_id: str,
 class DefaultAssistantThreadContextStore(AssistantThreadContextStore)
 ```
 
-#### client
+#### client: `WebClient`
 
-#### context
+#### context: `"BoltContext"`
 
 #### \_\_init\_\_
 

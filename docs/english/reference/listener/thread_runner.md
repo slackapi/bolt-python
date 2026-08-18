@@ -9,7 +9,7 @@ title: slack_bolt.listener.thread_runner
 class LazyListenerRunner(metaclass=ABCMeta)
 ```
 
-#### logger
+#### logger: `Logger`
 
 #### start
 
@@ -44,17 +44,17 @@ Synchronously runs the function with a given request data.
 class Listener(metaclass=ABCMeta)
 ```
 
-#### matchers
+#### matchers: `Sequence[ListenerMatcher]`
 
-#### middleware
+#### middleware: `Sequence[Middleware]`
 
-#### ack\_function
+#### ack\_function: `Callable[..., BoltResponse]`
 
-#### lazy\_functions
+#### lazy\_functions: `Sequence[Callable[..., None]]`
 
-#### auto\_acknowledgement
+#### auto\_acknowledgement: `bool`
 
-#### ack\_timeout
+#### ack\_timeout: `int`
 
 #### matches
 
@@ -191,31 +191,31 @@ def warning_did_not_call_ack(listener_name: str) -> str
 class BoltRequest()
 ```
 
-#### raw\_body
+#### raw\_body: `str`
 
-#### query
+#### query: `Dict[str, Sequence[str]]`
 
 The query string data in any data format.
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The request headers.
 
-#### content\_type
+#### content\_type: `Optional[str]`
 
-#### body
+#### body: `Dict[str, Any]`
 
 The raw request body (only plain text is supported for &quot;http&quot; mode)
 
-#### context
+#### context: `BoltContext`
 
 The context in this request.
 
-#### lazy\_only
+#### lazy\_only: `bool`
 
-#### lazy\_function\_name
+#### lazy\_function\_name: `Optional[str]`
 
-#### mode
+#### mode: `str`
 
 The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
@@ -253,15 +253,15 @@ def to_copyable() -> "BoltRequest"
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -329,19 +329,19 @@ Returns the name for the given Callable function object.
 class ThreadListenerRunner()
 ```
 
-#### logger
+#### logger: `Logger`
 
-#### process\_before\_response
+#### process\_before\_response: `bool`
 
-#### listener\_error\_handler
+#### listener\_error\_handler: `ListenerErrorHandler`
 
-#### listener\_start\_handler
+#### listener\_start\_handler: `ListenerStartHandler`
 
-#### listener\_completion\_handler
+#### listener\_completion\_handler: `ListenerCompletionHandler`
 
-#### listener\_executor
+#### listener\_executor: `Executor`
 
-#### lazy\_listener\_runner
+#### lazy\_listener\_runner: `LazyListenerRunner`
 
 #### \_\_init\_\_
 

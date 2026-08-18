@@ -9,15 +9,15 @@ title: slack_bolt.middleware.attaching_conversation_kwargs.async_attaching_conve
 class AsyncAssistantUtilities()
 ```
 
-#### payload
+#### payload: `dict`
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
-#### thread\_context\_store
+#### thread\_context\_store: `AsyncAssistantThreadContextStore`
 
 #### \_\_init\_\_
 
@@ -84,15 +84,15 @@ async def find(*, channel_id: str,
 class AsyncSayStream()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel
+#### channel: `Optional[str]`
 
-#### recipient\_team\_id
+#### recipient\_team\_id: `Optional[str]`
 
-#### recipient\_user\_id
+#### recipient\_user\_id: `Optional[str]`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
 #### \_\_init\_\_
 
@@ -111,11 +111,11 @@ def __init__(*,
 class AsyncSetStatus()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 
@@ -129,11 +129,11 @@ def __init__(client: AsyncWebClient, channel_id: str, thread_ts: str)
 class AsyncSetSuggestedPrompts()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
 #### \_\_init\_\_
 
@@ -206,31 +206,31 @@ The name of this middleware
 class AsyncBoltRequest()
 ```
 
-#### raw\_body
+#### raw\_body: `str`
 
-#### body
+#### body: `Dict[str, Any]`
 
 The raw request body (only plain text is supported for &quot;http&quot; mode)
 
-#### query
+#### query: `Dict[str, Sequence[str]]`
 
 The query string data in any data format.
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The request headers.
 
-#### content\_type
+#### content\_type: `Optional[str]`
 
-#### context
+#### context: `AsyncBoltContext`
 
 The context in this request.
 
-#### lazy\_only
+#### lazy\_only: `bool`
 
-#### lazy\_function\_name
+#### lazy\_function\_name: `Optional[str]`
 
-#### mode
+#### mode: `str`
 
 The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
@@ -305,15 +305,15 @@ def to_event(body: Dict[str, Any]) -> Optional[Dict[str, Any]]
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -358,7 +358,7 @@ def cookies() -> Sequence[SimpleCookie]
 class AsyncAttachingConversationKwargs(AsyncMiddleware)
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `Optional[AsyncAssistantThreadContextStore]`
 
 #### \_\_init\_\_
 

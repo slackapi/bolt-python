@@ -9,9 +9,9 @@ title: slack_bolt.context.fail.async_fail
 class AsyncFail()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### function\_execution\_id
+#### function\_execution\_id: `Optional[str]`
 
 #### \_\_init\_\_
 

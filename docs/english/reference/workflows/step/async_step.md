@@ -236,17 +236,17 @@ def save_thread_context() -> Optional[AsyncSaveThreadContext]
 class AsyncListener(metaclass=ABCMeta)
 ```
 
-#### matchers
+#### matchers: `Sequence[AsyncListenerMatcher]`
 
-#### middleware
+#### middleware: `Sequence[AsyncMiddleware]`
 
-#### ack\_function
+#### ack\_function: `Callable[..., Awaitable[BoltResponse]]`
 
-#### lazy\_functions
+#### lazy\_functions: `Sequence[Callable[..., Awaitable[None]]]`
 
-#### auto\_acknowledgement
+#### auto\_acknowledgement: `bool`
 
-#### ack\_timeout
+#### ack\_timeout: `int`
 
 #### async\_matches
 
@@ -300,25 +300,25 @@ Runs all the registered middleware and then run the listener function.
 class AsyncCustomListener(AsyncListener)
 ```
 
-#### app\_name
+#### app\_name: `str`
 
-#### ack\_function
+#### ack\_function: `Callable[..., Awaitable[Optional[BoltResponse]]]`
 
 type: ignore[assignment]
 
-#### lazy\_functions
+#### lazy\_functions: `Sequence[Callable[..., Awaitable[None]]]`
 
-#### matchers
+#### matchers: `Sequence[AsyncListenerMatcher]`
 
-#### middleware
+#### middleware: `Sequence[AsyncMiddleware]`
 
-#### auto\_acknowledgement
+#### auto\_acknowledgement: `bool`
 
-#### ack\_timeout
+#### ack\_timeout: `int`
 
-#### arg\_names
+#### arg\_names: `MutableSequence[str]`
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 
@@ -377,13 +377,13 @@ def workflow_step_execute(
 class AsyncCustomMiddleware(AsyncMiddleware)
 ```
 
-#### app\_name
+#### app\_name: `str`
 
-#### func
+#### func: `Callable[..., Awaitable[Any]]`
 
-#### arg\_names
+#### arg\_names: `MutableSequence[str]`
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 
@@ -415,15 +415,15 @@ def name() -> str
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -665,13 +665,13 @@ Matches against the request and returns True if matched.
 class AsyncCustomListenerMatcher(AsyncListenerMatcher)
 ```
 
-#### app\_name
+#### app\_name: `str`
 
-#### func
+#### func: `Callable[..., Awaitable[bool]]`
 
-#### arg\_names
+#### arg\_names: `Sequence[str]`
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 
@@ -754,7 +754,7 @@ class AsyncWorkflowStepBuilder()
 Steps from apps
 Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
 
-#### callback\_id
+#### callback\_id: `Union[str, Pattern]`
 
 The callback_id for the workflow
 
@@ -968,19 +968,19 @@ def to_listener_middleware(
 class AsyncWorkflowStep()
 ```
 
-#### callback\_id
+#### callback\_id: `Union[str, Pattern]`
 
 The Callback ID of the step from app
 
-#### edit
+#### edit: `AsyncListener`
 
 `edit` listener, which displays a modal in Workflow Builder
 
-#### save
+#### save: `AsyncListener`
 
 `save` listener, which accepts workflow creator&#x27;s data submission in Workflow Builder
 
-#### execute
+#### execute: `AsyncListener`
 
 `execute` listener, which processes the step from app execution
 

@@ -9,11 +9,11 @@ title: slack_bolt.context.set_status.async_set_status
 class AsyncSetStatus()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 

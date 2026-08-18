@@ -11,11 +11,11 @@ Default implementation is the aiohttp-based one.
 class AsyncSocketModeHandler(AsyncBaseSocketModeHandler)
 ```
 
-#### app
+#### app: `AsyncApp`
 
-#### app\_token
+#### app\_token: `str`
 
-#### client
+#### client: `SocketModeClient`
 
 #### \_\_init\_\_
 

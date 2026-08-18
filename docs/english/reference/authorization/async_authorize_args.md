@@ -236,23 +236,23 @@ def save_thread_context() -> Optional[AsyncSaveThreadContext]
 class AsyncAuthorizeArgs()
 ```
 
-#### context
+#### context: `AsyncBoltContext`
 
 The request context
 
-#### logger
+#### logger: `Logger`
 
-#### client
+#### client: `AsyncWebClient`
 
-#### enterprise\_id
+#### enterprise\_id: `Optional[str]`
 
 The Organization ID (Enterprise Grid)
 
-#### team\_id
+#### team\_id: `Optional[str]`
 
 The workspace ID
 
-#### user\_id
+#### user\_id: `Optional[str]`
 
 The request user ID
 

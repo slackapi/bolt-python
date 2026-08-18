@@ -236,11 +236,11 @@ def save_thread_context() -> Optional[AsyncSaveThreadContext]
 class AssistantThreadContext(dict)
 ```
 
-#### enterprise\_id
+#### enterprise\_id: `Optional[str]`
 
-#### team\_id
+#### team\_id: `Optional[str]`
 
-#### channel\_id
+#### channel\_id: `str`
 
 #### \_\_init\_\_
 
@@ -275,9 +275,9 @@ class DefaultAsyncAssistantThreadContextStore(AsyncAssistantThreadContextStore
                                               )
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### context
+#### context: `AsyncBoltContext`
 
 #### \_\_init\_\_
 

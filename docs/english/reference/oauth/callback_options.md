@@ -22,31 +22,31 @@ def __init__(*, logger: Logger, state_utils: OAuthStateUtils,
 class BoltRequest()
 ```
 
-#### raw\_body
+#### raw\_body: `str`
 
-#### query
+#### query: `Dict[str, Sequence[str]]`
 
 The query string data in any data format.
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The request headers.
 
-#### content\_type
+#### content\_type: `Optional[str]`
 
-#### body
+#### body: `Dict[str, Any]`
 
 The raw request body (only plain text is supported for &quot;http&quot; mode)
 
-#### context
+#### context: `BoltContext`
 
 The context in this request.
 
-#### lazy\_only
+#### lazy\_only: `bool`
 
-#### lazy\_function\_name
+#### lazy\_function\_name: `Optional[str]`
 
-#### mode
+#### mode: `str`
 
 The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
@@ -84,15 +84,15 @@ def to_copyable() -> "BoltRequest"
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -188,11 +188,11 @@ The arguments for a failure function.
 class CallbackOptions()
 ```
 
-#### success
+#### success: `Callable[[SuccessArgs], BoltResponse]`
 
 A handler for successful installation.
 
-#### failure
+#### failure: `Callable[[FailureArgs], BoltResponse]`
 
 A handler for any types of installation failures.
 
@@ -216,9 +216,9 @@ The configurations for OAuth flow.
 class DefaultCallbackOptions(CallbackOptions)
 ```
 
-#### success
+#### success: `Callable[[SuccessArgs], BoltResponse]`
 
-#### failure
+#### failure: `Callable[[FailureArgs], BoltResponse]`
 
 #### \_\_init\_\_
 

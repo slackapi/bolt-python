@@ -16,15 +16,15 @@ def create_copy(original: Any) -> Any
 class Say()
 ```
 
-#### client
+#### client: `Optional[WebClient]`
 
-#### channel
+#### channel: `Optional[str]`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
-#### metadata
+#### metadata: `Optional[Union[Dict, Metadata]]`
 
-#### build\_metadata
+#### build\_metadata: `Optional[Callable[[], Optional[Union[Dict, Metadata]]]]`
 
 #### \_\_init\_\_
 

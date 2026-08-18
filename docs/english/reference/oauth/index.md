@@ -25,21 +25,21 @@ Refer to https://docs.slack.dev/tools/bolt-python/concepts/authenticating-oauth 
 class OAuthFlow()
 ```
 
-#### settings
+#### settings: `OAuthSettings`
 
 OAuth settings to configure this module.
 
-#### client\_id
+#### client\_id: `str`
 
-#### redirect\_uri
+#### redirect\_uri: `Optional[str]`
 
-#### install\_path
+#### install\_path: `str`
 
-#### redirect\_uri\_path
+#### redirect\_uri\_path: `str`
 
-#### success\_handler
+#### success\_handler: `Callable[[SuccessArgs], BoltResponse]`
 
-#### failure\_handler
+#### failure\_handler: `Callable[[FailureArgs], BoltResponse]`
 
 #### \_\_init\_\_
 

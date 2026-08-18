@@ -10,11 +10,11 @@ slug: set_suggested_prompts
 class SetSuggestedPrompts()
 ```
 
-#### client
+#### client: `WebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
 #### \_\_init\_\_
 

@@ -64,11 +64,11 @@ def process(*, req: BoltRequest, resp: BoltResponse,
 class MultiTeamsAuthorization(Authorization)
 ```
 
-#### authorize
+#### authorize: `Authorize`
 
 The function to authorize incoming requests from Slack.
 
-#### user\_token\_resolution
+#### user\_token\_resolution: `str`
 
 Either &quot;authed_user&quot; or &quot;actor&quot;.
 
@@ -104,13 +104,13 @@ def process(*, req: BoltRequest, resp: BoltResponse,
 class CustomMiddleware(Middleware)
 ```
 
-#### app\_name
+#### app\_name: `str`
 
-#### func
+#### func: `Callable[..., Any]`
 
-#### arg\_names
+#### arg\_names: `MutableSequence[str]`
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 
@@ -257,12 +257,12 @@ def process(*, req: BoltRequest, resp: BoltResponse,
 class SslCheck(Middleware)
 ```
 
-#### verification\_token
+#### verification\_token: `Optional[str]`
 
 The verification token to check (optional as it&#x27;s already deprecated -
 https://docs.slack.dev/authentication/verifying-requests-from-slack/`deprecation`)
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 
@@ -333,7 +333,7 @@ def process(*, req: BoltRequest, resp: BoltResponse,
 class AttachingConversationKwargs(Middleware)
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `Optional[AssistantThreadContextStore]`
 
 #### \_\_init\_\_
 

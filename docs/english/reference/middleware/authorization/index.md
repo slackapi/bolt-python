@@ -26,11 +26,11 @@ class Authorization(Middleware)
 class MultiTeamsAuthorization(Authorization)
 ```
 
-#### authorize
+#### authorize: `Authorize`
 
 The function to authorize incoming requests from Slack.
 
-#### user\_token\_resolution
+#### user\_token\_resolution: `str`
 
 Either &quot;authed_user&quot; or &quot;actor&quot;.
 

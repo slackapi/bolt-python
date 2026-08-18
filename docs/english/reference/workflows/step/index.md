@@ -18,19 +18,19 @@ title: slack_bolt.workflows.step
 class WorkflowStep()
 ```
 
-#### callback\_id
+#### callback\_id: `Union[str, Pattern]`
 
 The Callback ID of the step from app
 
-#### edit
+#### edit: `Listener`
 
 `edit` listener, which displays a modal in Workflow Builder
 
-#### save
+#### save: `Listener`
 
 `save` listener, which accepts workflow creator&#x27;s data submission in Workflow Builder
 
-#### execute
+#### execute: `Listener`
 
 `execute` listener, which processes step from app execution
 

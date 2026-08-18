@@ -9,11 +9,11 @@ title: slack_bolt.context.get_thread_context.async_get_thread_context
 class AssistantThreadContext(dict)
 ```
 
-#### enterprise\_id
+#### enterprise\_id: `Optional[str]`
 
-#### team\_id
+#### team\_id: `Optional[str]`
 
-#### channel\_id
+#### channel\_id: `str`
 
 #### \_\_init\_\_
 
@@ -47,15 +47,15 @@ async def find(*, channel_id: str,
 class AsyncGetThreadContext()
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `AsyncAssistantThreadContextStore`
 
-#### payload
+#### payload: `dict`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
-#### thread\_context\_loaded
+#### thread\_context\_loaded: `bool`
 
 #### \_\_init\_\_
 

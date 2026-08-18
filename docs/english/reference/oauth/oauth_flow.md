@@ -68,9 +68,9 @@ The arguments for a success function.
 class DefaultCallbackOptions(CallbackOptions)
 ```
 
-#### success
+#### success: `Callable[[SuccessArgs], BoltResponse]`
 
-#### failure
+#### failure: `Callable[[FailureArgs], BoltResponse]`
 
 #### \_\_init\_\_
 
@@ -85,11 +85,11 @@ def __init__(*, logger: Logger, state_utils: OAuthStateUtils,
 class CallbackOptions()
 ```
 
-#### success
+#### success: `Callable[[SuccessArgs], BoltResponse]`
 
 A handler for successful installation.
 
-#### failure
+#### failure: `Callable[[FailureArgs], BoltResponse]`
 
 A handler for any types of installation failures.
 
@@ -113,69 +113,69 @@ The configurations for OAuth flow.
 class OAuthSettings()
 ```
 
-#### client\_id
+#### client\_id: `str`
 
 Check the value in Settings &gt; Basic Information &gt; App Credentials
 
-#### client\_secret
+#### client\_secret: `str`
 
 Check the value in Settings &gt; Basic Information &gt; App Credentials
 
-#### scopes
+#### scopes: `Optional[Sequence[str]]`
 
 Check the value in Settings &gt; Manage Distribution
 
-#### user\_scopes
+#### user\_scopes: `Optional[Sequence[str]]`
 
 Check the value in Settings &gt; Manage Distribution
 
-#### redirect\_uri
+#### redirect\_uri: `Optional[str]`
 
 Check the value in Features &gt; OAuth &amp; Permissions &gt; Redirect URLs
 
-#### install\_path
+#### install\_path: `str`
 
 The endpoint to start an OAuth flow (Default: `/slack/install`)
 
-#### install\_page\_rendering\_enabled
+#### install\_page\_rendering\_enabled: `bool`
 
 Renders a web page for install_path access if True
 
-#### redirect\_uri\_path
+#### redirect\_uri\_path: `str`
 
 The path of Redirect URL (Default: `/slack/oauth_redirect`)
 
-#### callback\_options
+#### callback\_options: `Optional[CallbackOptions]`
 
 Give success/failure functions f you want to customize callback functions.
 
-#### success\_url
+#### success\_url: `Optional[str]`
 
 Set a complete URL if you want to redirect end-users when an installation completes.
 
-#### failure\_url
+#### failure\_url: `Optional[str]`
 
 Set a complete URL if you want to redirect end-users when an installation fails.
 
-#### authorization\_url
+#### authorization\_url: `str`
 
 Set a URL if you want to customize the URL `https://slack.com/oauth/v2/authorize`
 
-#### installation\_store
+#### installation\_store: `InstallationStore`
 
 Specify the instance of `InstallationStore` (Default: `FileInstallationStore`)
 
-#### installation\_store\_bot\_only
+#### installation\_store\_bot\_only: `bool`
 
 Use `InstallationStore#find_bot()` if True (Default: False)
 
-#### token\_rotation\_expiration\_minutes
+#### token\_rotation\_expiration\_minutes: `int`
 
 Minutes before refreshing tokens (Default: 2 hours)
 
-#### authorize
+#### authorize: `Authorize`
 
-#### user\_token\_resolution
+#### user\_token\_resolution: `str`
 
 The option to pick up a user token per request (Default: authed_user)
 The available values are &quot;authed_user&quot; and &quot;actor&quot;. When you want to resolve the user token
@@ -184,29 +184,29 @@ bolt-python tries to resolve a user token for context.actor_enterprise/team/user
 This can be useful for events in Slack Connect channels. Note that actor IDs can be absent
 in some scenarios.
 
-#### state\_validation\_enabled
+#### state\_validation\_enabled: `bool`
 
 Set False if your OAuth flow omits the state parameter validation (Default: True)
 
-#### state\_store
+#### state\_store: `OAuthStateStore`
 
 Specify the instance of `InstallationStore` (Default: `FileOAuthStateStore`)
 
-#### state\_cookie\_name
+#### state\_cookie\_name: `str`
 
 The cookie name that is set for installers&#x27; browser. (Default: &quot;slack-app-oauth-state&quot;)
 
-#### state\_expiration\_seconds
+#### state\_expiration\_seconds: `int`
 
 The seconds that the state value is alive (Default: 600 seconds)
 
-#### state\_utils
+#### state\_utils: `OAuthStateUtils`
 
-#### authorize\_url\_generator
+#### authorize\_url\_generator: `AuthorizeUrlGenerator`
 
-#### redirect\_uri\_page\_renderer
+#### redirect\_uri\_page\_renderer: `RedirectUriPageRenderer`
 
-#### logger
+#### logger: `Logger`
 
 The logger that will be used internally
 
@@ -274,31 +274,31 @@ The settings for Slack App installation (OAuth flow).
 class BoltRequest()
 ```
 
-#### raw\_body
+#### raw\_body: `str`
 
-#### query
+#### query: `Dict[str, Sequence[str]]`
 
 The query string data in any data format.
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The request headers.
 
-#### content\_type
+#### content\_type: `Optional[str]`
 
-#### body
+#### body: `Dict[str, Any]`
 
 The raw request body (only plain text is supported for &quot;http&quot; mode)
 
-#### context
+#### context: `BoltContext`
 
 The context in this request.
 
-#### lazy\_only
+#### lazy\_only: `bool`
 
-#### lazy\_function\_name
+#### lazy\_function\_name: `Optional[str]`
 
-#### mode
+#### mode: `str`
 
 The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
@@ -336,15 +336,15 @@ def to_copyable() -> "BoltRequest"
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -396,21 +396,21 @@ def create_web_client(token: Optional[str] = None,
 class OAuthFlow()
 ```
 
-#### settings
+#### settings: `OAuthSettings`
 
 OAuth settings to configure this module.
 
-#### client\_id
+#### client\_id: `str`
 
-#### redirect\_uri
+#### redirect\_uri: `Optional[str]`
 
-#### install\_path
+#### install\_path: `str`
 
-#### redirect\_uri\_path
+#### redirect\_uri\_path: `str`
 
-#### success\_handler
+#### success\_handler: `Callable[[SuccessArgs], BoltResponse]`
 
-#### failure\_handler
+#### failure\_handler: `Callable[[FailureArgs], BoltResponse]`
 
 #### \_\_init\_\_
 

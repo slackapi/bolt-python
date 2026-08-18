@@ -9,23 +9,23 @@ title: slack_bolt.authorization.authorize
 class AuthorizeArgs()
 ```
 
-#### context
+#### context: `BoltContext`
 
 The request context
 
-#### logger
+#### logger: `Logger`
 
-#### client
+#### client: `WebClient`
 
-#### enterprise\_id
+#### enterprise\_id: `Optional[str]`
 
 The Organization ID (Enterprise Grid)
 
-#### team\_id
+#### team\_id: `Optional[str]`
 
 The workspace ID
 
-#### user\_id
+#### user\_id: `Optional[str]`
 
 The request user ID
 
@@ -53,51 +53,51 @@ class AuthorizeResult(dict)
 
 Authorize function call result
 
-#### enterprise\_id
+#### enterprise\_id: `Optional[str]`
 
 Organization ID (Enterprise Grid) starting with `E`
 
-#### team\_id
+#### team\_id: `Optional[str]`
 
 Workspace ID starting with `T`
 
-#### team
+#### team: `Optional[str]`
 
 Workspace name
 
-#### url
+#### url: `Optional[str]`
 
 Workspace slack.com URL
 
-#### bot\_id
+#### bot\_id: `Optional[str]`
 
 Bot ID starting with `B`
 
-#### bot\_user\_id
+#### bot\_user\_id: `Optional[str]`
 
 Bot user&#x27;s User ID starting with either `U` or `W`
 
-#### bot\_token
+#### bot\_token: `Optional[str]`
 
 Bot user access token starting with `xoxb-`
 
-#### bot\_scopes
+#### bot\_scopes: `Optional[Sequence[str]]`
 
 The scopes associated with the bot token
 
-#### user\_id
+#### user\_id: `Optional[str]`
 
 The request user ID
 
-#### user
+#### user: `Optional[str]`
 
 The request user&#x27;s name
 
-#### user\_token
+#### user\_token: `Optional[str]`
 
 User access token starting with `xoxp-`
 
-#### user\_scopes
+#### user\_scopes: `Optional[Sequence[str]]`
 
 The scopes associated wth the user token
 
@@ -432,17 +432,17 @@ If you use the OAuth flow settings, this `authorize` implementation will be used
 As long as your own InstallationStore (or the built-in ones) works as you expect,
 you can expect that the `authorize` layer should work for you without any customization.
 
-#### authorize\_result\_cache
+#### authorize\_result\_cache: `Dict[str, AuthorizeResult]`
 
-#### bot\_only
+#### bot\_only: `bool`
 
-#### user\_token\_resolution
+#### user\_token\_resolution: `str`
 
-#### find\_installation\_available
+#### find\_installation\_available: `bool`
 
-#### find\_bot\_available
+#### find\_bot\_available: `bool`
 
-#### token\_rotator
+#### token\_rotator: `Optional[TokenRotator]`
 
 #### \_\_init\_\_
 

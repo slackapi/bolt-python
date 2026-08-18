@@ -14,9 +14,9 @@ title: slack_bolt.context.complete
 class Complete()
 ```
 
-#### client
+#### client: `WebClient`
 
-#### function\_execution\_id
+#### function\_execution\_id: `Optional[str]`
 
 #### \_\_init\_\_
 

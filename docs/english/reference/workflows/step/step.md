@@ -245,17 +245,17 @@ General class in a Bolt app
 class Listener(metaclass=ABCMeta)
 ```
 
-#### matchers
+#### matchers: `Sequence[ListenerMatcher]`
 
-#### middleware
+#### middleware: `Sequence[Middleware]`
 
-#### ack\_function
+#### ack\_function: `Callable[..., BoltResponse]`
 
-#### lazy\_functions
+#### lazy\_functions: `Sequence[Callable[..., None]]`
 
-#### auto\_acknowledgement
+#### auto\_acknowledgement: `bool`
 
-#### ack\_timeout
+#### ack\_timeout: `int`
 
 #### matches
 
@@ -308,25 +308,25 @@ Runs all the registered middleware and then run the listener function.
 class CustomListener(Listener)
 ```
 
-#### app\_name
+#### app\_name: `str`
 
-#### ack\_function
+#### ack\_function: `Callable[..., Optional[BoltResponse]]`
 
 type: ignore[assignment]
 
-#### lazy\_functions
+#### lazy\_functions: `Sequence[Callable[..., None]]`
 
-#### matchers
+#### matchers: `Sequence[ListenerMatcher]`
 
-#### middleware
+#### middleware: `Sequence[Middleware]`
 
-#### auto\_acknowledgement
+#### auto\_acknowledgement: `bool`
 
-#### ack\_timeout
+#### ack\_timeout: `int`
 
-#### arg\_names
+#### arg\_names: `MutableSequence[str]`
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 
@@ -380,13 +380,13 @@ Matches against the request and returns True if matched.
 class CustomListenerMatcher(ListenerMatcher)
 ```
 
-#### app\_name
+#### app\_name: `str`
 
-#### func
+#### func: `Callable[..., bool]`
 
-#### arg\_names
+#### arg\_names: `MutableSequence[str]`
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 
@@ -439,13 +439,13 @@ def workflow_step_execute(
 class CustomMiddleware(Middleware)
 ```
 
-#### app\_name
+#### app\_name: `str`
 
-#### func
+#### func: `Callable[..., Any]`
 
-#### arg\_names
+#### arg\_names: `MutableSequence[str]`
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 
@@ -532,15 +532,15 @@ The name of this middleware
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -752,7 +752,7 @@ class WorkflowStepBuilder()
 Steps from apps
 Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
 
-#### callback\_id
+#### callback\_id: `Union[str, Pattern]`
 
 The callback_id for the workflow
 
@@ -966,19 +966,19 @@ def to_listener_middleware(
 class WorkflowStep()
 ```
 
-#### callback\_id
+#### callback\_id: `Union[str, Pattern]`
 
 The Callback ID of the step from app
 
-#### edit
+#### edit: `Listener`
 
 `edit` listener, which displays a modal in Workflow Builder
 
-#### save
+#### save: `Listener`
 
 `save` listener, which accepts workflow creator&#x27;s data submission in Workflow Builder
 
-#### execute
+#### execute: `Listener`
 
 `execute` listener, which processes step from app execution
 

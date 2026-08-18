@@ -10,11 +10,11 @@ slug: respond
 class Respond()
 ```
 
-#### response\_url
+#### response\_url: `Optional[str]`
 
-#### proxy
+#### proxy: `Optional[str]`
 
-#### ssl
+#### ssl: `Optional[SSLContext]`
 
 #### \_\_init\_\_
 

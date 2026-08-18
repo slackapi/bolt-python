@@ -238,7 +238,7 @@ class TokenRevocationListeners()
 
 Listener functions to handle token revocation / uninstallation events
 
-#### installation\_store
+#### installation\_store: `InstallationStore`
 
 #### \_\_init\_\_
 

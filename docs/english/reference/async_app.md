@@ -922,7 +922,7 @@ def enable_token_revocation_listeners() -> None
 class AsyncAck()
 ```
 
-#### response
+#### response: `Optional[BoltResponse]`
 
 #### \_\_init\_\_
 
@@ -1163,11 +1163,11 @@ def save_thread_context() -> Optional[AsyncSaveThreadContext]
 class AsyncRespond()
 ```
 
-#### response\_url
+#### response\_url: `Optional[str]`
 
-#### proxy
+#### proxy: `Optional[str]`
 
-#### ssl
+#### ssl: `Optional[SSLContext]`
 
 #### \_\_init\_\_
 
@@ -1184,13 +1184,13 @@ def __init__(*,
 class AsyncSay()
 ```
 
-#### client
+#### client: `Optional[AsyncWebClient]`
 
-#### channel
+#### channel: `Optional[str]`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
-#### build\_metadata
+#### build\_metadata: `Optional[Callable[[], Awaitable[Union[Dict, Metadata]]]]`
 
 #### \_\_init\_\_
 
@@ -1209,17 +1209,17 @@ def __init__(
 class AsyncListener(metaclass=ABCMeta)
 ```
 
-#### matchers
+#### matchers: `Sequence[AsyncListenerMatcher]`
 
-#### middleware
+#### middleware: `Sequence[AsyncMiddleware]`
 
-#### ack\_function
+#### ack\_function: `Callable[..., Awaitable[BoltResponse]]`
 
-#### lazy\_functions
+#### lazy\_functions: `Sequence[Callable[..., Awaitable[None]]]`
 
-#### auto\_acknowledgement
+#### auto\_acknowledgement: `bool`
 
-#### ack\_timeout
+#### ack\_timeout: `int`
 
 #### async\_matches
 
@@ -1273,13 +1273,13 @@ Runs all the registered middleware and then run the listener function.
 class AsyncCustomListenerMatcher(AsyncListenerMatcher)
 ```
 
-#### app\_name
+#### app\_name: `str`
 
-#### func
+#### func: `Callable[..., Awaitable[bool]]`
 
-#### arg\_names
+#### arg\_names: `Sequence[str]`
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 
@@ -1302,31 +1302,31 @@ async def async_matches(req: AsyncBoltRequest, resp: BoltResponse) -> bool
 class AsyncBoltRequest()
 ```
 
-#### raw\_body
+#### raw\_body: `str`
 
-#### body
+#### body: `Dict[str, Any]`
 
 The raw request body (only plain text is supported for &quot;http&quot; mode)
 
-#### query
+#### query: `Dict[str, Sequence[str]]`
 
 The query string data in any data format.
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The request headers.
 
-#### content\_type
+#### content\_type: `Optional[str]`
 
-#### context
+#### context: `AsyncBoltContext`
 
 The context in this request.
 
-#### lazy\_only
+#### lazy\_only: `bool`
 
-#### lazy\_function\_name
+#### lazy\_function\_name: `Optional[str]`
 
-#### mode
+#### mode: `str`
 
 The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
@@ -1364,9 +1364,9 @@ def to_copyable() -> "AsyncBoltRequest"
 class AsyncAssistant(AsyncMiddleware)
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `Optional[AsyncAssistantThreadContextStore]`
 
-#### base\_logger
+#### base\_logger: `Optional[logging.Logger]`
 
 #### \_\_init\_\_
 
@@ -1454,11 +1454,11 @@ def build_listener(listener_or_functions: Union[AsyncListener, Callable,
 class AsyncSetStatus()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 
@@ -1472,11 +1472,11 @@ def __init__(client: AsyncWebClient, channel_id: str, thread_ts: str)
 class AsyncSetTitle()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 
@@ -1490,11 +1490,11 @@ def __init__(client: AsyncWebClient, channel_id: str, thread_ts: str)
 class AsyncSetSuggestedPrompts()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
 #### \_\_init\_\_
 
@@ -1510,15 +1510,15 @@ def __init__(client: AsyncWebClient,
 class AsyncGetThreadContext()
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `AsyncAssistantThreadContextStore`
 
-#### payload
+#### payload: `dict`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
-#### thread\_context\_loaded
+#### thread\_context\_loaded: `bool`
 
 #### \_\_init\_\_
 
@@ -1533,11 +1533,11 @@ def __init__(thread_context_store: AsyncAssistantThreadContextStore,
 class AsyncSaveThreadContext()
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `AsyncAssistantThreadContextStore`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 
@@ -1552,15 +1552,15 @@ def __init__(thread_context_store: AsyncAssistantThreadContextStore,
 class AsyncSayStream()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel
+#### channel: `Optional[str]`
 
-#### recipient\_team\_id
+#### recipient\_team\_id: `Optional[str]`
 
-#### recipient\_user\_id
+#### recipient\_user\_id: `Optional[str]`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
 #### \_\_init\_\_
 

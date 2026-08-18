@@ -9,7 +9,7 @@ title: slack_bolt.adapter.asgi.async_handler
 class AsyncSlackRequestHandler(SlackRequestHandler)
 ```
 
-#### app
+#### app: `AsyncApp`
 
 Your bolt application
 

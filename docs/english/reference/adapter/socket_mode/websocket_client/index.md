@@ -848,9 +848,9 @@ def enable_token_revocation_listeners() -> None
 class BaseSocketModeHandler()
 ```
 
-#### app
+#### app: `App`
 
-#### client
+#### client: `BaseSocketModeClient`
 
 #### handle
 
@@ -918,15 +918,15 @@ def send_response(client: BaseSocketModeClient, req: SocketModeRequest,
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -971,15 +971,15 @@ def cookies() -> Sequence[SimpleCookie]
 class SocketModeHandler(BaseSocketModeHandler)
 ```
 
-#### app
+#### app: `App`
 
 The Bolt app
 
-#### app\_token
+#### app\_token: `str`
 
 App-level token starting with `xapp-`
 
-#### client
+#### client: `SocketModeClient`
 
 #### \_\_init\_\_
 

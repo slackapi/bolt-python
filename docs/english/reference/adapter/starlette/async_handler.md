@@ -9,15 +9,15 @@ title: slack_bolt.adapter.starlette.async_handler
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -929,31 +929,31 @@ def enable_token_revocation_listeners() -> None
 class AsyncBoltRequest()
 ```
 
-#### raw\_body
+#### raw\_body: `str`
 
-#### body
+#### body: `Dict[str, Any]`
 
 The raw request body (only plain text is supported for &quot;http&quot; mode)
 
-#### query
+#### query: `Dict[str, Sequence[str]]`
 
 The query string data in any data format.
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The request headers.
 
-#### content\_type
+#### content\_type: `Optional[str]`
 
-#### context
+#### context: `AsyncBoltContext`
 
 The context in this request.
 
-#### lazy\_only
+#### lazy\_only: `bool`
 
-#### lazy\_function\_name
+#### lazy\_function\_name: `Optional[str]`
 
-#### mode
+#### mode: `str`
 
 The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
@@ -991,21 +991,21 @@ def to_copyable() -> "AsyncBoltRequest"
 class AsyncOAuthFlow()
 ```
 
-#### settings
+#### settings: `AsyncOAuthSettings`
 
 OAuth settings to configure this module.
 
-#### client\_id
+#### client\_id: `str`
 
-#### redirect\_uri
+#### redirect\_uri: `Optional[str]`
 
-#### install\_path
+#### install\_path: `str`
 
-#### redirect\_uri\_path
+#### redirect\_uri\_path: `str`
 
-#### success\_handler
+#### success\_handler: `Callable[[AsyncSuccessArgs], Awaitable[BoltResponse]]`
 
-#### failure\_handler
+#### failure\_handler: `Callable[[AsyncFailureArgs], Awaitable[BoltResponse]]`
 
 #### \_\_init\_\_
 

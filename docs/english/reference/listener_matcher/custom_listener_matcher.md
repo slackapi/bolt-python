@@ -31,31 +31,31 @@ def get_bolt_app_logger(app_name: str,
 class BoltRequest()
 ```
 
-#### raw\_body
+#### raw\_body: `str`
 
-#### query
+#### query: `Dict[str, Sequence[str]]`
 
 The query string data in any data format.
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The request headers.
 
-#### content\_type
+#### content\_type: `Optional[str]`
 
-#### body
+#### body: `Dict[str, Any]`
 
 The raw request body (only plain text is supported for &quot;http&quot; mode)
 
-#### context
+#### context: `BoltContext`
 
 The context in this request.
 
-#### lazy\_only
+#### lazy\_only: `bool`
 
-#### lazy\_function\_name
+#### lazy\_function\_name: `Optional[str]`
 
-#### mode
+#### mode: `str`
 
 The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
@@ -93,15 +93,15 @@ def to_copyable() -> "BoltRequest"
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -177,13 +177,13 @@ def get_arg_names_of_callable(func: Callable) -> List[str]
 class CustomListenerMatcher(ListenerMatcher)
 ```
 
-#### app\_name
+#### app\_name: `str`
 
-#### func
+#### func: `Callable[..., bool]`
 
-#### arg\_names
+#### arg\_names: `MutableSequence[str]`
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 

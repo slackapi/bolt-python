@@ -29,15 +29,15 @@ def find(*, channel_id: str,
 class SayStream()
 ```
 
-#### client
+#### client: `WebClient`
 
-#### channel
+#### channel: `Optional[str]`
 
-#### recipient\_team\_id
+#### recipient\_team\_id: `Optional[str]`
 
-#### recipient\_user\_id
+#### recipient\_user\_id: `Optional[str]`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
 #### \_\_init\_\_
 
@@ -56,11 +56,11 @@ def __init__(*,
 class SetStatus()
 ```
 
-#### client
+#### client: `WebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 
@@ -74,11 +74,11 @@ def __init__(client: WebClient, channel_id: str, thread_ts: str)
 class SetSuggestedPrompts()
 ```
 
-#### client
+#### client: `WebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
 #### \_\_init\_\_
 
@@ -150,15 +150,15 @@ The name of this middleware
 class AssistantUtilities()
 ```
 
-#### payload
+#### payload: `dict`
 
-#### client
+#### client: `WebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
-#### thread\_context\_store
+#### thread\_context\_store: `AssistantThreadContextStore`
 
 #### \_\_init\_\_
 
@@ -241,31 +241,31 @@ def to_event(body: Dict[str, Any]) -> Optional[Dict[str, Any]]
 class BoltRequest()
 ```
 
-#### raw\_body
+#### raw\_body: `str`
 
-#### query
+#### query: `Dict[str, Sequence[str]]`
 
 The query string data in any data format.
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The request headers.
 
-#### content\_type
+#### content\_type: `Optional[str]`
 
-#### body
+#### body: `Dict[str, Any]`
 
 The raw request body (only plain text is supported for &quot;http&quot; mode)
 
-#### context
+#### context: `BoltContext`
 
 The context in this request.
 
-#### lazy\_only
+#### lazy\_only: `bool`
 
-#### lazy\_function\_name
+#### lazy\_function\_name: `Optional[str]`
 
-#### mode
+#### mode: `str`
 
 The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
@@ -303,15 +303,15 @@ def to_copyable() -> "BoltRequest"
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -356,7 +356,7 @@ def cookies() -> Sequence[SimpleCookie]
 class AttachingConversationKwargs(Middleware)
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `Optional[AssistantThreadContextStore]`
 
 #### \_\_init\_\_
 

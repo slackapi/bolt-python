@@ -29,15 +29,15 @@ Socket Mode adapter package provides the following implementations. If you don&#
 class SocketModeHandler(BaseSocketModeHandler)
 ```
 
-#### app
+#### app: `App`
 
 The Bolt app
 
-#### app\_token
+#### app\_token: `str`
 
 App-level token starting with `xapp-`
 
-#### client
+#### client: `SocketModeClient`
 
 #### \_\_init\_\_
 

@@ -15,7 +15,7 @@ title: slack_bolt.context.ack
 class Ack()
 ```
 
-#### response
+#### response: `Optional[BoltResponse]`
 
 #### \_\_init\_\_
 

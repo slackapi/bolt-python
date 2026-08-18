@@ -9,11 +9,11 @@ title: slack_bolt.middleware.assistant.async_assistant
 class AsyncSaveThreadContext()
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `AsyncAssistantThreadContextStore`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 
@@ -48,17 +48,17 @@ async def find(*, channel_id: str,
 class AsyncioListenerRunner()
 ```
 
-#### logger
+#### logger: `Logger`
 
-#### process\_before\_response
+#### process\_before\_response: `bool`
 
-#### listener\_error\_handler
+#### listener\_error\_handler: `AsyncListenerErrorHandler`
 
-#### listener\_start\_handler
+#### listener\_start\_handler: `AsyncListenerStartHandler`
 
-#### listener\_completion\_handler
+#### listener\_completion\_handler: `AsyncListenerCompletionHandler`
 
-#### lazy\_listener\_runner
+#### lazy\_listener\_runner: `AsyncLazyListenerRunner`
 
 #### \_\_init\_\_
 
@@ -96,7 +96,7 @@ def build_listener_matcher(
 class AsyncAttachingConversationKwargs(AsyncMiddleware)
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `Optional[AsyncAssistantThreadContextStore]`
 
 #### \_\_init\_\_
 
@@ -120,31 +120,31 @@ async def async_process(
 class AsyncBoltRequest()
 ```
 
-#### raw\_body
+#### raw\_body: `str`
 
-#### body
+#### body: `Dict[str, Any]`
 
 The raw request body (only plain text is supported for &quot;http&quot; mode)
 
-#### query
+#### query: `Dict[str, Sequence[str]]`
 
 The query string data in any data format.
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The request headers.
 
-#### content\_type
+#### content\_type: `Optional[str]`
 
-#### context
+#### context: `AsyncBoltContext`
 
 The context in this request.
 
-#### lazy\_only
+#### lazy\_only: `bool`
 
-#### lazy\_function\_name
+#### lazy\_function\_name: `Optional[str]`
 
-#### mode
+#### mode: `str`
 
 The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
@@ -182,15 +182,15 @@ def to_copyable() -> "AsyncBoltRequest"
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -243,17 +243,17 @@ General class in a Bolt app
 class AsyncListener(metaclass=ABCMeta)
 ```
 
-#### matchers
+#### matchers: `Sequence[AsyncListenerMatcher]`
 
-#### middleware
+#### middleware: `Sequence[AsyncMiddleware]`
 
-#### ack\_function
+#### ack\_function: `Callable[..., Awaitable[BoltResponse]]`
 
-#### lazy\_functions
+#### lazy\_functions: `Sequence[Callable[..., Awaitable[None]]]`
 
-#### auto\_acknowledgement
+#### auto\_acknowledgement: `bool`
 
-#### ack\_timeout
+#### ack\_timeout: `int`
 
 #### async\_matches
 
@@ -307,25 +307,25 @@ Runs all the registered middleware and then run the listener function.
 class AsyncCustomListener(AsyncListener)
 ```
 
-#### app\_name
+#### app\_name: `str`
 
-#### ack\_function
+#### ack\_function: `Callable[..., Awaitable[Optional[BoltResponse]]]`
 
 type: ignore[assignment]
 
-#### lazy\_functions
+#### lazy\_functions: `Sequence[Callable[..., Awaitable[None]]]`
 
-#### matchers
+#### matchers: `Sequence[AsyncListenerMatcher]`
 
-#### middleware
+#### middleware: `Sequence[AsyncMiddleware]`
 
-#### auto\_acknowledgement
+#### auto\_acknowledgement: `bool`
 
-#### ack\_timeout
+#### ack\_timeout: `int`
 
-#### arg\_names
+#### arg\_names: `MutableSequence[str]`
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 
@@ -484,9 +484,9 @@ Tests if a decorator invocation is without () or (args).
 class AsyncAssistant(AsyncMiddleware)
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `Optional[AsyncAssistantThreadContextStore]`
 
-#### base\_logger
+#### base\_logger: `Optional[logging.Logger]`
 
 #### \_\_init\_\_
 

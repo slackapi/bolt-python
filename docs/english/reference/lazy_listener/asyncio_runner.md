@@ -16,7 +16,7 @@ async def to_runnable_function(internal_func: Callable[..., Awaitable[None]],
 class AsyncLazyListenerRunner(metaclass=ABCMeta)
 ```
 
-#### logger
+#### logger: `Logger`
 
 #### start
 
@@ -53,31 +53,31 @@ Synchronously run the function with a given request data.
 class AsyncBoltRequest()
 ```
 
-#### raw\_body
+#### raw\_body: `str`
 
-#### body
+#### body: `Dict[str, Any]`
 
 The raw request body (only plain text is supported for &quot;http&quot; mode)
 
-#### query
+#### query: `Dict[str, Sequence[str]]`
 
 The query string data in any data format.
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The request headers.
 
-#### content\_type
+#### content\_type: `Optional[str]`
 
-#### context
+#### context: `AsyncBoltContext`
 
 The context in this request.
 
-#### lazy\_only
+#### lazy\_only: `bool`
 
-#### lazy\_function\_name
+#### lazy\_function\_name: `Optional[str]`
 
-#### mode
+#### mode: `str`
 
 The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
@@ -115,7 +115,7 @@ def to_copyable() -> "AsyncBoltRequest"
 class AsyncioLazyListenerRunner(AsyncLazyListenerRunner)
 ```
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 

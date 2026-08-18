@@ -14,11 +14,11 @@ title: slack_bolt.context.save_thread_context
 class SaveThreadContext()
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `AssistantThreadContextStore`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 

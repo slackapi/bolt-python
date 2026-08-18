@@ -13,17 +13,17 @@ If you use the OAuth flow settings, this authorize implementation will be used.
 As long as your own InstallationStore (or the built-in ones) works as you expect,
 you can expect that the authorize layer should work for you without any customization.
 
-#### authorize\_result\_cache
+#### authorize\_result\_cache: `Dict[str, AuthorizeResult]`
 
-#### bot\_only
+#### bot\_only: `bool`
 
-#### user\_token\_resolution
+#### user\_token\_resolution: `str`
 
-#### find\_installation\_available
+#### find\_installation\_available: `Optional[bool]`
 
-#### find\_bot\_available
+#### find\_bot\_available: `Optional[bool]`
 
-#### token\_rotator
+#### token\_rotator: `Optional[AsyncTokenRotator]`
 
 #### \_\_init\_\_
 
@@ -69,9 +69,9 @@ General class in a Bolt app
 class AsyncCallbackOptions()
 ```
 
-#### success
+#### success: `Callable[[AsyncSuccessArgs], Awaitable[BoltResponse]]`
 
-#### failure
+#### failure: `Callable[[AsyncFailureArgs], Awaitable[BoltResponse]]`
 
 #### \_\_init\_\_
 
@@ -93,67 +93,67 @@ def get_or_create_default_installation_store(
 class AsyncOAuthSettings()
 ```
 
-#### client\_id
+#### client\_id: `str`
 
 Check the value in Settings &gt; Basic Information &gt; App Credentials
 
-#### client\_secret
+#### client\_secret: `str`
 
 Check the value in Settings &gt; Basic Information &gt; App Credentials
 
-#### scopes
+#### scopes: `Optional[Sequence[str]]`
 
 Check the value in Settings &gt; Manage Distribution
 
-#### user\_scopes
+#### user\_scopes: `Optional[Sequence[str]]`
 
 Check the value in Settings &gt; Manage Distribution
 
-#### redirect\_uri
+#### redirect\_uri: `Optional[str]`
 
 Check the value in Features &gt; OAuth &amp; Permissions &gt; Redirect URLs
 
-#### install\_path
+#### install\_path: `str`
 
 The endpoint to start an OAuth flow (Default: `/slack/install`)
 
-#### install\_page\_rendering\_enabled
+#### install\_page\_rendering\_enabled: `bool`
 
 Renders a web page for install_path access if True
 
-#### redirect\_uri\_path
+#### redirect\_uri\_path: `str`
 
 The path of Redirect URL (Default: `/slack/oauth_redirect`)
 
-#### callback\_options
+#### callback\_options: `Optional[AsyncCallbackOptions]`
 
 Give success/failure functions f you want to customize callback functions.
 
-#### success\_url
+#### success\_url: `Optional[str]`
 
 Set a complete URL if you want to redirect end-users when an installation completes.
 
-#### failure\_url
+#### failure\_url: `Optional[str]`
 
 Set a complete URL if you want to redirect end-users when an installation fails.
 
-#### authorization\_url
+#### authorization\_url: `str`
 
 Set a URL if you want to customize the URL `https://slack.com/oauth/v2/authorize`
 
-#### installation\_store
+#### installation\_store: `AsyncInstallationStore`
 
 Specify the instance of `InstallationStore` (Default: `FileInstallationStore`)
 
-#### installation\_store\_bot\_only
+#### installation\_store\_bot\_only: `bool`
 
 Use `InstallationStore#find_bot()` if True (Default: False)
 
-#### token\_rotation\_expiration\_minutes
+#### token\_rotation\_expiration\_minutes: `int`
 
 Minutes before refreshing tokens (Default: 2 hours)
 
-#### user\_token\_resolution
+#### user\_token\_resolution: `str`
 
 The option to pick up a user token per request (Default: authed_user)
 The available values are &quot;authed_user&quot; and &quot;actor&quot;. When you want to resolve the user token
@@ -162,31 +162,31 @@ bolt-python tries to resolve a user token for context.actor_enterprise/team/user
 This can be useful for events in Slack Connect channels. Note that actor IDs can be absent
 in some scenarios.
 
-#### authorize
+#### authorize: `AsyncAuthorize`
 
-#### state\_validation\_enabled
+#### state\_validation\_enabled: `bool`
 
 Set False if your OAuth flow omits the state parameter validation (Default: True)
 
-#### state\_store
+#### state\_store: `AsyncOAuthStateStore`
 
 Specify the instance of `InstallationStore` (Default: `FileOAuthStateStore`)
 
-#### state\_cookie\_name
+#### state\_cookie\_name: `str`
 
 The cookie name that is set for installers&#x27; browser. (Default: &quot;slack-app-oauth-state&quot;)
 
-#### state\_expiration\_seconds
+#### state\_expiration\_seconds: `int`
 
 The seconds that the state value is alive (Default: 600 seconds)
 
-#### state\_utils
+#### state\_utils: `OAuthStateUtils`
 
-#### authorize\_url\_generator
+#### authorize\_url\_generator: `AuthorizeUrlGenerator`
 
-#### redirect\_uri\_page\_renderer
+#### redirect\_uri\_page\_renderer: `RedirectUriPageRenderer`
 
-#### logger
+#### logger: `Logger`
 
 The logger that will be used internally
 

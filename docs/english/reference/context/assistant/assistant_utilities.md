@@ -28,9 +28,9 @@ def find(*, channel_id: str,
 class DefaultAssistantThreadContextStore(AssistantThreadContextStore)
 ```
 
-#### client
+#### client: `WebClient`
 
-#### context
+#### context: `"BoltContext"`
 
 #### \_\_init\_\_
 
@@ -284,15 +284,15 @@ def save_thread_context() -> Optional[SaveThreadContext]
 class Say()
 ```
 
-#### client
+#### client: `Optional[WebClient]`
 
-#### channel
+#### channel: `Optional[str]`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
-#### metadata
+#### metadata: `Optional[Union[Dict, Metadata]]`
 
-#### build\_metadata
+#### build\_metadata: `Optional[Callable[[], Optional[Union[Dict, Metadata]]]]`
 
 #### \_\_init\_\_
 
@@ -321,15 +321,15 @@ This data pattern is available for assistant_* events.
 class GetThreadContext()
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `AssistantThreadContextStore`
 
-#### payload
+#### payload: `dict`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
-#### thread\_context\_loaded
+#### thread\_context\_loaded: `bool`
 
 #### \_\_init\_\_
 
@@ -344,11 +344,11 @@ def __init__(thread_context_store: AssistantThreadContextStore,
 class SaveThreadContext()
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `AssistantThreadContextStore`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 
@@ -363,11 +363,11 @@ def __init__(thread_context_store: AssistantThreadContextStore,
 class SetTitle()
 ```
 
-#### client
+#### client: `WebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 
@@ -381,15 +381,15 @@ def __init__(client: WebClient, channel_id: str, thread_ts: str)
 class AssistantUtilities()
 ```
 
-#### payload
+#### payload: `dict`
 
-#### client
+#### client: `WebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
-#### thread\_context\_store
+#### thread\_context\_store: `AssistantThreadContextStore`
 
 #### \_\_init\_\_
 

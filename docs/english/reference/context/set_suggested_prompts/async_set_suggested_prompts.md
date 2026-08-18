@@ -9,11 +9,11 @@ title: slack_bolt.context.set_suggested_prompts.async_set_suggested_prompts
 class AsyncSetSuggestedPrompts()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
 #### \_\_init\_\_
 

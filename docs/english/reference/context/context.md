@@ -10,7 +10,7 @@ slug: context
 class Ack()
 ```
 
-#### response
+#### response: `Optional[BoltResponse]`
 
 #### \_\_init\_\_
 
@@ -242,9 +242,9 @@ def set_authorize_result(authorize_result: AuthorizeResult)
 class Complete()
 ```
 
-#### client
+#### client: `WebClient`
 
-#### function\_execution\_id
+#### function\_execution\_id: `Optional[str]`
 
 #### \_\_init\_\_
 
@@ -270,9 +270,9 @@ Check if this complete function has been called.
 class Fail()
 ```
 
-#### client
+#### client: `WebClient`
 
-#### function\_execution\_id
+#### function\_execution\_id: `Optional[str]`
 
 #### \_\_init\_\_
 
@@ -298,15 +298,15 @@ Check if this fail function has been called.
 class GetThreadContext()
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `AssistantThreadContextStore`
 
-#### payload
+#### payload: `dict`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
-#### thread\_context\_loaded
+#### thread\_context\_loaded: `bool`
 
 #### \_\_init\_\_
 
@@ -321,11 +321,11 @@ def __init__(thread_context_store: AssistantThreadContextStore,
 class Respond()
 ```
 
-#### response\_url
+#### response\_url: `Optional[str]`
 
-#### proxy
+#### proxy: `Optional[str]`
 
-#### ssl
+#### ssl: `Optional[SSLContext]`
 
 #### \_\_init\_\_
 
@@ -342,11 +342,11 @@ def __init__(*,
 class SaveThreadContext()
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `AssistantThreadContextStore`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 
@@ -361,15 +361,15 @@ def __init__(thread_context_store: AssistantThreadContextStore,
 class Say()
 ```
 
-#### client
+#### client: `Optional[WebClient]`
 
-#### channel
+#### channel: `Optional[str]`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
-#### metadata
+#### metadata: `Optional[Union[Dict, Metadata]]`
 
-#### build\_metadata
+#### build\_metadata: `Optional[Callable[[], Optional[Union[Dict, Metadata]]]]`
 
 #### \_\_init\_\_
 
@@ -389,15 +389,15 @@ def __init__(
 class SayStream()
 ```
 
-#### client
+#### client: `WebClient`
 
-#### channel
+#### channel: `Optional[str]`
 
-#### recipient\_team\_id
+#### recipient\_team\_id: `Optional[str]`
 
-#### recipient\_user\_id
+#### recipient\_user\_id: `Optional[str]`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
 #### \_\_init\_\_
 
@@ -416,11 +416,11 @@ def __init__(*,
 class SetStatus()
 ```
 
-#### client
+#### client: `WebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 
@@ -434,11 +434,11 @@ def __init__(client: WebClient, channel_id: str, thread_ts: str)
 class SetSuggestedPrompts()
 ```
 
-#### client
+#### client: `WebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
 #### \_\_init\_\_
 
@@ -454,11 +454,11 @@ def __init__(client: WebClient,
 class SetTitle()
 ```
 
-#### client
+#### client: `WebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 

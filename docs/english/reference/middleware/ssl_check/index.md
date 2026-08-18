@@ -14,12 +14,12 @@ title: slack_bolt.middleware.ssl_check
 class SslCheck(Middleware)
 ```
 
-#### verification\_token
+#### verification\_token: `Optional[str]`
 
 The verification token to check (optional as it&#x27;s already deprecated -
 https://docs.slack.dev/authentication/verifying-requests-from-slack/`deprecation`)
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 

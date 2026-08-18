@@ -9,11 +9,11 @@ title: slack_bolt.context.assistant.thread_context
 class AssistantThreadContext(dict)
 ```
 
-#### enterprise\_id
+#### enterprise\_id: `Optional[str]`
 
-#### team\_id
+#### team\_id: `Optional[str]`
 
-#### channel\_id
+#### channel\_id: `str`
 
 #### \_\_init\_\_
 

@@ -19,17 +19,17 @@ General class in a Bolt app
 class BoltUnhandledRequestError(BoltError)
 ```
 
-#### request
+#### request: `"BoltRequest"`
 
 type: ignore[name-defined]
 
-#### body
+#### body: `dict`
 
-#### current\_response
+#### current\_response: `Optional["BoltResponse"]`
 
 type: ignore[name-defined]
 
-#### last\_global\_middleware\_name
+#### last\_global\_middleware\_name: `Optional[str]`
 
 #### \_\_init\_\_
 

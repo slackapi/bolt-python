@@ -9,31 +9,31 @@ title: slack_bolt.kwargs_injection.utils
 class BoltRequest()
 ```
 
-#### raw\_body
+#### raw\_body: `str`
 
-#### query
+#### query: `Dict[str, Sequence[str]]`
 
 The query string data in any data format.
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The request headers.
 
-#### content\_type
+#### content\_type: `Optional[str]`
 
-#### body
+#### body: `Dict[str, Any]`
 
 The raw request body (only plain text is supported for &quot;http&quot; mode)
 
-#### context
+#### context: `BoltContext`
 
 The context in this request.
 
-#### lazy\_only
+#### lazy\_only: `bool`
 
-#### lazy\_function\_name
+#### lazy\_function\_name: `Optional[str]`
 
-#### mode
+#### mode: `str`
 
 The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
@@ -71,15 +71,15 @@ def to_copyable() -> "BoltRequest"
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -155,119 +155,119 @@ Alternatively, you can include a parameter named `args` and it will be injected 
         )
 ```
 
-#### client
+#### client: `WebClient`
 
 `slack_sdk.web.WebClient` instance with a valid token
 
-#### logger
+#### logger: `Logger`
 
 Logger instance
 
-#### req
+#### req: `BoltRequest`
 
 Incoming request from Slack
 
-#### resp
+#### resp: `BoltResponse`
 
 Response representation
 
-#### request
+#### request: `BoltRequest`
 
 Incoming request from Slack
 
-#### response
+#### response: `BoltResponse`
 
 Response representation
 
-#### context
+#### context: `BoltContext`
 
 Context data associated with the incoming request
 
-#### body
+#### body: `Dict[str, Any]`
 
 Parsed request body data
 
-#### payload
+#### payload: `Dict[str, Any]`
 
 The unwrapped core data in the request body
 
-#### options
+#### options: `Optional[Dict[str, Any]]`
 
 An alias for payload in an `@app.options` listener
 
-#### shortcut
+#### shortcut: `Optional[Dict[str, Any]]`
 
 An alias for payload in an `@app.shortcut` listener
 
-#### action
+#### action: `Optional[Dict[str, Any]]`
 
 An alias for payload in an `@app.action` listener
 
-#### view
+#### view: `Optional[Dict[str, Any]]`
 
 An alias for payload in an `@app.view` listener
 
-#### command
+#### command: `Optional[Dict[str, Any]]`
 
 An alias for payload in an `@app.command` listener
 
-#### event
+#### event: `Optional[Dict[str, Any]]`
 
 An alias for payload in an `@app.event` listener
 
-#### message
+#### message: `Optional[Dict[str, Any]]`
 
 An alias for payload in an `@app.message` listener
 
-#### ack
+#### ack: `Ack`
 
 `ack()` utility function, which returns acknowledgement to the Slack servers
 
-#### say
+#### say: `Say`
 
 `say()` utility function, which calls `chat.postMessage` API with the associated channel ID
 
-#### respond
+#### respond: `Respond`
 
 `respond()` utility function, which utilizes the associated `response_url`
 
-#### complete
+#### complete: `Complete`
 
 `complete()` utility function, signals a successful completion of the custom function
 
-#### fail
+#### fail: `Fail`
 
 `fail()` utility function, signal that the custom function failed to complete
 
-#### set\_status
+#### set\_status: `Optional[SetStatus]`
 
 `set_status()` utility function for AI Agents &amp; Assistants
 
-#### set\_title
+#### set\_title: `Optional[SetTitle]`
 
 `set_title()` utility function for AI Agents &amp; Assistants
 
-#### set\_suggested\_prompts
+#### set\_suggested\_prompts: `Optional[SetSuggestedPrompts]`
 
 `set_suggested_prompts()` utility function for AI Agents &amp; Assistants
 
-#### get\_thread\_context
+#### get\_thread\_context: `Optional[GetThreadContext]`
 
 `get_thread_context()` utility function for AI Agents &amp; Assistants
 
-#### save\_thread\_context
+#### save\_thread\_context: `Optional[SaveThreadContext]`
 
 `save_thread_context()` utility function for AI Agents &amp; Assistants
 
-#### say\_stream
+#### say\_stream: `Optional[SayStream]`
 
 `say_stream()` utility function for conversations, AI Agents &amp; Assistants
 
-#### next
+#### next: `Callable[[], None]`
 
 `next()` utility function, which tells the middleware chain that it can continue with the next one
 
-#### next\_
+#### next\_: `Callable[[], None]`
 
 An alias of `next()` for avoiding the Python built-in method overrides in middleware functions
 

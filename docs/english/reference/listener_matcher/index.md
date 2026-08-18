@@ -22,13 +22,13 @@ This interface enables developers to utilize simple predicate functions for addi
 class CustomListenerMatcher(ListenerMatcher)
 ```
 
-#### app\_name
+#### app\_name: `str`
 
-#### func
+#### func: `Callable[..., bool]`
 
-#### arg\_names
+#### arg\_names: `MutableSequence[str]`
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 

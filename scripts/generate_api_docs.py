@@ -90,6 +90,9 @@ CONFIG = {
         "type": "docusaurus",
         "docs_base_path": DOCS_BASE_PATH,
         "relative_output_path": REFERENCE_SUBDIR,
+        "markdown": {
+            "render_typehint_in_data_header": True,
+        },
     },
 }
 

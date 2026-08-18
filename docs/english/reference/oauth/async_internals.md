@@ -9,7 +9,7 @@ title: slack_bolt.oauth.async_internals
 def warning_installation_store_conflicts() -> str
 ```
 
-#### default\_installation\_stores
+#### default\_installation\_stores: `Dict[str, AsyncInstallationStore]`
 
 #### get\_or\_create\_default\_installation\_store
 

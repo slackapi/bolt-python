@@ -30,25 +30,25 @@ process the request data, and may send response back to Slack.
 class CustomListener(Listener)
 ```
 
-#### app\_name
+#### app\_name: `str`
 
-#### ack\_function
+#### ack\_function: `Callable[..., Optional[BoltResponse]]`
 
 type: ignore[assignment]
 
-#### lazy\_functions
+#### lazy\_functions: `Sequence[Callable[..., None]]`
 
-#### matchers
+#### matchers: `Sequence[ListenerMatcher]`
 
-#### middleware
+#### middleware: `Sequence[Middleware]`
 
-#### auto\_acknowledgement
+#### auto\_acknowledgement: `bool`
 
-#### ack\_timeout
+#### ack\_timeout: `int`
 
-#### arg\_names
+#### arg\_names: `MutableSequence[str]`
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 
@@ -77,17 +77,17 @@ def run_ack_function(*, request: BoltRequest,
 class Listener(metaclass=ABCMeta)
 ```
 
-#### matchers
+#### matchers: `Sequence[ListenerMatcher]`
 
-#### middleware
+#### middleware: `Sequence[Middleware]`
 
-#### ack\_function
+#### ack\_function: `Callable[..., BoltResponse]`
 
-#### lazy\_functions
+#### lazy\_functions: `Sequence[Callable[..., None]]`
 
-#### auto\_acknowledgement
+#### auto\_acknowledgement: `bool`
 
-#### ack\_timeout
+#### ack\_timeout: `int`
 
 #### matches
 

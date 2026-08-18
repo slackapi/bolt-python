@@ -112,7 +112,7 @@ async def async_process(
 class AsyncAttachingConversationKwargs(AsyncMiddleware)
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `Optional[AsyncAssistantThreadContextStore]`
 
 #### \_\_init\_\_
 

@@ -9,17 +9,17 @@ title: slack_bolt.workflows.step.async_step_middleware
 class AsyncListener(metaclass=ABCMeta)
 ```
 
-#### matchers
+#### matchers: `Sequence[AsyncListenerMatcher]`
 
-#### middleware
+#### middleware: `Sequence[AsyncMiddleware]`
 
-#### ack\_function
+#### ack\_function: `Callable[..., Awaitable[BoltResponse]]`
 
-#### lazy\_functions
+#### lazy\_functions: `Sequence[Callable[..., Awaitable[None]]]`
 
-#### auto\_acknowledgement
+#### auto\_acknowledgement: `bool`
 
-#### ack\_timeout
+#### ack\_timeout: `int`
 
 #### async\_matches
 
@@ -130,31 +130,31 @@ The name of this middleware
 class AsyncBoltRequest()
 ```
 
-#### raw\_body
+#### raw\_body: `str`
 
-#### body
+#### body: `Dict[str, Any]`
 
 The raw request body (only plain text is supported for &quot;http&quot; mode)
 
-#### query
+#### query: `Dict[str, Sequence[str]]`
 
 The query string data in any data format.
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The request headers.
 
-#### content\_type
+#### content\_type: `Optional[str]`
 
-#### context
+#### context: `AsyncBoltContext`
 
 The context in this request.
 
-#### lazy\_only
+#### lazy\_only: `bool`
 
-#### lazy\_function\_name
+#### lazy\_function\_name: `Optional[str]`
 
-#### mode
+#### mode: `str`
 
 The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
@@ -192,15 +192,15 @@ def to_copyable() -> "AsyncBoltRequest"
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -262,19 +262,19 @@ Returns the name for the given Callable function object.
 class AsyncWorkflowStep()
 ```
 
-#### callback\_id
+#### callback\_id: `Union[str, Pattern]`
 
 The Callback ID of the step from app
 
-#### edit
+#### edit: `AsyncListener`
 
 `edit` listener, which displays a modal in Workflow Builder
 
-#### save
+#### save: `AsyncListener`
 
 `save` listener, which accepts workflow creator&#x27;s data submission in Workflow Builder
 
-#### execute
+#### execute: `AsyncListener`
 
 `execute` listener, which processes the step from app execution
 

@@ -10,9 +10,9 @@ slug: fail
 class Fail()
 ```
 
-#### client
+#### client: `WebClient`
 
-#### function\_execution\_id
+#### function\_execution\_id: `Optional[str]`
 
 #### \_\_init\_\_
 

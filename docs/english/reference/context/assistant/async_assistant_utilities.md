@@ -30,9 +30,9 @@ class DefaultAsyncAssistantThreadContextStore(AsyncAssistantThreadContextStore
                                               )
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### context
+#### context: `AsyncBoltContext`
 
 #### \_\_init\_\_
 
@@ -287,13 +287,13 @@ def save_thread_context() -> Optional[AsyncSaveThreadContext]
 class AsyncSay()
 ```
 
-#### client
+#### client: `Optional[AsyncWebClient]`
 
-#### channel
+#### channel: `Optional[str]`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
-#### build\_metadata
+#### build\_metadata: `Optional[Callable[[], Awaitable[Union[Dict, Metadata]]]]`
 
 #### \_\_init\_\_
 
@@ -321,15 +321,15 @@ This data pattern is available for assistant_* events.
 class AsyncGetThreadContext()
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `AsyncAssistantThreadContextStore`
 
-#### payload
+#### payload: `dict`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
-#### thread\_context\_loaded
+#### thread\_context\_loaded: `bool`
 
 #### \_\_init\_\_
 
@@ -344,11 +344,11 @@ def __init__(thread_context_store: AsyncAssistantThreadContextStore,
 class AsyncSaveThreadContext()
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `AsyncAssistantThreadContextStore`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 
@@ -363,11 +363,11 @@ def __init__(thread_context_store: AsyncAssistantThreadContextStore,
 class AsyncSetTitle()
 ```
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 
@@ -381,15 +381,15 @@ def __init__(client: AsyncWebClient, channel_id: str, thread_ts: str)
 class AsyncAssistantUtilities()
 ```
 
-#### payload
+#### payload: `dict`
 
-#### client
+#### client: `AsyncWebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
-#### thread\_context\_store
+#### thread\_context\_store: `AsyncAssistantThreadContextStore`
 
 #### \_\_init\_\_
 

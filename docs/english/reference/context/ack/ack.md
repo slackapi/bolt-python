@@ -10,15 +10,15 @@ slug: ack
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -63,7 +63,7 @@ def cookies() -> Sequence[SimpleCookie]
 class Ack()
 ```
 
-#### response
+#### response: `Optional[BoltResponse]`
 
 #### \_\_init\_\_
 

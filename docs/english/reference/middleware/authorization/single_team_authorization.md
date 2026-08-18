@@ -21,31 +21,31 @@ class Authorization(Middleware)
 class BoltRequest()
 ```
 
-#### raw\_body
+#### raw\_body: `str`
 
-#### query
+#### query: `Dict[str, Sequence[str]]`
 
 The query string data in any data format.
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The request headers.
 
-#### content\_type
+#### content\_type: `Optional[str]`
 
-#### body
+#### body: `Dict[str, Any]`
 
 The raw request body (only plain text is supported for &quot;http&quot; mode)
 
-#### context
+#### context: `BoltContext`
 
 The context in this request.
 
-#### lazy\_only
+#### lazy\_only: `bool`
 
-#### lazy\_function\_name
+#### lazy\_function\_name: `Optional[str]`
 
-#### mode
+#### mode: `str`
 
 The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
@@ -83,15 +83,15 @@ def to_copyable() -> "BoltRequest"
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -138,51 +138,51 @@ class AuthorizeResult(dict)
 
 Authorize function call result
 
-#### enterprise\_id
+#### enterprise\_id: `Optional[str]`
 
 Organization ID (Enterprise Grid) starting with `E`
 
-#### team\_id
+#### team\_id: `Optional[str]`
 
 Workspace ID starting with `T`
 
-#### team
+#### team: `Optional[str]`
 
 Workspace name
 
-#### url
+#### url: `Optional[str]`
 
 Workspace slack.com URL
 
-#### bot\_id
+#### bot\_id: `Optional[str]`
 
 Bot ID starting with `B`
 
-#### bot\_user\_id
+#### bot\_user\_id: `Optional[str]`
 
 Bot user&#x27;s User ID starting with either `U` or `W`
 
-#### bot\_token
+#### bot\_token: `Optional[str]`
 
 Bot user access token starting with `xoxb-`
 
-#### bot\_scopes
+#### bot\_scopes: `Optional[Sequence[str]]`
 
 The scopes associated with the bot token
 
-#### user\_id
+#### user\_id: `Optional[str]`
 
 The request user ID
 
-#### user
+#### user: `Optional[str]`
 
 The request user&#x27;s name
 
-#### user\_token
+#### user\_token: `Optional[str]`
 
 User access token starting with `xoxp-`
 
-#### user\_scopes
+#### user\_scopes: `Optional[Sequence[str]]`
 
 The scopes associated wth the user token
 

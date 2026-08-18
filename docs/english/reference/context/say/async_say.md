@@ -15,13 +15,13 @@ def create_copy(original: Any) -> Any
 class AsyncSay()
 ```
 
-#### client
+#### client: `Optional[AsyncWebClient]`
 
-#### channel
+#### channel: `Optional[str]`
 
-#### thread\_ts
+#### thread\_ts: `Optional[str]`
 
-#### build\_metadata
+#### build\_metadata: `Optional[Callable[[], Awaitable[Union[Dict, Metadata]]]]`
 
 #### \_\_init\_\_
 

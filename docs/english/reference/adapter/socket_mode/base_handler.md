@@ -855,9 +855,9 @@ def get_boot_message(development_server: bool = False) -> str
 class BaseSocketModeHandler()
 ```
 
-#### app
+#### app: `App`
 
-#### client
+#### client: `BaseSocketModeClient`
 
 #### handle
 

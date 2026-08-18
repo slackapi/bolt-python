@@ -1721,9 +1721,9 @@ def get_boot_message(development_server: bool = False) -> str
 class AsyncBaseSocketModeHandler()
 ```
 
-#### app
+#### app: `Union[App, AsyncApp]`
 
-#### client
+#### client: `AsyncBaseSocketModeClient`
 
 #### handle
 

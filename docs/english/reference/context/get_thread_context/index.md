@@ -14,15 +14,15 @@ title: slack_bolt.context.get_thread_context
 class GetThreadContext()
 ```
 
-#### thread\_context\_store
+#### thread\_context\_store: `AssistantThreadContextStore`
 
-#### payload
+#### payload: `dict`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
-#### thread\_context\_loaded
+#### thread\_context\_loaded: `bool`
 
 #### \_\_init\_\_
 

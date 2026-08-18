@@ -44,7 +44,7 @@ Refer to https://docs.slack.dev/tools/bolt-python/concepts/lazy-listeners for mo
 class LazyListenerRunner(metaclass=ABCMeta)
 ```
 
-#### logger
+#### logger: `Logger`
 
 #### start
 
@@ -79,7 +79,7 @@ Synchronously runs the function with a given request data.
 class ThreadLazyListenerRunner(LazyListenerRunner)
 ```
 
-#### logger
+#### logger: `Logger`
 
 #### \_\_init\_\_
 

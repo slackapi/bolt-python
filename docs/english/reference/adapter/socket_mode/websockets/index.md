@@ -848,9 +848,9 @@ def enable_token_revocation_listeners() -> None
 class AsyncBaseSocketModeHandler()
 ```
 
-#### app
+#### app: `Union[App, AsyncApp]`
 
-#### client
+#### client: `AsyncBaseSocketModeClient`
 
 #### handle
 
@@ -1793,15 +1793,15 @@ def enable_token_revocation_listeners() -> None
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -1846,15 +1846,15 @@ def cookies() -> Sequence[SimpleCookie]
 class SocketModeHandler(AsyncBaseSocketModeHandler)
 ```
 
-#### app
+#### app: `App`
 
 The Bolt app
 
-#### app\_token
+#### app\_token: `str`
 
 App-level token starting with `xapp-`
 
-#### client
+#### client: `SocketModeClient`
 
 #### \_\_init\_\_
 
@@ -1892,11 +1892,11 @@ async def handle(client: SocketModeClient, req: SocketModeRequest) -> None
 class AsyncSocketModeHandler(AsyncBaseSocketModeHandler)
 ```
 
-#### app
+#### app: `AsyncApp`
 
-#### app\_token
+#### app\_token: `str`
 
-#### client
+#### client: `SocketModeClient`
 
 #### \_\_init\_\_
 

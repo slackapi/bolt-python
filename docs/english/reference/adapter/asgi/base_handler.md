@@ -897,15 +897,15 @@ def enable_token_revocation_listeners() -> None
 class BoltResponse()
 ```
 
-#### status
+#### status: `int`
 
 HTTP status code
 
-#### body
+#### body: `str`
 
 The response body (dict and str are supported)
 
-#### headers
+#### headers: `Dict[str, Sequence[str]]`
 
 The response headers.
 
@@ -950,11 +950,11 @@ def cookies() -> Sequence[SimpleCookie]
 class BaseSlackRequestHandler()
 ```
 
-#### app
+#### app: `Union[App, "AsyncApp"]`
 
 type: ignore[name-defined]
 
-#### path
+#### path: `str`
 
 #### dispatch
 

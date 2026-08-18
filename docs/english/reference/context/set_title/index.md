@@ -14,11 +14,11 @@ title: slack_bolt.context.set_title
 class SetTitle()
 ```
 
-#### client
+#### client: `WebClient`
 
-#### channel\_id
+#### channel\_id: `str`
 
-#### thread\_ts
+#### thread\_ts: `str`
 
 #### \_\_init\_\_
 
