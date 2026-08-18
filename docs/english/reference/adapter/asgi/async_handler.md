@@ -11,6 +11,8 @@ class AsyncSlackRequestHandler(SlackRequestHandler)
 
 #### app
 
+Your bolt application
+
 #### \_\_init\_\_
 
 ```python

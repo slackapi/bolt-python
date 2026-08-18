@@ -19,7 +19,9 @@ from ...authorization.authorize import Authorize
 
 class MultiTeamsAuthorization(Authorization):
     authorize: Authorize
+    """The function to authorize incoming requests from Slack."""
     user_token_resolution: str
+    """Either "authed_user" or "actor"."""
 
     def __init__(
         self,

@@ -28,7 +28,11 @@ class MultiTeamsAuthorization(Authorization)
 
 #### authorize
 
+The function to authorize incoming requests from Slack.
+
 #### user\_token\_resolution
+
+Either &quot;authed_user&quot; or &quot;actor&quot;.
 
 #### \_\_init\_\_
 

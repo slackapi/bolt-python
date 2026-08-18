@@ -23,9 +23,15 @@ class BoltResponse()
 
 #### status
 
+HTTP status code
+
 #### body
 
+The response body (dict and str are supported)
+
 #### headers
+
+The response headers.
 
 #### \_\_init\_\_
 

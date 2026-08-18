@@ -9,6 +9,7 @@ from slack_bolt.response import BoltResponse
 
 class AsyncSlackRequestHandler(SlackRequestHandler):
     app: AsyncApp
+    """Your bolt application"""
 
     def __init__(self, app: AsyncApp, path: str = "/slack/events"):
         """Setup Bolt as an ASGI web framework, this will make your application compatible with ASGI web servers.

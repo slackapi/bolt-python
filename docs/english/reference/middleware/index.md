@@ -66,7 +66,11 @@ class MultiTeamsAuthorization(Authorization)
 
 #### authorize
 
+The function to authorize incoming requests from Slack.
+
 #### user\_token\_resolution
+
+Either &quot;authed_user&quot; or &quot;actor&quot;.
 
 #### \_\_init\_\_
 
@@ -254,6 +258,9 @@ class SslCheck(Middleware)
 ```
 
 #### verification\_token
+
+The verification token to check (optional as it&#x27;s already deprecated -
+https://docs.slack.dev/authentication/verifying-requests-from-slack/`deprecation`)
 
 #### logger
 

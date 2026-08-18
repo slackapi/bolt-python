@@ -23,9 +23,15 @@ class BoltResponse()
 
 #### status
 
+HTTP status code
+
 #### body
 
+The response body (dict and str are supported)
+
 #### headers
+
+The response headers.
 
 #### \_\_init\_\_
 
@@ -76,9 +82,15 @@ class AsyncSlackAppServer()
 
 #### port
 
+The port to listen on
+
 #### path
 
+The path to receive incoming requests from Slack
+
 #### host
+
+The hostname to serve the web endpoints. (Default: 0.0.0.0)
 
 #### bolt\_app
 

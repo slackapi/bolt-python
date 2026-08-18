@@ -31,7 +31,11 @@ class SocketModeHandler(BaseSocketModeHandler)
 
 #### app
 
+The Bolt app
+
 #### app\_token
+
+App-level token starting with `xapp-`
 
 #### client
 

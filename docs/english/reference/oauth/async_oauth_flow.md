@@ -110,47 +110,90 @@ class AsyncOAuthSettings()
 
 #### client\_id
 
+Check the value in Settings &gt; Basic Information &gt; App Credentials
+
 #### client\_secret
+
+Check the value in Settings &gt; Basic Information &gt; App Credentials
 
 #### scopes
 
+Check the value in Settings &gt; Manage Distribution
+
 #### user\_scopes
+
+Check the value in Settings &gt; Manage Distribution
 
 #### redirect\_uri
 
+Check the value in Features &gt; OAuth &amp; Permissions &gt; Redirect URLs
+
 #### install\_path
+
+The endpoint to start an OAuth flow (Default: `/slack/install`)
 
 #### install\_page\_rendering\_enabled
 
+Renders a web page for install_path access if True
+
 #### redirect\_uri\_path
+
+The path of Redirect URL (Default: `/slack/oauth_redirect`)
 
 #### callback\_options
 
+Give success/failure functions f you want to customize callback functions.
+
 #### success\_url
+
+Set a complete URL if you want to redirect end-users when an installation completes.
 
 #### failure\_url
 
+Set a complete URL if you want to redirect end-users when an installation fails.
+
 #### authorization\_url
 
-default: https://slack.com/oauth/v2/authorize
+Set a URL if you want to customize the URL `https://slack.com/oauth/v2/authorize`
 
 #### installation\_store
 
+Specify the instance of `InstallationStore` (Default: `FileInstallationStore`)
+
 #### installation\_store\_bot\_only
+
+Use `InstallationStore#find_bot()` if True (Default: False)
 
 #### token\_rotation\_expiration\_minutes
 
+Minutes before refreshing tokens (Default: 2 hours)
+
 #### user\_token\_resolution
+
+The option to pick up a user token per request (Default: authed_user)
+The available values are &quot;authed_user&quot; and &quot;actor&quot;. When you want to resolve the user token
+per request using the event&#x27;s actor IDs, you can set &quot;actor&quot; instead. With this option,
+bolt-python tries to resolve a user token for context.actor_enterprise/team/user_id.
+This can be useful for events in Slack Connect channels. Note that actor IDs can be absent
+in some scenarios.
 
 #### authorize
 
 #### state\_validation\_enabled
 
+Set False if your OAuth flow omits the state parameter validation (Default: True)
+
 #### state\_store
+
+Specify the instance of `InstallationStore` (Default: `FileOAuthStateStore`)
 
 #### state\_cookie\_name
 
+The cookie name that is set for installers&#x27; browser. (Default: &quot;slack-app-oauth-state&quot;)
+
 #### state\_expiration\_seconds
+
+The seconds that the state value is alive (Default: 600 seconds)
 
 #### state\_utils
 
@@ -159,6 +202,8 @@ default: https://slack.com/oauth/v2/authorize
 #### redirect\_uri\_page\_renderer
 
 #### logger
+
+The logger that will be used internally
 
 #### \_\_init\_\_
 
@@ -228,13 +273,21 @@ class AsyncBoltRequest()
 
 #### body
 
+The raw request body (only plain text is supported for &quot;http&quot; mode)
+
 #### query
 
+The query string data in any data format.
+
 #### headers
+
+The request headers.
 
 #### content\_type
 
 #### context
+
+The context in this request.
 
 #### lazy\_only
 
@@ -242,7 +295,7 @@ class AsyncBoltRequest()
 
 #### mode
 
-either &quot;http&quot; or &quot;socket_mode&quot;
+The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
 #### \_\_init\_\_
 
@@ -280,9 +333,15 @@ class BoltResponse()
 
 #### status
 
+HTTP status code
+
 #### body
 
+The response body (dict and str are supported)
+
 #### headers
+
+The response headers.
 
 #### \_\_init\_\_
 
@@ -333,6 +392,8 @@ class AsyncOAuthFlow()
 ```
 
 #### settings
+
+OAuth settings to configure this module.
 
 #### client\_id
 

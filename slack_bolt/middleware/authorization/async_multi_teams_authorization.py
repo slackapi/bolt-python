@@ -14,7 +14,9 @@ from ...authorization.async_authorize import AsyncAuthorize
 
 class AsyncMultiTeamsAuthorization(AsyncAuthorization):
     authorize: AsyncAuthorize
+    """The function to authorize incoming requests from Slack."""
     user_token_resolution: str
+    """Either "authed_user" or "actor"."""
 
     def __init__(
         self,

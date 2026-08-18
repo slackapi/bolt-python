@@ -28,6 +28,7 @@ class WorkflowStepBuilder:
     """
 
     callback_id: Union[str, Pattern]
+    """The callback_id for the workflow"""
     _base_logger: Optional[Logger]
     _edit: Optional[Listener]
     _save: Optional[Listener]

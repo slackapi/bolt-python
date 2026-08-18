@@ -27,6 +27,8 @@ class OAuthFlow()
 
 #### settings
 
+OAuth settings to configure this module.
+
 #### client\_id
 
 #### redirect\_uri

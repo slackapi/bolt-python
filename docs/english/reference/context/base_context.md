@@ -13,37 +13,51 @@ Authorize function call result
 
 #### enterprise\_id
 
+Organization ID (Enterprise Grid) starting with `E`
+
 #### team\_id
+
+Workspace ID starting with `T`
 
 #### team
 
-since v1.18
+Workspace name
 
 #### url
 
-since v1.18
+Workspace slack.com URL
 
 #### bot\_id
 
+Bot ID starting with `B`
+
 #### bot\_user\_id
+
+Bot user&#x27;s User ID starting with either `U` or `W`
 
 #### bot\_token
 
+Bot user access token starting with `xoxb-`
+
 #### bot\_scopes
 
-since v1.17
+The scopes associated with the bot token
 
 #### user\_id
 
+The request user ID
+
 #### user
 
-since v1.18
+The request user&#x27;s name
 
 #### user\_token
 
+User access token starting with `xoxp-`
+
 #### user\_scopes
 
-since v1.17
+The scopes associated wth the user token
 
 #### \_\_init\_\_
 

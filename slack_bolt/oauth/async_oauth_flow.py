@@ -28,6 +28,7 @@ from slack_bolt.util.async_utils import create_async_web_client
 
 class AsyncOAuthFlow:
     settings: AsyncOAuthSettings
+    """OAuth settings to configure this module."""
     client_id: str
     redirect_uri: Optional[str]
     install_path: str

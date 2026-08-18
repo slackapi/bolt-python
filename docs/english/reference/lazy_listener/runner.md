@@ -20,13 +20,21 @@ class BoltRequest()
 
 #### query
 
+The query string data in any data format.
+
 #### headers
+
+The request headers.
 
 #### content\_type
 
 #### body
 
+The raw request body (only plain text is supported for &quot;http&quot; mode)
+
 #### context
+
+The context in this request.
 
 #### lazy\_only
 
@@ -34,7 +42,7 @@ class BoltRequest()
 
 #### mode
 
-either &quot;http&quot; or &quot;socket_mode&quot;
+The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
 #### \_\_init\_\_
 

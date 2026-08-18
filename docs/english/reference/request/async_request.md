@@ -289,13 +289,21 @@ class AsyncBoltRequest()
 
 #### body
 
+The raw request body (only plain text is supported for &quot;http&quot; mode)
+
 #### query
 
+The query string data in any data format.
+
 #### headers
+
+The request headers.
 
 #### content\_type
 
 #### context
+
+The context in this request.
 
 #### lazy\_only
 
@@ -303,7 +311,7 @@ class AsyncBoltRequest()
 
 #### mode
 
-either &quot;http&quot; or &quot;socket_mode&quot;
+The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
 #### \_\_init\_\_
 

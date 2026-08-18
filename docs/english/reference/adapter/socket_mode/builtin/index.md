@@ -920,9 +920,15 @@ class BoltResponse()
 
 #### status
 
+HTTP status code
+
 #### body
 
+The response body (dict and str are supported)
+
 #### headers
+
+The response headers.
 
 #### \_\_init\_\_
 
@@ -967,7 +973,11 @@ class SocketModeHandler(BaseSocketModeHandler)
 
 #### app
 
+The Bolt app
+
 #### app\_token
+
+App-level token starting with `xapp-`
 
 #### client
 

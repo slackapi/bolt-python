@@ -9,6 +9,8 @@ from slack_bolt.response import BoltResponse
 
 class SslCheck(Middleware):
     verification_token: Optional[str]
+    """The verification token to check (optional as it's already deprecated -
+    https://docs.slack.dev/authentication/verifying-requests-from-slack/#deprecation)"""
     logger: Logger
 
     def __init__(

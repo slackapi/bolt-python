@@ -238,15 +238,23 @@ class AsyncAuthorizeArgs()
 
 #### context
 
+The request context
+
 #### logger
 
 #### client
 
 #### enterprise\_id
 
+The Organization ID (Enterprise Grid)
+
 #### team\_id
 
+The workspace ID
+
 #### user\_id
+
+The request user ID
 
 #### \_\_init\_\_
 

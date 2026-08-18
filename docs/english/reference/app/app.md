@@ -14,37 +14,51 @@ Authorize function call result
 
 #### enterprise\_id
 
+Organization ID (Enterprise Grid) starting with `E`
+
 #### team\_id
+
+Workspace ID starting with `T`
 
 #### team
 
-since v1.18
+Workspace name
 
 #### url
 
-since v1.18
+Workspace slack.com URL
 
 #### bot\_id
 
+Bot ID starting with `B`
+
 #### bot\_user\_id
+
+Bot user&#x27;s User ID starting with either `U` or `W`
 
 #### bot\_token
 
+Bot user access token starting with `xoxb-`
+
 #### bot\_scopes
 
-since v1.17
+The scopes associated with the bot token
 
 #### user\_id
 
+The request user ID
+
 #### user
 
-since v1.18
+The request user&#x27;s name
 
 #### user\_token
 
+User access token starting with `xoxp-`
+
 #### user\_scopes
 
-since v1.17
+The scopes associated wth the user token
 
 #### \_\_init\_\_
 
@@ -735,6 +749,9 @@ class SslCheck(Middleware)
 
 #### verification\_token
 
+The verification token to check (optional as it&#x27;s already deprecated -
+https://docs.slack.dev/authentication/verifying-requests-from-slack/`deprecation`)
+
 #### logger
 
 #### \_\_init\_\_
@@ -833,7 +850,11 @@ class MultiTeamsAuthorization(Authorization)
 
 #### authorize
 
+The function to authorize incoming requests from Slack.
+
 #### user\_token\_resolution
+
+Either &quot;authed_user&quot; or &quot;actor&quot;.
 
 #### \_\_init\_\_
 
@@ -1160,6 +1181,8 @@ class OAuthFlow()
 
 #### settings
 
+OAuth settings to configure this module.
+
 #### client\_id
 
 #### redirect\_uri
@@ -1294,49 +1317,90 @@ class OAuthSettings()
 
 #### client\_id
 
+Check the value in Settings &gt; Basic Information &gt; App Credentials
+
 #### client\_secret
+
+Check the value in Settings &gt; Basic Information &gt; App Credentials
 
 #### scopes
 
+Check the value in Settings &gt; Manage Distribution
+
 #### user\_scopes
+
+Check the value in Settings &gt; Manage Distribution
 
 #### redirect\_uri
 
+Check the value in Features &gt; OAuth &amp; Permissions &gt; Redirect URLs
+
 #### install\_path
+
+The endpoint to start an OAuth flow (Default: `/slack/install`)
 
 #### install\_page\_rendering\_enabled
 
+Renders a web page for install_path access if True
+
 #### redirect\_uri\_path
+
+The path of Redirect URL (Default: `/slack/oauth_redirect`)
 
 #### callback\_options
 
+Give success/failure functions f you want to customize callback functions.
+
 #### success\_url
+
+Set a complete URL if you want to redirect end-users when an installation completes.
 
 #### failure\_url
 
+Set a complete URL if you want to redirect end-users when an installation fails.
+
 #### authorization\_url
 
-default: https://slack.com/oauth/v2/authorize
+Set a URL if you want to customize the URL `https://slack.com/oauth/v2/authorize`
 
 #### installation\_store
 
+Specify the instance of `InstallationStore` (Default: `FileInstallationStore`)
+
 #### installation\_store\_bot\_only
 
+Use `InstallationStore#find_bot()` if True (Default: False)
+
 #### token\_rotation\_expiration\_minutes
+
+Minutes before refreshing tokens (Default: 2 hours)
 
 #### authorize
 
 #### user\_token\_resolution
 
-default: &quot;authed_user&quot;
+The option to pick up a user token per request (Default: authed_user)
+The available values are &quot;authed_user&quot; and &quot;actor&quot;. When you want to resolve the user token
+per request using the event&#x27;s actor IDs, you can set &quot;actor&quot; instead. With this option,
+bolt-python tries to resolve a user token for context.actor_enterprise/team/user_id.
+This can be useful for events in Slack Connect channels. Note that actor IDs can be absent
+in some scenarios.
 
 #### state\_validation\_enabled
 
+Set False if your OAuth flow omits the state parameter validation (Default: True)
+
 #### state\_store
+
+Specify the instance of `InstallationStore` (Default: `FileOAuthStateStore`)
 
 #### state\_cookie\_name
 
+The cookie name that is set for installers&#x27; browser. (Default: &quot;slack-app-oauth-state&quot;)
+
 #### state\_expiration\_seconds
+
+The seconds that the state value is alive (Default: 600 seconds)
 
 #### state\_utils
 
@@ -1345,6 +1409,8 @@ default: &quot;authed_user&quot;
 #### redirect\_uri\_page\_renderer
 
 #### logger
+
+The logger that will be used internally
 
 #### \_\_init\_\_
 
@@ -1414,13 +1480,21 @@ class BoltRequest()
 
 #### query
 
+The query string data in any data format.
+
 #### headers
+
+The request headers.
 
 #### content\_type
 
 #### body
 
+The raw request body (only plain text is supported for &quot;http&quot; mode)
+
 #### context
+
+The context in this request.
 
 #### lazy\_only
 
@@ -1428,7 +1502,7 @@ class BoltRequest()
 
 #### mode
 
-either &quot;http&quot; or &quot;socket_mode&quot;
+The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
 
 #### \_\_init\_\_
 
@@ -1466,9 +1540,15 @@ class BoltResponse()
 
 #### status
 
+HTTP status code
+
 #### body
 
+The response body (dict and str are supported)
+
 #### headers
+
+The response headers.
 
 #### \_\_init\_\_
 
@@ -1647,6 +1727,8 @@ Steps from apps
 Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
 
 #### callback\_id
+
+The callback_id for the workflow
 
 #### \_\_init\_\_
 

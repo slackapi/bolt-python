@@ -534,9 +534,15 @@ class BoltResponse()
 
 #### status
 
+HTTP status code
+
 #### body
 
+The response body (dict and str are supported)
+
 #### headers
+
+The response headers.
 
 #### \_\_init\_\_
 
@@ -747,6 +753,8 @@ Steps from apps
 Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
 
 #### callback\_id
+
+The callback_id for the workflow
 
 #### \_\_init\_\_
 
