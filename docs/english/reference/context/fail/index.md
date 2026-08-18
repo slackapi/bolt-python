@@ -3,6 +3,11 @@ sidebar_label: fail
 title: slack_bolt.context.fail
 ---
 
+## Submodules
+
+- [slack_bolt.context.fail.async_fail](/tools/bolt-python/reference/context/fail/async_fail)
+- [slack_bolt.context.fail.fail](/tools/bolt-python/reference/context/fail/fail)
+
 ## Fail Objects
 
 ```python

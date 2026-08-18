@@ -3,6 +3,7 @@ sidebar_label: lazy_listener
 title: slack_bolt.lazy_listener
 ---
 
+
 Lazy listener runner is a beta feature for the apps running on Function-as-a-Service platforms.
 
 ```python
@@ -27,6 +28,15 @@ Lazy listener runner is a beta feature for the apps running on Function-as-a-Ser
 ```
 
 Refer to https://docs.slack.dev/tools/bolt-python/concepts/lazy-listeners for more details.
+
+## Submodules
+
+- [slack_bolt.lazy_listener.async_internals](/tools/bolt-python/reference/lazy_listener/async_internals)
+- [slack_bolt.lazy_listener.async_runner](/tools/bolt-python/reference/lazy_listener/async_runner)
+- [slack_bolt.lazy_listener.asyncio_runner](/tools/bolt-python/reference/lazy_listener/asyncio_runner)
+- [slack_bolt.lazy_listener.internals](/tools/bolt-python/reference/lazy_listener/internals)
+- [slack_bolt.lazy_listener.runner](/tools/bolt-python/reference/lazy_listener/runner)
+- [slack_bolt.lazy_listener.thread_runner](/tools/bolt-python/reference/lazy_listener/thread_runner)
 
 ## LazyListenerRunner Objects
 

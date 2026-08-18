@@ -3,6 +3,11 @@ sidebar_label: ignoring_self_events
 title: slack_bolt.middleware.ignoring_self_events
 ---
 
+## Submodules
+
+- [slack_bolt.middleware.ignoring_self_events.async_ignoring_self_events](/tools/bolt-python/reference/middleware/ignoring_self_events/async_ignoring_self_events)
+- [slack_bolt.middleware.ignoring_self_events.ignoring_self_events](/tools/bolt-python/reference/middleware/ignoring_self_events/ignoring_self_events)
+
 ## IgnoringSelfEvents Objects
 
 ```python

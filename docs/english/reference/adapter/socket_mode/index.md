@@ -3,12 +3,25 @@ sidebar_label: socket_mode
 title: slack_bolt.adapter.socket_mode
 ---
 
+
 Socket Mode adapter package provides the following implementations. If you don&#x27;t have strong reasons to use 3rd party library based adapters, we recommend using the built-in client based one.
 
 * `slack_bolt.adapter.socket_mode.builtin`
 * `slack_bolt.adapter.socket_mode.websocket_client`
 * `slack_bolt.adapter.socket_mode.aiohttp`
 * `slack_bolt.adapter.socket_mode.websockets`
+
+## Submodules
+
+- [slack_bolt.adapter.socket_mode.aiohttp](/tools/bolt-python/reference/adapter/socket_mode/aiohttp)
+- [slack_bolt.adapter.socket_mode.async_base_handler](/tools/bolt-python/reference/adapter/socket_mode/async_base_handler)
+- [slack_bolt.adapter.socket_mode.async_handler](/tools/bolt-python/reference/adapter/socket_mode/async_handler)
+- [slack_bolt.adapter.socket_mode.async_internals](/tools/bolt-python/reference/adapter/socket_mode/async_internals)
+- [slack_bolt.adapter.socket_mode.base_handler](/tools/bolt-python/reference/adapter/socket_mode/base_handler)
+- [slack_bolt.adapter.socket_mode.builtin](/tools/bolt-python/reference/adapter/socket_mode/builtin)
+- [slack_bolt.adapter.socket_mode.internals](/tools/bolt-python/reference/adapter/socket_mode/internals)
+- [slack_bolt.adapter.socket_mode.websocket_client](/tools/bolt-python/reference/adapter/socket_mode/websocket_client)
+- [slack_bolt.adapter.socket_mode.websockets](/tools/bolt-python/reference/adapter/socket_mode/websockets)
 
 ## SocketModeHandler Objects
 

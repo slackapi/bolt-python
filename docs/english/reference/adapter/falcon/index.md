@@ -3,6 +3,11 @@ sidebar_label: falcon
 title: slack_bolt.adapter.falcon
 ---
 
+## Submodules
+
+- [slack_bolt.adapter.falcon.async_resource](/tools/bolt-python/reference/adapter/falcon/async_resource)
+- [slack_bolt.adapter.falcon.resource](/tools/bolt-python/reference/adapter/falcon/resource)
+
 ## SlackAppResource Objects
 
 ```python

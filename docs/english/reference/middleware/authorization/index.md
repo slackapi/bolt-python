@@ -3,6 +3,17 @@ sidebar_label: authorization
 title: slack_bolt.middleware.authorization
 ---
 
+## Submodules
+
+- [slack_bolt.middleware.authorization.async_authorization](/tools/bolt-python/reference/middleware/authorization/async_authorization)
+- [slack_bolt.middleware.authorization.async_internals](/tools/bolt-python/reference/middleware/authorization/async_internals)
+- [slack_bolt.middleware.authorization.async_multi_teams_authorization](/tools/bolt-python/reference/middleware/authorization/async_multi_teams_authorization)
+- [slack_bolt.middleware.authorization.async_single_team_authorization](/tools/bolt-python/reference/middleware/authorization/async_single_team_authorization)
+- [slack_bolt.middleware.authorization.authorization](/tools/bolt-python/reference/middleware/authorization/authorization)
+- [slack_bolt.middleware.authorization.internals](/tools/bolt-python/reference/middleware/authorization/internals)
+- [slack_bolt.middleware.authorization.multi_teams_authorization](/tools/bolt-python/reference/middleware/authorization/multi_teams_authorization)
+- [slack_bolt.middleware.authorization.single_team_authorization](/tools/bolt-python/reference/middleware/authorization/single_team_authorization)
+
 ## Authorization Objects
 
 ```python

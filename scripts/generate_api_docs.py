@@ -264,6 +264,7 @@ def main():
     _flatten_top_package()
     _label_top_level_module_docs()
     _disambiguate_folder_named_docs()
+    _add_submodule_links()
     _check_mdx_hazards()
     _finalize_reference_sidebar()
     _strip_reference_from_site_sidebar()
@@ -449,6 +450,109 @@ def _disambiguate_folder_named_docs():
 # The guard below turns that into a loud failure here, pointing at the generated
 # file, instead of a cryptic failure later in the docs repo.
 _MDX_ESM_RE = re.compile(r"^(export|import)\s")
+
+
+def _doc_title(path):
+    """Return a doc's ``title`` frontmatter (the fully-qualified dotted name),
+    falling back to the file's basename without extension."""
+    with open(path, encoding="utf-8") as handle:
+        text = handle.read()
+    match = re.search(r"^title:\s*(.+)$", text, flags=re.M)
+    if match:
+        return match.group(1).strip()
+    return os.path.splitext(os.path.basename(path))[0]
+
+
+def _doc_route(path):
+    """Return the absolute Docusaurus route for a generated doc file.
+
+    The route is the path relative to the docs root (DOCS_BASE_PATH), carrying
+    the docs site base prefix (SIDEBAR_DOC_ID_PREFIX), with ``.md`` stripped and
+    a trailing ``/index`` removed (Docusaurus serves an ``index`` doc at its
+    folder URL). A folder named module doc (``<folder>/<folder>.md``) carries a
+    relative ``slug: <folder>`` resolving to exactly this path, so stripping
+    ``.md`` is correct there too.
+
+    An absolute route resolves identically for the rendered site and a raw file
+    reader. A source relative link cannot, because a package ``index.md`` is
+    served one directory above where its source lives."""
+    rel = os.path.relpath(path, DOCS_BASE_PATH).replace(os.sep, "/")
+    rel = rel[: -len(".md")]
+    if rel.endswith("/index"):
+        rel = rel[: -len("/index")]
+    return "/" + SIDEBAR_DOC_ID_PREFIX + rel
+
+
+def _insert_after_intro(path, section):
+    """Insert ``section`` (a list of body lines) into a doc after its frontmatter
+    and any intro prose, but before the first Markdown header.
+
+    An agent reading the raw file should hit the submodule list near the top, not
+    buried under the class/function docs. This places it after the frontmatter and
+    the package's leading description paragraph, immediately above the first ``#``
+    header (or at end-of-file if the doc has no headers)."""
+    with open(path, encoding="utf-8") as handle:
+        text = handle.read()
+
+    prefix = ""
+    body = text
+    if text.startswith("---\n"):
+        end = text.index("\n---\n", 4) + len("\n---\n")
+        prefix = text[:end]
+        body = text[end:]
+
+    lines = body.split("\n")
+    header_idx = next((i for i, line in enumerate(lines) if line.startswith("#")), None)
+    if header_idx is None:
+        # No headers: append after a trailing blank-line separator.
+        new_body = body.rstrip("\n") + "\n\n" + "\n".join(section) + "\n"
+    else:
+        before = "\n".join(lines[:header_idx]).rstrip("\n")
+        after = "\n".join(lines[header_idx:])
+        intro = (before + "\n\n") if before.strip() else ""
+        new_body = "\n" + intro + "\n".join(section) + "\n\n" + after
+
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write(prefix + new_body)
+
+
+def _add_submodule_links():
+    """Append a "Submodules" section to each package ``index.md`` listing its
+    child modules and subpackages as relative ``.md`` links.
+
+    The sidebar encodes this hierarchy, but the rendered ``.md`` body does not --
+    an agent reading the raw file (no sidebar, no rendered ToC) can't see what a
+    package contains or navigate to its members. Explicit in-body links make the
+    files self navigable. The links are absolute Docusaurus routes (see
+    _doc_route), which resolve identically for the rendered site and a raw file
+    reader. Entries are sorted by fully qualified title so subpackages and
+    submodules interleave in a single predictable list."""
+    reference_dir = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR)
+    updated = 0
+    for dirpath, dirnames, filenames in os.walk(reference_dir):
+        if "index.md" not in filenames:
+            continue
+        entries = []
+        # Subpackages: child directories that have their own index.md.
+        for name in dirnames:
+            child_index = os.path.join(dirpath, name, "index.md")
+            if os.path.exists(child_index):
+                entries.append((_doc_title(child_index), _doc_route(child_index)))
+        # Submodules: sibling .md files other than this package's own index.md.
+        for name in filenames:
+            if not name.endswith(".md") or name == "index.md":
+                continue
+            child = os.path.join(dirpath, name)
+            entries.append((_doc_title(child), _doc_route(child)))
+        if not entries:
+            continue
+        entries.sort(key=lambda entry: entry[0])
+        section = ["## Submodules", ""]
+        section += ["- [{}]({})".format(title, href) for title, href in entries]
+        _insert_after_intro(os.path.join(dirpath, "index.md"), section)
+        updated += 1
+
+    print("Added submodule links to {} package index docs".format(updated))
 
 
 def _check_mdx_hazards():

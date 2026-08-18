@@ -3,10 +3,19 @@ sidebar_label: authorization
 title: slack_bolt.authorization
 ---
 
+
 Authorization is the process of determining which Slack credentials should be available
 while processing an incoming Slack event.
 
 Refer to https://docs.slack.dev/tools/bolt-python/concepts/authorization for details.
+
+## Submodules
+
+- [slack_bolt.authorization.async_authorize](/tools/bolt-python/reference/authorization/async_authorize)
+- [slack_bolt.authorization.async_authorize_args](/tools/bolt-python/reference/authorization/async_authorize_args)
+- [slack_bolt.authorization.authorize](/tools/bolt-python/reference/authorization/authorize)
+- [slack_bolt.authorization.authorize_args](/tools/bolt-python/reference/authorization/authorize_args)
+- [slack_bolt.authorization.authorize_result](/tools/bolt-python/reference/authorization/authorize_result)
 
 ## AuthorizeResult Objects
 

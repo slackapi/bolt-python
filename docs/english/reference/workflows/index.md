@@ -13,3 +13,6 @@ Check the following API documents first:
 
 Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
 
+## Submodules
+
+- [slack_bolt.workflows.step](/tools/bolt-python/reference/workflows/step)
