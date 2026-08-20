@@ -3,7 +3,7 @@ sidebar_label: slack_bolt
 title: slack_bolt
 ---
 
-A Python framework to build Slack apps in a flash with the latest platform features.Read the [getting started guide](https://docs.slack.dev/tools/bolt-python/creating-an-app) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt.
+A Python framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://docs.slack.dev/tools/bolt-python/creating-an-app) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt.
 
 * Website: https://docs.slack.dev/tools/bolt-python/
 * GitHub repository: https://github.com/slackapi/bolt-python
