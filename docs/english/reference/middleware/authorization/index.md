@@ -32,32 +32,36 @@ The function to authorize incoming requests from Slack.
 
 #### user\_token\_resolution: `str`
 
-Either &quot;authed_user&quot; or &quot;actor&quot;.
+Either "authed_user" or "actor".
 
 #### \_\_init\_\_
 
 ```python
-def __init__(*,
-             authorize: Authorize,
-             base_logger: Optional[Logger] = None,
-             user_token_resolution: str = "authed_user",
-             user_facing_authorize_error_message: Optional[str] = None)
+def __init__(
+    *,
+    authorize: Authorize,
+    base_logger: Optional[Logger] = None,
+    user_token_resolution: str = 'authed_user',
+    user_facing_authorize_error_message: Optional[str] = None)
 ```
 
 Multi-workspace authorization.
 
 **Arguments**:
 
-- `authorize` - The function to authorize incoming requests from Slack.
-- `base_logger` - The base logger
-- `user_token_resolution` - &quot;authed_user&quot; or &quot;actor&quot;
-- `user_facing_authorize_error_message` - The user-facing error message when installation is not found
+- `authorize` _Authorize_ - The function to authorize incoming requests from Slack.
+- `base_logger` _Optional[Logger]_ - The base logger
+- `user_token_resolution` _str_ - "authed_user" or "actor"
+- `user_facing_authorize_error_message` _Optional[str]_ - The user-facing error message when installation is not found
 
 #### process
 
 ```python
-def process(*, req: BoltRequest, resp: BoltResponse,
-            next: Callable[[], BoltResponse]) -> BoltResponse
+def process(
+    *,
+    req: BoltRequest,
+    resp: BoltResponse,
+    next: Callable[[], BoltResponse]) -> BoltResponse
 ```
 
 ## SingleTeamAuthorization Objects
@@ -69,23 +73,26 @@ class SingleTeamAuthorization(Authorization)
 #### \_\_init\_\_
 
 ```python
-def __init__(*,
-             auth_test_result: Optional[SlackResponse] = None,
-             base_logger: Optional[Logger] = None,
-             user_facing_authorize_error_message: Optional[str] = None)
+def __init__(
+    *,
+    auth_test_result: Optional[SlackResponse] = None,
+    base_logger: Optional[Logger] = None,
+    user_facing_authorize_error_message: Optional[str] = None)
 ```
 
 Single-workspace authorization.
 
 **Arguments**:
 
-- `auth_test_result` - The initial `auth.test` API call result.
-- `base_logger` - The base logger
+- `auth_test_result` _Optional[SlackResponse]_ - The initial `auth.test` API call result.
+- `base_logger` _Optional[Logger]_ - The base logger
 
 #### process
 
 ```python
-def process(*, req: BoltRequest, resp: BoltResponse,
-            next: Callable[[], BoltResponse]) -> BoltResponse
+def process(
+    *,
+    req: BoltRequest,
+    resp: BoltResponse,
+    next: Callable[[], BoltResponse]) -> BoltResponse
 ```
-

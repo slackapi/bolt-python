@@ -18,8 +18,5 @@ class AsyncSetSuggestedPrompts()
 #### \_\_init\_\_
 
 ```python
-def __init__(client: AsyncWebClient,
-             channel_id: str,
-             thread_ts: Optional[str] = None)
+def __init__(client: AsyncWebClient, channel_id: str, thread_ts: Optional[str] = None)
 ```
-

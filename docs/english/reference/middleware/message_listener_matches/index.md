@@ -25,7 +25,9 @@ Captures matched keywords and saves the values in context.
 #### process
 
 ```python
-def process(*, req: BoltRequest, resp: BoltResponse,
-            next: Callable[[], BoltResponse]) -> BoltResponse
+def process(
+    *,
+    req: BoltRequest,
+    resp: BoltResponse,
+    next: Callable[[], BoltResponse]) -> BoltResponse
 ```
-

@@ -31,4 +31,3 @@ Check if this fail function has been called.
 **Returns**:
 
 - `bool` - True if the fail function has been called, False otherwise.
-

@@ -3,26 +3,18 @@ sidebar_label: utils
 title: slack_bolt.util.utils
 ---
 
-## BoltError Objects
-
-```python
-class BoltError(Exception)
-```
-
-General class in a Bolt app
-
 #### create\_web\_client
 
 ```python
-def create_web_client(token: Optional[str] = None,
-                      logger: Optional[Logger] = None) -> WebClient
+def create_web_client(
+    token: Optional[str] = None,
+    logger: Optional[Logger] = None) -> WebClient
 ```
 
 #### convert\_to\_dict\_list
 
 ```python
-def convert_to_dict_list(
-        objects: Sequence[Union[Dict, JsonObject]]) -> Sequence[Dict]
+def convert_to_dict_list(objects: Sequence[Union[Dict, JsonObject]]) -> Sequence[Dict]
 ```
 
 #### convert\_to\_dict
@@ -53,12 +45,11 @@ Returns the name for the given Callable function object.
 
 **Arguments**:
 
-- `func` - Either a `Callable` instance or a function, which as `__name__`
-  
+- `func` _Callable_ - Either a `Callable` instance or a function, which as `__name__`
 
 **Returns**:
 
-  The name of the given Callable object
+- `str` - The name of the given Callable object
 
 #### get\_arg\_names\_of\_callable
 
@@ -83,9 +74,7 @@ Tests if a decorator invocation is without () or (args).
 **Arguments**:
 
 - `args` - arguments
-  
 
 **Returns**:
 
-  True if it&#x27;s an invocation without args
-
+- `bool` - True if it's an invocation without args

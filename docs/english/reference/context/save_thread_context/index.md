@@ -23,7 +23,8 @@ class SaveThreadContext()
 #### \_\_init\_\_
 
 ```python
-def __init__(thread_context_store: AssistantThreadContextStore,
-             channel_id: str, thread_ts: str)
+def __init__(
+    thread_context_store: AssistantThreadContextStore,
+    channel_id: str,
+    thread_ts: str)
 ```
-

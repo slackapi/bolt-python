@@ -1,9 +1,7 @@
 ---
-sidebar_label: slack_bolt.error
+sidebar_label: error
 title: slack_bolt.error
 ---
-
-Bolt specific error types.
 
 ## BoltError Objects
 
@@ -19,24 +17,20 @@ General class in a Bolt app
 class BoltUnhandledRequestError(BoltError)
 ```
 
-#### request: `"BoltRequest"`
-
-type: ignore[name-defined]
+#### request: `BoltRequest`
 
 #### body: `dict`
 
-#### current\_response: `Optional["BoltResponse"]`
-
-type: ignore[name-defined]
+#### current\_response: `Optional[BoltResponse]`
 
 #### last\_global\_middleware\_name: `Optional[str]`
 
 #### \_\_init\_\_
 
 ```python
-def __init__(*,
-             request: Union["BoltRequest", "AsyncBoltRequest"],
-             current_response: Optional["BoltResponse"],
-             last_global_middleware_name: Optional[str] = None)
+def __init__(
+    *,
+    request: Union[BoltRequest, AsyncBoltRequest],
+    current_response: Optional[BoltResponse],
+    last_global_middleware_name: Optional[str] = None)
 ```
-

@@ -23,8 +23,6 @@ def __init__(app: App)
 
 ```python
 async def handle(
-        req: Request,
-        addition_context_properties: Optional[Dict[str,
-                                                   Any]] = None) -> Response
+    req: Request,
+    addition_context_properties: Optional[Dict[str, Any]] = None) -> Response
 ```
-

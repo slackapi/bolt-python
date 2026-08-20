@@ -3,13 +3,6 @@ sidebar_label: app
 title: slack_bolt.app
 ---
 
-
-Application interface in Bolt.
-
-For most use cases, we recommend using `slack_bolt.app.app`.
-If you already have knowledge about asyncio and prefer the programming model,
-you can use `slack_bolt.app.async_app` for building async apps.
-
 ## Submodules
 
 - [slack_bolt.app.app](/tools/bolt-python/reference/app/app)
@@ -25,34 +18,33 @@ class App()
 #### \_\_init\_\_
 
 ```python
-def __init__(*,
-             logger: Optional[logging.Logger] = None,
-             name: Optional[str] = None,
-             process_before_response: bool = False,
-             raise_error_for_unhandled_request: bool = False,
-             signing_secret: Optional[str] = None,
-             token: Optional[str] = None,
-             token_verification_enabled: bool = True,
-             client: Optional[WebClient] = None,
-             before_authorize: Optional[Union[Middleware,
-                                              Callable[..., Any]]] = None,
-             authorize: Optional[Callable[..., AuthorizeResult]] = None,
-             user_facing_authorize_error_message: Optional[str] = None,
-             installation_store: Optional[InstallationStore] = None,
-             installation_store_bot_only: Optional[bool] = None,
-             request_verification_enabled: bool = True,
-             ignoring_self_events_enabled: bool = True,
-             ignoring_self_assistant_message_events_enabled: bool = True,
-             ssl_check_enabled: bool = True,
-             url_verification_enabled: bool = True,
-             attaching_function_token_enabled: bool = True,
-             oauth_settings: Optional[OAuthSettings] = None,
-             oauth_flow: Optional[OAuthFlow] = None,
-             verification_token: Optional[str] = None,
-             listener_executor: Optional[Executor] = None,
-             assistant_thread_context_store: Optional[
-                 AssistantThreadContextStore] = None,
-             attaching_conversation_kwargs_enabled: bool = True)
+def __init__(
+    *,
+    logger: Optional[logging.Logger] = None,
+    name: Optional[str] = None,
+    process_before_response: bool = False,
+    raise_error_for_unhandled_request: bool = False,
+    signing_secret: Optional[str] = None,
+    token: Optional[str] = None,
+    token_verification_enabled: bool = True,
+    client: Optional[WebClient] = None,
+    before_authorize: Optional[Union[Middleware, Callable[..., Any]]] = None,
+    authorize: Optional[Callable[..., AuthorizeResult]] = None,
+    user_facing_authorize_error_message: Optional[str] = None,
+    installation_store: Optional[InstallationStore] = None,
+    installation_store_bot_only: Optional[bool] = None,
+    request_verification_enabled: bool = True,
+    ignoring_self_events_enabled: bool = True,
+    ignoring_self_assistant_message_events_enabled: bool = True,
+    ssl_check_enabled: bool = True,
+    url_verification_enabled: bool = True,
+    attaching_function_token_enabled: bool = True,
+    oauth_settings: Optional[OAuthSettings] = None,
+    oauth_flow: Optional[OAuthFlow] = None,
+    verification_token: Optional[str] = None,
+    listener_executor: Optional[Executor] = None,
+    assistant_thread_context_store: Optional[AssistantThreadContextStore] = None,
+    attaching_conversation_kwargs_enabled: bool = True)
 ```
 
 Bolt App that provides functionalities to register middleware/listeners.
@@ -85,51 +77,51 @@ refer to https://docs.slack.dev/tools/bolt-python/concepts/authenticating-oauth 
 
 **Arguments**:
 
-- `logger` - The custom logger that can be used in this app.
-- `name` - The application name that will be used in logging. If absent, the source file name will be used.
-- `process_before_response` - True if this app runs on Function as a Service. (Default: False)
-- `raise_error_for_unhandled_request` - True if you want to raise exceptions for unhandled requests
+- `logger` _Optional[logging.Logger]_ - The custom logger that can be used in this app.
+- `name` _Optional[str]_ - The application name that will be used in logging. If absent, the source file name will be used.
+- `process_before_response` _bool_ - True if this app runs on Function as a Service. (Default: False)
+- `raise_error_for_unhandled_request` _bool_ - True if you want to raise exceptions for unhandled requests
   and use @app.error listeners instead of
   the built-in handler, which pints warning logs and returns 404 to Slack (Default: False)
-- `signing_secret` - The Signing Secret value used for verifying requests from Slack.
-- `token` - The bot/user access token required only for single-workspace app.
-- `token_verification_enabled` - Verifies the validity of the given token if True.
-- `client` - The singleton `slack_sdk.WebClient` instance for this app.
-- `before_authorize` - A global middleware that can be executed right before authorize function
-- `authorize` - The function to authorize an incoming request from Slack
+- `signing_secret` _Optional[str]_ - The Signing Secret value used for verifying requests from Slack.
+- `token` _Optional[str]_ - The bot/user access token required only for single-workspace app.
+- `token_verification_enabled` _bool_ - Verifies the validity of the given token if True.
+- `client` _Optional[WebClient]_ - The singleton `slack_sdk.WebClient` instance for this app.
+- `before_authorize` _Optional[Union[Middleware, Callable[..., Any]]]_ - A global middleware that can be executed right before authorize function
+- `authorize` _Optional[Callable[..., AuthorizeResult]]_ - The function to authorize an incoming request from Slack
   by checking if there is a team/user in the installation data.
-- `user_facing_authorize_error_message` - The user-facing error message to display
-  when the app is installed but the installation is not managed by this app&#x27;s installation store
-- `installation_store` - The module offering save/find operations of installation data
-- `installation_store_bot_only` - Use `InstallationStore#find_bot()` if True (Default: False)
-- `request_verification_enabled` - False if you would like to disable the built-in middleware (Default: True).
+- `user_facing_authorize_error_message` _Optional[str]_ - The user-facing error message to display
+  when the app is installed but the installation is not managed by this app's installation store
+- `installation_store` _Optional[InstallationStore]_ - The module offering save/find operations of installation data
+- `installation_store_bot_only` _Optional[bool]_ - Use `InstallationStore#find_bot()` if True (Default: False)
+- `request_verification_enabled` _bool_ - False if you would like to disable the built-in middleware (Default: True).
   `RequestVerification` is a built-in middleware that verifies the signature in HTTP Mode requests.
-  Make sure if it&#x27;s safe enough when you turn a built-in middleware off.
+  Make sure if it's safe enough when you turn a built-in middleware off.
   We strongly recommend using RequestVerification for better security.
   If you have a proxy that verifies request signature in front of the Bolt app,
-  it&#x27;s totally fine to disable RequestVerification to avoid duplication of work.
-  Don&#x27;t turn it off just for easiness of development.
-- `ignoring_self_events_enabled` - False if you would like to disable the built-in middleware (Default: True).
+  it's totally fine to disable RequestVerification to avoid duplication of work.
+  Don't turn it off just for easiness of development.
+- `ignoring_self_events_enabled` _bool_ - False if you would like to disable the built-in middleware (Default: True).
   `IgnoringSelfEvents` is a built-in middleware that enables Bolt apps to easily skip the events
-  generated by this app&#x27;s bot user (this is useful for avoiding code error causing an infinite loop).
-- `ignoring_self_assistant_message_events_enabled` - False if you would like to disable the built-in middleware.
-  `IgnoringSelfEvents` for this app&#x27;s bot user message events within an assistant thread
+  generated by this app's bot user (this is useful for avoiding code error causing an infinite loop).
+- `ignoring_self_assistant_message_events_enabled` _bool_ - False if you would like to disable the built-in middleware.
+  `IgnoringSelfEvents` for this app's bot user message events within an assistant thread
   This is useful for avoiding code error causing an infinite loop; Default: True
-- `url_verification_enabled` - False if you would like to disable the built-in middleware (Default: True).
+- `url_verification_enabled` _bool_ - False if you would like to disable the built-in middleware (Default: True).
   `UrlVerification` is a built-in middleware that handles url_verification requests
   that verify the endpoint for Events API in HTTP Mode requests.
-- `attaching_function_token_enabled` - False if you would like to disable the built-in middleware (Default: True).
+- `attaching_function_token_enabled` _bool_ - False if you would like to disable the built-in middleware (Default: True).
   `AttachingFunctionToken` is a built-in middleware that injects the just-in-time workflow-execution tokens
   when your app receives `function_executed` or interactivity events scoped to a custom step.
-- `ssl_check_enabled` - bool = False if you would like to disable the built-in middleware (Default: True).
+- `ssl_check_enabled` _bool_ - bool = False if you would like to disable the built-in middleware (Default: True).
   `SslCheck` is a built-in middleware that handles ssl_check requests from Slack.
-- `oauth_settings` - The settings related to Slack app installation flow (OAuth flow)
-- `oauth_flow` - Instantiated `slack_bolt.oauth.OAuthFlow`. This is always prioritized over oauth_settings.
-- `verification_token` - Deprecated verification mechanism. This can be used only for ssl_check requests.
-- `listener_executor` - Custom executor to run background tasks. If absent, the default `ThreadPoolExecutor` will
+- `oauth_settings` _Optional[OAuthSettings]_ - The settings related to Slack app installation flow (OAuth flow)
+- `oauth_flow` _Optional[OAuthFlow]_ - Instantiated `slack_bolt.oauth.OAuthFlow`. This is always prioritized over oauth_settings.
+- `verification_token` _Optional[str]_ - Deprecated verification mechanism. This can be used only for ssl_check requests.
+- `listener_executor` _Optional[Executor]_ - Custom executor to run background tasks. If absent, the default `ThreadPoolExecutor` will
   be used.
-- `assistant_thread_context_store` - Custom AssistantThreadContext store (Default: the built-in implementation,
-  which uses a parent message&#x27;s metadata to store the latest context)
+- `assistant_thread_context_store` _Optional[AssistantThreadContextStore]_ - Custom AssistantThreadContext store (Default: the built-in implementation,
+  which uses a parent message's metadata to store the latest context)
 
 #### name
 
@@ -195,9 +187,10 @@ def process_before_response() -> bool
 #### start
 
 ```python
-def start(port: int = 3000,
-          path: str = "/slack/events",
-          http_server_logger_enabled: bool = True) -> None
+def start(
+    port: int = 3000,
+    path: str = '/slack/events',
+    http_server_logger_enabled: bool = True) -> None
 ```
 
 Starts a web server for local development.
@@ -213,9 +206,9 @@ For production, consider using a production-ready WSGI server such as Gunicorn.
 
 **Arguments**:
 
-- `port` - The port to listen on (Default: 3000)
-- `path` - The path to handle request from Slack (Default: `/slack/events`)
-- `http_server_logger_enabled` - The flag to enable http.server logging if True (Default: True)
+- `port` _int_ - The port to listen on (Default: 3000)
+- `path` _str_ - The path to handle request from Slack (Default: `/slack/events`)
+- `http_server_logger_enabled` _bool_ - The flag to enable http.server logging if True (Default: True)
 
 #### dispatch
 
@@ -227,12 +220,11 @@ Applies all middleware and dispatches an incoming request from Slack to the righ
 
 **Arguments**:
 
-- `req` - An incoming request from Slack
-  
+- `req` _BoltRequest_ - An incoming request from Slack
 
 **Returns**:
 
-  The response generated by this Bolt app
+- `BoltResponse` - The response generated by this Bolt app
 
 #### use
 
@@ -242,7 +234,7 @@ def use(*args) -> Optional[Callable]
 
 Registers a new global middleware to this app. This method can be used as either a decorator or a method.
 
-Refer to `App#middleware()` method&#x27;s docstring for details.
+Refer to `App#middleware()` method's docstring for details.
 
 #### middleware
 
@@ -268,7 +260,7 @@ This method can be used as either a decorator or a method.
 
 Refer to https://docs.slack.dev/tools/bolt-python/concepts/global-middleware for details.
 
-To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#x27;s API document.
+To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
 **Arguments**:
 
@@ -283,23 +275,22 @@ def assistant(assistant: Assistant) -> Optional[Callable]
 #### step
 
 ```python
-def step(callback_id: Union[str, Pattern, WorkflowStep, WorkflowStepBuilder],
-         edit: Optional[Union[Callable[..., Optional[BoltResponse]], Listener,
-                              Sequence[Callable]]] = None,
-         save: Optional[Union[Callable[..., Optional[BoltResponse]], Listener,
-                              Sequence[Callable]]] = None,
-         execute: Optional[Union[Callable[..., Optional[BoltResponse]],
-                                 Listener, Sequence[Callable]]] = None)
+def step(
+    callback_id: Union[str, Pattern, WorkflowStep, WorkflowStepBuilder],
+    edit: Optional[Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]] = None,
+    save: Optional[Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]] = None,
+    execute: Optional[Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]] = None)
 ```
 
-Deprecated:
+**Deprecated**:
+
 Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
 Registers a new step from app listener.
 
-Unlike others, this method doesn&#x27;t behave as a decorator.
-If you want to register a step from app by a decorator, use `WorkflowStepBuilder`&#x27;s methods.
+Unlike others, this method doesn't behave as a decorator.
+If you want to register a step from app by a decorator, use `WorkflowStepBuilder`'s methods.
 
 ```python
     # Create a new WorkflowStep instance
@@ -316,7 +307,7 @@ If you want to register a step from app by a decorator, use `WorkflowStepBuilder
 
 Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details of steps from apps.
 
-To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#x27;s API document.
+To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
 For further information about WorkflowStep specific function arguments
 such as `configure`, `update`, `complete`, and `fail`,
@@ -324,17 +315,16 @@ refer to `slack_bolt.workflows.step.utilities` API documents.
 
 **Arguments**:
 
-- `callback_id` - The Callback ID for this step from app
-- `edit` - The function for displaying a modal in the Workflow Builder
-- `save` - The function for handling configuration in the Workflow Builder
-- `execute` - The function for handling the step execution
+- `callback_id` _Union[str, Pattern, WorkflowStep, WorkflowStepBuilder]_ - The Callback ID for this step from app
+- `edit` _Optional[Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]]_ - The function for displaying a modal in the Workflow Builder
+- `save` _Optional[Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]]_ - The function for handling configuration in the Workflow Builder
+- `execute` _Optional[Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]]_ - The function for handling the step execution
 
 #### error
 
 ```python
 def error(
-    func: Callable[..., Optional[BoltResponse]]
-) -> Callable[..., Optional[BoltResponse]]
+    func: Callable[..., Optional[BoltResponse]]) -> Callable[..., Optional[BoltResponse]]
 ```
 
 Updates the global error handler. This method can be used as either a decorator or a method.
@@ -352,26 +342,20 @@ Updates the global error handler. This method can be used as either a decorator 
     app.error(custom_error_handler)
 ```
 
-To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#x27;s API document.
+To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
 **Arguments**:
 
-- `func` - The function that is supposed to be executed
+- `func` _Callable[..., Optional[BoltResponse]]_ - The function that is supposed to be executed
   when getting an unhandled error in Bolt app.
 
 #### event
 
 ```python
 def event(
-    event: Union[
-        str,
-        Pattern,
-        Dict[str, Optional[Union[str, Sequence[Optional[Union[str,
-                                                              Pattern]]]]]],
-    ],
+    event: Union[str, Pattern, Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]]],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new event listener. This method can be used as either a decorator or a method.
@@ -393,29 +377,28 @@ Registers a new event listener. This method can be used as either a decorator or
 
 Refer to https://docs.slack.dev/apis/events-api/ for details of Events API.
 
-To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#x27;s API document.
+To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
 **Arguments**:
 
-- `event` - The conditions that match a request payload.
+- `event` _Union[str, Pattern, Dict[str, Optional[Union[str, Sequence[Optional[Union[str, Pattern]]]]]]]_ - The conditions that match a request payload.
   If you pass a dict for this, you can have type, subtype in the constraint.
-- `matchers` - A list of listener matcher functions.
+- `matchers` _Optional[Sequence[Callable[..., bool]]]_ - A list of listener matcher functions.
   Only when all the matchers return True, the listener function can be invoked.
-- `middleware` - A list of lister middleware functions.
+- `middleware` _Optional[Sequence[Union[Callable, Middleware]]]_ - A list of lister middleware functions.
   Only when all the middleware call `next()` method, the listener function can be invoked.
 
 #### message
 
 ```python
 def message(
-    keyword: Union[str, Pattern] = "",
+    keyword: Union[str, Pattern] = '',
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new message event listener. This method can be used as either a decorator or a method.
-Check the `App#event` method&#x27;s docstring for details.
+Check the `App#event` method's docstring for details.
 
 ```python
     # Use this method as a decorator
@@ -432,14 +415,14 @@ Check the `App#event` method&#x27;s docstring for details.
 
 Refer to https://docs.slack.dev/reference/events/message/ for details of `message` events.
 
-To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#x27;s API document.
+To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
 **Arguments**:
 
-- `keyword` - The keyword to match
-- `matchers` - A list of listener matcher functions.
+- `keyword` _Union[str, Pattern]_ - The keyword to match
+- `matchers` _Optional[Sequence[Callable[..., bool]]]_ - A list of listener matcher functions.
   Only when all the matchers return True, the listener function can be invoked.
-- `middleware` - A list of lister middleware functions.
+- `middleware` _Optional[Sequence[Union[Callable, Middleware]]]_ - A list of lister middleware functions.
   Only when all the middleware call `next()` method, the listener function can be invoked.
 
 #### function
@@ -450,8 +433,7 @@ def function(
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
     middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     auto_acknowledge: bool = True,
-    ack_timeout: int = 3
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    ack_timeout: int = 3) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new Function listener.
@@ -475,14 +457,14 @@ This method can be used as either a decorator or a method.
     app.function("reverse")(reverse_string)
 ```
 
-To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#x27;s API document.
+To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
 **Arguments**:
 
-- `callback_id` - The callback id to identify the function
-- `matchers` - A list of listener matcher functions.
+- `callback_id` _Union[str, Pattern]_ - The callback id to identify the function
+- `matchers` _Optional[Sequence[Callable[..., bool]]]_ - A list of listener matcher functions.
   Only when all the matchers return True, the listener function can be invoked.
-- `middleware` - A list of lister middleware functions.
+- `middleware` _Optional[Sequence[Union[Callable, Middleware]]]_ - A list of lister middleware functions.
   Only when all the middleware call `next()` method, the listener function can be invoked.
 
 #### command
@@ -491,8 +473,7 @@ To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_in
 def command(
     command: Union[str, Pattern],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new slash command listener.
@@ -514,14 +495,14 @@ This method can be used as either a decorator or a method.
 
 Refer to https://docs.slack.dev/interactivity/implementing-slash-commands/ for details of Slash Commands.
 
-To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#x27;s API document.
+To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
 **Arguments**:
 
-- `command` - The conditions that match a request payload
-- `matchers` - A list of listener matcher functions.
+- `command` _Union[str, Pattern]_ - The conditions that match a request payload
+- `matchers` _Optional[Sequence[Callable[..., bool]]]_ - A list of listener matcher functions.
   Only when all the matchers return True, the listener function can be invoked.
-- `middleware` - A list of lister middleware functions.
+- `middleware` _Optional[Sequence[Union[Callable, Middleware]]]_ - A list of lister middleware functions.
   Only when all the middleware call `next()` method, the listener function can be invoked.
 
 #### shortcut
@@ -530,8 +511,7 @@ To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_in
 def shortcut(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new shortcut listener.
@@ -559,14 +539,14 @@ This method can be used as either a decorator or a method.
 
 Refer to https://docs.slack.dev/interactivity/implementing-shortcuts/ for details about Shortcuts.
 
-To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#x27;s API document.
+To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
 **Arguments**:
 
-- `constraints` - The conditions that match a request payload.
-- `matchers` - A list of listener matcher functions.
+- `constraints` _Union[str, Pattern, Dict[str, Union[str, Pattern]]]_ - The conditions that match a request payload.
+- `matchers` _Optional[Sequence[Callable[..., bool]]]_ - A list of listener matcher functions.
   Only when all the matchers return True, the listener function can be invoked.
-- `middleware` - A list of lister middleware functions.
+- `middleware` _Optional[Sequence[Union[Callable, Middleware]]]_ - A list of lister middleware functions.
   Only when all the middleware call `next()` method, the listener function can be invoked.
 
 #### global\_shortcut
@@ -575,8 +555,7 @@ To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_in
 def global_shortcut(
     callback_id: Union[str, Pattern],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new global shortcut listener.
@@ -587,8 +566,7 @@ Registers a new global shortcut listener.
 def message_shortcut(
     callback_id: Union[str, Pattern],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new message shortcut listener.
@@ -599,8 +577,7 @@ Registers a new message shortcut listener.
 def action(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new action listener. This method can be used as either a decorator or a method.
@@ -621,14 +598,14 @@ Registers a new action listener. This method can be used as either a decorator o
 * Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons/ for actions in `attachments`.
 * Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for actions in dialogs.
 
-To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#x27;s API document.
+To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
 **Arguments**:
 
-- `constraints` - The conditions that match a request payload
-- `matchers` - A list of listener matcher functions.
+- `constraints` _Union[str, Pattern, Dict[str, Union[str, Pattern]]]_ - The conditions that match a request payload
+- `matchers` _Optional[Sequence[Callable[..., bool]]]_ - A list of listener matcher functions.
   Only when all the matchers return True, the listener function can be invoked.
-- `middleware` - A list of lister middleware functions.
+- `middleware` _Optional[Sequence[Union[Callable, Middleware]]]_ - A list of lister middleware functions.
   Only when all the middleware call `next()` method, the listener function can be invoked.
 
 #### block\_action
@@ -637,8 +614,7 @@ To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_in
 def block_action(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new `block_actions` action listener.
@@ -650,8 +626,7 @@ Refer to https://docs.slack.dev/reference/interaction-payloads/block_actions-pay
 def attachment_action(
     callback_id: Union[str, Pattern],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new `interactive_message` action listener.
@@ -663,8 +638,7 @@ Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons/ 
 def dialog_submission(
     callback_id: Union[str, Pattern],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new `dialog_submission` listener.
@@ -676,8 +650,7 @@ Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details.
 def dialog_cancellation(
     callback_id: Union[str, Pattern],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new `dialog_cancellation` listener.
@@ -689,8 +662,7 @@ Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details.
 def view(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new `view_submission`/`view_closed` event listener.
@@ -722,14 +694,14 @@ This method can be used as either a decorator or a method.
 
 Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload for details of payloads.
 
-To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#x27;s API document.
+To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
 **Arguments**:
 
-- `constraints` - The conditions that match a request payload
-- `matchers` - A list of listener matcher functions.
+- `constraints` _Union[str, Pattern, Dict[str, Union[str, Pattern]]]_ - The conditions that match a request payload
+- `matchers` _Optional[Sequence[Callable[..., bool]]]_ - A list of listener matcher functions.
   Only when all the matchers return True, the listener function can be invoked.
-- `middleware` - A list of lister middleware functions.
+- `middleware` _Optional[Sequence[Union[Callable, Middleware]]]_ - A list of lister middleware functions.
   Only when all the middleware call `next()` method, the listener function can be invoked.
 
 #### view\_submission
@@ -738,12 +710,11 @@ To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_in
 def view_submission(
     constraints: Union[str, Pattern],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new `view_submission` listener.
-Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/`view_submission` for
+Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for
 details.
 
 #### view\_closed
@@ -752,12 +723,11 @@ details.
 def view_closed(
     constraints: Union[str, Pattern],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new `view_closed` listener.
-Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/`view_closed` for details.
+Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_closed for details.
 
 #### options
 
@@ -765,8 +735,7 @@ Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions
 def options(
     constraints: Union[str, Pattern, Dict[str, Union[str, Pattern]]],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new options listener.
@@ -799,13 +768,13 @@ Refer to the following documents for details:
 * https://docs.slack.dev/reference/block-kit/block-elements/select-menu-element#external_select
 * https://docs.slack.dev/reference/block-kit/block-elements/multi-select-menu-element#external_multi_select
 
-To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`&#x27;s API document.
+To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
 **Arguments**:
 
-- `matchers` - A list of listener matcher functions.
+- `matchers` _Optional[Sequence[Callable[..., bool]]]_ - A list of listener matcher functions.
   Only when all the matchers return True, the listener function can be invoked.
-- `middleware` - A list of lister middleware functions.
+- `middleware` _Optional[Sequence[Union[Callable, Middleware]]]_ - A list of lister middleware functions.
   Only when all the middleware call `next()` method, the listener function can be invoked.
 
 #### block\_suggestion
@@ -814,8 +783,7 @@ To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_in
 def block_suggestion(
     action_id: Union[str, Pattern],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new `block_suggestion` listener.
@@ -826,8 +794,7 @@ Registers a new `block_suggestion` listener.
 def dialog_suggestion(
     callback_id: Union[str, Pattern],
     matchers: Optional[Sequence[Callable[..., bool]]] = None,
-    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None
-) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
+    middleware: Optional[Sequence[Union[Callable, Middleware]]] = None) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]
 ```
 
 Registers a new `dialog_suggestion` listener.
@@ -836,15 +803,13 @@ Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details.
 #### default\_tokens\_revoked\_event\_listener
 
 ```python
-def default_tokens_revoked_event_listener(
-) -> Callable[..., Optional[BoltResponse]]
+def default_tokens_revoked_event_listener() -> Callable[..., Optional[BoltResponse]]
 ```
 
 #### default\_app\_uninstalled\_event\_listener
 
 ```python
-def default_app_uninstalled_event_listener(
-) -> Callable[..., Optional[BoltResponse]]
+def default_app_uninstalled_event_listener() -> Callable[..., Optional[BoltResponse]]
 ```
 
 #### enable\_token\_revocation\_listeners
@@ -852,4 +817,3 @@ def default_app_uninstalled_event_listener(
 ```python
 def enable_token_revocation_listeners() -> None
 ```
-

@@ -20,8 +20,8 @@ def __init__(app: Chalice, config: Config) -> None
 #### invoke
 
 ```python
-def invoke(FunctionName: str,
-           InvocationType: str = "Event",
-           Payload: str = "{}") -> InvokeResponse
+def invoke(
+    FunctionName: str,
+    InvocationType: str = 'Event',
+    Payload: str = '{}') -> InvokeResponse
 ```
-

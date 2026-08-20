@@ -1,571 +1,534 @@
 #!/usr/bin/env python
-"""Generate the Markdown API reference for slack_bolt using pydoc-markdown.
+"""Generate the Markdown API reference for slack_bolt using griffe.
 
-This is invoked by scripts/generate_api_docs.sh. It exists as a Python driver
-(rather than a plain `pydoc-markdown` CLI call) because pydoc-markdown has no
-built-in way to inline re-exported objects: by default a module that only
-re-exports a class (e.g. slack_bolt/adapter/fastapi/__init__.py re-exporting
-SlackRequestHandler from the starlette adapter) renders as an empty page, and
-the class is documented only at its definition site.
+Invoked by scripts/generate_api_docs.sh. griffe (the parser behind
+mkdocstrings) is used purely as the extraction engine: it loads the package,
+resolves re-export aliases to their concrete definition, and parses Google-style
+docstrings into structured sections. This module renders that structured data
+into the Docusaurus-flavored Markdown tree the docs site imports.
 
-pdoc3 (the previous generator) inlined re-exports at every re-export site, so
-framework-specific pages such as adapter/fastapi showed their handler class.
-To preserve that behavior, inline_reexports() resolves each re-export to the
-concrete Class/Function and splices a copy in under the exported name.
+Using griffe removes three workarounds the previous pydoc-markdown driver
+needed:
+
+  * re-export inlining -- griffe models ``from .x import Y`` as an Alias whose
+    ``.target`` is the concrete class/function, so re-export-only modules (e.g.
+    adapter/fastapi/__init__.py) render the class inline with no manual index
+    walking.
+  * docstring code-fence ordering -- griffe's Google parser keeps fenced
+    examples in their original position within a ``text`` section, so no
+    order-preserving processor subclass is required.
+  * the HTML-escaper token-collision bug -- there is no token-replace escaping
+    pass here; MDX-hazardous characters are escaped inline, outside code spans.
+
+The output layout (flattened under ``reference/``, package overviews as
+``index.md``, an import-ready ``sidebar.json``) is produced directly rather than
+rendered and then rewritten.
 """
 
-import copy
-import html
 import json
 import os
 import re
 
-import docspec
-from pydoc_markdown import PydocMarkdown
-from pydoc_markdown.contrib.processors.google import GoogleProcessor, generate_sections_markdown
-from pydoc_markdown.contrib.processors.smart import SmartProcessor
-from pydoc_markdown.contrib.renderers import markdown as _markdown_renderer
+import griffe
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# The API reference lives under the English docs tree. docs_base_path is the
+# The API reference lives under the English docs tree. DOCS_BASE_PATH is the
 # directory Docusaurus doc IDs are relative to; the reference is written to
 # DOCS_BASE_PATH/REFERENCE_SUBDIR.
 DOCS_BASE_PATH = os.path.join(REPO_ROOT, "docs", "english")
 REFERENCE_SUBDIR = "reference"
 
+# The docs site (docs.slack.dev) imports the generated sidebar.json into its
+# sidebars.js and appends it under "Bolt for Python". Its doc IDs resolve
+# relative to the docs root there, hence the prefix.
+SIDEBAR_DOC_ID_PREFIX = "tools/bolt-python/"
 
-def _escape_except_code(string):
-    """HTML-escape a docstring while leaving fenced blocks and inline code spans
-    untouched.
+# Signatures longer than this render one parameter per line.
+MAX_SIGNATURE_WIDTH = 88
 
-    This replaces pydoc-markdown's own ``escape_except_blockquotes``, which has a
-    token-collision bug: it swaps each code span for a ``BLOCKQUOTE_TOKEN_<i>``
-    placeholder and later restores them with ``str.replace``. Once a docstring has
-    more than ten code spans, restoring ``BLOCKQUOTE_TOKEN_1`` also rewrites the
-    ``BLOCKQUOTE_TOKEN_1`` prefix of ``BLOCKQUOTE_TOKEN_10``/``_11``/..., which
-    duplicates whatever token 1 held (often a whole fenced code block) into later
-    spans and leaves stray ``0``/``1`` digits behind. Bolt's ``App.step`` docstring
-    (a fenced example plus a many-item ``Args:`` list) triggers exactly this.
-
-    The fix uses NUL-delimited placeholders so no placeholder is a prefix of
-    another, and restores each exactly once.
-    """
-    triple = r"```[\s\S]*?```"
-    single = r"`[^`]*`"
-    matches = re.findall("({}|{})".format(triple, single), string)
-    for i, match in enumerate(matches):
-        string = string.replace(match, "\x00CODE{}\x00".format(i), 1)
-    escaped = html.escape(string)
-    for i, match in enumerate(matches):
-        escaped = escaped.replace("\x00CODE{}\x00".format(i), match, 1)
-    return escaped
+PACKAGE = "slack_bolt"
 
 
-CONFIG = {
-    "loaders": [
-        {"type": "python", "search_path": [REPO_ROOT], "packages": ["slack_bolt"]},
-    ],
-    "processors": [
-        # documented_only=False keeps signatures for members that lack a
-        # docstring (matching pdoc3). The expression drops private names and
-        # Indirection members (bare imports/re-exports) so imported symbols
-        # like Optional/WebClient do not leak in as empty headings. __init__ is
-        # explicitly kept: constructors carry the class's `Args:` docstring
-        # (e.g. BoltRequest), which pdoc3 folded onto the class page -- without
-        # this exception every per-argument description would be dropped.
-        {
-            "type": "filter",
-            "documented_only": False,
-            "exclude_private": True,
-            "expression": (
-                '(name == "__init__" or not name.startswith("_")) and default() '
-                'and obj.__class__.__name__ != "Indirection"'
-            ),
-        },
-        {"type": "smart"},
-        {"type": "crossref"},
-    ],
-    "renderer": {
-        "type": "docusaurus",
-        "docs_base_path": DOCS_BASE_PATH,
-        "relative_output_path": REFERENCE_SUBDIR,
-        "markdown": {
-            "render_typehint_in_data_header": True,
-        },
-    },
-}
+# --------------------------------------------------------------------------- #
+# MDX escaping
+# --------------------------------------------------------------------------- #
+
+# Docusaurus v3 parses every .md file as MDX: a bare ``<`` reads as JSX and a
+# bare ``{`` as a JS expression, either of which aborts the docs build. Escape
+# those two characters in prose while leaving fenced blocks and inline code
+# spans untouched.
+_CODE_SPLIT_RE = re.compile(r"(```[\s\S]*?```|`[^`]*`)")
 
 
-class OrderedGoogleProcessor(GoogleProcessor):
-    """GoogleProcessor that keeps fenced code blocks in their original position.
-
-    The stock GoogleProcessor buffers every line into ``current_lines`` and only
-    flushes it when a section keyword (``Args:`` etc.) is reached. A fenced code
-    block that appears *before* any section keyword therefore gets held back and
-    re-emitted after the intervening prose, leaving a blank gap where it was.
-    bolt-python docstrings routinely show a usage example first and then prose,
-    so this reorders them. This override sends pre-keyword lines (including code
-    fences) straight to the output so their order is preserved, while keeping the
-    stock Google-style ``Args:`` -> ``**Arguments**`` section rendering.
-    """
-
-    def _process(self, node):
-        if not node.docstring:
-            return
-        lines = []
-        current_lines = []
-        in_codeblock = False
-        keyword = None
-
-        def _commit():
-            if keyword:
-                generate_sections_markdown(lines, {keyword: current_lines})
-            else:
-                lines.extend(current_lines)
-            current_lines.clear()
-
-        for line in node.docstring.content.split("\n"):
-            if line.lstrip().startswith("```"):
-                in_codeblock = not in_codeblock
-                (current_lines if keyword else lines).append(line)
-                continue
-
-            if in_codeblock:
-                (current_lines if keyword else lines).append(line)
-                continue
-
-            line = line.strip()
-            if line in self._keywords_map:
-                _commit()
-                keyword = self._keywords_map[line]
-                continue
-
-            if keyword is None:
-                lines.append(line)
-                continue
-
-            param_match = None
-            for param_re in self._param_res:
-                param_match = param_re.match(line)
-                if param_match:
-                    groups = param_match.groupdict()
-                    if "type" in groups:
-                        current_lines.append("- `{param}` _{type}_ - {desc}".format(**groups))
-                    else:
-                        current_lines.append("- `{param}` - {desc}".format(**groups))
-                    break
-
-            if not param_match:
-                current_lines.append("  {line}".format(line=line))
-
-        _commit()
-        node.docstring.content = "\n".join(lines)
+def _escape_mdx(text):
+    """Escape MDX-hazardous characters outside code spans and fenced blocks."""
+    out = []
+    for i, chunk in enumerate(_CODE_SPLIT_RE.split(text)):
+        # Odd indices are the captured code spans/blocks -- leave them verbatim.
+        if i % 2 == 1:
+            out.append(chunk)
+        else:
+            out.append(chunk.replace("<", "&lt;").replace("{", "&#123;"))
+    return "".join(out)
 
 
-def _use_ordered_google_processor(session):
-    """Swap the stock GoogleProcessor inside the `smart` processor for the
-    order-preserving subclass above."""
-    for processor in session.processors:
-        if isinstance(processor, SmartProcessor):
-            processor.google = OrderedGoogleProcessor()
+def _escape_header(name):
+    """Escape a name for use in a Markdown header (underscores/asterisks)."""
+    return name.replace("_", "\\_").replace("*", "\\*")
 
 
-def _build_index(modules):
-    """Map every member's fully-qualified name to its docspec object, and
-    return the set of names that are packages (have submodules)."""
-    index = {}
-    module_names = set()
+# --------------------------------------------------------------------------- #
+# Signatures
+# --------------------------------------------------------------------------- #
 
-    def visit(obj, prefix):
-        fqn = "{}.{}".format(prefix, obj.name) if prefix else obj.name
-        index[fqn] = obj
-        for child in getattr(obj, "members", None) or []:
-            visit(child, fqn)
-
-    for mod in modules:
-        module_names.add(mod.name)
-        visit(mod, "")
-
-    packages = {
-        name for name in module_names if any(other != name and other.startswith(name + ".") for other in module_names)
-    }
-    return index, packages
+_VAR_POSITIONAL = "variadic positional"
+_VAR_KEYWORD = "variadic keyword"
+_POSITIONAL_ONLY = "positional-only"
+_KEYWORD_ONLY = "keyword-only"
 
 
-def _resolve_target(target, module_name, packages):
-    """Resolve a relative Indirection target to an absolute FQN using Python
-    import semantics. For a package __init__, one leading dot is the package
-    itself; for a regular module it is the containing package."""
-    if not target.startswith("."):
+def _parameter_source(param):
+    """Render a single parameter as Python source (``name: type = default``)."""
+    if param.kind.value == _VAR_POSITIONAL:
+        text = "*" + param.name
+    elif param.kind.value == _VAR_KEYWORD:
+        text = "**" + param.name
+    else:
+        text = param.name
+
+    annotation = str(param.annotation) if param.annotation is not None else None
+    default = str(param.default) if param.default is not None else None
+    if annotation:
+        text += ": " + annotation
+    if default is not None and param.kind.value not in (_VAR_POSITIONAL, _VAR_KEYWORD):
+        text += " = " + default if annotation else "=" + default
+    return text
+
+
+def _parameter_list(func, drop_first_self):
+    """Build the ordered parameter fragments for a function, inserting the
+    ``/`` (positional-only) and bare ``*`` (keyword-only) separators the way
+    ``inspect.Signature`` does."""
+    params = list(func.parameters)
+    if drop_first_self and params and params[0].name in ("self", "cls"):
+        params = params[1:]
+
+    fragments = []
+    render_pos_only_sep = False
+    render_kw_only_sep = True
+    for param in params:
+        kind = param.kind.value
+        if kind == _POSITIONAL_ONLY:
+            render_pos_only_sep = True
+        elif render_pos_only_sep:
+            fragments.append("/")
+            render_pos_only_sep = False
+
+        if kind == _VAR_POSITIONAL:
+            render_kw_only_sep = False
+        elif kind == _KEYWORD_ONLY and render_kw_only_sep:
+            fragments.append("*")
+            render_kw_only_sep = False
+
+        fragments.append(_parameter_source(param))
+
+    if render_pos_only_sep:
+        fragments.append("/")
+    return fragments
+
+
+def _format_function_signature(func, name, is_method):
+    """Render a ``def``/``async def`` signature, wrapping long ones one
+    parameter per line."""
+    prefix = "async def " if "async" in (func.labels or set()) else "def "
+    fragments = _parameter_list(func, drop_first_self=is_method)
+    returns = " -> {}".format(func.returns) if func.returns is not None else ""
+
+    one_line = "{}{}({}){}".format(prefix, name, ", ".join(fragments), returns)
+    if len(one_line) <= MAX_SIGNATURE_WIDTH:
+        return one_line
+
+    inner = ",\n".join("    " + fragment for fragment in fragments)
+    return "{}{}(\n{}){}".format(prefix, name, inner, returns)
+
+
+def _format_classdef_signature(cls):
+    """Render a ``class Name(bases)`` signature."""
+    bases = ", ".join(str(base) for base in cls.bases)
+    return "class {}({})".format(cls.name, bases)
+
+
+def _property_signature(attr):
+    """Render a property as a ``@property``-decorated getter."""
+    returns = " -> {}".format(attr.annotation) if attr.annotation is not None else ""
+    return "@property\ndef {}(){}".format(attr.name, returns)
+
+
+# --------------------------------------------------------------------------- #
+# Docstrings
+# --------------------------------------------------------------------------- #
+
+
+def _indent_continuation(text):
+    """Indent wrapped continuation lines of a list item by two spaces."""
+    return _escape_mdx(text).replace("\n", "\n  ")
+
+
+def _render_docstring(obj, out):
+    """Append an object's docstring, section by section, to ``out``."""
+    if not obj.docstring:
+        return
+    for section in obj.docstring.parsed:
+        kind = section.kind.value
+        if kind == "text":
+            out.append(_escape_mdx(section.value))
+            out.append("")
+        elif kind == "parameters":
+            out.append("**Arguments**:")
+            out.append("")
+            for param in section.value:
+                typ = " _{}_".format(param.annotation) if param.annotation else ""
+                if param.description:
+                    out.append("- `{}`{} - {}".format(param.name, typ, _indent_continuation(param.description)))
+                else:
+                    out.append("- `{}`{}".format(param.name, typ))
+            out.append("")
+        elif kind == "returns":
+            out.append("**Returns**:")
+            out.append("")
+            for ret in section.value:
+                bits = []
+                if ret.annotation:
+                    bits.append("`{}`".format(ret.annotation))
+                if ret.description:
+                    bits.append(_indent_continuation(ret.description))
+                out.append("- " + " - ".join(bits))
+            out.append("")
+        elif kind == "raises":
+            out.append("**Raises**:")
+            out.append("")
+            for exc in section.value:
+                typ = "`{}`".format(exc.annotation) if exc.annotation else ""
+                if exc.description:
+                    out.append("- {} - {}".format(typ, _indent_continuation(exc.description)))
+                else:
+                    out.append("- {}".format(typ))
+            out.append("")
+        elif kind == "admonition":
+            label = (section.value.kind or "note").replace("-", " ").title()
+            out.append("**{}**:".format(label))
+            out.append("")
+            out.append(_escape_mdx(section.value.contents))
+            out.append("")
+        else:
+            # Unknown/rare section (examples, yields, ...): render its text form.
+            out.append(_escape_mdx(str(getattr(section.value, "contents", section.value))))
+            out.append("")
+
+
+# --------------------------------------------------------------------------- #
+# Member selection (with re-export inlining)
+# --------------------------------------------------------------------------- #
+
+
+def _is_public(name):
+    """Keep public names plus ``__init__`` (constructors carry the class's
+    ``Args:``); drop every other dunder/private name."""
+    return name == "__init__" or not name.startswith("_")
+
+
+def _inlined_export_target(alias):
+    """If *alias* re-exports a concrete slack_bolt class/function, return it."""
+    try:
+        target = alias.target
+    except Exception:
+        return None
+    if target.canonical_path.startswith(PACKAGE + ".") and target.kind.value in ("class", "function"):
         return target
-    dots = len(target) - len(target.lstrip("."))
-    rest = target[dots:]
-    containing_pkg = module_name if module_name in packages else module_name.rsplit(".", 1)[0]
-    up = dots - 1
-    base_parts = containing_pkg.split(".")
-    base = base_parts[: len(base_parts) - up] if up else base_parts
-    return ".".join(base + ([rest] if rest else [])) if base else rest
-
-
-def _follow(fqn, index, packages, seen):
-    """Follow an indirection chain to the concrete Class/Function, or None."""
-    if fqn in seen:
-        return None
-    seen.add(fqn)
-    obj = index.get(fqn)
-    if obj is None:
-        return None
-    if isinstance(obj, (docspec.Class, docspec.Function)):
-        return obj
-    if type(obj).__name__ == "Indirection":
-        parent = fqn.rsplit(".", 1)[0]
-        return _follow(_resolve_target(obj.target, parent, packages), index, packages, seen)
     return None
 
 
-def inline_reexports(modules):
-    """Replace re-export Indirections with a copy of the object they point to,
-    so re-export-only modules render the class/function inline."""
-    index, packages = _build_index(modules)
-    inlined = 0
-    for mod in modules:
-        new_members = []
-        for member in mod.members:
-            if type(member).__name__ == "Indirection":
-                fqn = _resolve_target(member.target, mod.name, packages)
-                target_obj = _follow(fqn, index, packages, set())
-                if target_obj is not None:
-                    clone = copy.deepcopy(target_obj)
-                    clone.name = member.name
-                    new_members.append(clone)
-                    inlined += 1
-                    continue
-            new_members.append(member)
-        mod.members = new_members
-    print("Inlined {} re-exported objects".format(inlined))
+def _documented_members(parent):
+    """Yield ``(display_name, object)`` pairs to document under *parent*.
 
-
-def main():
-    # The docusaurus renderer writes sidebar.json into the output directory and
-    # expects it to already exist.
-    os.makedirs(os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR), exist_ok=True)
-
-    # Replace pydoc-markdown's buggy code-span-preserving HTML escaper (see
-    # _escape_except_code for the bug it fixes). The MarkdownRenderer looks the
-    # function up on its own module at render time, so patching it here is enough.
-    _markdown_renderer.escape_except_blockquotes = _escape_except_code
-
-    session = PydocMarkdown()
-    session.load_config(CONFIG)
-    _use_ordered_google_processor(session)
-    modules = session.load_modules()
-    inline_reexports(modules)
-    session.process(modules)
-    session.render(modules)
-    _rename_package_indexes()
-    _flatten_top_package()
-    _label_top_level_module_docs()
-    _disambiguate_folder_named_docs()
-    _add_submodule_links()
-    _check_mdx_hazards()
-    _finalize_reference_sidebar()
-    _strip_reference_from_site_sidebar()
-
-
-def _rename_package_indexes():
-    """Rename each package's ``__init__.md`` to ``index.md`` and rewrite the
-    generated ``sidebar.json`` to match.
-
-    The docusaurus renderer writes a package's docs to ``<pkg>/__init__.md``,
-    whose Docusaurus route is ``.../<pkg>/__init__`` -- there is no document at
-    the bare ``.../<pkg>/`` URL. Docusaurus serves ``index.md`` at the folder
-    URL, so renaming makes ``.../reference/slack_bolt/`` resolve (the path the
-    sidebar's Reference link points at) instead of 404ing.
-    """
-    reference_dir = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR)
-    renamed = 0
-    for dirpath, _dirnames, filenames in os.walk(reference_dir):
-        if "__init__.md" in filenames:
-            os.replace(
-                os.path.join(dirpath, "__init__.md"),
-                os.path.join(dirpath, "index.md"),
-            )
-            renamed += 1
-
-    sidebar_path = os.path.join(reference_dir, "sidebar.json")
-    with open(sidebar_path, encoding="utf-8") as handle:
-        sidebar = json.load(handle)
-
-    def rewrite(node):
-        if isinstance(node, str):
-            return node[: -len("__init__")] + "index" if node.endswith("/__init__") else node
-        if isinstance(node, list):
-            return [rewrite(item) for item in node]
-        if isinstance(node, dict):
-            return {key: rewrite(value) for key, value in node.items()}
-        return node
-
-    with open(sidebar_path, "w", encoding="utf-8") as handle:
-        json.dump(rewrite(sidebar), handle, indent=2)
-        handle.write("\n")
-
-    print("Renamed {} package __init__.md files to index.md".format(renamed))
-
-
-def _flatten_top_package():
-    """Hoist ``reference/slack_bolt/*`` up to ``reference/*`` so the reference
-    root URL is ``/reference`` instead of ``/reference/slack_bolt``.
-
-    The renderer mirrors the Python package layout, nesting everything under a
-    ``slack_bolt/`` directory. Since the entire reference *is* slack_bolt, that
-    segment is redundant in every URL. Moving the package contents up one level
-    turns ``.../reference/slack_bolt/`` into ``.../reference/`` (the package
-    overview becomes the reference landing page) and ``.../reference/slack_bolt/
-    app/app`` into ``.../reference/app/app``. Sidebar labels (``slack_bolt.app``)
-    are unaffected; only the doc-ID paths in sidebar.json are rewritten to match."""
-    reference_dir = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR)
-    package_dir = os.path.join(reference_dir, "slack_bolt")
-    if not os.path.isdir(package_dir):
-        raise SystemExit("Expected {} to exist before flattening".format(package_dir))
-
-    for entry in os.listdir(package_dir):
-        source = os.path.join(package_dir, entry)
-        target = os.path.join(reference_dir, entry)
-        if os.path.exists(target):
-            raise SystemExit("Flatten would clobber existing {}".format(target))
-        os.replace(source, target)
-    os.rmdir(package_dir)
-
-    sidebar_path = os.path.join(reference_dir, "sidebar.json")
-    with open(sidebar_path, encoding="utf-8") as handle:
-        sidebar = json.load(handle)
-
-    old_prefix = "{}/slack_bolt".format(REFERENCE_SUBDIR)
-    new_prefix = REFERENCE_SUBDIR
-
-    def rewrite(node):
-        if isinstance(node, str):
-            if node == old_prefix:
-                return new_prefix
-            if node.startswith(old_prefix + "/"):
-                return new_prefix + node[len(old_prefix) :]
-            return node
-        if isinstance(node, list):
-            return [rewrite(item) for item in node]
-        if isinstance(node, dict):
-            return {key: rewrite(value) for key, value in node.items()}
-        return node
-
-    with open(sidebar_path, "w", encoding="utf-8") as handle:
-        json.dump(rewrite(sidebar), handle, indent=2)
-        handle.write("\n")
-
-    print("Flattened reference/slack_bolt/* to reference/*")
-
-
-def _label_top_level_module_docs():
-    """Rewrite each top-level module doc's ``sidebar_label`` frontmatter to its
-    fully-qualified dotted name.
-
-    Subpackages render as sidebar categories the renderer labels ``slack_bolt.<name>``,
-    but a top-level *module* (slack_bolt/async_app.py, slack_bolt/version.py, after
-    flattening) becomes a leaf doc whose ``sidebar_label`` is the bare name
-    (``async_app``/``version``). Sitting beside the ``slack_bolt.*`` categories,
-    those read inconsistently. The reliable fix is to set the doc's own
-    ``sidebar_label`` -- Docusaurus always honors it, regardless of whether the
-    sidebar item is a bare string or an object -- so the leaf's ``title``
-    (``slack_bolt.async_app``) is copied over ``sidebar_label``. Only the direct
-    ``.md`` children of reference/ are top-level modules; ``index.md`` (the package
-    overview) and nested module docs are left alone."""
-    reference_dir = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR)
-    relabeled = 0
-    for filename in os.listdir(reference_dir):
-        if not filename.endswith(".md") or filename == "index.md":
+    Submodules are skipped (they become their own files). Aliases are inlined
+    only when they are declared in the module's ``__all__`` and resolve to a
+    concrete slack_bolt class/function, so genuine public re-exports render
+    inline while incidental imports do not."""
+    exports = set(parent.exports or []) if parent.is_module else set()
+    members = []
+    for name, member in parent.members.items():
+        if member.is_alias:
+            if name in exports:
+                target = _inlined_export_target(member)
+                if target is not None:
+                    members.append((name, target))
             continue
-        path = os.path.join(reference_dir, filename)
-        if not os.path.isfile(path):
+        if member.is_module:
             continue
-        with open(path, encoding="utf-8") as handle:
-            text = handle.read()
-        if not text.startswith("---\n"):
-            raise SystemExit("Expected frontmatter in {}".format(path))
-        end = text.index("\n---\n", 4)
-        frontmatter = text[4:end]
-        body = text[end + len("\n---\n") :]
-        title = re.search(r"^title:\s*(.+)$", frontmatter, re.M)
-        if not title:
+        if not _is_public(name):
             continue
-        frontmatter = re.sub(r"^sidebar_label:\s*.+$", "sidebar_label: " + title.group(1).strip(), frontmatter, count=1, flags=re.M)
+        # Drop undocumented instance attributes (bare ``self.x = x`` assignments
+        # with neither a type annotation nor a docstring) -- they are
+        # implementation detail. Class- and module-level constants are kept.
+        labels = member.labels or set()
+        if member.kind.value == "attribute" and labels == {"instance-attribute"}:
+            if member.annotation is None and not member.docstring:
+                continue
+        members.append((name, member))
+    return members
+
+
+# --------------------------------------------------------------------------- #
+# Object rendering
+# --------------------------------------------------------------------------- #
+
+
+def _render_object(display_name, obj, out):
+    """Append the Markdown for a single class/function/attribute to ``out``."""
+    kind = obj.kind.value
+
+    if kind == "class":
+        out.append("## {} Objects".format(_escape_header(obj.name)))
+        out.append("")
+        out.append("```python")
+        out.append(_format_classdef_signature(obj))
+        out.append("```")
+        out.append("")
+        _render_docstring(obj, out)
+        for child_name, child in _documented_members(obj):
+            _render_object(child_name, child, out)
+        return
+
+    if kind == "function":
+        is_method = obj.parent is not None and obj.parent.kind.value == "class"
+        out.append("#### {}".format(_escape_header(display_name)))
+        out.append("")
+        out.append("```python")
+        out.append(_format_function_signature(obj, display_name, is_method))
+        out.append("```")
+        out.append("")
+        _render_docstring(obj, out)
+        return
+
+    # Attribute -- a property renders as a getter, a plain variable as a header
+    # carrying its type hint (no value block).
+    if "property" in (obj.labels or set()):
+        out.append("#### {}".format(_escape_header(display_name)))
+        out.append("")
+        out.append("```python")
+        out.append(_property_signature(obj))
+        out.append("```")
+        out.append("")
+    elif obj.annotation is not None:
+        out.append("#### {}: `{}`".format(_escape_header(display_name), obj.annotation))
+        out.append("")
+    else:
+        out.append("#### {}".format(_escape_header(display_name)))
+        out.append("")
+    _render_docstring(obj, out)
+
+
+# --------------------------------------------------------------------------- #
+# Module -> page
+# --------------------------------------------------------------------------- #
+
+
+def _relative_path(module):
+    """Path of *module* relative to the top package (``""`` for slack_bolt)."""
+    if module.name == PACKAGE:
+        return ""
+    return module.canonical_path.split(".", 1)[1].replace(".", "/")
+
+
+def _iter_modules(module):
+    """Yield *module* and every submodule, depth-first in source order."""
+    yield module
+    for member in module.members.values():
+        if not member.is_alias and member.is_module:
+            yield from _iter_modules(member)
+
+
+def _render_body(module):
+    """Render a module's members (its docstring is intentionally omitted to
+    match the reference's member-focused layout)."""
+    out = []
+    for name, obj in _documented_members(module):
+        _render_object(name, obj, out)
+    return "\n".join(out).rstrip("\n") + "\n" if out else ""
+
+
+# --------------------------------------------------------------------------- #
+# Routes and the sidebar
+# --------------------------------------------------------------------------- #
+
+
+def _doc_id(rel_path, is_package):
+    """Docs-root doc ID for a module, e.g. ``reference/app/app`` or the package
+    overview ``reference/app/index``."""
+    if not rel_path:
+        base = REFERENCE_SUBDIR + "/index"
+    elif is_package:
+        base = "{}/{}/index".format(REFERENCE_SUBDIR, rel_path)
+    else:
+        base = "{}/{}".format(REFERENCE_SUBDIR, rel_path)
+    return SIDEBAR_DOC_ID_PREFIX + base
+
+
+def _doc_route(doc_id):
+    """Absolute Docusaurus route for a doc ID (``.../index`` served at folder)."""
+    route = "/" + doc_id
+    if route.endswith("/index"):
+        route = route[: -len("/index")]
+    return route
+
+
+# --------------------------------------------------------------------------- #
+# Generation
+# --------------------------------------------------------------------------- #
+
+
+def _load_package():
+    return griffe.load(
+        PACKAGE,
+        search_paths=[REPO_ROOT],
+        docstring_parser=griffe.Parser.google,
+    )
+
+
+def _build_pages(root):
+    """Render every module into an in-memory page record."""
+    pages = {}
+    for module in _iter_modules(root):
+        rel_path = _relative_path(module)
+        is_package = os.path.basename(str(module.filepath)) == "__init__.py"
+        dotted = module.canonical_path
+        if not rel_path:
+            sidebar_label = dotted
+        elif is_package:
+            sidebar_label = rel_path.rsplit("/", 1)[-1]
+        elif "/" in rel_path:
+            sidebar_label = rel_path.rsplit("/", 1)[-1]
+        else:
+            # Top-level leaf module (async_app, version): full dotted name reads
+            # consistently beside the slack_bolt.* package categories.
+            sidebar_label = dotted
+        pages[rel_path] = {
+            "module": module,
+            "is_package": is_package,
+            "title": dotted,
+            "sidebar_label": sidebar_label,
+            "doc_id": _doc_id(rel_path, is_package),
+            "body": _render_body(module),
+        }
+    return pages
+
+
+def _submodule_links(rel_path, pages):
+    """Sorted child module/subpackage links for a package overview page."""
+    prefix = rel_path + "/" if rel_path else ""
+    depth = prefix.count("/")
+    children = []
+    for other_rel, page in pages.items():
+        if not other_rel or not other_rel.startswith(prefix):
+            continue
+        if other_rel.count("/") != depth:
+            continue
+        children.append((page["title"], _doc_route(page["doc_id"])))
+    children.sort()
+    return children
+
+
+def _write_pages(pages):
+    reference_dir = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR)
+    for rel_path, page in pages.items():
+        if page["is_package"] or not rel_path:
+            path = os.path.join(reference_dir, rel_path, "index.md")
+        else:
+            path = os.path.join(reference_dir, rel_path + ".md")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+
+        frontmatter = ["---", "sidebar_label: {}".format(page["sidebar_label"]), "title: {}".format(page["title"])]
+        # A module whose file is <folder>/<folder>.md collides with the folder's
+        # index.md route; pin it with a relative slug.
+        basename = os.path.basename(path)[: -len(".md")]
+        parent = os.path.basename(os.path.dirname(path))
+        if basename == parent and basename != "index":
+            frontmatter.append("slug: {}".format(basename))
+        frontmatter.append("---")
+
+        body_parts = []
+        if page["is_package"] or not rel_path:
+            links = _submodule_links(rel_path, pages)
+            if links:
+                body_parts.append("## Submodules")
+                body_parts.append("")
+                body_parts += ["- [{}]({})".format(title, route) for title, route in links]
+                body_parts.append("")
+        if page["body"]:
+            body_parts.append(page["body"])
+
         with open(path, "w", encoding="utf-8") as handle:
-            handle.write("---\n" + frontmatter + "\n---\n" + body)
-        relabeled += 1
-    print("Relabeled {} top-level module docs' sidebar_label with dotted names".format(relabeled))
+            handle.write("\n".join(frontmatter) + "\n\n" + "\n".join(body_parts).rstrip("\n") + "\n")
 
 
-def _disambiguate_folder_named_docs():
-    """Give each ``<folder>/<folder>.md`` module doc an explicit relative slug so
-    it stops colliding with the package's ``index.md``.
+def _build_sidebar(pages):
+    """Build the import-ready "Reference" category from the page tree."""
 
-    Docusaurus routes three filenames to a folder's own URL: ``index.md``,
-    ``README.md``, and ``<foldername>.md``. A subpackage that also contains a
-    same-named module -- e.g. ``slack_bolt/app`` with the module ``app.py`` --
-    therefore renders both ``app/index.md`` (the package, from _rename_package_indexes)
-    and ``app/app.md`` (the module) at the same route ``.../app/``, which trips
-    Docusaurus's "Duplicate routes" warning and is non-deterministic. Setting a
-    relative ``slug: <foldername>`` on the module doc pins it to ``.../app/app``
-    while the package keeps ``.../app/``. The slug is relative (no leading "/") so
-    it stays correct under whatever base path the docs site mounts the tree at;
-    doc IDs are unchanged, so sidebar entries still resolve."""
-    reference_dir = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR)
-    fixed = 0
-    for dirpath, _dirnames, filenames in os.walk(reference_dir):
-        name = os.path.basename(dirpath)
-        module_doc = name + ".md"
-        if "index.md" in filenames and module_doc in filenames:
-            path = os.path.join(dirpath, module_doc)
-            with open(path, encoding="utf-8") as handle:
-                text = handle.read()
-            # The renderer always emits YAML frontmatter as the first block:
-            # "---\n<frontmatter>\n---\n<body>".
-            opening = "---\n"
-            closing = "\n---\n"
-            if not text.startswith(opening):
-                raise SystemExit("Expected frontmatter in {}".format(path))
-            end = text.index(closing, len(opening))
-            frontmatter = text[len(opening) : end]
-            body = text[end + len(closing) :]
-            if "\nslug:" not in ("\n" + frontmatter):
-                frontmatter = frontmatter.rstrip("\n") + "\nslug: {}".format(name)
-            text = opening + frontmatter + closing + body
-            with open(path, "w", encoding="utf-8") as handle:
-                handle.write(text)
-            fixed += 1
+    def category(rel_path, depth):
+        page = pages[rel_path]
+        label = page["title"] if depth <= 1 else page["title"].rsplit(".", 1)[-1]
+        prefix = rel_path + "/" if rel_path else ""
+        child_depth = prefix.count("/")
 
-    print("Disambiguated {} folder-named module docs with an explicit slug".format(fixed))
+        subcategories = []
+        leaves = []
+        for other_rel, other in sorted(pages.items()):
+            if other_rel == rel_path or not other_rel.startswith(prefix):
+                continue
+            if other_rel.count("/") != child_depth:
+                continue
+            if other["is_package"]:
+                subcategories.append(category(other_rel, depth + 1))
+            else:
+                leaves.append(other["doc_id"])
+
+        items = subcategories + leaves
+        node = {"type": "category", "label": label, "link": {"type": "doc", "id": page["doc_id"]}}
+        if items:
+            node["items"] = items
+        else:
+            # No children: a plain doc leaf avoids an empty expandable node.
+            return {"type": "doc", "id": page["doc_id"], "label": label}
+        return node
+
+    root = category("", 0)
+    root["label"] = "Reference"
+    return root
 
 
-# Docusaurus v3 parses every .md file as MDX, so a line that begins (at column
-# zero, outside a code fence) with `export`/`import` is read as an ESM statement
-# and a bare `<` as JSX -- either aborts the docs-site build with an opaque acorn
-# error. pydoc-markdown strips docstring indentation, so an *unfenced* shell/py
-# example (e.g. `export SLACK_BOT_TOKEN=...`) lands at column zero and trips this.
-# The guard below turns that into a loud failure here, pointing at the generated
-# file, instead of a cryptic failure later in the docs repo.
+def _write_sidebar(pages):
+    sidebar = _build_sidebar(pages)
+    path = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR, "sidebar.json")
+    with open(path, "w", encoding="utf-8") as handle:
+        json.dump(sidebar, handle, indent=2, ensure_ascii=False)
+        handle.write("\n")
+    print("Wrote sidebar.json")
+
+
+# --------------------------------------------------------------------------- #
+# Safety gate + site sidebar
+# --------------------------------------------------------------------------- #
+
 _MDX_ESM_RE = re.compile(r"^(export|import)\s")
 
 
-def _doc_title(path):
-    """Return a doc's ``title`` frontmatter (the fully-qualified dotted name),
-    falling back to the file's basename without extension."""
-    with open(path, encoding="utf-8") as handle:
-        text = handle.read()
-    match = re.search(r"^title:\s*(.+)$", text, flags=re.M)
-    if match:
-        return match.group(1).strip()
-    return os.path.splitext(os.path.basename(path))[0]
-
-
-def _doc_route(path):
-    """Return the absolute Docusaurus route for a generated doc file.
-
-    The route is the path relative to the docs root (DOCS_BASE_PATH), carrying
-    the docs site base prefix (SIDEBAR_DOC_ID_PREFIX), with ``.md`` stripped and
-    a trailing ``/index`` removed (Docusaurus serves an ``index`` doc at its
-    folder URL). A folder named module doc (``<folder>/<folder>.md``) carries a
-    relative ``slug: <folder>`` resolving to exactly this path, so stripping
-    ``.md`` is correct there too.
-
-    An absolute route resolves identically for the rendered site and a raw file
-    reader. A source relative link cannot, because a package ``index.md`` is
-    served one directory above where its source lives."""
-    rel = os.path.relpath(path, DOCS_BASE_PATH).replace(os.sep, "/")
-    rel = rel[: -len(".md")]
-    if rel.endswith("/index"):
-        rel = rel[: -len("/index")]
-    return "/" + SIDEBAR_DOC_ID_PREFIX + rel
-
-
-def _insert_after_intro(path, section):
-    """Insert ``section`` (a list of body lines) into a doc after its frontmatter
-    and any intro prose, but before the first Markdown header.
-
-    An agent reading the raw file should hit the submodule list near the top, not
-    buried under the class/function docs. This places it after the frontmatter and
-    the package's leading description paragraph, immediately above the first ``#``
-    header (or at end-of-file if the doc has no headers)."""
-    with open(path, encoding="utf-8") as handle:
-        text = handle.read()
-
-    prefix = ""
-    body = text
-    if text.startswith("---\n"):
-        end = text.index("\n---\n", 4) + len("\n---\n")
-        prefix = text[:end]
-        body = text[end:]
-
-    lines = body.split("\n")
-    header_idx = next((i for i, line in enumerate(lines) if line.startswith("#")), None)
-    if header_idx is None:
-        # No headers: append after a trailing blank-line separator.
-        new_body = body.rstrip("\n") + "\n\n" + "\n".join(section) + "\n"
-    else:
-        before = "\n".join(lines[:header_idx]).rstrip("\n")
-        after = "\n".join(lines[header_idx:])
-        intro = (before + "\n\n") if before.strip() else ""
-        new_body = "\n" + intro + "\n".join(section) + "\n\n" + after
-
-    with open(path, "w", encoding="utf-8") as handle:
-        handle.write(prefix + new_body)
-
-
-def _add_submodule_links():
-    """Append a "Submodules" section to each package ``index.md`` listing its
-    child modules and subpackages as relative ``.md`` links.
-
-    The sidebar encodes this hierarchy, but the rendered ``.md`` body does not --
-    an agent reading the raw file (no sidebar, no rendered ToC) can't see what a
-    package contains or navigate to its members. Explicit in-body links make the
-    files self navigable. The links are absolute Docusaurus routes (see
-    _doc_route), which resolve identically for the rendered site and a raw file
-    reader. Entries are sorted by fully qualified title so subpackages and
-    submodules interleave in a single predictable list."""
-    reference_dir = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR)
-    updated = 0
-    for dirpath, dirnames, filenames in os.walk(reference_dir):
-        if "index.md" not in filenames:
-            continue
-        entries = []
-        # Subpackages: child directories that have their own index.md.
-        for name in dirnames:
-            child_index = os.path.join(dirpath, name, "index.md")
-            if os.path.exists(child_index):
-                entries.append((_doc_title(child_index), _doc_route(child_index)))
-        # Submodules: sibling .md files other than this package's own index.md.
-        for name in filenames:
-            if not name.endswith(".md") or name == "index.md":
-                continue
-            child = os.path.join(dirpath, name)
-            entries.append((_doc_title(child), _doc_route(child)))
-        if not entries:
-            continue
-        entries.sort(key=lambda entry: entry[0])
-        section = ["## Submodules", ""]
-        section += ["- [{}]({})".format(title, href) for title, href in entries]
-        _insert_after_intro(os.path.join(dirpath, "index.md"), section)
-        updated += 1
-
-    print("Added submodule links to {} package index docs".format(updated))
-
-
 def _check_mdx_hazards():
-    """Fail generation if any rendered Markdown has an MDX/acorn hazard.
-
-    Scans every generated .md for lines outside code fences that MDX would try to
-    parse as JavaScript: leading ``export``/``import`` (ESM) or a leading ``<``
+    """Fail generation if any rendered Markdown has an MDX/acorn hazard: a line
+    outside a code fence beginning with ``export``/``import`` (ESM) or ``<``
     (JSX). These come from unfenced code examples in docstrings; the fix is to
-    fence the example at its source (see slack_bolt/adapter/asgi/aiohttp for the
-    canonical pattern)."""
+    fence the example in its source docstring."""
     reference_dir = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR)
     hazards = []
     for dirpath, _dirnames, filenames in os.walk(reference_dir):
@@ -585,7 +548,6 @@ def _check_mdx_hazards():
                     if _MDX_ESM_RE.match(line) or line.startswith("<"):
                         rel = os.path.relpath(path, DOCS_BASE_PATH)
                         hazards.append("{}:{}: {}".format(rel, lineno, line))
-
     if hazards:
         raise SystemExit(
             "MDX/acorn hazards found in generated Markdown (unfenced code at column "
@@ -594,152 +556,17 @@ def _check_mdx_hazards():
     print("No MDX/acorn hazards in generated Markdown")
 
 
-# The docs site (docs.slack.dev) build imports this generated sidebar.json in
-# its sidebars.js and appends it under the "Bolt for Python" nav, so the file
-# ships as an import-ready, self-contained "Reference" category. Its doc IDs are
-# resolved relative to the docs root there, hence the prefix.
-SIDEBAR_DOC_ID_PREFIX = "tools/bolt-python/"
-
-
-def _prefix_doc_ids(node):
-    """Return a copy of the generated sidebar with the docs-root prefix added to
-    every doc-ID string. Doc IDs only appear as string elements of ``items``
-    lists; ``label``/``type``/``link`` values are left untouched."""
-    if isinstance(node, dict):
-        return {
-            key: [_prefix_doc_ids(item) for item in value] if key == "items" and isinstance(value, list) else value
-            for key, value in node.items()
-        }
-    if isinstance(node, list):
-        return [_prefix_doc_ids(item) for item in node]
-    if isinstance(node, str):
-        return SIDEBAR_DOC_ID_PREFIX + node
-    return node
-
-
-def _link_categories_to_overview(node, depth=0):
-    """Turn each package category's ``index`` overview doc into the category's
-    ``link`` and drop it from ``items``, returning the (possibly replaced) node.
-
-    A package renders as ``{type: category, label: slack_bolt.app, items: [
-    ".../app/index", ".../app/app", ...]}``. Both the ``index`` doc (the package
-    overview, sidebar_label "app") and the ``app`` module doc (also "app") show
-    up as sibling leaves labeled identically, which is confusing. Promoting the
-    overview to a ``link: {type: doc, id: .../index}`` on the category header --
-    the standard Docusaurus idiom -- makes clicking the category name open the
-    overview and removes the duplicate leaf, leaving only the true module docs.
-
-    A package with *no* submodules (only an ``index``, e.g. slack_bolt.error)
-    would become an empty category -- a dead expandable node. In that case the
-    category is replaced outright by a plain doc leaf pointing at the index, so
-    it renders as an ordinary link with no empty twisty.
-
-    ``depth`` is the node's depth below the Reference root (which is depth 0, its
-    top-level package categories depth 1). Top-level categories keep the full
-    dotted label (``slack_bolt.adapter``); *nested* categories (depth >= 2) are
-    relabeled to just their last dotted segment (``aiohttp`` instead of
-    ``slack_bolt.adapter.aiohttp``) since the ancestor path is already visible in
-    the tree. The page ``title`` frontmatter keeps the full dotted name."""
-    if not isinstance(node, dict):
-        return node
-    items = node.get("items")
-    if not isinstance(items, list):
-        return node
-
-    # Shorten nested category labels to their leaf segment (depth 1 kept full).
-    short_label = node.get("label", "")
-    if depth >= 2 and "." in short_label:
-        short_label = short_label.rsplit(".", 1)[-1]
-        node["label"] = short_label
-
-    # Find this node's own overview *before* recursing: at this point child
-    # categories are still dicts, so the only ``.../index`` string is genuinely
-    # this node's overview. (Recursing first can collapse an index-only child to
-    # a bare ``.../index`` string, which would then be mistaken for this node's
-    # overview.)
-    overview = next(
-        (item for item in items if isinstance(item, str) and item.rsplit("/", 1)[-1] == "index"),
-        None,
-    )
-
-    node["items"] = [_link_categories_to_overview(child, depth + 1) for child in items]
-
-    if overview is None or "link" in node:
-        return node
-
-    remaining = [item for item in node["items"] if item is not overview]
-    if not remaining:
-        # Index-only package (e.g. slack_bolt.error): collapse the category to a
-        # plain doc leaf. Its label comes from the index doc's own sidebar_label
-        # (the bare package name); rewrite it to match how the category would have
-        # read -- full dotted at depth 1, leaf segment when nested.
-        _set_sidebar_label(overview, short_label)
-        return overview
-    node["link"] = {"type": "doc", "id": overview}
-    node["items"] = remaining
-    return node
-
-
-def _set_sidebar_label(doc_id, label):
-    """Overwrite the ``sidebar_label`` frontmatter of a generated doc."""
-    rel = doc_id[len(SIDEBAR_DOC_ID_PREFIX) :] if doc_id.startswith(SIDEBAR_DOC_ID_PREFIX) else doc_id
-    path = os.path.join(DOCS_BASE_PATH, rel + ".md")
-    with open(path, encoding="utf-8") as handle:
-        text = handle.read()
-    if not text.startswith("---\n"):
-        raise SystemExit("Expected frontmatter in {}".format(path))
-    end = text.index("\n---\n", 4)
-    frontmatter = text[4:end]
-    body = text[end + len("\n---\n") :]
-    frontmatter = re.sub(r"^sidebar_label:\s*.+$", "sidebar_label: " + label, frontmatter, count=1, flags=re.M)
-    with open(path, "w", encoding="utf-8") as handle:
-        handle.write("---\n" + frontmatter + "\n---\n" + body)
-
-
-def _finalize_reference_sidebar():
-    """Rewrite the generated reference/sidebar.json in place into the shape the
-    docs repo imports: a self-contained "Reference" category with docs-root
-    doc IDs and the redundant top-level "slack_bolt" wrapper collapsed away.
-
-    The docs-site sidebars.js does ``import ref from '.../reference/sidebar.json'``
-    and appends ``ref`` directly, so this file is the single source of truth for
-    the reference nav -- no copy lives in _sidebar.json."""
-    reference_sidebar = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR, "sidebar.json")
-    with open(reference_sidebar, encoding="utf-8") as handle:
-        category = _prefix_doc_ids(json.load(handle))
-    category["label"] = "Reference"
-
-    # The generated tree nests everything under a single "slack_bolt" category
-    # (Reference -> slack_bolt -> ...). Collapse that redundant level so the
-    # sidebar goes straight from Reference to the top-level modules.
-    items = category.get("items")
-    if isinstance(items, list) and len(items) == 1 and isinstance(items[0], dict) and items[0].get("label") == "slack_bolt":
-        category["items"] = items[0]["items"]
-
-    _link_categories_to_overview(category)
-
-    with open(reference_sidebar, "w", encoding="utf-8") as handle:
-        json.dump(category, handle, indent=2, ensure_ascii=False)
-        handle.write("\n")
-
-    print("Finalized reference/sidebar.json as an import-ready Reference category")
-
-
 def _strip_reference_from_site_sidebar():
     """Remove the "Reference" entry from docs/english/_sidebar.json.
 
-    Under the docs-repo import model (_finalize_reference_sidebar), the reference
-    nav is contributed by the docs-site build from reference/sidebar.json. Leaving
-    a Reference entry here too would render it twice, so drop it. A missing entry
-    is fine (idempotent) -- only warn."""
+    The reference nav is contributed by the docs-site build from
+    reference/sidebar.json, so a Reference entry here too would render it twice.
+    A missing entry is fine (idempotent)."""
     site_sidebar = os.path.join(DOCS_BASE_PATH, "_sidebar.json")
     with open(site_sidebar, encoding="utf-8") as handle:
         entries = json.load(handle)
 
-    def is_reference_entry(entry):
-        return isinstance(entry, dict) and entry.get("label") == "Reference"
-
-    new_entries = [entry for entry in entries if not is_reference_entry(entry)]
+    new_entries = [e for e in entries if not (isinstance(e, dict) and e.get("label") == "Reference")]
     if len(new_entries) == len(entries):
         print('No "Reference" entry in _sidebar.json to strip (already absent)')
         return
@@ -748,8 +575,18 @@ def _strip_reference_from_site_sidebar():
     with open(site_sidebar, "w", encoding="utf-8") as handle:
         json.dump(new_entries, handle, indent="\t", ensure_ascii=False)
         handle.write("\n")
-
     print("Stripped Reference entry from _sidebar.json")
+
+
+def main():
+    os.makedirs(os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR), exist_ok=True)
+    root = _load_package()
+    pages = _build_pages(root)
+    _write_pages(pages)
+    _write_sidebar(pages)
+    _check_mdx_hazards()
+    _strip_reference_from_site_sidebar()
+    print("Generated {} reference pages".format(len(pages)))
 
 
 if __name__ == "__main__":

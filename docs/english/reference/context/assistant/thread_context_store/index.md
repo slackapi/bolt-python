@@ -3,7 +3,6 @@ sidebar_label: thread_context_store
 title: slack_bolt.context.assistant.thread_context_store
 ---
 
-
 ## Submodules
 
 - [slack_bolt.context.assistant.thread_context_store.async_store](/tools/bolt-python/reference/context/assistant/thread_context_store/async_store)

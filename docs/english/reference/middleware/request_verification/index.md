@@ -27,8 +27,8 @@ Refer to https://docs.slack.dev/authentication/verifying-requests-from-slack/ fo
 
 **Arguments**:
 
-- `signing_secret` - The signing secret
-- `base_logger` - The base logger
+- `signing_secret` _str_ - The signing secret
+- `base_logger` _Optional[Logger]_ - The base logger
 
 #### verifier
 
@@ -40,7 +40,9 @@ def verifier() -> SignatureVerifier
 #### process
 
 ```python
-def process(*, req: BoltRequest, resp: BoltResponse,
-            next: Callable[[], BoltResponse]) -> BoltResponse
+def process(
+    *,
+    req: BoltRequest,
+    resp: BoltResponse,
+    next: Callable[[], BoltResponse]) -> BoltResponse
 ```
-

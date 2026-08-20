@@ -22,11 +22,11 @@ class AsyncSayStream()
 #### \_\_init\_\_
 
 ```python
-def __init__(*,
-             client: AsyncWebClient,
-             channel: Optional[str] = None,
-             recipient_team_id: Optional[str] = None,
-             recipient_user_id: Optional[str] = None,
-             thread_ts: Optional[str] = None)
+def __init__(
+    *,
+    client: AsyncWebClient,
+    channel: Optional[str] = None,
+    recipient_team_id: Optional[str] = None,
+    recipient_user_id: Optional[str] = None,
+    thread_ts: Optional[str] = None)
 ```
-

@@ -40,4 +40,3 @@ def on_get(req: Request, resp: Response)
 ```python
 def on_post(req: Request, resp: Response)
 ```
-

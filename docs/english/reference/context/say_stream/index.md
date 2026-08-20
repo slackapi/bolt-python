@@ -27,11 +27,11 @@ class SayStream()
 #### \_\_init\_\_
 
 ```python
-def __init__(*,
-             client: WebClient,
-             channel: Optional[str] = None,
-             recipient_team_id: Optional[str] = None,
-             recipient_user_id: Optional[str] = None,
-             thread_ts: Optional[str] = None)
+def __init__(
+    *,
+    client: WebClient,
+    channel: Optional[str] = None,
+    recipient_team_id: Optional[str] = None,
+    recipient_user_id: Optional[str] = None,
+    thread_ts: Optional[str] = None)
 ```
-

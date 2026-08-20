@@ -38,4 +38,3 @@ Refer to https://api.slack.com/methods/workflows.stepCompleted for details.
 ```python
 def __init__(*, client: WebClient, body: dict)
 ```
-

@@ -28,8 +28,7 @@ def __init__(app: App)
 #### clear\_all\_log\_handlers
 
 ```python
-@classmethod
-def clear_all_log_handlers(cls)
+def clear_all_log_handlers()
 ```
 
 #### handle
@@ -37,4 +36,3 @@ def clear_all_log_handlers(cls)
 ```python
 def handle(event, context)
 ```
-

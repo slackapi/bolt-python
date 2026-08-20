@@ -26,12 +26,14 @@ Refer to https://docs.slack.dev/reference/events/url_verification/ for details.
 
 **Arguments**:
 
-- `base_logger` - The base logger
+- `base_logger` _Optional[Logger]_ - The base logger
 
 #### process
 
 ```python
-def process(*, req: BoltRequest, resp: BoltResponse,
-            next: Callable[[], BoltResponse]) -> BoltResponse
+def process(
+    *,
+    req: BoltRequest,
+    resp: BoltResponse,
+    next: Callable[[], BoltResponse]) -> BoltResponse
 ```
-

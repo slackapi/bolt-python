@@ -22,4 +22,3 @@ class Ack()
 ```python
 def __init__()
 ```
-

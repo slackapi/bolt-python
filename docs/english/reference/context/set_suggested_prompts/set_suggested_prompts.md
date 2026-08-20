@@ -19,8 +19,5 @@ class SetSuggestedPrompts()
 #### \_\_init\_\_
 
 ```python
-def __init__(client: WebClient,
-             channel_id: str,
-             thread_ts: Optional[str] = None)
+def __init__(client: WebClient, channel_id: str, thread_ts: Optional[str] = None)
 ```
-

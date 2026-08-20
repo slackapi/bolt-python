@@ -33,7 +33,5 @@ def __init__(
     channel: Optional[str],
     thread_ts: Optional[str] = None,
     metadata: Optional[Union[Dict, Metadata]] = None,
-    build_metadata: Optional[Callable[[], Optional[Union[Dict,
-                                                         Metadata]]]] = None)
+    build_metadata: Optional[Callable[[], Optional[Union[Dict, Metadata]]]] = None)
 ```
-

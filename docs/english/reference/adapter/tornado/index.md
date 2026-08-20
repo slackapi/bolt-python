@@ -43,4 +43,3 @@ def initialize(app: App)
 ```python
 def get()
 ```
-

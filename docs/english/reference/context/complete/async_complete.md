@@ -30,4 +30,3 @@ Check if this complete function has been called.
 **Returns**:
 
 - `bool` - True if the complete function has been called, False otherwise.
-

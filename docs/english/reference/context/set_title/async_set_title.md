@@ -20,4 +20,3 @@ class AsyncSetTitle()
 ```python
 def __init__(client: AsyncWebClient, channel_id: str, thread_ts: str)
 ```
-

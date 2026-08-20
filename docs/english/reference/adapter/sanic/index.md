@@ -24,7 +24,5 @@ def __init__(app: AsyncApp)
 ```python
 async def handle(
     req: Request,
-    addition_context_properties: Optional[Dict[str,
-                                               Any]] = None) -> HTTPResponse
+    addition_context_properties: Optional[Dict[str, Any]] = None) -> HTTPResponse
 ```
-

@@ -3,7 +3,6 @@ sidebar_label: assistant
 title: slack_bolt.context.assistant
 ---
 
-
 ## Submodules
 
 - [slack_bolt.context.assistant.assistant_utilities](/tools/bolt-python/reference/context/assistant/assistant_utilities)

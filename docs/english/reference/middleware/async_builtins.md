@@ -13,8 +13,10 @@ class AsyncIgnoringSelfEvents(IgnoringSelfEvents, AsyncMiddleware)
 
 ```python
 async def async_process(
-        *, req: AsyncBoltRequest, resp: BoltResponse,
-        next: Callable[[], Awaitable[BoltResponse]]) -> BoltResponse
+    *,
+    req: AsyncBoltRequest,
+    resp: BoltResponse,
+    next: Callable[[], Awaitable[BoltResponse]]) -> BoltResponse
 ```
 
 ## AsyncRequestVerification Objects
@@ -32,8 +34,10 @@ Refer to https://docs.slack.dev/authentication/verifying-requests-from-slack/ fo
 
 ```python
 async def async_process(
-        *, req: AsyncBoltRequest, resp: BoltResponse,
-        next: Callable[[], Awaitable[BoltResponse]]) -> BoltResponse
+    *,
+    req: AsyncBoltRequest,
+    resp: BoltResponse,
+    next: Callable[[], Awaitable[BoltResponse]]) -> BoltResponse
 ```
 
 ## AsyncSslCheck Objects
@@ -46,8 +50,10 @@ class AsyncSslCheck(SslCheck, AsyncMiddleware)
 
 ```python
 async def async_process(
-        *, req: AsyncBoltRequest, resp: BoltResponse,
-        next: Callable[[], Awaitable[BoltResponse]]) -> BoltResponse
+    *,
+    req: AsyncBoltRequest,
+    resp: BoltResponse,
+    next: Callable[[], Awaitable[BoltResponse]]) -> BoltResponse
 ```
 
 ## AsyncUrlVerification Objects
@@ -66,8 +72,10 @@ def __init__(base_logger: Optional[Logger] = None)
 
 ```python
 async def async_process(
-        *, req: AsyncBoltRequest, resp: BoltResponse,
-        next: Callable[[], Awaitable[BoltResponse]]) -> BoltResponse
+    *,
+    req: AsyncBoltRequest,
+    resp: BoltResponse,
+    next: Callable[[], Awaitable[BoltResponse]]) -> BoltResponse
 ```
 
 ## AsyncMessageListenerMatches Objects
@@ -88,8 +96,10 @@ Captures matched keywords and saves the values in context.
 
 ```python
 async def async_process(
-        *, req: AsyncBoltRequest, resp: BoltResponse,
-        next: Callable[[], Awaitable[BoltResponse]]) -> BoltResponse
+    *,
+    req: AsyncBoltRequest,
+    resp: BoltResponse,
+    next: Callable[[], Awaitable[BoltResponse]]) -> BoltResponse
 ```
 
 ## AsyncAttachingFunctionToken Objects
@@ -102,8 +112,10 @@ class AsyncAttachingFunctionToken(AsyncMiddleware)
 
 ```python
 async def async_process(
-        *, req: AsyncBoltRequest, resp: BoltResponse,
-        next: Callable[[], Awaitable[BoltResponse]]) -> BoltResponse
+    *,
+    req: AsyncBoltRequest,
+    resp: BoltResponse,
+    next: Callable[[], Awaitable[BoltResponse]]) -> BoltResponse
 ```
 
 ## AsyncAttachingConversationKwargs Objects
@@ -117,16 +129,15 @@ class AsyncAttachingConversationKwargs(AsyncMiddleware)
 #### \_\_init\_\_
 
 ```python
-def __init__(
-        thread_context_store: Optional[AsyncAssistantThreadContextStore] = None
-)
+def __init__(thread_context_store: Optional[AsyncAssistantThreadContextStore] = None)
 ```
 
 #### async\_process
 
 ```python
 async def async_process(
-        *, req: AsyncBoltRequest, resp: BoltResponse,
-        next: Callable[[], Awaitable[BoltResponse]]) -> Optional[BoltResponse]
+    *,
+    req: AsyncBoltRequest,
+    resp: BoltResponse,
+    next: Callable[[], Awaitable[BoltResponse]]) -> Optional[BoltResponse]
 ```
-

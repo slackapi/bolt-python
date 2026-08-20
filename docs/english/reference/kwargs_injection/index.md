@@ -3,12 +3,6 @@ sidebar_label: kwargs_injection
 title: slack_bolt.kwargs_injection
 ---
 
-
-For middleware/listener arguments, Bolt does flexible data injection in accordance with their names.
-
-To learn the available arguments, check `slack_bolt.kwargs_injection.args`&#x27;s API document.
-For steps from apps, checking `slack_bolt.workflows.step.utilities` as well should be helpful.
-
 ## Submodules
 
 - [slack_bolt.kwargs_injection.args](/tools/bolt-python/reference/kwargs_injection/args)
@@ -57,7 +51,7 @@ Alternatively, you can include a parameter named `args` and it will be injected 
 
 `slack_sdk.web.WebClient` instance with a valid token
 
-#### logger: `Logger`
+#### logger: `logging.Logger`
 
 Logger instance
 
@@ -139,27 +133,27 @@ An alias for payload in an `@app.message` listener
 
 #### set\_status: `Optional[SetStatus]`
 
-`set_status()` utility function for AI Agents &amp; Assistants
+`set_status()` utility function for AI Agents & Assistants
 
 #### set\_title: `Optional[SetTitle]`
 
-`set_title()` utility function for AI Agents &amp; Assistants
+`set_title()` utility function for AI Agents & Assistants
 
 #### set\_suggested\_prompts: `Optional[SetSuggestedPrompts]`
 
-`set_suggested_prompts()` utility function for AI Agents &amp; Assistants
+`set_suggested_prompts()` utility function for AI Agents & Assistants
 
 #### get\_thread\_context: `Optional[GetThreadContext]`
 
-`get_thread_context()` utility function for AI Agents &amp; Assistants
+`get_thread_context()` utility function for AI Agents & Assistants
 
 #### save\_thread\_context: `Optional[SaveThreadContext]`
 
-`save_thread_context()` utility function for AI Agents &amp; Assistants
+`save_thread_context()` utility function for AI Agents & Assistants
 
 #### say\_stream: `Optional[SayStream]`
 
-`say_stream()` utility function for conversations, AI Agents &amp; Assistants
+`say_stream()` utility function for conversations, AI Agents & Assistants
 
 #### next: `Callable[[], None]`
 
@@ -172,47 +166,48 @@ An alias of `next()` for avoiding the Python built-in method overrides in middle
 #### \_\_init\_\_
 
 ```python
-def __init__(*,
-             logger: logging.Logger,
-             client: WebClient,
-             req: BoltRequest,
-             resp: BoltResponse,
-             context: BoltContext,
-             body: Dict[str, Any],
-             payload: Dict[str, Any],
-             options: Optional[Dict[str, Any]] = None,
-             shortcut: Optional[Dict[str, Any]] = None,
-             action: Optional[Dict[str, Any]] = None,
-             view: Optional[Dict[str, Any]] = None,
-             command: Optional[Dict[str, Any]] = None,
-             event: Optional[Dict[str, Any]] = None,
-             message: Optional[Dict[str, Any]] = None,
-             ack: Ack,
-             say: Say,
-             respond: Respond,
-             complete: Complete,
-             fail: Fail,
-             set_status: Optional[SetStatus] = None,
-             set_title: Optional[SetTitle] = None,
-             set_suggested_prompts: Optional[SetSuggestedPrompts] = None,
-             get_thread_context: Optional[GetThreadContext] = None,
-             save_thread_context: Optional[SaveThreadContext] = None,
-             say_stream: Optional[SayStream] = None,
-             next: Callable[[], None],
-             **kwargs)
+def __init__(
+    *,
+    logger: logging.Logger,
+    client: WebClient,
+    req: BoltRequest,
+    resp: BoltResponse,
+    context: BoltContext,
+    body: Dict[str, Any],
+    payload: Dict[str, Any],
+    options: Optional[Dict[str, Any]] = None,
+    shortcut: Optional[Dict[str, Any]] = None,
+    action: Optional[Dict[str, Any]] = None,
+    view: Optional[Dict[str, Any]] = None,
+    command: Optional[Dict[str, Any]] = None,
+    event: Optional[Dict[str, Any]] = None,
+    message: Optional[Dict[str, Any]] = None,
+    ack: Ack,
+    say: Say,
+    respond: Respond,
+    complete: Complete,
+    fail: Fail,
+    set_status: Optional[SetStatus] = None,
+    set_title: Optional[SetTitle] = None,
+    set_suggested_prompts: Optional[SetSuggestedPrompts] = None,
+    get_thread_context: Optional[GetThreadContext] = None,
+    save_thread_context: Optional[SaveThreadContext] = None,
+    say_stream: Optional[SayStream] = None,
+    next: Callable[[], None],
+    **kwargs)
 ```
 
 #### build\_required\_kwargs
 
 ```python
-def build_required_kwargs(*,
-                          logger: logging.Logger,
-                          required_arg_names: MutableSequence[str],
-                          request: BoltRequest,
-                          response: Optional[BoltResponse],
-                          next_func: Optional[Callable[[], None]] = None,
-                          this_func: Optional[Callable] = None,
-                          error: Optional[Exception] = None,
-                          next_keys_required: bool = True) -> Dict[str, Any]
+def build_required_kwargs(
+    *,
+    logger: logging.Logger,
+    required_arg_names: MutableSequence[str],
+    request: BoltRequest,
+    response: Optional[BoltResponse],
+    next_func: Optional[Callable[[], None]] = None,
+    this_func: Optional[Callable] = None,
+    error: Optional[Exception] = None,
+    next_keys_required: bool = True) -> Dict[str, Any]
 ```
-

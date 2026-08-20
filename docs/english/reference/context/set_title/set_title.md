@@ -21,4 +21,3 @@ class SetTitle()
 ```python
 def __init__(client: WebClient, channel_id: str, thread_ts: str)
 ```
-

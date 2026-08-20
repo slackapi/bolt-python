@@ -3,134 +3,6 @@ sidebar_label: messages
 title: slack_bolt.logger.messages
 ---
 
-## BoltRequest Objects
-
-```python
-class BoltRequest()
-```
-
-#### raw\_body: `str`
-
-#### query: `Dict[str, Sequence[str]]`
-
-The query string data in any data format.
-
-#### headers: `Dict[str, Sequence[str]]`
-
-The request headers.
-
-#### content\_type: `Optional[str]`
-
-#### body: `Dict[str, Any]`
-
-The raw request body (only plain text is supported for &quot;http&quot; mode)
-
-#### context: `BoltContext`
-
-The context in this request.
-
-#### lazy\_only: `bool`
-
-#### lazy\_function\_name: `Optional[str]`
-
-#### mode: `str`
-
-The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
-
-#### \_\_init\_\_
-
-```python
-def __init__(*,
-             body: Union[str, dict],
-             query: Optional[Union[str, Dict[str, str],
-                                   Dict[str, Sequence[str]]]] = None,
-             headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None,
-             context: Optional[Dict[str, Any]] = None,
-             mode: str = "http")
-```
-
-Request to a Bolt app.
-
-**Arguments**:
-
-- `body` - The raw request body (only plain text is supported for &quot;http&quot; mode)
-- `query` - The query string data in any data format.
-- `headers` - The request headers.
-- `context` - The context in this request.
-- `mode` - The mode used for this request. (either &quot;http&quot; or &quot;socket_mode&quot;)
-
-#### to\_copyable
-
-```python
-def to_copyable() -> "BoltRequest"
-```
-
-#### is\_action
-
-```python
-def is_action(body: Dict[str, Any]) -> bool
-```
-
-#### is\_event
-
-```python
-def is_event(body: Dict[str, Any]) -> bool
-```
-
-#### is\_function
-
-```python
-def is_function(body: Dict[str, Any]) -> bool
-```
-
-#### is\_options
-
-```python
-def is_options(body: Dict[str, Any]) -> bool
-```
-
-#### is\_shortcut
-
-```python
-def is_shortcut(body: Dict[str, Any]) -> bool
-```
-
-#### is\_slash\_command
-
-```python
-def is_slash_command(body: Dict[str, Any]) -> bool
-```
-
-#### is\_view\_submission
-
-```python
-def is_view_submission(body: Dict[str, Any]) -> bool
-```
-
-#### is\_view\_closed
-
-```python
-def is_view_closed(body: Dict[str, Any]) -> bool
-```
-
-#### is\_workflow\_step\_edit
-
-```python
-def is_workflow_step_edit(body: Dict[str, Any]) -> bool
-```
-
-#### is\_workflow\_step\_save
-
-```python
-def is_workflow_step_save(body: Dict[str, Any]) -> bool
-```
-
-#### is\_workflow\_step\_execute
-
-```python
-def is_workflow_step_execute(body: Dict[str, Any]) -> bool
-```
-
 #### error\_client\_invalid\_type
 
 ```python
@@ -225,14 +97,14 @@ def warning_installation_store_conflicts() -> str
 
 ```python
 def warning_unhandled_by_global_middleware(
-        name: str, req: Union[BoltRequest, "AsyncBoltRequest"]) -> str
+    name: str,
+    req: Union[BoltRequest, AsyncBoltRequest]) -> str
 ```
 
 #### warning\_unhandled\_request
 
 ```python
-def warning_unhandled_request(
-        req: Union[BoltRequest, "AsyncBoltRequest"]) -> str
+def warning_unhandled_request(req: Union[BoltRequest, AsyncBoltRequest]) -> str
 ```
 
 #### warning\_did\_not\_call\_ack
@@ -256,8 +128,9 @@ def warning_skip_uncommon_arg_name(arg_name: str) -> str
 #### warning\_ack\_timeout\_has\_no\_effect
 
 ```python
-def warning_ack_timeout_has_no_effect(identifier: Union[str, Pattern],
-                                      ack_timeout: int) -> str
+def warning_ack_timeout_has_no_effect(
+    identifier: Union[str, Pattern],
+    ack_timeout: int) -> str
 ```
 
 #### info\_default\_oauth\_settings\_loaded
@@ -299,8 +172,9 @@ def debug_responding(status: int, body: str, millis: int) -> str
 #### debug\_return\_listener\_middleware\_response
 
 ```python
-def debug_return_listener_middleware_response(listener_name: str, status: int,
-                                              body: str,
-                                              starting_time: float) -> str
+def debug_return_listener_middleware_response(
+    listener_name: str,
+    status: int,
+    body: str,
+    starting_time: float) -> str
 ```
-

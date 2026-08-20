@@ -28,7 +28,7 @@ The Callback ID of the step from app
 
 #### save: `Listener`
 
-`save` listener, which accepts workflow creator&#x27;s data submission in Workflow Builder
+`save` listener, which accepts workflow creator's data submission in Workflow Builder
 
 #### execute: `Listener`
 
@@ -37,60 +37,57 @@ The Callback ID of the step from app
 #### \_\_init\_\_
 
 ```python
-def __init__(*,
-             callback_id: Union[str, Pattern],
-             edit: Union[Callable[..., Optional[BoltResponse]], Listener,
-                         Sequence[Callable]],
-             save: Union[Callable[..., Optional[BoltResponse]], Listener,
-                         Sequence[Callable]],
-             execute: Union[Callable[..., Optional[BoltResponse]], Listener,
-                            Sequence[Callable]],
-             app_name: Optional[str] = None,
-             base_logger: Optional[Logger] = None)
+def __init__(
+    *,
+    callback_id: Union[str, Pattern],
+    edit: Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]],
+    save: Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]],
+    execute: Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]],
+    app_name: Optional[str] = None,
+    base_logger: Optional[Logger] = None)
 ```
 
-Deprecated:
+**Deprecated**:
+
 Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
 **Arguments**:
 
-- `callback_id` - The callback_id for this step from app
-- `edit` - Either a single function or a list of functions for opening a modal in the builder UI
-  When it&#x27;s a list, the first one is responsible for ack() while the rest are lazy listeners.
-- `save` - Either a single function or a list of functions for handling modal interactions in the builder UI
-  When it&#x27;s a list, the first one is responsible for ack() while the rest are lazy listeners.
-- `execute` - Either a single function or a list of functions for handling step from app executions
-  When it&#x27;s a list, the first one is responsible for ack() while the rest are lazy listeners.
-- `app_name` - The app name that can be mainly used for logging
-- `base_logger` - The logger instance that can be used as a template when creating this step&#x27;s logger
+- `callback_id` _Union[str, Pattern]_ - The callback_id for this step from app
+- `edit` _Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]_ - Either a single function or a list of functions for opening a modal in the builder UI
+  When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
+- `save` _Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]_ - Either a single function or a list of functions for handling modal interactions in the builder UI
+  When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
+- `execute` _Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]_ - Either a single function or a list of functions for handling step from app executions
+  When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
+- `app_name` _Optional[str]_ - The app name that can be mainly used for logging
+- `base_logger` _Optional[Logger]_ - The logger instance that can be used as a template when creating this step's logger
 
 #### builder
 
 ```python
-@classmethod
-def builder(cls,
-            callback_id: Union[str, Pattern],
-            base_logger: Optional[Logger] = None) -> WorkflowStepBuilder
+def builder(
+    callback_id: Union[str, Pattern],
+    base_logger: Optional[Logger] = None) -> WorkflowStepBuilder
 ```
 
-Deprecated:
-    Steps from apps for legacy workflows are now deprecated.
-    Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+**Deprecated**:
+
+Steps from apps for legacy workflows are now deprecated.
+Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
 #### build\_listener
 
 ```python
-@classmethod
-def build_listener(cls,
-                   callback_id: Union[str, Pattern],
-                   app_name: str,
-                   listener_or_functions: Union[Listener, Callable,
-                                                List[Callable]],
-                   name: str,
-                   matchers: Optional[List[ListenerMatcher]] = None,
-                   middleware: Optional[List[Middleware]] = None,
-                   base_logger: Optional[Logger] = None) -> Listener
+def build_listener(
+    callback_id: Union[str, Pattern],
+    app_name: str,
+    listener_or_functions: Union[Listener, Callable, List[Callable]],
+    name: str,
+    matchers: Optional[List[ListenerMatcher]] = None,
+    middleware: Optional[List[Middleware]] = None,
+    base_logger: Optional[Logger] = None) -> Listener
 ```
 
 ## WorkflowStepMiddleware Objects
@@ -110,8 +107,11 @@ def __init__(step: WorkflowStep)
 #### process
 
 ```python
-def process(*, req: BoltRequest, resp: BoltResponse,
-            next: Callable[[], BoltResponse]) -> Optional[BoltResponse]
+def process(
+    *,
+    req: BoltRequest,
+    resp: BoltResponse,
+    next: Callable[[], BoltResponse]) -> Optional[BoltResponse]
 ```
 
 ## Complete Objects
@@ -277,4 +277,3 @@ Refer to https://api.slack.com/methods/workflows.stepFailed for details.
 ```python
 def __init__(*, client: WebClient, body: dict)
 ```
-

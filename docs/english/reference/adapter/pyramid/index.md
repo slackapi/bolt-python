@@ -24,4 +24,3 @@ def __init__(app: App)
 ```python
 def handle(request: Request) -> Response
 ```
-

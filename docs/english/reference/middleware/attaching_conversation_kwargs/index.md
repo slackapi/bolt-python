@@ -19,14 +19,15 @@ class AttachingConversationKwargs(Middleware)
 #### \_\_init\_\_
 
 ```python
-def __init__(
-        thread_context_store: Optional[AssistantThreadContextStore] = None)
+def __init__(thread_context_store: Optional[AssistantThreadContextStore] = None)
 ```
 
 #### process
 
 ```python
-def process(*, req: BoltRequest, resp: BoltResponse,
-            next: Callable[[], BoltResponse]) -> Optional[BoltResponse]
+def process(
+    *,
+    req: BoltRequest,
+    resp: BoltResponse,
+    next: Callable[[], BoltResponse]) -> Optional[BoltResponse]
 ```
-

@@ -20,4 +20,3 @@ class AssistantThreadContext(dict)
 ```python
 def __init__(payload: dict)
 ```
-

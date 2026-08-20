@@ -72,8 +72,7 @@ def is_assistant_thread_context_changed_event(body: Dict[str, Any]) -> bool
 #### is\_app\_home\_opened\_event
 
 ```python
-def is_app_home_opened_event(body: Dict[str, Any],
-                             tab: Optional[str] = None) -> bool
+def is_app_home_opened_event(body: Dict[str, Any], tab: Optional[str] = None) -> bool
 ```
 
 #### is\_user\_message\_event\_in\_assistant\_thread
@@ -91,8 +90,7 @@ def is_bot_message_event_in_assistant_thread(body: Dict[str, Any]) -> bool
 #### is\_other\_message\_sub\_event\_in\_assistant\_thread
 
 ```python
-def is_other_message_sub_event_in_assistant_thread(
-        body: Dict[str, Any]) -> bool
+def is_other_message_sub_event_in_assistant_thread(body: Dict[str, Any]) -> bool
 ```
 
 #### to\_command
@@ -232,4 +230,3 @@ def is_workflow_step_save(body: Dict[str, Any]) -> bool
 ```python
 def to_step(body: Dict[str, Any]) -> Optional[Dict[str, Any]]
 ```
-

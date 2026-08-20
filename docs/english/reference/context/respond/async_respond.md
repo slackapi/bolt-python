@@ -18,9 +18,9 @@ class AsyncRespond()
 #### \_\_init\_\_
 
 ```python
-def __init__(*,
-             response_url: Optional[str],
-             proxy: Optional[str] = None,
-             ssl: Optional[SSLContext] = None)
+def __init__(
+    *,
+    response_url: Optional[str],
+    proxy: Optional[str] = None,
+    ssl: Optional[SSLContext] = None)
 ```
-

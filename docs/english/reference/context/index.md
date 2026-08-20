@@ -3,13 +3,6 @@ sidebar_label: context
 title: slack_bolt.context
 ---
 
-
-All listeners have access to a context dictionary, which can be used to enrich events with additional information.
-Bolt automatically attaches information that is included in the incoming event,
-like `user_id`, `team_id`, `channel_id`, and `enterprise_id`.
-
-Refer to https://docs.slack.dev/tools/bolt-python/concepts/context for details.
-
 ## Submodules
 
 - [slack_bolt.context.ack](/tools/bolt-python/reference/context/ack)
@@ -39,14 +32,14 @@ Context object associated with a request from Slack.
 #### to\_copyable
 
 ```python
-def to_copyable() -> "BoltContext"
+def to_copyable() -> BoltContext
 ```
 
 #### listener\_runner
 
 ```python
 @property
-def listener_runner() -> "ThreadListenerRunner"
+def listener_runner() -> ThreadListenerRunner
 ```
 
 The properly configured listener_runner that is available for middleware/listeners.
@@ -79,7 +72,7 @@ The `WebClient` instance available for this request.
 
 **Returns**:
 
-  `WebClient` instance
+- `WebClient` - `WebClient` instance
 
 #### ack
 
@@ -103,7 +96,7 @@ def ack() -> Ack
 
 **Returns**:
 
-  Callable `ack()` function
+- `Ack` - Callable `ack()` function
 
 #### say
 
@@ -129,7 +122,7 @@ def say() -> Say
 
 **Returns**:
 
-  Callable `say()` function
+- `Say` - Callable `say()` function
 
 #### respond
 
@@ -155,7 +148,7 @@ def respond() -> Optional[Respond]
 
 **Returns**:
 
-  Callable `respond()` function
+- `Optional[Respond]` - Callable `respond()` function
 
 #### complete
 
@@ -164,7 +157,7 @@ def respond() -> Optional[Respond]
 def complete() -> Complete
 ```
 
-`complete()` function for this request. Once a custom function&#x27;s state is set to complete,
+`complete()` function for this request. Once a custom function's state is set to complete,
 any outputs the function returns will be passed along to the next step of its housing workflow,
 or complete the workflow if the function is the last step in a workflow. Additionally,
 any interactivity handlers associated to a function invocation will no longer be invocable.
@@ -183,7 +176,7 @@ any interactivity handlers associated to a function invocation will no longer be
 
 **Returns**:
 
-  Callable `complete()` function
+- `Complete` - Callable `complete()` function
 
 #### fail
 
@@ -192,7 +185,7 @@ any interactivity handlers associated to a function invocation will no longer be
 def fail() -> Fail
 ```
 
-`fail()` function for this request. Once a custom function&#x27;s state is set to error,
+`fail()` function for this request. Once a custom function's state is set to error,
 its housing workflow will be interrupted and any provided error message will be passed
 on to the end user through SlackBot. Additionally, any interactivity handlers associated
 to a function invocation will no longer be invocable.
@@ -211,7 +204,7 @@ to a function invocation will no longer be invocable.
 
 **Returns**:
 
-  Callable `fail()` function
+- `Fail` - Callable `fail()` function
 
 #### set\_title
 
@@ -254,4 +247,3 @@ def say_stream() -> Optional[SayStream]
 @property
 def save_thread_context() -> Optional[SaveThreadContext]
 ```
-

@@ -3,11 +3,6 @@ sidebar_label: listener
 title: slack_bolt.listener
 ---
 
-
-Listeners process an incoming request from Slack if the request&#x27;s type or data structure matches
-the predefined conditions of the listener. Typically, a listener acknowledge requests from Slack,
-process the request data, and may send response back to Slack.
-
 ## Submodules
 
 - [slack_bolt.listener.async_builtins](/tools/bolt-python/reference/listener/async_builtins)
@@ -34,8 +29,6 @@ class CustomListener(Listener)
 
 #### ack\_function: `Callable[..., Optional[BoltResponse]]`
 
-type: ignore[assignment]
-
 #### lazy\_functions: `Sequence[Callable[..., None]]`
 
 #### matchers: `Sequence[ListenerMatcher]`
@@ -53,28 +46,31 @@ type: ignore[assignment]
 #### \_\_init\_\_
 
 ```python
-def __init__(*,
-             app_name: str,
-             ack_function: Callable[..., Optional[BoltResponse]],
-             lazy_functions: Sequence[Callable[..., None]],
-             matchers: Sequence[ListenerMatcher],
-             middleware: Sequence[Middleware],
-             auto_acknowledgement: bool = False,
-             ack_timeout: int = 3,
-             base_logger: Optional[Logger] = None)
+def __init__(
+    *,
+    app_name: str,
+    ack_function: Callable[..., Optional[BoltResponse]],
+    lazy_functions: Sequence[Callable[..., None]],
+    matchers: Sequence[ListenerMatcher],
+    middleware: Sequence[Middleware],
+    auto_acknowledgement: bool = False,
+    ack_timeout: int = 3,
+    base_logger: Optional[Logger] = None)
 ```
 
 #### run\_ack\_function
 
 ```python
-def run_ack_function(*, request: BoltRequest,
-                     response: BoltResponse) -> Optional[BoltResponse]
+def run_ack_function(
+    *,
+    request: BoltRequest,
+    response: BoltResponse) -> Optional[BoltResponse]
 ```
 
 ## Listener Objects
 
 ```python
-class Listener(metaclass=ABCMeta)
+class Listener()
 ```
 
 #### matchers: `Sequence[ListenerMatcher]`
@@ -98,41 +94,41 @@ def matches(*, req: BoltRequest, resp: BoltResponse) -> bool
 #### run\_middleware
 
 ```python
-def run_middleware(*, req: BoltRequest,
-                   resp: BoltResponse) -> Tuple[Optional[BoltResponse], bool]
+def run_middleware(
+    *,
+    req: BoltRequest,
+    resp: BoltResponse) -> Tuple[Optional[BoltResponse], bool]
 ```
 
 Runs a middleware.
 
 **Arguments**:
 
-- `req` - The incoming request
-- `resp` - The current response
-  
+- `req` _BoltRequest_ - The incoming request
+- `resp` _BoltResponse_ - The current response
 
 **Returns**:
 
-  A tuple of the processed response and a flag indicating termination
+- `Tuple[Optional[BoltResponse], bool]` - A tuple of the processed response and a flag indicating termination
 
 #### run\_ack\_function
 
 ```python
-@abstractmethod
-def run_ack_function(*, request: BoltRequest,
-                     response: BoltResponse) -> Optional[BoltResponse]
+def run_ack_function(
+    *,
+    request: BoltRequest,
+    response: BoltResponse) -> Optional[BoltResponse]
 ```
 
 Runs all the registered middleware and then run the listener function.
 
 **Arguments**:
 
-- `request` - The incoming request
-- `response` - The current response
-  
+- `request` _BoltRequest_ - The incoming request
+- `response` _BoltResponse_ - The current response
 
 **Returns**:
 
-  The processed response
+- `Optional[BoltResponse]` - The processed response
 
 #### builtin\_listener\_classes
-
