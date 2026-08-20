@@ -3,6 +3,8 @@ sidebar_label: error
 title: slack_bolt.error
 ---
 
+Bolt specific error types.
+
 ## BoltError Objects
 
 ```python

@@ -67,11 +67,7 @@ class CallbackOptions()
 
 #### success: `Callable[[SuccessArgs], BoltResponse]`
 
-A handler for successful installation.
-
 #### failure: `Callable[[FailureArgs], BoltResponse]`
-
-A handler for any types of installation failures.
 
 #### \_\_init\_\_
 

@@ -35,7 +35,6 @@ def client() -> AsyncWebClient
 
 The `AsyncWebClient` instance available for this request.
 
-```python
     @app.event("app_mention")
     async def handle_events(context):
         await context.client.chat_postMessage(
@@ -50,7 +49,6 @@ The `AsyncWebClient` instance available for this request.
             channel=context.channel_id,
             text="Thanks!",
         )
-```
 
 **Returns**:
 
@@ -65,7 +63,6 @@ def ack() -> AsyncAck
 
 `ack()` function for this request.
 
-```python
     @app.action("button")
     async def handle_button_clicks(context):
         await context.ack()
@@ -74,7 +71,6 @@ def ack() -> AsyncAck
     @app.action("button")
     async def handle_button_clicks(ack):
         await ack()
-```
 
 **Returns**:
 
@@ -89,7 +85,6 @@ def say() -> AsyncSay
 
 `say()` function for this request.
 
-```python
     @app.action("button")
     async def handle_button_clicks(context):
         await context.ack()
@@ -100,7 +95,6 @@ def say() -> AsyncSay
     async def handle_button_clicks(ack, say):
         await ack()
         await say("Hi!")
-```
 
 **Returns**:
 
@@ -115,7 +109,6 @@ def respond() -> Optional[AsyncRespond]
 
 `respond()` function for this request.
 
-```python
     @app.action("button")
     async def handle_button_clicks(context):
         await context.ack()
@@ -126,7 +119,6 @@ def respond() -> Optional[AsyncRespond]
     async def handle_button_clicks(ack, respond):
         await ack()
         await respond("Hi!")
-```
 
 **Returns**:
 
@@ -144,17 +136,15 @@ any outputs the function returns will be passed along to the next step of its ho
 or complete the workflow if the function is the last step in a workflow. Additionally,
 any interactivity handlers associated to a function invocation will no longer be invocable.
 
-```python
     @app.function("reverse")
     async def handle_button_clicks(ack, complete):
         await ack()
-        await complete(outputs={"stringReverse":"olleh"})
+        await complete(outputs=&#123;"stringReverse":"olleh"})
 
     @app.function("reverse")
     async def handle_button_clicks(context):
         await context.ack()
-        await context.complete(outputs={"stringReverse":"olleh"})
-```
+        await context.complete(outputs=&#123;"stringReverse":"olleh"})
 
 **Returns**:
 
@@ -172,7 +162,6 @@ its housing workflow will be interrupted and any provided error message will be 
 on to the end user through SlackBot. Additionally, any interactivity handlers associated
 to a function invocation will no longer be invocable.
 
-```python
     @app.function("reverse")
     async def handle_button_clicks(ack, fail):
         await ack()
@@ -182,7 +171,6 @@ to a function invocation will no longer be invocable.
     async def handle_button_clicks(context):
         await context.ack()
         await context.fail(error="something went wrong")
-```
 
 **Returns**:
 

@@ -11,11 +11,10 @@ class Fail()
 
 `fail()` utility to tell Slack the execution failure of a step from app.
 
-```python
     def execute(step, complete, fail):
         inputs = step["inputs"]
         # if something went wrong
-        error = {"message": "Just testing step failure!"}
+        error = &#123;"message": "Just testing step failure!"}
         fail(error=error)
 
     ws = WorkflowStep(
@@ -25,7 +24,6 @@ class Fail()
         execute=execute,
     )
     app.step(ws)
-```
 
 This utility is a thin wrapper of workflows.stepFailed API method.
 Refer to https://api.slack.com/methods/workflows.stepFailed for details.

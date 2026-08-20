@@ -11,23 +11,15 @@ class AuthorizeArgs()
 
 #### context: `BoltContext`
 
-The request context
-
 #### logger: `Logger`
 
 #### client: `WebClient`
 
 #### enterprise\_id: `Optional[str]`
 
-The Organization ID (Enterprise Grid)
-
 #### team\_id: `Optional[str]`
 
-The workspace ID
-
 #### user\_id: `Optional[str]`
-
-The request user ID
 
 #### \_\_init\_\_
 

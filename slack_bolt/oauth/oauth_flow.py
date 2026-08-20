@@ -27,7 +27,6 @@ from slack_bolt.util.utils import create_web_client
 
 class OAuthFlow:
     settings: OAuthSettings
-    """OAuth settings to configure this module."""
     client_id: str
     redirect_uri: Optional[str]
     install_path: str

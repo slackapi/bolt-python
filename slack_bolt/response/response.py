@@ -5,11 +5,8 @@ from typing import Union, Dict, Optional, Sequence
 
 class BoltResponse:
     status: int
-    """HTTP status code"""
     body: str
-    """The response body (dict and str are supported)"""
     headers: Dict[str, Sequence[str]]
-    """The response headers."""
 
     def __init__(
         self,

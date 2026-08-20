@@ -3,6 +3,11 @@ sidebar_label: authorization
 title: slack_bolt.authorization
 ---
 
+Authorization is the process of determining which Slack credentials should be available
+while processing an incoming Slack event.
+
+Refer to https://docs.slack.dev/tools/bolt-python/concepts/authorization for details.
+
 ## Submodules
 
 - [slack_bolt.authorization.async_authorize](/tools/bolt-python/reference/authorization/async_authorize)
@@ -21,51 +26,27 @@ Authorize function call result
 
 #### enterprise\_id: `Optional[str]`
 
-Organization ID (Enterprise Grid) starting with `E`
-
 #### team\_id: `Optional[str]`
-
-Workspace ID starting with `T`
 
 #### team: `Optional[str]`
 
-Workspace name
-
 #### url: `Optional[str]`
-
-Workspace slack.com URL
 
 #### bot\_id: `Optional[str]`
 
-Bot ID starting with `B`
-
 #### bot\_user\_id: `Optional[str]`
-
-Bot user's User ID starting with either `U` or `W`
 
 #### bot\_token: `Optional[str]`
 
-Bot user access token starting with `xoxb-`
-
 #### bot\_scopes: `Optional[Sequence[str]]`
-
-The scopes associated with the bot token
 
 #### user\_id: `Optional[str]`
 
-The request user ID
-
 #### user: `Optional[str]`
-
-The request user's name
 
 #### user\_token: `Optional[str]`
 
-User access token starting with `xoxp-`
-
 #### user\_scopes: `Optional[Sequence[str]]`
-
-The scopes associated wth the user token
 
 #### \_\_init\_\_
 

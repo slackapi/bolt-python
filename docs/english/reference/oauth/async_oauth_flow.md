@@ -11,8 +11,6 @@ class AsyncOAuthFlow()
 
 #### settings: `AsyncOAuthSettings`
 
-OAuth settings to configure this module.
-
 #### client\_id: `str`
 
 #### redirect\_uri: `Optional[str]`

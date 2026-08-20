@@ -13,29 +13,19 @@ class AsyncBoltRequest()
 
 #### body: `Dict[str, Any]`
 
-The raw request body (only plain text is supported for "http" mode)
-
 #### query: `Dict[str, Sequence[str]]`
 
-The query string data in any data format.
-
 #### headers: `Dict[str, Sequence[str]]`
-
-The request headers.
 
 #### content\_type: `Optional[str]`
 
 #### context: `AsyncBoltContext`
-
-The context in this request.
 
 #### lazy\_only: `bool`
 
 #### lazy\_function\_name: `Optional[str]`
 
 #### mode: `str`
-
-The mode used for this request. (either "http" or "socket_mode")
 
 #### \_\_init\_\_
 

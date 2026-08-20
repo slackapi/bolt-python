@@ -3,6 +3,11 @@ sidebar_label: kwargs_injection
 title: slack_bolt.kwargs_injection
 ---
 
+For middleware/listener arguments, Bolt does flexible data injection in accordance with their names.
+
+To learn the available arguments, check `slack_bolt.kwargs_injection.args`'s API document.
+For steps from apps, checking `slack_bolt.workflows.step.utilities` as well should be helpful.
+
 ## Submodules
 
 - [slack_bolt.kwargs_injection.args](/tools/bolt-python/reference/kwargs_injection/args)
@@ -19,33 +24,29 @@ class Args()
 All the arguments in this class are available in any middleware / listeners.
 You can inject the named variables in the argument list in arbitrary order.
 
-```python
     @app.action("link_button")
     def handle_buttons(ack, respond, logger, context, body, client):
-        logger.info(f"request body: {body}")
+        logger.info(f"request body: &#123;body}")
         ack()
         if context.channel_id is not None:
             respond("Hi!")
         client.views_open(
             trigger_id=body["trigger_id"],
-            view={ ... }
+            view=&#123; ... }
         )
-```
 
 Alternatively, you can include a parameter named `args` and it will be injected with an instance of this class.
 
-```python
     @app.action("link_button")
     def handle_buttons(args):
-        args.logger.info(f"request body: {args.body}")
+        args.logger.info(f"request body: &#123;args.body}")
         args.ack()
         if args.context.channel_id is not None:
             args.respond("Hi!")
         args.client.views_open(
             trigger_id=args.body["trigger_id"],
-            view={ ... }
+            view=&#123; ... }
         )
-```
 
 #### client: `WebClient`
 

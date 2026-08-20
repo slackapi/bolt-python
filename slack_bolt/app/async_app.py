@@ -146,7 +146,6 @@ class AsyncApp:
     ):
         """Bolt App that provides functionalities to register middleware/listeners.
 
-        ```python
             import os
             from slack_bolt.async_app import AsyncApp
 
@@ -165,7 +164,6 @@ class AsyncApp:
             # Start your app
             if __name__ == "__main__":
                 app.start(port=int(os.environ.get("PORT", 3000)))
-        ```
 
         Refer to https://docs.slack.dev/tools/bolt-python/concepts/async for details.
 
@@ -532,7 +530,6 @@ class AsyncApp:
     def web_app(self, path: str = "/slack/events", port: int = 3000) -> web.Application:
         """Returns a `web.Application` instance for aiohttp-devtools users.
 
-        ```python
             from slack_bolt.async_app import AsyncApp
             app = AsyncApp()
 
@@ -545,7 +542,6 @@ class AsyncApp:
                 return app.web_app()
 
             # adev runserver --port 3000 --app-factory app_factory async_app.py
-        ```
 
         Args:
             path: The path to receive incoming requests from Slack
@@ -693,18 +689,14 @@ class AsyncApp:
         """Registers a new middleware to this app.
         This method can be used as either a decorator or a method.
 
-        ```python
             # Use this method as a decorator
             @app.middleware
             async def middleware_func(logger, body, next):
                 logger.info(f"request body: {body}")
                 await next()
-        ```
 
-        ```python
             # Pass a function to this method
             app.middleware(middleware_func)
-        ```
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
 
@@ -754,7 +746,6 @@ class AsyncApp:
         Unlike others, this method doesn't behave as a decorator.
         If you want to register a step from app by a decorator, use `AsyncWorkflowStepBuilder`'s methods.
 
-        ```python
             # Create a new WorkflowStep instance
             from slack_bolt.workflows.async_step import AsyncWorkflowStep
             ws = AsyncWorkflowStep(
@@ -765,7 +756,6 @@ class AsyncApp:
             )
             # Pass Step to set up listeners
             app.step(ws)
-        ```
 
         Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details of steps from apps.
 
@@ -811,18 +801,14 @@ class AsyncApp:
     ) -> Callable[..., Awaitable[Optional[BoltResponse]]]:
         """Updates the global error handler. This method can be used as either a decorator or a method.
 
-        ```python
             # Use this method as a decorator
             @app.error
             async def custom_error_handler(error, body, logger):
                 logger.exception(f"Error: {error}")
                 logger.info(f"Request body: {body}")
-        ```
 
-        ```python
             # Pass a function to this method
             app.error(custom_error_handler)
-        ```
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
 
@@ -858,7 +844,6 @@ class AsyncApp:
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         """Registers a new event listener. This method can be used as either a decorator or a method.
 
-        ```python
             # Use this method as a decorator
             @app.event("team_join")
             async def ask_for_introduction(event, say):
@@ -866,12 +851,9 @@ class AsyncApp:
                 user_id = event["user"]
                 text = f"Welcome to the team, <@{user_id}>! :tada: You can introduce yourself in this channel."
                 await say(text=text, channel=welcome_channel_id)
-        ```
 
-        ```python
             # Pass a function to this method
             app.event("team_join")(ask_for_introduction)
-        ```
 
         Refer to https://docs.slack.dev/apis/events-api/ for details of Events API.
 
@@ -905,18 +887,14 @@ class AsyncApp:
         """Registers a new message event listener. This method can be used as either a decorator or a method.
         Check the `App#event` method's docstring for details.
 
-        ```python
             # Use this method as a decorator
             @app.message(":wave:")
             async def say_hello(message, say):
                 user = message['user']
                 await say(f"Hi there, <@{user}>!")
-        ```
 
-        ```python
             # Pass a function to this method
             app.message(":wave:")(say_hello)
-        ```
 
         Refer to https://docs.slack.dev/reference/events/message/ for details of `message` events.
 
@@ -974,7 +952,6 @@ class AsyncApp:
         """Registers a new Function listener.
         This method can be used as either a decorator or a method.
 
-        ```python
             # Use this method as a decorator
             @app.function("reverse")
             async def reverse_string(ack: AsyncAck, inputs: dict, complete: AsyncComplete, fail: AsyncFail):
@@ -985,12 +962,9 @@ class AsyncApp:
                 except Exception as e:
                     await fail(f"Cannot reverse string (error: {e})")
                     raise e
-        ```
 
-        ```python
             # Pass a function to this method
             app.function("reverse")(reverse_string)
-        ```
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
 
@@ -1029,19 +1003,15 @@ class AsyncApp:
         """Registers a new slash command listener.
         This method can be used as either a decorator or a method.
 
-        ```python
             # Use this method as a decorator
             @app.command("/echo")
             async def repeat_text(ack, say, command):
                 # Acknowledge command request
                 await ack()
                 await say(f"{command['text']}")
-        ```
 
-        ```python
             # Pass a function to this method
             app.command("/echo")(repeat_text)
-        ```
 
         Refer to https://docs.slack.dev/interactivity/implementing-slash-commands/ for details of Slash Commands.
 
@@ -1074,7 +1044,6 @@ class AsyncApp:
         """Registers a new shortcut listener.
         This method can be used as either a decorator or a method.
 
-        ```python
             # Use this method as a decorator
             @app.shortcut("open_modal")
             async def open_modal(ack, body, client):
@@ -1087,12 +1056,9 @@ class AsyncApp:
                     # View payload
                     view={ ... }
                 )
-        ```
 
-        ```python
             # Pass a function to this method
             app.shortcut("open_modal")(open_modal)
-        ```
 
         Refer to https://docs.slack.dev/interactivity/implementing-shortcuts/ for details about Shortcuts.
 
@@ -1154,17 +1120,13 @@ class AsyncApp:
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         """Registers a new action listener. This method can be used as either a decorator or a method.
 
-        ```python
             # Use this method as a decorator
             @app.action("approve_button")
             async def update_message(ack):
                 await ack()
-        ```
 
-        ```python
             # Pass a function to this method
             app.action("approve_button")(update_message)
-        ```
 
         * Refer to https://docs.slack.dev/reference/interaction-payloads/block_actions-payload/ for actions in `blocks`.
         * Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons/ for actions in `attachments`.
@@ -1264,7 +1226,6 @@ class AsyncApp:
         """Registers a new `view_submission`/`view_closed` event listener.
         This method can be used as either a decorator or a method.
 
-        ```python
             # Use this method as a decorator
             @app.view("view_1")
             async def handle_submission(ack, body, client, view):
@@ -1281,12 +1242,9 @@ class AsyncApp:
                 # Acknowledge the view_submission event and close the modal
                 await ack()
                 # Do whatever you want with the input data - here we're saving it to a DB
-        ```
 
-        ```python
             # Pass a function to this method
             app.view("view_1")(handle_submission)
-        ```
 
         Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload for details of payloads.
 
@@ -1353,7 +1311,6 @@ class AsyncApp:
         """Registers a new options listener.
         This method can be used as either a decorator or a method.
 
-        ```python
             # Use this method as a decorator
             @app.options("menu_selection")
             async def show_menu_options(ack):
@@ -1368,12 +1325,9 @@ class AsyncApp:
                     },
                 ]
                 await ack(options=options)
-        ```
 
-        ```python
             # Pass a function to this method
             app.options("menu_selection")(show_menu_options)
-        ```
 
         Refer to the following documents for details:
 

@@ -11,11 +11,7 @@ class AsyncMultiTeamsAuthorization(AsyncAuthorization)
 
 #### authorize: `AsyncAuthorize`
 
-The function to authorize incoming requests from Slack.
-
 #### user\_token\_resolution: `str`
-
-Either "authed_user" or "actor".
 
 #### \_\_init\_\_
 

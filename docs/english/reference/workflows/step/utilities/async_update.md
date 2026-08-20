@@ -11,7 +11,6 @@ class AsyncUpdate()
 
 `update()` utility to tell Slack the processing results of a `save` listener.
 
-```python
     async def save(ack, view, update):
         await ack()
 
@@ -19,17 +18,17 @@ class AsyncUpdate()
         task_name = values["task_name_input"]["name"]
         task_description = values["task_description_input"]["description"]
 
-        inputs = {
-            "task_name": {"value": task_name["value"]},
-            "task_description": {"value": task_description["value"]}
+        inputs = &#123;
+            "task_name": &#123;"value": task_name["value"]},
+            "task_description": &#123;"value": task_description["value"]}
         }
         outputs = [
-            {
+            &#123;
                 "type": "text",
                 "name": "task_name",
                 "label": "Task name",
             },
-            {
+            &#123;
                 "type": "text",
                 "name": "task_description",
                 "label": "Task description",
@@ -44,7 +43,6 @@ class AsyncUpdate()
         execute=execute,
     )
     app.step(ws)
-```
 
 This utility is a thin wrapper of workflows.stepFailed API method.
 Refer to https://api.slack.com/methods/workflows.updateStep for details.

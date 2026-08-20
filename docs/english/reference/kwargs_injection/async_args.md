@@ -12,33 +12,29 @@ class AsyncArgs()
 All the arguments in this class are available in any middleware / listeners.
 You can inject the named variables in the argument list in arbitrary order.
 
-```python
     @app.action("link_button")
     async def handle_buttons(ack, respond, logger, context, body, client):
-        logger.info(f"request body: {body}")
+        logger.info(f"request body: &#123;body}")
         await ack()
         if context.channel_id is not None:
             await respond("Hi!")
         await client.views_open(
             trigger_id=body["trigger_id"],
-            view={ ... }
+            view=&#123; ... }
         )
-```
 
 Alternatively, you can include a parameter named `args` and it will be injected with an instance of this class.
 
-```python
     @app.action("link_button")
     async def handle_buttons(args):
-        args.logger.info(f"request body: {args.body}")
+        args.logger.info(f"request body: &#123;args.body}")
         await args.ack()
         if args.context.channel_id is not None:
             await args.respond("Hi!")
         await args.client.views_open(
             trigger_id=args.body["trigger_id"],
-            view={ ... }
+            view=&#123; ... }
         )
-```
 
 #### logger: `Logger`
 

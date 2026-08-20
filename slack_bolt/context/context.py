@@ -54,7 +54,6 @@ class BoltContext(BaseContext):
     def client(self) -> WebClient:
         """The `WebClient` instance available for this request.
 
-        ```python
             @app.event("app_mention")
             def handle_events(context):
                 context.client.chat_postMessage(
@@ -69,7 +68,6 @@ class BoltContext(BaseContext):
                     channel=context.channel_id,
                     text="Thanks!",
                 )
-        ```
 
         Returns:
             `WebClient` instance
@@ -82,7 +80,6 @@ class BoltContext(BaseContext):
     def ack(self) -> Ack:
         """`ack()` function for this request.
 
-        ```python
             @app.action("button")
             def handle_button_clicks(context):
                 context.ack()
@@ -91,7 +88,6 @@ class BoltContext(BaseContext):
             @app.action("button")
             def handle_button_clicks(ack):
                 ack()
-        ```
 
         Returns:
             Callable `ack()` function
@@ -104,7 +100,6 @@ class BoltContext(BaseContext):
     def say(self) -> Say:
         """`say()` function for this request.
 
-        ```python
             @app.action("button")
             def handle_button_clicks(context):
                 context.ack()
@@ -115,7 +110,6 @@ class BoltContext(BaseContext):
             def handle_button_clicks(ack, say):
                 ack()
                 say("Hi!")
-        ```
 
         Returns:
             Callable `say()` function
@@ -128,7 +122,6 @@ class BoltContext(BaseContext):
     def respond(self) -> Optional[Respond]:
         """`respond()` function for this request.
 
-        ```python
             @app.action("button")
             def handle_button_clicks(context):
                 context.ack()
@@ -139,7 +132,6 @@ class BoltContext(BaseContext):
             def handle_button_clicks(ack, respond):
                 ack()
                 respond("Hi!")
-        ```
 
         Returns:
             Callable `respond()` function
@@ -159,7 +151,6 @@ class BoltContext(BaseContext):
         or complete the workflow if the function is the last step in a workflow. Additionally,
         any interactivity handlers associated to a function invocation will no longer be invocable.
 
-        ```python
             @app.function("reverse")
             def handle_button_clicks(ack, complete):
                 ack()
@@ -169,7 +160,6 @@ class BoltContext(BaseContext):
             def handle_button_clicks(context):
                 context.ack()
                 context.complete(outputs={"stringReverse":"olleh"})
-        ```
 
         Returns:
             Callable `complete()` function
@@ -185,7 +175,6 @@ class BoltContext(BaseContext):
         on to the end user through SlackBot. Additionally, any interactivity handlers associated
         to a function invocation will no longer be invocable.
 
-        ```python
             @app.function("reverse")
             def handle_button_clicks(ack, fail):
                 ack()
@@ -195,7 +184,6 @@ class BoltContext(BaseContext):
             def handle_button_clicks(context):
                 context.ack()
                 context.fail(error="something went wrong")
-        ```
 
         Returns:
             Callable `fail()` function

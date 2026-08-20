@@ -8,15 +8,11 @@ from slack_bolt.context.context import BoltContext
 
 class AuthorizeArgs:
     context: BoltContext
-    """The request context"""
     logger: Logger
     client: WebClient
     enterprise_id: Optional[str]
-    """The Organization ID (Enterprise Grid)"""
     team_id: Optional[str]
-    """The workspace ID"""
     user_id: Optional[str]
-    """The request user ID"""
 
     def __init__(
         self,

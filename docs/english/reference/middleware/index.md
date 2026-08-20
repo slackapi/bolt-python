@@ -3,6 +3,12 @@ sidebar_label: middleware
 title: slack_bolt.middleware
 ---
 
+A middleware processes request data and calls `next()` method
+if the execution chain should continue running the following middleware.
+
+Middleware can be used globally before all listener executions.
+It's also possible to run a middleware only for a particular listener.
+
 ## Submodules
 
 - [slack_bolt.middleware.assistant](/tools/bolt-python/reference/middleware/assistant)
@@ -98,22 +104,18 @@ def process(
 Processes a request data before other middleware and listeners.
 A middleware calls `next()` function if the chain should continue.
 
-```python
     @app.middleware
     def simple_middleware(req, resp, next):
         # do something here
         next()
-```
 
 This `process(req, resp, next)` method is supposed to be invoked only inside bolt-python.
 If you want to avoid the name `next()` in your middleware functions, you can use `next_()` method instead.
 
-```python
     @app.middleware
     def simple_middleware(req, resp, next_):
         # do something here
         next_()
-```
 
 **Arguments**:
 

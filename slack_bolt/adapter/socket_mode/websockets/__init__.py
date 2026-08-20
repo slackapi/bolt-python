@@ -22,9 +22,7 @@ from slack_bolt.response import BoltResponse
 
 class SocketModeHandler(AsyncBaseSocketModeHandler):
     app: App
-    """The Bolt app"""
     app_token: str
-    """App-level token starting with `xapp-`"""
     client: SocketModeClient
 
     def __init__(

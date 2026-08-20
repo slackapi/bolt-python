@@ -3,6 +3,8 @@ sidebar_label: async_base_handler
 title: slack_bolt.adapter.socket_mode.async_base_handler
 ---
 
+The base class of asyncio-based Socket Mode client implementation
+
 ## AsyncBaseSocketModeHandler Objects
 
 ```python

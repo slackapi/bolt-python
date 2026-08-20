@@ -4,7 +4,6 @@ from slack_sdk.web.async_client import AsyncWebClient
 class AsyncUpdate:
     """`update()` utility to tell Slack the processing results of a `save` listener.
 
-    ```python
         async def save(ack, view, update):
             await ack()
 
@@ -37,7 +36,6 @@ class AsyncUpdate:
             execute=execute,
         )
         app.step(ws)
-    ```
 
     This utility is a thin wrapper of workflows.stepFailed API method.
     Refer to https://api.slack.com/methods/workflows.updateStep for details.

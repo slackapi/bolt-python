@@ -3,6 +3,13 @@ sidebar_label: socket_mode
 title: slack_bolt.adapter.socket_mode
 ---
 
+Socket Mode adapter package provides the following implementations. If you don't have strong reasons to use 3rd party library based adapters, we recommend using the built-in client based one.
+
+* `slack_bolt.adapter.socket_mode.builtin`
+* `slack_bolt.adapter.socket_mode.websocket_client`
+* `slack_bolt.adapter.socket_mode.aiohttp`
+* `slack_bolt.adapter.socket_mode.websockets`
+
 ## Submodules
 
 - [slack_bolt.adapter.socket_mode.aiohttp](/tools/bolt-python/reference/adapter/socket_mode/aiohttp)
@@ -23,11 +30,7 @@ class SocketModeHandler(BaseSocketModeHandler)
 
 #### app: `App`
 
-The Bolt app
-
 #### app\_token: `str`
-
-App-level token starting with `xapp-`
 
 #### client: `SocketModeClient`
 

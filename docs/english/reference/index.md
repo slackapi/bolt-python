@@ -3,6 +3,12 @@ sidebar_label: slack_bolt
 title: slack_bolt
 ---
 
+A Python framework to build Slack apps in a flash with the latest platform features.Read the [getting started guide](https://docs.slack.dev/tools/bolt-python/creating-an-app) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt.
+
+* Website: https://docs.slack.dev/tools/bolt-python/
+* GitHub repository: https://github.com/slackapi/bolt-python
+* The class representing a Bolt app: `slack_bolt.app.app`
+
 ## Submodules
 
 - [slack_bolt.adapter](/tools/bolt-python/reference/adapter)
@@ -83,33 +89,29 @@ class Args()
 All the arguments in this class are available in any middleware / listeners.
 You can inject the named variables in the argument list in arbitrary order.
 
-```python
     @app.action("link_button")
     def handle_buttons(ack, respond, logger, context, body, client):
-        logger.info(f"request body: {body}")
+        logger.info(f"request body: &#123;body}")
         ack()
         if context.channel_id is not None:
             respond("Hi!")
         client.views_open(
             trigger_id=body["trigger_id"],
-            view={ ... }
+            view=&#123; ... }
         )
-```
 
 Alternatively, you can include a parameter named `args` and it will be injected with an instance of this class.
 
-```python
     @app.action("link_button")
     def handle_buttons(args):
-        args.logger.info(f"request body: {args.body}")
+        args.logger.info(f"request body: &#123;args.body}")
         args.ack()
         if args.context.channel_id is not None:
             args.respond("Hi!")
         args.client.views_open(
             trigger_id=args.body["trigger_id"],
-            view={ ... }
+            view=&#123; ... }
         )
-```
 
 ## Listener Objects
 

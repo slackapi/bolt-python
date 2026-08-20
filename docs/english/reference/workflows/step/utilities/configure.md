@@ -11,20 +11,19 @@ class Configure()
 
 `configure()` utility to send the modal view in Workflow Builder.
 
-```python
     def edit(ack, step, configure):
         ack()
 
         blocks = [
-            {
+            &#123;
                 "type": "input",
                 "block_id": "task_name_input",
-                "element": {
+                "element": &#123;
                     "type": "plain_text_input",
                     "action_id": "name",
-                    "placeholder": {"type": "plain_text", "text": "Add a task name"},
+                    "placeholder": &#123;"type": "plain_text", "text": "Add a task name"},
                 },
-                "label": {"type": "plain_text", "text": "Task name"},
+                "label": &#123;"type": "plain_text", "text": "Task name"},
             },
         ]
         configure(blocks=blocks)
@@ -36,7 +35,6 @@ class Configure()
         execute=execute,
     )
     app.step(ws)
-```
 
 Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
 

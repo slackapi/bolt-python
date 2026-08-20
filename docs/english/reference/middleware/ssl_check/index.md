@@ -16,9 +16,6 @@ class SslCheck(Middleware)
 
 #### verification\_token: `Optional[str]`
 
-The verification token to check (optional as it's already deprecated -
-https://docs.slack.dev/authentication/verifying-requests-from-slack/#deprecation)
-
 #### logger: `Logger`
 
 #### \_\_init\_\_

@@ -122,11 +122,10 @@ class Complete()
 
 `complete()` utility to tell Slack the completion of a step from app execution.
 
-```python
     def execute(step, complete, fail):
         inputs = step["inputs"]
         # if everything was successful
-        outputs = {
+        outputs = &#123;
             "task_name": inputs["task_name"]["value"],
             "task_description": inputs["task_description"]["value"],
         }
@@ -139,7 +138,6 @@ class Complete()
         execute=execute,
     )
     app.step(ws)
-```
 
 This utility is a thin wrapper of workflows.stepCompleted API method.
 Refer to https://api.slack.com/methods/workflows.stepCompleted for details.
@@ -158,20 +156,19 @@ class Configure()
 
 `configure()` utility to send the modal view in Workflow Builder.
 
-```python
     def edit(ack, step, configure):
         ack()
 
         blocks = [
-            {
+            &#123;
                 "type": "input",
                 "block_id": "task_name_input",
-                "element": {
+                "element": &#123;
                     "type": "plain_text_input",
                     "action_id": "name",
-                    "placeholder": {"type": "plain_text", "text": "Add a task name"},
+                    "placeholder": &#123;"type": "plain_text", "text": "Add a task name"},
                 },
-                "label": {"type": "plain_text", "text": "Task name"},
+                "label": &#123;"type": "plain_text", "text": "Task name"},
             },
         ]
         configure(blocks=blocks)
@@ -183,7 +180,6 @@ class Configure()
         execute=execute,
     )
     app.step(ws)
-```
 
 Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
 
@@ -201,7 +197,6 @@ class Update()
 
 `update()` utility to tell Slack the processing results of a `save` listener.
 
-```python
     def save(ack, view, update):
         ack()
 
@@ -209,17 +204,17 @@ class Update()
         task_name = values["task_name_input"]["name"]
         task_description = values["task_description_input"]["description"]
 
-        inputs = {
-            "task_name": {"value": task_name["value"]},
-            "task_description": {"value": task_description["value"]}
+        inputs = &#123;
+            "task_name": &#123;"value": task_name["value"]},
+            "task_description": &#123;"value": task_description["value"]}
         }
         outputs = [
-            {
+            &#123;
                 "type": "text",
                 "name": "task_name",
                 "label": "Task name",
             },
-            {
+            &#123;
                 "type": "text",
                 "name": "task_description",
                 "label": "Task description",
@@ -234,7 +229,6 @@ class Update()
         execute=execute,
     )
     app.step(ws)
-```
 
 This utility is a thin wrapper of workflows.stepFailed API method.
 Refer to https://api.slack.com/methods/workflows.updateStep for details.
@@ -253,11 +247,10 @@ class Fail()
 
 `fail()` utility to tell Slack the execution failure of a step from app.
 
-```python
     def execute(step, complete, fail):
         inputs = step["inputs"]
         # if something went wrong
-        error = {"message": "Just testing step failure!"}
+        error = &#123;"message": "Just testing step failure!"}
         fail(error=error)
 
     ws = WorkflowStep(
@@ -267,7 +260,6 @@ class Fail()
         execute=execute,
     )
     app.step(ws)
-```
 
 This utility is a thin wrapper of workflows.stepFailed API method.
 Refer to https://api.slack.com/methods/workflows.stepFailed for details.

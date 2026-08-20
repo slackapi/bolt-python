@@ -28,7 +28,6 @@ class WorkflowStepBuilder:
     """
 
     callback_id: Union[str, Pattern]
-    """The callback_id for the workflow"""
     _base_logger: Optional[Logger]
     _edit: Optional[Listener]
     _save: Optional[Listener]
@@ -47,7 +46,6 @@ class WorkflowStepBuilder:
 
         This builder is supposed to be used as decorator.
 
-        ```python
             my_step = WorkflowStep.builder("my_step")
             @my_step.edit
             def edit_my_step(ack, configure):
@@ -59,7 +57,6 @@ class WorkflowStepBuilder:
             def execute_my_step(step, complete, fail):
                 pass
             app.step(my_step)
-        ```
 
         For further information about WorkflowStep specific function arguments
         such as `configure`, `update`, `complete`, and `fail`,
@@ -93,19 +90,15 @@ class WorkflowStepBuilder:
 
         You can use this method as decorator as well.
 
-        ```python
             @my_step.edit
             def edit_my_step(ack, configure):
                 pass
-        ```
 
         It's also possible to add additional listener matchers and/or middleware
 
-        ```python
             @my_step.edit(matchers=[is_valid], middleware=[update_context])
             def edit_my_step(ack, configure):
                 pass
-        ```
 
         For further information about WorkflowStep specific function arguments
         such as `configure`, `update`, `complete`, and `fail`,
@@ -151,19 +144,15 @@ class WorkflowStepBuilder:
 
         You can use this method as decorator as well.
 
-        ```python
             @my_step.save
             def save_my_step(ack, step, update):
                 pass
-        ```
 
         It's also possible to add additional listener matchers and/or middleware
 
-        ```python
             @my_step.save(matchers=[is_valid], middleware=[update_context])
             def save_my_step(ack, step, update):
                 pass
-        ```
 
         For further information about WorkflowStep specific function arguments
         such as `configure`, `update`, `complete`, and `fail`,
@@ -208,19 +197,15 @@ class WorkflowStepBuilder:
 
         You can use this method as decorator as well.
 
-        ```python
             @my_step.execute
             def execute_my_step(step, complete, fail):
                 pass
-        ```
 
         It's also possible to add additional listener matchers and/or middleware
 
-        ```python
             @my_step.save(matchers=[is_valid], middleware=[update_context])
             def execute_my_step(step, complete, fail):
                 pass
-        ```
 
         For further information about WorkflowStep specific function arguments
         such as `configure`, `update`, `complete`, and `fail`,

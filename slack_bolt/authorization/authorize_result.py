@@ -7,31 +7,19 @@ class AuthorizeResult(dict):
     """Authorize function call result"""
 
     enterprise_id: Optional[str]
-    """Organization ID (Enterprise Grid) starting with `E`"""
     team_id: Optional[str]
-    """Workspace ID starting with `T`"""
     team: Optional[str]  # since v1.18
-    """Workspace name"""
     url: Optional[str]  # since v1.18
-    """Workspace slack.com URL"""
 
     bot_id: Optional[str]
-    """Bot ID starting with `B`"""
     bot_user_id: Optional[str]
-    """Bot user's User ID starting with either `U` or `W`"""
     bot_token: Optional[str]
-    """Bot user access token starting with `xoxb-`"""
     bot_scopes: Optional[Sequence[str]]  # since v1.17
-    """The scopes associated with the bot token"""
 
     user_id: Optional[str]
-    """The request user ID"""
     user: Optional[str]  # since v1.18
-    """The request user's name"""
     user_token: Optional[str]
-    """User access token starting with `xoxp-`"""
     user_scopes: Optional[Sequence[str]]  # since v1.17
-    """The scopes associated wth the user token"""
 
     def __init__(
         self,

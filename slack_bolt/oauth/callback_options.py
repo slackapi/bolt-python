@@ -67,9 +67,7 @@ class FailureArgs:
 
 class CallbackOptions:
     success: Callable[[SuccessArgs], BoltResponse]
-    """A handler for successful installation."""
     failure: Callable[[FailureArgs], BoltResponse]
-    """A handler for any types of installation failures."""
 
     def __init__(
         self,

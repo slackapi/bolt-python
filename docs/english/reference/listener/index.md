@@ -3,6 +3,10 @@ sidebar_label: listener
 title: slack_bolt.listener
 ---
 
+Listeners process an incoming request from Slack if the request's type or data structure matches
+the predefined conditions of the listener. Typically, a listener acknowledge requests from Slack,
+process the request data, and may send response back to Slack.
+
 ## Submodules
 
 - [slack_bolt.listener.async_builtins](/tools/bolt-python/reference/listener/async_builtins)

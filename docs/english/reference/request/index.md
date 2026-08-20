@@ -3,6 +3,11 @@ sidebar_label: request
 title: slack_bolt.request
 ---
 
+Incoming request from Slack through either HTTP request or Socket Mode connection.
+
+Refer to https://docs.slack.dev/apis/events-api/ for the two types of connections.
+This interface encapsulates the difference between the two.
+
 ## Submodules
 
 - [slack_bolt.request.async_internals](/tools/bolt-python/reference/request/async_internals)
@@ -21,29 +26,19 @@ class BoltRequest()
 
 #### query: `Dict[str, Sequence[str]]`
 
-The query string data in any data format.
-
 #### headers: `Dict[str, Sequence[str]]`
-
-The request headers.
 
 #### content\_type: `Optional[str]`
 
 #### body: `Dict[str, Any]`
 
-The raw request body (only plain text is supported for "http" mode)
-
 #### context: `BoltContext`
-
-The context in this request.
 
 #### lazy\_only: `bool`
 
 #### lazy\_function\_name: `Optional[str]`
 
 #### mode: `str`
-
-The mode used for this request. (either "http" or "socket_mode")
 
 #### \_\_init\_\_
 

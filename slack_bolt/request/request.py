@@ -15,18 +15,13 @@ from slack_bolt.request.internals import (
 class BoltRequest:
     raw_body: str
     query: Dict[str, Sequence[str]]
-    """The query string data in any data format."""
     headers: Dict[str, Sequence[str]]
-    """The request headers."""
     content_type: Optional[str]
     body: Dict[str, Any]
-    """The raw request body (only plain text is supported for "http" mode)"""
     context: BoltContext
-    """The context in this request."""
     lazy_only: bool
     lazy_function_name: Optional[str]
     mode: str  # either "http" or "socket_mode"
-    """The mode used for this request. (either "http" or "socket_mode")"""
 
     def __init__(
         self,

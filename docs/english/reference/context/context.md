@@ -36,7 +36,6 @@ def client() -> WebClient
 
 The `WebClient` instance available for this request.
 
-```python
     @app.event("app_mention")
     def handle_events(context):
         context.client.chat_postMessage(
@@ -51,7 +50,6 @@ The `WebClient` instance available for this request.
             channel=context.channel_id,
             text="Thanks!",
         )
-```
 
 **Returns**:
 
@@ -66,7 +64,6 @@ def ack() -> Ack
 
 `ack()` function for this request.
 
-```python
     @app.action("button")
     def handle_button_clicks(context):
         context.ack()
@@ -75,7 +72,6 @@ def ack() -> Ack
     @app.action("button")
     def handle_button_clicks(ack):
         ack()
-```
 
 **Returns**:
 
@@ -90,7 +86,6 @@ def say() -> Say
 
 `say()` function for this request.
 
-```python
     @app.action("button")
     def handle_button_clicks(context):
         context.ack()
@@ -101,7 +96,6 @@ def say() -> Say
     def handle_button_clicks(ack, say):
         ack()
         say("Hi!")
-```
 
 **Returns**:
 
@@ -116,7 +110,6 @@ def respond() -> Optional[Respond]
 
 `respond()` function for this request.
 
-```python
     @app.action("button")
     def handle_button_clicks(context):
         context.ack()
@@ -127,7 +120,6 @@ def respond() -> Optional[Respond]
     def handle_button_clicks(ack, respond):
         ack()
         respond("Hi!")
-```
 
 **Returns**:
 
@@ -145,17 +137,15 @@ any outputs the function returns will be passed along to the next step of its ho
 or complete the workflow if the function is the last step in a workflow. Additionally,
 any interactivity handlers associated to a function invocation will no longer be invocable.
 
-```python
     @app.function("reverse")
     def handle_button_clicks(ack, complete):
         ack()
-        complete(outputs={"stringReverse":"olleh"})
+        complete(outputs=&#123;"stringReverse":"olleh"})
 
     @app.function("reverse")
     def handle_button_clicks(context):
         context.ack()
-        context.complete(outputs={"stringReverse":"olleh"})
-```
+        context.complete(outputs=&#123;"stringReverse":"olleh"})
 
 **Returns**:
 
@@ -173,7 +163,6 @@ its housing workflow will be interrupted and any provided error message will be 
 on to the end user through SlackBot. Additionally, any interactivity handlers associated
 to a function invocation will no longer be invocable.
 
-```python
     @app.function("reverse")
     def handle_button_clicks(ack, fail):
         ack()
@@ -183,7 +172,6 @@ to a function invocation will no longer be invocable.
     def handle_button_clicks(context):
         context.ack()
         context.fail(error="something went wrong")
-```
 
 **Returns**:
 

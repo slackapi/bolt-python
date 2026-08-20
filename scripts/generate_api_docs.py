@@ -15,6 +15,7 @@ rendered and then rewritten.
 import json
 import os
 import re
+import shutil
 
 import griffe
 
@@ -337,9 +338,16 @@ def _iter_modules(module):
             yield from _iter_modules(member)
 
 
+def _module_docstring(module):
+    """Render a module's own docstring (the package/module overview), if any."""
+    out = []
+    _render_docstring(module, out)
+    return "\n".join(out).rstrip("\n")
+
+
 def _render_body(module):
-    """Render a module's members (its docstring is intentionally omitted to
-    match the reference's member-focused layout)."""
+    """Render a module's members (the module docstring is rendered separately
+    at the top of the page)."""
     out = []
     for name, obj in _documented_members(module):
         _render_object(name, obj, out)
@@ -400,6 +408,7 @@ def _build_pages(root):
             "title": dotted,
             "sidebar_label": sidebar_label,
             "doc_id": _doc_id(rel_path, is_package),
+            "docstring": _module_docstring(module),
             "body": _render_body(module),
         }
     return pages
@@ -439,6 +448,9 @@ def _write_pages(pages):
         frontmatter.append("---")
 
         body_parts = []
+        if page["docstring"]:
+            body_parts.append(page["docstring"])
+            body_parts.append("")
         if page["is_package"] or not rel_path:
             links = _submodule_links(rel_path, pages)
             if links:
@@ -559,7 +571,11 @@ def _strip_reference_from_site_sidebar():
 
 
 def main():
-    os.makedirs(os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR), exist_ok=True)
+    # Rebuild the reference tree from scratch so renamed/removed modules don't
+    # leave orphaned pages behind. Everything under reference/ is generated.
+    reference_dir = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR)
+    shutil.rmtree(reference_dir, ignore_errors=True)
+    os.makedirs(reference_dir, exist_ok=True)
     root = _load_package()
     pages = _build_pages(root)
     _write_pages(pages)

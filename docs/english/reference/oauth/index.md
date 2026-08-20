@@ -3,6 +3,10 @@ sidebar_label: oauth
 title: slack_bolt.oauth
 ---
 
+Slack OAuth flow support for building an app that is installable in any workspaces.
+
+Refer to https://docs.slack.dev/tools/bolt-python/concepts/authenticating-oauth for details.
+
 ## Submodules
 
 - [slack_bolt.oauth.async_callback_options](/tools/bolt-python/reference/oauth/async_callback_options)
@@ -21,8 +25,6 @@ class OAuthFlow()
 ```
 
 #### settings: `OAuthSettings`
-
-OAuth settings to configure this module.
 
 #### client\_id: `str`
 

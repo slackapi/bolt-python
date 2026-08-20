@@ -3,6 +3,8 @@ sidebar_label: websocket_client
 title: slack_bolt.adapter.socket_mode.websocket_client
 ---
 
+[`websocket-client`](https://pypi.org/project/websocket-client/) based implementation
+
 ## SocketModeHandler Objects
 
 ```python
@@ -11,11 +13,7 @@ class SocketModeHandler(BaseSocketModeHandler)
 
 #### app: `App`
 
-The Bolt app
-
 #### app\_token: `str`
-
-App-level token starting with `xapp-`
 
 #### client: `SocketModeClient`
 

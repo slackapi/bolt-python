@@ -11,15 +11,9 @@ class AsyncSlackAppServer()
 
 #### port: `int`
 
-The port to listen on
-
 #### path: `str`
 
-The path to receive incoming requests from Slack
-
 #### host: `str`
-
-The hostname to serve the web endpoints. (Default: 0.0.0.0)
 
 #### bolt\_app: `AsyncApp`
 

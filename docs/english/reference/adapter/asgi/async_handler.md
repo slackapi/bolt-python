@@ -11,8 +11,6 @@ class AsyncSlackRequestHandler(SlackRequestHandler)
 
 #### app: `AsyncApp`
 
-Your bolt application
-
 #### \_\_init\_\_
 
 ```python
@@ -25,7 +23,6 @@ This can be used for production deployment.
 With the default settings, `http://localhost:3000/slack/events`
 Run Bolt with [uvicron](https://www.uvicorn.org/)
 
-```python
     # Python
     app = AsyncApp()
     api = SlackRequestHandler(app)
@@ -34,7 +31,6 @@ Run Bolt with [uvicron](https://www.uvicorn.org/)
     export SLACK_SIGNING_SECRET=***
     export SLACK_BOT_TOKEN=xoxb-***
     uvicorn app:api --port 3000 --log-level debug
-```
 
 **Arguments**:
 
