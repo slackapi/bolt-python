@@ -24,18 +24,23 @@ async def async_process(
 Processes a request data before other middleware and listeners.
 A middleware calls `next()` function if the chain should continue.
 
-    @app.middleware
-    async def simple_middleware(req, resp, next):
-        # do something here
-        await next()
+```python
+@app.middleware
+async def simple_middleware(req, resp, next):
+    # do something here
+    await next()
+```
 
 This `async_process(req, resp, next)` method is supposed to be invoked only inside bolt-python.
 If you want to avoid the name `next()` in your middleware functions, you can use `next_()` method instead.
 
-    @app.middleware
-    async def simple_middleware(req, resp, next_):
-        # do something here
-        await next_()
+```python
+@app.middleware
+async def simple_middleware(req, resp, next_):
+    # do something here
+    await next_()
+```
+
 
 **Arguments**:
 

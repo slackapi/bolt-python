@@ -36,20 +36,23 @@ def client() -> WebClient
 
 The `WebClient` instance available for this request.
 
-    @app.event("app_mention")
-    def handle_events(context):
-        context.client.chat_postMessage(
-            channel=context.channel_id,
-            text="Thanks!",
-        )
+```python
+@app.event("app_mention")
+def handle_events(context):
+    context.client.chat_postMessage(
+        channel=context.channel_id,
+        text="Thanks!",
+    )
 
-    # You can access "client" this way too.
-    @app.event("app_mention")
-    def handle_events(client, context):
-        client.chat_postMessage(
-            channel=context.channel_id,
-            text="Thanks!",
-        )
+# You can access "client" this way too.
+@app.event("app_mention")
+def handle_events(client, context):
+    client.chat_postMessage(
+        channel=context.channel_id,
+        text="Thanks!",
+    )
+```
+
 
 **Returns**:
 
@@ -64,14 +67,17 @@ def ack() -> Ack
 
 `ack()` function for this request.
 
-    @app.action("button")
-    def handle_button_clicks(context):
-        context.ack()
+```python
+@app.action("button")
+def handle_button_clicks(context):
+    context.ack()
 
-    # You can access "ack" this way too.
-    @app.action("button")
-    def handle_button_clicks(ack):
-        ack()
+# You can access "ack" this way too.
+@app.action("button")
+def handle_button_clicks(ack):
+    ack()
+```
+
 
 **Returns**:
 
@@ -86,16 +92,19 @@ def say() -> Say
 
 `say()` function for this request.
 
-    @app.action("button")
-    def handle_button_clicks(context):
-        context.ack()
-        context.say("Hi!")
+```python
+@app.action("button")
+def handle_button_clicks(context):
+    context.ack()
+    context.say("Hi!")
 
-    # You can access "ack" this way too.
-    @app.action("button")
-    def handle_button_clicks(ack, say):
-        ack()
-        say("Hi!")
+# You can access "ack" this way too.
+@app.action("button")
+def handle_button_clicks(ack, say):
+    ack()
+    say("Hi!")
+```
+
 
 **Returns**:
 
@@ -110,16 +119,19 @@ def respond() -> Optional[Respond]
 
 `respond()` function for this request.
 
-    @app.action("button")
-    def handle_button_clicks(context):
-        context.ack()
-        context.respond("Hi!")
+```python
+@app.action("button")
+def handle_button_clicks(context):
+    context.ack()
+    context.respond("Hi!")
 
-    # You can access "ack" this way too.
-    @app.action("button")
-    def handle_button_clicks(ack, respond):
-        ack()
-        respond("Hi!")
+# You can access "ack" this way too.
+@app.action("button")
+def handle_button_clicks(ack, respond):
+    ack()
+    respond("Hi!")
+```
+
 
 **Returns**:
 
@@ -137,15 +149,18 @@ any outputs the function returns will be passed along to the next step of its ho
 or complete the workflow if the function is the last step in a workflow. Additionally,
 any interactivity handlers associated to a function invocation will no longer be invocable.
 
-    @app.function("reverse")
-    def handle_button_clicks(ack, complete):
-        ack()
-        complete(outputs=&#123;"stringReverse":"olleh"})
+```python
+@app.function("reverse")
+def handle_button_clicks(ack, complete):
+    ack()
+    complete(outputs={"stringReverse":"olleh"})
 
-    @app.function("reverse")
-    def handle_button_clicks(context):
-        context.ack()
-        context.complete(outputs=&#123;"stringReverse":"olleh"})
+@app.function("reverse")
+def handle_button_clicks(context):
+    context.ack()
+    context.complete(outputs={"stringReverse":"olleh"})
+```
+
 
 **Returns**:
 
@@ -163,15 +178,18 @@ its housing workflow will be interrupted and any provided error message will be 
 on to the end user through SlackBot. Additionally, any interactivity handlers associated
 to a function invocation will no longer be invocable.
 
-    @app.function("reverse")
-    def handle_button_clicks(ack, fail):
-        ack()
-        fail(error="something went wrong")
+```python
+@app.function("reverse")
+def handle_button_clicks(ack, fail):
+    ack()
+    fail(error="something went wrong")
 
-    @app.function("reverse")
-    def handle_button_clicks(context):
-        context.ack()
-        context.fail(error="something went wrong")
+@app.function("reverse")
+def handle_button_clicks(context):
+    context.ack()
+    context.fail(error="something went wrong")
+```
+
 
 **Returns**:
 

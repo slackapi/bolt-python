@@ -30,17 +30,19 @@ Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
 This builder is supposed to be used as decorator.
 
-    my_step = AsyncWorkflowStep.builder("my_step")
-    @my_step.edit
-    async def edit_my_step(ack, configure):
-        pass
-    @my_step.save
-    async def save_my_step(ack, step, update):
-        pass
-    @my_step.execute
-    async def execute_my_step(step, complete, fail):
-        pass
-    app.step(my_step)
+```python
+my_step = AsyncWorkflowStep.builder("my_step")
+@my_step.edit
+async def edit_my_step(ack, configure):
+    pass
+@my_step.save
+async def save_my_step(ack, step, update):
+    pass
+@my_step.execute
+async def execute_my_step(step, complete, fail):
+    pass
+app.step(my_step)
+```
 
 For further information about AsyncWorkflowStep specific function arguments
 such as `configure`, `update`, `complete`, and `fail`,
@@ -71,15 +73,19 @@ Registers a new edit listener with details.
 
 You can use this method as decorator as well.
 
-    @my_step.edit
-    def edit_my_step(ack, configure):
-        pass
+```python
+@my_step.edit
+def edit_my_step(ack, configure):
+    pass
+```
 
 It's also possible to add additional listener matchers and/or middleware
 
-    @my_step.edit(matchers=[is_valid], middleware=[update_context])
-    def edit_my_step(ack, configure):
-        pass
+```python
+@my_step.edit(matchers=[is_valid], middleware=[update_context])
+def edit_my_step(ack, configure):
+    pass
+```
 
 For further information about AsyncWorkflowStep specific function arguments
 such as `configure`, `update`, `complete`, and `fail`,
@@ -111,15 +117,19 @@ Registers a new save listener with details.
 
 You can use this method as decorator as well.
 
-    @my_step.save
-    def save_my_step(ack, step, update):
-        pass
+```python
+@my_step.save
+def save_my_step(ack, step, update):
+    pass
+```
 
 It's also possible to add additional listener matchers and/or middleware
 
-    @my_step.save(matchers=[is_valid], middleware=[update_context])
-    def save_my_step(ack, step, update):
-        pass
+```python
+@my_step.save(matchers=[is_valid], middleware=[update_context])
+def save_my_step(ack, step, update):
+    pass
+```
 
 For further information about AsyncWorkflowStep specific function arguments
 such as `configure`, `update`, `complete`, and `fail`,
@@ -151,15 +161,19 @@ Registers a new execute listener with details.
 
 You can use this method as decorator as well.
 
-    @my_step.execute
-    def execute_my_step(step, complete, fail):
-        pass
+```python
+@my_step.execute
+def execute_my_step(step, complete, fail):
+    pass
+```
 
 It's also possible to add additional listener matchers and/or middleware
 
-    @my_step.save(matchers=[is_valid], middleware=[update_context])
-    def execute_my_step(step, complete, fail):
-        pass
+```python
+@my_step.save(matchers=[is_valid], middleware=[update_context])
+def execute_my_step(step, complete, fail):
+    pass
+```
 
 For further information about AsyncWorkflowStep specific function arguments
 such as `configure`, `update`, `complete`, and `fail`,

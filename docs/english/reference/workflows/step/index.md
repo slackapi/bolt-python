@@ -122,22 +122,24 @@ class Complete()
 
 `complete()` utility to tell Slack the completion of a step from app execution.
 
-    def execute(step, complete, fail):
-        inputs = step["inputs"]
-        # if everything was successful
-        outputs = &#123;
-            "task_name": inputs["task_name"]["value"],
-            "task_description": inputs["task_description"]["value"],
-        }
-        complete(outputs=outputs)
+```python
+def execute(step, complete, fail):
+    inputs = step["inputs"]
+    # if everything was successful
+    outputs = {
+        "task_name": inputs["task_name"]["value"],
+        "task_description": inputs["task_description"]["value"],
+    }
+    complete(outputs=outputs)
 
-    ws = WorkflowStep(
-        callback_id="add_task",
-        edit=edit,
-        save=save,
-        execute=execute,
-    )
-    app.step(ws)
+ws = WorkflowStep(
+    callback_id="add_task",
+    edit=edit,
+    save=save,
+    execute=execute,
+)
+app.step(ws)
+```
 
 This utility is a thin wrapper of workflows.stepCompleted API method.
 Refer to https://api.slack.com/methods/workflows.stepCompleted for details.
@@ -156,30 +158,32 @@ class Configure()
 
 `configure()` utility to send the modal view in Workflow Builder.
 
-    def edit(ack, step, configure):
-        ack()
+```python
+def edit(ack, step, configure):
+    ack()
 
-        blocks = [
-            &#123;
-                "type": "input",
-                "block_id": "task_name_input",
-                "element": &#123;
-                    "type": "plain_text_input",
-                    "action_id": "name",
-                    "placeholder": &#123;"type": "plain_text", "text": "Add a task name"},
-                },
-                "label": &#123;"type": "plain_text", "text": "Task name"},
+    blocks = [
+        {
+            "type": "input",
+            "block_id": "task_name_input",
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "name",
+                "placeholder": {"type": "plain_text", "text": "Add a task name"},
             },
-        ]
-        configure(blocks=blocks)
+            "label": {"type": "plain_text", "text": "Task name"},
+        },
+    ]
+    configure(blocks=blocks)
 
-    ws = WorkflowStep(
-        callback_id="add_task",
-        edit=edit,
-        save=save,
-        execute=execute,
-    )
-    app.step(ws)
+ws = WorkflowStep(
+    callback_id="add_task",
+    edit=edit,
+    save=save,
+    execute=execute,
+)
+app.step(ws)
+```
 
 Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
 
@@ -197,38 +201,40 @@ class Update()
 
 `update()` utility to tell Slack the processing results of a `save` listener.
 
-    def save(ack, view, update):
-        ack()
+```python
+def save(ack, view, update):
+    ack()
 
-        values = view["state"]["values"]
-        task_name = values["task_name_input"]["name"]
-        task_description = values["task_description_input"]["description"]
+    values = view["state"]["values"]
+    task_name = values["task_name_input"]["name"]
+    task_description = values["task_description_input"]["description"]
 
-        inputs = &#123;
-            "task_name": &#123;"value": task_name["value"]},
-            "task_description": &#123;"value": task_description["value"]}
+    inputs = {
+        "task_name": {"value": task_name["value"]},
+        "task_description": {"value": task_description["value"]}
+    }
+    outputs = [
+        {
+            "type": "text",
+            "name": "task_name",
+            "label": "Task name",
+        },
+        {
+            "type": "text",
+            "name": "task_description",
+            "label": "Task description",
         }
-        outputs = [
-            &#123;
-                "type": "text",
-                "name": "task_name",
-                "label": "Task name",
-            },
-            &#123;
-                "type": "text",
-                "name": "task_description",
-                "label": "Task description",
-            }
-        ]
-        update(inputs=inputs, outputs=outputs)
+    ]
+    update(inputs=inputs, outputs=outputs)
 
-    ws = WorkflowStep(
-        callback_id="add_task",
-        edit=edit,
-        save=save,
-        execute=execute,
-    )
-    app.step(ws)
+ws = WorkflowStep(
+    callback_id="add_task",
+    edit=edit,
+    save=save,
+    execute=execute,
+)
+app.step(ws)
+```
 
 This utility is a thin wrapper of workflows.stepFailed API method.
 Refer to https://api.slack.com/methods/workflows.updateStep for details.
@@ -247,19 +253,21 @@ class Fail()
 
 `fail()` utility to tell Slack the execution failure of a step from app.
 
-    def execute(step, complete, fail):
-        inputs = step["inputs"]
-        # if something went wrong
-        error = &#123;"message": "Just testing step failure!"}
-        fail(error=error)
+```python
+def execute(step, complete, fail):
+    inputs = step["inputs"]
+    # if something went wrong
+    error = {"message": "Just testing step failure!"}
+    fail(error=error)
 
-    ws = WorkflowStep(
-        callback_id="add_task",
-        edit=edit,
-        save=save,
-        execute=execute,
-    )
-    app.step(ws)
+ws = WorkflowStep(
+    callback_id="add_task",
+    edit=edit,
+    save=save,
+    execute=execute,
+)
+app.step(ws)
+```
 
 This utility is a thin wrapper of workflows.stepFailed API method.
 Refer to https://api.slack.com/methods/workflows.stepFailed for details.

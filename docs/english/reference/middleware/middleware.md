@@ -25,18 +25,23 @@ def process(
 Processes a request data before other middleware and listeners.
 A middleware calls `next()` function if the chain should continue.
 
-    @app.middleware
-    def simple_middleware(req, resp, next):
-        # do something here
-        next()
+```python
+@app.middleware
+def simple_middleware(req, resp, next):
+    # do something here
+    next()
+```
 
 This `process(req, resp, next)` method is supposed to be invoked only inside bolt-python.
 If you want to avoid the name `next()` in your middleware functions, you can use `next_()` method instead.
 
-    @app.middleware
-    def simple_middleware(req, resp, next_):
-        # do something here
-        next_()
+```python
+@app.middleware
+def simple_middleware(req, resp, next_):
+    # do something here
+    next_()
+```
+
 
 **Arguments**:
 

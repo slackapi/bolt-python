@@ -28,17 +28,18 @@ This can be used for production deployments.
 With the default settings, `http://localhost:3000/slack/events`
 Run Bolt with [gunicorn](https://gunicorn.org/)
 
-# Python
-    app = App()
+```python
+app = App()
 
-    api = SlackRequestHandler(app)
+api = SlackRequestHandler(app)
+```
 
-# bash
-    export SLACK_SIGNING_SECRET=***
+```bash
+export SLACK_SIGNING_SECRET=***
+export SLACK_BOT_TOKEN=xoxb-***
 
-    export SLACK_BOT_TOKEN=xoxb-***
-
-    gunicorn app:api -b 0.0.0.0:3000 --log-level debug
+gunicorn app:api -b 0.0.0.0:3000 --log-level debug
+```
 
 **Arguments**:
 

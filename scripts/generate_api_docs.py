@@ -158,6 +158,41 @@ def _property_signature(attr):
 # --------------------------------------------------------------------------- #
 
 
+def _reflow_indented_code(text):
+    """Convert Markdown indented code blocks (4-space, RST literal-block style
+    used in many docstrings) into fenced ``python`` blocks.
+
+    A bare indented block renders without syntax highlighting and, worse, its
+    ``#`` comment lines can be misread as headers by some Markdown/MDX
+    processors. Re-emitting the block fenced removes both problems and lets
+    _escape_mdx leave the code verbatim. Only blocks preceded by a blank line
+    are treated as code, matching CommonMark (an indented run cannot interrupt
+    a paragraph)."""
+    lines = text.split("\n")
+    out = []
+    i = 0
+    prev_blank = True  # start of a section counts as a preceding blank line
+    while i < len(lines):
+        line = lines[i]
+        if prev_blank and line.startswith("    ") and line.strip():
+            block = []
+            while i < len(lines) and (lines[i].startswith("    ") or not lines[i].strip()):
+                block.append(lines[i])
+                i += 1
+            while block and not block[-1].strip():
+                block.pop()
+            out.append("```python")
+            out.extend(bl[4:] if bl.startswith("    ") else bl for bl in block)
+            out.append("```")
+            out.append("")
+            prev_blank = True
+            continue
+        out.append(line)
+        prev_blank = not line.strip()
+        i += 1
+    return "\n".join(out)
+
+
 def _indent_continuation(text):
     """Indent wrapped continuation lines of a list item by two spaces."""
     return _escape_mdx(text).replace("\n", "\n  ")
@@ -170,7 +205,7 @@ def _render_docstring(obj, out):
     for section in obj.docstring.parsed:
         kind = section.kind.value
         if kind == "text":
-            out.append(_escape_mdx(section.value))
+            out.append(_escape_mdx(_reflow_indented_code(section.value)))
             out.append("")
         elif kind == "parameters":
             out.append("**Arguments**:")
@@ -207,11 +242,12 @@ def _render_docstring(obj, out):
             label = (section.value.kind or "note").replace("-", " ").title()
             out.append("**{}**:".format(label))
             out.append("")
-            out.append(_escape_mdx(section.value.contents))
+            out.append(_escape_mdx(_reflow_indented_code(section.value.contents)))
             out.append("")
         else:
             # Unknown/rare section (examples, yields, ...): render its text form.
-            out.append(_escape_mdx(str(getattr(section.value, "contents", section.value))))
+            contents = str(getattr(section.value, "contents", section.value))
+            out.append(_escape_mdx(_reflow_indented_code(contents)))
             out.append("")
 
 
