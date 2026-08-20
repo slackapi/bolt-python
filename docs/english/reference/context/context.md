@@ -53,7 +53,6 @@ def handle_events(client, context):
     )
 ```
 
-
 **Returns**:
 
 - `WebClient` - `WebClient` instance
@@ -77,7 +76,6 @@ def handle_button_clicks(context):
 def handle_button_clicks(ack):
     ack()
 ```
-
 
 **Returns**:
 
@@ -105,7 +103,6 @@ def handle_button_clicks(ack, say):
     say("Hi!")
 ```
 
-
 **Returns**:
 
 - `Say` - Callable `say()` function
@@ -131,7 +128,6 @@ def handle_button_clicks(ack, respond):
     ack()
     respond("Hi!")
 ```
-
 
 **Returns**:
 
@@ -161,7 +157,6 @@ def handle_button_clicks(context):
     context.complete(outputs={"stringReverse":"olleh"})
 ```
 
-
 **Returns**:
 
 - `Complete` - Callable `complete()` function
@@ -189,7 +184,6 @@ def handle_button_clicks(context):
     context.ack()
     context.fail(error="something went wrong")
 ```
-
 
 **Returns**:
 

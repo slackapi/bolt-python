@@ -52,7 +52,6 @@ def handle_buttons(args):
     )
 ```
 
-
 #### client: `WebClient`
 
 `slack_sdk.web.WebClient` instance with a valid token

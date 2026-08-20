@@ -117,7 +117,6 @@ def handle_buttons(args):
     )
 ```
 
-
 ## Listener Objects
 
 ```python

@@ -214,7 +214,6 @@ def app_factory():
 # adev runserver --port 3000 --app-factory app_factory async_app.py
 ```
 
-
 **Arguments**:
 
 - `path` _str_ - The path to receive incoming requests from Slack

@@ -52,7 +52,6 @@ async def handle_events(client, context):
     )
 ```
 
-
 **Returns**:
 
 - `AsyncWebClient` - `AsyncWebClient` instance
@@ -76,7 +75,6 @@ async def handle_button_clicks(context):
 async def handle_button_clicks(ack):
     await ack()
 ```
-
 
 **Returns**:
 
@@ -104,7 +102,6 @@ async def handle_button_clicks(ack, say):
     await say("Hi!")
 ```
 
-
 **Returns**:
 
 - `AsyncSay` - Callable `say()` function
@@ -130,7 +127,6 @@ async def handle_button_clicks(ack, respond):
     await ack()
     await respond("Hi!")
 ```
-
 
 **Returns**:
 
@@ -160,7 +156,6 @@ async def handle_button_clicks(context):
     await context.complete(outputs={"stringReverse":"olleh"})
 ```
 
-
 **Returns**:
 
 - `AsyncComplete` - Callable `complete()` function
@@ -188,7 +183,6 @@ async def handle_button_clicks(context):
     await context.ack()
     await context.fail(error="something went wrong")
 ```
-
 
 **Returns**:
 

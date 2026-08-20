@@ -121,7 +121,6 @@ def simple_middleware(req, resp, next_):
     next_()
 ```
 
-
 **Arguments**:
 
 - `req` _BoltRequest_ - The incoming request

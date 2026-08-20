@@ -42,7 +42,6 @@ export SLACK_BOT_TOKEN=xoxb-***
 uvicorn app:api --port 3000 --log-level debug
 ```
 
-
 **Arguments**:
 
 - `app` _App_ - Your bolt application

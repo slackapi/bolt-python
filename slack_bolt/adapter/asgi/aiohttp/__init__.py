@@ -17,14 +17,16 @@ class AsyncSlackRequestHandler(SlackRequestHandler):
         With the default settings, `http://localhost:3000/slack/events`
         Run Bolt with [uvicron](https://www.uvicorn.org/)
 
-            # Python
-            app = AsyncApp()
-            api = SlackRequestHandler(app)
+        ```python
+        # Python
+        app = AsyncApp()
+        api = SlackRequestHandler(app)
 
-            # bash
-            export SLACK_SIGNING_SECRET=***
-            export SLACK_BOT_TOKEN=xoxb-***
-            uvicorn app:api --port 3000 --log-level debug
+        # bash
+        export SLACK_SIGNING_SECRET=***
+        export SLACK_BOT_TOKEN=xoxb-***
+        uvicorn app:api --port 3000 --log-level debug
+        ```
 
         Args:
             app: Your bolt application

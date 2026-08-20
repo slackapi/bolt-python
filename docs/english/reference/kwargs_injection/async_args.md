@@ -40,7 +40,6 @@ async def handle_buttons(args):
     )
 ```
 
-
 #### logger: `Logger`
 
 Logger instance

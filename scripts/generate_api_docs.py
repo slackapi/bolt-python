@@ -172,11 +172,26 @@ def _reflow_indented_code(text):
     out = []
     i = 0
     prev_blank = True  # start of a section counts as a preceding blank line
+    fence_open = False
     while i < len(lines):
         line = lines[i]
+        # Never touch content inside an existing fenced block; just mirror it.
+        if line.strip().startswith("```"):
+            fence_open = not fence_open
+            out.append(line)
+            prev_blank = False
+            i += 1
+            continue
+        if fence_open:
+            out.append(line)
+            prev_blank = False
+            i += 1
+            continue
         if prev_blank and line.startswith("    ") and line.strip():
             block = []
             while i < len(lines) and (lines[i].startswith("    ") or not lines[i].strip()):
+                if lines[i].strip().startswith("```"):
+                    break
                 block.append(lines[i])
                 i += 1
             while block and not block[-1].strip():

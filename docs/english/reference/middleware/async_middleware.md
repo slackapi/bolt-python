@@ -41,7 +41,6 @@ async def simple_middleware(req, resp, next_):
     await next_()
 ```
 
-
 **Arguments**:
 
 - `req` _AsyncBoltRequest_ - The incoming request

@@ -137,24 +137,26 @@ class App:
     ):
         """Bolt App that provides functionalities to register middleware/listeners.
 
-            import os
-            from slack_bolt import App
+        ```python
+        import os
+        from slack_bolt import App
 
-            # Initializes your app with your bot token and signing secret
-            app = App(
-                token=os.environ.get("SLACK_BOT_TOKEN"),
-                signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
-            )
+        # Initializes your app with your bot token and signing secret
+        app = App(
+            token=os.environ.get("SLACK_BOT_TOKEN"),
+            signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+        )
 
-            # Listens to incoming messages that contain "hello"
-            @app.message("hello")
-            def message_hello(message, say):
-                # say() sends a message to the channel where the event was triggered
-                say(f"Hey there <@{message['user']}>!")
+        # Listens to incoming messages that contain "hello"
+        @app.message("hello")
+        def message_hello(message, say):
+            # say() sends a message to the channel where the event was triggered
+            say(f"Hey there <@{message['user']}>!")
 
-            # Start your app
-            if __name__ == "__main__":
-                app.start(port=int(os.environ.get("PORT", 3000)))
+        # Start your app
+        if __name__ == "__main__":
+            app.start(port=int(os.environ.get("PORT", 3000)))
+        ```
 
         Refer to https://docs.slack.dev/tools/bolt-python/creating-an-app for details.
 
@@ -511,9 +513,11 @@ class App:
     ) -> None:
         """Starts a web server for local development.
 
-            # With the default settings, `http://localhost:3000/slack/events`
-            # is available for handling incoming requests from Slack
-            app.start()
+        ```python
+        # With the default settings, `http://localhost:3000/slack/events`
+        # is available for handling incoming requests from Slack
+        app.start()
+        ```
 
         This method internally starts a Web server process built with the `http.server` module.
         For production, consider using a production-ready WSGI server such as Gunicorn.
@@ -660,14 +664,16 @@ class App:
         """Registers a new middleware to this app.
         This method can be used as either a decorator or a method.
 
-            # Use this method as a decorator
-            @app.middleware
-            def middleware_func(logger, body, next):
-                logger.info(f"request body: {body}")
-                next()
+        ```python
+        # Use this method as a decorator
+        @app.middleware
+        def middleware_func(logger, body, next):
+            logger.info(f"request body: {body}")
+            next()
 
-            # Pass a function to this method
-            app.middleware(middleware_func)
+        # Pass a function to this method
+        app.middleware(middleware_func)
+        ```
 
         Refer to https://docs.slack.dev/tools/bolt-python/concepts/global-middleware for details.
 
@@ -722,16 +728,18 @@ class App:
         Unlike others, this method doesn't behave as a decorator.
         If you want to register a step from app by a decorator, use `WorkflowStepBuilder`'s methods.
 
-            # Create a new WorkflowStep instance
-            from slack_bolt.workflows.step import WorkflowStep
-            ws = WorkflowStep(
-                callback_id="add_task",
-                edit=edit,
-                save=save,
-                execute=execute,
-            )
-            # Pass Step to set up listeners
-            app.step(ws)
+        ```python
+        # Create a new WorkflowStep instance
+        from slack_bolt.workflows.step import WorkflowStep
+        ws = WorkflowStep(
+            callback_id="add_task",
+            edit=edit,
+            save=save,
+            execute=execute,
+        )
+        # Pass Step to set up listeners
+        app.step(ws)
+        ```
 
         Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details of steps from apps.
 
@@ -776,14 +784,16 @@ class App:
     def error(self, func: Callable[..., Optional[BoltResponse]]) -> Callable[..., Optional[BoltResponse]]:
         """Updates the global error handler. This method can be used as either a decorator or a method.
 
-            # Use this method as a decorator
-            @app.error
-            def custom_error_handler(error, body, logger):
-                logger.exception(f"Error: {error}")
-                logger.info(f"Request body: {body}")
+        ```python
+        # Use this method as a decorator
+        @app.error
+        def custom_error_handler(error, body, logger):
+            logger.exception(f"Error: {error}")
+            logger.info(f"Request body: {body}")
 
-            # Pass a function to this method
-            app.error(custom_error_handler)
+        # Pass a function to this method
+        app.error(custom_error_handler)
+        ```
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
@@ -816,16 +826,18 @@ class App:
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new event listener. This method can be used as either a decorator or a method.
 
-            # Use this method as a decorator
-            @app.event("team_join")
-            def ask_for_introduction(event, say):
-                welcome_channel_id = "C12345"
-                user_id = event["user"]
-                text = f"Welcome to the team, <@{user_id}>! :tada: You can introduce yourself in this channel."
-                say(text=text, channel=welcome_channel_id)
+        ```python
+        # Use this method as a decorator
+        @app.event("team_join")
+        def ask_for_introduction(event, say):
+            welcome_channel_id = "C12345"
+            user_id = event["user"]
+            text = f"Welcome to the team, <@{user_id}>! :tada: You can introduce yourself in this channel."
+            say(text=text, channel=welcome_channel_id)
 
-            # Pass a function to this method
-            app.event("team_join")(ask_for_introduction)
+        # Pass a function to this method
+        app.event("team_join")(ask_for_introduction)
+        ```
 
         Refer to https://docs.slack.dev/apis/events-api/ for details of Events API.
 
@@ -859,14 +871,16 @@ class App:
         """Registers a new message event listener. This method can be used as either a decorator or a method.
         Check the `App#event` method's docstring for details.
 
-            # Use this method as a decorator
-            @app.message(":wave:")
-            def say_hello(message, say):
-                user = message['user']
-                say(f"Hi there, <@{user}>!")
+        ```python
+        # Use this method as a decorator
+        @app.message(":wave:")
+        def say_hello(message, say):
+            user = message['user']
+            say(f"Hi there, <@{user}>!")
 
-            # Pass a function to this method
-            app.message(":wave:")(say_hello)
+        # Pass a function to this method
+        app.message(":wave:")(say_hello)
+        ```
 
         Refer to https://docs.slack.dev/reference/events/message/ for details of `message` events.
 
@@ -921,19 +935,21 @@ class App:
         """Registers a new Function listener.
         This method can be used as either a decorator or a method.
 
-            # Use this method as a decorator
-            @app.function("reverse")
-            def reverse_string(ack: Ack, inputs: dict, complete: Complete, fail: Fail):
-                try:
-                    ack()
-                    string_to_reverse = inputs["stringToReverse"]
-                    complete(outputs={"reverseString": string_to_reverse[::-1]})
-                except Exception as e:
-                    fail(f"Cannot reverse string (error: {e})")
-                    raise e
+        ```python
+        # Use this method as a decorator
+        @app.function("reverse")
+        def reverse_string(ack: Ack, inputs: dict, complete: Complete, fail: Fail):
+            try:
+                ack()
+                string_to_reverse = inputs["stringToReverse"]
+                complete(outputs={"reverseString": string_to_reverse[::-1]})
+            except Exception as e:
+                fail(f"Cannot reverse string (error: {e})")
+                raise e
 
-            # Pass a function to this method
-            app.function("reverse")(reverse_string)
+        # Pass a function to this method
+        app.function("reverse")(reverse_string)
+        ```
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
@@ -971,15 +987,17 @@ class App:
         """Registers a new slash command listener.
         This method can be used as either a decorator or a method.
 
-            # Use this method as a decorator
-            @app.command("/echo")
-            def repeat_text(ack, say, command):
-                # Acknowledge command request
-                ack()
-                say(f"{command['text']}")
+        ```python
+        # Use this method as a decorator
+        @app.command("/echo")
+        def repeat_text(ack, say, command):
+            # Acknowledge command request
+            ack()
+            say(f"{command['text']}")
 
-            # Pass a function to this method
-            app.command("/echo")(repeat_text)
+        # Pass a function to this method
+        app.command("/echo")(repeat_text)
+        ```
 
         Refer to https://docs.slack.dev/interactivity/implementing-slash-commands/ for details of Slash Commands.
 
@@ -1012,21 +1030,23 @@ class App:
         """Registers a new shortcut listener.
         This method can be used as either a decorator or a method.
 
-            # Use this method as a decorator
-            @app.shortcut("open_modal")
-            def open_modal(ack, body, client):
-                # Acknowledge the command request
-                ack()
-                # Call views_open with the built-in client
-                client.views_open(
-                    # Pass a valid trigger_id within 3 seconds of receiving it
-                    trigger_id=body["trigger_id"],
-                    # View payload
-                    view={ ... }
-                )
+        ```python
+        # Use this method as a decorator
+        @app.shortcut("open_modal")
+        def open_modal(ack, body, client):
+            # Acknowledge the command request
+            ack()
+            # Call views_open with the built-in client
+            client.views_open(
+                # Pass a valid trigger_id within 3 seconds of receiving it
+                trigger_id=body["trigger_id"],
+                # View payload
+                view={ ... }
+            )
 
-            # Pass a function to this method
-            app.shortcut("open_modal")(open_modal)
+        # Pass a function to this method
+        app.shortcut("open_modal")(open_modal)
+        ```
 
         Refer to https://docs.slack.dev/interactivity/implementing-shortcuts/ for details about Shortcuts.
 
@@ -1088,13 +1108,15 @@ class App:
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new action listener. This method can be used as either a decorator or a method.
 
-            # Use this method as a decorator
-            @app.action("approve_button")
-            def update_message(ack):
-                ack()
+        ```python
+        # Use this method as a decorator
+        @app.action("approve_button")
+        def update_message(ack):
+            ack()
 
-            # Pass a function to this method
-            app.action("approve_button")(update_message)
+        # Pass a function to this method
+        app.action("approve_button")(update_message)
+        ```
 
         * Refer to https://docs.slack.dev/reference/interaction-payloads/block_actions-payload/ for actions in `blocks`.
         * Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons/ for actions in `attachments`.
@@ -1194,25 +1216,27 @@ class App:
         """Registers a new `view_submission`/`view_closed` event listener.
         This method can be used as either a decorator or a method.
 
-            # Use this method as a decorator
-            @app.view("view_1")
-            def handle_submission(ack, body, client, view):
-                # Assume there's an input block with `block_c` as the block_id and `dreamy_input`
-                hopes_and_dreams = view["state"]["values"]["block_c"]["dreamy_input"]
-                user = body["user"]["id"]
-                # Validate the inputs
-                errors = {}
-                if hopes_and_dreams is not None and len(hopes_and_dreams) <= 5:
-                    errors["block_c"] = "The value must be longer than 5 characters"
-                if len(errors) > 0:
-                    ack(response_action="errors", errors=errors)
-                    return
-                # Acknowledge the view_submission event and close the modal
-                ack()
-                # Do whatever you want with the input data - here we're saving it to a DB
+        ```python
+        # Use this method as a decorator
+        @app.view("view_1")
+        def handle_submission(ack, body, client, view):
+            # Assume there's an input block with `block_c` as the block_id and `dreamy_input`
+            hopes_and_dreams = view["state"]["values"]["block_c"]["dreamy_input"]
+            user = body["user"]["id"]
+            # Validate the inputs
+            errors = {}
+            if hopes_and_dreams is not None and len(hopes_and_dreams) <= 5:
+                errors["block_c"] = "The value must be longer than 5 characters"
+            if len(errors) > 0:
+                ack(response_action="errors", errors=errors)
+                return
+            # Acknowledge the view_submission event and close the modal
+            ack()
+            # Do whatever you want with the input data - here we're saving it to a DB
 
-            # Pass a function to this method
-            app.view("view_1")(handle_submission)
+        # Pass a function to this method
+        app.view("view_1")(handle_submission)
+        ```
 
         Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload for details of payloads.
 
@@ -1279,23 +1303,25 @@ class App:
         """Registers a new options listener.
         This method can be used as either a decorator or a method.
 
-            # Use this method as a decorator
-            @app.options("menu_selection")
-            def show_menu_options(ack):
-                options = [
-                    {
-                        "text": {"type": "plain_text", "text": "Option 1"},
-                        "value": "1-1",
-                    },
-                    {
-                        "text": {"type": "plain_text", "text": "Option 2"},
-                        "value": "1-2",
-                    },
-                ]
-                ack(options=options)
+        ```python
+        # Use this method as a decorator
+        @app.options("menu_selection")
+        def show_menu_options(ack):
+            options = [
+                {
+                    "text": {"type": "plain_text", "text": "Option 1"},
+                    "value": "1-1",
+                },
+                {
+                    "text": {"type": "plain_text", "text": "Option 2"},
+                    "value": "1-2",
+                },
+            ]
+            ack(options=options)
 
-            # Pass a function to this method
-            app.options("menu_selection")(show_menu_options)
+        # Pass a function to this method
+        app.options("menu_selection")(show_menu_options)
+        ```
 
         Refer to the following documents for details:
 
