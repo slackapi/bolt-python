@@ -1,5 +1,5 @@
 ---
-sidebar_label: slack_bolt.version
+sidebar_label: version
 title: slack_bolt.version
 ---
 

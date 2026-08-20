@@ -8,7 +8,7 @@
   "items": [
     {
       "type": "category",
-      "label": "slack_bolt.adapter",
+      "label": "adapter",
       "link": {
         "type": "doc",
         "id": "tools/bolt-python/reference/adapter/index"
@@ -238,7 +238,7 @@
     },
     {
       "type": "category",
-      "label": "slack_bolt.app",
+      "label": "app",
       "link": {
         "type": "doc",
         "id": "tools/bolt-python/reference/app/index"
@@ -251,7 +251,7 @@
     },
     {
       "type": "category",
-      "label": "slack_bolt.authorization",
+      "label": "authorization",
       "link": {
         "type": "doc",
         "id": "tools/bolt-python/reference/authorization/index"
@@ -266,7 +266,7 @@
     },
     {
       "type": "category",
-      "label": "slack_bolt.context",
+      "label": "context",
       "link": {
         "type": "doc",
         "id": "tools/bolt-python/reference/context/index"
@@ -452,11 +452,11 @@
     {
       "type": "doc",
       "id": "tools/bolt-python/reference/error/index",
-      "label": "slack_bolt.error"
+      "label": "error"
     },
     {
       "type": "category",
-      "label": "slack_bolt.kwargs_injection",
+      "label": "kwargs_injection",
       "link": {
         "type": "doc",
         "id": "tools/bolt-python/reference/kwargs_injection/index"
@@ -470,7 +470,7 @@
     },
     {
       "type": "category",
-      "label": "slack_bolt.lazy_listener",
+      "label": "lazy_listener",
       "link": {
         "type": "doc",
         "id": "tools/bolt-python/reference/lazy_listener/index"
@@ -486,7 +486,7 @@
     },
     {
       "type": "category",
-      "label": "slack_bolt.listener",
+      "label": "listener",
       "link": {
         "type": "doc",
         "id": "tools/bolt-python/reference/listener/index"
@@ -509,7 +509,7 @@
     },
     {
       "type": "category",
-      "label": "slack_bolt.listener_matcher",
+      "label": "listener_matcher",
       "link": {
         "type": "doc",
         "id": "tools/bolt-python/reference/listener_matcher/index"
@@ -524,7 +524,7 @@
     },
     {
       "type": "category",
-      "label": "slack_bolt.logger",
+      "label": "logger",
       "link": {
         "type": "doc",
         "id": "tools/bolt-python/reference/logger/index"
@@ -535,7 +535,7 @@
     },
     {
       "type": "category",
-      "label": "slack_bolt.middleware",
+      "label": "middleware",
       "link": {
         "type": "doc",
         "id": "tools/bolt-python/reference/middleware/index"
@@ -666,7 +666,7 @@
     },
     {
       "type": "category",
-      "label": "slack_bolt.oauth",
+      "label": "oauth",
       "link": {
         "type": "doc",
         "id": "tools/bolt-python/reference/oauth/index"
@@ -684,7 +684,7 @@
     },
     {
       "type": "category",
-      "label": "slack_bolt.request",
+      "label": "request",
       "link": {
         "type": "doc",
         "id": "tools/bolt-python/reference/request/index"
@@ -699,7 +699,7 @@
     },
     {
       "type": "category",
-      "label": "slack_bolt.response",
+      "label": "response",
       "link": {
         "type": "doc",
         "id": "tools/bolt-python/reference/response/index"
@@ -710,7 +710,7 @@
     },
     {
       "type": "category",
-      "label": "slack_bolt.util",
+      "label": "util",
       "link": {
         "type": "doc",
         "id": "tools/bolt-python/reference/util/index"
@@ -722,7 +722,7 @@
     },
     {
       "type": "category",
-      "label": "slack_bolt.workflows",
+      "label": "workflows",
       "link": {
         "type": "doc",
         "id": "tools/bolt-python/reference/workflows/index"

@@ -7,19 +7,6 @@ resolves re-export aliases to their concrete definition, and parses Google-style
 docstrings into structured sections. This module renders that structured data
 into the Docusaurus-flavored Markdown tree the docs site imports.
 
-Using griffe removes three workarounds the previous pydoc-markdown driver
-needed:
-
-  * re-export inlining -- griffe models ``from .x import Y`` as an Alias whose
-    ``.target`` is the concrete class/function, so re-export-only modules (e.g.
-    adapter/fastapi/__init__.py) render the class inline with no manual index
-    walking.
-  * docstring code-fence ordering -- griffe's Google parser keeps fenced
-    examples in their original position within a ``text`` section, so no
-    order-preserving processor subclass is required.
-  * the HTML-escaper token-collision bug -- there is no token-replace escaping
-    pass here; MDX-hazardous characters are escaped inline, outside code spans.
-
 The output layout (flattened under ``reference/``, package overviews as
 ``index.md``, an import-ready ``sidebar.json``) is produced directly rather than
 rendered and then rewritten.
@@ -404,16 +391,9 @@ def _build_pages(root):
         rel_path = _relative_path(module)
         is_package = os.path.basename(str(module.filepath)) == "__init__.py"
         dotted = module.canonical_path
-        if not rel_path:
-            sidebar_label = dotted
-        elif is_package:
-            sidebar_label = rel_path.rsplit("/", 1)[-1]
-        elif "/" in rel_path:
-            sidebar_label = rel_path.rsplit("/", 1)[-1]
-        else:
-            # Top-level leaf module (async_app, version): full dotted name reads
-            # consistently beside the slack_bolt.* package categories.
-            sidebar_label = dotted
+        # Sidebar labels use the bare final component (e.g. "error", "app");
+        # the dotted path lives in the page title instead.
+        sidebar_label = dotted.rsplit(".", 1)[-1]
         pages[rel_path] = {
             "module": module,
             "is_package": is_package,
@@ -476,9 +456,9 @@ def _write_pages(pages):
 def _build_sidebar(pages):
     """Build the import-ready "Reference" category from the page tree."""
 
-    def category(rel_path, depth):
+    def category(rel_path):
         page = pages[rel_path]
-        label = page["title"] if depth <= 1 else page["title"].rsplit(".", 1)[-1]
+        label = page["title"].rsplit(".", 1)[-1]
         prefix = rel_path + "/" if rel_path else ""
         child_depth = prefix.count("/")
 
@@ -490,7 +470,7 @@ def _build_sidebar(pages):
             if other_rel.count("/") != child_depth:
                 continue
             if other["is_package"]:
-                subcategories.append(category(other_rel, depth + 1))
+                subcategories.append(category(other_rel))
             else:
                 leaves.append(other["doc_id"])
 
@@ -503,7 +483,7 @@ def _build_sidebar(pages):
             return {"type": "doc", "id": page["doc_id"], "label": label}
         return node
 
-    root = category("", 0)
+    root = category("")
     root["label"] = "Reference"
     return root
 
