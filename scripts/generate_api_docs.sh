@@ -10,7 +10,7 @@ cd "${script_dir}/.."
 pip install -U pip
 pip install -U -r requirements/adapter_dev.txt
 pip install -U -r requirements/async_dev.txt
-pip install -U griffe
+pip install -U -r requirements/documentation.txt
 pip install .
 rm -rf docs/english/reference
 
