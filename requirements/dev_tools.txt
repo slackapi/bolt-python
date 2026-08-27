@@ -3,8 +3,6 @@
 # mypy
 mypy==2.3.0
 
-# flake8
-flake8==7.3.0
-
-# black
-black==26.3.1
+# ruff
+# Note: replaces flake8 (lint) and black (format)
+ruff==0.16.4

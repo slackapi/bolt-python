@@ -38,8 +38,12 @@ readme = { file = ["README.md"], content-type = "text/markdown" }
 [tool.distutils.bdist_wheel]
 universal = true
 
-[tool.black]
+[tool.ruff]
 line-length = 125
+
+[tool.ruff.lint]
+select = ["E", "W", "F"]
+ignore = ["F841", "F821", "E402"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
