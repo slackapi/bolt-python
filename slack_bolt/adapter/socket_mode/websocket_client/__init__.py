@@ -1,4 +1,4 @@
-"""[`websocket-client`](https://pypi.org/project/websocket-client/) based implementation"""
+"""[`websocket-client`](https://pypi.org/project/websocket-client/) based implementation."""
 
 import os
 from logging import Logger
@@ -34,7 +34,7 @@ class SocketModeHandler(BaseSocketModeHandler):
         proxy_type: Optional[str] = None,
         trace_enabled: bool = False,
     ):
-        """Socket Mode adapter for Bolt apps
+        """Socket Mode adapter for Bolt apps.
 
         Args:
             app: The Bolt app

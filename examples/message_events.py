@@ -46,8 +46,7 @@ def reply_in_thread(body: dict, say: Say):
     event={"type": "message", "subtype": "message_deleted"},
     matchers=[
         # Skip the deletion of messages by this listener
-        lambda body: "You've deleted a message: "
-        not in body["event"]["previous_message"]["text"]
+        lambda body: "You've deleted a message: " not in body["event"]["previous_message"]["text"]
     ],
 )
 def detect_deletion(say: Say, body: dict):

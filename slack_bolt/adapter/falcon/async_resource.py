@@ -12,8 +12,7 @@ from slack_bolt.request.async_request import AsyncBoltRequest
 
 
 class AsyncSlackAppResource:
-    """
-    For use with ASGI Falcon Apps.
+    """For use with ASGI Falcon Apps.
 
     from slack_bolt.async_app import AsyncApp
     app = AsyncApp()

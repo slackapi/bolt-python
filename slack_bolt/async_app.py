@@ -1,4 +1,4 @@
-"""Module for creating asyncio based apps
+"""Module for creating asyncio based apps.
 
 ### Creating an async app
 

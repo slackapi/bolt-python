@@ -52,6 +52,7 @@ handler = SlackRequestHandler(app)
 # Cloud Function
 def hello_bolt_app(req: Request):
     """HTTP Cloud Function.
+
     Args:
         req (flask.Request): The request object.
         <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>

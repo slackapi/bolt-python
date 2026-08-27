@@ -42,8 +42,30 @@ universal = true
 line-length = 125
 
 [tool.ruff.lint]
-select = ["E", "W", "F"]
-ignore = ["F841", "F821", "E402"]
+select = ["E", "W", "F", "D"]
+ignore = [
+	"F841",
+	"F821",
+	"E402",
+	# missing-docstring: do not add docstrings where none exist (the only D rules ignored)
+	"D100",
+	"D101",
+	"D102",
+	"D103",
+	"D104",
+	"D105",
+	"D106",
+	"D107",
+]
+
+[tool.ruff.lint.pydocstyle]
+# google convention resolves D203/D211 and D212/D213 conflicts and implicitly ignores
+# D400/D401/D404/D413. Keep `select = ["D"]` a category select -- an explicit rule-code
+# select would override the convention and resurface those rules.
+convention = "google"
+
+[tool.ruff.format]
+docstring-code-format = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -3,7 +3,7 @@ from slack_sdk.oauth.installation_store.installation_store import InstallationSt
 
 
 class TokenRevocationListeners:
-    """Listener functions to handle token revocation / uninstallation events"""
+    """Listener functions to handle token revocation / uninstallation events."""
 
     installation_store: InstallationStore
 

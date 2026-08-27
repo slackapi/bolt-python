@@ -10,7 +10,7 @@ from slack_bolt.workflows.step.step import WorkflowStep
 
 
 class WorkflowStepMiddleware(Middleware):
-    """Base middleware for step from app specific ones"""
+    """Base middleware for step from app specific ones."""
 
     def __init__(self, step: WorkflowStep):
         self.step = step

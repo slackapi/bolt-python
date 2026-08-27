@@ -145,7 +145,9 @@ class AsyncBoltContext(BaseContext):
 
     @property
     def complete(self) -> AsyncComplete:
-        """`complete()` function for this request. Once a custom function's state is set to complete,
+        """`complete()` function for this request.
+
+        Once a custom function's state is set to complete,
         any outputs the function returns will be passed along to the next step of its housing workflow,
         or complete the workflow if the function is the last step in a workflow. Additionally,
         any interactivity handlers associated to a function invocation will no longer be invocable.
@@ -169,7 +171,9 @@ class AsyncBoltContext(BaseContext):
 
     @property
     def fail(self) -> AsyncFail:
-        """`fail()` function for this request. Once a custom function's state is set to error,
+        """`fail()` function for this request.
+
+        Once a custom function's state is set to error,
         its housing workflow will be interrupted and any provided error message will be passed
         on to the end user through SlackBot. Additionally, any interactivity handlers associated
         to a function invocation will no longer be invocable.

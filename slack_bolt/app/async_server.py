@@ -26,6 +26,7 @@ class AsyncSlackAppServer:
         host: Optional[str] = None,
     ):
         """Standalone AIOHTTP Web Server.
+
         Refer to https://docs.aiohttp.org/en/stable/web.html for details of AIOHTTP.
 
         Args:

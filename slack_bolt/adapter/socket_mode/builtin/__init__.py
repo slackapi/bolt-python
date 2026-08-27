@@ -1,4 +1,4 @@
-"""The built-in implementation, which does not have any external dependencies"""
+"""The built-in implementation, which does not have any external dependencies."""
 
 import os
 from logging import Logger
@@ -36,7 +36,7 @@ class SocketModeHandler(BaseSocketModeHandler):
         receive_buffer_size: int = 1024,
         concurrency: int = 10,
     ):
-        """Socket Mode adapter for Bolt apps
+        """Socket Mode adapter for Bolt apps.
 
         Args:
             app: The Bolt app

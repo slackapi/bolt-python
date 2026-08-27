@@ -20,6 +20,7 @@ class AsyncMiddleware(metaclass=ABCMeta):
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> Optional[BoltResponse]:
         """Processes a request data before other middleware and listeners.
+
         A middleware calls `next()` function if the chain should continue.
 
             @app.middleware
@@ -47,5 +48,5 @@ class AsyncMiddleware(metaclass=ABCMeta):
 
     @property
     def name(self) -> str:
-        """The name of this middleware"""
+        """The name of this middleware."""
         return f"{self.__module__}.{self.__class__.__name__}"

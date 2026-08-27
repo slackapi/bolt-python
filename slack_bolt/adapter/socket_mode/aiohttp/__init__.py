@@ -1,4 +1,4 @@
-"""[`aiohttp`](https://pypi.org/project/aiohttp/) based implementation / asyncio compatible"""
+"""[`aiohttp`](https://pypi.org/project/aiohttp/) based implementation / asyncio compatible."""
 
 import os
 from logging import Logger
@@ -35,7 +35,7 @@ class SocketModeHandler(AsyncBaseSocketModeHandler):
         proxy: Optional[str] = None,
         ping_interval: float = 10,
     ):
-        """Socket Mode adapter for Bolt apps
+        """Socket Mode adapter for Bolt apps.
 
         Args:
             app: The Bolt app

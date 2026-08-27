@@ -213,6 +213,10 @@ class AsyncApp:
             verification_token: Deprecated verification mechanism. This can be used only for ssl_check requests.
             assistant_thread_context_store: Custom AssistantThreadContext store (Default: the built-in implementation,
                 which uses a parent message's metadata to store the latest context)
+            attaching_conversation_kwargs_enabled: False if you would like to disable the built-in
+                middleware (Default: True). `AttachingConversationKwargs` is a built-in middleware that attaches
+                conversation-specific listener arguments (such as `say`, `set_status`, `say_stream`, and
+                `set_suggested_prompts`) for assistant thread and direct message events.
         """
         if signing_secret is None:
             signing_secret = os.environ.get("SLACK_SIGNING_SECRET", "")
@@ -467,7 +471,7 @@ class AsyncApp:
 
     @property
     def name(self) -> str:
-        """The name of this app (default: the filename)"""
+        """The name of this app (default: the filename)."""
         return self._name
 
     @property
@@ -511,6 +515,7 @@ class AsyncApp:
         host: Optional[str] = None,
     ) -> AsyncSlackAppServer:
         """Configure a web server using AIOHTTP.
+
         Refer to https://docs.aiohttp.org/ for more details about AIOHTTP.
 
         Args:
@@ -551,6 +556,7 @@ class AsyncApp:
 
     def start(self, port: int = 3000, path: str = "/slack/events", host: Optional[str] = None) -> None:
         """Start a web server using AIOHTTP.
+
         Refer to https://docs.aiohttp.org/ for more details about AIOHTTP.
 
         Args:
@@ -687,6 +693,7 @@ class AsyncApp:
 
     def middleware(self, *args) -> Optional[Callable]:
         """Registers a new middleware to this app.
+
         This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
@@ -736,8 +743,8 @@ class AsyncApp:
         save: Optional[Union[Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]]] = None,
         execute: Optional[Union[Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]]] = None,
     ):
-        """
-        Deprecated:
+        """Deprecated: register a new step from app listener.
+
             Steps from apps for legacy workflows are now deprecated.
             Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
@@ -885,6 +892,7 @@ class AsyncApp:
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         """Registers a new message event listener. This method can be used as either a decorator or a method.
+
         Check the `App#event` method's docstring for details.
 
             # Use this method as a decorator
@@ -950,6 +958,7 @@ class AsyncApp:
         ack_timeout: int = 3,
     ) -> Callable[..., Optional[Callable[..., Awaitable[BoltResponse]]]]:
         """Registers a new Function listener.
+
         This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
@@ -974,6 +983,11 @@ class AsyncApp:
                 Only when all the matchers return True, the listener function can be invoked.
             middleware: A list of lister middleware functions.
                 Only when all the middleware call `next()` method, the listener function can be invoked.
+            auto_acknowledge: Whether Bolt automatically acknowledges the function execution event on the
+                listener's behalf. When False, your listener must call `ack()` itself within `ack_timeout`
+                seconds (Default: True).
+            ack_timeout: The number of seconds to wait for the listener to call `ack()`.
+                Only takes effect when `auto_acknowledge` is False (Default: 3).
         """
         if auto_acknowledge is True:
             if ack_timeout != 3:
@@ -1001,6 +1015,7 @@ class AsyncApp:
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         """Registers a new slash command listener.
+
         This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
@@ -1042,6 +1057,7 @@ class AsyncApp:
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         """Registers a new shortcut listener.
+
         This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
@@ -1156,6 +1172,7 @@ class AsyncApp:
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         """Registers a new `block_actions` action listener.
+
         Refer to https://docs.slack.dev/reference/interaction-payloads/block_actions-payload/ for details.
         """
 
@@ -1173,7 +1190,9 @@ class AsyncApp:
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         """Registers a new `interactive_message` action listener.
-        Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons/ for details."""
+
+        Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons/ for details.
+        """
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1189,7 +1208,9 @@ class AsyncApp:
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         """Registers a new `dialog_submission` listener.
-        Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details."""
+
+        Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details.
+        """
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1205,7 +1226,9 @@ class AsyncApp:
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         """Registers a new `dialog_submission` listener.
-        Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details."""
+
+        Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details.
+        """
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1224,6 +1247,7 @@ class AsyncApp:
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         """Registers a new `view_submission`/`view_closed` event listener.
+
         This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
@@ -1238,7 +1262,7 @@ class AsyncApp:
                     errors["block_c"] = "The value must be longer than 5 characters"
                 if len(errors) > 0:
                     await ack(response_action="errors", errors=errors)
-                    return
+                    return  # Return early to display the validation errors to the user
                 # Acknowledge the view_submission event and close the modal
                 await ack()
                 # Do whatever you want with the input data - here we're saving it to a DB
@@ -1272,6 +1296,7 @@ class AsyncApp:
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         """Registers a new `view_submission` listener.
+
         Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for
         details.
         """
@@ -1290,7 +1315,9 @@ class AsyncApp:
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         """Registers a new `view_closed` listener.
-        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_closed for details."""
+
+        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_closed for details.
+        """
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1309,6 +1336,7 @@ class AsyncApp:
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         """Registers a new options listener.
+
         This method can be used as either a decorator or a method.
 
             # Use this method as a decorator
@@ -1337,6 +1365,7 @@ class AsyncApp:
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.async_args`'s API document.
 
         Args:
+            constraints: The conditions that match a request payload
             matchers: A list of listener matcher functions.
                 Only when all the matchers return True, the listener function can be invoked.
             middleware: A list of lister middleware functions.
@@ -1372,7 +1401,9 @@ class AsyncApp:
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
         """Registers a new `dialog_suggestion` listener.
-        Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details."""
+
+        Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details.
+        """
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)

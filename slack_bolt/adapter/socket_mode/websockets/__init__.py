@@ -1,4 +1,4 @@
-"""[`websockets`](https://pypi.org/project/websockets/) based implementation  / asyncio compatible"""
+"""[`websockets`](https://pypi.org/project/websockets/) based implementation  / asyncio compatible."""
 
 import os
 from logging import Logger
