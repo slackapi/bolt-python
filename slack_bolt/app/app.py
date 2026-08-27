@@ -589,7 +589,7 @@ class App:
                     # run all the middleware attached to this listener first
                     middleware_resp, next_was_not_called = listener.run_middleware(
                         req=req, resp=resp  # type: ignore[arg-type]
-                    )
+                    )  # fmt: skip
                     if next_was_not_called:
                         if middleware_resp is not None:
                             if self._framework_logger.level <= logging.DEBUG:

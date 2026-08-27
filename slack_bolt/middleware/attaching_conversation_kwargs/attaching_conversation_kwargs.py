@@ -19,7 +19,6 @@ from slack_bolt.response.response import BoltResponse
 
 
 class AttachingConversationKwargs(Middleware):
-
     thread_context_store: Optional[AssistantThreadContextStore]
 
     def __init__(self, thread_context_store: Optional[AssistantThreadContextStore] = None):

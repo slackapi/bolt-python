@@ -1,4 +1,4 @@
-# flake8: noqa F811
+# ruff: noqa: F811
 import asyncio
 import logging
 import os

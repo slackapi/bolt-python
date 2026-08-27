@@ -356,7 +356,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize):
     # ------------------------------------------------
 
     def _debug_log_for_not_found(self, enterprise_id: Optional[str], team_id: Optional[str]):
-        self.logger.debug("No installation data found " f"for enterprise_id: {enterprise_id} team_id: {team_id}")
+        self.logger.debug(f"No installation data found for enterprise_id: {enterprise_id} team_id: {team_id}")
 
     async def _rotate_and_save_tokens_if_necessary(self, installation: Optional[Installation]) -> Optional[Installation]:
         if installation is None or (installation.user_refresh_token is None and installation.bot_refresh_token is None):

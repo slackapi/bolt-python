@@ -59,7 +59,7 @@ class BaseSlackRequestHandler:
         if scope["type"] == "http":
             response: AsgiHttpResponse = await self._get_http_response(
                 method=scope["method"], path=scope["path"], request=AsgiHttpRequest(scope, receive)  # type: ignore[arg-type]
-            )
+            )  # fmt: skip
             await send(response.get_response_start())
             await send(response.get_response_body())
             return

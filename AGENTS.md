@@ -16,7 +16,7 @@ Slack Bolt for Python -- a framework for building Slack apps in Python.
 
 ## Environment Setup
 
-You can verify the venv is active by checking `echo $VIRTUAL_ENV`. If tools like `black`, `flake8`, `mypy` or `pytest` are not found, ask the user to activate the venv.
+You can verify the venv is active by checking `echo $VIRTUAL_ENV`. If tools like `ruff`, `mypy` or `pytest` are not found, ask the user to activate the venv.
 
 A python virtual environment (`venv`) should be activated before running any commands.
 
@@ -65,10 +65,10 @@ Always use the project scripts instead of calling `pytest` directly:
 ### Formatting, Linting, Type Checking
 
 ```bash
-# Format -- Black, configured in pyproject.toml
+# Format -- Ruff formatter (+ lint autofix), configured in pyproject.toml
 ./scripts/format.sh --no-install
 
-# Lint -- Flake8, configured in .flake8
+# Lint -- Ruff linter, configured in pyproject.toml
 ./scripts/lint.sh --no-install
 
 # Type check -- mypy, configured in pyproject.toml
@@ -210,7 +210,7 @@ The core package has a **single required runtime dependency**: `slack_sdk` (defi
 - `test_async.txt` -- test runner deps (`pytest`, `pytest-asyncio`, includes `async_dev.txt`)
 - `test.txt` -- test deps without async (`pytest`, `pytest-cov`)
 - `test_adapter.txt` -- adapter-specific test deps (`moto`, `boddle`, `sanic-testing`)
-- `dev_tools.txt` -- dev tools (`mypy`, `flake8`, `black`)
+- `dev_tools.txt` -- dev tools (`mypy`, `ruff`)
 
 When adding a new dependency: add it to the appropriate `requirements/*.txt` file with version constraints, never to `pyproject.toml` `dependencies` (unless it's a core runtime dep, which is very rare).
 

@@ -11,7 +11,6 @@ from tests.utils import remove_os_env_temporarily, restore_os_env
 
 
 class TestAsyncComplete:
-
     @pytest.fixture(scope="function", autouse=True)
     def setup_teardown(self):
         old_os_env = remove_os_env_temporarily()

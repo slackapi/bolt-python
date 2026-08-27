@@ -101,27 +101,30 @@ class TestApp:
         }
 
     def build_app_mention_request(self):
-        timestamp, body = str(int(time())), json.dumps(
-            {
-                "token": "verification_token",
-                "team_id": "T111",
-                "enterprise_id": "E111",
-                "api_app_id": "A111",
-                "event": {
-                    "client_msg_id": "9cbd4c5b-7ddf-4ede-b479-ad21fca66d63",
-                    "type": "app_mention",
-                    "text": "<@W111> Hi there!",
-                    "user": "W222",
-                    "ts": "1595926230.009600",
-                    "team": "T111",
-                    "channel": "C111",
-                    "event_ts": "1595926230.009600",
-                },
-                "type": "event_callback",
-                "event_id": "Ev111",
-                "event_time": 1595926230,
-                "authed_users": ["W111"],
-            }
+        timestamp, body = (
+            str(int(time())),
+            json.dumps(
+                {
+                    "token": "verification_token",
+                    "team_id": "T111",
+                    "enterprise_id": "E111",
+                    "api_app_id": "A111",
+                    "event": {
+                        "client_msg_id": "9cbd4c5b-7ddf-4ede-b479-ad21fca66d63",
+                        "type": "app_mention",
+                        "text": "<@W111> Hi there!",
+                        "user": "W222",
+                        "ts": "1595926230.009600",
+                        "team": "T111",
+                        "channel": "C111",
+                        "event_ts": "1595926230.009600",
+                    },
+                    "type": "event_callback",
+                    "event_id": "Ev111",
+                    "event_time": 1595926230,
+                    "authed_users": ["W111"],
+                }
+            ),
         )
         return BoltRequest(body=body, headers=self.build_headers(timestamp, body))
 

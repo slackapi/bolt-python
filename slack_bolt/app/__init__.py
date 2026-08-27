@@ -1,4 +1,4 @@
-# flake8: noqa
+# ruff: noqa
 """Application interface in Bolt.
 
 For most use cases, we recommend using `slack_bolt.app.app`.

@@ -588,7 +588,7 @@ class AsyncApp:
                     self._framework_logger.debug(f"Applying {middleware.name}")
                 resp = await middleware.async_process(
                     req=req, resp=resp, next=async_middleware_next  # type: ignore[arg-type]
-                )
+                )  # fmt: skip
                 if not middleware_state["next_called"]:
                     if resp is None:
                         # next() method was not called without providing the response to return to Slack
@@ -619,7 +619,7 @@ class AsyncApp:
                     # run all the middleware attached to this listener first
                     middleware_resp, next_was_not_called = await listener.run_async_middleware(
                         req=req, resp=resp  # type: ignore[arg-type]
-                    )
+                    )  # fmt: skip
                     if next_was_not_called:
                         if middleware_resp is not None:
                             if self._framework_logger.level <= logging.DEBUG:
