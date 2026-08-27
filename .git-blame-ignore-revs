@@ -1,5 +1,5 @@
 # change black settings
 0e4cd56b69e8f83166cd262f762802b7f18c3d21
 
-# apply ruff format across the codebase
-07e8ac9d98c535ade20040883a04734b4c9d04b8
+# apply ruff format across the codebase (#1566)
+5814077ee7ef79eaa4df6e4602260c179536a814
