@@ -4,5 +4,4 @@
 mypy==2.3.0
 
 # ruff
-# Note: replaces flake8 (lint) and black (format)
 ruff==0.16.4
