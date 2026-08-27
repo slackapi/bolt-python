@@ -38,7 +38,7 @@ class AsyncAuthorize:
 
 
 class AsyncCallableAuthorize(AsyncAuthorize):
-    """When you pass the authorize argument in AsyncApp constructor, this authorize implementation will be used."""
+    """When you pass the `authorize` argument in AsyncApp constructor, this `authorize` implementation will be used."""
 
     def __init__(self, *, logger: Logger, func: Callable[..., Awaitable[AuthorizeResult]]):
         self.logger = logger

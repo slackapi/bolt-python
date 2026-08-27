@@ -38,9 +38,8 @@ class AsyncBaseSocketModeHandler:
         await self.client.close()
 
     async def start_async(self):
-        """Establishes a new connection and then starts infinite sleep.
+        """Establishes a new connection and then starts infinite sleep to prevent the termination of this process.
 
-        to prevent the termination of this process.
         If you don't want to have the sleep, use `#connect()` method instead.
         """
         await self.connect_async()

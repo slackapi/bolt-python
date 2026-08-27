@@ -41,9 +41,8 @@ class BaseSocketModeHandler:
         self.client.close()
 
     def start(self):
-        """Establishes a new connection and then blocks the current thread.
+        """Establishes a new connection and then blocks the current thread to prevent the termination of this process.
 
-        to prevent the termination of this process.
         If you don't want to block the current thread, use `#connect()` method instead.
         """
         self.connect()

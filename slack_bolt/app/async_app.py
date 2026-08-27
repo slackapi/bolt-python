@@ -745,8 +745,8 @@ class AsyncApp:
     ):
         """Deprecated: register a new step from app listener.
 
-            Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+        Steps from apps for legacy workflows are now deprecated.
+        Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         Registers a new step from app listener.
 
@@ -1225,7 +1225,7 @@ class AsyncApp:
         matchers: Optional[Sequence[Callable[..., Awaitable[bool]]]] = None,
         middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]:
-        """Registers a new `dialog_submission` listener.
+        """Registers a new `dialog_cancellation` listener.
 
         Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details.
         """

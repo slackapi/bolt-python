@@ -11,9 +11,10 @@ from slack_bolt.request import BoltRequest
 
 
 class SlackAppResource:
-    """from slack_bolt import App.
+    """For use with WSGI Falcon Apps.
 
-    app = App().
+    from slack_bolt import App
+    app = App()
 
     import falcon
     api = application = falcon.API()

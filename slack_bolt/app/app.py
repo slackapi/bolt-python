@@ -720,8 +720,8 @@ class App:
     ):
         """Deprecated: register a new step from app listener.
 
-            Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+        Steps from apps for legacy workflows are now deprecated.
+        Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         Registers a new step from app listener.
 
