@@ -213,9 +213,7 @@ class Assistant(Middleware):
         primary_matcher: Callable[..., bool],
         custom_matchers: Optional[Union[Callable[..., bool], ListenerMatcher]],
     ):
-        return [CustomListenerMatcher(app_name=self.app_name, func=primary_matcher)] + (
-            custom_matchers or []
-        )  # type: ignore[operator]
+        return [CustomListenerMatcher(app_name=self.app_name, func=primary_matcher)] + (custom_matchers or [])  # type: ignore[operator]
 
     @staticmethod
     def default_thread_context_changed(save_thread_context: SaveThreadContext, payload: dict):

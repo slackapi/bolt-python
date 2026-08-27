@@ -189,8 +189,7 @@ class TestFunction:
         assert response.status == 404
         assert_auth_test_count(self, 1)
         assert elapsed_seconds == timeout + 1, (
-            f"Expected handler to time out after {timeout + 1} time.sleep calls, "
-            f"but it was called {elapsed_seconds} times"
+            f"Expected handler to time out after {timeout + 1} time.sleep calls, but it was called {elapsed_seconds} times"
         )
 
     def test_warning_when_timeout_improperly_set(self, caplog):

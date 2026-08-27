@@ -66,8 +66,7 @@ def release_thread_local_connections(logger: Logger, execution_timing: str):
     if logger.level <= logging.DEBUG:
         current: Thread = current_thread()
         logger.debug(
-            "Released thread-bound old DB connections "
-            f"(thread name: {current.name}, execution timing: {execution_timing})"
+            f"Released thread-bound old DB connections (thread name: {current.name}, execution timing: {execution_timing})"
         )
 
 

@@ -16,7 +16,6 @@ from tests.mock_web_api_server import (
 
 
 class TestAsyncOAuthFlowSQLite3:
-
     @pytest.fixture(scope="function", autouse=True)
     def setup_teardown(self):
         setup_mock_web_api_server_async(self)

@@ -65,5 +65,5 @@ class RequestVerification(Middleware):
 
     def _debug_log_error(self, signature, timestamp, body) -> None:
         self.logger.info(
-            "Invalid request signature detected " f"(signature: {signature}, timestamp: {timestamp}, body: {body})"
+            f"Invalid request signature detected (signature: {signature}, timestamp: {timestamp}, body: {body})"
         )
