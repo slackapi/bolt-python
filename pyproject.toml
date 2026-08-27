@@ -59,9 +59,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.pydocstyle]
-# google convention resolves D203/D211 and D212/D213 conflicts and implicitly ignores
-# D400/D401/D404/D413. Keep `select = ["D"]` a category select -- an explicit rule-code
-# select would override the convention and resurface those rules.
+# Keep `select = ["D"]` a bare category select; listing explicit D codes would override this convention.
 convention = "google"
 
 [tool.ruff.format]
