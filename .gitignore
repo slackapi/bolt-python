@@ -35,6 +35,9 @@ pip
 # JetBrains PyCharm settings
 .idea/
 
+# VS Code settings
+.vscode/
+
 tmp.txt
 .DS_Store
 logs/
