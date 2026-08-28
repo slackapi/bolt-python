@@ -15,7 +15,7 @@ class ListenerCompletionHandler(metaclass=ABCMeta):
         request: BoltRequest,
         response: Optional[BoltResponse],
     ) -> None:
-        """Do something extra after the listener execution
+        """Do something extra after the listener execution.
 
         Args:
             request: The request.

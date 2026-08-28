@@ -1,5 +1,4 @@
-"""Authorization is the process of determining which Slack credentials should be available
-while processing an incoming Slack event.
+"""Authorization determines which Slack credentials should be available while processing an incoming Slack event.
 
 Refer to https://docs.slack.dev/tools/bolt-python/concepts/authorization for details.
 """

@@ -10,3 +10,4 @@ if [[ "$1" != "--no-install" ]]; then
 fi
 
 ruff check slack_bolt/ examples/
+ruff format --check slack_bolt/ tests/ examples/

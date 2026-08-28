@@ -1,5 +1,4 @@
-"""
-WSGI config for myslackapp project.
+"""WSGI config for myslackapp project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

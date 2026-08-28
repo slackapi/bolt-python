@@ -15,7 +15,7 @@ class AsyncListenerStartHandler(metaclass=ABCMeta):
         request: AsyncBoltRequest,
         response: Optional[BoltResponse],
     ) -> None:
-        """Do something extra before the listener execution
+        """Do something extra before the listener execution.
 
         Args:
             request: The request.

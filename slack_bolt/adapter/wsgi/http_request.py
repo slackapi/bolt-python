@@ -7,8 +7,7 @@ from .internals import ENCODING
 
 
 class WsgiHttpRequest:
-    """This Class uses the PEP 3333 standard to extract request information
-    from the WSGI web server running the application
+    """Extracts request information from the WSGI web server using the PEP 3333 standard.
 
     PEP 3333: https://peps.python.org/pep-3333/
     """

@@ -14,6 +14,7 @@ from slack_bolt.response import BoltResponse
 class SlackRequestHandler:
     def __init__(self, app: App, path: str = "/slack/events"):
         """Setup Bolt as a WSGI web framework, this will make your application compatible with WSGI web servers.
+
         This can be used for production deployments.
 
         With the default settings, `http://localhost:3000/slack/events`

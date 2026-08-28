@@ -1,5 +1,4 @@
-"""
-ASGI config for myslackapp project.
+"""ASGI config for myslackapp project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

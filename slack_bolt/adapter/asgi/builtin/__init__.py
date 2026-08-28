@@ -11,6 +11,7 @@ from slack_bolt.adapter.asgi.base_handler import BaseSlackRequestHandler
 class SlackRequestHandler(BaseSlackRequestHandler):
     def __init__(self, app: App, path: str = "/slack/events"):
         """Setup Bolt as an ASGI web framework, this will make your application compatible with ASGI web servers.
+
         This can be used for production deployment.
 
         With the default settings, `http://localhost:3000/slack/events`

@@ -12,6 +12,7 @@ class AsyncSlackRequestHandler(SlackRequestHandler):
 
     def __init__(self, app: AsyncApp, path: str = "/slack/events"):
         """Setup Bolt as an ASGI web framework, this will make your application compatible with ASGI web servers.
+
         This can be used for production deployment.
 
         With the default settings, `http://localhost:3000/slack/events`

@@ -1,4 +1,4 @@
-"""Internal functions"""
+"""Internal functions."""
 
 import json
 import logging

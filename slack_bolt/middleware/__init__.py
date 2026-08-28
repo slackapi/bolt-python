@@ -1,5 +1,6 @@
-"""A middleware processes request data and calls `next()` method
-if the execution chain should continue running the following middleware.
+"""A middleware processes request data and controls the execution chain.
+
+Call the `next()` method if the execution chain should continue running the following middleware.
 
 Middleware can be used globally before all listener executions.
 It's also possible to run a middleware only for a particular listener.

@@ -20,6 +20,7 @@ from slack_sdk.web.async_client import AsyncWebClient
 
 class AsyncArgs:
     """All the arguments in this class are available in any middleware / listeners.
+
     You can inject the named variables in the argument list in arbitrary order.
 
         @app.action("link_button")

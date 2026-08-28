@@ -41,7 +41,6 @@ class AsyncBoltRequest:
             context: The context in this request.
             mode: The mode used for this request. (either "http" or "socket_mode")
         """
-
         if mode == "http":
             # HTTP Mode
             if body is not None and not isinstance(body, str):

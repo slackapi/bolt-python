@@ -5,8 +5,7 @@ from .internals import ENCODING
 
 
 class WsgiHttpResponse:
-    """This Class uses the PEP 3333 standard to adapt bolt response information
-    for the WSGI web server running the application
+    """Adapts bolt response information for the WSGI web server using the PEP 3333 standard.
 
     PEP 3333: https://peps.python.org/pep-3333/
     """

@@ -7,8 +7,9 @@ from slack_bolt.response import BoltResponse
 
 
 class AsyncRequestVerification(RequestVerification, AsyncMiddleware):
-    """Verifies an incoming request by checking the validity of
-    `x-slack-signature`, `x-slack-request-timestamp`, and its body data.
+    """Verifies an incoming request from Slack.
+
+    Checks the validity of `x-slack-signature`, `x-slack-request-timestamp`, and the request body data.
 
     Refer to https://docs.slack.dev/authentication/verifying-requests-from-slack/ for details.
     """

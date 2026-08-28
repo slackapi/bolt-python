@@ -4,7 +4,7 @@ from slack_sdk.web import SlackResponse
 
 
 class AuthorizeResult(dict):
-    """Authorize function call result"""
+    """Authorize function call result."""
 
     enterprise_id: Optional[str]
     team_id: Optional[str]
@@ -39,7 +39,8 @@ class AuthorizeResult(dict):
         user_token: Optional[str] = None,
         user_scopes: Optional[Union[Sequence[str], str]] = None,
     ):
-        """
+        """Initialize the authorize function call result.
+
         Args:
             enterprise_id: Organization ID (Enterprise Grid) starting with `E`
             team_id: Workspace ID starting with `T`
@@ -52,7 +53,7 @@ class AuthorizeResult(dict):
             user_id: The request user ID
             user: The request user's name
             user_token: User access token starting with `xoxp-`
-            user_scopes: The scopes associated wth the user token
+            user_scopes: The scopes associated with the user token
         """
         self["enterprise_id"] = self.enterprise_id = enterprise_id
         self["team_id"] = self.team_id = team_id

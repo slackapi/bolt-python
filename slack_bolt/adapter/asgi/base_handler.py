@@ -18,15 +18,15 @@ class BaseSlackRequestHandler:
     path: str
 
     async def dispatch(self, request: AsgiHttpRequest) -> BoltResponse:
-        """Dispatches a request to the Bolt App"""
+        """Dispatches a request to the Bolt App."""
         raise NotImplementedError
 
     async def handle_installation(self, request: AsgiHttpRequest) -> BoltResponse:
-        """Handles installation of the OAuthFlow"""
+        """Handles installation of the OAuthFlow."""
         raise NotImplementedError
 
     async def handle_callback(self, request: AsgiHttpRequest) -> BoltResponse:
-        """Handles the callback of the OAuthFlow"""
+        """Handles the callback of the OAuthFlow."""
         raise NotImplementedError
 
     async def _get_http_response(self, method: str, path: str, request: AsgiHttpRequest) -> AsgiHttpResponse:

@@ -5,7 +5,7 @@ from slack_sdk.oauth.installation_store.async_installation_store import (
 
 
 class AsyncTokenRevocationListeners:
-    """Listener functions to handle token revocation / uninstallation events"""
+    """Listener functions to handle token revocation / uninstallation events."""
 
     installation_store: AsyncInstallationStore
 
