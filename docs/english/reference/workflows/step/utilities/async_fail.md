@@ -3,10 +3,10 @@ sidebar_label: async_fail
 title: slack_bolt.workflows.step.utilities.async_fail
 ---
 
-## AsyncFail Objects
+## `AsyncFail`
 
 ```python
-class AsyncFail()
+AsyncFail(*, client, body)
 ```
 
 `fail()` utility to tell Slack the execution failure of a step from app.
@@ -29,9 +29,3 @@ app.step(ws)
 
 This utility is a thin wrapper of workflows.stepFailed API method.
 Refer to https://api.slack.com/methods/workflows.stepFailed for details.
-
-#### \_\_init\_\_
-
-```python
-def __init__(*, client: AsyncWebClient, body: dict)
-```

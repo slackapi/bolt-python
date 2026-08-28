@@ -3,37 +3,31 @@ sidebar_label: url_verification
 title: slack_bolt.middleware.url_verification
 ---
 
-## Submodules
-
-- [slack_bolt.middleware.url_verification.async_url_verification](/tools/bolt-python/reference/middleware/url_verification/async_url_verification)
-- [slack_bolt.middleware.url_verification.url_verification](/tools/bolt-python/reference/middleware/url_verification/url_verification)
-
-## UrlVerification Objects
+## `UrlVerification`
 
 ```python
-class UrlVerification(Middleware)
+UrlVerification(base_logger=None)
 ```
 
-#### \_\_init\_\_
-
-```python
-def __init__(base_logger: Optional[Logger] = None)
-```
+Bases: Middleware
 
 Handles url_verification requests.
 
 Refer to https://docs.slack.dev/reference/events/url_verification/ for details.
 
-**Arguments**:
+**Parameters:**
 
-- `base_logger` _Optional[Logger]_ - The base logger
+- **base_logger** (Optional[Logger]) – The base logger
 
-#### process
+### `name`
 
 ```python
-def process(
-    *,
-    req: BoltRequest,
-    resp: BoltResponse,
-    next: Callable[[], BoltResponse]) -> BoltResponse
+name: str
 ```
+
+The name of this middleware.
+
+## Submodules
+
+- [slack_bolt.middleware.url_verification.async_url_verification](/tools/bolt-python/reference/middleware/url_verification/async_url_verification)
+- [slack_bolt.middleware.url_verification.url_verification](/tools/bolt-python/reference/middleware/url_verification/url_verification)

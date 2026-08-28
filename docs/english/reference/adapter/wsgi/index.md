@@ -3,23 +3,10 @@ sidebar_label: wsgi
 title: slack_bolt.adapter.wsgi
 ---
 
-## Submodules
-
-- [slack_bolt.adapter.wsgi.handler](/tools/bolt-python/reference/adapter/wsgi/handler)
-- [slack_bolt.adapter.wsgi.http_request](/tools/bolt-python/reference/adapter/wsgi/http_request)
-- [slack_bolt.adapter.wsgi.http_response](/tools/bolt-python/reference/adapter/wsgi/http_response)
-- [slack_bolt.adapter.wsgi.internals](/tools/bolt-python/reference/adapter/wsgi/internals)
-
-## SlackRequestHandler Objects
+## `SlackRequestHandler`
 
 ```python
-class SlackRequestHandler()
-```
-
-#### \_\_init\_\_
-
-```python
-def __init__(app: App, path: str = '/slack/events')
+SlackRequestHandler(app, path='/slack/events')
 ```
 
 Setup Bolt as a WSGI web framework, this will make your application compatible with WSGI web servers.
@@ -29,42 +16,28 @@ This can be used for production deployments.
 With the default settings, `http://localhost:3000/slack/events`
 Run Bolt with [gunicorn](https://gunicorn.org/)
 
-# Python
-    app = App()
-
 ```python
+app = App()
+
 api = SlackRequestHandler(app)
 ```
 
-# bash
-    export SLACK_SIGNING_SECRET=***
+```bash
+export SLACK_SIGNING_SECRET=***
 
-```python
 export SLACK_BOT_TOKEN=xoxb-***
 
 gunicorn app:api -b 0.0.0.0:3000 --log-level debug
 ```
 
+**Parameters:**
 
-**Arguments**:
+- **app** (App) – Your bolt application
+- **path** (str) – The path to handle request from Slack (Default: `/slack/events`)
 
-- `app` _App_ - Your bolt application
-- `path` _str_ - The path to handle request from Slack (Default: `/slack/events`)
+## Submodules
 
-#### dispatch
-
-```python
-def dispatch(request: WsgiHttpRequest) -> BoltResponse
-```
-
-#### handle\_installation
-
-```python
-def handle_installation(request: WsgiHttpRequest) -> BoltResponse
-```
-
-#### handle\_callback
-
-```python
-def handle_callback(request: WsgiHttpRequest) -> BoltResponse
-```
+- [slack_bolt.adapter.wsgi.handler](/tools/bolt-python/reference/adapter/wsgi/handler)
+- [slack_bolt.adapter.wsgi.http_request](/tools/bolt-python/reference/adapter/wsgi/http_request)
+- [slack_bolt.adapter.wsgi.http_response](/tools/bolt-python/reference/adapter/wsgi/http_response)
+- [slack_bolt.adapter.wsgi.internals](/tools/bolt-python/reference/adapter/wsgi/internals)

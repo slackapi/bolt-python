@@ -4,30 +4,20 @@ title: slack_bolt.context.fail.fail
 slug: fail
 ---
 
-## Fail Objects
+## `Fail`
 
 ```python
-class Fail()
+Fail(client, function_execution_id)
 ```
 
-#### client: `WebClient`
-
-#### function\_execution\_id: `Optional[str]`
-
-#### \_\_init\_\_
+### `has_been_called`
 
 ```python
-def __init__(client: WebClient, function_execution_id: Optional[str])
-```
-
-#### has\_been\_called
-
-```python
-def has_been_called() -> bool
+has_been_called()
 ```
 
 Check if this fail function has been called.
 
-**Returns**:
+**Returns:**
 
-- `bool` - True if the fail function has been called, False otherwise.
+- **bool** (bool) – True if the fail function has been called, False otherwise.

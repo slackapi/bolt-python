@@ -3,10 +3,10 @@ sidebar_label: configure
 title: slack_bolt.workflows.step.utilities.configure
 ---
 
-## Configure Objects
+## `Configure`
 
 ```python
-class Configure()
+Configure(*, callback_id, client, body)
 ```
 
 `configure()` utility to send the modal view in Workflow Builder.
@@ -39,9 +39,3 @@ app.step(ws)
 ```
 
 Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
-
-#### \_\_init\_\_
-
-```python
-def __init__(*, callback_id: str, client: WebClient, body: dict)
-```

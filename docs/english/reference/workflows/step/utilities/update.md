@@ -3,10 +3,10 @@ sidebar_label: update
 title: slack_bolt.workflows.step.utilities.update
 ---
 
-## Update Objects
+## `Update`
 
 ```python
-class Update()
+Update(*, client, body)
 ```
 
 `update()` utility to tell Slack the processing results of a `save` listener.
@@ -48,9 +48,3 @@ app.step(ws)
 
 This utility is a thin wrapper of workflows.stepFailed API method.
 Refer to https://api.slack.com/methods/workflows.updateStep for details.
-
-#### \_\_init\_\_
-
-```python
-def __init__(*, client: WebClient, body: dict)
-```

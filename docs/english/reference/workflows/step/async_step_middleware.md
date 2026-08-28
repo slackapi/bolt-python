@@ -3,26 +3,20 @@ sidebar_label: async_step_middleware
 title: slack_bolt.workflows.step.async_step_middleware
 ---
 
-## AsyncWorkflowStepMiddleware Objects
+## `AsyncWorkflowStepMiddleware`
 
 ```python
-class AsyncWorkflowStepMiddleware(AsyncMiddleware)
+AsyncWorkflowStepMiddleware(step)
 ```
+
+Bases: AsyncMiddleware
 
 Base middleware for step from app specific ones.
 
-#### \_\_init\_\_
+### `name`
 
 ```python
-def __init__(step: AsyncWorkflowStep)
+name: str
 ```
 
-#### async\_process
-
-```python
-async def async_process(
-    *,
-    req: AsyncBoltRequest,
-    resp: BoltResponse,
-    next: Callable[[], Awaitable[BoltResponse]]) -> BoltResponse
-```
+The name of this middleware.

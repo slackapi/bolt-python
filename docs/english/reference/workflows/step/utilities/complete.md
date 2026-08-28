@@ -3,10 +3,10 @@ sidebar_label: complete
 title: slack_bolt.workflows.step.utilities.complete
 ---
 
-## Complete Objects
+## `Complete`
 
 ```python
-class Complete()
+Complete(*, client, body)
 ```
 
 `complete()` utility to tell Slack the completion of a step from app execution.
@@ -32,9 +32,3 @@ app.step(ws)
 
 This utility is a thin wrapper of workflows.stepCompleted API method.
 Refer to https://api.slack.com/methods/workflows.stepCompleted for details.
-
-#### \_\_init\_\_
-
-```python
-def __init__(*, client: WebClient, body: dict)
-```

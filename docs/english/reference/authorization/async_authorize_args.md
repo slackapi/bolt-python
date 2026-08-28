@@ -3,40 +3,17 @@ sidebar_label: async_authorize_args
 title: slack_bolt.authorization.async_authorize_args
 ---
 
-## AsyncAuthorizeArgs Objects
+## `AsyncAuthorizeArgs`
 
 ```python
-class AsyncAuthorizeArgs()
-```
-
-#### context: `AsyncBoltContext`
-
-#### logger: `Logger`
-
-#### client: `AsyncWebClient`
-
-#### enterprise\_id: `Optional[str]`
-
-#### team\_id: `Optional[str]`
-
-#### user\_id: `Optional[str]`
-
-#### \_\_init\_\_
-
-```python
-def __init__(
-    *,
-    context: AsyncBoltContext,
-    enterprise_id: Optional[str],
-    team_id: Optional[str],
-    user_id: Optional[str])
+AsyncAuthorizeArgs(*, context, enterprise_id, team_id, user_id)
 ```
 
 The full list of the arguments passed to `authorize` function.
 
-**Arguments**:
+**Parameters:**
 
-- `context` _AsyncBoltContext_ - The request context
-- `enterprise_id` _Optional[str]_ - The Organization ID (Enterprise Grid)
-- `team_id` _Optional[str]_ - The workspace ID
-- `user_id` _Optional[str]_ - The request user ID
+- **context** (AsyncBoltContext) – The request context
+- **enterprise_id** (Optional[str]) – The Organization ID (Enterprise Grid)
+- **team_id** (Optional[str]) – The workspace ID
+- **user_id** (Optional[str]) – The request user ID

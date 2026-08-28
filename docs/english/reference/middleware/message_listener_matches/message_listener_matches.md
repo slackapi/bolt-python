@@ -4,26 +4,20 @@ title: slack_bolt.middleware.message_listener_matches.message_listener_matches
 slug: message_listener_matches
 ---
 
-## MessageListenerMatches Objects
+## `MessageListenerMatches`
 
 ```python
-class MessageListenerMatches(Middleware)
+MessageListenerMatches(keyword)
 ```
 
-#### \_\_init\_\_
-
-```python
-def __init__(keyword: Union[str, Pattern])
-```
+Bases: Middleware
 
 Captures matched keywords and saves the values in context.
 
-#### process
+### `name`
 
 ```python
-def process(
-    *,
-    req: BoltRequest,
-    resp: BoltResponse,
-    next: Callable[[], BoltResponse]) -> BoltResponse
+name: str
 ```
+
+The name of this middleware.

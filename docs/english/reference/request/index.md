@@ -8,6 +8,22 @@ Incoming request from Slack through either HTTP request or Socket Mode connectio
 Refer to https://docs.slack.dev/apis/events-api/ for the two types of connections.
 This interface encapsulates the difference between the two.
 
+## `BoltRequest`
+
+```python
+BoltRequest(*, body, query=None, headers=None, context=None, mode='http')
+```
+
+Request to a Bolt app.
+
+**Parameters:**
+
+- **body** (Union[str, dict]) – The raw request body (only plain text is supported for "http" mode)
+- **query** (Optional[Union[str, Dict[str, str], Dict[str, Sequence[str]]]]) – The query string data in any data format.
+- **headers** (Optional[Dict[str, Union[str, Sequence[str]]]]) – The request headers.
+- **context** (Optional[Dict[str, Any]]) – The context in this request.
+- **mode** (str) – The mode used for this request. (either "http" or "socket_mode")
+
 ## Submodules
 
 - [slack_bolt.request.async_internals](/tools/bolt-python/reference/request/async_internals)
@@ -15,55 +31,3 @@ This interface encapsulates the difference between the two.
 - [slack_bolt.request.internals](/tools/bolt-python/reference/request/internals)
 - [slack_bolt.request.payload_utils](/tools/bolt-python/reference/request/payload_utils)
 - [slack_bolt.request.request](/tools/bolt-python/reference/request/request)
-
-## BoltRequest Objects
-
-```python
-class BoltRequest()
-```
-
-#### raw\_body: `str`
-
-#### query: `Dict[str, Sequence[str]]`
-
-#### headers: `Dict[str, Sequence[str]]`
-
-#### content\_type: `Optional[str]`
-
-#### body: `Dict[str, Any]`
-
-#### context: `BoltContext`
-
-#### lazy\_only: `bool`
-
-#### lazy\_function\_name: `Optional[str]`
-
-#### mode: `str`
-
-#### \_\_init\_\_
-
-```python
-def __init__(
-    *,
-    body: Union[str, dict],
-    query: Optional[Union[str, Dict[str, str], Dict[str, Sequence[str]]]] = None,
-    headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None,
-    context: Optional[Dict[str, Any]] = None,
-    mode: str = 'http')
-```
-
-Request to a Bolt app.
-
-**Arguments**:
-
-- `body` _Union[str, dict]_ - The raw request body (only plain text is supported for "http" mode)
-- `query` _Optional[Union[str, Dict[str, str], Dict[str, Sequence[str]]]]_ - The query string data in any data format.
-- `headers` _Optional[Dict[str, Union[str, Sequence[str]]]]_ - The request headers.
-- `context` _Optional[Dict[str, Any]]_ - The context in this request.
-- `mode` _str_ - The mode used for this request. (either "http" or "socket_mode")
-
-#### to\_copyable
-
-```python
-def to_copyable() -> BoltRequest
-```

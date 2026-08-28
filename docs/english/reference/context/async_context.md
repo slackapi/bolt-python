@@ -3,34 +3,112 @@ sidebar_label: async_context
 title: slack_bolt.context.async_context
 ---
 
-## AsyncBoltContext Objects
+## `AsyncBoltContext`
 
-```python
-class AsyncBoltContext(BaseContext)
-```
+Bases: BaseContext
 
 Context object associated with a request from Slack.
 
-#### to\_copyable
+### `ack`
 
 ```python
-def to_copyable() -> AsyncBoltContext
+ack: AsyncAck
 ```
 
-#### listener\_runner
+`ack()` function for this request.
 
 ```python
-@property
-def listener_runner() -> AsyncioListenerRunner
+@app.action("button")
+async def handle_button_clicks(context):
+    await context.ack()
+
+# You can access "ack" this way too.
+@app.action("button")
+async def handle_button_clicks(ack):
+    await ack()
 ```
 
-The properly configured listener_runner that is available for middleware/listeners.
+**Returns:**
 
-#### client
+- AsyncAck – Callable `ack()` function
+
+### `actor_enterprise_id`
 
 ```python
-@property
-def client() -> AsyncWebClient
+actor_enterprise_id: Optional[str]
+```
+
+The action's actor's Enterprise Grid organization ID.
+
+Note that this property is especially useful for handling events in Slack Connect channels.
+That being said, it's not guaranteed to have a valid ID for all events due to server-side inconsistency.
+
+### `actor_team_id`
+
+```python
+actor_team_id: Optional[str]
+```
+
+The action's actor's workspace ID.
+
+Note that this property is especially useful for handling events in Slack Connect channels.
+That being said, it's not guaranteed to have a valid ID for all events due to server-side inconsistency.
+
+### `actor_user_id`
+
+```python
+actor_user_id: Optional[str]
+```
+
+The action's actor's user ID.
+
+Note that this property is especially useful for handling events in Slack Connect channels.
+That being said, it's not guaranteed to have a valid ID for all events due to server-side inconsistency.
+
+### `authorize_result`
+
+```python
+authorize_result: Optional[AuthorizeResult]
+```
+
+The authorize result resolved for this request.
+
+### `bot_id`
+
+```python
+bot_id: Optional[str]
+```
+
+The bot ID resolved for this request.
+
+### `bot_token`
+
+```python
+bot_token: Optional[str]
+```
+
+The bot token resolved for this request.
+
+### `bot_user_id`
+
+```python
+bot_user_id: Optional[str]
+```
+
+The bot user ID resolved for this request.
+
+### `channel_id`
+
+```python
+channel_id: Optional[str]
+```
+
+The conversation ID associated with this request.
+
+### `client`
+
+```python
+client: AsyncWebClient
 ```
 
 The `AsyncWebClient` instance available for this request.
@@ -52,95 +130,14 @@ async def handle_events(client, context):
     )
 ```
 
+**Returns:**
 
-**Returns**:
+- AsyncWebClient – `AsyncWebClient` instance
 
-- `AsyncWebClient` - `AsyncWebClient` instance
-
-#### ack
-
-```python
-@property
-def ack() -> AsyncAck
-```
-
-`ack()` function for this request.
+### `complete`
 
 ```python
-@app.action("button")
-async def handle_button_clicks(context):
-    await context.ack()
-
-# You can access "ack" this way too.
-@app.action("button")
-async def handle_button_clicks(ack):
-    await ack()
-```
-
-
-**Returns**:
-
-- `AsyncAck` - Callable `ack()` function
-
-#### say
-
-```python
-@property
-def say() -> AsyncSay
-```
-
-`say()` function for this request.
-
-```python
-@app.action("button")
-async def handle_button_clicks(context):
-    await context.ack()
-    await context.say("Hi!")
-
-# You can access "ack" this way too.
-@app.action("button")
-async def handle_button_clicks(ack, say):
-    await ack()
-    await say("Hi!")
-```
-
-
-**Returns**:
-
-- `AsyncSay` - Callable `say()` function
-
-#### respond
-
-```python
-@property
-def respond() -> Optional[AsyncRespond]
-```
-
-`respond()` function for this request.
-
-```python
-@app.action("button")
-async def handle_button_clicks(context):
-    await context.ack()
-    await context.respond("Hi!")
-
-# You can access "ack" this way too.
-@app.action("button")
-async def handle_button_clicks(ack, respond):
-    await ack()
-    await respond("Hi!")
-```
-
-
-**Returns**:
-
-- `Optional[AsyncRespond]` - Callable `respond()` function
-
-#### complete
-
-```python
-@property
-def complete() -> AsyncComplete
+complete: AsyncComplete
 ```
 
 `complete()` function for this request.
@@ -162,16 +159,22 @@ async def handle_button_clicks(context):
     await context.complete(outputs={"stringReverse":"olleh"})
 ```
 
+**Returns:**
 
-**Returns**:
+- AsyncComplete – Callable `complete()` function
 
-- `AsyncComplete` - Callable `complete()` function
-
-#### fail
+### `enterprise_id`
 
 ```python
-@property
-def fail() -> AsyncFail
+enterprise_id: Optional[str]
+```
+
+The Enterprise Grid Organization ID of this request.
+
+### `fail`
+
+```python
+fail: AsyncFail
 ```
 
 `fail()` function for this request.
@@ -193,49 +196,166 @@ async def handle_button_clicks(context):
     await context.fail(error="something went wrong")
 ```
 
+**Returns:**
 
-**Returns**:
+- AsyncFail – Callable `fail()` function
 
-- `AsyncFail` - Callable `fail()` function
-
-#### set\_title
-
-```python
-@property
-def set_title() -> Optional[AsyncSetTitle]
-```
-
-#### set\_status
+### `function_bot_access_token`
 
 ```python
-@property
-def set_status() -> Optional[AsyncSetStatus]
+function_bot_access_token: Optional[str]
 ```
 
-#### set\_suggested\_prompts
+The bot token resolved for this function request.
+
+Only available for `function_executed` and interactivity events scoped to a custom step.
+
+### `function_execution_id`
 
 ```python
-@property
-def set_suggested_prompts() -> Optional[AsyncSetSuggestedPrompts]
+function_execution_id: Optional[str]
 ```
 
-#### get\_thread\_context
+The `function_execution_id` associated with this request.
+
+Only available for `function_executed` and interactivity events scoped to a custom step.
+
+### `inputs`
 
 ```python
-@property
-def get_thread_context() -> Optional[AsyncGetThreadContext]
+inputs: Optional[Dict[str, Any]]
 ```
 
-#### say\_stream
+The `inputs` associated with this request.
+
+Only available for `function_executed` and interactivity events scoped to a custom step.
+
+### `is_enterprise_install`
 
 ```python
-@property
-def say_stream() -> Optional[AsyncSayStream]
+is_enterprise_install: Optional[bool]
 ```
 
-#### save\_thread\_context
+True if the request is associated with an Org-wide installation.
+
+### `listener_runner`
 
 ```python
-@property
-def save_thread_context() -> Optional[AsyncSaveThreadContext]
+listener_runner: AsyncioListenerRunner
 ```
+
+The properly configured listener_runner that is available for middleware/listeners.
+
+### `logger`
+
+```python
+logger: Logger
+```
+
+The properly configured logger that is available for middleware/listeners.
+
+### `matches`
+
+```python
+matches: Optional[Tuple]
+```
+
+Returns all the matched parts in message listener's regexp.
+
+### `respond`
+
+```python
+respond: Optional[AsyncRespond]
+```
+
+`respond()` function for this request.
+
+```python
+@app.action("button")
+async def handle_button_clicks(context):
+    await context.ack()
+    await context.respond("Hi!")
+
+# You can access "ack" this way too.
+@app.action("button")
+async def handle_button_clicks(ack, respond):
+    await ack()
+    await respond("Hi!")
+```
+
+**Returns:**
+
+- Optional[AsyncRespond] – Callable `respond()` function
+
+### `response_url`
+
+```python
+response_url: Optional[str]
+```
+
+The `response_url` associated with this request.
+
+### `say`
+
+```python
+say: AsyncSay
+```
+
+`say()` function for this request.
+
+```python
+@app.action("button")
+async def handle_button_clicks(context):
+    await context.ack()
+    await context.say("Hi!")
+
+# You can access "ack" this way too.
+@app.action("button")
+async def handle_button_clicks(ack, say):
+    await ack()
+    await say("Hi!")
+```
+
+**Returns:**
+
+- AsyncSay – Callable `say()` function
+
+### `team_id`
+
+```python
+team_id: Optional[str]
+```
+
+The Workspace ID of this request.
+
+### `thread_ts`
+
+```python
+thread_ts: Optional[str]
+```
+
+The conversation thread's ID associated with this request.
+
+### `token`
+
+```python
+token: Optional[str]
+```
+
+The (bot/user) token resolved for this request.
+
+### `user_id`
+
+```python
+user_id: Optional[str]
+```
+
+The user ID associated ith this request.
+
+### `user_token`
+
+```python
+user_token: Optional[str]
+```
+
+The user token resolved for this request.

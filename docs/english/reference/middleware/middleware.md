@@ -4,22 +4,22 @@ title: slack_bolt.middleware.middleware
 slug: middleware
 ---
 
-## Middleware Objects
-
-```python
-class Middleware()
-```
+## `Middleware`
 
 A middleware can process request data before other middleware and listener functions.
 
-#### process
+### `name`
 
 ```python
-def process(
-    *,
-    req: BoltRequest,
-    resp: BoltResponse,
-    next: Callable[[], BoltResponse]) -> Optional[BoltResponse]
+name: str
+```
+
+The name of this middleware.
+
+### `process`
+
+```python
+process(*, req, resp, next)
 ```
 
 Processes a request data before other middleware and listeners.
@@ -43,22 +43,12 @@ def simple_middleware(req, resp, next_):
     next_()
 ```
 
+**Parameters:**
 
-**Arguments**:
+- **req** (BoltRequest) – The incoming request
+- **resp** (BoltResponse) – The response
+- **next** (Callable[[], BoltResponse]) – The function to tell the chain that it can continue
 
-- `req` _BoltRequest_ - The incoming request
-- `resp` _BoltResponse_ - The response
-- `next` _Callable[[], BoltResponse]_ - The function to tell the chain that it can continue
+**Returns:**
 
-**Returns**:
-
-- `Optional[BoltResponse]` - Processed response (optional)
-
-#### name
-
-```python
-@property
-def name() -> str
-```
-
-The name of this middleware.
+- Optional[BoltResponse] – Processed response (optional)

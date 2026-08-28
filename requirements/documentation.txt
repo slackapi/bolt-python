@@ -1,8 +1,0 @@
-# pip install -r requirements/documentation.txt
-
-# griffe
-# Note: doc-gen only; the generator runs on the latest supported Python (see
-# scripts/generate_api_docs.sh), so no python_version markers are needed.
-# Note: pinned so the committed reference tree under docs/english/reference stays
-# reproducible -- an unpinned griffe can silently shift the generated Markdown.
-griffe==2.2.0

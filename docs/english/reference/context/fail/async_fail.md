@@ -3,30 +3,20 @@ sidebar_label: async_fail
 title: slack_bolt.context.fail.async_fail
 ---
 
-## AsyncFail Objects
+## `AsyncFail`
 
 ```python
-class AsyncFail()
+AsyncFail(client, function_execution_id)
 ```
 
-#### client: `AsyncWebClient`
-
-#### function\_execution\_id: `Optional[str]`
-
-#### \_\_init\_\_
+### `has_been_called`
 
 ```python
-def __init__(client: AsyncWebClient, function_execution_id: Optional[str])
-```
-
-#### has\_been\_called
-
-```python
-def has_been_called() -> bool
+has_been_called()
 ```
 
 Check if this fail function has been called.
 
-**Returns**:
+**Returns:**
 
-- `bool` - True if the fail function has been called, False otherwise.
+- **bool** (bool) – True if the fail function has been called, False otherwise.

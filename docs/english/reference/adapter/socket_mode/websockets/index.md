@@ -5,28 +5,13 @@ title: slack_bolt.adapter.socket_mode.websockets
 
 [`websockets`](https://pypi.org/project/websockets/) based implementation  / asyncio compatible.
 
-## SocketModeHandler Objects
+## `SocketModeHandler`
 
 ```python
-class SocketModeHandler(AsyncBaseSocketModeHandler)
+SocketModeHandler(app, app_token=None, logger=None, web_client=None, ping_interval=10)
 ```
 
-#### app: `App`
-
-#### app\_token: `str`
-
-#### client: `SocketModeClient`
-
-#### \_\_init\_\_
-
-```python
-def __init__(
-    app: App,
-    app_token: Optional[str] = None,
-    logger: Optional[Logger] = None,
-    web_client: Optional[AsyncWebClient] = None,
-    ping_interval: float = 10)
-```
+Bases: AsyncBaseSocketModeHandler
 
 Socket Mode adapter for Bolt apps.
 
@@ -34,45 +19,44 @@ Please note that this adapter does not support proxy configuration
 as the underlying websockets module does not support proxy-wired connections.
 If you use proxy, consider using one of the other Socket Mode adapters.
 
-**Arguments**:
+**Parameters:**
 
-- `app` _App_ - The Bolt app
-- `app_token` _Optional[str]_ - App-level token starting with `xapp-`
-- `logger` _Optional[Logger]_ - Custom logger
-- `web_client` _Optional[AsyncWebClient]_ - custom `slack_sdk.web.WebClient` instance
-- `ping_interval` _float_ - The ping-pong internal (seconds)
+- **app** (App) – The Bolt app
+- **app_token** (Optional[str]) – App-level token starting with `xapp-`
+- **logger** (Optional[Logger]) – Custom logger
+- **web_client** (Optional[AsyncWebClient]) – custom `slack_sdk.web.WebClient` instance
+- **ping_interval** (float) – The ping-pong internal (seconds)
 
-#### handle
-
-```python
-async def handle(client: SocketModeClient, req: SocketModeRequest) -> None
-```
-
-## AsyncSocketModeHandler Objects
+### `close_async`
 
 ```python
-class AsyncSocketModeHandler(AsyncBaseSocketModeHandler)
+close_async()
 ```
 
-#### app: `AsyncApp`
+Disconnects from the Socket Mode server and cleans the resources this instance holds up.
 
-#### app\_token: `str`
-
-#### client: `SocketModeClient`
-
-#### \_\_init\_\_
+### `connect_async`
 
 ```python
-def __init__(
-    app: AsyncApp,
-    app_token: Optional[str] = None,
-    logger: Optional[Logger] = None,
-    web_client: Optional[AsyncWebClient] = None,
-    ping_interval: float = 10)
+connect_async()
 ```
 
-#### handle
+Establishes a new connection with the Socket Mode server.
+
+### `disconnect_async`
 
 ```python
-async def handle(client: SocketModeClient, req: SocketModeRequest) -> None
+disconnect_async()
 ```
+
+Disconnects the current WebSocket connection with the Socket Mode server.
+
+### `start_async`
+
+```python
+start_async()
+```
+
+Establishes a new connection and then starts infinite sleep to prevent the termination of this process.
+
+If you don't want to have the sleep, use `#connect()` method instead.

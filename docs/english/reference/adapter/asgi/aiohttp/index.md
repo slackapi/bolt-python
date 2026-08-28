@@ -3,19 +3,13 @@ sidebar_label: aiohttp
 title: slack_bolt.adapter.asgi.aiohttp
 ---
 
-## AsyncSlackRequestHandler Objects
+## `AsyncSlackRequestHandler`
 
 ```python
-class AsyncSlackRequestHandler(SlackRequestHandler)
+AsyncSlackRequestHandler(app, path='/slack/events')
 ```
 
-#### app: `AsyncApp`
-
-#### \_\_init\_\_
-
-```python
-def __init__(app: AsyncApp, path: str = '/slack/events')
-```
+Bases: SlackRequestHandler
 
 Setup Bolt as an ASGI web framework, this will make your application compatible with ASGI web servers.
 
@@ -25,36 +19,17 @@ With the default settings, `http://localhost:3000/slack/events`
 Run Bolt with [uvicron](https://www.uvicorn.org/)
 
 ```python
-# Python
 app = AsyncApp()
 api = SlackRequestHandler(app)
+```
 
-# bash
+```bash
 export SLACK_SIGNING_SECRET=***
 export SLACK_BOT_TOKEN=xoxb-***
 uvicorn app:api --port 3000 --log-level debug
 ```
 
+**Parameters:**
 
-**Arguments**:
-
-- `app` _AsyncApp_ - Your bolt application
-- `path` _str_ - The path to handle request from Slack (Default: `/slack/events`)
-
-#### dispatch
-
-```python
-async def dispatch(request: AsgiHttpRequest) -> BoltResponse
-```
-
-#### handle\_installation
-
-```python
-async def handle_installation(request: AsgiHttpRequest) -> BoltResponse
-```
-
-#### handle\_callback
-
-```python
-async def handle_callback(request: AsgiHttpRequest) -> BoltResponse
-```
+- **app** (AsyncApp) – Your bolt application
+- **path** (str) – The path to handle request from Slack (Default: `/slack/events`)

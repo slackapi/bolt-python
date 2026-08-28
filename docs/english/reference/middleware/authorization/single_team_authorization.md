@@ -3,36 +3,26 @@ sidebar_label: single_team_authorization
 title: slack_bolt.middleware.authorization.single_team_authorization
 ---
 
-## SingleTeamAuthorization Objects
+## `SingleTeamAuthorization`
 
 ```python
-class SingleTeamAuthorization(Authorization)
+SingleTeamAuthorization(*, auth_test_result=None, base_logger=None, user_facing_authorize_error_message=None)
 ```
 
-#### \_\_init\_\_
-
-```python
-def __init__(
-    *,
-    auth_test_result: Optional[SlackResponse] = None,
-    base_logger: Optional[Logger] = None,
-    user_facing_authorize_error_message: Optional[str] = None)
-```
+Bases: Authorization
 
 Single-workspace authorization.
 
-**Arguments**:
+**Parameters:**
 
-- `auth_test_result` _Optional[SlackResponse]_ - The initial `auth.test` API call result.
-- `base_logger` _Optional[Logger]_ - The base logger
-- `user_facing_authorize_error_message` _Optional[str]_ - The message shown to the end-user when authorization fails
+- **auth_test_result** (Optional[SlackResponse]) – The initial `auth.test` API call result.
+- **base_logger** (Optional[Logger]) – The base logger
+- **user_facing_authorize_error_message** (Optional[str]) – The message shown to the end-user when authorization fails
 
-#### process
+### `name`
 
 ```python
-def process(
-    *,
-    req: BoltRequest,
-    resp: BoltResponse,
-    next: Callable[[], BoltResponse]) -> BoltResponse
+name: str
 ```
+
+The name of this middleware.
