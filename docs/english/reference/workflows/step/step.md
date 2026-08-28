@@ -10,7 +10,8 @@ slug: step
 class WorkflowStepBuilder()
 ```
 
-Steps from apps
+Steps from apps.
+
 Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
 
 #### callback\_id: `Union[str, Pattern]`
@@ -24,9 +25,8 @@ def __init__(
     base_logger: Optional[Logger] = None)
 ```
 
-**Deprecated**:
+Deprecated: Steps from apps for legacy workflows are now deprecated.
 
-Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
 This builder is supposed to be used as decorator.
@@ -65,9 +65,8 @@ def edit(
     lazy: Optional[List[Callable[..., None]]] = None)
 ```
 
-**Deprecated**:
+Deprecated: Steps from apps for legacy workflows are now deprecated.
 
-Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
 Registers a new edit listener with details.
@@ -109,9 +108,8 @@ def save(
     lazy: Optional[List[Callable[..., None]]] = None)
 ```
 
-**Deprecated**:
+Deprecated: Steps from apps for legacy workflows are now deprecated.
 
-Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
 Registers a new save listener with details.
@@ -153,9 +151,8 @@ def execute(
     lazy: Optional[List[Callable[..., None]]] = None)
 ```
 
-**Deprecated**:
+Deprecated: Steps from apps for legacy workflows are now deprecated.
 
-Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
 Registers a new execute listener with details.
@@ -193,9 +190,8 @@ refer to `slack_bolt.workflows.step.utilities` API documents.
 def build(base_logger: Optional[Logger] = None) -> WorkflowStep
 ```
 
-**Deprecated**:
+Deprecated: Steps from apps for legacy workflows are now deprecated.
 
-Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
 Constructs a WorkflowStep object. This method may raise an exception
@@ -258,9 +254,8 @@ def __init__(
     base_logger: Optional[Logger] = None)
 ```
 
-**Deprecated**:
+Deprecated: Steps from apps for legacy workflows are now deprecated.
 
-Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
 **Arguments**:
@@ -283,9 +278,8 @@ def builder(
     base_logger: Optional[Logger] = None) -> WorkflowStepBuilder
 ```
 
-**Deprecated**:
+Deprecated: Steps from apps for legacy workflows are now deprecated.
 
-Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
 #### build\_listener

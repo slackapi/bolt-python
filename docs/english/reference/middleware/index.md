@@ -3,8 +3,9 @@ sidebar_label: middleware
 title: slack_bolt.middleware
 ---
 
-A middleware processes request data and calls `next()` method
-if the execution chain should continue running the following middleware.
+A middleware processes request data and controls the execution chain.
+
+Call the `next()` method if the execution chain should continue running the following middleware.
 
 Middleware can be used globally before all listener executions.
 It's also possible to run a middleware only for a particular listener.
@@ -102,6 +103,7 @@ def process(
 ```
 
 Processes a request data before other middleware and listeners.
+
 A middleware calls `next()` function if the chain should continue.
 
 ```python
@@ -121,6 +123,7 @@ def simple_middleware(req, resp, next_):
     next_()
 ```
 
+
 **Arguments**:
 
 - `req` _BoltRequest_ - The incoming request
@@ -138,7 +141,7 @@ def simple_middleware(req, resp, next_):
 def name() -> str
 ```
 
-The name of this middleware
+The name of this middleware.
 
 ## RequestVerification Objects
 

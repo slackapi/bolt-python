@@ -45,7 +45,7 @@ def error_auth_test_failure(error_response: SlackResponse) -> str:
 
 
 def error_token_required() -> str:
-    return "Either an env variable `SLACK_BOT_TOKEN` " "or `token` argument in the constructor is required."
+    return "Either an env variable `SLACK_BOT_TOKEN` or `token` argument in the constructor is required."
 
 
 def error_unexpected_listener_middleware(middleware_type) -> str:
@@ -89,9 +89,7 @@ def warning_client_prioritized_and_token_skipped() -> str:
 
 
 def warning_token_skipped() -> str:
-    return (
-        "As `installation_store` or `authorize` has been used, " "`token` (or SLACK_BOT_TOKEN env variable) will be ignored."
-    )
+    return "As `installation_store` or `authorize` has been used, `token` (or SLACK_BOT_TOKEN env variable) will be ignored."
 
 
 def warning_installation_store_conflicts() -> str:
@@ -99,7 +97,8 @@ def warning_installation_store_conflicts() -> str:
 
 
 def warning_unhandled_by_global_middleware(
-    name: str, req: Union[BoltRequest, "AsyncBoltRequest"]  # type: ignore[name-defined]
+    name: str,
+    req: Union[BoltRequest, "AsyncBoltRequest"],  # type: ignore[name-defined]
 ) -> str:
     return (
         f"A global middleware ({name}) skipped calling either `next()` or `next_()` "
@@ -194,8 +193,8 @@ def warning_unhandled_request(
         return _build_unhandled_request_suggestion(
             default_message,
             f"""
-from slack_bolt.workflows.step{'.async_step' if is_async else ''} import {'Async' if is_async else ''}WorkflowStep
-ws = {'Async' if is_async else ''}WorkflowStep(
+from slack_bolt.workflows.step{".async_step" if is_async else ""} import {"Async" if is_async else ""}WorkflowStep
+ws = {"Async" if is_async else ""}WorkflowStep(
     callback_id="{callback_id}",
     edit=edit,
     save=save,
@@ -214,8 +213,8 @@ app.step(ws)
             default_message,
             f"""
 @app.action("{action_id_or_callback_id}")
-{'async ' if is_async else ''}def handle_some_action(ack, body, logger):
-    {'await ' if is_async else ''}ack()
+{"async " if is_async else ""}def handle_some_action(ack, body, logger):
+    {"await " if is_async else ""}ack()
     logger.info(body)
 """,
         )
@@ -225,13 +224,13 @@ app.step(ws)
         if req.body.get("action_id") is not None:
             constraints = '"' + req.body["action_id"] + '"'
         elif req.body.get("type") == "dialog_suggestion":
-            constraints = f"""{{"type": "dialog_suggestion", "callback_id": "{req.body.get('callback_id')}"}}"""
+            constraints = f"""{{"type": "dialog_suggestion", "callback_id": "{req.body.get("callback_id")}"}}"""
         return _build_unhandled_request_suggestion(
             default_message,
             f"""
 @app.options({constraints})
-{'async ' if is_async else ''}def handle_some_options(ack):
-    {'await ' if is_async else ''}ack(options=[ ... ])
+{"async " if is_async else ""}def handle_some_options(ack):
+    {"await " if is_async else ""}ack(options=[ ... ])
 """,
         )
     if is_shortcut(req.body):
@@ -241,8 +240,8 @@ app.step(ws)
             default_message,
             f"""
 @app.shortcut("{id}")
-{'async ' if is_async else ''}def handle_shortcuts(ack, body, logger):
-    {'await ' if is_async else ''}ack()
+{"async " if is_async else ""}def handle_shortcuts(ack, body, logger):
+    {"await " if is_async else ""}ack()
     logger.info(body)
 """,
         )
@@ -251,9 +250,9 @@ app.step(ws)
         return _build_unhandled_request_suggestion(
             default_message,
             f"""
-@app.view("{req.body.get('view', {}).get('callback_id', 'modal-view-id')}")
-{'async ' if is_async else ''}def handle_view_submission_events(ack, body, logger):
-    {'await ' if is_async else ''}ack()
+@app.view("{req.body.get("view", {}).get("callback_id", "modal-view-id")}")
+{"async " if is_async else ""}def handle_view_submission_events(ack, body, logger):
+    {"await " if is_async else ""}ack()
     logger.info(body)
 """,
         )
@@ -262,9 +261,9 @@ app.step(ws)
         return _build_unhandled_request_suggestion(
             default_message,
             f"""
-@app.view_closed("{req.body.get('view', {}).get('callback_id', 'modal-view-id')}")
-{'async ' if is_async else ''}def handle_view_closed_events(ack, body, logger):
-    {'await ' if is_async else ''}ack()
+@app.view_closed("{req.body.get("view", {}).get("callback_id", "modal-view-id")}")
+{"async " if is_async else ""}def handle_view_closed_events(ack, body, logger):
+    {"await " if is_async else ""}ack()
     logger.info(body)
 """,
         )
@@ -279,23 +278,23 @@ app.step(ws)
                 default_message,
                 f"""
 @app.function("{callback_id}")
-{'async ' if is_async else ''}def handle_some_function(ack, body, complete, fail, logger):
-    {'await ' if is_async else ''}ack()
+{"async " if is_async else ""}def handle_some_function(ack, body, complete, fail, logger):
+    {"await " if is_async else ""}ack()
     logger.info(body)
     try:
         # TODO: do something here
         outputs = {{}}
-        {'await ' if is_async else ''}complete(outputs=outputs)
+        {"await " if is_async else ""}complete(outputs=outputs)
     except Exception as e:
         error = f"Failed to handle a function request (error: {{e}})"
-        {'await ' if is_async else ''}fail(error=error)
+        {"await " if is_async else ""}fail(error=error)
 """,
             )
         return _build_unhandled_request_suggestion(
             default_message,
             f"""
 @app.event("{event_type}")
-{'async ' if is_async else ''}def handle_{event_type}_events(body, logger):
+{"async " if is_async else ""}def handle_{event_type}_events(body, logger):
     logger.info(body)
 """,
         )
@@ -306,8 +305,8 @@ app.step(ws)
             default_message,
             f"""
 @app.command("{command}")
-{'async ' if is_async else ''}def handle_some_command(ack, body, logger):
-    {'await ' if is_async else ''}ack()
+{"async " if is_async else ""}def handle_some_command(ack, body, logger):
+    {"await " if is_async else ""}ack()
     logger.info(body)
 """,
         )
@@ -320,8 +319,7 @@ def warning_did_not_call_ack(listener_name: str) -> str:
 
 def warning_bot_only_conflicts() -> str:
     return (
-        "installation_store_bot_only exists in both App and OAuthFlow.settings. "
-        "The one passed in App constructor is used."
+        "installation_store_bot_only exists in both App and OAuthFlow.settings. The one passed in App constructor is used."
     )
 
 
@@ -334,7 +332,7 @@ def warning_skip_uncommon_arg_name(arg_name: str) -> str:
 
 def warning_ack_timeout_has_no_effect(identifier: Union[str, Pattern], ack_timeout: int) -> str:
     handler_example = f'@app.function("{identifier}")' if isinstance(identifier, str) else f"@app.function({identifier})"
-    return f"On {handler_example}, as `auto_acknowledge` is `True`, " f"`ack_timeout={ack_timeout}` you gave will be unused"
+    return f"On {handler_example}, as `auto_acknowledge` is `True`, `ack_timeout={ack_timeout}` you gave will be unused"
 
 
 # -------------------------------

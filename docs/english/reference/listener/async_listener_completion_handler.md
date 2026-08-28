@@ -15,7 +15,7 @@ class AsyncListenerCompletionHandler()
 async def handle(request: AsyncBoltRequest, response: Optional[BoltResponse]) -> None
 ```
 
-Do something extra after the listener execution
+Do something extra after the listener execution.
 
 **Arguments**:
 

@@ -3,7 +3,7 @@ sidebar_label: aiohttp
 title: slack_bolt.adapter.socket_mode.aiohttp
 ---
 
-[`aiohttp`](https://pypi.org/project/aiohttp/) based implementation / asyncio compatible
+[`aiohttp`](https://pypi.org/project/aiohttp/) based implementation / asyncio compatible.
 
 ## SocketModeHandler Objects
 
@@ -29,7 +29,7 @@ def __init__(
     ping_interval: float = 10)
 ```
 
-Socket Mode adapter for Bolt apps
+Socket Mode adapter for Bolt apps.
 
 **Arguments**:
 

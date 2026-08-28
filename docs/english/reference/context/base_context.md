@@ -79,6 +79,7 @@ def actor_enterprise_id() -> Optional[str]
 ```
 
 The action's actor's Enterprise Grid organization ID.
+
 Note that this property is especially useful for handling events in Slack Connect channels.
 That being said, it's not guaranteed to have a valid ID for all events due to server-side inconsistency.
 
@@ -90,6 +91,7 @@ def actor_team_id() -> Optional[str]
 ```
 
 The action's actor's workspace ID.
+
 Note that this property is especially useful for handling events in Slack Connect channels.
 That being said, it's not guaranteed to have a valid ID for all events due to server-side inconsistency.
 
@@ -101,6 +103,7 @@ def actor_user_id() -> Optional[str]
 ```
 
 The action's actor's user ID.
+
 Note that this property is especially useful for handling events in Slack Connect channels.
 That being said, it's not guaranteed to have a valid ID for all events due to server-side inconsistency.
 
@@ -138,7 +141,7 @@ The `response_url` associated with this request.
 def matches() -> Optional[Tuple]
 ```
 
-Returns all the matched parts in message listener's regexp
+Returns all the matched parts in message listener's regexp.
 
 #### function\_execution\_id
 
@@ -148,6 +151,7 @@ def function_execution_id() -> Optional[str]
 ```
 
 The `function_execution_id` associated with this request.
+
 Only available for `function_executed` and interactivity events scoped to a custom step.
 
 #### inputs
@@ -158,6 +162,7 @@ def inputs() -> Optional[Dict[str, Any]]
 ```
 
 The `inputs` associated with this request.
+
 Only available for `function_executed` and interactivity events scoped to a custom step.
 
 #### authorize\_result
@@ -177,6 +182,7 @@ def function_bot_access_token() -> Optional[str]
 ```
 
 The bot token resolved for this function request.
+
 Only available for `function_executed` and interactivity events scoped to a custom step.
 
 #### bot\_token

@@ -137,26 +137,24 @@ class App:
     ):
         """Bolt App that provides functionalities to register middleware/listeners.
 
-        ```python
-        import os
-        from slack_bolt import App
+            import os
+            from slack_bolt import App
 
-        # Initializes your app with your bot token and signing secret
-        app = App(
-            token=os.environ.get("SLACK_BOT_TOKEN"),
-            signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
-        )
+            # Initializes your app with your bot token and signing secret
+            app = App(
+                token=os.environ.get("SLACK_BOT_TOKEN"),
+                signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+            )
 
-        # Listens to incoming messages that contain "hello"
-        @app.message("hello")
-        def message_hello(message, say):
-            # say() sends a message to the channel where the event was triggered
-            say(f"Hey there <@{message['user']}>!")
+            # Listens to incoming messages that contain "hello"
+            @app.message("hello")
+            def message_hello(message, say):
+                # say() sends a message to the channel where the event was triggered
+                say(f"Hey there <@{message['user']}>!")
 
-        # Start your app
-        if __name__ == "__main__":
-            app.start(port=int(os.environ.get("PORT", 3000)))
-        ```
+            # Start your app
+            if __name__ == "__main__":
+                app.start(port=int(os.environ.get("PORT", 3000)))
 
         Refer to https://docs.slack.dev/tools/bolt-python/creating-an-app for details.
 
@@ -209,6 +207,10 @@ class App:
                 be used.
             assistant_thread_context_store: Custom AssistantThreadContext store (Default: the built-in implementation,
                 which uses a parent message's metadata to store the latest context)
+            attaching_conversation_kwargs_enabled: False if you would like to disable the built-in
+                middleware (Default: True). `AttachingConversationKwargs` is a built-in middleware that attaches
+                conversation-specific listener arguments (such as `say`, `set_status`, `say_stream`, and
+                `set_suggested_prompts`) for assistant thread and direct message events.
         """
         if signing_secret is None:
             signing_secret = os.environ.get("SLACK_SIGNING_SECRET", "")
@@ -470,7 +472,7 @@ class App:
 
     @property
     def name(self) -> str:
-        """The name of this app (default: the filename)"""
+        """The name of this app (default: the filename)."""
         return self._name
 
     @property
@@ -513,11 +515,9 @@ class App:
     ) -> None:
         """Starts a web server for local development.
 
-        ```python
-        # With the default settings, `http://localhost:3000/slack/events`
-        # is available for handling incoming requests from Slack
-        app.start()
-        ```
+            # With the default settings, `http://localhost:3000/slack/events`
+            # is available for handling incoming requests from Slack
+            app.start()
 
         This method internally starts a Web server process built with the `http.server` module.
         For production, consider using a production-ready WSGI server such as Gunicorn.
@@ -593,7 +593,7 @@ class App:
                     # run all the middleware attached to this listener first
                     middleware_resp, next_was_not_called = listener.run_middleware(
                         req=req, resp=resp  # type: ignore[arg-type]
-                    )
+                    )  # fmt: skip
                     if next_was_not_called:
                         if middleware_resp is not None:
                             if self._framework_logger.level <= logging.DEBUG:
@@ -657,23 +657,23 @@ class App:
     def use(self, *args) -> Optional[Callable]:
         """Registers a new global middleware to this app. This method can be used as either a decorator or a method.
 
-        Refer to `App#middleware()` method's docstring for details."""
+        Refer to `App#middleware()` method's docstring for details.
+        """
         return self.middleware(*args)
 
     def middleware(self, *args) -> Optional[Callable]:
         """Registers a new middleware to this app.
+
         This method can be used as either a decorator or a method.
 
-        ```python
-        # Use this method as a decorator
-        @app.middleware
-        def middleware_func(logger, body, next):
-            logger.info(f"request body: {body}")
-            next()
+            # Use this method as a decorator
+            @app.middleware
+            def middleware_func(logger, body, next):
+                logger.info(f"request body: {body}")
+                next()
 
-        # Pass a function to this method
-        app.middleware(middleware_func)
-        ```
+            # Pass a function to this method
+            app.middleware(middleware_func)
 
         Refer to https://docs.slack.dev/tools/bolt-python/concepts/global-middleware for details.
 
@@ -718,28 +718,26 @@ class App:
         save: Optional[Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]] = None,
         execute: Optional[Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]] = None,
     ):
-        """
-        Deprecated:
-            Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+        """Deprecated: register a new step from app listener.
+
+        Steps from apps for legacy workflows are now deprecated.
+        Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         Registers a new step from app listener.
 
         Unlike others, this method doesn't behave as a decorator.
         If you want to register a step from app by a decorator, use `WorkflowStepBuilder`'s methods.
 
-        ```python
-        # Create a new WorkflowStep instance
-        from slack_bolt.workflows.step import WorkflowStep
-        ws = WorkflowStep(
-            callback_id="add_task",
-            edit=edit,
-            save=save,
-            execute=execute,
-        )
-        # Pass Step to set up listeners
-        app.step(ws)
-        ```
+            # Create a new WorkflowStep instance
+            from slack_bolt.workflows.step import WorkflowStep
+            ws = WorkflowStep(
+                callback_id="add_task",
+                edit=edit,
+                save=save,
+                execute=execute,
+            )
+            # Pass Step to set up listeners
+            app.step(ws)
 
         Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details of steps from apps.
 
@@ -784,16 +782,14 @@ class App:
     def error(self, func: Callable[..., Optional[BoltResponse]]) -> Callable[..., Optional[BoltResponse]]:
         """Updates the global error handler. This method can be used as either a decorator or a method.
 
-        ```python
-        # Use this method as a decorator
-        @app.error
-        def custom_error_handler(error, body, logger):
-            logger.exception(f"Error: {error}")
-            logger.info(f"Request body: {body}")
+            # Use this method as a decorator
+            @app.error
+            def custom_error_handler(error, body, logger):
+                logger.exception(f"Error: {error}")
+                logger.info(f"Request body: {body}")
 
-        # Pass a function to this method
-        app.error(custom_error_handler)
-        ```
+            # Pass a function to this method
+            app.error(custom_error_handler)
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
@@ -826,18 +822,16 @@ class App:
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new event listener. This method can be used as either a decorator or a method.
 
-        ```python
-        # Use this method as a decorator
-        @app.event("team_join")
-        def ask_for_introduction(event, say):
-            welcome_channel_id = "C12345"
-            user_id = event["user"]
-            text = f"Welcome to the team, <@{user_id}>! :tada: You can introduce yourself in this channel."
-            say(text=text, channel=welcome_channel_id)
+            # Use this method as a decorator
+            @app.event("team_join")
+            def ask_for_introduction(event, say):
+                welcome_channel_id = "C12345"
+                user_id = event["user"]
+                text = f"Welcome to the team, <@{user_id}>! :tada: You can introduce yourself in this channel."
+                say(text=text, channel=welcome_channel_id)
 
-        # Pass a function to this method
-        app.event("team_join")(ask_for_introduction)
-        ```
+            # Pass a function to this method
+            app.event("team_join")(ask_for_introduction)
 
         Refer to https://docs.slack.dev/apis/events-api/ for details of Events API.
 
@@ -869,18 +863,17 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new message event listener. This method can be used as either a decorator or a method.
+
         Check the `App#event` method's docstring for details.
 
-        ```python
-        # Use this method as a decorator
-        @app.message(":wave:")
-        def say_hello(message, say):
-            user = message['user']
-            say(f"Hi there, <@{user}>!")
+            # Use this method as a decorator
+            @app.message(":wave:")
+            def say_hello(message, say):
+                user = message['user']
+                say(f"Hi there, <@{user}>!")
 
-        # Pass a function to this method
-        app.message(":wave:")(say_hello)
-        ```
+            # Pass a function to this method
+            app.message(":wave:")(say_hello)
 
         Refer to https://docs.slack.dev/reference/events/message/ for details of `message` events.
 
@@ -933,23 +926,22 @@ class App:
         ack_timeout: int = 3,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new Function listener.
+
         This method can be used as either a decorator or a method.
 
-        ```python
-        # Use this method as a decorator
-        @app.function("reverse")
-        def reverse_string(ack: Ack, inputs: dict, complete: Complete, fail: Fail):
-            try:
-                ack()
-                string_to_reverse = inputs["stringToReverse"]
-                complete(outputs={"reverseString": string_to_reverse[::-1]})
-            except Exception as e:
-                fail(f"Cannot reverse string (error: {e})")
-                raise e
+            # Use this method as a decorator
+            @app.function("reverse")
+            def reverse_string(ack: Ack, inputs: dict, complete: Complete, fail: Fail):
+                try:
+                    ack()
+                    string_to_reverse = inputs["stringToReverse"]
+                    complete(outputs={"reverseString": string_to_reverse[::-1]})
+                except Exception as e:
+                    fail(f"Cannot reverse string (error: {e})")
+                    raise e
 
-        # Pass a function to this method
-        app.function("reverse")(reverse_string)
-        ```
+            # Pass a function to this method
+            app.function("reverse")(reverse_string)
 
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
@@ -959,8 +951,12 @@ class App:
                 Only when all the matchers return True, the listener function can be invoked.
             middleware: A list of lister middleware functions.
                 Only when all the middleware call `next()` method, the listener function can be invoked.
+            auto_acknowledge: Whether Bolt automatically acknowledges the function execution event on the
+                listener's behalf. When False, your listener must call `ack()` itself within `ack_timeout`
+                seconds (Default: True).
+            ack_timeout: The number of seconds to wait for the listener to call `ack()`.
+                Only takes effect when `auto_acknowledge` is False (Default: 3).
         """
-
         if auto_acknowledge is True:
             if ack_timeout != 3:
                 self._framework_logger.warning(warning_ack_timeout_has_no_effect(callback_id, ack_timeout))
@@ -985,19 +981,18 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new slash command listener.
+
         This method can be used as either a decorator or a method.
 
-        ```python
-        # Use this method as a decorator
-        @app.command("/echo")
-        def repeat_text(ack, say, command):
-            # Acknowledge command request
-            ack()
-            say(f"{command['text']}")
+            # Use this method as a decorator
+            @app.command("/echo")
+            def repeat_text(ack, say, command):
+                # Acknowledge command request
+                ack()
+                say(f"{command['text']}")
 
-        # Pass a function to this method
-        app.command("/echo")(repeat_text)
-        ```
+            # Pass a function to this method
+            app.command("/echo")(repeat_text)
 
         Refer to https://docs.slack.dev/interactivity/implementing-slash-commands/ for details of Slash Commands.
 
@@ -1028,25 +1023,24 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new shortcut listener.
+
         This method can be used as either a decorator or a method.
 
-        ```python
-        # Use this method as a decorator
-        @app.shortcut("open_modal")
-        def open_modal(ack, body, client):
-            # Acknowledge the command request
-            ack()
-            # Call views_open with the built-in client
-            client.views_open(
-                # Pass a valid trigger_id within 3 seconds of receiving it
-                trigger_id=body["trigger_id"],
-                # View payload
-                view={ ... }
-            )
+            # Use this method as a decorator
+            @app.shortcut("open_modal")
+            def open_modal(ack, body, client):
+                # Acknowledge the command request
+                ack()
+                # Call views_open with the built-in client
+                client.views_open(
+                    # Pass a valid trigger_id within 3 seconds of receiving it
+                    trigger_id=body["trigger_id"],
+                    # View payload
+                    view={ ... }
+                )
 
-        # Pass a function to this method
-        app.shortcut("open_modal")(open_modal)
-        ```
+            # Pass a function to this method
+            app.shortcut("open_modal")(open_modal)
 
         Refer to https://docs.slack.dev/interactivity/implementing-shortcuts/ for details about Shortcuts.
 
@@ -1108,15 +1102,13 @@ class App:
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new action listener. This method can be used as either a decorator or a method.
 
-        ```python
-        # Use this method as a decorator
-        @app.action("approve_button")
-        def update_message(ack):
-            ack()
+            # Use this method as a decorator
+            @app.action("approve_button")
+            def update_message(ack):
+                ack()
 
-        # Pass a function to this method
-        app.action("approve_button")(update_message)
-        ```
+            # Pass a function to this method
+            app.action("approve_button")(update_message)
 
         * Refer to https://docs.slack.dev/reference/interaction-payloads/block_actions-payload/ for actions in `blocks`.
         * Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons/ for actions in `attachments`.
@@ -1146,6 +1138,7 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `block_actions` action listener.
+
         Refer to https://docs.slack.dev/reference/interaction-payloads/block_actions-payload/ for details.
         """
 
@@ -1163,7 +1156,9 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `interactive_message` action listener.
-        Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons/ for details."""
+
+        Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons/ for details.
+        """
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1179,7 +1174,9 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `dialog_submission` listener.
-        Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details."""
+
+        Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details.
+        """
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1195,7 +1192,9 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `dialog_cancellation` listener.
-        Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details."""
+
+        Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details.
+        """
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1214,29 +1213,28 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `view_submission`/`view_closed` event listener.
+
         This method can be used as either a decorator or a method.
 
-        ```python
-        # Use this method as a decorator
-        @app.view("view_1")
-        def handle_submission(ack, body, client, view):
-            # Assume there's an input block with `block_c` as the block_id and `dreamy_input`
-            hopes_and_dreams = view["state"]["values"]["block_c"]["dreamy_input"]
-            user = body["user"]["id"]
-            # Validate the inputs
-            errors = {}
-            if hopes_and_dreams is not None and len(hopes_and_dreams) <= 5:
-                errors["block_c"] = "The value must be longer than 5 characters"
-            if len(errors) > 0:
-                ack(response_action="errors", errors=errors)
-                return
-            # Acknowledge the view_submission event and close the modal
-            ack()
-            # Do whatever you want with the input data - here we're saving it to a DB
+            # Use this method as a decorator
+            @app.view("view_1")
+            def handle_submission(ack, body, client, view):
+                # Assume there's an input block with `block_c` as the block_id and `dreamy_input`
+                hopes_and_dreams = view["state"]["values"]["block_c"]["dreamy_input"]
+                user = body["user"]["id"]
+                # Validate the inputs
+                errors = {}
+                if hopes_and_dreams is not None and len(hopes_and_dreams) <= 5:
+                    errors["block_c"] = "The value must be longer than 5 characters"
+                if len(errors) > 0:
+                    ack(response_action="errors", errors=errors)
+                    return  # Return early to display the validation errors to the user
+                # Acknowledge the view_submission event and close the modal
+                ack()
+                # Do whatever you want with the input data - here we're saving it to a DB
 
-        # Pass a function to this method
-        app.view("view_1")(handle_submission)
-        ```
+            # Pass a function to this method
+            app.view("view_1")(handle_submission)
 
         Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload for details of payloads.
 
@@ -1264,6 +1262,7 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `view_submission` listener.
+
         Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for
         details.
         """
@@ -1282,7 +1281,9 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `view_closed` listener.
-        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_closed for details."""
+
+        Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_closed for details.
+        """
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1301,27 +1302,26 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new options listener.
+
         This method can be used as either a decorator or a method.
 
-        ```python
-        # Use this method as a decorator
-        @app.options("menu_selection")
-        def show_menu_options(ack):
-            options = [
-                {
-                    "text": {"type": "plain_text", "text": "Option 1"},
-                    "value": "1-1",
-                },
-                {
-                    "text": {"type": "plain_text", "text": "Option 2"},
-                    "value": "1-2",
-                },
-            ]
-            ack(options=options)
+            # Use this method as a decorator
+            @app.options("menu_selection")
+            def show_menu_options(ack):
+                options = [
+                    {
+                        "text": {"type": "plain_text", "text": "Option 1"},
+                        "value": "1-1",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Option 2"},
+                        "value": "1-2",
+                    },
+                ]
+                ack(options=options)
 
-        # Pass a function to this method
-        app.options("menu_selection")(show_menu_options)
-        ```
+            # Pass a function to this method
+            app.options("menu_selection")(show_menu_options)
 
         Refer to the following documents for details:
 
@@ -1331,6 +1331,7 @@ class App:
         To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_injection.args`'s API document.
 
         Args:
+            constraints: The conditions that match a request payload
             matchers: A list of listener matcher functions.
                 Only when all the matchers return True, the listener function can be invoked.
             middleware: A list of lister middleware functions.
@@ -1366,7 +1367,9 @@ class App:
         middleware: Optional[Sequence[Union[Callable, Middleware]]] = None,
     ) -> Callable[..., Optional[Callable[..., Optional[BoltResponse]]]]:
         """Registers a new `dialog_suggestion` listener.
-        Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details."""
+
+        Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details.
+        """
 
         def __call__(*args, **kwargs):
             functions = self._to_listener_functions(kwargs) if kwargs else list(args)
@@ -1495,7 +1498,7 @@ class SlackAppDevelopmentServer:
         oauth_flow: Optional[OAuthFlow] = None,
         http_server_logger_enabled: bool = True,
     ):
-        """Slack App Development Server
+        """Slack App Development Server.
 
         This is a thin wrapper of http.server.HTTPServer and is good enough
         for your local development or prototyping.

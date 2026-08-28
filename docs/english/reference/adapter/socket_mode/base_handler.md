@@ -4,6 +4,7 @@ title: slack_bolt.adapter.socket_mode.base_handler
 ---
 
 The base class of Socket Mode client implementation.
+
 If you want to build asyncio-based ones, use `AsyncBaseSocketModeHandler` instead.
 
 ## BaseSocketModeHandler Objects
@@ -35,7 +36,7 @@ Handles Socket Mode envelope requests through a WebSocket connection.
 def connect()
 ```
 
-Establishes a new connection with the Socket Mode server
+Establishes a new connection with the Socket Mode server.
 
 #### disconnect
 
@@ -43,7 +44,7 @@ Establishes a new connection with the Socket Mode server
 def disconnect()
 ```
 
-Disconnects the current WebSocket connection with the Socket Mode server
+Disconnects the current WebSocket connection with the Socket Mode server.
 
 #### close
 
@@ -51,7 +52,7 @@ Disconnects the current WebSocket connection with the Socket Mode server
 def close()
 ```
 
-Disconnects from the Socket Mode server and cleans the resources this instance holds up
+Disconnects from the Socket Mode server and cleans the resources this instance holds up.
 
 #### start
 
@@ -59,6 +60,6 @@ Disconnects from the Socket Mode server and cleans the resources this instance h
 def start()
 ```
 
-Establishes a new connection and then blocks the current thread
-to prevent the termination of this process.
+Establishes a new connection and then blocks the current thread to prevent the termination of this process.
+
 If you don't want to block the current thread, use `#connect()` method instead.

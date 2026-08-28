@@ -261,13 +261,13 @@ class TestPayloadUtils:
             "block_actions": block_actions_body,
         }
         for key, body in positives.items():
-            assert is_user_message_event_in_assistant_thread(
-                body
-            ), f"{key} should pass {is_user_message_event_in_assistant_thread.__name__}"
+            assert is_user_message_event_in_assistant_thread(body), (
+                f"{key} should pass {is_user_message_event_in_assistant_thread.__name__}"
+            )
         for key, body in negatives.items():
-            assert not is_user_message_event_in_assistant_thread(
-                body
-            ), f"{key} should NOT pass {is_user_message_event_in_assistant_thread.__name__}"
+            assert not is_user_message_event_in_assistant_thread(body), (
+                f"{key} should NOT pass {is_user_message_event_in_assistant_thread.__name__}"
+            )
 
     def test_is_bot_message_event_in_assistant_thread(self):
         positives = {
@@ -287,13 +287,13 @@ class TestPayloadUtils:
             "block_actions": block_actions_body,
         }
         for key, body in positives.items():
-            assert is_bot_message_event_in_assistant_thread(
-                body
-            ), f"{key} should pass {is_bot_message_event_in_assistant_thread.__name__}"
+            assert is_bot_message_event_in_assistant_thread(body), (
+                f"{key} should pass {is_bot_message_event_in_assistant_thread.__name__}"
+            )
         for key, body in negatives.items():
-            assert not is_bot_message_event_in_assistant_thread(
-                body
-            ), f"{key} should NOT pass {is_bot_message_event_in_assistant_thread.__name__}"
+            assert not is_bot_message_event_in_assistant_thread(body), (
+                f"{key} should NOT pass {is_bot_message_event_in_assistant_thread.__name__}"
+            )
 
     def test_is_bot_message_user_message_asymmetry(self):
         assert is_user_message_event_in_assistant_thread(file_share_im_message_body)
@@ -318,13 +318,13 @@ class TestPayloadUtils:
             "block_actions": block_actions_body,
         }
         for key, body in positives.items():
-            assert is_other_message_sub_event_in_assistant_thread(
-                body
-            ), f"{key} should pass {is_other_message_sub_event_in_assistant_thread.__name__}"
+            assert is_other_message_sub_event_in_assistant_thread(body), (
+                f"{key} should pass {is_other_message_sub_event_in_assistant_thread.__name__}"
+            )
         for key, body in negatives.items():
-            assert not is_other_message_sub_event_in_assistant_thread(
-                body
-            ), f"{key} should NOT pass {is_other_message_sub_event_in_assistant_thread.__name__}"
+            assert not is_other_message_sub_event_in_assistant_thread(body), (
+                f"{key} should NOT pass {is_other_message_sub_event_in_assistant_thread.__name__}"
+            )
 
     def test_is_assistant_event(self):
         positives = {
@@ -364,9 +364,9 @@ class TestPayloadUtils:
             "block_actions": block_actions_body,
         }
         for key, body in negatives.items():
-            assert not is_assistant_thread_started_event(
-                body
-            ), f"{key} should NOT pass {is_assistant_thread_started_event.__name__}"
+            assert not is_assistant_thread_started_event(body), (
+                f"{key} should NOT pass {is_assistant_thread_started_event.__name__}"
+            )
 
     def test_is_assistant_thread_context_changed_event(self):
         assert is_assistant_thread_context_changed_event(thread_context_changed_event_body)
@@ -381,9 +381,9 @@ class TestPayloadUtils:
             "block_actions": block_actions_body,
         }
         for key, body in negatives.items():
-            assert not is_assistant_thread_context_changed_event(
-                body
-            ), f"{key} should NOT pass {is_assistant_thread_context_changed_event.__name__}"
+            assert not is_assistant_thread_context_changed_event(body), (
+                f"{key} should NOT pass {is_assistant_thread_context_changed_event.__name__}"
+            )
 
     def test_is_app_home_opened_event(self):
         assert is_app_home_opened_event(app_home_opened_messages_body)
@@ -403,6 +403,6 @@ class TestPayloadUtils:
         }
         for key, body in negatives.items():
             assert not is_app_home_opened_event(body), f"{key} should NOT pass {is_app_home_opened_event.__name__}"
-            assert not is_app_home_opened_event(
-                body, tab="messages"
-            ), f"{key} should NOT pass {is_app_home_opened_event.__name__} with tab='messages'"
+            assert not is_app_home_opened_event(body, tab="messages"), (
+                f"{key} should NOT pass {is_app_home_opened_event.__name__} with tab='messages'"
+            )

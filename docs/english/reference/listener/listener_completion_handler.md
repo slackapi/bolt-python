@@ -15,7 +15,7 @@ class ListenerCompletionHandler()
 def handle(request: BoltRequest, response: Optional[BoltResponse]) -> None
 ```
 
-Do something extra after the listener execution
+Do something extra after the listener execution.
 
 **Arguments**:
 

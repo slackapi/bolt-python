@@ -19,7 +19,6 @@ async def next():
 
 
 class TestSingleTeamAuthorization:
-
     @pytest.fixture(scope="function", autouse=True)
     def setup_teardown(self):
         old_os_env = remove_os_env_temporarily()

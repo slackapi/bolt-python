@@ -21,35 +21,32 @@ from slack_sdk import WebClient
 
 class Args:
     """All the arguments in this class are available in any middleware / listeners.
+
     You can inject the named variables in the argument list in arbitrary order.
 
-    ```python
-    @app.action("link_button")
-    def handle_buttons(ack, respond, logger, context, body, client):
-        logger.info(f"request body: {body}")
-        ack()
-        if context.channel_id is not None:
-            respond("Hi!")
-        client.views_open(
-            trigger_id=body["trigger_id"],
-            view={ ... }
-        )
-    ```
+        @app.action("link_button")
+        def handle_buttons(ack, respond, logger, context, body, client):
+            logger.info(f"request body: {body}")
+            ack()
+            if context.channel_id is not None:
+                respond("Hi!")
+            client.views_open(
+                trigger_id=body["trigger_id"],
+                view={ ... }
+            )
 
     Alternatively, you can include a parameter named `args` and it will be injected with an instance of this class.
 
-    ```python
-    @app.action("link_button")
-    def handle_buttons(args):
-        args.logger.info(f"request body: {args.body}")
-        args.ack()
-        if args.context.channel_id is not None:
-            args.respond("Hi!")
-        args.client.views_open(
-            trigger_id=args.body["trigger_id"],
-            view={ ... }
-        )
-    ```
+        @app.action("link_button")
+        def handle_buttons(args):
+            args.logger.info(f"request body: {args.body}")
+            args.ack()
+            if args.context.channel_id is not None:
+                args.respond("Hi!")
+            args.client.views_open(
+                trigger_id=args.body["trigger_id"],
+                view={ ... }
+            )
 
     """
 

@@ -9,4 +9,5 @@ if [[ "$1" != "--no-install" ]]; then
     pip install -U -r requirements/dev_tools.txt
 fi
 
-flake8 slack_bolt/ && flake8 examples/
+ruff check slack_bolt/ examples/
+ruff format --check slack_bolt/ tests/ examples/

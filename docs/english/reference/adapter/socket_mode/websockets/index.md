@@ -3,7 +3,7 @@ sidebar_label: websockets
 title: slack_bolt.adapter.socket_mode.websockets
 ---
 
-[`websockets`](https://pypi.org/project/websockets/) based implementation  / asyncio compatible
+[`websockets`](https://pypi.org/project/websockets/) based implementation  / asyncio compatible.
 
 ## SocketModeHandler Objects
 

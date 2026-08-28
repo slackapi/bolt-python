@@ -17,6 +17,7 @@ class SslCheck(Middleware):
         base_logger: Optional[Logger] = None,
     ):
         """Handles `ssl_check` requests.
+
         Refer to https://docs.slack.dev/interactivity/implementing-slash-commands/ for details.
 
         Args:

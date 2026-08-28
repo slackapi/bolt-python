@@ -9,7 +9,7 @@ title: slack_bolt.workflows.step.step_middleware
 class WorkflowStepMiddleware(Middleware)
 ```
 
-Base middleware for step from app specific ones
+Base middleware for step from app specific ones.
 
 #### \_\_init\_\_
 

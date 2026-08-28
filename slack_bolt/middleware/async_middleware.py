@@ -20,24 +20,21 @@ class AsyncMiddleware(metaclass=ABCMeta):
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> Optional[BoltResponse]:
         """Processes a request data before other middleware and listeners.
+
         A middleware calls `next()` function if the chain should continue.
 
-        ```python
-        @app.middleware
-        async def simple_middleware(req, resp, next):
-            # do something here
-            await next()
-        ```
+            @app.middleware
+            async def simple_middleware(req, resp, next):
+                # do something here
+                await next()
 
         This `async_process(req, resp, next)` method is supposed to be invoked only inside bolt-python.
         If you want to avoid the name `next()` in your middleware functions, you can use `next_()` method instead.
 
-        ```python
-        @app.middleware
-        async def simple_middleware(req, resp, next_):
-            # do something here
-            await next_()
-        ```
+            @app.middleware
+            async def simple_middleware(req, resp, next_):
+                # do something here
+                await next_()
 
         Args:
             req: The incoming request
@@ -51,5 +48,5 @@ class AsyncMiddleware(metaclass=ABCMeta):
 
     @property
     def name(self) -> str:
-        """The name of this middleware"""
+        """The name of this middleware."""
         return f"{self.__module__}.{self.__class__.__name__}"

@@ -10,4 +10,5 @@ if [[ "$1" != "--no-install" ]]; then
     pip install -U -r requirements/dev_tools.txt
 fi
 
-black slack_bolt/ tests/
+ruff check --fix slack_bolt/ examples/
+ruff format slack_bolt/ tests/ examples/

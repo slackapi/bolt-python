@@ -19,7 +19,7 @@ class BaseSlackRequestHandler()
 async def dispatch(request: AsgiHttpRequest) -> BoltResponse
 ```
 
-Dispatches a request to the Bolt App
+Dispatches a request to the Bolt App.
 
 #### handle\_installation
 
@@ -27,7 +27,7 @@ Dispatches a request to the Bolt App
 async def handle_installation(request: AsgiHttpRequest) -> BoltResponse
 ```
 
-Handles installation of the OAuthFlow
+Handles installation of the OAuthFlow.
 
 #### handle\_callback
 
@@ -35,4 +35,4 @@ Handles installation of the OAuthFlow
 async def handle_callback(request: AsgiHttpRequest) -> BoltResponse
 ```
 
-Handles the callback of the OAuthFlow
+Handles the callback of the OAuthFlow.

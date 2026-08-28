@@ -66,13 +66,13 @@ def release_thread_local_connections(logger: Logger, execution_timing: str):
     if logger.level <= logging.DEBUG:
         current: Thread = current_thread()
         logger.debug(
-            "Released thread-bound old DB connections "
-            f"(thread name: {current.name}, execution timing: {execution_timing})"
+            f"Released thread-bound old DB connections (thread name: {current.name}, execution timing: {execution_timing})"
         )
 
 
 class DjangoListenerStartHandler(ListenerStartHandler):
     """Django sets DB connections as a thread-local variable per thread.
+
     If the thread is not managed on the Django app side, the connections won't be released by Django.
     This handler releases the connections every time a ThreadListenerRunner execution completes.
     """
@@ -83,6 +83,7 @@ class DjangoListenerStartHandler(ListenerStartHandler):
 
 class DjangoListenerCompletionHandler(ListenerCompletionHandler):
     """Django sets DB connections as a thread-local variable per thread.
+
     If the thread is not managed on the Django app side, the connections won't be released by Django.
     This handler releases the connections every time a ThreadListenerRunner execution completes.
     """

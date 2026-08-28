@@ -38,8 +38,32 @@ readme = { file = ["README.md"], content-type = "text/markdown" }
 [tool.distutils.bdist_wheel]
 universal = true
 
-[tool.black]
+[tool.ruff]
 line-length = 125
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "D"]
+ignore = [
+	"F841",
+	"F821",
+	"E402",
+	# missing-docstring: do not add docstrings where none exist (the only D rules ignored)
+	"D100",
+	"D101",
+	"D102",
+	"D103",
+	"D104",
+	"D105",
+	"D106",
+	"D107",
+]
+
+[tool.ruff.lint.pydocstyle]
+# Keep `select = ["D"]` a bare category select; listing explicit D codes would override this convention.
+convention = "google"
+
+[tool.ruff.format]
+docstring-code-format = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -22,6 +22,7 @@ class Args()
 ```
 
 All the arguments in this class are available in any middleware / listeners.
+
 You can inject the named variables in the argument list in arbitrary order.
 
 ```python
@@ -51,6 +52,7 @@ def handle_buttons(args):
         view={ ... }
     )
 ```
+
 
 #### client: `WebClient`
 

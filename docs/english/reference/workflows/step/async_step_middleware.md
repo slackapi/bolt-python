@@ -9,7 +9,7 @@ title: slack_bolt.workflows.step.async_step_middleware
 class AsyncWorkflowStepMiddleware(AsyncMiddleware)
 ```
 
-Base middleware for step from app specific ones
+Base middleware for step from app specific ones.
 
 #### \_\_init\_\_
 

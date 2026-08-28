@@ -3,8 +3,7 @@ sidebar_label: authorization
 title: slack_bolt.authorization
 ---
 
-Authorization is the process of determining which Slack credentials should be available
-while processing an incoming Slack event.
+Authorization determines which Slack credentials should be available while processing an incoming Slack event.
 
 Refer to https://docs.slack.dev/tools/bolt-python/concepts/authorization for details.
 
@@ -22,7 +21,7 @@ Refer to https://docs.slack.dev/tools/bolt-python/concepts/authorization for det
 class AuthorizeResult(dict)
 ```
 
-Authorize function call result
+Authorize function call result.
 
 #### enterprise\_id: `Optional[str]`
 
@@ -67,6 +66,8 @@ def __init__(
     user_scopes: Optional[Union[Sequence[str], str]] = None)
 ```
 
+Initialize the authorize function call result.
+
 **Arguments**:
 
 - `enterprise_id` _Optional[str]_ - Organization ID (Enterprise Grid) starting with `E`
@@ -80,7 +81,7 @@ def __init__(
 - `user_id` _Optional[str]_ - The request user ID
 - `user` _Optional[str]_ - The request user's name
 - `user_token` _Optional[str]_ - User access token starting with `xoxp-`
-- `user_scopes` _Optional[Union[Sequence[str], str]]_ - The scopes associated wth the user token
+- `user_scopes` _Optional[Union[Sequence[str], str]]_ - The scopes associated with the user token
 
 #### from\_auth\_test\_response
 

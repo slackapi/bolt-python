@@ -52,6 +52,7 @@ async def handle_events(client, context):
     )
 ```
 
+
 **Returns**:
 
 - `AsyncWebClient` - `AsyncWebClient` instance
@@ -75,6 +76,7 @@ async def handle_button_clicks(context):
 async def handle_button_clicks(ack):
     await ack()
 ```
+
 
 **Returns**:
 
@@ -102,6 +104,7 @@ async def handle_button_clicks(ack, say):
     await say("Hi!")
 ```
 
+
 **Returns**:
 
 - `AsyncSay` - Callable `say()` function
@@ -128,6 +131,7 @@ async def handle_button_clicks(ack, respond):
     await respond("Hi!")
 ```
 
+
 **Returns**:
 
 - `Optional[AsyncRespond]` - Callable `respond()` function
@@ -139,7 +143,9 @@ async def handle_button_clicks(ack, respond):
 def complete() -> AsyncComplete
 ```
 
-`complete()` function for this request. Once a custom function's state is set to complete,
+`complete()` function for this request.
+
+Once a custom function's state is set to complete,
 any outputs the function returns will be passed along to the next step of its housing workflow,
 or complete the workflow if the function is the last step in a workflow. Additionally,
 any interactivity handlers associated to a function invocation will no longer be invocable.
@@ -156,6 +162,7 @@ async def handle_button_clicks(context):
     await context.complete(outputs={"stringReverse":"olleh"})
 ```
 
+
 **Returns**:
 
 - `AsyncComplete` - Callable `complete()` function
@@ -167,7 +174,9 @@ async def handle_button_clicks(context):
 def fail() -> AsyncFail
 ```
 
-`fail()` function for this request. Once a custom function's state is set to error,
+`fail()` function for this request.
+
+Once a custom function's state is set to error,
 its housing workflow will be interrupted and any provided error message will be passed
 on to the end user through SlackBot. Additionally, any interactivity handlers associated
 to a function invocation will no longer be invocable.
@@ -183,6 +192,7 @@ async def handle_button_clicks(context):
     await context.ack()
     await context.fail(error="something went wrong")
 ```
+
 
 **Returns**:
 

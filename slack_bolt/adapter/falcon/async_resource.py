@@ -12,14 +12,15 @@ from slack_bolt.request.async_request import AsyncBoltRequest
 
 
 class AsyncSlackAppResource:
-    """
-    For use with ASGI Falcon Apps.
+    """For use with ASGI Falcon Apps.
 
     ```python
     from slack_bolt.async_app import AsyncApp
+
     app = AsyncApp()
 
     import falcon
+
     app = falcon.asgi.App()
     app.add_route("/slack/events", AsyncSlackAppResource(app))
     ```

@@ -3,7 +3,7 @@ sidebar_label: builtin
 title: slack_bolt.adapter.socket_mode.builtin
 ---
 
-The built-in implementation, which does not have any external dependencies
+The built-in implementation, which does not have any external dependencies.
 
 ## SocketModeHandler Objects
 
@@ -36,7 +36,7 @@ def __init__(
     concurrency: int = 10)
 ```
 
-Socket Mode adapter for Bolt apps
+Socket Mode adapter for Bolt apps.
 
 **Arguments**:
 

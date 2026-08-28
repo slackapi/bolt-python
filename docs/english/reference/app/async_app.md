@@ -111,6 +111,10 @@ refer to https://docs.slack.dev/tools/bolt-python/concepts/authenticating-oauth 
 - `verification_token` _Optional[str]_ - Deprecated verification mechanism. This can be used only for ssl_check requests.
 - `assistant_thread_context_store` _Optional[AsyncAssistantThreadContextStore]_ - Custom AssistantThreadContext store (Default: the built-in implementation,
   which uses a parent message's metadata to store the latest context)
+- `attaching_conversation_kwargs_enabled` _bool_ - False if you would like to disable the built-in
+  middleware (Default: True). `AttachingConversationKwargs` is a built-in middleware that attaches
+  conversation-specific listener arguments (such as `say`, `set_status`, `say_stream`, and
+  `set_suggested_prompts`) for assistant thread and direct message events.
 
 #### name
 
@@ -119,7 +123,7 @@ refer to https://docs.slack.dev/tools/bolt-python/concepts/authenticating-oauth 
 def name() -> str
 ```
 
-The name of this app (default: the filename)
+The name of this app (default: the filename).
 
 #### oauth\_flow
 
@@ -183,6 +187,7 @@ def server(
 ```
 
 Configure a web server using AIOHTTP.
+
 Refer to https://docs.aiohttp.org/ for more details about AIOHTTP.
 
 **Arguments**:
@@ -214,6 +219,7 @@ def app_factory():
 # adev runserver --port 3000 --app-factory app_factory async_app.py
 ```
 
+
 **Arguments**:
 
 - `path` _str_ - The path to receive incoming requests from Slack
@@ -229,6 +235,7 @@ def start(
 ```
 
 Start a web server using AIOHTTP.
+
 Refer to https://docs.aiohttp.org/ for more details about AIOHTTP.
 
 **Arguments**:
@@ -268,6 +275,7 @@ def middleware(*args) -> Optional[Callable]
 ```
 
 Registers a new middleware to this app.
+
 This method can be used as either a decorator or a method.
 
 ```python
@@ -303,7 +311,7 @@ def step(
     execute: Optional[Union[Callable[..., Optional[BoltResponse]], AsyncListener, Sequence[Callable]]] = None)
 ```
 
-**Deprecated**:
+Deprecated: register a new step from app listener.
 
 Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
@@ -414,6 +422,7 @@ def message(
 ```
 
 Registers a new message event listener. This method can be used as either a decorator or a method.
+
 Check the `App#event` method's docstring for details.
 
 ```python
@@ -451,6 +460,7 @@ def function(
 ```
 
 Registers a new Function listener.
+
 This method can be used as either a decorator or a method.
 
 ```python
@@ -478,6 +488,11 @@ To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_in
   Only when all the matchers return True, the listener function can be invoked.
 - `middleware` _Optional[Sequence[Union[Callable, AsyncMiddleware]]]_ - A list of lister middleware functions.
   Only when all the middleware call `next()` method, the listener function can be invoked.
+- `auto_acknowledge` _bool_ - Whether Bolt automatically acknowledges the function execution event on the
+  listener's behalf. When False, your listener must call `ack()` itself within `ack_timeout`
+  seconds (Default: True).
+- `ack_timeout` _int_ - The number of seconds to wait for the listener to call `ack()`.
+  Only takes effect when `auto_acknowledge` is False (Default: 3).
 
 #### command
 
@@ -489,6 +504,7 @@ def command(
 ```
 
 Registers a new slash command listener.
+
 This method can be used as either a decorator or a method.
 
 ```python
@@ -525,6 +541,7 @@ def shortcut(
 ```
 
 Registers a new shortcut listener.
+
 This method can be used as either a decorator or a method.
 
 ```python
@@ -624,6 +641,7 @@ def block_action(
 ```
 
 Registers a new `block_actions` action listener.
+
 Refer to https://docs.slack.dev/reference/interaction-payloads/block_actions-payload/ for details.
 
 #### attachment\_action
@@ -636,6 +654,7 @@ def attachment_action(
 ```
 
 Registers a new `interactive_message` action listener.
+
 Refer to https://docs.slack.dev/legacy/legacy-messaging/legacy-message-buttons/ for details.
 
 #### dialog\_submission
@@ -648,6 +667,7 @@ def dialog_submission(
 ```
 
 Registers a new `dialog_submission` listener.
+
 Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details.
 
 #### dialog\_cancellation
@@ -659,7 +679,8 @@ def dialog_cancellation(
     middleware: Optional[Sequence[Union[Callable, AsyncMiddleware]]] = None) -> Callable[..., Optional[Callable[..., Awaitable[Optional[BoltResponse]]]]]
 ```
 
-Registers a new `dialog_submission` listener.
+Registers a new `dialog_cancellation` listener.
+
 Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details.
 
 #### view
@@ -672,6 +693,7 @@ def view(
 ```
 
 Registers a new `view_submission`/`view_closed` event listener.
+
 This method can be used as either a decorator or a method.
 
 ```python
@@ -687,7 +709,7 @@ async def handle_submission(ack, body, client, view):
         errors["block_c"] = "The value must be longer than 5 characters"
     if len(errors) > 0:
         await ack(response_action="errors", errors=errors)
-        return
+        return  # Return early to display the validation errors to the user
     # Acknowledge the view_submission event and close the modal
     await ack()
     # Do whatever you want with the input data - here we're saving it to a DB
@@ -718,6 +740,7 @@ def view_submission(
 ```
 
 Registers a new `view_submission` listener.
+
 Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_submission for
 details.
 
@@ -731,6 +754,7 @@ def view_closed(
 ```
 
 Registers a new `view_closed` listener.
+
 Refer to https://docs.slack.dev/reference/interaction-payloads/view-interactions-payload/#view_closed for details.
 
 #### options
@@ -743,6 +767,7 @@ def options(
 ```
 
 Registers a new options listener.
+
 This method can be used as either a decorator or a method.
 
 ```python
@@ -774,6 +799,7 @@ To learn available arguments for middleware/listeners, see `slack_bolt.kwargs_in
 
 **Arguments**:
 
+- `constraints` _Union[str, Pattern, Dict[str, Union[str, Pattern]]]_ - The conditions that match a request payload
 - `matchers` _Optional[Sequence[Callable[..., Awaitable[bool]]]]_ - A list of listener matcher functions.
   Only when all the matchers return True, the listener function can be invoked.
 - `middleware` _Optional[Sequence[Union[Callable, AsyncMiddleware]]]_ - A list of lister middleware functions.
@@ -800,6 +826,7 @@ def dialog_suggestion(
 ```
 
 Registers a new `dialog_suggestion` listener.
+
 Refer to https://docs.slack.dev/legacy/legacy-dialogs/ for details.
 
 #### default\_tokens\_revoked\_event\_listener

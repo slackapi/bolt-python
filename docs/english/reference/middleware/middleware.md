@@ -23,6 +23,7 @@ def process(
 ```
 
 Processes a request data before other middleware and listeners.
+
 A middleware calls `next()` function if the chain should continue.
 
 ```python
@@ -42,6 +43,7 @@ def simple_middleware(req, resp, next_):
     next_()
 ```
 
+
 **Arguments**:
 
 - `req` _BoltRequest_ - The incoming request
@@ -59,4 +61,4 @@ def simple_middleware(req, resp, next_):
 def name() -> str
 ```
 
-The name of this middleware
+The name of this middleware.

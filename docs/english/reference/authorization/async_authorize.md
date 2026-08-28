@@ -9,8 +9,7 @@ title: slack_bolt.authorization.async_authorize
 class AsyncAuthorize()
 ```
 
-This provides authorize function that returns AuthorizeResult
-for an incoming request from Slack.
+This provides authorize function that returns AuthorizeResult for an incoming request from Slack.
 
 #### \_\_init\_\_
 
@@ -24,8 +23,7 @@ def __init__()
 class AsyncCallableAuthorize(AsyncAuthorize)
 ```
 
-When you pass the authorize argument in AsyncApp constructor,
-This authorize implementation will be used.
+When you pass the `authorize` argument in AsyncApp constructor, this `authorize` implementation will be used.
 
 #### \_\_init\_\_
 
@@ -40,6 +38,7 @@ class AsyncInstallationStoreAuthorize(AsyncAuthorize)
 ```
 
 If you use the OAuth flow settings, this authorize implementation will be used.
+
 As long as your own InstallationStore (or the built-in ones) works as you expect,
 you can expect that the authorize layer should work for you without any customization.
 

@@ -30,6 +30,7 @@ class SingleTeamAuthorization(Authorization):
         Args:
             auth_test_result: The initial `auth.test` API call result.
             base_logger: The base logger
+            user_facing_authorize_error_message: The message shown to the end-user when authorization fails
         """
         self.auth_test_result = auth_test_result
         self.logger = get_bolt_logger(SingleTeamAuthorization, base_logger=base_logger)

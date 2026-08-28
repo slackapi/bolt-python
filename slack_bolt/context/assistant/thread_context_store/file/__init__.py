@@ -6,7 +6,6 @@ from ..store import AssistantThreadContextStore, AssistantThreadContext
 
 
 class FileAssistantThreadContextStore(AssistantThreadContextStore):
-
     def __init__(
         self,
         base_dir: str = str(Path.home()) + "/.bolt-app-assistant-thread-contexts",

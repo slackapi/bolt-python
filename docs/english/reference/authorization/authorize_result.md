@@ -9,7 +9,7 @@ title: slack_bolt.authorization.authorize_result
 class AuthorizeResult(dict)
 ```
 
-Authorize function call result
+Authorize function call result.
 
 #### enterprise\_id: `Optional[str]`
 
@@ -54,6 +54,8 @@ def __init__(
     user_scopes: Optional[Union[Sequence[str], str]] = None)
 ```
 
+Initialize the authorize function call result.
+
 **Arguments**:
 
 - `enterprise_id` _Optional[str]_ - Organization ID (Enterprise Grid) starting with `E`
@@ -67,7 +69,7 @@ def __init__(
 - `user_id` _Optional[str]_ - The request user ID
 - `user` _Optional[str]_ - The request user's name
 - `user_token` _Optional[str]_ - User access token starting with `xoxp-`
-- `user_scopes` _Optional[Union[Sequence[str], str]]_ - The scopes associated wth the user token
+- `user_scopes` _Optional[Union[Sequence[str], str]]_ - The scopes associated with the user token
 
 #### from\_auth\_test\_response
 

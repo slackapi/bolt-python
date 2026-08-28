@@ -15,7 +15,7 @@ class AsyncListenerStartHandler()
 async def handle(request: AsyncBoltRequest, response: Optional[BoltResponse]) -> None
 ```
 
-Do something extra before the listener execution
+Do something extra before the listener execution.
 
 **Arguments**:
 

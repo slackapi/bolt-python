@@ -1,4 +1,4 @@
-"""The base class of asyncio-based Socket Mode client implementation"""
+"""The base class of asyncio-based Socket Mode client implementation."""
 
 import asyncio
 import logging
@@ -26,20 +26,20 @@ class AsyncBaseSocketModeHandler:
         raise NotImplementedError()
 
     async def connect_async(self):
-        """Establishes a new connection with the Socket Mode server"""
+        """Establishes a new connection with the Socket Mode server."""
         await self.client.connect()
 
     async def disconnect_async(self):
-        """Disconnects the current WebSocket connection with the Socket Mode server"""
+        """Disconnects the current WebSocket connection with the Socket Mode server."""
         await self.client.disconnect()
 
     async def close_async(self):
-        """Disconnects from the Socket Mode server and cleans the resources this instance holds up"""
+        """Disconnects from the Socket Mode server and cleans the resources this instance holds up."""
         await self.client.close()
 
     async def start_async(self):
-        """Establishes a new connection and then starts infinite sleep
-        to prevent the termination of this process.
+        """Establishes a new connection and then starts infinite sleep to prevent the termination of this process.
+
         If you don't want to have the sleep, use `#connect()` method instead.
         """
         await self.connect_async()

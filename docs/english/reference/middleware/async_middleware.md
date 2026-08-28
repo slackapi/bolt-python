@@ -22,6 +22,7 @@ async def async_process(
 ```
 
 Processes a request data before other middleware and listeners.
+
 A middleware calls `next()` function if the chain should continue.
 
 ```python
@@ -41,6 +42,7 @@ async def simple_middleware(req, resp, next_):
     await next_()
 ```
 
+
 **Arguments**:
 
 - `req` _AsyncBoltRequest_ - The incoming request
@@ -58,4 +60,4 @@ async def simple_middleware(req, resp, next_):
 def name() -> str
 ```
 
-The name of this middleware
+The name of this middleware.

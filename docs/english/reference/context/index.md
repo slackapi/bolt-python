@@ -4,6 +4,7 @@ title: slack_bolt.context
 ---
 
 All listeners have access to a context dictionary, which can be used to enrich events with additional information.
+
 Bolt automatically attaches information that is included in the incoming event,
 like `user_id`, `team_id`, `channel_id`, and `enterprise_id`.
 
@@ -76,6 +77,7 @@ def handle_events(client, context):
     )
 ```
 
+
 **Returns**:
 
 - `WebClient` - `WebClient` instance
@@ -99,6 +101,7 @@ def handle_button_clicks(context):
 def handle_button_clicks(ack):
     ack()
 ```
+
 
 **Returns**:
 
@@ -126,6 +129,7 @@ def handle_button_clicks(ack, say):
     say("Hi!")
 ```
 
+
 **Returns**:
 
 - `Say` - Callable `say()` function
@@ -152,6 +156,7 @@ def handle_button_clicks(ack, respond):
     respond("Hi!")
 ```
 
+
 **Returns**:
 
 - `Optional[Respond]` - Callable `respond()` function
@@ -163,7 +168,9 @@ def handle_button_clicks(ack, respond):
 def complete() -> Complete
 ```
 
-`complete()` function for this request. Once a custom function's state is set to complete,
+`complete()` function for this request.
+
+Once a custom function's state is set to complete,
 any outputs the function returns will be passed along to the next step of its housing workflow,
 or complete the workflow if the function is the last step in a workflow. Additionally,
 any interactivity handlers associated to a function invocation will no longer be invocable.
@@ -180,6 +187,7 @@ def handle_button_clicks(context):
     context.complete(outputs={"stringReverse":"olleh"})
 ```
 
+
 **Returns**:
 
 - `Complete` - Callable `complete()` function
@@ -191,7 +199,9 @@ def handle_button_clicks(context):
 def fail() -> Fail
 ```
 
-`fail()` function for this request. Once a custom function's state is set to error,
+`fail()` function for this request.
+
+Once a custom function's state is set to error,
 its housing workflow will be interrupted and any provided error message will be passed
 on to the end user through SlackBot. Additionally, any interactivity handlers associated
 to a function invocation will no longer be invocable.
@@ -207,6 +217,7 @@ def handle_button_clicks(context):
     context.ack()
     context.fail(error="something went wrong")
 ```
+
 
 **Returns**:
 

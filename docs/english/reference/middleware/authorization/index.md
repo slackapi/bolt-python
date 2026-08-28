@@ -82,6 +82,7 @@ Single-workspace authorization.
 
 - `auth_test_result` _Optional[SlackResponse]_ - The initial `auth.test` API call result.
 - `base_logger` _Optional[Logger]_ - The base logger
+- `user_facing_authorize_error_message` _Optional[str]_ - The message shown to the end-user when authorization fails
 
 #### process
 

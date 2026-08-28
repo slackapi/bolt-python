@@ -10,6 +10,7 @@ class AsyncArgs()
 ```
 
 All the arguments in this class are available in any middleware / listeners.
+
 You can inject the named variables in the argument list in arbitrary order.
 
 ```python
@@ -39,6 +40,7 @@ async def handle_buttons(args):
         view={ ... }
     )
 ```
+
 
 #### logger: `Logger`
 

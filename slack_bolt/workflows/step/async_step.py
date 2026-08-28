@@ -28,7 +28,8 @@ from ...middleware.async_middleware import AsyncMiddleware
 
 
 class AsyncWorkflowStepBuilder:
-    """Steps from apps
+    """Steps from apps.
+
     Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
     """
 
@@ -44,26 +45,23 @@ class AsyncWorkflowStepBuilder:
         app_name: Optional[str] = None,
         base_logger: Optional[Logger] = None,
     ):
-        """
-        Deprecated:
-            Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+        """Deprecated: Steps from apps for legacy workflows are now deprecated.
+
+        Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         This builder is supposed to be used as decorator.
 
-        ```python
-        my_step = AsyncWorkflowStep.builder("my_step")
-        @my_step.edit
-        async def edit_my_step(ack, configure):
-            pass
-        @my_step.save
-        async def save_my_step(ack, step, update):
-            pass
-        @my_step.execute
-        async def execute_my_step(step, complete, fail):
-            pass
-        app.step(my_step)
-        ```
+            my_step = AsyncWorkflowStep.builder("my_step")
+            @my_step.edit
+            async def edit_my_step(ack, configure):
+                pass
+            @my_step.save
+            async def save_my_step(ack, step, update):
+                pass
+            @my_step.execute
+            async def execute_my_step(step, complete, fail):
+                pass
+            app.step(my_step)
 
         For further information about AsyncWorkflowStep specific function arguments
         such as `configure`, `update`, `complete`, and `fail`,
@@ -88,28 +86,23 @@ class AsyncWorkflowStepBuilder:
         middleware: Optional[Union[Callable, AsyncMiddleware]] = None,
         lazy: Optional[List[Callable[..., Awaitable[None]]]] = None,
     ):
-        """
-        Deprecated:
-            Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+        """Deprecated: Steps from apps for legacy workflows are now deprecated.
+
+        Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         Registers a new edit listener with details.
 
         You can use this method as decorator as well.
 
-        ```python
-        @my_step.edit
-        def edit_my_step(ack, configure):
-            pass
-        ```
+            @my_step.edit
+            def edit_my_step(ack, configure):
+                pass
 
         It's also possible to add additional listener matchers and/or middleware
 
-        ```python
-        @my_step.edit(matchers=[is_valid], middleware=[update_context])
-        def edit_my_step(ack, configure):
-            pass
-        ```
+            @my_step.edit(matchers=[is_valid], middleware=[update_context])
+            def edit_my_step(ack, configure):
+                pass
 
         For further information about AsyncWorkflowStep specific function arguments
         such as `configure`, `update`, `complete`, and `fail`,
@@ -145,28 +138,23 @@ class AsyncWorkflowStepBuilder:
         middleware: Optional[Union[Callable, AsyncMiddleware]] = None,
         lazy: Optional[List[Callable[..., Awaitable[None]]]] = None,
     ):
-        """
-        Deprecated:
-            Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+        """Deprecated: Steps from apps for legacy workflows are now deprecated.
+
+        Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         Registers a new save listener with details.
 
         You can use this method as decorator as well.
 
-        ```python
-        @my_step.save
-        def save_my_step(ack, step, update):
-            pass
-        ```
+            @my_step.save
+            def save_my_step(ack, step, update):
+                pass
 
         It's also possible to add additional listener matchers and/or middleware
 
-        ```python
-        @my_step.save(matchers=[is_valid], middleware=[update_context])
-        def save_my_step(ack, step, update):
-            pass
-        ```
+            @my_step.save(matchers=[is_valid], middleware=[update_context])
+            def save_my_step(ack, step, update):
+                pass
 
         For further information about AsyncWorkflowStep specific function arguments
         such as `configure`, `update`, `complete`, and `fail`,
@@ -202,28 +190,23 @@ class AsyncWorkflowStepBuilder:
         middleware: Optional[Union[Callable, AsyncMiddleware]] = None,
         lazy: Optional[List[Callable[..., Awaitable[None]]]] = None,
     ):
-        """
-        Deprecated:
-            Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+        """Deprecated: Steps from apps for legacy workflows are now deprecated.
+
+        Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         Registers a new execute listener with details.
 
         You can use this method as decorator as well.
 
-        ```python
-        @my_step.execute
-        def execute_my_step(step, complete, fail):
-            pass
-        ```
+            @my_step.execute
+            def execute_my_step(step, complete, fail):
+                pass
 
         It's also possible to add additional listener matchers and/or middleware
 
-        ```python
-        @my_step.save(matchers=[is_valid], middleware=[update_context])
-        def execute_my_step(step, complete, fail):
-            pass
-        ```
+            @my_step.save(matchers=[is_valid], middleware=[update_context])
+            def execute_my_step(step, complete, fail):
+                pass
 
         For further information about AsyncWorkflowStep specific function arguments
         such as `configure`, `update`, `complete`, and `fail`,
@@ -253,10 +236,9 @@ class AsyncWorkflowStepBuilder:
         return _inner
 
     def build(self, base_logger: Optional[Logger] = None) -> "AsyncWorkflowStep":
-        """
-        Deprecated:
-            Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+        """Deprecated: Steps from apps for legacy workflows are now deprecated.
+
+        Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         Constructs a WorkflowStep object. This method may raise an exception
         if the builder doesn't have enough configurations to build the object.
@@ -351,10 +333,9 @@ class AsyncWorkflowStep:
         app_name: Optional[str] = None,
         base_logger: Optional[Logger] = None,
     ):
-        """
-        Deprecated:
-            Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+        """Deprecated: Steps from apps for legacy workflows are now deprecated.
+
+        Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
         Args:
             callback_id: The callback_id for this step from app
@@ -397,10 +378,9 @@ class AsyncWorkflowStep:
         callback_id: Union[str, Pattern],
         base_logger: Optional[Logger] = None,
     ) -> AsyncWorkflowStepBuilder:
-        """
-        Deprecated:
-            Steps from apps for legacy workflows are now deprecated.
-            Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+        """Deprecated: Steps from apps for legacy workflows are now deprecated.
+
+        Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
         """
         return AsyncWorkflowStepBuilder(callback_id, base_logger=base_logger)
 

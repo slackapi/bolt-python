@@ -27,6 +27,7 @@ def __init__(
 ```
 
 Handles `ssl_check` requests.
+
 Refer to https://docs.slack.dev/interactivity/implementing-slash-commands/ for details.
 
 **Arguments**:

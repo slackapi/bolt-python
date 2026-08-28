@@ -193,7 +193,7 @@ class TestAsyncFunction:
         assert response.status == 404
         await assert_auth_test_count_async(self, 1)
         assert elapsed_seconds == timeout + 1, (
-            f"Expected handler to time out after {timeout + 1} sleep calls, " f"but it was called {elapsed_seconds} times"
+            f"Expected handler to time out after {timeout + 1} sleep calls, but it was called {elapsed_seconds} times"
         )
 
     @pytest.mark.asyncio

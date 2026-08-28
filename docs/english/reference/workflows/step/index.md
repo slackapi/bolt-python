@@ -47,9 +47,8 @@ def __init__(
     base_logger: Optional[Logger] = None)
 ```
 
-**Deprecated**:
+Deprecated: Steps from apps for legacy workflows are now deprecated.
 
-Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
 **Arguments**:
@@ -72,9 +71,8 @@ def builder(
     base_logger: Optional[Logger] = None) -> WorkflowStepBuilder
 ```
 
-**Deprecated**:
+Deprecated: Steps from apps for legacy workflows are now deprecated.
 
-Steps from apps for legacy workflows are now deprecated.
 Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
 #### build\_listener
@@ -96,7 +94,7 @@ def build_listener(
 class WorkflowStepMiddleware(Middleware)
 ```
 
-Base middleware for step from app specific ones
+Base middleware for step from app specific ones.
 
 #### \_\_init\_\_
 

@@ -9,7 +9,7 @@ title: slack_bolt.listener.async_builtins
 class AsyncTokenRevocationListeners()
 ```
 
-Listener functions to handle token revocation / uninstallation events
+Listener functions to handle token revocation / uninstallation events.
 
 #### installation\_store: `AsyncInstallationStore`
 

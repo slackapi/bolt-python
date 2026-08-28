@@ -3,7 +3,7 @@ sidebar_label: async_internals
 title: slack_bolt.adapter.socket_mode.async_internals
 ---
 
-Internal functions
+Internal functions.
 
 #### run\_async\_bolt\_app
 

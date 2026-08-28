@@ -60,35 +60,38 @@ class TestApp:
         }
 
     def build_request(self, team_id: str = "T014GJXU940") -> AsyncBoltRequest:
-        timestamp, body = str(int(time())), json.dumps(
-            {
-                "team_id": team_id,
-                "enterprise_id": "E013Y3SHLAY",
-                "context_team_id": team_id,
-                "context_enterprise_id": "E013Y3SHLAY",
-                "api_app_id": "A04TEM7H4S0",
-                "event": {
-                    "type": "message",
-                    "files": [],
-                    "upload": False,
-                    "user": "W013QGS7BPF",
-                    "display_as_bot": False,
-                    "team": team_id,
-                    "channel": "C04T3ACM40K",
-                    "subtype": "file_share",
-                },
-                "type": "event_callback",
-                "authorizations": [
-                    {
-                        "enterprise_id": None,
-                        "team_id": "T0G9PQBBK",
-                        "user_id": "W23456789",
-                        "is_bot": True,
-                        "is_enterprise_install": False,
-                    }
-                ],
-                "is_ext_shared_channel": True,
-            }
+        timestamp, body = (
+            str(int(time())),
+            json.dumps(
+                {
+                    "team_id": team_id,
+                    "enterprise_id": "E013Y3SHLAY",
+                    "context_team_id": team_id,
+                    "context_enterprise_id": "E013Y3SHLAY",
+                    "api_app_id": "A04TEM7H4S0",
+                    "event": {
+                        "type": "message",
+                        "files": [],
+                        "upload": False,
+                        "user": "W013QGS7BPF",
+                        "display_as_bot": False,
+                        "team": team_id,
+                        "channel": "C04T3ACM40K",
+                        "subtype": "file_share",
+                    },
+                    "type": "event_callback",
+                    "authorizations": [
+                        {
+                            "enterprise_id": None,
+                            "team_id": "T0G9PQBBK",
+                            "user_id": "W23456789",
+                            "is_bot": True,
+                            "is_enterprise_install": False,
+                        }
+                    ],
+                    "is_ext_shared_channel": True,
+                }
+            ),
         )
         return AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
 

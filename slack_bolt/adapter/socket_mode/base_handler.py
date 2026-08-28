@@ -1,4 +1,5 @@
 """The base class of Socket Mode client implementation.
+
 If you want to build asyncio-based ones, use `AsyncBaseSocketModeHandler` instead.
 """
 
@@ -28,20 +29,20 @@ class BaseSocketModeHandler:
         raise NotImplementedError()
 
     def connect(self):
-        """Establishes a new connection with the Socket Mode server"""
+        """Establishes a new connection with the Socket Mode server."""
         self.client.connect()
 
     def disconnect(self):
-        """Disconnects the current WebSocket connection with the Socket Mode server"""
+        """Disconnects the current WebSocket connection with the Socket Mode server."""
         self.client.disconnect()
 
     def close(self):
-        """Disconnects from the Socket Mode server and cleans the resources this instance holds up"""
+        """Disconnects from the Socket Mode server and cleans the resources this instance holds up."""
         self.client.close()
 
     def start(self):
-        """Establishes a new connection and then blocks the current thread
-        to prevent the termination of this process.
+        """Establishes a new connection and then blocks the current thread to prevent the termination of this process.
+
         If you don't want to block the current thread, use `#connect()` method instead.
         """
         self.connect()

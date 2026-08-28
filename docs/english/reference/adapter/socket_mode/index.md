@@ -53,7 +53,7 @@ def __init__(
     concurrency: int = 10)
 ```
 
-Socket Mode adapter for Bolt apps
+Socket Mode adapter for Bolt apps.
 
 **Arguments**:
 

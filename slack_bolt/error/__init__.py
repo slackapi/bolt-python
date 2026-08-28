@@ -4,7 +4,7 @@ from typing import Optional, Union
 
 
 class BoltError(Exception):
-    """General class in a Bolt app"""
+    """General class in a Bolt app."""
 
 
 class BoltUnhandledRequestError(BoltError):

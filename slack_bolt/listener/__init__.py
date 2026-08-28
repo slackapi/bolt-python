@@ -1,6 +1,7 @@
-"""Listeners process an incoming request from Slack if the request's type or data structure matches
-the predefined conditions of the listener. Typically, a listener acknowledge requests from Slack,
-process the request data, and may send response back to Slack.
+"""Listeners process incoming requests from Slack.
+
+A listener runs when the request's type or data structure matches its predefined conditions.
+Typically, a listener acknowledges the request, processes its data, and may send a response back to Slack.
 """
 
 # Don't add async module imports here
