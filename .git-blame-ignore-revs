@@ -3,3 +3,6 @@
 
 # apply ruff format across the codebase (#1566)
 5814077ee7ef79eaa4df6e4602260c179536a814
+
+# add docstring formatting + linting (#1567)
+5007ee3248fcea2171efa7c293ae9d4a46afa71f
