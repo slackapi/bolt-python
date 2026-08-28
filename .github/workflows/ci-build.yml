@@ -58,6 +58,25 @@ jobs:
       - name: Type check all modules
         run: mypy --config-file pyproject.toml
 
+  docs-reference:
+    name: Reference docs drift
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python ${{ env.LATEST_SUPPORTED_PY }}
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ env.LATEST_SUPPORTED_PY }}
+      - name: Generate API reference
+        run: ./scripts/generate_api_docs.sh
+      - name: Verify committed reference is up to date
+        run: git diff --exit-code -- docs/english/reference
+
   unittest:
     name: Unit tests
     runs-on: ubuntu-22.04
