@@ -85,15 +85,23 @@ This builder is supposed to be used as decorator.
 
 ```python
 my_step = AsyncWorkflowStep.builder("my_step")
+
+
 @my_step.edit
 async def edit_my_step(ack, configure):
     pass
+
+
 @my_step.save
 async def save_my_step(ack, step, update):
     pass
+
+
 @my_step.execute
 async def execute_my_step(step, complete, fail):
     pass
+
+
 app.step(my_step)
 ```
 

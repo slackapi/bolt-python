@@ -22,6 +22,7 @@ ack: AsyncAck
 async def handle_button_clicks(context):
     await context.ack()
 
+
 # You can access "ack" this way too.
 @app.action("button")
 async def handle_button_clicks(ack):
@@ -121,6 +122,7 @@ async def handle_events(context):
         text="Thanks!",
     )
 
+
 # You can access "client" this way too.
 @app.event("app_mention")
 async def handle_events(client, context):
@@ -151,12 +153,13 @@ any interactivity handlers associated to a function invocation will no longer be
 @app.function("reverse")
 async def handle_button_clicks(ack, complete):
     await ack()
-    await complete(outputs={"stringReverse":"olleh"})
+    await complete(outputs={"stringReverse": "olleh"})
+
 
 @app.function("reverse")
 async def handle_button_clicks(context):
     await context.ack()
-    await context.complete(outputs={"stringReverse":"olleh"})
+    await context.complete(outputs={"stringReverse": "olleh"})
 ```
 
 **Returns:**
@@ -189,6 +192,7 @@ to a function invocation will no longer be invocable.
 async def handle_button_clicks(ack, fail):
     await ack()
     await fail(error="something went wrong")
+
 
 @app.function("reverse")
 async def handle_button_clicks(context):
@@ -276,6 +280,7 @@ async def handle_button_clicks(context):
     await context.ack()
     await context.respond("Hi!")
 
+
 # You can access "ack" this way too.
 @app.action("button")
 async def handle_button_clicks(ack, respond):
@@ -308,6 +313,7 @@ say: AsyncSay
 async def handle_button_clicks(context):
     await context.ack()
     await context.say("Hi!")
+
 
 # You can access "ack" this way too.
 @app.action("button")

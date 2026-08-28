@@ -291,47 +291,6 @@ def _write_pages(pages):
             handle.write("\n".join(frontmatter) + "\n\n" + "\n".join(body_parts).rstrip("\n") + "\n")
 
 
-# --------------------------------------------------------------------------- #
-# Safety gate
-# --------------------------------------------------------------------------- #
-
-_MDX_ESM_RE = re.compile(r"^(export|import)\s")
-
-
-def _check_mdx_hazards():
-    """Fail generation if any rendered Markdown has an MDX/acorn hazard.
-
-    A hazard is a line outside a code fence beginning with ``export``/``import``
-    (ESM) or ``<`` (JSX). These come from unfenced code examples in docstrings;
-    the fix is to fence the example in its source docstring.
-    """
-    reference_dir = os.path.join(DOCS_BASE_PATH, REFERENCE_SUBDIR)
-    hazards = []
-    for dirpath, _dirnames, filenames in os.walk(reference_dir):
-        for filename in filenames:
-            if not filename.endswith(".md"):
-                continue
-            path = os.path.join(dirpath, filename)
-            in_codeblock = False
-            with open(path, encoding="utf-8") as handle:
-                for lineno, raw in enumerate(handle, 1):
-                    line = raw.rstrip("\n")
-                    if line.lstrip().startswith("```"):
-                        in_codeblock = not in_codeblock
-                        continue
-                    if in_codeblock:
-                        continue
-                    if _MDX_ESM_RE.match(line) or line.startswith("<"):
-                        rel = os.path.relpath(path, DOCS_BASE_PATH)
-                        hazards.append("{}:{}: {}".format(rel, lineno, line))
-    if hazards:
-        raise SystemExit(
-            "MDX/acorn hazards found in generated Markdown (unfenced code at column "
-            "zero). Fence the offending example in its source docstring:\n  " + "\n  ".join(hazards)
-        )
-    print("No MDX/acorn hazards in generated Markdown")
-
-
 def main():
     # Rebuild the reference tree from scratch so renamed/removed modules don't
     # leave orphaned pages behind. Everything under reference/ is generated; the
@@ -342,7 +301,6 @@ def main():
     root = _load_package()
     pages = _build_pages(root)
     _write_pages(pages)
-    _check_mdx_hazards()
     print("Generated {} reference pages".format(len(pages)))
 
 

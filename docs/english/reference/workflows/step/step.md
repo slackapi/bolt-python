@@ -86,15 +86,23 @@ This builder is supposed to be used as decorator.
 
 ```python
 my_step = WorkflowStep.builder("my_step")
+
+
 @my_step.edit
 def edit_my_step(ack, configure):
     pass
+
+
 @my_step.save
 def save_my_step(ack, step, update):
     pass
+
+
 @my_step.execute
 def execute_my_step(step, complete, fail):
     pass
+
+
 app.step(my_step)
 ```
 

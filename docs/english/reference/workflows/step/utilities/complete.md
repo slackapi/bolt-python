@@ -21,6 +21,7 @@ def execute(step, complete, fail):
     }
     complete(outputs=outputs)
 
+
 ws = WorkflowStep(
     callback_id="add_task",
     edit=edit,

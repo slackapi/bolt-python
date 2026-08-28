@@ -7,30 +7,33 @@ from slack_sdk.models.blocks import Block
 class Configure:
     """`configure()` utility to send the modal view in Workflow Builder.
 
-        def edit(ack, step, configure):
-            ack()
+    ```python
+    def edit(ack, step, configure):
+        ack()
 
-            blocks = [
-                {
-                    "type": "input",
-                    "block_id": "task_name_input",
-                    "element": {
-                        "type": "plain_text_input",
-                        "action_id": "name",
-                        "placeholder": {"type": "plain_text", "text": "Add a task name"},
-                    },
-                    "label": {"type": "plain_text", "text": "Task name"},
+        blocks = [
+            {
+                "type": "input",
+                "block_id": "task_name_input",
+                "element": {
+                    "type": "plain_text_input",
+                    "action_id": "name",
+                    "placeholder": {"type": "plain_text", "text": "Add a task name"},
                 },
-            ]
-            configure(blocks=blocks)
+                "label": {"type": "plain_text", "text": "Task name"},
+            },
+        ]
+        configure(blocks=blocks)
 
-        ws = WorkflowStep(
-            callback_id="add_task",
-            edit=edit,
-            save=save,
-            execute=execute,
-        )
-        app.step(ws)
+
+    ws = WorkflowStep(
+        callback_id="add_task",
+        edit=edit,
+        save=save,
+        execute=execute,
+    )
+    app.step(ws)
+    ```
 
     Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
     """

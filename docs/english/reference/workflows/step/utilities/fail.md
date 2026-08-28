@@ -18,6 +18,7 @@ def execute(step, complete, fail):
     error = {"message": "Just testing step failure!"}
     fail(error=error)
 
+
 ws = WorkflowStep(
     callback_id="add_task",
     edit=edit,

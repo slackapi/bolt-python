@@ -21,6 +21,7 @@ def execute(step, complete, fail):
     }
     complete(outputs=outputs)
 
+
 ws = WorkflowStep(
     callback_id="add_task",
     edit=edit,
@@ -59,6 +60,7 @@ def edit(ack, step, configure):
     ]
     configure(blocks=blocks)
 
+
 ws = WorkflowStep(
     callback_id="add_task",
     edit=edit,
@@ -84,6 +86,7 @@ def execute(step, complete, fail):
     # if something went wrong
     error = {"message": "Just testing step failure!"}
     fail(error=error)
+
 
 ws = WorkflowStep(
     callback_id="add_task",
@@ -113,10 +116,7 @@ def save(ack, view, update):
     task_name = values["task_name_input"]["name"]
     task_description = values["task_description_input"]["description"]
 
-    inputs = {
-        "task_name": {"value": task_name["value"]},
-        "task_description": {"value": task_description["value"]}
-    }
+    inputs = {"task_name": {"value": task_name["value"]}, "task_description": {"value": task_description["value"]}}
     outputs = [
         {
             "type": "text",
@@ -127,9 +127,10 @@ def save(ack, view, update):
             "type": "text",
             "name": "task_description",
             "label": "Task description",
-        }
+        },
     ]
     update(inputs=inputs, outputs=outputs)
+
 
 ws = WorkflowStep(
     callback_id="add_task",

@@ -62,16 +62,15 @@ import os
 from slack_bolt.async_app import AsyncApp
 
 # Initializes your app with your bot token and signing secret
-app = AsyncApp(
-    token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
-)
+app = AsyncApp(token=os.environ.get("SLACK_BOT_TOKEN"), signing_secret=os.environ.get("SLACK_SIGNING_SECRET"))
+
 
 # Listens to incoming messages that contain "hello"
 @app.message("hello")
 async def message_hello(message, say):  # async function
     # say() sends a message to the channel where the event was triggered
     await say(f"Hey there <@{message['user']}>!")
+
 
 # Start your app
 if __name__ == "__main__":
@@ -145,6 +144,7 @@ Registers a new action listener. This method can be used as either a decorator o
 @app.action("approve_button")
 async def update_message(ack):
     await ack()
+
 
 # Pass a function to this method
 app.action("approve_button")(update_message)
@@ -234,6 +234,7 @@ async def repeat_text(ack, say, command):
     await ack()
     await say(f"{command['text']}")
 
+
 # Pass a function to this method
 app.command("/echo")(repeat_text)
 ```
@@ -295,6 +296,7 @@ async def custom_error_handler(error, body, logger):
     logger.exception(f"Error: {error}")
     logger.info(f"Request body: {body}")
 
+
 # Pass a function to this method
 app.error(custom_error_handler)
 ```
@@ -322,6 +324,7 @@ async def ask_for_introduction(event, say):
     user_id = event["user"]
     text = f"Welcome to the team, <@{user_id}>! :tada: You can introduce yourself in this channel."
     await say(text=text, channel=welcome_channel_id)
+
 
 # Pass a function to this method
 app.event("team_join")(ask_for_introduction)
@@ -361,6 +364,7 @@ async def reverse_string(ack: AsyncAck, inputs: dict, complete: AsyncComplete, f
     except Exception as e:
         await fail(f"Cannot reverse string (error: {e})")
         raise e
+
 
 # Pass a function to this method
 app.function("reverse")(reverse_string)
@@ -427,8 +431,9 @@ Check the `App#event` method's docstring for details.
 # Use this method as a decorator
 @app.message(":wave:")
 async def say_hello(message, say):
-    user = message['user']
+    user = message["user"]
     await say(f"Hi there, <@{user}>!")
+
 
 # Pass a function to this method
 app.message(":wave:")(say_hello)
@@ -470,6 +475,7 @@ This method can be used as either a decorator or a method.
 async def middleware_func(logger, body, next):
     logger.info(f"request body: {body}")
     await next()
+
 
 # Pass a function to this method
 app.middleware(middleware_func)
@@ -522,6 +528,7 @@ async def show_menu_options(ack):
         },
     ]
     await ack(options=options)
+
 
 # Pass a function to this method
 app.options("menu_selection")(show_menu_options)
@@ -579,8 +586,9 @@ async def open_modal(ack, body, client):
         # Pass a valid trigger_id within 3 seconds of receiving it
         trigger_id=body["trigger_id"],
         # View payload
-        view={ ... }
+        view={...},
     )
+
 
 # Pass a function to this method
 app.shortcut("open_modal")(open_modal)
@@ -633,6 +641,7 @@ If you want to register a step from app by a decorator, use `AsyncWorkflowStepBu
 ```python
 # Create a new WorkflowStep instance
 from slack_bolt.workflows.async_step import AsyncWorkflowStep
+
 ws = AsyncWorkflowStep(
     callback_id="add_task",
     edit=edit,
@@ -693,6 +702,7 @@ async def handle_submission(ack, body, client, view):
     await ack()
     # Do whatever you want with the input data - here we're saving it to a DB
 
+
 # Pass a function to this method
 app.view("view_1")(handle_submission)
 ```
@@ -740,15 +750,19 @@ Returns a `web.Application` instance for aiohttp-devtools users.
 
 ```python
 from slack_bolt.async_app import AsyncApp
+
 app = AsyncApp()
+
 
 @app.event("app_mention")
 async def event_test(body, say, logger):
     logger.info(body)
     await say("What's up?")
 
+
 def app_factory():
     return app.web_app()
+
 
 # adev runserver --port 3000 --app-factory app_factory async_app.py
 ```
@@ -776,6 +790,7 @@ ack: AsyncAck
 @app.action("button")
 async def handle_button_clicks(context):
     await context.ack()
+
 
 # You can access "ack" this way too.
 @app.action("button")
@@ -876,6 +891,7 @@ async def handle_events(context):
         text="Thanks!",
     )
 
+
 # You can access "client" this way too.
 @app.event("app_mention")
 async def handle_events(client, context):
@@ -906,12 +922,13 @@ any interactivity handlers associated to a function invocation will no longer be
 @app.function("reverse")
 async def handle_button_clicks(ack, complete):
     await ack()
-    await complete(outputs={"stringReverse":"olleh"})
+    await complete(outputs={"stringReverse": "olleh"})
+
 
 @app.function("reverse")
 async def handle_button_clicks(context):
     await context.ack()
-    await context.complete(outputs={"stringReverse":"olleh"})
+    await context.complete(outputs={"stringReverse": "olleh"})
 ```
 
 **Returns:**
@@ -944,6 +961,7 @@ to a function invocation will no longer be invocable.
 async def handle_button_clicks(ack, fail):
     await ack()
     await fail(error="something went wrong")
+
 
 @app.function("reverse")
 async def handle_button_clicks(context):
@@ -1031,6 +1049,7 @@ async def handle_button_clicks(context):
     await context.ack()
     await context.respond("Hi!")
 
+
 # You can access "ack" this way too.
 @app.action("button")
 async def handle_button_clicks(ack, respond):
@@ -1063,6 +1082,7 @@ say: AsyncSay
 async def handle_button_clicks(context):
     await context.ack()
     await context.say("Hi!")
+
 
 # You can access "ack" this way too.
 @app.action("button")

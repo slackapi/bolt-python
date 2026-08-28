@@ -19,10 +19,7 @@ def save(ack, view, update):
     task_name = values["task_name_input"]["name"]
     task_description = values["task_description_input"]["description"]
 
-    inputs = {
-        "task_name": {"value": task_name["value"]},
-        "task_description": {"value": task_description["value"]}
-    }
+    inputs = {"task_name": {"value": task_name["value"]}, "task_description": {"value": task_description["value"]}}
     outputs = [
         {
             "type": "text",
@@ -33,9 +30,10 @@ def save(ack, view, update):
             "type": "text",
             "name": "task_description",
             "label": "Task description",
-        }
+        },
     ]
     update(inputs=inputs, outputs=outputs)
+
 
 ws = WorkflowStep(
     callback_id="add_task",

@@ -29,6 +29,7 @@ def edit(ack, step, configure):
     ]
     configure(blocks=blocks)
 
+
 ws = WorkflowStep(
     callback_id="add_task",
     edit=edit,

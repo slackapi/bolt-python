@@ -22,16 +22,15 @@ import os
 from slack_bolt import App
 
 # Initializes your app with your bot token and signing secret
-app = App(
-    token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
-)
+app = App(token=os.environ.get("SLACK_BOT_TOKEN"), signing_secret=os.environ.get("SLACK_SIGNING_SECRET"))
+
 
 # Listens to incoming messages that contain "hello"
 @app.message("hello")
 def message_hello(message, say):
     # say() sends a message to the channel where the event was triggered
     say(f"Hey there <@{message['user']}>!")
+
 
 # Start your app
 if __name__ == "__main__":
@@ -109,6 +108,7 @@ Registers a new action listener. This method can be used as either a decorator o
 def update_message(ack):
     ack()
 
+
 # Pass a function to this method
 app.action("approve_button")(update_message)
 ```
@@ -180,6 +180,7 @@ def repeat_text(ack, say, command):
     # Acknowledge command request
     ack()
     say(f"{command['text']}")
+
 
 # Pass a function to this method
 app.command("/echo")(repeat_text)
@@ -258,6 +259,7 @@ def custom_error_handler(error, body, logger):
     logger.exception(f"Error: {error}")
     logger.info(f"Request body: {body}")
 
+
 # Pass a function to this method
 app.error(custom_error_handler)
 ```
@@ -285,6 +287,7 @@ def ask_for_introduction(event, say):
     user_id = event["user"]
     text = f"Welcome to the team, <@{user_id}>! :tada: You can introduce yourself in this channel."
     say(text=text, channel=welcome_channel_id)
+
 
 # Pass a function to this method
 app.event("team_join")(ask_for_introduction)
@@ -324,6 +327,7 @@ def reverse_string(ack: Ack, inputs: dict, complete: Complete, fail: Fail):
     except Exception as e:
         fail(f"Cannot reverse string (error: {e})")
         raise e
+
 
 # Pass a function to this method
 app.function("reverse")(reverse_string)
@@ -390,8 +394,9 @@ Check the `App#event` method's docstring for details.
 # Use this method as a decorator
 @app.message(":wave:")
 def say_hello(message, say):
-    user = message['user']
+    user = message["user"]
     say(f"Hi there, <@{user}>!")
+
 
 # Pass a function to this method
 app.message(":wave:")(say_hello)
@@ -433,6 +438,7 @@ This method can be used as either a decorator or a method.
 def middleware_func(logger, body, next):
     logger.info(f"request body: {body}")
     next()
+
 
 # Pass a function to this method
 app.middleware(middleware_func)
@@ -488,6 +494,7 @@ def show_menu_options(ack):
     ]
     ack(options=options)
 
+
 # Pass a function to this method
 app.options("menu_selection")(show_menu_options)
 ```
@@ -528,8 +535,9 @@ def open_modal(ack, body, client):
         # Pass a valid trigger_id within 3 seconds of receiving it
         trigger_id=body["trigger_id"],
         # View payload
-        view={ ... }
+        view={...},
     )
+
 
 # Pass a function to this method
 app.shortcut("open_modal")(open_modal)
@@ -589,6 +597,7 @@ If you want to register a step from app by a decorator, use `WorkflowStepBuilder
 ```python
 # Create a new WorkflowStep instance
 from slack_bolt.workflows.step import WorkflowStep
+
 ws = WorkflowStep(
     callback_id="add_task",
     edit=edit,
@@ -652,6 +661,7 @@ def handle_submission(ack, body, client, view):
     ack()
     # Do whatever you want with the input data - here we're saving it to a DB
 
+
 # Pass a function to this method
 app.view("view_1")(handle_submission)
 ```
@@ -706,10 +716,7 @@ def handle_buttons(ack, respond, logger, context, body, client):
     ack()
     if context.channel_id is not None:
         respond("Hi!")
-    client.views_open(
-        trigger_id=body["trigger_id"],
-        view={ ... }
-    )
+    client.views_open(trigger_id=body["trigger_id"], view={...})
 ```
 
 Alternatively, you can include a parameter named `args` and it will be injected with an instance of this class.
@@ -721,10 +728,7 @@ def handle_buttons(args):
     args.ack()
     if args.context.channel_id is not None:
         args.respond("Hi!")
-    args.client.views_open(
-        trigger_id=args.body["trigger_id"],
-        view={ ... }
-    )
+    args.client.views_open(trigger_id=args.body["trigger_id"], view={...})
 ```
 
 ### `ack`
@@ -978,6 +982,7 @@ ack: Ack
 def handle_button_clicks(context):
     context.ack()
 
+
 # You can access "ack" this way too.
 @app.action("button")
 def handle_button_clicks(ack):
@@ -1077,6 +1082,7 @@ def handle_events(context):
         text="Thanks!",
     )
 
+
 # You can access "client" this way too.
 @app.event("app_mention")
 def handle_events(client, context):
@@ -1107,12 +1113,13 @@ any interactivity handlers associated to a function invocation will no longer be
 @app.function("reverse")
 def handle_button_clicks(ack, complete):
     ack()
-    complete(outputs={"stringReverse":"olleh"})
+    complete(outputs={"stringReverse": "olleh"})
+
 
 @app.function("reverse")
 def handle_button_clicks(context):
     context.ack()
-    context.complete(outputs={"stringReverse":"olleh"})
+    context.complete(outputs={"stringReverse": "olleh"})
 ```
 
 **Returns:**
@@ -1145,6 +1152,7 @@ to a function invocation will no longer be invocable.
 def handle_button_clicks(ack, fail):
     ack()
     fail(error="something went wrong")
+
 
 @app.function("reverse")
 def handle_button_clicks(context):
@@ -1232,6 +1240,7 @@ def handle_button_clicks(context):
     context.ack()
     context.respond("Hi!")
 
+
 # You can access "ack" this way too.
 @app.action("button")
 def handle_button_clicks(ack, respond):
@@ -1264,6 +1273,7 @@ say: Say
 def handle_button_clicks(context):
     context.ack()
     context.say("Hi!")
+
 
 # You can access "ack" this way too.
 @app.action("button")
