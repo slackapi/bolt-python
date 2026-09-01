@@ -3,38 +3,30 @@ sidebar_label: async_runner
 title: slack_bolt.lazy_listener.async_runner
 ---
 
-## AsyncLazyListenerRunner Objects
+## `AsyncLazyListenerRunner`
+
+### `run`
 
 ```python
-class AsyncLazyListenerRunner()
-```
-
-#### logger: `Logger`
-
-#### start
-
-```python
-def start(function: Callable[..., Awaitable[None]], request: AsyncBoltRequest) -> None
-```
-
-Starts a new lazy listener execution.
-
-**Arguments**:
-
-- `function` _Callable[..., Awaitable[None]]_ - The function to run.
-- `request` _AsyncBoltRequest_ - The request to pass to the function. The object must be thread-safe.
-
-#### run
-
-```python
-async def run(
-    function: Callable[..., Awaitable[None]],
-    request: AsyncBoltRequest) -> None
+run(function, request)
 ```
 
 Synchronously run the function with a given request data.
 
-**Arguments**:
+**Parameters:**
 
-- `function` _Callable[..., Awaitable[None]]_ - The function to run.
-- `request` _AsyncBoltRequest_ - The request to pass to the function. The object must be thread-safe.
+- **function** (Callable..., [Awaitable[None]]) – The function to run.
+- **request** (AsyncBoltRequest) – The request to pass to the function. The object must be thread-safe.
+
+### `start`
+
+```python
+start(function, request)
+```
+
+Starts a new lazy listener execution.
+
+**Parameters:**
+
+- **function** (Callable..., [Awaitable[None]]) – The function to run.
+- **request** (AsyncBoltRequest) – The request to pass to the function. The object must be thread-safe.

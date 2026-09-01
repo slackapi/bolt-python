@@ -3,36 +3,28 @@ sidebar_label: base_handler
 title: slack_bolt.adapter.asgi.base_handler
 ---
 
-## BaseSlackRequestHandler Objects
+## `BaseSlackRequestHandler`
+
+### `dispatch`
 
 ```python
-class BaseSlackRequestHandler()
-```
-
-#### app: `Union[App, AsyncApp]`
-
-#### path: `str`
-
-#### dispatch
-
-```python
-async def dispatch(request: AsgiHttpRequest) -> BoltResponse
+dispatch(request)
 ```
 
 Dispatches a request to the Bolt App.
 
-#### handle\_installation
+### `handle_callback`
 
 ```python
-async def handle_installation(request: AsgiHttpRequest) -> BoltResponse
-```
-
-Handles installation of the OAuthFlow.
-
-#### handle\_callback
-
-```python
-async def handle_callback(request: AsgiHttpRequest) -> BoltResponse
+handle_callback(request)
 ```
 
 Handles the callback of the OAuthFlow.
+
+### `handle_installation`
+
+```python
+handle_installation(request)
+```
+
+Handles installation of the OAuthFlow.

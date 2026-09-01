@@ -4,26 +4,79 @@ title: slack_bolt.workflows.step.step
 slug: step
 ---
 
-## WorkflowStepBuilder Objects
+## `WorkflowStep`
 
 ```python
-class WorkflowStepBuilder()
+WorkflowStep(*, callback_id, edit, save, execute, app_name=None, base_logger=None)
+```
+
+Deprecated: Steps from apps for legacy workflows are now deprecated.
+
+Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+
+**Parameters:**
+
+- **callback_id** (Union[str, Pattern]) – The callback_id for this step from app
+- **edit** (Union[Callable..., [Optional[BoltResponse]], Listener, Sequence[Callable]]) – Either a single function or a list of functions for opening a modal in the builder UI
+When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
+- **save** (Union[Callable..., [Optional[BoltResponse]], Listener, Sequence[Callable]]) – Either a single function or a list of functions for handling modal interactions in the builder UI
+When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
+- **execute** (Union[Callable..., [Optional[BoltResponse]], Listener, Sequence[Callable]]) – Either a single function or a list of functions for handling step from app executions
+When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
+- **app_name** (Optional[str]) – The app name that can be mainly used for logging
+- **base_logger** (Optional[Logger]) – The logger instance that can be used as a template when creating this step's logger
+
+### `builder`
+
+```python
+builder(callback_id, base_logger=None)
+```
+
+Deprecated: Steps from apps for legacy workflows are now deprecated.
+
+Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+
+### `callback_id`
+
+```python
+callback_id: Union[str, Pattern] = callback_id
+```
+
+The Callback ID of the step from app
+
+### `edit`
+
+```python
+edit: Listener = self.build_listener(callback_id=callback_id, app_name=app_name, listener_or_functions=edit, name='edit', base_logger=base_logger)
+```
+
+`edit` listener, which displays a modal in Workflow Builder
+
+### `execute`
+
+```python
+execute: Listener = self.build_listener(callback_id=callback_id, app_name=app_name, listener_or_functions=execute, name='execute', base_logger=base_logger)
+```
+
+`execute` listener, which processes step from app execution
+
+### `save`
+
+```python
+save: Listener = self.build_listener(callback_id=callback_id, app_name=app_name, listener_or_functions=save, name='save', base_logger=base_logger)
+```
+
+`save` listener, which accepts workflow creator's data submission in Workflow Builder
+
+## `WorkflowStepBuilder`
+
+```python
+WorkflowStepBuilder(callback_id, app_name=None, base_logger=None)
 ```
 
 Steps from apps.
 
 Refer to https://docs.slack.dev/legacy/legacy-steps-from-apps/ for details.
-
-#### callback\_id: `Union[str, Pattern]`
-
-#### \_\_init\_\_
-
-```python
-def __init__(
-    callback_id: Union[str, Pattern],
-    app_name: Optional[str] = None,
-    base_logger: Optional[Logger] = None)
-```
 
 Deprecated: Steps from apps for legacy workflows are now deprecated.
 
@@ -49,20 +102,33 @@ For further information about WorkflowStep specific function arguments
 such as `configure`, `update`, `complete`, and `fail`,
 refer to `slack_bolt.workflows.step.utilities` API documents.
 
-**Arguments**:
+**Parameters:**
 
-- `callback_id` _Union[str, Pattern]_ - The callback_id for the workflow
-- `app_name` _Optional[str]_ - The application name mainly for logging
-- `base_logger` _Optional[Logger]_ - The base logger
+- **callback_id** (Union[str, Pattern]) – The callback_id for the workflow
+- **app_name** (Optional[str]) – The application name mainly for logging
+- **base_logger** (Optional[Logger]) – The base logger
 
-#### edit
+### `build`
 
 ```python
-def edit(
-    *args,
-    matchers: Optional[Union[Callable[..., bool], ListenerMatcher]] = None,
-    middleware: Optional[Union[Callable, Middleware]] = None,
-    lazy: Optional[List[Callable[..., None]]] = None)
+build(base_logger=None)
+```
+
+Deprecated: Steps from apps for legacy workflows are now deprecated.
+
+Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
+
+Constructs a WorkflowStep object. This method may raise an exception
+if the builder doesn't have enough configurations to build the object.
+
+**Returns:**
+
+- WorkflowStep – WorkflowStep object
+
+### `edit`
+
+```python
+edit(*args, matchers=None, middleware=None, lazy=None)
 ```
 
 Deprecated: Steps from apps for legacy workflows are now deprecated.
@@ -91,64 +157,17 @@ For further information about WorkflowStep specific function arguments
 such as `configure`, `update`, `complete`, and `fail`,
 refer to `slack_bolt.workflows.step.utilities` API documents.
 
-**Arguments**:
+**Parameters:**
 
-- `*args` - This method can behave as either decorator or a method
-- `matchers` _Optional[Union[Callable[..., bool], ListenerMatcher]]_ - Listener matchers
-- `middleware` _Optional[Union[Callable, Middleware]]_ - Listener middleware
-- `lazy` _Optional[List[Callable[..., None]]]_ - Lazy listeners
+- ***args** – This method can behave as either decorator or a method
+- **matchers** (Optional[Union[Callable..., [bool], ListenerMatcher]]) – Listener matchers
+- **middleware** (Optional[Union[Callable, Middleware]]) – Listener middleware
+- **lazy** (Optional[List[Callable[..., None]]]) – Lazy listeners
 
-#### save
-
-```python
-def save(
-    *args,
-    matchers: Optional[Union[Callable[..., bool], ListenerMatcher]] = None,
-    middleware: Optional[Union[Callable, Middleware]] = None,
-    lazy: Optional[List[Callable[..., None]]] = None)
-```
-
-Deprecated: Steps from apps for legacy workflows are now deprecated.
-
-Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
-
-Registers a new save listener with details.
-
-You can use this method as decorator as well.
+### `execute`
 
 ```python
-@my_step.save
-def save_my_step(ack, step, update):
-    pass
-```
-
-It's also possible to add additional listener matchers and/or middleware
-
-```python
-@my_step.save(matchers=[is_valid], middleware=[update_context])
-def save_my_step(ack, step, update):
-    pass
-```
-
-For further information about WorkflowStep specific function arguments
-such as `configure`, `update`, `complete`, and `fail`,
-refer to `slack_bolt.workflows.step.utilities` API documents.
-
-**Arguments**:
-
-- `*args` - This method can behave as either decorator or a method
-- `matchers` _Optional[Union[Callable[..., bool], ListenerMatcher]]_ - Listener matchers
-- `middleware` _Optional[Union[Callable, Middleware]]_ - Listener middleware
-- `lazy` _Optional[List[Callable[..., None]]]_ - Lazy listeners
-
-#### execute
-
-```python
-def execute(
-    *args,
-    matchers: Optional[Union[Callable[..., bool], ListenerMatcher]] = None,
-    middleware: Optional[Union[Callable, Middleware]] = None,
-    lazy: Optional[List[Callable[..., None]]] = None)
+execute(*args, matchers=None, middleware=None, lazy=None)
 ```
 
 Deprecated: Steps from apps for legacy workflows are now deprecated.
@@ -177,120 +196,48 @@ For further information about WorkflowStep specific function arguments
 such as `configure`, `update`, `complete`, and `fail`,
 refer to `slack_bolt.workflows.step.utilities` API documents.
 
-**Arguments**:
+**Parameters:**
 
-- `*args` - This method can behave as either decorator or a method
-- `matchers` _Optional[Union[Callable[..., bool], ListenerMatcher]]_ - Listener matchers
-- `middleware` _Optional[Union[Callable, Middleware]]_ - Listener middleware
-- `lazy` _Optional[List[Callable[..., None]]]_ - Lazy listeners
+- ***args** – This method can behave as either decorator or a method
+- **matchers** (Optional[Union[Callable..., [bool], ListenerMatcher]]) – Listener matchers
+- **middleware** (Optional[Union[Callable, Middleware]]) – Listener middleware
+- **lazy** (Optional[List[Callable[..., None]]]) – Lazy listeners
 
-#### build
+### `save`
 
 ```python
-def build(base_logger: Optional[Logger] = None) -> WorkflowStep
+save(*args, matchers=None, middleware=None, lazy=None)
 ```
 
 Deprecated: Steps from apps for legacy workflows are now deprecated.
 
 Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
 
-Constructs a WorkflowStep object. This method may raise an exception
-if the builder doesn't have enough configurations to build the object.
+Registers a new save listener with details.
 
-**Returns**:
-
-- `WorkflowStep` - WorkflowStep object
-
-#### to\_listener\_matchers
+You can use this method as decorator as well.
 
 ```python
-def to_listener_matchers(
-    app_name: str,
-    matchers: Optional[List[Union[Callable[..., bool], ListenerMatcher]]],
-    base_logger: Optional[Logger] = None) -> List[ListenerMatcher]
+@my_step.save
+def save_my_step(ack, step, update):
+    pass
 ```
 
-#### to\_listener\_middleware
+It's also possible to add additional listener matchers and/or middleware
 
 ```python
-def to_listener_middleware(
-    app_name: str,
-    middleware: Optional[List[Union[Callable, Middleware]]],
-    base_logger: Optional[Logger] = None) -> List[Middleware]
+@my_step.save(matchers=[is_valid], middleware=[update_context])
+def save_my_step(ack, step, update):
+    pass
 ```
 
-## WorkflowStep Objects
+For further information about WorkflowStep specific function arguments
+such as `configure`, `update`, `complete`, and `fail`,
+refer to `slack_bolt.workflows.step.utilities` API documents.
 
-```python
-class WorkflowStep()
-```
+**Parameters:**
 
-#### callback\_id: `Union[str, Pattern]`
-
-The Callback ID of the step from app
-
-#### edit: `Listener`
-
-`edit` listener, which displays a modal in Workflow Builder
-
-#### save: `Listener`
-
-`save` listener, which accepts workflow creator's data submission in Workflow Builder
-
-#### execute: `Listener`
-
-`execute` listener, which processes step from app execution
-
-#### \_\_init\_\_
-
-```python
-def __init__(
-    *,
-    callback_id: Union[str, Pattern],
-    edit: Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]],
-    save: Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]],
-    execute: Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]],
-    app_name: Optional[str] = None,
-    base_logger: Optional[Logger] = None)
-```
-
-Deprecated: Steps from apps for legacy workflows are now deprecated.
-
-Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
-
-**Arguments**:
-
-- `callback_id` _Union[str, Pattern]_ - The callback_id for this step from app
-- `edit` _Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]_ - Either a single function or a list of functions for opening a modal in the builder UI
-  When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
-- `save` _Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]_ - Either a single function or a list of functions for handling modal interactions in the builder UI
-  When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
-- `execute` _Union[Callable[..., Optional[BoltResponse]], Listener, Sequence[Callable]]_ - Either a single function or a list of functions for handling step from app executions
-  When it's a list, the first one is responsible for ack() while the rest are lazy listeners.
-- `app_name` _Optional[str]_ - The app name that can be mainly used for logging
-- `base_logger` _Optional[Logger]_ - The logger instance that can be used as a template when creating this step's logger
-
-#### builder
-
-```python
-def builder(
-    callback_id: Union[str, Pattern],
-    base_logger: Optional[Logger] = None) -> WorkflowStepBuilder
-```
-
-Deprecated: Steps from apps for legacy workflows are now deprecated.
-
-Use new custom steps: https://docs.slack.dev/workflows/workflow-steps/
-
-#### build\_listener
-
-```python
-def build_listener(
-    callback_id: Union[str, Pattern],
-    app_name: str,
-    listener_or_functions: Union[Listener, Callable, List[Callable]],
-    name: str,
-    matchers: Optional[List[ListenerMatcher]] = None,
-    middleware: Optional[List[Middleware]] = None,
-    base_logger: Optional[Logger] = None) -> Listener
-```
+- ***args** – This method can behave as either decorator or a method
+- **matchers** (Optional[Union[Callable..., [bool], ListenerMatcher]]) – Listener matchers
+- **middleware** (Optional[Union[Callable, Middleware]]) – Listener middleware
+- **lazy** (Optional[List[Callable[..., None]]]) – Lazy listeners

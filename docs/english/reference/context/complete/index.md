@@ -3,35 +3,25 @@ sidebar_label: complete
 title: slack_bolt.context.complete
 ---
 
-## Submodules
-
-- [slack_bolt.context.complete.async_complete](/tools/bolt-python/reference/context/complete/async_complete)
-- [slack_bolt.context.complete.complete](/tools/bolt-python/reference/context/complete/complete)
-
-## Complete Objects
+## `Complete`
 
 ```python
-class Complete()
+Complete(client, function_execution_id)
 ```
 
-#### client: `WebClient`
-
-#### function\_execution\_id: `Optional[str]`
-
-#### \_\_init\_\_
+### `has_been_called`
 
 ```python
-def __init__(client: WebClient, function_execution_id: Optional[str])
-```
-
-#### has\_been\_called
-
-```python
-def has_been_called() -> bool
+has_been_called()
 ```
 
 Check if this complete function has been called.
 
-**Returns**:
+**Returns:**
 
-- `bool` - True if the complete function has been called, False otherwise.
+- **bool** (bool) – True if the complete function has been called, False otherwise.
+
+## Submodules
+
+- [slack_bolt.context.complete.async_complete](/tools/bolt-python/reference/context/complete/async_complete)
+- [slack_bolt.context.complete.complete](/tools/bolt-python/reference/context/complete/complete)

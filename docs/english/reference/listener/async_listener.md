@@ -3,116 +3,38 @@ sidebar_label: async_listener
 title: slack_bolt.listener.async_listener
 ---
 
-## AsyncListener Objects
+## `AsyncListener`
+
+### `run_ack_function`
 
 ```python
-class AsyncListener()
-```
-
-#### matchers: `Sequence[AsyncListenerMatcher]`
-
-#### middleware: `Sequence[AsyncMiddleware]`
-
-#### ack\_function: `Callable[..., Awaitable[BoltResponse]]`
-
-#### lazy\_functions: `Sequence[Callable[..., Awaitable[None]]]`
-
-#### auto\_acknowledgement: `bool`
-
-#### ack\_timeout: `int`
-
-#### async\_matches
-
-```python
-async def async_matches(*, req: AsyncBoltRequest, resp: BoltResponse) -> bool
-```
-
-#### run\_async\_middleware
-
-```python
-async def run_async_middleware(
-    *,
-    req: AsyncBoltRequest,
-    resp: BoltResponse) -> Tuple[Optional[BoltResponse], bool]
-```
-
-Runs an async middleware.
-
-**Arguments**:
-
-- `req` _AsyncBoltRequest_ - The incoming request
-- `resp` _BoltResponse_ - The current response
-
-**Returns**:
-
-- `Tuple[Optional[BoltResponse], bool]` - A tuple of the processed response and a flag indicating termination
-
-#### run\_ack\_function
-
-```python
-async def run_ack_function(
-    *,
-    request: AsyncBoltRequest,
-    response: BoltResponse) -> Optional[BoltResponse]
+run_ack_function(*, request, response)
 ```
 
 Runs all the registered middleware and then run the listener function.
 
-**Arguments**:
+**Parameters:**
 
-- `request` _AsyncBoltRequest_ - The incoming request
-- `response` _BoltResponse_ - The current response
+- **request** (AsyncBoltRequest) – The incoming request
+- **response** (BoltResponse) – The current response
 
-**Returns**:
+**Returns:**
 
-- `Optional[BoltResponse]` - The processed response
+- Optional[BoltResponse] – The processed response
 
-## AsyncCustomListener Objects
-
-```python
-class AsyncCustomListener(AsyncListener)
-```
-
-#### app\_name: `str`
-
-#### ack\_function: `Callable[..., Awaitable[Optional[BoltResponse]]]`
-
-#### lazy\_functions: `Sequence[Callable[..., Awaitable[None]]]`
-
-#### matchers: `Sequence[AsyncListenerMatcher]`
-
-#### middleware: `Sequence[AsyncMiddleware]`
-
-#### auto\_acknowledgement: `bool`
-
-#### ack\_timeout: `int`
-
-#### arg\_names: `MutableSequence[str]`
-
-#### logger: `Logger`
-
-#### \_\_init\_\_
+### `run_async_middleware`
 
 ```python
-def __init__(
-    *,
-    app_name: str,
-    ack_function: Callable[..., Awaitable[Optional[BoltResponse]]],
-    lazy_functions: Sequence[Callable[..., Awaitable[None]]],
-    matchers: Sequence[AsyncListenerMatcher],
-    middleware: Sequence[AsyncMiddleware],
-    auto_acknowledgement: bool = False,
-    ack_timeout: int = 3,
-    base_logger: Optional[Logger] = None)
+run_async_middleware(*, req, resp)
 ```
 
-#### run\_ack\_function
+Runs an async middleware.
 
-```python
-async def run_ack_function(
-    *,
-    request: AsyncBoltRequest,
-    response: BoltResponse) -> Optional[BoltResponse]
-```
+**Parameters:**
 
-#### builtin\_async\_listener\_classes
+- **req** (AsyncBoltRequest) – The incoming request
+- **resp** (BoltResponse) – The current response
+
+**Returns:**
+
+- Tuple[Optional[BoltResponse], bool] – A tuple of the processed response and a flag indicating termination

@@ -3,30 +3,20 @@ sidebar_label: async_single_team_authorization
 title: slack_bolt.middleware.authorization.async_single_team_authorization
 ---
 
-## AsyncSingleTeamAuthorization Objects
+## `AsyncSingleTeamAuthorization`
 
 ```python
-class AsyncSingleTeamAuthorization(AsyncAuthorization)
+AsyncSingleTeamAuthorization(base_logger=None, user_facing_authorize_error_message=None)
 ```
 
-#### \_\_init\_\_
-
-```python
-def __init__(
-    base_logger: Optional[Logger] = None,
-    user_facing_authorize_error_message: Optional[str] = None)
-```
+Bases: AsyncAuthorization
 
 Single-workspace authorization.
 
-#### auth\_test\_result: `Optional[AsyncSlackResponse]`
-
-#### async\_process
+### `name`
 
 ```python
-async def async_process(
-    *,
-    req: AsyncBoltRequest,
-    resp: BoltResponse,
-    next: Callable[[], Awaitable[BoltResponse]]) -> BoltResponse
+name: str
 ```
+
+The name of this middleware.

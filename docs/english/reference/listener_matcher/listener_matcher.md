@@ -4,25 +4,21 @@ title: slack_bolt.listener_matcher.listener_matcher
 slug: listener_matcher
 ---
 
-## ListenerMatcher Objects
+## `ListenerMatcher`
+
+### `matches`
 
 ```python
-class ListenerMatcher()
-```
-
-#### matches
-
-```python
-def matches(req: BoltRequest, resp: BoltResponse) -> bool
+matches(req, resp)
 ```
 
 Matches against the request and returns True if matched.
 
-**Arguments**:
+**Parameters:**
 
-- `req` _BoltRequest_ - The request
-- `resp` _BoltResponse_ - The response
+- **req** (BoltRequest) – The request
+- **resp** (BoltResponse) – The response
 
-**Returns**:
+**Returns:**
 
-- `bool` - True if matched.
+- bool – True if matched.

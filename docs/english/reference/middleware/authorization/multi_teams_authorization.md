@@ -3,42 +3,27 @@ sidebar_label: multi_teams_authorization
 title: slack_bolt.middleware.authorization.multi_teams_authorization
 ---
 
-## MultiTeamsAuthorization Objects
+## `MultiTeamsAuthorization`
 
 ```python
-class MultiTeamsAuthorization(Authorization)
+MultiTeamsAuthorization(*, authorize, base_logger=None, user_token_resolution='authed_user', user_facing_authorize_error_message=None)
 ```
 
-#### authorize: `Authorize`
-
-#### user\_token\_resolution: `str`
-
-#### \_\_init\_\_
-
-```python
-def __init__(
-    *,
-    authorize: Authorize,
-    base_logger: Optional[Logger] = None,
-    user_token_resolution: str = 'authed_user',
-    user_facing_authorize_error_message: Optional[str] = None)
-```
+Bases: Authorization
 
 Multi-workspace authorization.
 
-**Arguments**:
+**Parameters:**
 
-- `authorize` _Authorize_ - The function to authorize incoming requests from Slack.
-- `base_logger` _Optional[Logger]_ - The base logger
-- `user_token_resolution` _str_ - "authed_user" or "actor"
-- `user_facing_authorize_error_message` _Optional[str]_ - The user-facing error message when installation is not found
+- **authorize** (Authorize) – The function to authorize incoming requests from Slack.
+- **base_logger** (Optional[Logger]) – The base logger
+- **user_token_resolution** (str) – "authed_user" or "actor"
+- **user_facing_authorize_error_message** (Optional[str]) – The user-facing error message when installation is not found
 
-#### process
+### `name`
 
 ```python
-def process(
-    *,
-    req: BoltRequest,
-    resp: BoltResponse,
-    next: Callable[[], BoltResponse]) -> BoltResponse
+name: str
 ```
+
+The name of this middleware.

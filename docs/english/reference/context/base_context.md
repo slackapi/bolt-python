@@ -3,79 +3,16 @@ sidebar_label: base_context
 title: slack_bolt.context.base_context
 ---
 
-## BaseContext Objects
+## `BaseContext`
 
-```python
-class BaseContext(dict)
-```
+Bases: dict
 
 Context object associated with a request from Slack.
 
-#### copyable\_standard\_property\_names
-
-#### non\_copyable\_standard\_property\_names
-
-#### standard\_property\_names
-
-#### logger
+### `actor_enterprise_id`
 
 ```python
-@property
-def logger() -> Logger
-```
-
-The properly configured logger that is available for middleware/listeners.
-
-#### token
-
-```python
-@property
-def token() -> Optional[str]
-```
-
-The (bot/user) token resolved for this request.
-
-#### enterprise\_id
-
-```python
-@property
-def enterprise_id() -> Optional[str]
-```
-
-The Enterprise Grid Organization ID of this request.
-
-#### is\_enterprise\_install
-
-```python
-@property
-def is_enterprise_install() -> Optional[bool]
-```
-
-True if the request is associated with an Org-wide installation.
-
-#### team\_id
-
-```python
-@property
-def team_id() -> Optional[str]
-```
-
-The Workspace ID of this request.
-
-#### user\_id
-
-```python
-@property
-def user_id() -> Optional[str]
-```
-
-The user ID associated ith this request.
-
-#### actor\_enterprise\_id
-
-```python
-@property
-def actor_enterprise_id() -> Optional[str]
+actor_enterprise_id: Optional[str]
 ```
 
 The action's actor's Enterprise Grid organization ID.
@@ -83,11 +20,10 @@ The action's actor's Enterprise Grid organization ID.
 Note that this property is especially useful for handling events in Slack Connect channels.
 That being said, it's not guaranteed to have a valid ID for all events due to server-side inconsistency.
 
-#### actor\_team\_id
+### `actor_team_id`
 
 ```python
-@property
-def actor_team_id() -> Optional[str]
+actor_team_id: Optional[str]
 ```
 
 The action's actor's workspace ID.
@@ -95,11 +31,10 @@ The action's actor's workspace ID.
 Note that this property is especially useful for handling events in Slack Connect channels.
 That being said, it's not guaranteed to have a valid ID for all events due to server-side inconsistency.
 
-#### actor\_user\_id
+### `actor_user_id`
 
 ```python
-@property
-def actor_user_id() -> Optional[str]
+actor_user_id: Optional[str]
 ```
 
 The action's actor's user ID.
@@ -107,122 +42,152 @@ The action's actor's user ID.
 Note that this property is especially useful for handling events in Slack Connect channels.
 That being said, it's not guaranteed to have a valid ID for all events due to server-side inconsistency.
 
-#### channel\_id
+### `authorize_result`
 
 ```python
-@property
-def channel_id() -> Optional[str]
-```
-
-The conversation ID associated with this request.
-
-#### thread\_ts
-
-```python
-@property
-def thread_ts() -> Optional[str]
-```
-
-The conversation thread's ID associated with this request.
-
-#### response\_url
-
-```python
-@property
-def response_url() -> Optional[str]
-```
-
-The `response_url` associated with this request.
-
-#### matches
-
-```python
-@property
-def matches() -> Optional[Tuple]
-```
-
-Returns all the matched parts in message listener's regexp.
-
-#### function\_execution\_id
-
-```python
-@property
-def function_execution_id() -> Optional[str]
-```
-
-The `function_execution_id` associated with this request.
-
-Only available for `function_executed` and interactivity events scoped to a custom step.
-
-#### inputs
-
-```python
-@property
-def inputs() -> Optional[Dict[str, Any]]
-```
-
-The `inputs` associated with this request.
-
-Only available for `function_executed` and interactivity events scoped to a custom step.
-
-#### authorize\_result
-
-```python
-@property
-def authorize_result() -> Optional[AuthorizeResult]
+authorize_result: Optional[AuthorizeResult]
 ```
 
 The authorize result resolved for this request.
 
-#### function\_bot\_access\_token
+### `bot_id`
 
 ```python
-@property
-def function_bot_access_token() -> Optional[str]
+bot_id: Optional[str]
+```
+
+The bot ID resolved for this request.
+
+### `bot_token`
+
+```python
+bot_token: Optional[str]
+```
+
+The bot token resolved for this request.
+
+### `bot_user_id`
+
+```python
+bot_user_id: Optional[str]
+```
+
+The bot user ID resolved for this request.
+
+### `channel_id`
+
+```python
+channel_id: Optional[str]
+```
+
+The conversation ID associated with this request.
+
+### `enterprise_id`
+
+```python
+enterprise_id: Optional[str]
+```
+
+The Enterprise Grid Organization ID of this request.
+
+### `function_bot_access_token`
+
+```python
+function_bot_access_token: Optional[str]
 ```
 
 The bot token resolved for this function request.
 
 Only available for `function_executed` and interactivity events scoped to a custom step.
 
-#### bot\_token
+### `function_execution_id`
 
 ```python
-@property
-def bot_token() -> Optional[str]
+function_execution_id: Optional[str]
 ```
 
-The bot token resolved for this request.
+The `function_execution_id` associated with this request.
 
-#### bot\_id
+Only available for `function_executed` and interactivity events scoped to a custom step.
+
+### `inputs`
 
 ```python
-@property
-def bot_id() -> Optional[str]
+inputs: Optional[Dict[str, Any]]
 ```
 
-The bot ID resolved for this request.
+The `inputs` associated with this request.
 
-#### bot\_user\_id
+Only available for `function_executed` and interactivity events scoped to a custom step.
+
+### `is_enterprise_install`
 
 ```python
-@property
-def bot_user_id() -> Optional[str]
+is_enterprise_install: Optional[bool]
 ```
 
-The bot user ID resolved for this request.
+True if the request is associated with an Org-wide installation.
 
-#### user\_token
+### `logger`
 
 ```python
-@property
-def user_token() -> Optional[str]
+logger: Logger
+```
+
+The properly configured logger that is available for middleware/listeners.
+
+### `matches`
+
+```python
+matches: Optional[Tuple]
+```
+
+Returns all the matched parts in message listener's regexp.
+
+### `response_url`
+
+```python
+response_url: Optional[str]
+```
+
+The `response_url` associated with this request.
+
+### `team_id`
+
+```python
+team_id: Optional[str]
+```
+
+The Workspace ID of this request.
+
+### `thread_ts`
+
+```python
+thread_ts: Optional[str]
+```
+
+The conversation thread's ID associated with this request.
+
+### `token`
+
+```python
+token: Optional[str]
+```
+
+The (bot/user) token resolved for this request.
+
+### `user_id`
+
+```python
+user_id: Optional[str]
+```
+
+The user ID associated ith this request.
+
+### `user_token`
+
+```python
+user_token: Optional[str]
 ```
 
 The user token resolved for this request.
-
-#### set\_authorize\_result
-
-```python
-def set_authorize_result(authorize_result: AuthorizeResult)
-```

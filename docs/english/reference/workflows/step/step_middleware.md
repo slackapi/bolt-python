@@ -3,26 +3,20 @@ sidebar_label: step_middleware
 title: slack_bolt.workflows.step.step_middleware
 ---
 
-## WorkflowStepMiddleware Objects
+## `WorkflowStepMiddleware`
 
 ```python
-class WorkflowStepMiddleware(Middleware)
+WorkflowStepMiddleware(step)
 ```
+
+Bases: Middleware
 
 Base middleware for step from app specific ones.
 
-#### \_\_init\_\_
+### `name`
 
 ```python
-def __init__(step: WorkflowStep)
+name: str
 ```
 
-#### process
-
-```python
-def process(
-    *,
-    req: BoltRequest,
-    resp: BoltResponse,
-    next: Callable[[], BoltResponse]) -> Optional[BoltResponse]
-```
+The name of this middleware.

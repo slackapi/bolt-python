@@ -3,26 +3,20 @@ sidebar_label: async_message_listener_matches
 title: slack_bolt.middleware.message_listener_matches.async_message_listener_matches
 ---
 
-## AsyncMessageListenerMatches Objects
+## `AsyncMessageListenerMatches`
 
 ```python
-class AsyncMessageListenerMatches(AsyncMiddleware)
+AsyncMessageListenerMatches(keyword)
 ```
 
-#### \_\_init\_\_
-
-```python
-def __init__(keyword: Union[str, Pattern])
-```
+Bases: AsyncMiddleware
 
 Captures matched keywords and saves the values in context.
 
-#### async\_process
+### `name`
 
 ```python
-async def async_process(
-    *,
-    req: AsyncBoltRequest,
-    resp: BoltResponse,
-    next: Callable[[], Awaitable[BoltResponse]]) -> BoltResponse
+name: str
 ```
+
+The name of this middleware.

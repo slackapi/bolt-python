@@ -4,20 +4,4 @@ title: slack_bolt.context.set_status.set_status
 slug: set_status
 ---
 
-## SetStatus Objects
 
-```python
-class SetStatus()
-```
-
-#### client: `WebClient`
-
-#### channel\_id: `str`
-
-#### thread\_ts: `str`
-
-#### \_\_init\_\_
-
-```python
-def __init__(client: WebClient, channel_id: str, thread_ts: str)
-```

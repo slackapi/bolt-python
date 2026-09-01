@@ -3,69 +3,33 @@ sidebar_label: async_authorize
 title: slack_bolt.authorization.async_authorize
 ---
 
-## AsyncAuthorize Objects
+## `AsyncAuthorize`
 
 ```python
-class AsyncAuthorize()
+AsyncAuthorize()
 ```
 
 This provides authorize function that returns AuthorizeResult for an incoming request from Slack.
 
-#### \_\_init\_\_
+## `AsyncCallableAuthorize`
 
 ```python
-def __init__()
+AsyncCallableAuthorize(*, logger, func)
 ```
 
-## AsyncCallableAuthorize Objects
-
-```python
-class AsyncCallableAuthorize(AsyncAuthorize)
-```
+Bases: AsyncAuthorize
 
 When you pass the `authorize` argument in AsyncApp constructor, this `authorize` implementation will be used.
 
-#### \_\_init\_\_
+## `AsyncInstallationStoreAuthorize`
 
 ```python
-def __init__(*, logger: Logger, func: Callable[..., Awaitable[AuthorizeResult]])
+AsyncInstallationStoreAuthorize(*, logger, installation_store, client_id=None, client_secret=None, token_rotation_expiration_minutes=None, bot_only=False, cache_enabled=False, client=None, user_token_resolution='authed_user')
 ```
 
-## AsyncInstallationStoreAuthorize Objects
-
-```python
-class AsyncInstallationStoreAuthorize(AsyncAuthorize)
-```
+Bases: AsyncAuthorize
 
 If you use the OAuth flow settings, this authorize implementation will be used.
 
 As long as your own InstallationStore (or the built-in ones) works as you expect,
 you can expect that the authorize layer should work for you without any customization.
-
-#### authorize\_result\_cache: `Dict[str, AuthorizeResult]`
-
-#### bot\_only: `bool`
-
-#### user\_token\_resolution: `str`
-
-#### find\_installation\_available: `Optional[bool]`
-
-#### find\_bot\_available: `Optional[bool]`
-
-#### token\_rotator: `Optional[AsyncTokenRotator]`
-
-#### \_\_init\_\_
-
-```python
-def __init__(
-    *,
-    logger: Logger,
-    installation_store: AsyncInstallationStore,
-    client_id: Optional[str] = None,
-    client_secret: Optional[str] = None,
-    token_rotation_expiration_minutes: Optional[int] = None,
-    bot_only: bool = False,
-    cache_enabled: bool = False,
-    client: Optional[AsyncWebClient] = None,
-    user_token_resolution: str = 'authed_user')
-```

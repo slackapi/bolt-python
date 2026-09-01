@@ -72,11 +72,9 @@ jobs:
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ env.LATEST_SUPPORTED_PY }}
-      # Regenerating also runs the MDX/acorn hazard gate inside the generator,
-      # so a stale tree or an unfenced code example both fail here.
-      - name: Regenerate the API reference
+      - name: Generate API reference
         run: ./scripts/generate_api_docs.sh
-      - name: Fail if the committed reference is out of date
+      - name: Verify committed reference is up to date
         run: git diff --exit-code -- docs/english/reference
 
   unittest:

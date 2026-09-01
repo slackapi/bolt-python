@@ -3,15 +3,10 @@ sidebar_label: falcon
 title: slack_bolt.adapter.falcon
 ---
 
-## Submodules
-
-- [slack_bolt.adapter.falcon.async_resource](/tools/bolt-python/reference/adapter/falcon/async_resource)
-- [slack_bolt.adapter.falcon.resource](/tools/bolt-python/reference/adapter/falcon/resource)
-
-## SlackAppResource Objects
+## `SlackAppResource`
 
 ```python
-class SlackAppResource()
+SlackAppResource(app)
 ```
 
 For use with WSGI Falcon Apps.
@@ -27,20 +22,7 @@ api = application = falcon.API()
 api.add_route("/slack/events", SlackAppResource(app))
 ```
 
-#### \_\_init\_\_
+## Submodules
 
-```python
-def __init__(app: App)
-```
-
-#### on\_get
-
-```python
-def on_get(req: Request, resp: Response)
-```
-
-#### on\_post
-
-```python
-def on_post(req: Request, resp: Response)
-```
+- [slack_bolt.adapter.falcon.async_resource](/tools/bolt-python/reference/adapter/falcon/async_resource)
+- [slack_bolt.adapter.falcon.resource](/tools/bolt-python/reference/adapter/falcon/resource)

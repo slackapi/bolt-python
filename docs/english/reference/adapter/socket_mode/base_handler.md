@@ -7,57 +7,49 @@ The base class of Socket Mode client implementation.
 
 If you want to build asyncio-based ones, use `AsyncBaseSocketModeHandler` instead.
 
-## BaseSocketModeHandler Objects
+## `BaseSocketModeHandler`
+
+### `close`
 
 ```python
-class BaseSocketModeHandler()
-```
-
-#### app: `App`
-
-#### client: `BaseSocketModeClient`
-
-#### handle
-
-```python
-def handle(client: BaseSocketModeClient, req: SocketModeRequest) -> None
-```
-
-Handles Socket Mode envelope requests through a WebSocket connection.
-
-**Arguments**:
-
-- `client` _BaseSocketModeClient_ - this Socket Mode client instance
-- `req` _SocketModeRequest_ - the request data
-
-#### connect
-
-```python
-def connect()
-```
-
-Establishes a new connection with the Socket Mode server.
-
-#### disconnect
-
-```python
-def disconnect()
-```
-
-Disconnects the current WebSocket connection with the Socket Mode server.
-
-#### close
-
-```python
-def close()
+close()
 ```
 
 Disconnects from the Socket Mode server and cleans the resources this instance holds up.
 
-#### start
+### `connect`
 
 ```python
-def start()
+connect()
+```
+
+Establishes a new connection with the Socket Mode server.
+
+### `disconnect`
+
+```python
+disconnect()
+```
+
+Disconnects the current WebSocket connection with the Socket Mode server.
+
+### `handle`
+
+```python
+handle(client, req)
+```
+
+Handles Socket Mode envelope requests through a WebSocket connection.
+
+**Parameters:**
+
+- **client** (BaseSocketModeClient) – this Socket Mode client instance
+- **req** (SocketModeRequest) – the request data
+
+### `start`
+
+```python
+start()
 ```
 
 Establishes a new connection and then blocks the current thread to prevent the termination of this process.

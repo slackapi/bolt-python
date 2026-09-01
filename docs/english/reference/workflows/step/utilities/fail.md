@@ -3,10 +3,10 @@ sidebar_label: fail
 title: slack_bolt.workflows.step.utilities.fail
 ---
 
-## Fail Objects
+## `Fail`
 
 ```python
-class Fail()
+Fail(*, client, body)
 ```
 
 `fail()` utility to tell Slack the execution failure of a step from app.
@@ -29,9 +29,3 @@ app.step(ws)
 
 This utility is a thin wrapper of workflows.stepFailed API method.
 Refer to https://api.slack.com/methods/workflows.stepFailed for details.
-
-#### \_\_init\_\_
-
-```python
-def __init__(*, client: WebClient, body: dict)
-```

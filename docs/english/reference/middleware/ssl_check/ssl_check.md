@@ -4,40 +4,28 @@ title: slack_bolt.middleware.ssl_check.ssl_check
 slug: ssl_check
 ---
 
-## SslCheck Objects
+## `SslCheck`
 
 ```python
-class SslCheck(Middleware)
+SslCheck(verification_token=None, base_logger=None)
 ```
 
-#### verification\_token: `Optional[str]`
-
-#### logger: `Logger`
-
-#### \_\_init\_\_
-
-```python
-def __init__(
-    verification_token: Optional[str] = None,
-    base_logger: Optional[Logger] = None)
-```
+Bases: Middleware
 
 Handles `ssl_check` requests.
 
 Refer to https://docs.slack.dev/interactivity/implementing-slash-commands/ for details.
 
-**Arguments**:
+**Parameters:**
 
-- `verification_token` _Optional[str]_ - The verification token to check
-  (optional as it's already deprecated - https://docs.slack.dev/authentication/verifying-requests-from-slack/#deprecation)
-- `base_logger` _Optional[Logger]_ - The base logger
+- **verification_token** (Optional[str]) – The verification token to check
+(optional as it's already deprecated - https://docs.slack.dev/authentication/verifying-requests-from-slack/#deprecation)
+- **base_logger** (Optional[Logger]) – The base logger
 
-#### process
+### `name`
 
 ```python
-def process(
-    *,
-    req: BoltRequest,
-    resp: BoltResponse,
-    next: Callable[[], BoltResponse]) -> BoltResponse
+name: str
 ```
+
+The name of this middleware.

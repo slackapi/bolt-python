@@ -8,6 +8,25 @@ A listener matcher is a simplified version of listener middleware.
 A listener matcher function returns bool value instead of `next()` method invocation inside.
 This interface enables developers to utilize simple predicate functions for additional listener conditions.
 
+## `ListenerMatcher`
+
+### `matches`
+
+```python
+matches(req, resp)
+```
+
+Matches against the request and returns True if matched.
+
+**Parameters:**
+
+- **req** (BoltRequest) – The request
+- **resp** (BoltResponse) – The response
+
+**Returns:**
+
+- bool – True if matched.
+
 ## Submodules
 
 - [slack_bolt.listener_matcher.async_builtins](/tools/bolt-python/reference/listener_matcher/async_builtins)
@@ -15,58 +34,3 @@ This interface enables developers to utilize simple predicate functions for addi
 - [slack_bolt.listener_matcher.builtins](/tools/bolt-python/reference/listener_matcher/builtins)
 - [slack_bolt.listener_matcher.custom_listener_matcher](/tools/bolt-python/reference/listener_matcher/custom_listener_matcher)
 - [slack_bolt.listener_matcher.listener_matcher](/tools/bolt-python/reference/listener_matcher/listener_matcher)
-
-## CustomListenerMatcher Objects
-
-```python
-class CustomListenerMatcher(ListenerMatcher)
-```
-
-#### app\_name: `str`
-
-#### func: `Callable[..., bool]`
-
-#### arg\_names: `MutableSequence[str]`
-
-#### logger: `Logger`
-
-#### \_\_init\_\_
-
-```python
-def __init__(
-    *,
-    app_name: str,
-    func: Callable[..., bool],
-    base_logger: Optional[Logger] = None)
-```
-
-#### matches
-
-```python
-def matches(req: BoltRequest, resp: BoltResponse) -> bool
-```
-
-## ListenerMatcher Objects
-
-```python
-class ListenerMatcher()
-```
-
-#### matches
-
-```python
-def matches(req: BoltRequest, resp: BoltResponse) -> bool
-```
-
-Matches against the request and returns True if matched.
-
-**Arguments**:
-
-- `req` _BoltRequest_ - The request
-- `resp` _BoltResponse_ - The response
-
-**Returns**:
-
-- `bool` - True if matched.
-
-#### builtin\_listener\_matcher\_classes

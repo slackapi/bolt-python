@@ -3,22 +3,14 @@ sidebar_label: async_middleware
 title: slack_bolt.middleware.async_middleware
 ---
 
-## AsyncMiddleware Objects
-
-```python
-class AsyncMiddleware()
-```
+## `AsyncMiddleware`
 
 A middleware can process request data before other middleware and listener functions.
 
-#### async\_process
+### `async_process`
 
 ```python
-async def async_process(
-    *,
-    req: AsyncBoltRequest,
-    resp: BoltResponse,
-    next: Callable[[], Awaitable[BoltResponse]]) -> Optional[BoltResponse]
+async_process(*, req, resp, next)
 ```
 
 Processes a request data before other middleware and listeners.
@@ -42,22 +34,20 @@ async def simple_middleware(req, resp, next_):
     await next_()
 ```
 
+**Parameters:**
 
-**Arguments**:
+- **req** (AsyncBoltRequest) – The incoming request
+- **resp** (BoltResponse) – The response
+- **next** (Callable[[], Awaitable[BoltResponse]]) – The function to tell the chain that it can continue
 
-- `req` _AsyncBoltRequest_ - The incoming request
-- `resp` _BoltResponse_ - The response
-- `next` _Callable[[], Awaitable[BoltResponse]]_ - The function to tell the chain that it can continue
+**Returns:**
 
-**Returns**:
+- Optional[BoltResponse] – Processed response (optional)
 
-- `Optional[BoltResponse]` - Processed response (optional)
-
-#### name
+### `name`
 
 ```python
-@property
-def name() -> str
+name: str
 ```
 
 The name of this middleware.
