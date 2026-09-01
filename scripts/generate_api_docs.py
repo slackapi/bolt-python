@@ -269,6 +269,10 @@ def _write_pages(pages):
         os.makedirs(os.path.dirname(path), exist_ok=True)
 
         frontmatter = ["---", "sidebar_label: {}".format(page["sidebar_label"]), "title: {}".format(page["title"])]
+        # Pin the top-level reference index to the top of its sidebar category;
+        # siblings have no explicit position, so any number floats it first.
+        if not rel_path:
+            frontmatter.append("sidebar_position: 1")
         # A module whose file is <folder>/<folder>.md collides with the folder's
         # index.md route; pin it with a relative slug.
         basename = os.path.basename(path)[: -len(".md")]
