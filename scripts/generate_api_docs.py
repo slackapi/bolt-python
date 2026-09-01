@@ -57,6 +57,8 @@ CONFIG.update(
     show_root_members_full_path=False,
     show_object_full_path=False,
     heading_level=2,
+    # big to keep signatures single-line, so output never depends on Black.
+    line_length=10**9,
 )
 
 
