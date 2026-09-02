@@ -76,4 +76,4 @@ tornado>=6.5.6,<7; python_version >= "3.9"
 # websocket_client
 # Note: Socket Mode 3rd party implementation
 websocket_client>=1.2.3,<1.9; python_version < "3.9"
-websocket_client>=1.9.0,<2; python_version >= "3.9"
+websocket_client>=1.9.1,<2; python_version >= "3.9"
