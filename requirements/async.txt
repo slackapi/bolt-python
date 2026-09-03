@@ -1,0 +1,2 @@
+# pip install -r requirements/async.txt
+aiohttp>=3,<4; python_version >= "3.9"
