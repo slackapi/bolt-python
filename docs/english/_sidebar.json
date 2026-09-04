@@ -5,8 +5,6 @@
 		"label": "Bolt for Python",
 		"className": "sidebar-title"
 	},
-	"tools/bolt-python/getting-started",
-	{ "type": "html", "value": "<hr>" },
 	"tools/bolt-python/creating-an-app",
 	{
 		"type": "category",
