@@ -19,7 +19,7 @@ The convention resolves this without dropping old-Python support: pin each inter
 
 ## File-layout convention
 
-Each file starts with a `# pip install -r requirements/<file>.txt` header, then lists **one dependency per section**: the name of the dependency (as a `# name` header), an optional rationale note (starting with `# Note:`, explaining why a version is pinned or split), then the requirement line(s), separated from the next section by a blank line. This makes every pin self-documenting.
+Each file starts with a `# pip install -r requirements/<file>.txt` header, then lists **one dependency per section**: the name of the dependency (as a `# name` header), an **extremely optional** rationale note (starting with `# Note:` — see below), then the requirement line(s), separated from the next section by a blank line. This makes every pin self-documenting.
 
 ```
 # pip install -r requirements/test.txt
@@ -33,6 +33,8 @@ pytest-cov>=7.1.0,<8; python_version >= "3.14"
 ```
 
 Keep this layout when adding or editing dependencies. Never leave an empty trailing `;` (a fossil of a collapsed split; delete it — the old `pytest-asyncio<2;` line was exactly this).
+
+**On the `# Note:` — omit it by default.** The requirement lines and their `python_version` markers already state *what* is pinned and *which interpreter gets which release*, and this skill already establishes that an old-side ceiling marks a floor jump. A note must never restate any of that. Write one only to record rationale the lines cannot express on their own — a non-obvious cap, or a coupling invisible from the specifier. The archetype is the `tracerite` pin (see "a coupled companion dependency" below): a companion dependency that breaks with no `requires_python` metadata, which no reader could infer from the line itself. A routine floor-jump split (like `chalice`, `fastapi`, or `starlette`) needs no note at all. Several older sections still carry notes that merely restate their lines; treat those as legacy, not a template to copy.
 
 ## Which files need Python-version markers
 
