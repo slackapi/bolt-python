@@ -8,3 +8,7 @@ griffe2md==1.5.0
 
 # griffelib -- griffe's PyPI distribution (import name `griffe`); pinned to match griffe2md's rendering
 griffelib==2.2.0
+
+# markdown-it-py -- CommonMark tokenizer used by generate_api_docs.py to locate code
+# blocks during the MDX-hazard check (also a transitive dep via griffe2md -> mdformat)
+markdown-it-py==4.2.0
