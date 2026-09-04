@@ -1,0 +1,12 @@
+# pip install -r requirements/docs.txt
+# Note: doc-gen only; runs on the latest supported Python (see scripts/generate_api_docs.sh).
+# Note: pinned so the committed reference tree under docs/english/reference stays reproducible;
+
+# griffe2md
+griffe2md==1.5.0
+
+# griffelib
+griffelib==2.2.0
+
+# markdown-it-py
+markdown-it-py==4.2.0
