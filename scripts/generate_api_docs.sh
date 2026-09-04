@@ -1,7 +1,5 @@
 #!/bin/bash
-# Generate the Markdown API reference from the latest source code.
-# The heavy lifting (griffe extraction + griffe2md rendering + MDX-safety
-# post-processing) lives in scripts/generate_api_docs.py.
+# Generate the Markdown API reference from the latest source code
 
 set -e
 script_dir=$(dirname "$0")

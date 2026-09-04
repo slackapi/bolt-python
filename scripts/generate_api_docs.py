@@ -205,48 +205,6 @@ def _write_pages(pages):
             handle.write("\n".join(frontmatter) + "\n\n" + "\n".join(body_parts).rstrip("\n") + "\n")
 
 
-# --------------------------------------------------------------------------- #
-# Safety gate
-# --------------------------------------------------------------------------- #
-
-_MDX_ESM_RE = re.compile(r"^(export|import)\s")
-
-
-def _code_line_numbers(text):
-    # Return the set of 1-indexed line numbers that fall inside code blocks.
-    covered = set()
-    for token in _MD_PARSER.parse(text):
-        if token.type in ("fence", "code_block") and token.map:
-            start, end = token.map
-            covered.update(range(start + 1, end + 1))
-    return covered
-
-
-def _check_mdx_hazards():
-    # Fail generation if any rendered Markdown has an MDX/acorn hazard.
-    hazards = []
-    for dirpath, _dirnames, filenames in os.walk(REFERENCE_DIR):
-        for filename in filenames:
-            if not filename.endswith(".md"):
-                continue
-            path = os.path.join(dirpath, filename)
-            with open(path, encoding="utf-8") as handle:
-                text = handle.read()
-            code_lines = _code_line_numbers(text)
-            for lineno, line in enumerate(text.splitlines(), 1):
-                if lineno in code_lines:
-                    continue
-                if _MDX_ESM_RE.match(line) or line.startswith("<"):
-                    rel = os.path.relpath(path, DOCS_BASE_PATH)
-                    hazards.append("{}:{}: {}".format(rel, lineno, line))
-    if hazards:
-        raise SystemExit(
-            "MDX/acorn hazards found in generated Markdown (unfenced code at column "
-            "zero). Fence the offending example in its source docstring:\n  " + "\n  ".join(hazards)
-        )
-    print("No MDX/acorn hazards in generated Markdown")
-
-
 def main():
     # Rebuild the reference tree
     shutil.rmtree(REFERENCE_DIR, ignore_errors=True)
@@ -254,7 +212,6 @@ def main():
     root = _load_package()
     pages = _build_pages(root)
     _write_pages(pages)
-    _check_mdx_hazards()
     print("Generated {} reference pages".format(len(pages)))
 
 

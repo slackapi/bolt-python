@@ -77,6 +77,29 @@ jobs:
       - name: Verify committed reference is up to date
         run: git diff --exit-code -- docs/english/reference
 
+  mdx-validate:
+    name: MDX validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: scripts/mdx-validate/package-lock.json
+      - name: Install validator dependencies
+        run: npm ci
+        working-directory: scripts/mdx-validate
+      - name: Validate generated reference Markdown as MDX
+        run: npm run validate
+        working-directory: scripts/mdx-validate
+
   unittest:
     name: Unit tests
     runs-on: ubuntu-22.04

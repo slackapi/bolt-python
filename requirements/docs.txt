@@ -1,14 +1,12 @@
 # pip install -r requirements/docs.txt
 # Note: doc-gen only; runs on the latest supported Python (see scripts/generate_api_docs.sh).
 # Note: pinned so the committed reference tree under docs/english/reference stays reproducible;
-#       an unpinned griffe/griffe2md can silently shift the generated Markdown (and fail the drift CI job).
 
-# griffe2md -- renders griffe objects to Markdown (pulls in griffelib + jinja2 + mdformat)
+# griffe2md
 griffe2md==1.5.0
 
-# griffelib -- griffe's PyPI distribution (import name `griffe`); pinned to match griffe2md's rendering
+# griffelib
 griffelib==2.2.0
 
-# markdown-it-py -- CommonMark tokenizer used by generate_api_docs.py to locate code
-# blocks during the MDX-hazard check (also a transitive dep via griffe2md -> mdformat)
+# markdown-it-py
 markdown-it-py==4.2.0
