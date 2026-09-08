@@ -100,7 +100,6 @@
 		"label": "Legacy",
 		"items": ["tools/bolt-python/legacy/steps-from-apps"]
 	},
-	{ "type": "html", "value": "<hr>" },
 	{
 		"type": "category",
 		"label": "Tutorials",
@@ -114,13 +113,11 @@
 			"tools/bolt-python/tutorial/modals/modals"
 		]
 	},
-	{ "type": "html", "value": "<hr>" },
 	{
 		"type": "link",
 		"label": "Reference",
 		"href": "https://docs.slack.dev/tools/bolt-python/reference/index.html"
 	},
-	{ "type": "html", "value": "<hr>" },
 	{
 		"type": "category",
 		"label": "日本語 (日本)",
