@@ -5,7 +5,7 @@ sidebar_label: Creating an app
 # Creating an app with Bolt for Python
 
 :::tip[More doing, less reading]
-This guide is a more thorough explanation on creating a Slack app. If you want a running app as fast as possible, follow our [Quickstart](/quickstart) that harnesses the power of the [Slack CLI](/tools/slack-cli). 
+This guide is a more thorough explanation on creating a Slack app. If you want a running app as fast as possible, follow our [Quickstart](/quickstart) that harnesses the power of Bolt and the [Slack CLI](/tools/slack-cli). 
 :::
 
 Follow along to get up and running with a Slack app using Bolt for Python. Along the way, we’ll create a new Slack app, set up your local environment, and develop an app that listens and responds to messages from a Slack workspace.
