@@ -14,7 +14,7 @@
         <img alt="Documentation" src="https://img.shields.io/badge/dev-docs-yellow"></a>
 </p>
 
-A Python framework to build Slack apps in a flash with the latest platform features. Read the [getting started guide](https://docs.slack.dev/tools/bolt-python/getting-started) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt. The Python module documents are available [here](https://docs.slack.dev/tools/bolt-python/reference/).
+A Python framework to build Slack apps in a flash with the latest platform features. Read the [Creating an app guide](https://docs.slack.dev/tools/bolt-python/creating-an-app) and look at our [code examples](https://github.com/slackapi/bolt-python/tree/main/examples) to learn how to build apps using Bolt. The Python module documents are available [here](https://docs.slack.dev/tools/bolt-python/reference/).
 
 ## Setup
 
