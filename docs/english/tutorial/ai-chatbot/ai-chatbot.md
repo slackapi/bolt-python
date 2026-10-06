@@ -241,5 +241,5 @@ You can also navigate to **Bolty** in your **Apps** list and select the **Messag
 
 Congratulations! You've successfully integrated the power of AI into your workspace. Check out these links to take the next steps in your Bolt for Python journey.
 
-- To learn more about Bolt for Python, refer to the [Getting started](/tools/bolt-python/getting-started) documentation.
+- To learn more about Bolt for Python, refer to the [Creating an app](/tools/bolt-python/creating-an-app) documentation.
 - For more details about creating workflow steps using the Bolt SDK, refer to the [workflow steps for Bolt](/workflows/workflow-steps) guide.

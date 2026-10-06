@@ -131,4 +131,4 @@ All done! 🎉 You've created your first slash command using Block Kit and modal
 
 ## Next steps {#next-steps}
 
-If you want to learn more about Bolt for Python, refer to the [Getting Started guide](https://docs.slack.dev/tools/bolt-python/getting-started).
+If you want to learn more about Bolt for Python, refer to the [Creating an app guide](https://docs.slack.dev/tools/bolt-python/creating-an-app).
