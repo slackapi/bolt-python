@@ -71,22 +71,26 @@ class SlackRequestHandler:
 
 
 def to_bolt_request(event) -> BoltRequest:
-    body = event.get("body", "")
-    if event["isBase64Encoded"]:
+    # API Gateway sends null (not a missing key) for fields that have no value,
+    # such as "headers", "multiValueHeaders" and "queryStringParameters".
+    # Every lookup below treats None the same as a missing key.
+    body = event.get("body") or ""
+    if event.get("isBase64Encoded") is True and body:
         body = base64.b64decode(body).decode("utf-8")
-    cookies: Sequence[str] = event.get("cookies", [])
-    if cookies is None or len(cookies) == 0:
+    cookies: Sequence[str] = event.get("cookies") or []
+    if len(cookies) == 0:
         # In the case of format v1
-        multiValueHeaders = event.get("multiValueHeaders", {})
-        cookies = multiValueHeaders.get("cookie", [])
+        multiValueHeaders = event.get("multiValueHeaders") or {}
+        cookies = multiValueHeaders.get("cookie") or []
         if len(cookies) == 0:
             # Try using uppercase
-            cookies = multiValueHeaders.get("Cookie", [])
-    headers = event.get("headers", {})
+            cookies = multiValueHeaders.get("Cookie") or []
+    # Copy the headers so the caller's event dict is left untouched
+    headers = dict(event.get("headers") or {})
     headers["cookie"] = cookies
     return BoltRequest(
         body=body,
-        query=event.get("queryStringParameters", {}),
+        query=event.get("queryStringParameters") or {},
         headers=headers,
     )
 
