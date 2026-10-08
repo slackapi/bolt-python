@@ -28,7 +28,7 @@ Django>=5.2.15,<6; python_version >= "3.10"
 # falcon
 # Note: falcon 4.2.0 requires Python >=3.9; 3.7/3.8 stay on the older pinned release.
 falcon>=2,<4; python_version < "3.9"
-falcon>=4.2.0,<5; python_version >= "3.9"
+falcon>=4.4.0,<5; python_version >= "3.9"
 
 # fastapi
 fastapi>=0.70.0,<1; python_version < "3.9"
@@ -66,7 +66,7 @@ sanic>=25.12.1,<26; python_version >= "3.10"
 # starlette
 starlette>=0.19.1,<0.45; python_version < "3.9"
 starlette>=0.49.3,<0.50; python_version >= "3.9" and python_version < "3.10"
-starlette>=1.6.0,<2; python_version >= "3.10"
+starlette>=1.7.0,<2; python_version >= "3.10"
 
 # tornado
 # Note: tornado 6.5.6 requires Python >=3.9; 3.7/3.8 stay on the older pinned release.
@@ -77,4 +77,4 @@ tornado>=6.5.8,<7; python_version >= "3.9"
 # Note: Socket Mode 3rd party implementation
 websocket_client>=1.2.3,<1.9; python_version < "3.9"
 websocket_client>=1.9.0,<1.9.1; python_version >= "3.9" and python_version < "3.10"
-websocket_client>=1.9.1,<2; python_version >= "3.10"
+websocket_client>=1.9.2,<2; python_version >= "3.10"
