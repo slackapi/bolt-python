@@ -8,7 +8,7 @@
 
 **`views_push`**
 
-既存のモーダルの上に新しいモーダルをスタックのように追加する場合は、組み込みのクライアントで `views_push` API を呼び出します。この API 呼び出しでは、有効な `trigger_id` と新しい[ビューのペイロード](/reference/interaction-payloads/view-interactions-payload/#view_submission)を指定します。`views_push` の引数は [モーダルの開始](#creating-modals) と同じです。モーダルを開いた後、このモーダルのスタックに追加できるモーダルビューは 2 つまでです。
+既存のモーダルの上に新しいモーダルをスタックのように追加する場合は、組み込みのクライアントで `views_push` API を呼び出します。この API 呼び出しでは、有効な `trigger_id` と新しい[ビューのペイロード](/reference/interaction-payloads/view-interactions-payload/#view_submission)を指定します。`views_push` の引数は [モーダルの開始](/tools/bolt-python/ja-jp/concepts/opening-modals) と同じです。モーダルを開いた後、このモーダルのスタックに追加できるモーダルビューは 2 つまでです。
 
 モーダルの更新と多重表示に関する詳細は、[API ドキュメント](/surfaces/modals)を参照してください。
 
