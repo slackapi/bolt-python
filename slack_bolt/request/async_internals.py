@@ -62,7 +62,7 @@ def build_async_context(
     elif "response_urls" in body:
         # In the case where response_url_enabled: true in a modal exists
         response_urls = body["response_urls"]
-        if len(response_urls) >= 1:
+        if isinstance(response_urls, list) and len(response_urls) >= 1 and isinstance(response_urls[0], dict):
             if len(response_urls) > 1:
                 context.logger.debug(debug_multiple_response_urls_detected())
             response_url = response_urls[0].get("response_url")

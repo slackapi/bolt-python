@@ -14,7 +14,10 @@ from slack_bolt.request.internals import (
     extract_actor_user_id,
     extract_function_execution_id,
     extract_thread_ts,
+    build_context,
+    parse_body,
 )
+from slack_bolt.context import BoltContext
 
 
 class TestRequestInternals:
@@ -1275,3 +1278,61 @@ class TestRequestInternals:
             extract_function_execution_id(payload)
             extract_function_bot_access_token(payload)
             extract_function_inputs(payload)
+
+    def test_extraction_functions_wrong_value_types(self):
+        # Bodies sent by non-Slack clients (scanners, bots) can put any JSON value under
+        # a key where Slack normally sends a dict or list. None of these should raise.
+        payloads = [
+            {"authorizations": "x"},
+            {"authorizations": [None]},
+            {"authorizations": ["str"]},
+            {"authorizations": [123]},
+            {"authorizations": {}},
+            {"enterprise": 123},
+            {"enterprise": ["a"]},
+            {"team": 123},
+            {"team": ["a"]},
+            {"user": 5},
+            {"user": ["a"]},
+            {"channel": 7},
+            {"channel": ["a"]},
+            {"event": None},
+            {"is_ext_shared_channel": True, "type": "event_callback", "event": "s"},
+            {"is_ext_shared_channel": True, "type": "event_callback", "event": None},
+            {"is_ext_shared_channel": True, "type": "event_callback", "event": 1},
+            {"is_ext_shared_channel": True, "type": "event_callback", "event": {"type": "app_mention"}},
+            {"response_urls": "abc"},
+            {"response_urls": [None]},
+            {"response_urls": ["x"]},
+            {"response_urls": []},
+            {"view": {"app_installed_team_id": None}, "team": None},
+        ]
+        for payload in payloads:
+            assert extract_is_enterprise_install(payload) in (True, False)
+            extract_enterprise_id(payload)
+            extract_team_id(payload)
+            extract_user_id(payload)
+            extract_actor_enterprise_id(payload)
+            extract_actor_team_id(payload)
+            extract_actor_user_id(payload)
+            extract_channel_id(payload)
+            extract_thread_ts(payload)
+            extract_function_execution_id(payload)
+            extract_function_bot_access_token(payload)
+            extract_function_inputs(payload)
+            build_context(BoltContext(), payload)
+
+    def test_parse_body_non_object_json(self):
+        # A JSON array or scalar is never a valid Slack payload, so it is treated as an empty body
+        assert parse_body("[1, 2]", "application/json") == {}
+        assert parse_body('"text"', "application/json") == {}
+        assert parse_body("123", "application/json") == {}
+        assert parse_body("null", "application/json") == {}
+        assert parse_body("payload=%5B1%5D", "application/x-www-form-urlencoded") == {}
+
+    def test_parse_body_invalid_json(self):
+        # Broken JSON is also treated as an empty body so the request can still be rejected
+        # by the signature check instead of failing while being parsed
+        assert parse_body("{not json", "application/json") == {}
+        assert parse_body("{", None) == {}
+        assert parse_body("payload=%7Bnot", "application/x-www-form-urlencoded") == {}

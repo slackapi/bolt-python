@@ -24,28 +24,54 @@ def parse_query(query: Optional[Union[str, Dict[str, str], Dict[str, Sequence[st
         raise ValueError(f"Unsupported type of query detected ({type(query)})")
 
 
+def _parse_json_object(text: str) -> Dict[str, Any]:
+    # Slack always sends a JSON object. Anything else (broken JSON, an array, a number, ...)
+    # cannot come from Slack, so it is treated as an empty body. This lets the request reach
+    # the signature check, which then rejects it, instead of failing while being parsed.
+    try:
+        parsed = json.loads(text)
+    except ValueError:
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
+
+
 def parse_body(body: str, content_type: Optional[str]) -> Dict[str, Any]:
     if not body:
         return {}
     if (content_type is not None and content_type == "application/json") or body.startswith("{"):
-        return json.loads(body)
+        return _parse_json_object(body)
     else:
         if "payload" in body:  # This is not JSON format yet
             params = dict(parse_qsl(body, keep_blank_values=True))
             payload = params.get("payload")
             if payload is not None:
-                return json.loads(payload)
+                return _parse_json_object(payload)
             else:
                 return {}
         else:
             return dict(parse_qsl(body, keep_blank_values=True))
 
 
+def _first_authorization(payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    # Returns payload["authorizations"][0] only when it really is a dict
+    authorizations = payload.get("authorizations")
+    if isinstance(authorizations, list) and len(authorizations) > 0 and isinstance(authorizations[0], dict):
+        return authorizations[0]
+    return None
+
+
+def _event(payload: Dict[str, Any]) -> Dict[str, Any]:
+    # Returns payload["event"] when it is a dict, otherwise an empty dict
+    event = payload.get("event")
+    return event if isinstance(event, dict) else {}
+
+
 def extract_is_enterprise_install(payload: Dict[str, Any]) -> Optional[bool]:
-    if payload.get("authorizations") is not None and len(payload["authorizations"]) > 0:
+    authorization = _first_authorization(payload)
+    if authorization is not None:
         # To make Events API handling functioning also for shared channels,
         # we should use .authorizations[0].is_enterprise_install over .is_enterprise_install
-        return extract_is_enterprise_install(payload["authorizations"][0])
+        return extract_is_enterprise_install(authorization)
     if "is_enterprise_install" in payload:
         is_enterprise_install = payload.get("is_enterprise_install")
         return is_enterprise_install is not None and (is_enterprise_install is True or is_enterprise_install == "true")
@@ -57,12 +83,13 @@ def extract_enterprise_id(payload: Dict[str, Any]) -> Optional[str]:
     if org is not None:
         if isinstance(org, str):
             return org
-        elif "id" in org:
+        elif isinstance(org, dict) and "id" in org:
             return org.get("id")
-    if payload.get("authorizations") is not None and len(payload["authorizations"]) > 0:
+    authorization = _first_authorization(payload)
+    if authorization is not None:
         # To make Events API handling functioning also for shared channels,
         # we should use .authorizations[0].enterprise_id over .enterprise_id
-        return extract_enterprise_id(payload["authorizations"][0])
+        return extract_enterprise_id(authorization)
     if "enterprise_id" in payload:
         return payload.get("enterprise_id")
     if isinstance(payload.get("team"), dict) and "enterprise_id" in payload["team"]:
@@ -78,7 +105,7 @@ def extract_actor_enterprise_id(payload: Dict[str, Any]) -> Optional[str]:
         if payload.get("type") == "event_callback":
             # For safety, we don't set actor IDs for the events like "file_shared",
             # which do not provide any team ID in $.event data. In the case, the IDs cannot be correct.
-            event_team_id = payload.get("event", {}).get("user_team") or payload.get("event", {}).get("team")
+            event_team_id = _event(payload).get("user_team") or _event(payload).get("team")
             if event_team_id is not None and str(event_team_id).startswith("E"):
                 return event_team_id
             if event_team_id == payload.get("team_id"):
@@ -101,12 +128,13 @@ def extract_team_id(payload: Dict[str, Any]) -> Optional[str]:
         team = payload.get("team")
         if isinstance(team, str):
             return team
-        elif team and "id" in team:
+        elif isinstance(team, dict) and "id" in team:
             return team.get("id")
-    if payload.get("authorizations") is not None and len(payload["authorizations"]) > 0:
+    authorization = _first_authorization(payload)
+    if authorization is not None:
         # To make Events API handling functioning also for shared channels,
         # we should use .authorizations[0].team_id over .team_id
-        return extract_team_id(payload["authorizations"][0])
+        return extract_team_id(authorization)
     if "team_id" in payload:
         return payload.get("team_id")
     if isinstance(payload.get("event"), dict):
@@ -121,14 +149,15 @@ def extract_team_id(payload: Dict[str, Any]) -> Optional[str]:
 def extract_actor_team_id(payload: Dict[str, Any]) -> Optional[str]:
     if payload.get("is_ext_shared_channel") is True:
         if payload.get("type") == "event_callback":
-            event_type = payload.get("event", {}).get("type")
+            event = _event(payload)
+            event_type = event.get("type")
             if event_type == "app_mention":
                 # The $.event.user_team can be an enterprise_id in app_mention events.
                 # In the scenario, there is no way to retrieve actor_team_id as of March 2023
-                user_team = payload.get("event", {}).get("user_team")
+                user_team = event.get("user_team")
                 if user_team is None:
                     # working with an app installed in this user's org/workspace side
-                    return payload.get("event", {}).get("team")
+                    return event.get("team")
                 if str(user_team).startswith("T"):
                     # interacting from a connected non-grid workspace
                     return user_team
@@ -136,7 +165,7 @@ def extract_actor_team_id(payload: Dict[str, Any]) -> Optional[str]:
                 return None
             # For safety, we don't set actor IDs for the events like "file_shared",
             # which do not provide any team ID in $.event data. In the case, the IDs cannot be correct.
-            event_user_team = payload.get("event", {}).get("user_team")
+            event_user_team = event.get("user_team")
             if event_user_team is not None:
                 if str(event_user_team).startswith("T"):
                     return event_user_team
@@ -146,7 +175,7 @@ def extract_actor_team_id(payload: Dict[str, Any]) -> Optional[str]:
                     elif event_user_team == payload.get("context_enterprise_id"):
                         return payload.get("context_team_id")
 
-            event_team = payload.get("event", {}).get("team")
+            event_team = event.get("team")
             if event_team is not None:
                 if str(event_team).startswith("T"):
                     return event_team
@@ -165,7 +194,7 @@ def extract_user_id(payload: Dict[str, Any]) -> Optional[str]:
     if user is not None:
         if isinstance(user, str):
             return user
-        elif "id" in user:
+        elif isinstance(user, dict) and "id" in user:
             return user.get("id")
     if "user_id" in payload:
         return payload.get("user_id")
@@ -184,7 +213,7 @@ def extract_actor_user_id(payload: Dict[str, Any]) -> Optional[str]:
     if payload.get("is_ext_shared_channel") is True:
         if payload.get("type") == "event_callback":
             event = payload.get("event")
-            if event is None:
+            if not isinstance(event, dict):
                 return None
             if extract_actor_enterprise_id(payload) is None and extract_actor_team_id(payload) is None:
                 # When both enterprise_id and team_id are not identified, we skip returning user_id too for safety
@@ -198,7 +227,7 @@ def extract_channel_id(payload: Dict[str, Any]) -> Optional[str]:
     if channel is not None:
         if isinstance(channel, str):
             return channel
-        elif "id" in channel:
+        elif isinstance(channel, dict) and "id" in channel:
             return channel.get("id")
     if "channel_id" in payload:
         return payload.get("channel_id")
@@ -295,7 +324,7 @@ def build_context(context: BoltContext, body: Dict[str, Any]) -> BoltContext:
     elif "response_urls" in body:
         # In the case where response_url_enabled: true in a modal exists
         response_urls = body["response_urls"]
-        if len(response_urls) >= 1:
+        if isinstance(response_urls, list) and len(response_urls) >= 1 and isinstance(response_urls[0], dict):
             if len(response_urls) > 1:
                 context.logger.debug(debug_multiple_response_urls_detected())
             response_url = response_urls[0].get("response_url")

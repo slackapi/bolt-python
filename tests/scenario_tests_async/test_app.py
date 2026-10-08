@@ -46,6 +46,28 @@ class TestAsyncApp:
     def non_coro_func(self, ack):
         ack()
 
+    @pytest.mark.asyncio
+    async def test_malformed_unsigned_request_is_rejected_not_crashed(self):
+        # A non-Slack client can send any JSON shape. The request must still reach the
+        # signature check and get a 401, instead of failing while the context is built.
+        app = AsyncApp(
+            client=AsyncWebClient(token=self.valid_token, base_url=self.mock_api_server_base_url),
+            signing_secret=self.signing_secret,
+        )
+        bodies = [
+            '{"type":"event_callback","event":{"type":"member_joined_channel","user":"U1","channel":"C1"}}',
+            '{"authorizations":"x","team":1,"user":2,"channel":3,"enterprise":4}',
+            '{"is_ext_shared_channel":true,"type":"event_callback","event":"s"}',
+            '{"response_urls":["x"]}',
+            "[1, 2, 3]",
+            "{not json",
+            "payload=%5B1%5D",
+        ]
+        for body in bodies:
+            req = AsyncBoltRequest(body=body, headers={"content-type": ["application/json"]})
+            resp = await app.async_dispatch(req)
+            assert resp.status == 401, body
+
     def test_non_coroutine_func_listener(self):
         app = AsyncApp(signing_secret="valid", token="xoxb-xxx")
         with pytest.raises(BoltError):
