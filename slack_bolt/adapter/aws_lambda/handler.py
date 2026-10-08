@@ -71,9 +71,6 @@ class SlackRequestHandler:
 
 
 def to_bolt_request(event) -> BoltRequest:
-    # API Gateway sends null (not a missing key) for fields that have no value,
-    # such as "headers", "multiValueHeaders" and "queryStringParameters".
-    # Every lookup below treats None the same as a missing key.
     body = event.get("body") or ""
     if event.get("isBase64Encoded") is True and body:
         body = base64.b64decode(body).decode("utf-8")
@@ -85,7 +82,6 @@ def to_bolt_request(event) -> BoltRequest:
         if len(cookies) == 0:
             # Try using uppercase
             cookies = multiValueHeaders.get("Cookie") or []
-    # Copy the headers so the caller's event dict is left untouched
     headers = dict(event.get("headers") or {})
     headers["cookie"] = cookies
     return BoltRequest(
