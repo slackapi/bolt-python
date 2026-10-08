@@ -16,6 +16,8 @@ from slack_bolt.response import BoltResponse
 from slack_bolt.error import BoltError
 from slack_bolt.listener.async_listener import AsyncListener, AsyncCustomListener
 from slack_bolt.middleware.async_middleware import AsyncMiddleware
+from slack_bolt.middleware.async_custom_middleware import AsyncCustomMiddleware
+from slack_bolt.logger.messages import error_unexpected_listener_middleware
 from slack_bolt.listener_matcher.async_listener_matcher import AsyncListenerMatcher
 from slack_bolt.request.payload_utils import (
     is_assistant_thread_started_event,
@@ -293,7 +295,7 @@ class AsyncAssistant(AsyncMiddleware):
         self,
         listener_or_functions: Union[AsyncListener, Callable, List[Callable]],
         matchers: Optional[List[Union[AsyncListenerMatcher, Callable[..., Awaitable[bool]]]]] = None,
-        middleware: Optional[List[AsyncMiddleware]] = None,
+        middleware: Optional[List[Union[Callable, AsyncMiddleware]]] = None,
         base_logger: Optional[Logger] = None,
     ) -> AsyncListener:
         if isinstance(listener_or_functions, Callable):  # type: ignore[arg-type]
@@ -302,8 +304,18 @@ class AsyncAssistant(AsyncMiddleware):
         if isinstance(listener_or_functions, AsyncListener):
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
-            middleware = middleware if middleware else []
-            middleware.insert(0, AsyncAttachingConversationKwargs(self.thread_context_store))
+            # Build a new list so the caller's list is left untouched,
+            # and wrap plain functions the same way AsyncApp does
+            listener_middleware: List[AsyncMiddleware] = [AsyncAttachingConversationKwargs(self.thread_context_store)]
+            for m in middleware or []:
+                if isinstance(m, AsyncMiddleware):
+                    listener_middleware.append(m)
+                elif isinstance(m, Callable):  # type: ignore[arg-type]
+                    listener_middleware.append(
+                        AsyncCustomMiddleware(app_name=self.app_name, func=m, base_logger=base_logger or self.base_logger)
+                    )
+                else:
+                    raise BoltError(error_unexpected_listener_middleware(type(m)))
             functions = listener_or_functions
             ack_function = functions.pop(0)
 
@@ -323,7 +335,7 @@ class AsyncAssistant(AsyncMiddleware):
             return AsyncCustomListener(
                 app_name=self.app_name,
                 matchers=listener_matchers,
-                middleware=middleware,
+                middleware=listener_middleware,
                 ack_function=ack_function,
                 lazy_functions=functions,
                 auto_acknowledgement=True,
