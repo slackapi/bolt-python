@@ -7,6 +7,7 @@ from slack_sdk.signature import SignatureVerifier
 from slack_sdk.web.async_client import AsyncWebClient
 
 from slack_bolt import BoltResponse
+from slack_bolt.kwargs_injection.async_args import AsyncArgs
 from slack_bolt.async_app import AsyncApp
 from slack_bolt.error import BoltUnhandledRequestError
 from slack_bolt.request.async_request import AsyncBoltRequest
@@ -162,6 +163,27 @@ class TestAsyncErrorHandler:
         response = await app.async_dispatch(request)
         assert response.status == 500
         assert response.headers["x-test-result"] == ["1"]
+
+    @pytest.mark.asyncio
+    async def test_custom_with_args(self):
+        called = []
+
+        async def error_handler(args: AsyncArgs):
+            assert isinstance(args.error, Exception)
+            args.response.headers["x-test-result"] = ["1"]
+            called.append(True)
+
+        async def failing_listener():
+            raise Exception("Something wrong!")
+
+        app = AsyncApp(client=self.web_client, signing_secret=self.signing_secret)
+        app.error(error_handler)
+        app.action("a")(failing_listener)
+
+        response = await app.async_dispatch(self.build_valid_request())
+        assert response.status == 500
+        assert response.headers["x-test-result"] == ["1"]
+        assert called == [True]
 
     @pytest.mark.asyncio
     async def test_unhandled_errors(self):
