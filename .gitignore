@@ -46,3 +46,6 @@ logs/
 *.db
 
 .pytype/
+
+# Node deps for the CI-only MDX validator (scripts/mdx-validate)
+scripts/mdx-validate/node_modules/
