@@ -1,3 +1,4 @@
+import base64
 import json
 from time import time
 from urllib.parse import quote
@@ -69,6 +70,55 @@ class TestAWSLambda:
     def test_not_found(self):
         response = not_found()
         assert response["statusCode"] == 404
+
+    def test_null_fields_in_api_gateway_event(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        event = {
+            "httpMethod": "POST",
+            "requestContext": {"httpMethod": "POST"},
+            "headers": None,
+            "multiValueHeaders": None,
+            "queryStringParameters": None,
+            "body": "{}",
+            "isBase64Encoded": False,
+        }
+        response = SlackRequestHandler(app).handle(event, self.context)
+        assert response["statusCode"] == 401
+        assert event["headers"] is None
+
+    def test_missing_is_base64_encoded_and_null_body(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        event = {"requestContext": {"http": {"method": "POST"}}, "headers": {}, "body": "{}"}
+        assert SlackRequestHandler(app).handle(event, self.context)["statusCode"] == 401
+        event = {"requestContext": {"http": {"method": "POST"}}, "headers": {}, "body": None, "isBase64Encoded": True}
+        assert SlackRequestHandler(app).handle(event, self.context)["statusCode"] == 401
+
+    def test_base64_encoded_body(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+
+        def event_handler():
+            pass
+
+        app.event("app_mention")(event_handler)
+        input = {
+            "token": "verification_token",
+            "team_id": "T111",
+            "api_app_id": "A111",
+            "event": {"type": "app_mention", "text": "<@W111> Hi", "user": "W222", "team": "T111", "channel": "C111"},
+            "type": "event_callback",
+            "event_id": "Ev111",
+            "event_time": 1595926230,
+        }
+        timestamp, body = str(int(time())), json.dumps(input)
+        event = {
+            "body": base64.b64encode(body.encode("utf-8")).decode("ascii"),
+            "queryStringParameters": None,
+            "headers": self.build_headers(timestamp, body),
+            "requestContext": {"http": {"method": "POST"}},
+            "isBase64Encoded": True,
+        }
+        response = SlackRequestHandler(app).handle(event, self.context)
+        assert response["statusCode"] == 200
 
     def test_first_value(self):
         assert _first_value({"foo": [1, 2, 3]}, "foo") == 1
