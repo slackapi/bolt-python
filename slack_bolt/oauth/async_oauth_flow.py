@@ -331,8 +331,8 @@ class AsyncOAuthFlow:
             if bot_token is not None:
                 auth_test = await self.client.auth_test(token=bot_token)
                 bot_id = auth_test["bot_id"]
-            if is_enterprise_install is True:
-                enterprise_url = auth_test.get("url")
+                if is_enterprise_install is True:
+                    enterprise_url = auth_test.get("url")
 
             return Installation(
                 app_id=oauth_response.get("app_id"),
