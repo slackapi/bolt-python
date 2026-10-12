@@ -1,19 +1,18 @@
 #!/bin/bash
-# Generate API documents from the latest source code
+# Generate the Markdown API reference from the latest source code
 
 set -e
 script_dir=$(dirname "$0")
 cd "${script_dir}/.."
 
-pip install -U pip
-pip install -U -r requirements/adapter_dev.txt
-pip install -U -r requirements/async_dev.txt
-pip install -U pdoc3
-pip install .
-rm -rf docs/reference
+if [[ "$1" != "--no-install" ]]; then
+    pip install -U pip
+    pip install -U -r requirements/adapter_dev.txt
+    pip install -U -r requirements/async_dev.txt
+    pip install -U -r requirements/docs.txt
+    pip install .
+fi
 
-pdoc slack_bolt --html -o docs/reference
-cp -R docs/reference/slack_bolt/* docs/reference/
-rm -rf docs/reference/slack_bolt
+rm -rf docs/english/reference
 
-open docs/reference/index.html
+python scripts/generate_api_docs.py
