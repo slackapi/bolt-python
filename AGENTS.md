@@ -214,7 +214,7 @@ The core package has a **single required runtime dependency**: `slack_sdk` (defi
 
 When adding a new dependency: add it to the appropriate `requirements/*.txt` file with version constraints, never to `pyproject.toml` `dependencies` (unless it's a core runtime dep, which is very rare).
 
-Before adding, bumping, pinning, or reviewing any dependency in `requirements/*.txt` -- whether a Dependabot PR or a manual edit -- follow the `managing-dependencies` skill in `.claude/skills/`. It defines the layout and `python_version` marker conventions that keep one set of pins working across the full CPython 3.7--3.14 matrix.
+Before adding, bumping, pinning, or reviewing any dependency in `requirements/*.txt` -- whether a Dependabot PR or a manual edit -- follow the `managing-dependencies` skill in `.claude/skills/`. It defines the layout and `python_version` marker conventions that keep one set of pins working across the full CPython 3.7--3.15 matrix.
 
 ## Test Organization and CI
 
@@ -236,7 +236,7 @@ GitHub Actions (`.github/workflows/ci-build.yml`) runs on every push to `main` a
 
 - **Lint** -- `./scripts/lint.sh` on latest Python
 - **Typecheck** -- `./scripts/run_mypy.sh` on latest Python
-- **Unit tests** -- full test suite across Python 3.7--3.14 matrix
+- **Unit tests** -- full test suite across Python 3.7--3.15 matrix
 - **Code coverage** -- uploaded to Codecov
 
 ## PR and Commit Guidelines
