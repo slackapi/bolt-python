@@ -9,7 +9,7 @@ cd ${script_dir}/..
 test_target="${1:-tests/}"
 
 # keep in sync with LATEST_SUPPORTED_PY in .github/workflows/ci-build.yml
-LATEST_SUPPORTED_PY="3.14"
+LATEST_SUPPORTED_PY="3.15"
 current_py=$(python --version | sed -E 's/Python ([0-9]+\.[0-9]+).*/\1/')
 
 ./scripts/install.sh
