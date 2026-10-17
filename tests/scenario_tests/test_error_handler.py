@@ -5,7 +5,7 @@ from urllib.parse import quote
 from slack_sdk import WebClient
 from slack_sdk.signature import SignatureVerifier
 
-from slack_bolt import BoltRequest, BoltResponse
+from slack_bolt import Args, BoltRequest, BoltResponse
 from slack_bolt.app import App
 from slack_bolt.error import BoltUnhandledRequestError
 from tests.mock_web_api_server import (
@@ -152,6 +152,26 @@ class TestErrorHandler:
         response = app.dispatch(request)
         assert response.status == 500
         assert response.headers["x-test-result"] == ["1"]
+
+    def test_custom_with_args(self):
+        called = []
+
+        def error_handler(args: Args):
+            assert isinstance(args.error, Exception)
+            args.response.headers["x-test-result"] = ["1"]
+            called.append(True)
+
+        def failing_listener():
+            raise Exception("Something wrong!")
+
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        app.error(error_handler)
+        app.action("a")(failing_listener)
+
+        response = app.dispatch(self.build_valid_request())
+        assert response.status == 500
+        assert response.headers["x-test-result"] == ["1"]
+        assert called == [True]
 
     def test_unhandled_errors(self):
         app = App(
