@@ -1,7 +1,7 @@
 #
 # docker build . -t your-repo/hello-bolt
 #
-FROM python:3.13-slim-trixie
+FROM tiangolo/uvicorn-gunicorn:python3.8-slim
 # eMudhra 53119: refresh the OS trust store and fail the build unless the
 # ca-certificates package carries the distrust fix for this Debian suite.
 ARG CA_CERTIFICATES_REFRESH=2026-10-21
@@ -25,10 +25,6 @@ WORKDIR /app/
 COPY *.py /app/
 COPY requirements.txt /app/
 RUN pip install -U pip && pip install -r requirements.txt
-# Previously provided by tiangolo/uvicorn-gunicorn (Python 3.8, EOL):
-# gunicorn with uvicorn workers serving $MODULE_NAME:$VARIABLE_NAME on port 80.
-ENV MODULE_NAME=main VARIABLE_NAME=app PORT=80
-CMD exec gunicorn --worker-class uvicorn_worker.UvicornWorker --bind "0.0.0.0:$PORT" "$MODULE_NAME:$VARIABLE_NAME"
 
 #
 # docker run -e SLACK_SIGNING_SECRET=$SLACK_SIGNING_SECRET -e SLACK_BOT_TOKEN=$SLACK_BOT_TOKEN -e VARIABLE_NAME="api" -p 80:80 -it your-repo/hello-bolt

@@ -1,12 +1,12 @@
 #
 # docker build . -t your-repo/hello-bolt
 #
-FROM python:3.13-slim-trixie AS builder
+FROM python:3.8-slim-bookworm as builder
 COPY requirements.txt /build/
 WORKDIR /build/
 RUN pip install -U pip && pip install -r requirements.txt
 
-FROM python:3.13-slim-trixie AS app
+FROM python:3.8-slim-bookworm as app
 # eMudhra 53119: refresh the OS trust store and fail the build unless the
 # ca-certificates package carries the distrust fix for this Debian suite.
 ARG CA_CERTIFICATES_REFRESH=2026-10-21

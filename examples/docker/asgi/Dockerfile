@@ -1,12 +1,12 @@
 #
 # docker build . -t your-repo/hello-bolt
 #
-FROM python:3.13-alpine3.24 AS builder
+FROM python:3.11-alpine3.20 as builder
 COPY requirements.txt /build/
 WORKDIR /build/
 RUN pip install -U pip && pip install -r requirements.txt
 
-FROM python:3.13-alpine3.24 AS app
+FROM python:3.11-alpine3.20 as app
 # eMudhra 53119: refresh the OS trust store and fail the build unless
 # ca-certificates carries the distrust fix (>= 20261020-r0).
 ARG CA_CERTIFICATES_REFRESH=2026-10-21
