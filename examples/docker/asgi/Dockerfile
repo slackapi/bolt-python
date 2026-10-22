@@ -14,10 +14,10 @@ RUN set -eu; \
     apk add --no-cache --upgrade ca-certificates ca-certificates-bundle; \
     for p in ca-certificates ca-certificates-bundle; do \
       v="$(apk info -e -v "$p" | sed "s/^$p-//")"; \
-      if [ "$(apk version -t "$v" 20261020-r0)" = "<" ]; then \
-        echo "ca-certificates gate FAILED: $p $v < 20261020-r0" >&2; exit 1; \
-      fi; \
-      echo "ca-certificates gate OK: $p $v >= 20261020-r0"; \
+      case "$(apk version -t "${v:-0}" 20261020-r0)" in \
+        "="|">") echo "ca-certificates gate OK: $p $v >= 20261020-r0" ;; \
+        *) echo "ca-certificates gate FAILED: $p ${v:-missing} < 20261020-r0" >&2; exit 1 ;; \
+      esac; \
     done
 WORKDIR /app/
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
