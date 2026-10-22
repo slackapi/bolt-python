@@ -1,3 +1,3 @@
 slack_bolt
 aiohttp>=3,<4
-sanic>=20,<21
+sanic>=25.12.1,<26
