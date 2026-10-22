@@ -1,4 +1,4 @@
-runtime: python38
+runtime: python313
 
 inbound_services:
   - warmup
