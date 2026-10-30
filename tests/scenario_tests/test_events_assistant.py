@@ -226,6 +226,45 @@ class TestEventsAssistant:
         assert listener_called.wait(timeout=0.1) is True
         assert middleware_called.wait(timeout=0.1) is True
 
+    def test_assistant_with_function_listener_middleware(self):
+        app = App(client=self.web_client)
+        assistant = Assistant()
+        listener_called = Event()
+        middleware_called = Event()
+
+        def function_middleware(next):
+            middleware_called.set()
+            next()
+
+        user_middleware = [function_middleware]
+
+        @assistant.thread_started(middleware=user_middleware)
+        def start_thread():
+            listener_called.set()
+
+        @assistant.user_message(middleware=user_middleware)
+        def handle_user_message():
+            listener_called.set()
+
+        app.assistant(assistant)
+        # the caller's list must not be modified
+        assert user_middleware == [function_middleware]
+
+        request = BoltRequest(body=thread_started_event_body, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert listener_called.wait(timeout=0.1) is True
+        assert middleware_called.wait(timeout=0.1) is True
+
+        listener_called.clear()
+        middleware_called.clear()
+
+        request = BoltRequest(body=user_message_event_body, mode="socket_mode")
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert listener_called.wait(timeout=0.1) is True
+        assert middleware_called.wait(timeout=0.1) is True
+
     def test_assistant_custom_middleware_can_short_circuit(self):
         app = App(client=self.web_client)
         assistant = Assistant()
