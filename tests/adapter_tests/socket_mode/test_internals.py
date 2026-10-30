@@ -18,3 +18,26 @@ class TestSocketModeInternals:
         )
         headers = build_headers(req)
         assert headers == {"x-slack-retry-num": "2", "x-slack-retry-reason": "http_timeout"}
+
+    def test_send_response_text_starting_with_brace(self):
+        # A text ack that happens to start with "{" is not JSON and must be sent as text
+        from slack_bolt.adapter.socket_mode.internals import send_response
+        from slack_bolt.response import BoltResponse
+        import logging
+
+        sent = []
+
+        class FakeClient:
+            logger = logging.getLogger("test")
+
+            def send_socket_mode_response(self, response):
+                sent.append(response)
+
+        req = SocketModeRequest(type="slash_commands", envelope_id="e1", payload={"command": "/echo"})
+        send_response(FakeClient(), req, BoltResponse(status=200, body="{foo"), 0.0)
+        assert len(sent) == 1
+        assert sent[0].payload == {"text": "{foo"}
+
+        sent.clear()
+        send_response(FakeClient(), req, BoltResponse(status=200, body='{"text": "hi"}'), 0.0)
+        assert sent[0].payload == {"text": "hi"}
