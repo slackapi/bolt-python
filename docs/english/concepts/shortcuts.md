@@ -40,7 +40,7 @@ def open_modal(ack, shortcut, client):
                     "elements": [
                         {
                             "type": "mrkdwn",
-                            "text": "Psssst this modal was designed using <https://api.slack.com/tools/block-kit-builder|*Block Kit Builder*>"
+                            "text": "Psssst this modal was designed using <https://app.slack.com/block-kit-builder|*Block Kit Builder*>"
                         }
                     ]
                 }
@@ -79,7 +79,7 @@ def open_modal(ack, shortcut, client):
                     "elements": [
                         {
                             "type": "mrkdwn",
-                            "text": "Psssst this modal was designed using <https://api.slack.com/tools/block-kit-builder|*Block Kit Builder*>"
+                            "text": "Psssst this modal was designed using <https://app.slack.com/block-kit-builder|*Block Kit Builder*>"
                         }
                     ]
                 }
