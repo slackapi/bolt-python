@@ -287,3 +287,36 @@ class TestOAuthFlow:
         resp = oauth_flow.handle_callback(req)
         assert resp.status == 502
         assert resp.body == "customized"
+
+    def test_run_installation_org_wide_install_without_bot_token(self):
+        # An org-wide install of an app that only asks for user scopes
+        # returns no access_token, so auth.test must not be called
+        oauth_flow = OAuthFlow(
+            client=WebClient(base_url=self.mock_api_server_base_url),
+            settings=OAuthSettings(
+                client_id="111.222",
+                client_secret="xxx",
+                scopes=["chat:write", "commands"],
+                installation_store=FileInstallationStore(),
+                state_store=FileOAuthStateStore(expiration_seconds=120),
+            ),
+        )
+
+        def oauth_v2_access(**kwargs):
+            return {
+                "ok": True,
+                "app_id": "A111",
+                "is_enterprise_install": True,
+                "enterprise": {"id": "E111", "name": "Org"},
+                "team": None,
+                "authed_user": {"id": "U111", "scope": "search:read", "access_token": "xoxp-1234", "token_type": "user"},
+            }
+
+        oauth_flow.client.oauth_v2_access = oauth_v2_access
+
+        installation = oauth_flow.run_installation("code")
+        assert installation is not None
+        assert installation.is_enterprise_install is True
+        assert installation.enterprise_id == "E111"
+        assert installation.bot_token is None
+        assert installation.user_token == "xoxp-1234"
