@@ -1,9 +1,13 @@
 # pip install -r requirements/async_dev.txt
 
 # aiohttp
-# Note: aiohttp 3.13.5 requires Python >=3.9; 3.7/3.8 stay on the older pinned release.
+# Newer aiohttp releases drop older Python versions, so each one gets its own floor:
+# - Python 3.7 and 3.8: any aiohttp 3.x
+# - Python 3.9: aiohttp 3.13.5 or later
+# - Python 3.10 and later: aiohttp 3.14.5 or later
 aiohttp>=3,<4; python_version < "3.9"
-aiohttp>=3.13.5,<4; python_version >= "3.9"
+aiohttp>=3.13.5,<4; python_version == "3.9"
+aiohttp>=3.14.5,<4; python_version >= "3.10"
 
 # websockets
 websockets<17
