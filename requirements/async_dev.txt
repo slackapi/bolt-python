@@ -2,8 +2,10 @@
 
 # aiohttp
 # Note: aiohttp 3.13.5 requires Python >=3.9; 3.7/3.8 stay on the older pinned release.
+# Note: aiohttp 3.14.5 requires Python >=3.10, so 3.9 stays on 3.13.5.
 aiohttp>=3,<4; python_version < "3.9"
-aiohttp>=3.14.5,<4; python_version >= "3.9"
+aiohttp>=3.13.5,<4; python_version == "3.9"
+aiohttp>=3.14.5,<4; python_version >= "3.10"
 
 # websockets
 websockets<17
