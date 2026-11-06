@@ -64,10 +64,6 @@ def build_required_kwargs(
         # error handler
         "error": error,  # Exception
     }
-    if not next_keys_required:
-        all_available_args.pop("next")
-        all_available_args.pop("next_")
-
     all_available_args["payload"] = (
         all_available_args["options"]
         or all_available_args["shortcut"]
@@ -97,7 +93,12 @@ def build_required_kwargs(
                 # We are sure that we should skip manipulating this arg
                 required_arg_names.pop(0)
 
-    kwargs: Dict[str, Any] = {k: v for k, v in all_available_args.items() if k in required_arg_names}
+    # next/next_ are only injectable where a middleware chain exists.
+    # They stay in all_available_args so an `args` object can still be built.
+    injectable_names = set(required_arg_names)
+    if not next_keys_required:
+        injectable_names -= {"next", "next_"}
+    kwargs: Dict[str, Any] = {k: v for k, v in all_available_args.items() if k in injectable_names}
     found_arg_names = kwargs.keys()
     for name in required_arg_names:
         if name == "args":
