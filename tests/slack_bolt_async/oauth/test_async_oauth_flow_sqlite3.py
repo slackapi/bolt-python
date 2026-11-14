@@ -41,6 +41,17 @@ class TestAsyncOAuthFlowSQLite3:
         assert oauth_flow.client is not None
 
     @pytest.mark.asyncio
+    async def test_instantiation_token_rotation_expiration_minutes(self):
+        oauth_flow = AsyncOAuthFlow.sqlite3(
+            database="./logs/test_db",
+            client_id="111.222",
+            client_secret="xxx",
+            scopes=["chat:write", "commands"],
+            token_rotation_expiration_minutes=30,
+        )
+        assert oauth_flow.settings.token_rotation_expiration_minutes == 30
+
+    @pytest.mark.asyncio
     async def test_handle_installation(self):
         oauth_flow = AsyncOAuthFlow.sqlite3(
             database="./logs/test_db",

@@ -113,6 +113,7 @@ class AsyncOAuthFlow:
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
         installation_store_bot_only: bool = False,
+        token_rotation_expiration_minutes: int = 120,
         client: Optional[AsyncWebClient] = None,
         logger: Optional[Logger] = None,
     ) -> "AsyncOAuthFlow":
@@ -152,6 +153,7 @@ class AsyncOAuthFlow:
                 # Installation Management
                 installation_store=installation_store,
                 installation_store_bot_only=installation_store_bot_only,
+                token_rotation_expiration_minutes=token_rotation_expiration_minutes,
                 # state parameter related configurations
                 state_store=state_store,
                 state_cookie_name=state_cookie_name,
