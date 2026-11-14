@@ -31,6 +31,8 @@ class LambdaContext:
     def __init__(self, function_name: str):
         self.function_name = function_name
         self.invoked_function_arn = f"arn:aws:lambda:us-east-1:account-id:function:{self.function_name}"
+        self.aws_request_id = "52fdfc07-2182-154f-163f-5f0f9a621d72"
+        self.log_stream_name = "2024/03/01/[$LATEST]abcdef0123456789"
 
 
 class TestAWSLambda:
@@ -66,6 +68,38 @@ class TestAWSLambda:
             "x-slack-signature": [self.generate_signature(body, timestamp)],
             "x-slack-request-timestamp": [timestamp],
         }
+
+    def test_lambda_context_in_bolt_context(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        captured = {}
+
+        @app.middleware
+        def capture(context, next):
+            captured.update(context)
+            next()
+
+        app.event("app_mention")(lambda: None)
+        input = {
+            "token": "verification_token",
+            "team_id": "T111",
+            "api_app_id": "A111",
+            "event": {"type": "app_mention", "text": "hi", "user": "W222", "team": "T111", "channel": "C111"},
+            "type": "event_callback",
+            "event_id": "Ev111",
+            "event_time": 1595926230,
+        }
+        timestamp, body = str(int(time())), json.dumps(input)
+        event = {
+            "body": body,
+            "queryStringParameters": {},
+            "headers": self.build_headers(timestamp, body),
+            "requestContext": {"http": {"method": "POST"}},
+            "isBase64Encoded": False,
+        }
+        response = SlackRequestHandler(app).handle(event, self.context)
+        assert response["statusCode"] == 200
+        assert captured["aws_request_id"] == self.context.aws_request_id
+        assert captured["log_stream_name"] == self.context.log_stream_name
 
     def test_not_found(self):
         response = not_found()
