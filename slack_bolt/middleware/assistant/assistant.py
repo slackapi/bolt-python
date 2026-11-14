@@ -16,6 +16,8 @@ from slack_bolt.listener.custom_listener import CustomListener
 from slack_bolt.listener import Listener
 from slack_bolt.listener.thread_runner import ThreadListenerRunner
 from slack_bolt.middleware import Middleware
+from slack_bolt.middleware.custom_middleware import CustomMiddleware
+from slack_bolt.logger.messages import error_unexpected_listener_middleware
 from slack_bolt.listener_matcher import ListenerMatcher
 from slack_bolt.request.payload_utils import (
     is_assistant_thread_started_event,
@@ -260,7 +262,7 @@ class Assistant(Middleware):
         self,
         listener_or_functions: Union[Listener, Callable, List[Callable]],
         matchers: Optional[List[Union[ListenerMatcher, Callable[..., bool]]]] = None,
-        middleware: Optional[List[Middleware]] = None,
+        middleware: Optional[List[Union[Callable, Middleware]]] = None,
         base_logger: Optional[Logger] = None,
     ) -> Listener:
         if isinstance(listener_or_functions, Callable):  # type: ignore[arg-type]
@@ -269,8 +271,18 @@ class Assistant(Middleware):
         if isinstance(listener_or_functions, Listener):
             return listener_or_functions
         elif isinstance(listener_or_functions, list):
-            middleware = middleware if middleware else []
-            middleware.insert(0, AttachingConversationKwargs(self.thread_context_store))
+            # Build a new list so the caller's list is left untouched,
+            # and wrap plain functions the same way App does
+            listener_middleware: List[Middleware] = [AttachingConversationKwargs(self.thread_context_store)]
+            for m in middleware or []:
+                if isinstance(m, Middleware):
+                    listener_middleware.append(m)
+                elif isinstance(m, Callable):  # type: ignore[arg-type]
+                    listener_middleware.append(
+                        CustomMiddleware(app_name=self.app_name, func=m, base_logger=base_logger or self.base_logger)
+                    )
+                else:
+                    raise BoltError(error_unexpected_listener_middleware(type(m)))
             functions = listener_or_functions
             ack_function = functions.pop(0)
 
@@ -290,7 +302,7 @@ class Assistant(Middleware):
             return CustomListener(
                 app_name=self.app_name,
                 matchers=listener_matchers,
-                middleware=middleware,
+                middleware=listener_middleware,
                 ack_function=ack_function,
                 lazy_functions=functions,
                 auto_acknowledgement=True,
