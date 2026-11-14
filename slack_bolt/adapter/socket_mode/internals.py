@@ -30,6 +30,19 @@ def run_bolt_app(app: App, req: SocketModeRequest):
     return bolt_resp
 
 
+def _to_payload(content_type: str, body: str) -> Dict:
+    # A text-only ack is labeled as JSON when it starts with "{".
+    # Only treat it as JSON when it really parses to an object; otherwise send it as text.
+    if content_type.startswith("application/json"):
+        try:
+            parsed = json.loads(body)
+            if isinstance(parsed, dict):
+                return parsed
+        except ValueError:
+            pass
+    return {"text": body}
+
+
 def send_response(
     client: BaseSocketModeClient,
     req: SocketModeRequest,
@@ -40,12 +53,9 @@ def send_response(
         content_type = bolt_resp.headers.get("content-type", [""])[0]
         if bolt_resp.body is None or len(bolt_resp.body) == 0:
             client.send_socket_mode_response(SocketModeResponse(envelope_id=req.envelope_id))
-        elif content_type.startswith("application/json"):
-            dict_body = json.loads(bolt_resp.body)
-            client.send_socket_mode_response(SocketModeResponse(envelope_id=req.envelope_id, payload=dict_body))
         else:
             client.send_socket_mode_response(
-                SocketModeResponse(envelope_id=req.envelope_id, payload={"text": bolt_resp.body})
+                SocketModeResponse(envelope_id=req.envelope_id, payload=_to_payload(content_type, bolt_resp.body))
             )
 
         if client.logger.level <= logging.DEBUG:
