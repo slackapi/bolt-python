@@ -243,6 +243,6 @@ GitHub Actions (`.github/workflows/ci-build.yml`) runs on every push to `main` a
 
 - PRs target the `main` branch
 - You MUST run `./scripts/install_all_and_run_tests.sh` before submitting
-- PR template (`.github/pull_request_template.md`) requires: Summary, Testing steps, Category checkboxes (`App`, `AsyncApp`, Adapters, Docs, Others)
+- PR template (`.github/PULL_REQUEST_TEMPLATE.md`) requires: Summary, Testing steps, Category checkboxes (`App`, `AsyncApp`, Adapters, Docs, Others)
 - Requirements: CLA signed, test suite passes, code review approval
 - Commits should be atomic with descriptive messages. Reference related issue numbers.
