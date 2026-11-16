@@ -50,6 +50,7 @@ class TestAsyncOAuthFlowSQLite3:
             token_rotation_expiration_minutes=30,
         )
         assert oauth_flow.settings.token_rotation_expiration_minutes == 30
+        assert oauth_flow.settings.authorize.token_rotation_expiration_minutes == 30
 
     @pytest.mark.asyncio
     async def test_handle_installation(self):

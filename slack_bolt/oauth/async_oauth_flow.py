@@ -113,9 +113,9 @@ class AsyncOAuthFlow:
         state_cookie_name: str = OAuthStateUtils.default_cookie_name,
         state_expiration_seconds: int = OAuthStateUtils.default_expiration_seconds,
         installation_store_bot_only: bool = False,
-        token_rotation_expiration_minutes: int = 120,
         client: Optional[AsyncWebClient] = None,
         logger: Optional[Logger] = None,
+        token_rotation_expiration_minutes: int = 120,
     ) -> "AsyncOAuthFlow":
 
         client_id = client_id or os.environ["SLACK_CLIENT_ID"]  # required
