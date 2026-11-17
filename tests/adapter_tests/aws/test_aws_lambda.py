@@ -98,8 +98,8 @@ class TestAWSLambda:
         }
         response = SlackRequestHandler(app).handle(event, self.context)
         assert response["statusCode"] == 200
-        assert captured["aws_request_id"] == self.context.aws_request_id
-        assert captured["log_stream_name"] == self.context.log_stream_name
+        assert captured["aws_lambda_request_id"] == self.context.aws_request_id
+        assert captured["aws_lambda_log_stream_name"] == self.context.log_stream_name
 
     def test_not_found(self):
         response = not_found()
