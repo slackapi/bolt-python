@@ -39,7 +39,7 @@ class SslCheck(Middleware):
         next: Callable[[], BoltResponse],
     ) -> BoltResponse:
         if self._is_ssl_check_request(req.body):
-            if self._verify_token_if_needed(req.body):
+            if not self._verify_token_if_needed(req.body):
                 return self._build_error_response()
             return self._build_success_response()
         else:
@@ -51,8 +51,12 @@ class SslCheck(Middleware):
     def _is_ssl_check_request(body: dict):
         return "ssl_check" in body and body["ssl_check"] == "1"
 
-    def _verify_token_if_needed(self, body: dict):
-        return self.verification_token and self.verification_token == body["token"]
+    def _verify_token_if_needed(self, body: dict) -> bool:
+        # Returns True when the request is acceptable: either no token check is configured,
+        # or the token in the body matches the configured one
+        if self.verification_token is None:
+            return True
+        return self.verification_token == body.get("token")
 
     @staticmethod
     def _build_success_response() -> BoltResponse:
