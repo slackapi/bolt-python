@@ -110,6 +110,8 @@ class AsyncArgs:
     """`next()` utility function, which tells the middleware chain that it can continue with the next one"""
     next_: Callable[[], Awaitable[None]]
     """An alias of `next()` for avoiding the Python built-in method overrides in middleware functions"""
+    error: Optional[Exception]
+    """The exception raised by a listener or middleware; only set in error handlers"""
 
     def __init__(
         self,
@@ -140,6 +142,7 @@ class AsyncArgs:
         save_thread_context: Optional[AsyncSaveThreadContext] = None,
         say_stream: Optional[AsyncSayStream] = None,
         next: Callable[[], Awaitable[None]],
+        error: Optional[Exception] = None,
         **kwargs,  # noqa
     ):
         self.logger: Logger = logger
@@ -173,3 +176,4 @@ class AsyncArgs:
 
         self.next: Callable[[], Awaitable[None]] = next
         self.next_: Callable[[], Awaitable[None]] = next
+        self.error: Optional[Exception] = error
