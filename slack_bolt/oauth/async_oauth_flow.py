@@ -115,6 +115,7 @@ class AsyncOAuthFlow:
         installation_store_bot_only: bool = False,
         client: Optional[AsyncWebClient] = None,
         logger: Optional[Logger] = None,
+        token_rotation_expiration_minutes: int = 120,
     ) -> "AsyncOAuthFlow":
 
         client_id = client_id or os.environ["SLACK_CLIENT_ID"]  # required
@@ -152,6 +153,7 @@ class AsyncOAuthFlow:
                 # Installation Management
                 installation_store=installation_store,
                 installation_store_bot_only=installation_store_bot_only,
+                token_rotation_expiration_minutes=token_rotation_expiration_minutes,
                 # state parameter related configurations
                 state_store=state_store,
                 state_cookie_name=state_cookie_name,
