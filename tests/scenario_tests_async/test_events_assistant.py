@@ -234,6 +234,46 @@ class TestAsyncEventsAssistant:
         assert (await asyncio.wait_for(listener_called.wait(), timeout=0.1)) is True
 
     @pytest.mark.asyncio
+    async def test_assistant_with_function_listener_middleware(self):
+        app = AsyncApp(client=self.web_client)
+        assistant = AsyncAssistant()
+        listener_called = asyncio.Event()
+        middleware_called = asyncio.Event()
+
+        async def function_middleware(next):
+            middleware_called.set()
+            await next()
+
+        user_middleware = [function_middleware]
+
+        @assistant.thread_started(middleware=user_middleware)
+        async def start_thread():
+            listener_called.set()
+
+        @assistant.user_message(middleware=user_middleware)
+        async def handle_user_message():
+            listener_called.set()
+
+        app.assistant(assistant)
+        # the caller's list must not be modified
+        assert user_middleware == [function_middleware]
+
+        request = AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await asyncio.wait_for(listener_called.wait(), timeout=0.1)
+        await asyncio.wait_for(middleware_called.wait(), timeout=0.1)
+
+        listener_called.clear()
+        middleware_called.clear()
+
+        request = AsyncBoltRequest(body=user_message_event_body, mode="socket_mode")
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        await asyncio.wait_for(listener_called.wait(), timeout=0.1)
+        await asyncio.wait_for(middleware_called.wait(), timeout=0.1)
+
+    @pytest.mark.asyncio
     async def test_assistant_with_custom_listener_middleware(self):
         app = AsyncApp(client=self.web_client)
         assistant = AsyncAssistant()
