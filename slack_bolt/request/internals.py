@@ -36,7 +36,7 @@ def parse_body(body: str, content_type: Optional[str]) -> Dict[str, Any]:
             if payload is not None:
                 return json.loads(payload)
             else:
-                return {}
+                return params
         else:
             return dict(parse_qsl(body, keep_blank_values=True))
 

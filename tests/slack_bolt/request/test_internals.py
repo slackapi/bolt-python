@@ -7,6 +7,7 @@ from slack_bolt.request.internals import (
     extract_user_id,
     extract_team_id,
     extract_enterprise_id,
+    parse_body,
     parse_query,
     extract_is_enterprise_install,
     extract_actor_enterprise_id,
@@ -588,6 +589,22 @@ class TestRequestInternals:
         for req in self.slack_connect_events_api_no_actor_enterprise_team_requests:
             user_id = extract_actor_user_id(req)
             assert user_id is None
+
+    def test_parse_body_json(self):
+        assert parse_body('{"type": "event_callback"}', "application/json") == {"type": "event_callback"}
+
+    def test_parse_body_payload_parameter(self):
+        body = "payload=%7B%22type%22%3A%22block_actions%22%7D"
+        assert parse_body(body, "application/x-www-form-urlencoded") == {"type": "block_actions"}
+
+    def test_parse_body_form_value_containing_payload(self):
+        # "payload" appearing in a value must not be taken for the payload parameter
+        body = "command=%2Fdeploy&text=show+payload+size&user_id=W111"
+        assert parse_body(body, "application/x-www-form-urlencoded") == {
+            "command": "/deploy",
+            "text": "show payload size",
+            "user_id": "W111",
+        }
 
     def test_parse_query(self):
         expected = {"foo": ["bar"], "baz": ["123"]}
