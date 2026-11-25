@@ -56,6 +56,32 @@ class TestSSLCheck:
         assert response.status == 200
         assert response.body == ""
 
+    def test_ssl_check_with_verification_token(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret, verification_token="expected")
+
+        def dispatch(body: str):
+            timestamp = str(int(time()))
+            request = BoltRequest(
+                body=body,
+                query={},
+                headers={
+                    "content-type": ["application/x-www-form-urlencoded"],
+                    "x-slack-signature": [self.generate_signature(body, timestamp)],
+                    "x-slack-request-timestamp": [timestamp],
+                },
+            )
+            return app.dispatch(request)
+
+        response = dispatch("token=expected&ssl_check=1")
+        assert response.status == 200
+        assert response.body == ""
+
+        response = dispatch("token=wrong&ssl_check=1")
+        assert response.status == 401
+
+        response = dispatch("ssl_check=1")
+        assert response.status == 401
+
     def test_ssl_check_disabled(self):
         app = App(
             client=self.web_client,
