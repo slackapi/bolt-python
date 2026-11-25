@@ -129,6 +129,27 @@ class TestAsyncSlashCommand:
         assert response.body == """{"error": "invalid request"}"""
         assert command_called is False
 
+    @pytest.mark.asyncio
+    async def test_text_containing_payload(self):
+        app = AsyncApp(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        received_text = None
+
+        async def command_handler(ack, command):
+            nonlocal received_text
+            received_text = command["text"]
+            await ack()
+
+        app.command("/hello-world")(command_handler)
+
+        timestamp, body = str(int(time())), slash_command_body.replace("&text=Hi", "&text=show+payload+size")
+        request = AsyncBoltRequest(body=body, headers=self.build_headers(timestamp, body))
+        response = await app.async_dispatch(request)
+        assert response.status == 200
+        assert received_text == "show payload size"
+
 
 slash_command_body = (
     "token=verification_token"

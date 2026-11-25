@@ -30,15 +30,11 @@ def parse_body(body: str, content_type: Optional[str]) -> Dict[str, Any]:
     if (content_type is not None and content_type == "application/json") or body.startswith("{"):
         return json.loads(body)
     else:
-        if "payload" in body:  # This is not JSON format yet
-            params = dict(parse_qsl(body, keep_blank_values=True))
-            payload = params.get("payload")
-            if payload is not None:
-                return json.loads(payload)
-            else:
-                return {}
-        else:
-            return dict(parse_qsl(body, keep_blank_values=True))
+        params = dict(parse_qsl(body, keep_blank_values=True))
+        payload = params.get("payload")
+        if payload is not None:  # This is not JSON format yet
+            return json.loads(payload)
+        return params
 
 
 def extract_is_enterprise_install(payload: Dict[str, Any]) -> Optional[bool]:

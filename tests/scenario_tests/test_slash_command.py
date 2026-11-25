@@ -121,6 +121,26 @@ class TestSlashCommand:
         assert response.body == """{"error": "invalid request"}"""
         assert command_called is False
 
+    def test_text_containing_payload(self):
+        app = App(
+            client=self.web_client,
+            signing_secret=self.signing_secret,
+        )
+        received_text = None
+
+        def command_handler(ack, command):
+            nonlocal received_text
+            received_text = command["text"]
+            ack()
+
+        app.command("/hello-world")(command_handler)
+
+        timestamp, body = str(int(time())), slash_command_body.replace("&text=Hi", "&text=show+payload+size")
+        request = BoltRequest(body=body, headers=self.build_headers(timestamp, body))
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert received_text == "show payload size"
+
 
 slash_command_body = (
     "token=verification_token"
