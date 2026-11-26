@@ -15,6 +15,7 @@ from .custom_middleware import CustomMiddleware
 from .ignoring_self_events import IgnoringSelfEvents
 from .middleware import Middleware
 from .request_verification import RequestVerification
+from .request_parsing import RequestParsing
 from .ssl_check import SslCheck
 from .url_verification import UrlVerification
 from .attaching_function_token import AttachingFunctionToken
@@ -23,6 +24,7 @@ from .attaching_conversation_kwargs import AttachingConversationKwargs
 builtin_middleware_classes = [
     SslCheck,
     RequestVerification,
+    RequestParsing,
     SingleTeamAuthorization,
     MultiTeamsAuthorization,
     IgnoringSelfEvents,
@@ -40,6 +42,7 @@ __all__ = [
     "IgnoringSelfEvents",
     "Middleware",
     "RequestVerification",
+    "RequestParsing",
     "SslCheck",
     "UrlVerification",
     "AttachingFunctionToken",

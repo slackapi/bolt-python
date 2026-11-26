@@ -64,6 +64,7 @@ from slack_bolt.middleware import (
     Middleware,
     SslCheck,
     RequestVerification,
+    RequestParsing,
     SingleTeamAuthorization,
     MultiTeamsAuthorization,
     IgnoringSelfEvents,
@@ -411,6 +412,7 @@ class App:
             )
         if request_verification_enabled is True:
             self._middleware_list.append(RequestVerification(self._signing_secret, base_logger=self._base_logger))
+        self._middleware_list.append(RequestParsing())
 
         if self._before_authorize is not None:
             self._middleware_list.append(self._before_authorize)

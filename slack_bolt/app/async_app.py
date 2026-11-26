@@ -83,6 +83,7 @@ from slack_bolt.logger import get_bolt_logger, get_bolt_app_logger
 from slack_bolt.middleware.async_builtins import (
     AsyncSslCheck,
     AsyncRequestVerification,
+    AsyncRequestParsing,
     AsyncIgnoringSelfEvents,
     AsyncUrlVerification,
     AsyncAttachingFunctionToken,
@@ -418,6 +419,7 @@ class AsyncApp:
             )
         if request_verification_enabled is True:
             self._async_middleware_list.append(AsyncRequestVerification(self._signing_secret, base_logger=self._base_logger))
+        self._async_middleware_list.append(AsyncRequestParsing())
 
         if self._async_before_authorize is not None:
             self._async_middleware_list.append(self._async_before_authorize)
