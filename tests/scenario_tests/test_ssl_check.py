@@ -1,3 +1,4 @@
+import json
 from time import time
 
 from slack_sdk.signature import SignatureVerifier
@@ -76,3 +77,32 @@ class TestSSLCheck:
         response = app.dispatch(request)
         assert response.status == 404
         assert response.body == """{"error": "unhandled request"}"""
+
+    def test_json_body_containing_ssl_check_reaches_its_listener(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret, process_before_response=True)
+        handled = []
+
+        @app.event("link_shared")
+        def handle_link_shared():
+            handled.append(True)
+
+        timestamp = str(int(time()))
+        body = json.dumps(
+            {
+                "type": "event_callback",
+                "team_id": "T111",
+                "event": {"type": "link_shared", "links": [{"url": "https://x.io/?a=1&ssl_check=1&b=2"}]},
+            }
+        )
+        request: BoltRequest = BoltRequest(
+            body=body,
+            query={},
+            headers={
+                "content-type": ["application/json"],
+                "x-slack-signature": [self.generate_signature(body, timestamp)],
+                "x-slack-request-timestamp": [timestamp],
+            },
+        )
+        response = app.dispatch(request)
+        assert response.status == 200
+        assert handled == [True]

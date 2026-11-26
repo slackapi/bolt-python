@@ -51,6 +51,8 @@ class SslCheck(Middleware):
 
     @staticmethod
     def _parse_form_params(raw_body: str) -> Dict[str, str]:
+        if raw_body.startswith("{"):
+            return {}
         return dict(parse_qsl(raw_body, keep_blank_values=True))
 
     @staticmethod
