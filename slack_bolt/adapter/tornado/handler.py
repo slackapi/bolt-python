@@ -14,7 +14,7 @@ class SlackEventsHandler(RequestHandler):
         self.app = app
 
     def post(self):
-        bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(self.request, defer_parsing=True))
+        bolt_resp: BoltResponse = self.app.dispatch(to_bolt_request(self.request))
         set_response(self, bolt_resp)
         return
 
@@ -37,12 +37,11 @@ class SlackOAuthHandler(RequestHandler):
         self.set_status(404)
 
 
-def to_bolt_request(req: HTTPServerRequest, defer_parsing: bool = False) -> BoltRequest:
+def to_bolt_request(req: HTTPServerRequest) -> BoltRequest:
     return BoltRequest(
         body=req.body.decode("utf-8") if req.body else "",
         query=req.query,
         headers=req.headers,  # type: ignore[arg-type]
-        defer_parsing=defer_parsing,
     )
 
 

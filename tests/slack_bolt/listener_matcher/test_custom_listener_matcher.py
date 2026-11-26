@@ -1,5 +1,6 @@
 from slack_bolt import BoltRequest, BoltResponse, CustomListenerMatcher
 from slack_bolt.listener_matcher import ListenerMatcher
+from tests.utils import parse_request
 
 
 def func(body, request, response, dummy):
@@ -24,10 +25,10 @@ class TestCustomListenerMatcher:
         )
         resp = BoltResponse(status=201)
 
-        req = BoltRequest(body='payload={"result":true}')
+        req = parse_request(BoltRequest(body='payload={"result":true}'))
         result = matcher.matches(req, resp)
         assert result is True
 
-        req = BoltRequest(body='payload={"result":false}')
+        req = parse_request(BoltRequest(body='payload={"result":false}'))
         result = matcher.matches(req, resp)
         assert result is False

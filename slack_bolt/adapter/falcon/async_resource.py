@@ -45,16 +45,15 @@ class AsyncSlackAppResource:
         resp.text = "The page is not found..."
 
     async def on_post(self, req: Request, resp: Response):
-        bolt_req = await self._to_bolt_request(req, defer_parsing=True)
+        bolt_req = await self._to_bolt_request(req)
         bolt_resp = await self.app.async_dispatch(bolt_req)
         await self._write_response(bolt_resp, resp)
 
-    async def _to_bolt_request(self, req: Request, defer_parsing: bool = False) -> AsyncBoltRequest:
+    async def _to_bolt_request(self, req: Request) -> AsyncBoltRequest:
         return AsyncBoltRequest(
             body=(await req.stream.read(req.content_length or 0)).decode("utf-8"),
             query=req.query_string,
             headers={k.lower(): v for k, v in req.headers.items()},
-            defer_parsing=defer_parsing,
         )
 
     async def _write_response(self, bolt_resp: BoltResponse, resp: Response):

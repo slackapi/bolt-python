@@ -9,16 +9,11 @@ from slack_bolt.async_app import AsyncApp, AsyncBoltRequest
 from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
 
 
-def to_async_bolt_request(
-    req: Request,
-    addition_context_properties: Optional[Dict[str, Any]] = None,
-    defer_parsing: bool = False,
-) -> AsyncBoltRequest:
+def to_async_bolt_request(req: Request, addition_context_properties: Optional[Dict[str, Any]] = None) -> AsyncBoltRequest:
     request = AsyncBoltRequest(
         body=req.body.decode("utf-8"),
         query=req.query_string,
         headers=req.headers,  # type: ignore[arg-type]
-        defer_parsing=defer_parsing,
     )
 
     if addition_context_properties is not None:
@@ -72,9 +67,7 @@ class AsyncSlackRequestHandler:
                     return to_sanic_response(bolt_resp)
 
         elif req.method == "POST":
-            bolt_resp = await self.app.async_dispatch(
-                to_async_bolt_request(req, addition_context_properties, defer_parsing=True)
-            )
+            bolt_resp = await self.app.async_dispatch(to_async_bolt_request(req, addition_context_properties))
             return to_sanic_response(bolt_resp)
 
         return HTTPResponse(

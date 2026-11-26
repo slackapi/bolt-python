@@ -5,7 +5,7 @@
 - `__init__(app: App)`: Constructor that accepts and stores an instance of the Bolt `App`.
 - `handle(req: Request)`: Function (typically named `handle()`) that receives incoming Slack requests, parses them to conform to an instance of [`BoltRequest`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/request/request.py), then dispatches them to the stored Bolt app.
 
-`BoltRequest` instantiation accepts these parameters:
+`BoltRequest` instantiation accepts four parameters:
 
 | Parameter | Description | Required? |
 |-----------|-------------|-----------|
@@ -13,7 +13,6 @@
 | `query: any` | The query string data | No |
 | `headers: Dict[str, Union[str, List[str]]]` | Request headers | No |
 | `context: BoltContext` | Any context for the request | No |
-| `defer_parsing: bool` | Waits to parse the body until after the request signature is verified. Set it to `True` when you pass the request to `app.dispatch()` | No |
 
 Your adapter will return [an instance of `BoltResponse`](https://github.com/slackapi/bolt-python/blob/main/slack_bolt/response/response.py) from the Bolt app.
 
@@ -39,8 +38,6 @@ def to_bolt_request(req: Request) -> BoltRequest:
         body=req.get_data(as_text=True),
         query=req.query_string.decode("utf-8"),
         headers=req.headers,
-        # Leaves the body unparsed until Bolt verifies the request came from Slack
-        defer_parsing=True,
     )
 
 # Takes in a BoltResponse and converts it to a standard Flask response

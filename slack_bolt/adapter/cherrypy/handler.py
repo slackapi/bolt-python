@@ -8,14 +8,13 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
-def build_bolt_request(defer_parsing: bool = False) -> BoltRequest:
+def build_bolt_request() -> BoltRequest:
     req = cherrypy.request
     body = req.raw_body if hasattr(req, "raw_body") else ""
     return BoltRequest(
         body=body,
         query=req.query_string,
         headers=req.headers,
-        defer_parsing=defer_parsing,
     )
 
 
@@ -74,7 +73,7 @@ class SlackRequestHandler:
                     set_response_status_and_headers(bolt_resp)
                     return (bolt_resp.body or "").encode("utf-8")
         elif req.method == "POST":
-            bolt_resp = self.app.dispatch(build_bolt_request(defer_parsing=True))
+            bolt_resp = self.app.dispatch(build_bolt_request())
             set_response_status_and_headers(bolt_resp)
             return (bolt_resp.body or "").encode("utf-8")
 

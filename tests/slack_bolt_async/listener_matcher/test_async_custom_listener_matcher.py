@@ -6,6 +6,7 @@ from slack_bolt.listener_matcher.async_listener_matcher import (
 )
 from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
+from tests.async_utils import async_parse_request
 
 
 async def func(body, request, response, dummy):
@@ -25,10 +26,10 @@ class TestAsyncCustomListenerMatcher:
         )
         resp = BoltResponse(status=201)
 
-        req = AsyncBoltRequest(body='payload={"result":true}')
+        req = await async_parse_request(AsyncBoltRequest(body='payload={"result":true}'))
         result = await matcher.async_matches(req, resp)
         assert result is True
 
-        req = AsyncBoltRequest(body='payload={"result":false}')
+        req = await async_parse_request(AsyncBoltRequest(body='payload={"result":false}'))
         result = await matcher.async_matches(req, resp)
         assert result is False

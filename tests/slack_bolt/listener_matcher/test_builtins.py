@@ -10,6 +10,7 @@ from slack_bolt.listener_matcher.builtins import (
     event,
     shortcut,
 )
+from tests.utils import parse_request
 
 
 class TestBuiltins:
@@ -34,7 +35,7 @@ class TestBuiltins:
         }
         raw_body = f"payload={quote(json.dumps(body))}"
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
-        req = BoltRequest(body=raw_body, headers=headers)
+        req = parse_request(BoltRequest(body=raw_body, headers=headers))
         resp = BoltResponse(status=404)
 
         assert block_action("valid_action_id").matches(req, resp) is True
@@ -91,7 +92,7 @@ class TestBuiltins:
             "event_time": 1601541373,
         }
 
-        request = BoltRequest(body=f"payload={quote(json.dumps(payload))}")
+        request = parse_request(BoltRequest(body=f"payload={quote(json.dumps(payload))}"))
 
         m = workflow_step_execute("copy_review")
         assert m.matches(request, None) == True
@@ -103,7 +104,7 @@ class TestBuiltins:
         assert m.matches(request, None) == True
 
     def test_events(self):
-        request = BoltRequest(body=json.dumps(event_payload))
+        request = parse_request(BoltRequest(body=json.dumps(event_payload)))
 
         m = event("app_mention")
         assert m.matches(request, None)
@@ -114,7 +115,7 @@ class TestBuiltins:
         m = event({"type": "message"})
         assert not m.matches(request, None)
 
-        request = BoltRequest(body=f"payload={quote(json.dumps(shortcut_payload))}")
+        request = parse_request(BoltRequest(body=f"payload={quote(json.dumps(shortcut_payload))}"))
 
         m = event("app_mention")
         assert not m.matches(request, None)
@@ -122,7 +123,7 @@ class TestBuiltins:
         assert not m.matches(request, None)
 
     def test_global_shortcuts(self):
-        request = BoltRequest(body=f"payload={quote(json.dumps(shortcut_payload))}")
+        request = parse_request(BoltRequest(body=f"payload={quote(json.dumps(shortcut_payload))}"))
 
         m = shortcut("test-shortcut")
         assert m.matches(request, None)
@@ -137,7 +138,7 @@ class TestBuiltins:
         assert not m.matches(request, None)
 
     def test_message_shortcuts(self):
-        request = BoltRequest(body=f"payload={quote(json.dumps(message_shortcut_payload))}")
+        request = parse_request(BoltRequest(body=f"payload={quote(json.dumps(message_shortcut_payload))}"))
 
         m = shortcut("test-shortcut")
         assert m.matches(request, None)

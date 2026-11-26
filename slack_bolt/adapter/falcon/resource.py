@@ -41,16 +41,15 @@ class SlackAppResource:
         resp.text = "The page is not found..."
 
     def on_post(self, req: Request, resp: Response):
-        bolt_req = self._to_bolt_request(req, defer_parsing=True)
+        bolt_req = self._to_bolt_request(req)
         bolt_resp = self.app.dispatch(bolt_req)
         self._write_response(bolt_resp, resp)
 
-    def _to_bolt_request(self, req: Request, defer_parsing: bool = False) -> BoltRequest:
+    def _to_bolt_request(self, req: Request) -> BoltRequest:
         return BoltRequest(
             body=req.stream.read(req.content_length or 0).decode("utf-8"),
             query=req.query_string,
             headers={k.lower(): v for k, v in req.headers.items()},
-            defer_parsing=defer_parsing,
         )
 
     def _write_response(self, bolt_resp: BoltResponse, resp: Response):

@@ -6,7 +6,7 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
-def to_bolt_request(req: Request, defer_parsing: bool = False) -> BoltRequest:
+def to_bolt_request(req: Request) -> BoltRequest:
     body = req.body.read()
     if isinstance(body, bytes):
         body = body.decode("utf-8")
@@ -14,7 +14,6 @@ def to_bolt_request(req: Request, defer_parsing: bool = False) -> BoltRequest:
         body=body,
         query=req.query_string,
         headers=req.headers,
-        defer_parsing=defer_parsing,
     )
 
 
@@ -42,7 +41,7 @@ class SlackRequestHandler:
                     set_response(bolt_resp, resp)
                     return bolt_resp.body or ""
         elif req.method == "POST":
-            bolt_resp = self.app.dispatch(to_bolt_request(req, defer_parsing=True))
+            bolt_resp = self.app.dispatch(to_bolt_request(req))
             set_response(bolt_resp, resp)
             return bolt_resp.body or ""
 

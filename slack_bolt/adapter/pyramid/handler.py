@@ -7,7 +7,7 @@ from slack_bolt import App, BoltRequest, BoltResponse
 from slack_bolt.oauth import OAuthFlow
 
 
-def to_bolt_request(request: Request, defer_parsing: bool = False) -> BoltRequest:
+def to_bolt_request(request: Request) -> BoltRequest:
     body: str = ""
     if request.body is not None:
         if isinstance(request.body, bytes):
@@ -18,7 +18,6 @@ def to_bolt_request(request: Request, defer_parsing: bool = False) -> BoltReques
         body=body,
         query=request.query_string,
         headers=request.headers,
-        defer_parsing=defer_parsing,
     )
     return bolt_req
 
@@ -54,7 +53,7 @@ class SlackRequestHandler:
                     bolt_resp = oauth_flow.handle_callback(bolt_req)
                     return to_pyramid_response(bolt_resp)
         elif request.method == "POST":
-            bolt_req = _attach_pyramid_request_to_context(to_bolt_request(request, defer_parsing=True), request)
+            bolt_req = _attach_pyramid_request_to_context(to_bolt_request(request), request)
             bolt_resp = self.app.dispatch(bolt_req)
             return to_pyramid_response(bolt_resp)
 

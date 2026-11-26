@@ -1,6 +1,7 @@
 from urllib.parse import quote
 
 from slack_bolt.request.request import BoltRequest
+from tests.utils import parse_request
 
 
 class TestRequest:
@@ -70,7 +71,7 @@ class TestRequest:
   ]
 }
 """
-        req = BoltRequest(body=f"payload={quote(payload)}")
+        req = parse_request(BoltRequest(body=f"payload={quote(payload)}"))
         assert req is not None
         assert req.context.team_id == "T_expected"
         assert req.context.user_id == "W111"
@@ -158,7 +159,7 @@ class TestRequest:
   }
 }
 """
-        req = BoltRequest(body=f"payload={quote(payload)}")
+        req = parse_request(BoltRequest(body=f"payload={quote(payload)}"))
         assert req is not None
         assert req.context.team_id == "T_expected"
         assert req.context.user_id == "W111"
@@ -236,7 +237,7 @@ class TestRequest:
   }
 }
 """
-        req = BoltRequest(body=f"payload={quote(payload)}")
+        req = parse_request(BoltRequest(body=f"payload={quote(payload)}"))
         assert req is not None
         assert req.context.team_id == "T_expected"
         assert req.context.user_id == "W111"

@@ -36,12 +36,7 @@ class AsyncSlackRequestHandler(SlackRequestHandler):
 
     async def dispatch(self, request: AsgiHttpRequest) -> BoltResponse:
         return await self.app.async_dispatch(
-            AsyncBoltRequest(
-                body=await request.get_raw_body(),
-                query=request.query_string,
-                headers=request.get_headers(),
-                defer_parsing=True,
-            )
+            AsyncBoltRequest(body=await request.get_raw_body(), query=request.query_string, headers=request.get_headers())
         )
 
     async def handle_installation(self, request: AsgiHttpRequest) -> BoltResponse:

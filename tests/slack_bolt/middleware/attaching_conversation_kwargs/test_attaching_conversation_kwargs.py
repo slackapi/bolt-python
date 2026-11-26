@@ -9,6 +9,7 @@ from tests.scenario_tests.test_events_assistant import (
     user_message_event_body,
     channel_user_message_event_body,
 )
+from tests.utils import parse_request
 
 
 def next():
@@ -85,7 +86,7 @@ app_home_opened_home_event_body = build_payload(
 class TestAttachingConversationKwargs:
     def test_assistant_event_attaches_kwargs(self):
         middleware = AttachingConversationKwargs()
-        req = BoltRequest(body=thread_started_event_body, mode="socket_mode")
+        req = parse_request(BoltRequest(body=thread_started_event_body, mode="socket_mode"))
         req.context["client"] = WebClient(token="xoxb-test")
 
         resp = middleware.process(req=req, resp=BoltResponse(status=404), next=next)
@@ -99,7 +100,7 @@ class TestAttachingConversationKwargs:
 
     def test_user_message_event_attaches_kwargs(self):
         middleware = AttachingConversationKwargs()
-        req = BoltRequest(body=user_message_event_body, mode="socket_mode")
+        req = parse_request(BoltRequest(body=user_message_event_body, mode="socket_mode"))
         req.context["client"] = WebClient(token="xoxb-test")
 
         resp = middleware.process(req=req, resp=BoltResponse(status=404), next=next)
@@ -113,7 +114,7 @@ class TestAttachingConversationKwargs:
 
     def test_top_level_dm_attaches_suggested_prompts_but_not_set_title(self):
         middleware = AttachingConversationKwargs()
-        req = BoltRequest(body=top_level_im_message_event_body, mode="socket_mode")
+        req = parse_request(BoltRequest(body=top_level_im_message_event_body, mode="socket_mode"))
         req.context["client"] = WebClient(token="xoxb-test")
 
         resp = middleware.process(req=req, resp=BoltResponse(status=404), next=next)
@@ -129,7 +130,7 @@ class TestAttachingConversationKwargs:
 
     def test_bot_dm_attaches_suggested_prompts(self):
         middleware = AttachingConversationKwargs()
-        req = BoltRequest(body=bot_im_message_event_body, mode="socket_mode")
+        req = parse_request(BoltRequest(body=bot_im_message_event_body, mode="socket_mode"))
         req.context["client"] = WebClient(token="xoxb-test")
 
         resp = middleware.process(req=req, resp=BoltResponse(status=404), next=next)
@@ -139,7 +140,7 @@ class TestAttachingConversationKwargs:
 
     def test_file_share_dm_attaches_suggested_prompts(self):
         middleware = AttachingConversationKwargs()
-        req = BoltRequest(body=file_share_im_message_event_body, mode="socket_mode")
+        req = parse_request(BoltRequest(body=file_share_im_message_event_body, mode="socket_mode"))
         req.context["client"] = WebClient(token="xoxb-test")
 
         resp = middleware.process(req=req, resp=BoltResponse(status=404), next=next)
@@ -149,7 +150,7 @@ class TestAttachingConversationKwargs:
 
     def test_app_home_opened_messages_tab_attaches_suggested_prompts(self):
         middleware = AttachingConversationKwargs()
-        req = BoltRequest(body=app_home_opened_messages_event_body, mode="socket_mode")
+        req = parse_request(BoltRequest(body=app_home_opened_messages_event_body, mode="socket_mode"))
         req.context["client"] = WebClient(token="xoxb-test")
 
         resp = middleware.process(req=req, resp=BoltResponse(status=404), next=next)
@@ -163,7 +164,7 @@ class TestAttachingConversationKwargs:
 
     def test_app_home_opened_home_tab_does_not_attach_suggested_prompts(self):
         middleware = AttachingConversationKwargs()
-        req = BoltRequest(body=app_home_opened_home_event_body, mode="socket_mode")
+        req = parse_request(BoltRequest(body=app_home_opened_home_event_body, mode="socket_mode"))
         req.context["client"] = WebClient(token="xoxb-test")
 
         resp = middleware.process(req=req, resp=BoltResponse(status=404), next=next)
@@ -173,7 +174,7 @@ class TestAttachingConversationKwargs:
 
     def test_non_assistant_event_does_not_attach_kwargs(self):
         middleware = AttachingConversationKwargs()
-        req = BoltRequest(body=channel_user_message_event_body, mode="socket_mode")
+        req = parse_request(BoltRequest(body=channel_user_message_event_body, mode="socket_mode"))
         req.context["client"] = WebClient(token="xoxb-test")
 
         resp = middleware.process(req=req, resp=BoltResponse(status=404), next=next)
@@ -186,7 +187,7 @@ class TestAttachingConversationKwargs:
 
     def test_non_event_does_not_attach_kwargs(self):
         middleware = AttachingConversationKwargs()
-        req = BoltRequest(body="payload={}", headers={})
+        req = parse_request(BoltRequest(body="payload={}", headers={}))
 
         resp = middleware.process(req=req, resp=BoltResponse(status=404), next=next)
 

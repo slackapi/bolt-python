@@ -11,13 +11,11 @@ def to_bolt_request(
     req: Request,
     body: bytes,
     addition_context_properties: Optional[Dict[str, Any]] = None,
-    defer_parsing: bool = False,
 ) -> BoltRequest:
     request = BoltRequest(
         body=body.decode("utf-8"),
         query=req.query_params,  # type: ignore[arg-type]
         headers=req.headers,  # type: ignore[arg-type]
-        defer_parsing=defer_parsing,
     )
     if addition_context_properties is not None:
         for k, v in addition_context_properties.items():
@@ -62,7 +60,7 @@ class SlackRequestHandler:
                     bolt_resp = oauth_flow.handle_callback(to_bolt_request(req, body, addition_context_properties))
                     return to_starlette_response(bolt_resp)
         elif req.method == "POST":
-            bolt_resp = self.app.dispatch(to_bolt_request(req, body, addition_context_properties, defer_parsing=True))
+            bolt_resp = self.app.dispatch(to_bolt_request(req, body, addition_context_properties))
             return to_starlette_response(bolt_resp)
 
         return Response(

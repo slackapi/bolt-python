@@ -23,14 +23,13 @@ from slack_bolt.request import BoltRequest
 from slack_bolt.response import BoltResponse
 
 
-def to_bolt_request(req: HttpRequest, defer_parsing: bool = False) -> BoltRequest:
+def to_bolt_request(req: HttpRequest) -> BoltRequest:
     raw_body: bytes = req.body
     body: str = raw_body.decode("utf-8") if raw_body else ""
     return BoltRequest(
         body=body,
         query=req.META["QUERY_STRING"],
         headers=req.headers,
-        defer_parsing=defer_parsing,
     )
 
 
@@ -175,7 +174,7 @@ class SlackRequestHandler:
                     bolt_resp = oauth_flow.handle_callback(to_bolt_request(req))
                     return to_django_response(bolt_resp)
         elif req.method == "POST":
-            bolt_resp = self.app.dispatch(to_bolt_request(req, defer_parsing=True))
+            bolt_resp = self.app.dispatch(to_bolt_request(req))
             return to_django_response(bolt_resp)
 
         return HttpResponse(status=404, content=b"Not Found")

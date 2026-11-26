@@ -4,12 +4,11 @@ from slack_bolt.context.context import BoltContext
 from slack_bolt.error import BoltError
 from slack_bolt.request.internals import (
     parse_query,
-    parse_body,
     build_normalized_headers,
-    build_context,
     extract_content_type,
     error_message_raw_body_required_in_http_mode,
 )
+from slack_bolt.util.utils import create_copy
 
 
 class BoltRequest:
@@ -22,7 +21,6 @@ class BoltRequest:
     lazy_only: bool
     lazy_function_name: Optional[str]
     mode: str  # either "http" or "socket_mode"
-    defer_parsing: bool
 
     def __init__(
         self,
@@ -32,9 +30,11 @@ class BoltRequest:
         headers: Optional[Dict[str, Union[str, Sequence[str]]]] = None,
         context: Optional[Dict[str, Any]] = None,
         mode: str = "http",  # either "http" or "socket_mode"
-        defer_parsing: bool = False,
     ):
         """Request to a Bolt app.
+
+        The body is parsed and the context is built from it when the app dispatches the request,
+        right after request verification, so unsigned payloads are never parsed.
 
         Args:
             body: The raw request body (only plain text is supported for "http" mode)
@@ -42,9 +42,6 @@ class BoltRequest:
             headers: The request headers.
             context: The context in this request.
             mode: The mode used for this request. (either "http" or "socket_mode")
-            defer_parsing: True to leave `body` empty and skip building `context` from it until
-                the built-in `RequestParsing` middleware runs after `RequestVerification`.
-                Adapters set this so unsigned payloads are never parsed.
         """
         if mode == "http":
             # HTTP Mode
@@ -66,36 +63,18 @@ class BoltRequest:
 
         self.body = body if isinstance(body, dict) else {}
         self.context = BoltContext(context if context else {})
-        self.defer_parsing = defer_parsing
-        if not defer_parsing:
-            self._parse_body_and_build_context()
         self.lazy_only = bool(self.headers.get("x-slack-bolt-lazy-only", [False])[0])
         self.lazy_function_name = self.headers.get("x-slack-bolt-lazy-function-name", [None])[0]
         self.mode = mode
 
-    def complete_deferred_parsing(self) -> None:
-        """Parses the body and builds the context of a request created with `defer_parsing=True`.
-
-        Context values set after the request was created take precedence over the ones in the body.
-        """
-        if not self.defer_parsing:
-            return
-        set_after_creation = dict(self.context)
-        self._parse_body_and_build_context()
-        self.context.update(set_after_creation)
-        self.defer_parsing = False
-
-    def _parse_body_and_build_context(self) -> None:
-        if self.raw_body:
-            self.body = parse_body(self.raw_body, self.content_type)
-        build_context(self.context, self.body)
-
     def to_copyable(self) -> "BoltRequest":
         body: Union[str, dict] = self.raw_body if self.mode == "http" else self.body
-        return BoltRequest(
+        copied = BoltRequest(
             body=body,
             query=self.query,
             headers=self.headers,
             context=self.context.to_copyable(),
             mode=self.mode,
         )
+        copied.body = create_copy(self.body)
+        return copied

@@ -36,7 +36,7 @@ class SlackRequestHandler:
                 bolt_resp = self.app.oauth_flow.handle_installation(bolt_req)
                 return to_flask_response(bolt_resp)
         elif req.method == "POST":
-            bolt_resp = self.app.dispatch(to_bolt_request(req, defer_parsing=True))
+            bolt_resp = self.app.dispatch(to_bolt_request(req))
             return to_flask_response(bolt_resp)
 
         return make_response("Not Found", 404)
