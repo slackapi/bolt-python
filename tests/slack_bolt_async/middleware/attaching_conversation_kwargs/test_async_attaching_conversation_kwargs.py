@@ -12,6 +12,7 @@ from tests.scenario_tests_async.test_events_assistant import (
     user_message_event_body,
     channel_user_message_event_body,
 )
+from tests.async_utils import async_parse_request
 
 
 async def next():
@@ -89,7 +90,7 @@ class TestAsyncAttachingConversationKwargs:
     @pytest.mark.asyncio
     async def test_assistant_event_attaches_kwargs(self):
         middleware = AsyncAttachingConversationKwargs()
-        req = AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode")
+        req = await async_parse_request(AsyncBoltRequest(body=thread_started_event_body, mode="socket_mode"))
         req.context["client"] = AsyncWebClient(token="xoxb-test")
 
         resp = await middleware.async_process(req=req, resp=BoltResponse(status=404), next=next)
@@ -104,7 +105,7 @@ class TestAsyncAttachingConversationKwargs:
     @pytest.mark.asyncio
     async def test_user_message_event_attaches_kwargs(self):
         middleware = AsyncAttachingConversationKwargs()
-        req = AsyncBoltRequest(body=user_message_event_body, mode="socket_mode")
+        req = await async_parse_request(AsyncBoltRequest(body=user_message_event_body, mode="socket_mode"))
         req.context["client"] = AsyncWebClient(token="xoxb-test")
 
         resp = await middleware.async_process(req=req, resp=BoltResponse(status=404), next=next)
@@ -119,7 +120,7 @@ class TestAsyncAttachingConversationKwargs:
     @pytest.mark.asyncio
     async def test_top_level_dm_attaches_suggested_prompts_but_not_set_title(self):
         middleware = AsyncAttachingConversationKwargs()
-        req = AsyncBoltRequest(body=top_level_im_message_event_body, mode="socket_mode")
+        req = await async_parse_request(AsyncBoltRequest(body=top_level_im_message_event_body, mode="socket_mode"))
         req.context["client"] = AsyncWebClient(token="xoxb-test")
 
         resp = await middleware.async_process(req=req, resp=BoltResponse(status=404), next=next)
@@ -136,7 +137,7 @@ class TestAsyncAttachingConversationKwargs:
     @pytest.mark.asyncio
     async def test_bot_dm_attaches_suggested_prompts(self):
         middleware = AsyncAttachingConversationKwargs()
-        req = AsyncBoltRequest(body=bot_im_message_event_body, mode="socket_mode")
+        req = await async_parse_request(AsyncBoltRequest(body=bot_im_message_event_body, mode="socket_mode"))
         req.context["client"] = AsyncWebClient(token="xoxb-test")
 
         resp = await middleware.async_process(req=req, resp=BoltResponse(status=404), next=next)
@@ -147,7 +148,7 @@ class TestAsyncAttachingConversationKwargs:
     @pytest.mark.asyncio
     async def test_file_share_dm_attaches_suggested_prompts(self):
         middleware = AsyncAttachingConversationKwargs()
-        req = AsyncBoltRequest(body=file_share_im_message_event_body, mode="socket_mode")
+        req = await async_parse_request(AsyncBoltRequest(body=file_share_im_message_event_body, mode="socket_mode"))
         req.context["client"] = AsyncWebClient(token="xoxb-test")
 
         resp = await middleware.async_process(req=req, resp=BoltResponse(status=404), next=next)
@@ -158,7 +159,7 @@ class TestAsyncAttachingConversationKwargs:
     @pytest.mark.asyncio
     async def test_app_home_opened_messages_tab_attaches_suggested_prompts(self):
         middleware = AsyncAttachingConversationKwargs()
-        req = AsyncBoltRequest(body=app_home_opened_messages_event_body, mode="socket_mode")
+        req = await async_parse_request(AsyncBoltRequest(body=app_home_opened_messages_event_body, mode="socket_mode"))
         req.context["client"] = AsyncWebClient(token="xoxb-test")
 
         resp = await middleware.async_process(req=req, resp=BoltResponse(status=404), next=next)
@@ -173,7 +174,7 @@ class TestAsyncAttachingConversationKwargs:
     @pytest.mark.asyncio
     async def test_app_home_opened_home_tab_does_not_attach_suggested_prompts(self):
         middleware = AsyncAttachingConversationKwargs()
-        req = AsyncBoltRequest(body=app_home_opened_home_event_body, mode="socket_mode")
+        req = await async_parse_request(AsyncBoltRequest(body=app_home_opened_home_event_body, mode="socket_mode"))
         req.context["client"] = AsyncWebClient(token="xoxb-test")
 
         resp = await middleware.async_process(req=req, resp=BoltResponse(status=404), next=next)
@@ -184,7 +185,7 @@ class TestAsyncAttachingConversationKwargs:
     @pytest.mark.asyncio
     async def test_non_assistant_event_does_not_attach_kwargs(self):
         middleware = AsyncAttachingConversationKwargs()
-        req = AsyncBoltRequest(body=channel_user_message_event_body, mode="socket_mode")
+        req = await async_parse_request(AsyncBoltRequest(body=channel_user_message_event_body, mode="socket_mode"))
         req.context["client"] = AsyncWebClient(token="xoxb-test")
 
         resp = await middleware.async_process(req=req, resp=BoltResponse(status=404), next=next)
@@ -198,7 +199,7 @@ class TestAsyncAttachingConversationKwargs:
     @pytest.mark.asyncio
     async def test_non_event_does_not_attach_kwargs(self):
         middleware = AsyncAttachingConversationKwargs()
-        req = AsyncBoltRequest(body="payload={}", headers={})
+        req = await async_parse_request(AsyncBoltRequest(body="payload={}", headers={}))
 
         resp = await middleware.async_process(req=req, resp=BoltResponse(status=404), next=next)
 

@@ -2,14 +2,13 @@ from typing import Dict, Optional, Union, Any, Sequence
 
 from slack_bolt.context.async_context import AsyncBoltContext
 from slack_bolt.error import BoltError
-from slack_bolt.request.async_internals import build_async_context
 from slack_bolt.request.internals import (
     parse_query,
-    parse_body,
     build_normalized_headers,
     extract_content_type,
     error_message_raw_body_required_in_http_mode,
 )
+from slack_bolt.util.utils import create_copy
 
 
 class AsyncBoltRequest:
@@ -59,24 +58,20 @@ class AsyncBoltRequest:
         self.headers = build_normalized_headers(headers)
         self.content_type = extract_content_type(self.headers)
 
-        if isinstance(body, str):
-            self.body = parse_body(self.raw_body, self.content_type)
-        elif isinstance(body, dict):
-            self.body = body
-        else:
-            self.body = {}
-
-        self.context = build_async_context(AsyncBoltContext(context if context else {}), self.body)
+        self.body = body if isinstance(body, dict) else {}
+        self.context = AsyncBoltContext(context if context else {})
         self.lazy_only = bool(self.headers.get("x-slack-bolt-lazy-only", [False])[0])
         self.lazy_function_name = self.headers.get("x-slack-bolt-lazy-function-name", [None])[0]
         self.mode = mode
 
     def to_copyable(self) -> "AsyncBoltRequest":
         body: Union[str, dict] = self.raw_body if self.mode == "http" else self.body
-        return AsyncBoltRequest(
+        copied = AsyncBoltRequest(
             body=body,
             query=self.query,
             headers=self.headers,
             context=self.context.to_copyable(),
             mode=self.mode,
         )
+        copied.body = create_copy(self.body)
+        return copied

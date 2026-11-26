@@ -17,8 +17,9 @@ class AsyncSslCheck(SslCheck, AsyncMiddleware):
         # only the internals of this method
         next: Callable[[], Awaitable[BoltResponse]],
     ) -> BoltResponse:
-        if self._is_ssl_check_request(req.body):
-            if self._verify_token_if_needed(req.body):
+        form_params = self._parse_form_params(req.raw_body)
+        if self._is_ssl_check_request(form_params):
+            if self._verify_token_if_needed(form_params):
                 return self._build_error_response()
             return self._build_success_response()
         else:
