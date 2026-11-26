@@ -72,7 +72,7 @@ class ChaliceSlackRequestHandler:
                     bolt_resp = oauth_flow.handle_installation(bolt_req)
                     return to_chalice_response(bolt_resp)
         elif method == "POST":
-            bolt_req = to_bolt_request(request, body)
+            bolt_req = to_bolt_request(request, body, defer_parsing=True)
             # https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
             aws_lambda_function_name = self.chalice.lambda_context.function_name
             bolt_req.context["aws_lambda_function_name"] = aws_lambda_function_name
@@ -81,7 +81,7 @@ class ChaliceSlackRequestHandler:
             aws_response = to_chalice_response(bolt_resp)
             return aws_response
         elif method == "NONE":
-            bolt_req = to_bolt_request(request, body)
+            bolt_req = to_bolt_request(request, body, defer_parsing=True)
             bolt_resp = self.app.dispatch(bolt_req)
             aws_response = to_chalice_response(bolt_resp)
             return aws_response
@@ -89,11 +89,12 @@ class ChaliceSlackRequestHandler:
         return not_found()
 
 
-def to_bolt_request(request: Request, body: str) -> BoltRequest:
+def to_bolt_request(request: Request, body: str, defer_parsing: bool = False) -> BoltRequest:
     return BoltRequest(
         body=body,
         query=request.query_params,  # type: ignore[arg-type]
         headers=request.headers,  # type: ignore[arg-type]
+        defer_parsing=defer_parsing,
     )
 
 

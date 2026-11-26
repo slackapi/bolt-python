@@ -6,11 +6,12 @@ from slack_bolt.request.async_request import AsyncBoltRequest
 from slack_bolt.response import BoltResponse
 
 
-async def to_bolt_request(request: web.Request) -> AsyncBoltRequest:
+async def to_bolt_request(request: web.Request, defer_parsing: bool = False) -> AsyncBoltRequest:
     return AsyncBoltRequest(
         body=await request.text(),
         query=request.query_string,
         headers=request.headers,  # type: ignore[arg-type]
+        defer_parsing=defer_parsing,
     )
 
 

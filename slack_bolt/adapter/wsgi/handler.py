@@ -41,7 +41,12 @@ class SlackRequestHandler:
 
     def dispatch(self, request: WsgiHttpRequest) -> BoltResponse:
         return self.app.dispatch(
-            BoltRequest(body=request.get_body(), query=request.query_string, headers=request.get_headers())
+            BoltRequest(
+                body=request.get_body(),
+                query=request.query_string,
+                headers=request.get_headers(),
+                defer_parsing=True,
+            )
         )
 
     def handle_installation(self, request: WsgiHttpRequest) -> BoltResponse:

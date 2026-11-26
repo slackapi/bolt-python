@@ -75,7 +75,7 @@ class AsyncSlackAppServer:
         if self.path != request.path:
             return web.Response(status=404)
 
-        bolt_req = await to_bolt_request(request)
+        bolt_req = await to_bolt_request(request, defer_parsing=True)
         bolt_resp: BoltResponse = await self.bolt_app.async_dispatch(bolt_req)
         return await to_aiohttp_response(bolt_resp)
 

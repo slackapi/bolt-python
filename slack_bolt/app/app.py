@@ -1573,6 +1573,7 @@ class SlackAppDevelopmentServer:
                     query=query,
                     # email.message.Message's mapping interface is dict compatible
                     headers=self.headers,
+                    defer_parsing=True,
                 )
                 bolt_resp: BoltResponse = _bolt_app.dispatch(bolt_req)
                 self._send_bolt_response(bolt_resp)

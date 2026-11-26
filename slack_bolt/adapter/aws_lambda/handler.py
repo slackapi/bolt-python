@@ -52,7 +52,7 @@ class SlackRequestHandler:
                     bolt_resp = oauth_flow.handle_installation(bolt_req)
                     return to_aws_response(bolt_resp)
         elif method == "POST":
-            bolt_req = to_bolt_request(event)
+            bolt_req = to_bolt_request(event, defer_parsing=True)
             # https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
             aws_lambda_function_name = context.function_name
             bolt_req.context["aws_lambda_function_name"] = aws_lambda_function_name
@@ -64,7 +64,7 @@ class SlackRequestHandler:
             aws_response = to_aws_response(bolt_resp)
             return aws_response
         elif method == "NONE":
-            bolt_req = to_bolt_request(event)
+            bolt_req = to_bolt_request(event, defer_parsing=True)
             bolt_resp = self.app.dispatch(bolt_req)
             aws_response = to_aws_response(bolt_resp)
             return aws_response
@@ -72,7 +72,7 @@ class SlackRequestHandler:
         return not_found()
 
 
-def to_bolt_request(event) -> BoltRequest:
+def to_bolt_request(event, defer_parsing: bool = False) -> BoltRequest:
     body = event.get("body") or ""
     if event.get("isBase64Encoded") is True and body:
         body = base64.b64decode(body).decode("utf-8")
@@ -90,6 +90,7 @@ def to_bolt_request(event) -> BoltRequest:
         body=body,
         query=event.get("queryStringParameters") or {},
         headers=headers,
+        defer_parsing=defer_parsing,
     )
 
 
