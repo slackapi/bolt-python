@@ -33,9 +33,6 @@ class BoltRequest:
     ):
         """Request to a Bolt app.
 
-        The body is parsed and the context is built from it when the app dispatches the request,
-        right after request verification, so unsigned payloads are never parsed.
-
         Args:
             body: The raw request body (only plain text is supported for "http" mode)
             query: The query string data in any data format.

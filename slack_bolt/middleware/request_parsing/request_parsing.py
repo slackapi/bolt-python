@@ -8,12 +8,6 @@ from slack_bolt.response import BoltResponse
 
 
 class RequestParsing(Middleware):
-    """Parses the request body and builds the context from it.
-
-    Runs right after `RequestVerification`, so unsigned payloads are never parsed.
-    Values already in the context take precedence over the ones in the body.
-    """
-
     def process(
         self,
         *,

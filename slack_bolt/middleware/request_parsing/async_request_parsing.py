@@ -9,12 +9,6 @@ from slack_bolt.response import BoltResponse
 
 
 class AsyncRequestParsing(AsyncMiddleware):
-    """Parses the request body and builds the context from it.
-
-    Runs right after `AsyncRequestVerification`, so unsigned payloads are never parsed.
-    Values already in the context take precedence over the ones in the body.
-    """
-
     async def async_process(
         self,
         *,
