@@ -48,13 +48,20 @@ class RequestVerification(Middleware):
         body = req.raw_body
         timestamp = req.headers.get("x-slack-request-timestamp", ["0"])[0]
         signature = req.headers.get("x-slack-signature", [""])[0]
-        if self.verifier.is_valid(body, timestamp, signature):
+        if self._is_valid_signature(body, timestamp, signature):
             return next()
         else:
             self._debug_log_error(signature, timestamp, body)
             return self._build_error_response()
 
     # -----------------------------------------
+
+    def _is_valid_signature(self, body: str, timestamp: str, signature: str) -> bool:
+        verifier = self.verifier
+        try:
+            return verifier.is_valid(body, timestamp, signature)
+        except (TypeError, ValueError):
+            return False
 
     @staticmethod
     def _can_skip(mode: str, body: Dict[str, Any]) -> bool:
