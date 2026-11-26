@@ -127,6 +127,29 @@ class TestAWSLambda:
         event = {"requestContext": {"http": {"method": "POST"}}, "headers": {}, "body": None, "isBase64Encoded": True}
         assert SlackRequestHandler(app).handle(event, self.context)["statusCode"] == 401
 
+    def test_malformed_unsigned_requests_are_rejected_before_parsing(self):
+        app = App(client=self.web_client, signing_secret=self.signing_secret)
+        app.event("member_joined_channel")(lambda: None)
+        malformed_bodies = [
+            json.dumps(
+                {
+                    "type": "event_callback",
+                    "event": {"type": "member_joined_channel", "user": "U0123456789", "channel": "C0123456789"},
+                }
+            ),
+            '{"type": "event_callback", "event": ',
+            "[1, 2, 3]",
+            json.dumps({"user": "U0123456789", "view": "V0123456789", "enterprise": 1}),
+        ]
+        for body in malformed_bodies:
+            event = {
+                "requestContext": {"http": {"method": "POST"}},
+                "headers": {"content-type": "application/json"},
+                "body": body,
+                "isBase64Encoded": False,
+            }
+            assert SlackRequestHandler(app).handle(event, self.context)["statusCode"] == 401
+
     def test_base64_encoded_body(self):
         app = App(client=self.web_client, signing_secret=self.signing_secret)
 
