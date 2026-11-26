@@ -1,5 +1,6 @@
 from logging import Logger
-from typing import Callable, Optional
+from typing import Callable, Dict, Optional
+from urllib.parse import parse_qsl
 
 from slack_bolt.logger import get_bolt_logger
 from slack_bolt.middleware.middleware import Middleware
@@ -38,14 +39,19 @@ class SslCheck(Middleware):
         # only the internals of this method
         next: Callable[[], BoltResponse],
     ) -> BoltResponse:
-        if self._is_ssl_check_request(req.body):
-            if self._verify_token_if_needed(req.body):
+        form_params = self._parse_form_params(req.raw_body)
+        if self._is_ssl_check_request(form_params):
+            if self._verify_token_if_needed(form_params):
                 return self._build_error_response()
             return self._build_success_response()
         else:
             return next()
 
     # -----------------------------------------
+
+    @staticmethod
+    def _parse_form_params(raw_body: str) -> Dict[str, str]:
+        return dict(parse_qsl(raw_body, keep_blank_values=True))
 
     @staticmethod
     def _is_ssl_check_request(body: dict):
